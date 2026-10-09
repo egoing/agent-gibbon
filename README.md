@@ -2,9 +2,10 @@
 
 에이전트가 CLI로 갱신하는 작은 플로팅 Markdown 메모. Tauri 2 + Rust + 시스템 WebView로 동작하며 웹 서버나 클라우드를 사용하지 않습니다.
 
-## 첫 프로토타입
+## 지원 기능
 
-- 단일 프레임리스 창, 제목 영역 드래그와 가장자리 크기 조절
+- ID로 구분하는 여러 프레임리스 메모 창, 제목 영역 드래그와 가장자리 크기 조절
+- 창별 배경색 지정과 읽기 쉬운 흑백 글자색 자동 선택
 - 상단 고정 토글, 제목·상태·갱신 시각 표시
 - `open`으로 앱 자동 실행과 표시, `update`로 부분 갱신, `close`로 숨기기
 - 갱신 시 포커스·위치·크기·숨김 상태 유지, 명시적인 `open`으로만 복원
@@ -12,7 +13,7 @@
 - 원시 HTML은 텍스트로 처리하고 sanitizer로 정리; 이미지·링크 이동·외부 리소스 차단
 - CLI는 stdout에 JSON 한 개를 반환; 오류는 `ok: false`와 종료 코드 1
 
-여러 메모, 자동 배치, 사용자 답변, 계정, 클라우드는 후속 범위입니다.
+자동 배치, 사용자 답변, 계정, 클라우드는 지원 범위에 포함하지 않습니다. 앱과 기본 사용 스킬은 작업계획 등 특정 워크플로우를 강제하지 않습니다.
 
 ## 빌드와 실행
 
@@ -53,13 +54,31 @@ printf '# 결과\n- [x] 구현 완료\n- [ ] 리뷰\n' | ./scripts/floatnote upd
 ./scripts/floatnote --help
 ```
 
+여러 창은 ID로 구분합니다. ID를 생략하면 기존과 같은 기본 창 `main`을 사용합니다.
+
+```sh
+./scripts/floatnote open --id research --title '자료' --color '#fff1b8' --markdown '# 조사 메모'
+./scripts/floatnote open --id build --title '구현' --color '#18304a' --markdown '# 구현 메모'
+./scripts/floatnote update --id research --color '#dcecff'
+./scripts/floatnote inspect --id build
+./scripts/floatnote close --id research
+./scripts/floatnote list
+```
+
+- ID는 영문·숫자·하이픈·밑줄 1~64자이며 대소문자를 구분합니다. 같은 ID의 `open`은 기존 창을 복원하고 다른 ID는 새 창을 만듭니다.
+- `update`·`close`·`inspect`는 기존 ID만 받습니다. 없는 창은 오류이며 다른 창에 대신 적용하지 않습니다.
+- 색상은 `open`·`update`의 `--color '#RRGGBB'`로 지정합니다. 기본값은 `#20252e`, 생략하면 기존 색상을 유지하며 응답은 소문자로 정규화됩니다. 빈 값·이름·알파 채널은 받지 않습니다. 기본색 복원은 `--color '#20252e'`입니다.
+- 색상은 창 전체 배경에 적용되고 글자색은 대비가 높은 흑백으로 선택됩니다. 코드·버튼 배경도 함께 바뀝니다.
+- 내용·색상·위치·크기·숨김·고정 상태는 창별로 독립적입니다. 생성 시 위치는 운영체제 기본 배치를 따르며 기존 창을 자동 재배치하지 않습니다.
+- `list`는 숨긴 창을 포함해 ID순으로 `id`, `title`, `status`, `color`, `visible`, `always_on_top`을 반환합니다. 본문은 개별 `inspect`로 확인합니다.
+
 `--title`, `--status`, `--markdown` 또는 `--file`은 `open`/`update`에서 사용합니다. 생략한 필드는 보존하며 빈 문자열은 값을 비웁니다. `--markdown`과 `--file`은 함께 쓸 수 없습니다. 요청 전체는 JSON 인코딩 후 1MiB 이하, 제목과 상태는 각각 UTF-8 1024바이트 이하입니다.
 
 `inspect`는 실제 창의 가시성·포커스·위치·크기·상단 고정과 현재 메모를 JSON으로 반환합니다. 좌표와 크기는 물리 픽셀입니다. 성공 응답은 네이티브 처리 완료를 뜻하며 화면은 최대 약 350ms 뒤 갱신됩니다. 갱신 시각은 Unix epoch 밀리초로 반환하며 화면에는 로컬 시각으로 표시합니다.
 
-앱이 실행되지 않았다면 `update`, `close`, `inspect`는 실패합니다. 자동 실행은 `open`만 수행합니다. 닫기 버튼·Escape·네이티브 닫기 요청은 프로세스를 종료하지 않고 창만 숨깁니다. 숨긴 뒤에도 메모 내용을 갱신할 수 있습니다. 직접 앱 번들을 실행하는 것도 명시적인 열기로 취급합니다.
+앱이 실행되지 않았다면 `update`, `close`, `inspect`, `list`는 실패합니다. 자동 실행은 `open`만 수행합니다. 닫기 버튼·Escape·네이티브 닫기 요청은 프로세스를 종료하지 않고 창만 숨깁니다. 숨긴 뒤에도 메모 내용을 갱신할 수 있습니다. 직접 앱 번들을 실행하는 것도 명시적인 열기로 취급합니다.
 
-첫 버전은 메모·위치·크기를 메모리에만 보관합니다. 프로세스를 완전히 종료하면 초기화되며, 재부팅 후 자동 실행하지 않습니다. 종료가 필요하면 활성 상태 보기에서 Floatnote 프로세스를 종료할 수 있습니다. 시작 오류 진단은 `src-tauri/target/release/floatnote --serve`를 사용합니다.
+메모·색상·위치·크기를 메모리에만 보관합니다. `close`는 삭제가 아니므로 숨긴 창도 같은 ID로 다시 열 수 있습니다. 프로세스를 완전히 종료하면 모든 창 상태가 초기화되며, 재부팅 후 자동 실행하지 않습니다. 종료가 필요하면 활성 상태 보기에서 Floatnote 프로세스를 종료할 수 있습니다. 구버전 앱이 실행 중이면 새 CLI의 ID·색상 요청을 처리할 수 없으므로, 필요한 메모를 보존한 후 프로세스를 종료하고 새 실행 파일로 다시 여세요. 시작 오류 진단은 `src-tauri/target/release/floatnote --serve`를 사용합니다.
 
 ## 로컬 통신과 안전한 렌더링
 
@@ -69,7 +88,7 @@ Rust에서 Markdown을 HTML로 변환하고 정리한 뒤 WebView에 전달합�
 
 ## 프로젝트 로컬 스킬
 
-[Floatnote 사용 스킬](.agents/skills/floatnote/SKILL.md)은 에이전트가 이 프로젝트의 실제 CLI로 진행 상태를 표시하는 절차와 숨김 보존 규칙을 담고 있습니다. 예제는 [examples/progress.md](examples/progress.md)입니다.
+[Floatnote 사용 스킬](.agents/skills/floatnote/SKILL.md)은 에이전트가 실제 CLI의 창 생성·조회·갱신·색상 지정과 숨김 보존 규칙을 담고 있습니다. 작업계획 표시 같은 운영 정책은 사용자 `AGENTS.md`에서 정합니다. 예제는 [examples/progress.md](examples/progress.md)입니다.
 
 ## 검증
 
@@ -79,11 +98,15 @@ npm run check
 cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
 node --check ui/app.js
 python3 scripts/smoke.py
+python3 scripts/multiwindow-smoke.py
 # macOS 자동화/손쉬운 사용 권한이 있는 환경에서 UI 버튼 검증
 python3 scripts/macos-ui-smoke.py
+python3 scripts/multiwindow-ui-smoke.py
 ```
 
-`smoke.py`는 실제 앱을 실행하거나 기존 앱의 메모를 교체하고 마지막에 숨깁니다. 포커스·위치·크기 보존, 반복 갱신, 닫은 뒤 갱신, 다시 열기, JSON 오류, 한글 체크리스트와 위험한 HTML 차단을 검사합니다. 실행 중 메모와 사용자 입력을 동시에 조작하지 마세요. `macos-ui-smoke.py`는 실제 WebView의 한글·체크리스트·시각과 고정/숨기기 버튼을 macOS 접근성 API로 검증합니다. 다른 앱에 포커스를 둔 상태에서 실행하세요. 마우스 드래그와 크기 조절은 별도로 확인합니다.
+`multiwindow-smoke.py`는 별도 ID의 창 두 개로 독립 상태·색상·목록·잘못된 IPC·기본 창 호환성을 검사하고 테스트 창만 숨깁니다.
+
+`smoke.py`는 실제 앱을 실행하거나 기존 앱의 메모를 교체하고 마지막에 숨깁니다. 포커스·위치·크기 보존, 반복 갱신, 닫은 뒤 갱신, 다시 열기, JSON 오류, 한글 체크리스트와 위험한 HTML 차단을 검사합니다. 실행 중 메모와 사용자 입력을 동시에 조작하지 마세요. `macos-ui-smoke.py`는 실제 WebView의 한글·체크리스트·시각과 고정/숨기기 버튼을 macOS 접근성 API로 검증합니다. `multiwindow-ui-smoke.py`는 두 창의 본문과 고정/숨기기 버튼이 해당 창에만 적용되는지 확인합니다. 화면 잠금을 해제하고 다른 앱에 포커스를 둔 상태에서 실행하세요. 마우스 드래그와 크기 조절은 별도로 확인합니다.
 
 환경과 수행 결과는 [검증 기록](docs/verification.md)에 기록합니다.
 

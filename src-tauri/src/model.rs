@@ -11,20 +11,67 @@ pub enum Action {
     Update,
     Close,
     Inspect,
+    List,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Request {
     pub action: Action,
+    pub id: Option<String>,
+    pub color: Option<String>,
     pub title: Option<String>,
     pub markdown: Option<String>,
     pub status: Option<String>,
 }
 
+impl Request {
+    pub fn id(&self) -> &str {
+        self.id.as_deref().unwrap_or("main")
+    }
+
+    pub fn validate(&self) -> Result<(), String> {
+        let id = self.id();
+        if id.is_empty()
+            || id.len() > 64
+            || !id
+                .bytes()
+                .all(|c| c.is_ascii_alphanumeric() || c == b'-' || c == b'_')
+        {
+            return Err("창 ID는 영문·숫자·하이픈·밑줄 1~64자여야 합니다".into());
+        }
+        if self.title.as_ref().is_some_and(|s| s.len() > 1024)
+            || self.status.as_ref().is_some_and(|s| s.len() > 1024)
+        {
+            return Err("제목과 상태는 각각 1024바이트 이하여야 합니다".into());
+        }
+        if let Some(color) = &self.color {
+            if color.len() != 7
+                || !color.starts_with('#')
+                || !color.as_bytes()[1..].iter().all(u8::is_ascii_hexdigit)
+            {
+                return Err("색상은 #RRGGBB 형식이어야 합니다".into());
+            }
+        }
+        if matches!(self.action, Action::Close | Action::Inspect | Action::List)
+            && (self.title.is_some()
+                || self.markdown.is_some()
+                || self.status.is_some()
+                || self.color.is_some())
+        {
+            return Err("close/inspect/list에는 내용·색상 옵션을 사용할 수 없습니다".into());
+        }
+        if matches!(self.action, Action::List) && self.id.is_some() {
+            return Err("list에는 창 ID를 지정할 수 없습니다".into());
+        }
+        Ok(())
+    }
+}
+
 #[derive(Clone, Serialize)]
 pub struct Note {
     pub title: String,
+    pub color: String,
     pub html: String,
     pub status: String,
     pub updated_at: u64,
@@ -34,6 +81,7 @@ impl Default for Note {
     fn default() -> Self {
         Self {
             title: "Floatnote".into(),
+            color: "#20252e".into(),
             html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),
             status: "대기".into(),
             updated_at: 0,
@@ -43,16 +91,15 @@ impl Default for Note {
 }
 impl Note {
     pub fn apply(&mut self, request: &Request) -> Result<(), String> {
-        if request.title.as_ref().is_some_and(|s| s.len() > 1024)
-            || request.status.as_ref().is_some_and(|s| s.len() > 1024)
-        {
-            return Err("제목과 상태는 각각 1024바이트 이하여야 합니다".into());
-        }
-        if matches!(request.action, Action::Close | Action::Inspect) {
-            if request.title.is_some() || request.markdown.is_some() || request.status.is_some() {
-                return Err("close/inspect에는 내용 옵션을 사용할 수 없습니다".into());
-            }
+        request.validate()?;
+        if matches!(
+            request.action,
+            Action::Close | Action::Inspect | Action::List
+        ) {
             return Ok(());
+        }
+        if let Some(color) = &request.color {
+            self.color = color.to_ascii_lowercase();
         }
         if let Some(title) = &request.title {
             self.title = title.clone();
@@ -106,6 +153,8 @@ mod tests {
     fn partial_updates_preserve_unspecified_fields() {
         let mut note = Note::default();
         note.apply(&Request {
+            id: None,
+            color: None,
             action: Action::Open,
             title: Some("작업".into()),
             markdown: Some("본문".into()),
@@ -113,6 +162,8 @@ mod tests {
         })
         .unwrap();
         note.apply(&Request {
+            id: None,
+            color: None,
             action: Action::Update,
             title: None,
             markdown: None,
@@ -128,6 +179,8 @@ mod tests {
         let mut note = Note::default();
         assert!(note
             .apply(&Request {
+                id: None,
+                color: None,
                 action: Action::Update,
                 title: Some("x".repeat(1025)),
                 markdown: None,
@@ -135,5 +188,66 @@ mod tests {
             })
             .is_err());
         assert_eq!(note.revision, 0);
+    }
+    #[test]
+    fn old_requests_keep_default_window_and_color() {
+        let request: Request =
+            serde_json::from_str(r#"{"action":"open","title":"legacy"}"#).unwrap();
+        assert_eq!(request.id(), "main");
+        let mut note = Note::default();
+        note.apply(&request).unwrap();
+        assert_eq!(note.color, "#20252e");
+    }
+
+    #[test]
+    fn color_updates_are_normalized_preserved_and_atomic() {
+        let mut note = Note::default();
+        let request: Request =
+            serde_json::from_str(r##"{"action":"update","color":"#AABBCC"}"##).unwrap();
+        note.apply(&request).unwrap();
+        assert_eq!(note.color, "#aabbcc");
+        let request: Request =
+            serde_json::from_str(r#"{"action":"update","status":"done"}"#).unwrap();
+        note.apply(&request).unwrap();
+        assert_eq!(note.color, "#aabbcc");
+        let before = serde_json::to_value(&note).unwrap();
+        for color in [
+            "",
+            "red",
+            "#abc",
+            "#00000000",
+            "#GG0000",
+            "#fffff;",
+            "#한글",
+        ] {
+            let request: Request = serde_json::from_value(
+                serde_json::json!({"action":"update","title":"bad","color":color}),
+            )
+            .unwrap();
+            assert!(note.apply(&request).is_err(), "{color}");
+            assert_eq!(serde_json::to_value(&note).unwrap(), before);
+        }
+    }
+
+    #[test]
+    fn invalid_ids_and_read_only_options_are_rejected() {
+        for id in ["", "a/b", "../main", "a b", "한글", &"x".repeat(65)] {
+            let request: Request =
+                serde_json::from_value(serde_json::json!({"action":"open","id":id})).unwrap();
+            assert!(request.validate().is_err(), "{id}");
+        }
+        for id in ["main", "note-main", "Job_2026-01", &"x".repeat(64)] {
+            let request: Request =
+                serde_json::from_value(serde_json::json!({"action":"open","id":id})).unwrap();
+            request.validate().unwrap();
+        }
+        for action in ["close", "inspect", "list"] {
+            let request: Request =
+                serde_json::from_value(serde_json::json!({"action":action,"color":"#112233"}))
+                    .unwrap();
+            assert!(request.validate().is_err());
+        }
+        let request: Request = serde_json::from_str(r#"{"action":"list","id":"main"}"#).unwrap();
+        assert!(request.validate().is_err());
     }
 }

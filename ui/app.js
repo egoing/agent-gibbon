@@ -1,4 +1,5 @@
 'use strict';
+import { themeFor } from './theme.mjs';
 const { invoke } = window.__TAURI__.core;
 const win = window.__TAURI__.window.getCurrentWindow();
 const $ = (id) => document.getElementById(id);
@@ -8,6 +9,12 @@ async function refresh() {
   try {
     const state = await invoke('snapshot');
     if (revision !== state.note.revision) {
+      const theme = themeFor(state.note.color);
+      document.documentElement.style.setProperty('--background', state.note.color);
+      document.documentElement.style.setProperty('--foreground', theme.foreground);
+      document.documentElement.style.colorScheme = theme.scheme;
+      document.documentElement.style.setProperty('--border', theme.border);
+      document.documentElement.style.setProperty('--panel', theme.panel);
       $('title').textContent = state.note.title;
       // HTML is generated and sanitized in Rust; no user HTML reaches this sink.
       $('content').innerHTML = state.note.html;

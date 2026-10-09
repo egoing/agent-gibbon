@@ -1,6 +1,36 @@
-# 프로토타입 검증 기록
+# Floatnote 검증 기록
 
 검증일: 2026-10-10 (Asia/Seoul)
+
+## 다중 창·색상 확장 — 이슈 #3
+
+현재 Floatnote 폴더의 `3-multiwindow-color` 브랜치에서 구현했습니다. 아래 초기 프로토타입 기록과 구분합니다.
+
+| 검증 | 결과 |
+|---|---|
+| 기준 테스트 | 변경 전 Rust 4개 통과 |
+| `npm test` | Rust 9개 + Node 2개 통과. ID/색상 검증, 거부 시 원자성, 기본 창 호환, 중복 옵션, 라벨 충돌 및 4,096개 RGB 샘플의 본문·코드/버튼 배경 대비 검사 |
+| `npm run check` | Clippy 모든 타깃, 경고를 오류로 처리하여 통과 |
+| Rustfmt / JS / Python 문법 / diff 공백 | 통과 |
+| `npm run build` | Intel x86_64 release 실행 파일과 Floatnote.app 생성 성공 |
+| `python3 scripts/smoke.py` | 기존 기본 창 CLI 회귀 통과 |
+| `python3 scripts/multiwindow-smoke.py` | 실제 창 2개의 독립 내용·색상·목록·반복 갱신·숨김·재열기·위치/크기/포커스 상태 보존, 잘못된 raw IPC 거부, 기본 창 호환 통과 |
+| `python3 scripts/multiwindow-ui-smoke.py` | 실행했으나 미완료: macOS 화면 잠금으로 System Events가 창을 조회하지 못함(exit 1, -1728). 버튼 격리와 실제 렌더링은 미검증 |
+| 실화면 색상·드래그·리사이즈 | 이번 확장에서는 미검증. 초기 프로토타입 결과를 새 다중 창 검증으로 간주하지 않음 |
+
+첫 빌드는 로컬 npm 의존성 미설치로 `tauri: command not found`(127)였으며 `npm ci` 후 성공했습니다. UI 테스트 작성 중 AppleScript 문자열의 Unicode 이스케이프 오류를 고쳤으나, 수정 후 실행은 화면 잠금 때문에 중단됐습니다. CoreGraphics 세션 정보로 잠금 상태를 확인했고, 잠금 해제는 자동 수행하지 않았습니다.
+
+실제 CLI의 네이티브 상태는 검증했지만, 잠긴 세션에서는 사용자가 보는 포커스·색상과 버튼 동작을 최종 확인할 수 없습니다. 구버전 프로세스에서 신버전으로 전환할 때 창 위치가 기본값으로 초기화됐으며, 잠금 때문에 접근성 API로 이전 위치를 복원하지 못했습니다. 이는 프로세스 재시작 시 상태를 초기화하는 기존 정책입니다.
+
+수동 확인: 화면 잠금을 해제한 뒤 다른 앱에 포커스를 두고 `python3 scripts/multiwindow-ui-smoke.py`를 실행합니다. 이어 서로 다른 ID로 밝은 색과 어두운 색 창을 열어 배경과 글자 가독성을 확인하고, 각각 드래그·리사이즈한 뒤 다른 창의 `update`가 위치나 크기를 바꾸지 않는지 확인합니다. 테스트용 창은 종료 시 숨겨집니다.
+
+- Conf 5(실제 네이티브 CLI 검증), Risk Medium(다중 창 상태와 CLI 계약 변경). GUI 미검증 범위는 위와 같습니다.
+- 메모·색상·위치의 영구 저장 및 프로세스 간 자동 복원은 범위 밖입니다.
+- 창 생성과 권한 범위는 [Tauri WebviewWindowBuilder](https://docs.rs/tauri/2.12.2/tauri/webview/struct.WebviewWindowBuilder.html)와 [Capabilities](https://v2.tauri.app/security/capabilities/)를 확인했습니다.
+
+## 초기 프로토타입 기록
+
+다음은 확장 전 단일 창 버전의 검증 기록입니다.
 
 ## 환경
 
