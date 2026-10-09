@@ -1,0 +1,1 @@
+{"name":"floatnote","version":"0.1.0","private":true,"scripts":{"build":"tauri build --bundles app","dev":"tauri dev","check":"cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings","test":"cargo test --manifest-path src-tauri/Cargo.toml"},"devDependencies":{"@tauri-apps/cli":"^2.0.0"}}

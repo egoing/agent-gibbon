@@ -1,0 +1,139 @@
+use pulldown_cmark::{html, Event, Options, Parser};
+use serde::{Deserialize, Serialize};
+use std::time::{SystemTime, UNIX_EPOCH};
+
+pub const MAX_REQUEST: u64 = 1024 * 1024;
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Action {
+    Open,
+    Update,
+    Close,
+    Inspect,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct Request {
+    pub action: Action,
+    pub title: Option<String>,
+    pub markdown: Option<String>,
+    pub status: Option<String>,
+}
+
+#[derive(Clone, Serialize)]
+pub struct Note {
+    pub title: String,
+    pub html: String,
+    pub status: String,
+    pub updated_at: u64,
+    pub revision: u64,
+}
+impl Default for Note {
+    fn default() -> Self {
+        Self {
+            title: "Floatnote".into(),
+            html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),
+            status: "대기".into(),
+            updated_at: 0,
+            revision: 0,
+        }
+    }
+}
+impl Note {
+    pub fn apply(&mut self, request: &Request) -> Result<(), String> {
+        if request.title.as_ref().is_some_and(|s| s.len() > 1024)
+            || request.status.as_ref().is_some_and(|s| s.len() > 1024)
+        {
+            return Err("제목과 상태는 각각 1024바이트 이하여야 합니다".into());
+        }
+        if matches!(request.action, Action::Close | Action::Inspect) {
+            if request.title.is_some() || request.markdown.is_some() || request.status.is_some() {
+                return Err("close/inspect에는 내용 옵션을 사용할 수 없습니다".into());
+            }
+            return Ok(());
+        }
+        if let Some(title) = &request.title {
+            self.title = title.clone();
+        }
+        if let Some(markdown) = &request.markdown {
+            self.html = render(markdown);
+        }
+        if let Some(status) = &request.status {
+            self.status = status.clone();
+        }
+        self.updated_at = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis() as u64;
+        self.revision += 1;
+        Ok(())
+    }
+}
+
+pub fn render(markdown: &str) -> String {
+    let parser = Parser::new_ext(
+        markdown,
+        Options::ENABLE_TASKLISTS | Options::ENABLE_STRIKETHROUGH | Options::ENABLE_TABLES,
+    )
+    .map(|event| match event {
+        Event::Html(raw) | Event::InlineHtml(raw) => Event::Text(raw),
+        Event::TaskListMarker(checked) => Event::Text(if checked { "☑ " } else { "☐ " }.into()),
+        other => other,
+    });
+    let mut output = String::new();
+    html::push_html(&mut output, parser);
+    // No images, navigation, arbitrary HTML or executable URL schemes.
+    ammonia::Builder::default()
+        .rm_tags(&["img"])
+        .rm_tag_attributes("a", &["href"])
+        .clean(&output)
+        .to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn renders_korean_tasks_and_blocks_active_content() {
+        let html = render("# 한글\n- [x] 완료\n- [ ] 대기\n<script>alert(1)</script>\n<img src=x onerror=alert(1)>\n[실행](javascript:alert(1))\n![외부](https://example.com/tracker)");
+        assert!(html.contains("<h1>한글</h1>"));
+        assert!(html.contains("☑ 완료") && html.contains("☐ 대기"));
+        assert!(!html.contains("<script") && !html.contains("<img") && !html.contains("href="));
+    }
+    #[test]
+    fn partial_updates_preserve_unspecified_fields() {
+        let mut note = Note::default();
+        note.apply(&Request {
+            action: Action::Open,
+            title: Some("작업".into()),
+            markdown: Some("본문".into()),
+            status: None,
+        })
+        .unwrap();
+        note.apply(&Request {
+            action: Action::Update,
+            title: None,
+            markdown: None,
+            status: Some("완료".into()),
+        })
+        .unwrap();
+        assert_eq!(note.title, "작업");
+        assert!(note.html.contains("본문"));
+        assert_eq!(note.revision, 2);
+    }
+    #[test]
+    fn rejected_update_does_not_change_note() {
+        let mut note = Note::default();
+        assert!(note
+            .apply(&Request {
+                action: Action::Update,
+                title: Some("x".repeat(1025)),
+                markdown: None,
+                status: None
+            })
+            .is_err());
+        assert_eq!(note.revision, 0);
+    }
+}
