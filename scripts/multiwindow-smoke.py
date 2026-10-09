@@ -55,6 +55,16 @@ try:
     assert first['note']['color'] == '#ffe8a3'
     assert second['note']['color'] == '#18304a'
     assert first['visible'] and second['visible']
+    def overlaps(left, right):
+        x, y = left['position']['x'], left['position']['y']
+        u, v = right['position']['x'], right['position']['y']
+        return x < u + right['size']['width'] and x + left['size']['width'] > u and y < v + right['size']['height'] and y + left['size']['height'] > v
+    assert not overlaps(first, second), 'new notes overlap'
+    for entry in call('list')['windows']:
+        if entry['visible'] and entry['id'] not in (a, b):
+            other = snapshot(entry['id'])
+            assert not overlaps(first, other) and not overlaps(second, other)
+
     assert snapshot(a) == first
     stable(default, call('inspect'))
     assert default['note'] == call('inspect')['note']
@@ -86,7 +96,7 @@ try:
     legacy = raw({'action': 'inspect'})
     assert legacy['id'] == 'main' and legacy['note'] == default['note']
     stable(default, legacy)
-    print('PASS: two independent windows, default compatibility, colors, invalid raw IPC atomicity, missing IDs, sorted list, repeated updates, focus/geometry/hidden preservation, reuse')
+    print('PASS: two independent non-overlapping windows, default compatibility, colors, invalid raw IPC atomicity, missing IDs, sorted list, repeated updates, focus/geometry/hidden preservation, reuse')
 finally:
     for note_id in created:
         call('close', '--id', note_id)

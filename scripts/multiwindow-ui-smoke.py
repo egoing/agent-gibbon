@@ -35,7 +35,8 @@ def contents(note_id):
 
 
 def click(note_id, control):
-    root = 'group 1 of UI element 1 of scroll area 1 of group 1 of group 1 of ' + ref(note_id)
+    title = cli('inspect', '--id', note_id)['note']['title'] or '메모 내용'
+    root = 'group ' + json.dumps(title, ensure_ascii=False) + ' of UI element 1 of scroll area 1 of group 1 of group 1 of ' + ref(note_id)
     apple(f'tell application "System Events" to tell process "floatnote" to click {control} of {root}')
     time.sleep(0.3)
 
@@ -59,7 +60,24 @@ try:
     for note_id, present, absent in [(a, '☑ 알파 완료', '베타 대기'), (b, '☐ 베타 대기', '알파 완료')]:
         text = contents(note_id)
         assert present in text and absent not in text, text
-        assert '갱신' in text
+        assert '갱신' not in text
+    # Actual pointer input validates the thin drag strip and resize hit areas.
+    frame = apple('tell application "System Events" to tell process "floatnote" to get {position, size} of ' + ref(a))
+    x, y, width, height = map(float, frame.split(','))
+    before_drag = cli('inspect', '--id', a)
+    subprocess.run(['/usr/bin/swift', str(ROOT / 'scripts/macos-input.swift'), 'drag', str(x + 60), str(y + 5), str(x + 100), str(y + 25)], check=True, capture_output=True, timeout=15)
+    time.sleep(.4)
+    after_drag = cli('inspect', '--id', a)
+    assert after_drag['position'] != before_drag['position'], 'thin drag strip did not move the window'
+    assert cli('inspect', '--id', b)['position'] == second['position']
+    frame = apple('tell application "System Events" to tell process "floatnote" to get {position, size} of ' + ref(a))
+    x, y, width, height = map(float, frame.split(','))
+    subprocess.run(['/usr/bin/swift', str(ROOT / 'scripts/macos-input.swift'), 'drag', str(x + width - 2), str(y + height - 2), str(x + width + 28), str(y + height + 18)], check=True, capture_output=True, timeout=15)
+    time.sleep(.4)
+    after_resize = cli('inspect', '--id', a)
+    assert after_resize['size']['width'] > after_drag['size']['width']
+    assert after_resize['size']['height'] > after_drag['size']['height']
+    assert cli('inspect', '--id', b)['size'] == second['size']
     click(a, 'checkbox "상단 고정"')
     assert cli('inspect', '--id', a)['always_on_top'] != first['always_on_top']
     assert cli('inspect', '--id', b)['always_on_top'] == second['always_on_top']
@@ -80,7 +98,7 @@ try:
     assert not cli('update', '--id', a, '--color', '#112233')['visible']
     restore_front(front)
     assert cli('open', '--id', a)['visible'] and active() == front
-    print('PASS: separate WebView contents, Korean/tasks/timestamp, per-window pin/hide controls, content refresh, background focus preservation, hidden color update and explicit reopen')
+    print('PASS: separate WebView contents, Korean/task rows without footer, per-window pin/hide controls, content refresh, thin-strip drag/corner resize, background focus preservation, hidden color update and explicit reopen')
 finally:
     for note_id in created:
         cli('close', '--id', note_id)
