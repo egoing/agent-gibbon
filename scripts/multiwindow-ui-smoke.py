@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import subprocess
 import time
+import tempfile
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -61,15 +62,22 @@ try:
         text = contents(note_id)
         assert present in text and absent not in text, text
         assert '갱신' not in text
-    # Actual pointer input validates the thin drag strip and resize hit areas.
+    # Drag from rendered text, then empty body space; no tiny handle or modifier.
     frame = apple('tell application "System Events" to tell process "floatnote" to get {position, size} of ' + ref(a))
     x, y, width, height = map(float, frame.split(','))
     before_drag = cli('inspect', '--id', a)
-    subprocess.run(['/usr/bin/swift', str(ROOT / 'scripts/macos-input.swift'), 'drag', str(x + 60), str(y + 5), str(x + 100), str(y + 25)], check=True, capture_output=True, timeout=15)
+    subprocess.run(['/usr/bin/swift', str(ROOT / 'scripts/macos-input.swift'), 'drag', str(x + 60), str(y + 33), str(x + 100), str(y + 53)], check=True, capture_output=True, timeout=15)
     time.sleep(.4)
     after_drag = cli('inspect', '--id', a)
-    assert after_drag['position'] != before_drag['position'], 'thin drag strip did not move the window'
+    assert after_drag['position'] != before_drag['position'], 'dragging rendered text did not move the window'
     assert cli('inspect', '--id', b)['position'] == second['position']
+    frame = apple('tell application "System Events" to tell process "floatnote" to get {position, size} of ' + ref(a))
+    x, y, width, height = map(float, frame.split(','))
+    subprocess.run(['/usr/bin/swift', str(ROOT / 'scripts/macos-input.swift'), 'drag', str(x + width / 2), str(y + height - 30), str(x + width / 2 + 20), str(y + height - 10)], check=True, capture_output=True, timeout=15)
+    time.sleep(.4)
+    after_blank_drag = cli('inspect', '--id', a)
+    assert after_blank_drag['position'] != after_drag['position'], 'dragging empty body space did not move the window'
+
     frame = apple('tell application "System Events" to tell process "floatnote" to get {position, size} of ' + ref(a))
     x, y, width, height = map(float, frame.split(','))
     subprocess.run(['/usr/bin/swift', str(ROOT / 'scripts/macos-input.swift'), 'drag', str(x + width - 2), str(y + height - 2), str(x + width + 28), str(y + height + 18)], check=True, capture_output=True, timeout=15)
@@ -78,6 +86,26 @@ try:
     assert after_resize['size']['width'] > after_drag['size']['width']
     assert after_resize['size']['height'] > after_drag['size']['height']
     assert cli('inspect', '--id', b)['size'] == second['size']
+    with tempfile.TemporaryDirectory(prefix='floatnote-clipboard-') as folder:
+        saved = str(Path(folder) / 'clipboard.plist')
+        helper = str(ROOT / 'scripts/macos-clipboard.swift')
+        subprocess.run(['/usr/bin/swift', helper, 'save', saved], check=True, capture_output=True, timeout=15)
+        copied = False
+        try:
+            before_copy = cli('inspect', '--id', a)
+            click(a, 'button "본문 복사"')
+            pasted = subprocess.check_output(['/usr/bin/pbpaste'], text=True)
+            copied = '알파 완료' in pasted
+            assert copied and '첫째 창' in pasted and '베타 대기' not in pasted
+            assert '본문 복사' not in pasted and '메모 숨기기' not in pasted
+            after_copy = cli('inspect', '--id', a)
+            assert after_copy['position'] == before_copy['position'], 'copy button dragged the window'
+            assert after_copy['size'] == before_copy['size']
+        finally:
+            # Do not replace a new clipboard value copied concurrently by the user.
+            current = subprocess.check_output(['/usr/bin/pbpaste'], text=True)
+            if copied and current == pasted:
+                subprocess.run(['/usr/bin/swift', helper, 'restore', saved], check=True, capture_output=True, timeout=15)
     click(a, 'checkbox "상단 고정"')
     assert cli('inspect', '--id', a)['always_on_top'] != first['always_on_top']
     assert cli('inspect', '--id', b)['always_on_top'] == second['always_on_top']
@@ -98,7 +126,7 @@ try:
     assert not cli('update', '--id', a, '--color', '#112233')['visible']
     restore_front(front)
     assert cli('open', '--id', a)['visible'] and active() == front
-    print('PASS: separate WebView contents, Korean/task rows without footer, per-window pin/hide controls, content refresh, thin-strip drag/corner resize, background focus preservation, hidden color update and explicit reopen')
+    print('PASS: separate WebView contents, Korean/task rows without footer, per-window pin/hide controls, content refresh, whole-body text/blank drag, copy button and clipboard restoration, corner resize, background focus preservation, hidden color update and explicit reopen')
 finally:
     for note_id in created:
         cli('close', '--id', note_id)
