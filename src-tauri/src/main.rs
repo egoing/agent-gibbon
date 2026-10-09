@@ -4,6 +4,7 @@ use model::{Action, Note, Request, MAX_REQUEST};
 use serde_json::{json, Value};
 use std::os::unix::process::CommandExt;
 use std::{
+    collections::BTreeMap,
     io::{Read, Write},
     process::{Command, Stdio},
     sync::{mpsc, Mutex},
@@ -11,10 +12,27 @@ use std::{
 };
 use tauri::{Manager, State};
 
-type AppNote = Mutex<Note>;
-fn window(app: &tauri::AppHandle) -> Result<tauri::WebviewWindow, String> {
-    app.get_webview_window("main")
-        .ok_or("메모 창을 찾을 수 없습니다".into())
+type AppNotes = Mutex<BTreeMap<String, Note>>;
+fn label(id: &str) -> String {
+    if id == "main" {
+        "main".into()
+    } else {
+        format!("note-{id}")
+    }
+}
+fn window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindow, String> {
+    app.get_webview_window(&label(id)).ok_or_else(|| {
+        format!("메모 창을 찾을 수 없습니다: {id}. 먼저 open --id {id}를 실행하세요")
+    })
+}
+fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindow, String> {
+    let mut config = app.config().app.windows[0].clone();
+    config.label = label(id);
+    config.title = format!("Floatnote — {id}");
+    tauri::WebviewWindowBuilder::from_config(app, &config)
+        .map_err(|e| e.to_string())?
+        .build()
+        .map_err(|e| e.to_string())
 }
 // Called only on Tauri's main thread. macOS `show()` makes the window key;
 // ordering it front directly preserves the user's active application.
@@ -32,47 +50,86 @@ fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
     #[cfg(not(target_os = "macos"))]
     win.show().map_err(|e| e.to_string())
 }
-#[tauri::command]
-fn snapshot(app: tauri::AppHandle, note: State<AppNote>) -> Result<Value, String> {
-    let win = window(&app)?;
+fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<Value, String> {
     let position = win.outer_position().map_err(|e| e.to_string())?;
     let size = win.outer_size().map_err(|e| e.to_string())?;
     Ok(
-        json!({"ok":true,"note":*note.lock().map_err(|e| e.to_string())?,"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        json!({"ok":true,"id":id,"note":note,"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     )
 }
 #[tauri::command]
-fn hide_note(app: tauri::AppHandle) -> Result<(), String> {
-    window(&app)?.hide().map_err(|e| e.to_string())
+fn snapshot(window: tauri::WebviewWindow, notes: State<AppNotes>) -> Result<Value, String> {
+    // Tauri injects the calling window; the frontend cannot select another note.
+    let id = window.label().strip_prefix("note-").unwrap_or("main");
+    let notes = notes.lock().map_err(|e| e.to_string())?;
+    inspect_window(&window, id, notes.get(id).ok_or("메모를 찾을 수 없습니다")?)
 }
 #[tauri::command]
-fn toggle_pin(app: tauri::AppHandle) -> Result<(), String> {
-    let win = window(&app)?;
-    win.set_always_on_top(!win.is_always_on_top().map_err(|e| e.to_string())?)
+fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
+    window.hide().map_err(|e| e.to_string())
+}
+#[tauri::command]
+fn toggle_pin(window: tauri::WebviewWindow) -> Result<(), String> {
+    window
+        .set_always_on_top(!window.is_always_on_top().map_err(|e| e.to_string())?)
         .map_err(|e| e.to_string())
 }
 fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
-    let state = app.state::<AppNote>();
-    // Validate and prepare before touching native window state.
-    let mut next = state.lock().map_err(|e| e.to_string())?.clone();
+    request.validate()?;
+    let state = app.state::<AppNotes>();
+    if matches!(request.action, Action::List) {
+        let notes = state.lock().map_err(|e| e.to_string())?;
+        let mut windows = Vec::new();
+        for (id, note) in notes.iter() {
+            let win = window(app, id)?;
+            windows.push(
+                json!({"id":id,"title":note.title,"status":note.status,"color":note.color,
+                "visible":win.is_visible().map_err(|e| e.to_string())?,
+                "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?}),
+            );
+        }
+        return Ok(json!({"ok":true,"windows":windows}));
+    }
+    let id = request.id().to_string();
+    // No lock is held while creating a WebView: its startup may invoke snapshot.
+    let existing = state.lock().map_err(|e| e.to_string())?.get(&id).cloned();
+    if existing.is_none() && !matches!(request.action, Action::Open) {
+        return Err(format!(
+            "메모 창을 찾을 수 없습니다: {id}. 먼저 open --id {id}를 실행하세요"
+        ));
+    }
+    let mut next = existing.clone().unwrap_or_default();
     next.apply(&request)?;
-    let win = window(app)?;
+    let win = if existing.is_some() {
+        window(app, &id)?
+    } else {
+        create_window(app, &id)?
+    };
     match request.action {
         Action::Open => {
-            show_without_focus(&win)?;
+            if let Err(error) = show_without_focus(&win) {
+                if existing.is_none() {
+                    let _ = win.destroy();
+                }
+                return Err(error);
+            }
         }
         Action::Close => win.hide().map_err(|e| e.to_string())?,
-        Action::Update | Action::Inspect => (),
+        Action::Update | Action::Inspect | Action::List => (),
     }
-    *state.lock().map_err(|e| e.to_string())? = next;
-    snapshot(app.clone(), state)
+    let response = inspect_window(&win, &id, &next);
+    state.lock().map_err(|e| e.to_string())?.insert(id, next);
+    response
 }
 fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     let builder = tauri::Builder::default();
     #[cfg(target_os = "macos")]
     let builder = builder.activate_ignoring_other_apps(false);
     let app = builder
-        .manage(Mutex::new(Note::default()))
+        .manage(Mutex::new(BTreeMap::from([(
+            "main".to_string(),
+            Note::default(),
+        )])))
         .invoke_handler(tauri::generate_handler![snapshot, hide_note, toggle_pin])
         .on_window_event(|win, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
@@ -84,7 +141,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             if initial_open {
-                show_without_focus(&window(app.handle())?)?;
+                show_without_focus(&window(app.handle(), "main")?)?;
             }
             let handle = app.handle().clone();
             std::thread::spawn(move || {
@@ -127,9 +184,11 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
 }
 
 fn parse(args: &[String]) -> Result<Request, String> {
-    let action = match args.first().map(String::as_str) { Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, _ => return Err("사용법: floatnote open|update [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close / inspect".into()) };
+    let action = match args.first().map(String::as_str) { Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: floatnote open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
         action,
+        id: None,
+        color: None,
         title: None,
         status: None,
         markdown: None,
@@ -139,6 +198,8 @@ fn parse(args: &[String]) -> Result<Request, String> {
         let key = &args[i];
         let value = args.get(i + 1).ok_or("옵션 값이 없습니다")?;
         match key.as_str() {
+            "--id" if request.id.is_none() => request.id = Some(value.clone()),
+            "--color" if request.color.is_none() => request.color = Some(value.clone()),
             "--title" if request.title.is_none() => request.title = Some(value.clone()),
             "--status" if request.status.is_none() => request.status = Some(value.clone()),
             "--markdown" if request.markdown.is_none() => request.markdown = Some(value.clone()),
@@ -162,7 +223,7 @@ fn parse(args: &[String]) -> Result<Request, String> {
         }
         i += 2;
     }
-    Note::default().apply(&request)?;
+    request.validate()?;
     if serde_json::to_vec(&request)
         .map_err(|e| e.to_string())?
         .len() as u64
@@ -220,7 +281,7 @@ fn main() {
         }
     } else if args == ["--help"] || args == ["-h"] {
         Ok(
-            json!({"ok":true,"usage":"floatnote open|update [--title TEXT] [--status TEXT] [--file PATH|- | --markdown TEXT]; floatnote close|inspect","note":"open만 앱을 시작하거나 창을 복원합니다. close는 숨기기입니다."}),
+            json!({"ok":true,"usage":"floatnote open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--file PATH|- | --markdown TEXT]; floatnote close|inspect [--id ID]; floatnote list","note":"open만 앱을 시작하거나 창을 생성·복원합니다. ID 생략 시 main, close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
         )
     } else {
         cli(&args)
@@ -245,5 +306,33 @@ mod tests {
         ] {
             assert!(parse(&args.into_iter().map(String::from).collect::<Vec<_>>()).is_err());
         }
+    }
+    #[test]
+    fn named_window_commands_and_list_parse() {
+        let args = ["open", "--id", "job-1", "--color", "#AABBCC"];
+        let request = parse(&args.map(String::from)).unwrap();
+        assert_eq!(request.id(), "job-1");
+        assert_eq!(request.color.as_deref(), Some("#AABBCC"));
+        for command in ["open", "update", "close", "inspect"] {
+            assert!(parse(&[command.into(), "--id".into(), "job-1".into()]).is_ok());
+        }
+        assert!(parse(&["list".into()]).is_ok());
+        for args in [
+            vec!["open", "--id", "x", "--id", "y"],
+            vec!["open", "--color", "#112233", "--color", "#445566"],
+            vec!["list", "--id", "main"],
+            vec!["inspect", "--color", "#112233"],
+            vec!["open", "--id", ""],
+            vec!["open", "--color", "red"],
+        ] {
+            assert!(parse(&args.into_iter().map(String::from).collect::<Vec<_>>()).is_err());
+        }
+    }
+
+    #[test]
+    fn window_labels_do_not_collide() {
+        assert_eq!(label("main"), "main");
+        assert_ne!(label("main"), label("note-main"));
+        assert_ne!(label("x"), label("note-x"));
     }
 }
