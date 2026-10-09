@@ -1,4 +1,4 @@
-use pulldown_cmark::{html, Event, Options, Parser};
+use pulldown_cmark::{html, Event, Options, Parser, Tag, TagEnd};
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -120,19 +120,63 @@ impl Note {
 }
 
 pub fn render(markdown: &str) -> String {
-    let parser = Parser::new_ext(
+    let mut events: Vec<_> = Parser::new_ext(
         markdown,
         Options::ENABLE_TASKLISTS | Options::ENABLE_STRIKETHROUGH | Options::ENABLE_TABLES,
     )
     .map(|event| match event {
         Event::Html(raw) | Event::InlineHtml(raw) => Event::Text(raw),
-        Event::TaskListMarker(checked) => Event::Text(if checked { "☑ " } else { "☐ " }.into()),
         other => other,
-    });
+    })
+    .collect();
+    // Annotate only lists whose direct items are all tasks; ordinary and mixed
+    // lists retain their indentation. Raw user HTML was escaped above.
+    let mut lists: Vec<(usize, Vec<bool>)> = Vec::new();
+    let mut items = Vec::new();
+    for index in 0..events.len() {
+        match &events[index] {
+            Event::Start(Tag::List(_)) => lists.push((index, Vec::new())),
+            Event::Start(Tag::Item) => {
+                if let Some((_, flags)) = lists.last_mut() {
+                    flags.push(false);
+                }
+                items.push((index, false));
+            }
+            Event::TaskListMarker(checked) => {
+                let checked = *checked;
+                if let Some((_, task)) = items.last_mut() {
+                    *task = true;
+                }
+                if let Some((_, flags)) = lists.last_mut() {
+                    if let Some(flag) = flags.last_mut() {
+                        *flag = true;
+                    }
+                }
+                events[index] = Event::Text(if checked { "☑ " } else { "☐ " }.into());
+            }
+            Event::End(TagEnd::Item) => {
+                if let Some((start, true)) = items.pop() {
+                    events[start] = Event::Html("<li class=\"task-item\">".into());
+                    events[index] = Event::Html("</li>".into());
+                }
+            }
+            Event::End(TagEnd::List(_)) => {
+                if let Some((start, flags)) = lists.pop() {
+                    if !flags.is_empty() && flags.iter().all(|task| *task) {
+                        events[start] = Event::Html("<ul class=\"task-list\">".into());
+                        events[index] = Event::Html("</ul>".into());
+                    }
+                }
+            }
+            _ => (),
+        }
+    }
     let mut output = String::new();
-    html::push_html(&mut output, parser);
+    html::push_html(&mut output, events.into_iter());
     // No images, navigation, arbitrary HTML or executable URL schemes.
     ammonia::Builder::default()
+        .add_tag_attributes("ul", &["class"])
+        .add_tag_attributes("li", &["class"])
         .rm_tags(&["img"])
         .rm_tag_attributes("a", &["href"])
         .clean(&output)
@@ -249,5 +293,19 @@ mod tests {
         }
         let request: Request = serde_json::from_str(r#"{"action":"list","id":"main"}"#).unwrap();
         assert!(request.validate().is_err());
+    }
+    #[test]
+    fn tasks_use_unindented_rows_but_normal_lists_keep_markers() {
+        let tasks = render("- [x] 완료\n- [ ] 대기");
+        assert!(tasks.contains("<ul class=\"task-list\">"));
+        assert_eq!(tasks.matches("class=\"task-item\"").count(), 2);
+        let normal = render("- 첫째\n- 둘째");
+        assert!(!normal.contains("task-list") && !normal.contains("task-item"));
+        let mixed = render("- 일반\n- [ ] 체크");
+        assert!(!mixed.contains("task-list") && mixed.contains("task-item"));
+        let nested = render("- 부모\n  - [ ] 자식\n- 형제");
+        assert_eq!(nested.matches("class=\"task-list\"").count(), 1);
+        let loose = render("- [x] 첫째\n\n- [ ] 둘째");
+        assert_eq!(loose.matches("class=\"task-item\"").count(), 2);
     }
 }

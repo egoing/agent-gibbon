@@ -15,11 +15,9 @@ async function refresh() {
       document.documentElement.style.colorScheme = theme.scheme;
       document.documentElement.style.setProperty('--border', theme.border);
       document.documentElement.style.setProperty('--panel', theme.panel);
-      $('title').textContent = state.note.title;
+      $('viewport').setAttribute('aria-label', state.note.title || '메모 내용');
       // HTML is generated and sanitized in Rust; no user HTML reaches this sink.
       $('content').innerHTML = state.note.html;
-      $('status').textContent = state.note.status;
-      $('updated').textContent = state.note.updated_at ? new Date(state.note.updated_at).toLocaleTimeString('ko-KR') + ' 갱신' : '';
       revision = state.note.revision;
     }
     $('pin').setAttribute('aria-pressed', String(state.always_on_top));
@@ -36,5 +34,14 @@ for (const grip of document.querySelectorAll('.resize')) {
 $('pin').addEventListener('click', () => invoke('toggle_pin').catch(failure));
 $('close').addEventListener('click', () => invoke('hide_note').catch(failure));
 document.addEventListener('keydown', (event) => { if (event.key === 'Escape') invoke('hide_note').catch(failure); });
+$('controls').addEventListener('mousedown', (event) => {
+  if (event.button === 0 && !event.target.closest('button')) win.startDragging().catch(failure);
+});
+$('viewport').addEventListener('mousedown', (event) => {
+  if (event.button === 0 && event.altKey && !event.target.closest('button')) {
+    event.preventDefault();
+    win.startDragging().catch(failure);
+  }
+});
 $('content').addEventListener('click', (event) => { if (event.target.closest('a')) event.preventDefault(); });
 refresh();

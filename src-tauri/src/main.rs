@@ -1,5 +1,7 @@
 mod ipc;
 mod model;
+mod placement;
+mod tray;
 use model::{Action, Note, Request, MAX_REQUEST};
 use serde_json::{json, Value};
 use std::os::unix::process::CommandExt;
@@ -33,6 +35,70 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
         .map_err(|e| e.to_string())?
         .build()
         .map_err(|e| e.to_string())
+}
+// Window APIs and monitor work areas use physical pixels. Convert the new
+// window's logical size per monitor so mixed-DPI displays retain its size.
+fn place_new_window(app: &tauri::AppHandle, win: &tauri::WebviewWindow) -> Result<(), String> {
+    let position = win.outer_position().map_err(|e| e.to_string())?;
+    let size = win.outer_size().map_err(|e| e.to_string())?;
+    let scale = win.scale_factor().map_err(|e| e.to_string())?;
+    let mut occupied = Vec::new();
+    for other in app.webview_windows().values() {
+        if other.label() == win.label() || !other.is_visible().map_err(|e| e.to_string())? {
+            continue;
+        }
+        let p = other.outer_position().map_err(|e| e.to_string())?;
+        let s = other.outer_size().map_err(|e| e.to_string())?;
+        occupied.push(placement::Rect {
+            x: p.x.into(),
+            y: p.y.into(),
+            width: s.width.into(),
+            height: s.height.into(),
+        });
+    }
+    let mut monitors = win.available_monitors().map_err(|e| e.to_string())?;
+    if let Some(current) = win.current_monitor().map_err(|e| e.to_string())? {
+        if let Some(index) = monitors
+            .iter()
+            .position(|m| m.position() == current.position())
+        {
+            monitors.swap(0, index);
+        }
+    }
+    for monitor in monitors {
+        let work = monitor.work_area();
+        let gap = (8.0 * monitor.scale_factor()).round() as i64;
+        let area = placement::Rect {
+            x: i64::from(work.position.x) + gap,
+            y: i64::from(work.position.y) + gap,
+            width: i64::from(work.size.width) - 2 * gap,
+            height: i64::from(work.size.height) - 2 * gap,
+        };
+        let target = (
+            (f64::from(size.width) / scale * monitor.scale_factor()).round() as i64,
+            (f64::from(size.height) / scale * monitor.scale_factor()).round() as i64,
+        );
+        if let Some(rect) = placement::find_space(
+            area,
+            target,
+            (position.x.into(), position.y.into()),
+            &occupied,
+            gap,
+        ) {
+            win.set_position(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32))
+                .map_err(|e| e.to_string())?;
+            win.set_size(tauri::PhysicalSize::new(
+                rect.width as u32,
+                rect.height as u32,
+            ))
+            .map_err(|e| e.to_string())?;
+            return Ok(());
+        }
+    }
+    Err(
+        "기존 메모와 겹치지 않는 화면 공간이 없습니다. 메모를 숨기거나 크기를 줄인 후 다시 여세요"
+            .into(),
+    )
 }
 // Called only on Tauri's main thread. macOS `show()` makes the window key;
 // ordering it front directly preserves the user's active application.
@@ -107,6 +173,14 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
     };
     match request.action {
         Action::Open => {
+            if existing.as_ref().is_none_or(|note| note.revision == 0) {
+                if let Err(error) = place_new_window(app, &win) {
+                    if existing.is_none() {
+                        let _ = win.destroy();
+                    }
+                    return Err(error);
+                }
+            }
             if let Err(error) = show_without_focus(&win) {
                 if existing.is_none() {
                     let _ = win.destroy();
@@ -117,8 +191,16 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
         Action::Close => win.hide().map_err(|e| e.to_string())?,
         Action::Update | Action::Inspect | Action::List => (),
     }
+    let menu_changed = existing
+        .as_ref()
+        .is_none_or(|previous| previous.title != next.title);
     let response = inspect_window(&win, &id, &next);
     state.lock().map_err(|e| e.to_string())?.insert(id, next);
+    if menu_changed {
+        if let Err(error) = tray::refresh(app) {
+            eprintln!("메뉴 막대 갱신 실패: {error}");
+        }
+    }
     response
 }
 fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
@@ -140,8 +222,19 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .setup(move |app| {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            tray::install(app.handle())?;
             if initial_open {
-                show_without_focus(&window(app.handle(), "main")?)?;
+                apply(
+                    app.handle(),
+                    Request {
+                        action: Action::Open,
+                        id: None,
+                        color: None,
+                        title: None,
+                        markdown: None,
+                        status: None,
+                    },
+                )?;
             }
             let handle = app.handle().clone();
             std::thread::spawn(move || {
@@ -268,7 +361,23 @@ fn cli(args: &[String]) -> Result<Value, String> {
         }
         Err(_) => return Err("앱이 실행 중이지 않습니다. 먼저 open을 실행하세요".into()),
     };
-    ipc::exchange(stream, &request)
+    let response = ipc::exchange(stream, &request)?;
+    if matches!(request.action, Action::Open) && response["ok"] == true {
+        // Native move/resize events are queued. A fresh IPC turn observes the
+        // actual final frame rather than the pre-placement cached coordinates.
+        return ipc::exchange(
+            ipc::connect()?,
+            &Request {
+                action: Action::Inspect,
+                id: request.id,
+                color: None,
+                title: None,
+                markdown: None,
+                status: None,
+            },
+        );
+    }
+    Ok(response)
 }
 fn main() {
     let args: Vec<_> = std::env::args().skip(1).collect();

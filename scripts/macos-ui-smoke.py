@@ -26,13 +26,13 @@ opened = cli('open', '--title', 'UI 검증', '--file', str(ROOT / 'examples/prog
 time.sleep(2)
 assert active() == front, 'open changed foreground app'
 assert not opened['focused'], 'run this test with another app focused'
-content = apple('tell application "System Events" to tell process "floatnote" to get entire contents of window 1')
-for expected in ('UI 검증', '☑ 단일 플로팅 메모', '☐ 실제 작업에서 사용성 확인', '갱신'):
+content = apple('tell application "System Events" to tell process "floatnote" to get entire contents of window \"Floatnote\"')
+for expected in ('☑ 단일 플로팅 메모', '☐ 실제 작업에서 사용성 확인'):
     assert expected in content, expected
-root = 'group 1 of UI element 1 of scroll area 1 of group 1 of group 1 of window 1'
 def click(control):
+    root = 'group "UI 검증" of UI element 1 of scroll area 1 of group 1 of group 1 of window "Floatnote"'
     apple(f'tell application "System Events" to tell process "floatnote" to click {control} of {root}')
-    time.sleep(0.2)
+    time.sleep(0.3)
 click('checkbox "상단 고정"')
 assert cli('inspect')['always_on_top'] != opened['always_on_top']
 click('checkbox "상단 고정"')
@@ -50,4 +50,4 @@ assert not cli('inspect')['visible']
 assert not cli('update', '--status', '숨김 유지')['visible']
 assert cli('open')['visible'] and active() == front
 cli('close')
-print('PASS: actual WebView Korean/tasks/timestamp, pin toggle, hide button, background focus preservation, hidden update and explicit reopen')
+print('PASS: actual WebView Korean/task rows without footer, pin toggle, hide button, background focus preservation, hidden update and explicit reopen')

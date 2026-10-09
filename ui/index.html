@@ -1,8 +1,12 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Floatnote</title><link rel="stylesheet" href="style.css"><script type="module" src="app.js"></script></head>
 <body>
-<header id="drag"><span class="mark" aria-hidden="true">◈</span><h1 id="title">Floatnote</h1><button id="pin" aria-label="상단 고정" aria-pressed="true" title="상단 고정">고정</button><button id="close" aria-label="메모 숨기기" title="메모 숨기기">×</button></header>
-<main id="content" aria-label="메모 내용"><p>작업 내용을 기다리고 있습니다.</p></main>
-<footer><span id="status">연결 중</span><time id="updated"></time></footer><div id="error" role="alert" hidden></div>
+<div id="drag" aria-label="창 이동" title="드래그하여 이동"></div>
+<main id="viewport" aria-label="메모 내용">
+<div id="controls">
+<button id="pin" aria-label="상단 고정" aria-pressed="true" title="상단 고정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 7 4 4v2H5v-2l4-4-1-7Z"/><path d="M12 16v6"/></svg></button><button id="close" aria-label="메모 숨기기" title="메모 숨기기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+</div>
+<div id="content"><p>작업 내용을 기다리고 있습니다.</p></div>
+</main><div id="error" role="alert" hidden></div>
 <div class="resize" data-direction="North" id="n"></div><div class="resize" data-direction="South" id="s"></div><div class="resize" data-direction="East" id="e"></div><div class="resize" data-direction="West" id="w"></div><div class="resize corner" data-direction="NorthWest" id="nw"></div><div class="resize corner" data-direction="NorthEast" id="ne"></div><div class="resize corner" data-direction="SouthWest" id="sw"></div><div class="resize corner" data-direction="SouthEast" id="se"></div>
 </body></html>
