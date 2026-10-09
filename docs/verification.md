@@ -8,9 +8,9 @@
 
 - `npm test`: Rust 16개 + Node 2개 통과. `npm run check`와 release 빌드 통과.
 - 실제 본문/빈 공간 드래그, 버튼 클릭 시 위치 보존, 복사 내용의 창별 격리 검증을 `scripts/multiwindow-ui-smoke.py`에 추가했습니다. 테스트는 클립보드의 모든 표현을 임시 보관하고 사용자가 중간에 다른 내용을 복사하지 않았을 때 복원합니다.
-- 최신 UI 실환경 검증은 보류입니다. 화면 잠금(`CGSSessionScreenIsLocked = 1`) 때문에 접근성 창 조회가 실패했습니다. 실행 중인 이전 빌드와 기존 창 상태를 보존했으며 새 빌드는 아직 실행하지 않았습니다.
-- 잠금 해제 후 기존 창 상태를 보존해 새 빌드를 실행하고 `python3 scripts/multiwindow-ui-smoke.py`로 확인합니다. 아래 화면 캡처 및 실환경 통과 기록은 복사 버튼 추가 전 버전입니다.
-- 최신 변경 Conf 3 / Risk Low. 공식 API: [Clipboard](https://v2.tauri.app/plugin/clipboard/).
+- 화면 잠금 해제 후 최신 release를 적용했습니다. 보이는 기존 창 6개의 위치·크기·고정 상태를 비교해 보존을 확인했습니다. `scripts/multiwindow-ui-smoke.py`에서 실제 본문/빈 공간 드래그, 본문 복사와 클립보드 복원, 버튼 클릭 시 위치 유지, 창별 핀·숨김 격리, 모서리 크기 조절, 배경 포커스 보존을 모두 통과했습니다.
+- `scripts/macos-tray-smoke.py`도 최신 빌드에서 통과했습니다. 아래 화면 캡처를 최신 복사·핀·닫기 아이콘이 있는 실제 창으로 교체했고 본문이 버튼을 피해 줄바꿈되는 것을 확인했습니다.
+- 최신 변경 Conf 5 / Risk Low. 공식 API: [Clipboard](https://v2.tauri.app/plugin/clipboard/).
 
 ## 슬림 UI·신규 창 배치·메뉴 막대 복원 — 이전 빌드 검증
 
