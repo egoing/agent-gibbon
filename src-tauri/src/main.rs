@@ -208,6 +208,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     let builder = builder.activate_ignoring_other_apps(false);
     let app = builder
+        .plugin(tauri_plugin_clipboard_manager::init())
         .manage(Mutex::new(BTreeMap::from([(
             "main".to_string(),
             Note::default(),

@@ -25,8 +25,10 @@ async function refresh() {
   } catch (error) { failure(error); }
   setTimeout(refresh, 350);
 }
-$('drag').addEventListener('mousedown', (event) => {
-  if (event.button === 0 && !event.target.closest('button')) win.startDragging().catch(failure);
+document.addEventListener('mousedown', (event) => {
+  if (event.button !== 0 || event.target.closest('button, .resize')) return;
+  event.preventDefault();
+  win.startDragging().catch(failure);
 });
 for (const grip of document.querySelectorAll('.resize')) {
   grip.addEventListener('mousedown', (event) => { if (event.button === 0) win.startResizeDragging(grip.dataset.direction).catch(failure); });
@@ -34,14 +36,18 @@ for (const grip of document.querySelectorAll('.resize')) {
 $('pin').addEventListener('click', () => invoke('toggle_pin').catch(failure));
 $('close').addEventListener('click', () => invoke('hide_note').catch(failure));
 document.addEventListener('keydown', (event) => { if (event.key === 'Escape') invoke('hide_note').catch(failure); });
-$('controls').addEventListener('mousedown', (event) => {
-  if (event.button === 0 && !event.target.closest('button')) win.startDragging().catch(failure);
-});
-$('viewport').addEventListener('mousedown', (event) => {
-  if (event.button === 0 && event.altKey && !event.target.closest('button')) {
-    event.preventDefault();
-    win.startDragging().catch(failure);
-  }
+let copyFeedback;
+$('copy').addEventListener('click', async () => {
+  try {
+    await window.__TAURI__.clipboardManager.writeText($('content').innerText);
+    $('copy').dataset.copied = 'true';
+    $('copy').title = '복사됨';
+    clearTimeout(copyFeedback);
+    copyFeedback = setTimeout(() => {
+      delete $('copy').dataset.copied;
+      $('copy').title = '본문 복사';
+    }, 1200);
+  } catch (error) { failure(error); }
 });
 $('content').addEventListener('click', (event) => { if (event.target.closest('a')) event.preventDefault(); });
 refresh();

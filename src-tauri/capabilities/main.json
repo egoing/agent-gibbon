@@ -1,1 +1,1 @@
-{"identifier":"main","windows":["main","note-*"],"permissions":["core:window:allow-start-dragging","core:window:allow-start-resize-dragging"]}
+{"identifier":"main","windows":["main","note-*"],"permissions":["core:window:allow-start-dragging","core:window:allow-start-resize-dragging","clipboard-manager:allow-write-text"]}
