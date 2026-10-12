@@ -51,3 +51,7 @@ $('copy').addEventListener('click', async () => {
 });
 $('content').addEventListener('click', (event) => { if (event.target.closest('a')) event.preventDefault(); });
 refresh();
+
+for (const event of ['pointerenter', 'pointerleave']) {
+  document.documentElement.addEventListener(event, () => invoke('sync_opacity').catch(failure));
+}

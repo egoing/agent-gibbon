@@ -39,7 +39,10 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
 // Window APIs and monitor work areas use physical pixels. Convert the new
 // window's logical size per monitor so mixed-DPI displays retain its size.
 fn place_new_window(app: &tauri::AppHandle, win: &tauri::WebviewWindow) -> Result<(), String> {
-    let position = win.outer_position().map_err(|e| e.to_string())?;
+    use std::hash::{BuildHasher, Hasher};
+    let random = std::collections::hash_map::RandomState::new()
+        .build_hasher()
+        .finish();
     let size = win.outer_size().map_err(|e| e.to_string())?;
     let scale = win.scale_factor().map_err(|e| e.to_string())?;
     let mut occupied = Vec::new();
@@ -78,13 +81,7 @@ fn place_new_window(app: &tauri::AppHandle, win: &tauri::WebviewWindow) -> Resul
             (f64::from(size.width) / scale * monitor.scale_factor()).round() as i64,
             (f64::from(size.height) / scale * monitor.scale_factor()).round() as i64,
         );
-        if let Some(rect) = placement::find_space(
-            area,
-            target,
-            (position.x.into(), position.y.into()),
-            &occupied,
-            gap,
-        ) {
+        if let Some(rect) = placement::find_space(area, target, random, &occupied, gap) {
             win.set_position(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32))
                 .map_err(|e| e.to_string())?;
             win.set_size(tauri::PhysicalSize::new(
@@ -109,6 +106,7 @@ fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
         // SAFETY: Tauri owns this live NSWindow; main-thread callers retain win
         // throughout the synchronous call and never store the borrowed pointer.
         unsafe {
+            sync_opacity(win.clone())?;
             (&*(ptr as *const objc2_app_kit::NSWindow)).orderFrontRegardless();
         }
         Ok(())
@@ -116,11 +114,42 @@ fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
     #[cfg(not(target_os = "macos"))]
     win.show().map_err(|e| e.to_string())
 }
+// Native alpha blends the entire window, including its background and controls.
+// Called by synchronous commands and the IPC main-thread handler only.
+#[tauri::command]
+fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
+    #[cfg(target_os = "macos")]
+    {
+        let cursor = window.cursor_position().map_err(|e| e.to_string())?;
+        let p = window.outer_position().map_err(|e| e.to_string())?;
+        let size = window.outer_size().map_err(|e| e.to_string())?;
+        let hovered = cursor.x >= f64::from(p.x)
+            && cursor.y >= f64::from(p.y)
+            && cursor.x < f64::from(p.x) + f64::from(size.width)
+            && cursor.y < f64::from(p.y) + f64::from(size.height);
+        let alpha = if hovered { 1.0 } else { 0.5 };
+        let ptr = window.ns_window().map_err(|e| e.to_string())?;
+        // SAFETY: Tauri owns the live NSWindow, borrowed only on the main thread.
+        unsafe {
+            let native = &*(ptr as *const objc2_app_kit::NSWindow);
+            if native.alphaValue() != alpha {
+                native.setAlphaValue(alpha);
+            }
+        }
+        Ok(alpha)
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = window;
+        Ok(1.0)
+    }
+}
 fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<Value, String> {
+    let opacity = sync_opacity(win.clone())?;
     let position = win.outer_position().map_err(|e| e.to_string())?;
     let size = win.outer_size().map_err(|e| e.to_string())?;
     Ok(
-        json!({"ok":true,"id":id,"note":note,"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        json!({"ok":true,"id":id,"note":note,"opacity":opacity,"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     )
 }
 #[tauri::command]
@@ -213,7 +242,12 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             "main".to_string(),
             Note::default(),
         )])))
-        .invoke_handler(tauri::generate_handler![snapshot, hide_note, toggle_pin])
+        .invoke_handler(tauri::generate_handler![
+            snapshot,
+            hide_note,
+            toggle_pin,
+            sync_opacity
+        ])
         .on_window_event(|win, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 api.prevent_close();

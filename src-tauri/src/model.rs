@@ -64,6 +64,9 @@ impl Request {
         if matches!(self.action, Action::List) && self.id.is_some() {
             return Err("list에는 창 ID를 지정할 수 없습니다".into());
         }
+        if let Some(markdown) = &self.markdown {
+            validate_markdown(markdown)?;
+        }
         Ok(())
     }
 }
@@ -117,6 +120,49 @@ impl Note {
         self.revision += 1;
         Ok(())
     }
+}
+
+// Markdown accepts plain text, so reject only a likely missing task-list marker.
+// Parser offsets exclude fenced/indented code, inline code and actual links.
+fn validate_markdown(markdown: &str) -> Result<(), String> {
+    let mut excluded = Vec::new();
+    let mut code_start = None;
+    let mut link_start = None;
+    for (event, range) in Parser::new_ext(markdown, Options::ENABLE_TASKLISTS).into_offset_iter() {
+        match event {
+            Event::Start(Tag::CodeBlock(_)) => code_start = Some(range.start),
+            Event::End(TagEnd::CodeBlock) => {
+                if let Some(start) = code_start.take() {
+                    excluded.push(start..range.end);
+                }
+            }
+            Event::Start(Tag::Link { .. }) => link_start = Some(range.start),
+            Event::End(TagEnd::Link) => {
+                if let Some(start) = link_start.take() {
+                    excluded.push(start..range.end);
+                }
+            }
+            Event::Code(_) => excluded.push(range),
+            _ => (),
+        }
+    }
+    let mut offset = 0;
+    for (index, line) in markdown.split_inclusive('\n').enumerate() {
+        let text = line.trim_start();
+        let start = offset + line.len() - text.len();
+        let bytes = text.as_bytes();
+        if bytes.len() >= 3
+            && bytes[0] == b'['
+            && matches!(bytes[1], b' ' | b'x' | b'X')
+            && bytes[2] == b']'
+            && (bytes.len() == 3 || bytes[3].is_ascii_whitespace())
+            && !excluded.iter().any(|range| range.contains(&start))
+        {
+            return Err(format!("MARKDOWN_TASK_MARKER: {}행: 체크리스트 앞의 목록 기호가 빠졌습니다. '- [ ] 항목' 또는 '- [x] 완료 항목'으로 수정한 뒤 재시도하세요. 문자 그대로 표시하려면 코드(`...`) 또는 이스케이프(\\[)를 사용하세요. 기존 메모는 변경되지 않았습니다.", index + 1));
+        }
+        offset += line.len();
+    }
+    Ok(())
 }
 
 pub fn render(markdown: &str) -> String {
@@ -186,6 +232,43 @@ pub fn render(markdown: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn malformed_tasks_report_line_and_preserve_all_fields() {
+        let mut note = Note::default();
+        let before = serde_json::to_value(&note).unwrap();
+        let request: Request = serde_json::from_value(serde_json::json!({
+            "action":"update", "title":"changed", "color":"#abcdef", "status":"changed",
+            "markdown":"# 제목\n\n[x] 완료\n[ ] 대기"
+        }))
+        .unwrap();
+        let error = note.apply(&request).unwrap_err();
+        assert!(error.contains("MARKDOWN_TASK_MARKER") && error.contains("3행"));
+        assert!(error.contains("- [x]"));
+        assert_eq!(serde_json::to_value(&note).unwrap(), before);
+        for text in ["[ ] 대기", "  [X] 완료", "[x]", "제목\r\n[ ] 대기"] {
+            assert!(validate_markdown(text).is_err(), "{text}");
+        }
+    }
+    #[test]
+    fn markdown_validation_allows_code_links_and_real_tasks() {
+        for text in [
+            "- [ ] 대기\n- [x] 완료",
+            "일반 문장 [ ] 설명",
+            "\\[ ] 문자",
+            "```md\n[ ] 예제\n```",
+            "~~~\n[x] 예제\n~~~",
+            "    [ ] 코드",
+            "`[ ] 예제`",
+            "[x](https://example.com) 링크",
+            "[x] 참조\n\n[x]: https://example.com",
+            "- 항목\n    ```\n    [ ] 코드\n    ```",
+        ] {
+            assert!(validate_markdown(text).is_ok(), "{text}");
+        }
+        assert!(validate_markdown("```\n[ ] 예제\n```\n[ ] 오류")
+            .unwrap_err()
+            .contains("4행"));
+    }
     #[test]
     fn renders_korean_tasks_and_blocks_active_content() {
         let html = render("# 한글\n- [x] 완료\n- [ ] 대기\n<script>alert(1)</script>\n<img src=x onerror=alert(1)>\n[실행](javascript:alert(1))\n![외부](https://example.com/tracker)");
