@@ -6,7 +6,8 @@
     "build": "tauri build --bundles app",
     "dev": "tauri dev",
     "check": "cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings",
-    "test": "cargo test --manifest-path src-tauri/Cargo.toml && node --test tests/*.test.mjs"
+    "test": "cargo test --manifest-path src-tauri/Cargo.toml && node --test tests/*.test.mjs",
+    "build:release": "tauri build --bundles app,dmg"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.0.0"

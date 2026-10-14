@@ -75,6 +75,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 apply(
                     app,
                     Request {
+                        source_path: None,
                         action: Action::Open,
                         id: Some(id.into()),
                         color: None,

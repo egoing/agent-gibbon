@@ -4,10 +4,69 @@ const { invoke } = window.__TAURI__.core;
 const win = window.__TAURI__.window.getCurrentWindow();
 const $ = (id) => document.getElementById(id);
 let revision = -1;
+let latestNote;
+let editing = false;
+let saving = false;
+let editRevision;
+const fontSizes = [12, 14, 16, 18];
+let fontIndex = 0;
+$('font-size').addEventListener('click', () => {
+  fontIndex = (fontIndex + 1) % fontSizes.length;
+  const size = fontSizes[fontIndex];
+  document.documentElement.style.setProperty('--font-size', `${size}px`);
+  $('font-size').title = `글자 크기 ${size}px · 클릭하여 변경`;
+  $('font-size').setAttribute('aria-label', `글자 크기 ${size}px, 클릭하여 변경`);
+});
+function endEditing() {
+  editing = false;
+  $('editor').hidden = true;
+  $('content').hidden = false;
+  $('copy').disabled = false;
+  $('edit').disabled = false;
+  $('error').hidden = true;
+  $('edit').focus();
+}
+$('edit').addEventListener('click', () => {
+  if (!latestNote || editing) return;
+  editing = true;
+  editRevision = latestNote.revision;
+  $('markdown').value = latestNote.markdown;
+  $('save-target').textContent = latestNote.source_path ? '원본 파일에 저장' : '메모에 저장';
+  $('save-target').title = latestNote.source_path || '앱 종료 시 초기화됩니다';
+  $('content').hidden = true;
+  $('editor').hidden = false;
+  $('copy').disabled = true;
+  $('edit').disabled = true;
+  $('error').hidden = true;
+  $('markdown').focus();
+});
+$('cancel').addEventListener('click', endEditing);
+async function save() {
+  if (!editing || saving) return;
+  saving = true;
+  $('save').disabled = true;
+  $('cancel').disabled = true;
+  $('markdown').readOnly = true;
+  try {
+    latestNote = await invoke('save_note', { markdown: $('markdown').value, expectedRevision: editRevision });
+    $('content').innerHTML = latestNote.html;
+    revision = latestNote.revision;
+    endEditing();
+  } catch (error) { failure(error); }
+  finally {
+    saving = false;
+    $('save').disabled = false;
+    $('cancel').disabled = false;
+    $('markdown').readOnly = false;
+  }
+}
+$('save').addEventListener('click', save);
 function failure(error) { $('error').textContent = String(error); $('error').hidden = false; }
 async function refresh() {
   try {
     const state = await invoke('snapshot');
+    latestNote = state.note;
+    $('edit').disabled = editing;
     if (revision !== state.note.revision) {
       const theme = themeFor(state.note.color);
       document.documentElement.style.setProperty('--background', state.note.color);
@@ -21,12 +80,11 @@ async function refresh() {
       revision = state.note.revision;
     }
     $('pin').setAttribute('aria-pressed', String(state.always_on_top));
-    $('error').hidden = true;
   } catch (error) { failure(error); }
   setTimeout(refresh, 350);
 }
 document.addEventListener('mousedown', (event) => {
-  if (event.button !== 0 || event.target.closest('button, .resize')) return;
+  if (event.button !== 0 || event.target.closest('button, #editor, #error, #warp-tip, .resize')) return;
   event.preventDefault();
   win.startDragging().catch(failure);
 });
@@ -35,7 +93,17 @@ for (const grip of document.querySelectorAll('.resize')) {
 }
 $('pin').addEventListener('click', () => invoke('toggle_pin').catch(failure));
 $('close').addEventListener('click', () => invoke('hide_note').catch(failure));
-document.addEventListener('keydown', (event) => { if (event.key === 'Escape') invoke('hide_note').catch(failure); });
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    if (editing) { if (!saving) endEditing(); }
+    else invoke('hide_note').catch(failure);
+  }
+  if (editing && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+    event.preventDefault();
+    save();
+  }
+});
 let copyFeedback;
 $('copy').addEventListener('click', async () => {
   try {
@@ -55,3 +123,40 @@ refresh();
 for (const event of ['pointerenter', 'pointerleave']) {
   document.documentElement.addEventListener(event, () => invoke('sync_opacity').catch(failure));
 }
+
+const warpTipKey = 'floatnote.warp-tip-dismissed';
+let warpTipDismissed = false;
+let warpTipTimer;
+function isWarpTipDismissed() {
+  try { return warpTipDismissed || localStorage.getItem(warpTipKey) === 'true'; }
+  catch { return warpTipDismissed; }
+}
+function showWarpTip() {
+  if (isWarpTipDismissed()) return;
+  $('warp-tip').hidden = false;
+  clearTimeout(warpTipTimer);
+  warpTipTimer = setTimeout(() => { $('warp-tip').hidden = true; }, 12000);
+}
+$('warp-tip-close').addEventListener('click', () => { $('warp-tip').hidden = true; });
+$('warp-tip-dismiss').addEventListener('click', () => {
+  try { localStorage.setItem(warpTipKey, 'true'); }
+  catch (error) { failure(`안내 설정을 저장하지 못했습니다: ${error}`); return; }
+  warpTipDismissed = true;
+  $('warp-tip').hidden = true;
+});
+let warping = false;
+$('warp').addEventListener('click', async () => {
+  if (warping) return;
+  warping = true;
+  try { await invoke('warp_note'); showWarpTip(); }
+  catch (error) { failure(error); }
+  finally { warping = false; }
+});
+async function pollWarp() {
+  try {
+    if (!warping && await invoke('poll_warp')) showWarpTip();
+    if (isWarpTipDismissed()) $('warp-tip').hidden = true;
+  } catch (error) { failure(error); }
+  setTimeout(pollWarp, 100);
+}
+pollWarp();

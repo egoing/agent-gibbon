@@ -1,7 +1,9 @@
 mod ipc;
 mod model;
 mod placement;
+mod source;
 mod tray;
+mod warp;
 use model::{Action, Note, Request, MAX_REQUEST};
 use serde_json::{json, Value};
 use std::os::unix::process::CommandExt;
@@ -89,6 +91,7 @@ fn place_new_window(app: &tauri::AppHandle, win: &tauri::WebviewWindow) -> Resul
                 rect.height as u32,
             ))
             .map_err(|e| e.to_string())?;
+            warp::remember(app, win, rect.y, work.position.y, monitor.scale_factor())?;
             return Ok(());
         }
     }
@@ -158,6 +161,19 @@ fn snapshot(window: tauri::WebviewWindow, notes: State<AppNotes>) -> Result<Valu
     let id = window.label().strip_prefix("note-").unwrap_or("main");
     let notes = notes.lock().map_err(|e| e.to_string())?;
     inspect_window(&window, id, notes.get(id).ok_or("메모를 찾을 수 없습니다")?)
+}
+#[tauri::command]
+fn save_note(
+    window: tauri::WebviewWindow,
+    notes: State<AppNotes>,
+    markdown: String,
+    expected_revision: u64,
+) -> Result<Note, String> {
+    let id = window.label().strip_prefix("note-").unwrap_or("main");
+    let mut notes = notes.lock().map_err(|e| e.to_string())?;
+    let note = notes.get_mut(id).ok_or("메모를 찾을 수 없습니다")?;
+    note.save_edit(markdown, expected_revision)?;
+    Ok(note.clone())
 }
 #[tauri::command]
 fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
@@ -238,6 +254,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     let builder = builder.activate_ignoring_other_apps(false);
     let app = builder
         .plugin(tauri_plugin_clipboard_manager::init())
+        .manage(warp::Warps::default())
         .manage(Mutex::new(BTreeMap::from([(
             "main".to_string(),
             Note::default(),
@@ -246,7 +263,10 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             snapshot,
             hide_note,
             toggle_pin,
-            sync_opacity
+            sync_opacity,
+            save_note,
+            warp::warp_note,
+            warp::poll_warp
         ])
         .on_window_event(|win, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
@@ -262,6 +282,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 apply(
                     app.handle(),
                     Request {
+                        source_path: None,
                         action: Action::Open,
                         id: None,
                         color: None,
@@ -315,6 +336,7 @@ fn parse(args: &[String]) -> Result<Request, String> {
     let action = match args.first().map(String::as_str) { Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: floatnote open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
         action,
+        source_path: None,
         id: None,
         color: None,
         title: None,
@@ -335,7 +357,13 @@ fn parse(args: &[String]) -> Result<Request, String> {
                 let input: Box<dyn Read> = if value == "-" {
                     Box::new(std::io::stdin())
                 } else {
-                    Box::new(std::fs::File::open(value).map_err(|e| e.to_string())?)
+                    let path = std::fs::canonicalize(value).map_err(|e| e.to_string())?;
+                    request.source_path = Some(
+                        path.to_str()
+                            .ok_or("파일 경로는 UTF-8이어야 합니다")?
+                            .to_owned(),
+                    );
+                    Box::new(std::fs::File::open(path).map_err(|e| e.to_string())?)
                 };
                 let mut text = String::new();
                 input
@@ -403,6 +431,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
         return ipc::exchange(
             ipc::connect()?,
             &Request {
+                source_path: None,
                 action: Action::Inspect,
                 id: request.id,
                 color: None,

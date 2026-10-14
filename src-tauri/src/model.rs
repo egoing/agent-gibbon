@@ -22,6 +22,8 @@ pub struct Request {
     pub color: Option<String>,
     pub title: Option<String>,
     pub markdown: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_path: Option<String>,
     pub status: Option<String>,
 }
 
@@ -64,7 +66,15 @@ impl Request {
         if matches!(self.action, Action::List) && self.id.is_some() {
             return Err("list에는 창 ID를 지정할 수 없습니다".into());
         }
+        if let Some(path) = &self.source_path {
+            if self.markdown.is_none() || !std::path::Path::new(path).is_absolute() {
+                return Err("원본 파일에는 절대 경로와 본문이 필요합니다".into());
+            }
+        }
         if let Some(markdown) = &self.markdown {
+            if markdown.len() as u64 > MAX_REQUEST {
+                return Err("본문은 1MiB 이하여야 합니다".into());
+            }
             validate_markdown(markdown)?;
         }
         Ok(())
@@ -76,6 +86,8 @@ pub struct Note {
     pub title: String,
     pub color: String,
     pub html: String,
+    pub markdown: String,
+    pub source_path: Option<String>,
     pub status: String,
     pub updated_at: u64,
     pub revision: u64,
@@ -86,6 +98,8 @@ impl Default for Note {
             title: "Floatnote".into(),
             color: "#20252e".into(),
             html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),
+            markdown: "작업 내용을 기다리고 있습니다.".into(),
+            source_path: None,
             status: "대기".into(),
             updated_at: 0,
             revision: 0,
@@ -93,6 +107,30 @@ impl Default for Note {
     }
 }
 impl Note {
+    pub fn save_edit(&mut self, markdown: String, expected_revision: u64) -> Result<(), String> {
+        if self.revision != expected_revision {
+            return Err(
+                "메모가 외부에서 갱신되었습니다. 작성 내용을 복사한 뒤 취소하고 다시 편집하세요."
+                    .into(),
+            );
+        }
+        let mut next = self.clone();
+        next.apply(&Request {
+            action: Action::Update,
+            id: None,
+            color: None,
+            title: None,
+            status: None,
+            source_path: self.source_path.clone(),
+            markdown: Some(markdown),
+        })?;
+        if let Some(path) = &self.source_path {
+            crate::source::save(path, &self.markdown, &next.markdown)?;
+        }
+        *self = next;
+        Ok(())
+    }
+
     pub fn apply(&mut self, request: &Request) -> Result<(), String> {
         request.validate()?;
         if matches!(
@@ -109,6 +147,8 @@ impl Note {
         }
         if let Some(markdown) = &request.markdown {
             self.html = render(markdown);
+            self.markdown = markdown.clone();
+            self.source_path = request.source_path.clone();
         }
         if let Some(status) = &request.status {
             self.status = status.clone();
@@ -233,6 +273,64 @@ pub fn render(markdown: &str) -> String {
 mod tests {
     use super::*;
     #[test]
+    fn editor_saves_source_and_rejects_stale_or_invalid_changes() {
+        let folder =
+            std::env::temp_dir().join(format!("floatnote-edit-test-{}", std::process::id()));
+        std::fs::create_dir(&folder).unwrap();
+        let path = folder.join("note.md");
+        std::fs::write(&path, "원문").unwrap();
+        let mut note = Note::default();
+        note.apply(&Request {
+            action: Action::Open,
+            id: None,
+            title: None,
+            color: None,
+            status: None,
+            markdown: Some("원문".into()),
+            source_path: Some(path.to_str().unwrap().into()),
+        })
+        .unwrap();
+        note.save_edit("# 편집\n- [x] 완료".into(), 1).unwrap();
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), note.markdown);
+        assert!(note.html.contains("☑ 완료"));
+        let before = serde_json::to_value(&note).unwrap();
+        assert!(note.save_edit("오래된 편집".into(), 1).is_err());
+        assert!(note.save_edit("[ ] 잘못된 체크리스트".into(), 2).is_err());
+        std::fs::write(&path, "외부 변경").unwrap();
+        assert!(note.save_edit("덮어쓰기".into(), 2).is_err());
+        assert_eq!(serde_json::to_value(&note).unwrap(), before);
+        assert_eq!(std::fs::read_to_string(&path).unwrap(), "외부 변경");
+        std::fs::remove_file(&path).unwrap();
+        assert!(note.save_edit("삭제된 파일".into(), 2).is_err());
+        assert!(!path.exists());
+        assert_eq!(std::fs::read_dir(&folder).unwrap().count(), 0);
+        std::fs::remove_dir(&folder).unwrap();
+    }
+    #[test]
+    fn inline_update_detaches_file_and_editor_preserves_metadata() {
+        let mut note = Note::default();
+        let request = serde_json::from_value(serde_json::json!({
+            "action":"open", "markdown":"본문", "source_path":"/tmp/unused.md", "title":"제목", "color":"#ffeeaa"
+        })).unwrap();
+        note.apply(&request).unwrap();
+        let request =
+            serde_json::from_value(serde_json::json!({"action":"update", "status":"상태"}))
+                .unwrap();
+        note.apply(&request).unwrap();
+        assert_eq!(note.source_path.as_deref(), Some("/tmp/unused.md"));
+        let request =
+            serde_json::from_value(serde_json::json!({"action":"update", "markdown":"직접 입력"}))
+                .unwrap();
+        note.apply(&request).unwrap();
+        assert!(note.source_path.is_none());
+        note.save_edit(String::new(), 3).unwrap();
+        assert_eq!(note.markdown, "");
+        assert_eq!(note.html, "");
+        assert_eq!(note.title, "제목");
+        assert_eq!(note.status, "상태");
+        assert_eq!(note.color, "#ffeeaa");
+    }
+    #[test]
     fn malformed_tasks_report_line_and_preserve_all_fields() {
         let mut note = Note::default();
         let before = serde_json::to_value(&note).unwrap();
@@ -280,6 +378,7 @@ mod tests {
     fn partial_updates_preserve_unspecified_fields() {
         let mut note = Note::default();
         note.apply(&Request {
+            source_path: None,
             id: None,
             color: None,
             action: Action::Open,
@@ -289,6 +388,7 @@ mod tests {
         })
         .unwrap();
         note.apply(&Request {
+            source_path: None,
             id: None,
             color: None,
             action: Action::Update,
@@ -306,6 +406,7 @@ mod tests {
         let mut note = Note::default();
         assert!(note
             .apply(&Request {
+                source_path: None,
                 id: None,
                 color: None,
                 action: Action::Update,
