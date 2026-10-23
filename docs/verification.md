@@ -219,3 +219,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 사용자 승인에 따라 변경 사항 커밋 후 Apple Silicon(arm64)용 앱·DMG를 빌드하고 비공개 GitHub 저장소에 릴리스한다.
 - 기존 v0.1.0 Intel Mac 릴리스는 보존한다. 이번 버전의 Intel 실행 검증과 빌드는 포함하지 않는다.
 - Apple Developer ID 서명·공증은 기존과 동일하게 제공하지 않는다. 실행 중인 기존 앱과 메모는 자동 교체·재시작하지 않는다.
+
+### Apple Silicon 배포 서명
+
+최초 앱 번들 검사에서 링커 서명만 남아 리소스 봉인이 없는 상태를 발견했다. `bundle.macOS.signingIdentity`를 `-`로 명시해 Tauri가 번들 전체에 애드혹 서명을 하도록 변경하고 앱·DMG를 다시 생성한다. Developer ID 인증·공증을 의미하지 않는다.
