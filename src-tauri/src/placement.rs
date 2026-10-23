@@ -66,6 +66,41 @@ pub fn find_space(
     None
 }
 
+// When every monitor is occupied, keep the panel on screen with minimal overlap.
+pub fn least_overlap(area: Rect, size: (i64, i64), occupied: &[Rect]) -> Option<(i64, Rect)> {
+    if size.0 <= 0 || size.1 <= 0 || size.0 > area.width || size.1 > area.height {
+        return None;
+    }
+    let mut xs = vec![area.x, area.right() - size.0];
+    let mut ys = vec![area.y, area.bottom() - size.1];
+    for r in occupied {
+        xs.extend([r.x - size.0, r.right()]);
+        ys.extend([r.y - size.1, r.bottom()]);
+    }
+    let mut best = None;
+    for x in xs {
+        for &y in &ys {
+            let candidate = Rect {
+                x: x.clamp(area.x, area.right() - size.0),
+                y: y.clamp(area.y, area.bottom() - size.1),
+                width: size.0,
+                height: size.1,
+            };
+            let score = occupied
+                .iter()
+                .map(|r| {
+                    (candidate.right().min(r.right()) - candidate.x.max(r.x)).max(0)
+                        * (candidate.bottom().min(r.bottom()) - candidate.y.max(r.y)).max(0)
+                })
+                .sum();
+            if best.as_ref().is_none_or(|(old, _)| score < *old) {
+                best = Some((score, candidate));
+            }
+        }
+    }
+    best
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

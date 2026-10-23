@@ -8,12 +8,37 @@ let latestNote;
 let editing = false;
 let saving = false;
 let editRevision;
+let needsFit = true;
+let fitting = false;
+async function fitContent() {
+  if (!needsFit || fitting || editing) return;
+  fitting = true;
+  // Measure natural flow independently of the current window height.
+  const measure = $('viewport').cloneNode(true);
+  measure.id = 'measure-viewport';
+  Object.assign(measure.style, {
+    position: 'fixed', left: '-10000px', top: '0', visibility: 'hidden',
+    display: 'flow-root', flex: 'none', width: 'max-content', minWidth: '238px',
+    maxWidth: '478px', height: 'auto', minHeight: '0', maxHeight: 'none',
+    overflow: 'visible', padding: '3px', overflowWrap: 'anywhere', pointerEvents: 'none',
+  });
+  document.body.appendChild(measure);
+  const rect = measure.getBoundingClientRect();
+  const width = Math.ceil(rect.width + 2);
+  const height = Math.ceil(rect.height + 2);
+  measure.remove();
+  try { needsFit = !await invoke('fit_note', { width, height }); }
+  catch (error) { failure(error); }
+  finally { fitting = false; }
+}
 const fontSizes = [12, 14, 16, 18];
 let fontIndex = 0;
 $('font-size').addEventListener('click', () => {
   fontIndex = (fontIndex + 1) % fontSizes.length;
   const size = fontSizes[fontIndex];
   document.documentElement.style.setProperty('--font-size', `${size}px`);
+  needsFit = true;
+  fitContent();
   $('font-size').title = `글자 크기 ${size}px · 클릭하여 변경`;
   $('font-size').setAttribute('aria-label', `글자 크기 ${size}px, 클릭하여 변경`);
 });
@@ -24,6 +49,8 @@ function endEditing() {
   $('copy').disabled = false;
   $('edit').disabled = false;
   $('error').hidden = true;
+  needsFit = true;
+  fitContent();
   $('edit').focus();
 }
 $('edit').addEventListener('click', () => {
@@ -78,8 +105,10 @@ async function refresh() {
       // HTML is generated and sanitized in Rust; no user HTML reaches this sink.
       $('content').innerHTML = state.note.html;
       revision = state.note.revision;
+      needsFit = true;
     }
     $('pin').setAttribute('aria-pressed', String(state.always_on_top));
+    await fitContent();
   } catch (error) { failure(error); }
   setTimeout(refresh, 350);
 }
@@ -89,7 +118,13 @@ document.addEventListener('mousedown', (event) => {
   win.startDragging().catch(failure);
 });
 for (const grip of document.querySelectorAll('.resize')) {
-  grip.addEventListener('mousedown', (event) => { if (event.button === 0) win.startResizeDragging(grip.dataset.direction).catch(failure); });
+  grip.addEventListener('mousedown', (event) => {
+    if (event.button !== 0) return;
+    needsFit = false;
+    // Start native resizing inside the original mouse gesture.
+    invoke('manual_resize').catch(failure);
+    win.startResizeDragging(grip.dataset.direction).catch(failure);
+  });
 }
 $('pin').addEventListener('click', () => invoke('toggle_pin').catch(failure));
 $('close').addEventListener('click', () => invoke('hide_note').catch(failure));

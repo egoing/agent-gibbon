@@ -1,6 +1,8 @@
+mod entrance;
 mod ipc;
 mod model;
 mod placement;
+mod sizing;
 mod source;
 mod tray;
 mod warp;
@@ -40,7 +42,11 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
 }
 // Window APIs and monitor work areas use physical pixels. Convert the new
 // window's logical size per monitor so mixed-DPI displays retain its size.
-fn place_new_window(app: &tauri::AppHandle, win: &tauri::WebviewWindow) -> Result<(), String> {
+fn place_new_window(
+    app: &tauri::AppHandle,
+    win: &tauri::WebviewWindow,
+    requested_size: Option<tauri::LogicalSize<f64>>,
+) -> Result<tauri::PhysicalPosition<i32>, String> {
     use std::hash::{BuildHasher, Hasher};
     let random = std::collections::hash_map::RandomState::new()
         .build_hasher()
@@ -70,6 +76,7 @@ fn place_new_window(app: &tauri::AppHandle, win: &tauri::WebviewWindow) -> Resul
             monitors.swap(0, index);
         }
     }
+    let mut fallback = None;
     for monitor in monitors {
         let work = monitor.work_area();
         let gap = (8.0 * monitor.scale_factor()).round() as i64;
@@ -79,10 +86,22 @@ fn place_new_window(app: &tauri::AppHandle, win: &tauri::WebviewWindow) -> Resul
             width: i64::from(work.size.width) - 2 * gap,
             height: i64::from(work.size.height) - 2 * gap,
         };
+        let logical = requested_size.unwrap_or(tauri::LogicalSize::new(
+            f64::from(size.width) / scale,
+            f64::from(size.height) / scale,
+        ));
         let target = (
-            (f64::from(size.width) / scale * monitor.scale_factor()).round() as i64,
-            (f64::from(size.height) / scale * monitor.scale_factor()).round() as i64,
+            (logical.width * monitor.scale_factor()).round() as i64,
+            (logical.height * monitor.scale_factor()).round() as i64,
         );
+        if let Some((score, rect)) = placement::least_overlap(area, target, &occupied) {
+            if fallback
+                .as_ref()
+                .is_none_or(|(best, _, _, _)| score < *best)
+            {
+                fallback = Some((score, rect, work.position.y, monitor.scale_factor()));
+            }
+        }
         if let Some(rect) = placement::find_space(area, target, random, &occupied, gap) {
             win.set_position(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32))
                 .map_err(|e| e.to_string())?;
@@ -92,13 +111,21 @@ fn place_new_window(app: &tauri::AppHandle, win: &tauri::WebviewWindow) -> Resul
             ))
             .map_err(|e| e.to_string())?;
             warp::remember(app, win, rect.y, work.position.y, monitor.scale_factor())?;
-            return Ok(());
+            return Ok(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32));
         }
     }
-    Err(
-        "기존 메모와 겹치지 않는 화면 공간이 없습니다. 메모를 숨기거나 크기를 줄인 후 다시 여세요"
-            .into(),
-    )
+    if let Some((_, rect, work_y, scale)) = fallback {
+        win.set_position(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32))
+            .map_err(|e| e.to_string())?;
+        win.set_size(tauri::PhysicalSize::new(
+            rect.width as u32,
+            rect.height as u32,
+        ))
+        .map_err(|e| e.to_string())?;
+        warp::remember(app, win, rect.y, work_y, scale)?;
+        return Ok(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32));
+    }
+    Err("패널을 배치할 수 있는 화면이 없습니다".into())
 }
 // Called only on Tauri's main thread. macOS `show()` makes the window key;
 // ordering it front directly preserves the user's active application.
@@ -130,7 +157,11 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
             && cursor.y >= f64::from(p.y)
             && cursor.x < f64::from(p.x) + f64::from(size.width)
             && cursor.y < f64::from(p.y) + f64::from(size.height);
-        let alpha = if hovered { 1.0 } else { 0.5 };
+        let alpha = if hovered || entrance::active(&window) {
+            1.0
+        } else {
+            0.5
+        };
         let ptr = window.ns_window().map_err(|e| e.to_string())?;
         // SAFETY: Tauri owns the live NSWindow, borrowed only on the main thread.
         unsafe {
@@ -177,6 +208,8 @@ fn save_note(
 }
 #[tauri::command]
 fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
+    sizing::cancel(&window);
+    entrance::finish(&window)?;
     window.hide().map_err(|e| e.to_string())
 }
 #[tauri::command]
@@ -219,21 +252,16 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
     match request.action {
         Action::Open => {
             if existing.as_ref().is_none_or(|note| note.revision == 0) {
-                if let Err(error) = place_new_window(app, &win) {
-                    if existing.is_none() {
-                        let _ = win.destroy();
-                    }
-                    return Err(error);
-                }
-            }
-            if let Err(error) = show_without_focus(&win) {
-                if existing.is_none() {
-                    let _ = win.destroy();
-                }
+                sizing::prepare(&win)?;
+            } else if let Err(error) = entrance::show(&win, None) {
                 return Err(error);
             }
         }
-        Action::Close => win.hide().map_err(|e| e.to_string())?,
+        Action::Close => {
+            sizing::cancel(&win);
+            entrance::finish(&win)?;
+            win.hide().map_err(|e| e.to_string())?;
+        }
         Action::Update | Action::Inspect | Action::List => (),
     }
     let menu_changed = existing
@@ -255,6 +283,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     let app = builder
         .plugin(tauri_plugin_clipboard_manager::init())
         .manage(warp::Warps::default())
+        .manage(entrance::Entrances::default())
+        .manage(sizing::Sizes::default())
         .manage(Mutex::new(BTreeMap::from([(
             "main".to_string(),
             Note::default(),
@@ -266,11 +296,17 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sync_opacity,
             save_note,
             warp::warp_note,
-            warp::poll_warp
+            warp::poll_warp,
+            sizing::fit_note,
+            sizing::manual_resize
         ])
         .on_window_event(|win, event| {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 api.prevent_close();
+                if let Some(webview) = win.app_handle().get_webview_window(win.label()) {
+                    sizing::cancel(&webview);
+                    let _ = entrance::finish(&webview);
+                }
                 let _ = win.hide();
             }
         })
@@ -426,6 +462,8 @@ fn cli(args: &[String]) -> Result<Value, String> {
     };
     let response = ipc::exchange(stream, &request)?;
     if matches!(request.action, Action::Open) && response["ok"] == true {
+        // Let the entrance finish before reporting the final destination.
+        std::thread::sleep(Duration::from_millis(950));
         // Native move/resize events are queued. A fresh IPC turn observes the
         // actual final frame rather than the pre-placement cached coordinates.
         return ipc::exchange(
