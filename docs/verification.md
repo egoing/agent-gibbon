@@ -223,3 +223,9 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 ### Apple Silicon 배포 서명
 
 최초 앱 번들 검사에서 링커 서명만 남아 리소스 봉인이 없는 상태를 발견했다. `bundle.macOS.signingIdentity`를 `-`로 명시해 Tauri가 번들 전체에 애드혹 서명을 하도록 변경하고 앱·DMG를 다시 생성한다. Developer ID 인증·공증을 의미하지 않는다.
+
+### 배포 빌드 확인 결과
+
+- v0.2.0 arm64 앱·DMG 생성 완료. 앱 번들의 `codesign --verify --deep --strict` 통과.
+- DMG 이미지 무결성 검사 통과. 읽기 전용으로 마운트한 DMG 안 앱도 서명 검증을 통과했고 버전 0.2.0, 빌드된 앱과의 바이너리 SHA-256 일치, CLI `--help` 실행을 확인했다.
+- 다운로드 검증용 SHA256SUMS.txt를 배포 파일과 함께 제공한다.
