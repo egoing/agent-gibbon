@@ -18,8 +18,8 @@ async function fitContent() {
   measure.id = 'measure-viewport';
   Object.assign(measure.style, {
     position: 'fixed', left: '-10000px', top: '0', visibility: 'hidden',
-    display: 'flow-root', flex: 'none', width: 'max-content', minWidth: '238px',
-    maxWidth: '478px', height: 'auto', minHeight: '0', maxHeight: 'none',
+    display: 'flow-root', flex: 'none', width: '298px', minWidth: '298px',
+    maxWidth: '298px', height: 'auto', minHeight: '0', maxHeight: 'none',
     overflow: 'visible', padding: '3px', overflowWrap: 'anywhere', pointerEvents: 'none',
   });
   document.body.appendChild(measure);

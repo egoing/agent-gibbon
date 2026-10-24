@@ -58,7 +58,9 @@ fn place_new_window(
         if other.label() == win.label() || !other.is_visible().map_err(|e| e.to_string())? {
             continue;
         }
-        let p = other.outer_position().map_err(|e| e.to_string())?;
+        let p = entrance::destination(other)
+            .map(Ok)
+            .unwrap_or_else(|| other.outer_position().map_err(|e| e.to_string()))?;
         let s = other.outer_size().map_err(|e| e.to_string())?;
         occupied.push(placement::Rect {
             x: p.x.into(),
@@ -183,7 +185,7 @@ fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<V
     let position = win.outer_position().map_err(|e| e.to_string())?;
     let size = win.outer_size().map_err(|e| e.to_string())?;
     Ok(
-        json!({"ok":true,"id":id,"note":note,"opacity":opacity,"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        json!({"ok":true,"id":id,"note":note,"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     )
 }
 #[tauri::command]
@@ -462,22 +464,25 @@ fn cli(args: &[String]) -> Result<Value, String> {
     };
     let response = ipc::exchange(stream, &request)?;
     if matches!(request.action, Action::Open) && response["ok"] == true {
-        // Let the entrance finish before reporting the final destination.
+        // Initial content measurement may be pending before the entrance starts.
         std::thread::sleep(Duration::from_millis(950));
-        // Native move/resize events are queued. A fresh IPC turn observes the
-        // actual final frame rather than the pre-placement cached coordinates.
-        return ipc::exchange(
-            ipc::connect()?,
-            &Request {
-                source_path: None,
-                action: Action::Inspect,
-                id: request.id,
-                color: None,
-                title: None,
-                markdown: None,
-                status: None,
-            },
-        );
+        let inspect = Request {
+            source_path: None,
+            action: Action::Inspect,
+            id: request.id,
+            color: None,
+            title: None,
+            markdown: None,
+            status: None,
+        };
+        let deadline = Instant::now() + Duration::from_secs(5);
+        loop {
+            let state = ipc::exchange(ipc::connect()?, &inspect)?;
+            if state["animating"] != true || Instant::now() >= deadline {
+                return Ok(state);
+            }
+            std::thread::sleep(Duration::from_millis(100));
+        }
     }
     Ok(response)
 }

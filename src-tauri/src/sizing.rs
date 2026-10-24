@@ -67,9 +67,7 @@ pub fn fit_note(
     let work = monitor.work_area();
     let scale = monitor.scale_factor();
     let size = LogicalSize::new(
-        width
-            .clamp(240.0, 480.0)
-            .min((f64::from(work.size.width) / scale - 16.0).max(144.0)),
+        300.0_f64.min((f64::from(work.size.width) / scale - 16.0).max(144.0)),
         height
             .clamp(48.0, 420.0)
             .min((f64::from(work.size.height) / scale - 16.0).max(32.0)),

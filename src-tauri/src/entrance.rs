@@ -44,6 +44,16 @@ pub fn active(window: &WebviewWindow) -> bool {
         .unwrap_or(false)
 }
 
+pub fn destination(window: &WebviewWindow) -> Option<PhysicalPosition<i32>> {
+    window
+        .state::<Entrances>()
+        .0
+        .lock()
+        .ok()?
+        .get(window.label())
+        .map(|flight| flight.destination)
+}
+
 fn near(a: PhysicalPosition<i32>, b: PhysicalPosition<i32>) -> bool {
     (i64::from(a.x) - i64::from(b.x)).abs() <= 2 && (i64::from(a.y) - i64::from(b.y)).abs() <= 2
 }
@@ -58,7 +68,7 @@ pub fn show(
     finish(window)?;
     let destination = match destination {
         Some(p) => p,
-        None => window.outer_position().map_err(|e| e.to_string())?,
+        None => crate::place_new_window(window.app_handle(), window, None)?,
     };
     let Some(monitor) = window.current_monitor().map_err(|e| e.to_string())? else {
         return crate::show_without_focus(window);
@@ -133,8 +143,12 @@ fn tick(
         flights.remove(window.label());
         return Ok(false);
     }
-    let t = (started.elapsed().as_secs_f64() / 0.420).min(1.0);
     let hidden = !window.is_visible().map_err(|e| e.to_string())?;
+    let elapsed = started.elapsed().as_secs_f64();
+    if elapsed < 3.0 && !hidden {
+        return Ok(true);
+    }
+    let t = ((elapsed - 3.0).max(0.0) / 0.420).min(1.0);
     let ease = if hidden { 1.0 } else { 1.0 - (1.0 - t).powi(3) };
     let interpolate =
         |a: i32, b: i32| (f64::from(a) + (f64::from(b) - f64::from(a)) * ease).round() as i32;
