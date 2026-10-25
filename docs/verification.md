@@ -461,3 +461,15 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 이전 평면 파일을 원본 보존 복사하며 기존 대상은 덮어쓰지 않는 이관 테스트 통과. 같은 폴더에 다른 파일이 있어도 메모 복원 성공.
 - `npm run dev:build`, `npm test`(Rust 44 통과/1 무시, JS 18 통과), `npm run check`, 실제 `scripts/persistence-smoke.py` 통과. smoke에서 `docs/<ID>/index.md`와 개발 인스턴스 경로를 검증.
 - 이미지 기능 및 날짜 메타데이터 추가 없음. 설치 앱 교체 및 실제 사용자 Documents 경로 쓰기는 수행하지 않음. Conf 5는 개발 앱의 저장/재실행 경로 기준, Risk Medium.
+
+
+## 2026-10-25 Ctrl 접촉 감지 개선
+
+- macOS 앱 내부·외부 마우스 이동/드래그 및 modifier 변경 이벤트에서 접기 판정을 실행한다. 기존 100ms 확인은 보조로 유지한다. 이벤트는 소비하거나 변경하지 않는다.
+- 접힌 노트만 사방 4 논리 px까지 감지한다. 클릭 영역과 실제 12px 창 크기는 유지하며, 펼친 노트에는 여유 영역을 적용하지 않는다.
+- AppKit의 창 frame과 마우스 위치를 함께 사용하여 서로 다른 화면 배율에 따른 좌표 단위 혼합을 피한다.
+- 환경: arm64 macOS, Node v24.21.0, Rust 1.91.1. `npm run check`, `npm test`, `npm run dev:build` 통과.
+- `python3 scripts/fold-contact-smoke.py` 실환경 통과: 20ms 접촉 10회 반복 전환, 접힌 제목 위쪽 3px 여유 영역, 펼친 창의 영역 외 접촉 무시, 창 크기·위치·포커스·핀·본문 보존, 숨긴 노트 유지. 검사 후 Ctrl과 포인터를 복원하고 테스트 노트를 숨긴 뒤 직접 시작한 워크트리 프로세스만 종료했다.
+- 입력 검증에는 macOS 이벤트 전송 권한이 필요하다. 실행 전 modifier 키를 놓고 테스트 중 마우스와 키보드를 조작하지 않는다. `npm run dev:build` 후 실행하며, 다른 개발 노트는 숨긴 상태여야 한다.
+- 이번 실환경 검증은 다른 앱에 포커스를 둔 접촉을 확인했다. 여러 배율의 모니터 간 이동과 앱 내부 이벤트 경로를 별도로 재현하지는 않았다. 설치 앱 교체와 두 워크트리 격리 회귀는 수행하지 않았다.
+- 설계 참고: [Apple NSEvent 이벤트 모니터](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/EventOverview/MonitoringEvents/MonitoringEvents.html), [Tauri Rust 명령](https://v2.tauri.app/develop/calling-rust/).
