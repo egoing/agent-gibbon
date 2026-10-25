@@ -280,3 +280,49 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 실환경 커서 입력 시도는 실패했습니다. `CGEvent.post`로 좌표 (5,40)을 요청했으나 실제 (1123,669)가 유지되어 입력 미전달을 확인했습니다. `persistent-native.log`의 커서 확인 실패는 이 환경 제한이며 실제 커서 확인 통과로 보고하지 않습니다. 스모크는 이후 요청/실제 좌표를 비교하여 미전달만 SKIP으로 분리하고, 입력이 전달되면 강조 해제 assertion을 반드시 실행합니다.
 - 실제 창 순서·3초 alpha 및 강조 상태 유지·숨김/재열기/빈 본문은 `persistent-native-partial.log`에 기록합니다. 강조 색상/커서 접촉/편집·복사·워프 UI 실환경 제한은 남아 있습니다. 후속 변경의 Conf 3(기능 경계조건 단위 검증), Risk Medium이며 자동 병합하지 않습니다.
 - 커버리지 대조: 사용자 요구사항 변경에 따른 정당한 테스트 변경, 불투명·확인 상태 분리, stale 확인/snapshot 처리의 실사용 검증을 추가했습니다. 공유 스킬 원본은 수정하지 않습니다.
+## 2026-10-25 커서 근처 등장 — 이슈 #7
+
+- 기준 SHA `ff0712c4421364ff9a60ce132123ddafb01be8d8`에서 baseline을 캡처했다. `npm test`(Rust 23 + Node 7), `cargo check --all-targets`, Clippy·Rustfmt·JS 문법·diff 검사, `npm run build` 모두 통과했으며 제외한 기존 실패는 없다.
+- 환경: Apple Silicon arm64, Rust/Cargo 1.91.1, Node 24.21.0, npm 11.19.0, Tauri Rust 2.12.2. 원본 로그는 `/Users/egoinglee/Library/Logs/floatnote-is2-7`에 보존한다.
+- TDD red: `scripts/entrance-smoke.py`를 실제 기준 release 앱의 격리 사본에서 실행했다. `open`이 3.589초 동안 대기하여 2.5초 반환 상한 assertion이 실패했다. red ref는 `refs/is2/red/7`에 보존한다.
+- 실제 앱 검증은 release 실행 파일 사본의 IPC 디렉터리 문자열만 같은 길이의 `/tmp/floatnot7-`로 교체하고 애드혹 서명한 `floatnote-qa7` 프로세스에서 수행했다. 테스트가 만든 프로세스만 종료하며 사용자 앱을 재시작·교체하지 않았다. 테스트는 고유 ID 메모만 만들고 커서·전면 앱을 복원한다.
+- 최초 green: Rust 27 + Node 7, 타입·린트·빌드 통과. 실제 커서 오른쪽 하단에서 왼쪽 위 여백, 3.6초 이상 위치 불변과 opacity 1.0, 즉시 CLI 반환, 이미 보이는 창의 open/갱신 유지, 마우스 이동 후 목적지 이동·opacity 0.5, 지연된 자동 크기 적용, 숨김/복원/취소/창 독립성 통과.
+- 추가 드래그 검증은 최초 AppleScript Unicode escape 오류, 1차 교정 후 접근성 권한 거부(-1728), CLI 프레임 조회로 바꾼 2차 실행에서는 드래그 최종 위치 assertion 실패를 기록했다. assertion을 약화하지 않았으며 별도 작업자에게 에스컬레이션했다.
+- 독립 감사에서 테스트 완화·실행 결과 퇴행·스코프 이탈은 미발동이었다. 다른 배율의 모니터에서 대기하는 창의 목적지 예약 크기 결함(P2)을 발견해 보완 대상으로 기록했다.
+- 실제 다중 모니터·혼합 배율 장비 검증은 수행하지 않았다. 단위 테스트와 API/소스 검토 범위를 실제 장비 검증으로 간주하지 않는다.
+- 좌표 API 근거: [Tauri WebviewWindow](https://docs.rs/tauri/latest/tauri/webview/struct.WebviewWindow.html). 설치된 Tao 0.37.1의 macOS cursor_position, monitor position/size, window outer_size 구현을 함께 확인했다.
+
+### 에스컬레이션 보완과 남은 실환경 검증
+
+- 목적지의 물리 크기를 함께 저장하여 대기 모니터의 배율과 무관하게 예약 영역을 유지한다. 목적지 2x/커서 1x 및 반대 방향을 단위 테스트로 검증한다.
+- 본문 드래그는 백엔드에서 등장 상태를 취소한 뒤 시작한다. 수동 크기 조절도 현재 위치를 유지하며 취소한다. 숨김·워프에 사용하는 목적지 완료 처리와 구분한다. UI 이벤트 단위 테스트에서 본문 드래그 요청과 편집/버튼/보조 버튼 제외를 확인한다.
+- `CGPreflightPostEventAccess() == false`로 합성 버튼 이벤트 권한 부재를 확인했다. `scripts/macos-input.swift`는 입력 전 이를 검사하고 `INPUT_UNAVAILABLE`과 종료 코드 77을 반환한다. 커서 위치 이동은 가능했지만 클릭·드래그가 전송되지 않아 기존 실패를 실제 드래그 결함 재현으로 해석하지 않는다.
+- 보완 후 Rust 28 + Node 9, 타입·린트·release 앱 빌드와 기존 red 실앱 스크립트 전체가 통과했다. 기존 red 테스트의 assertion은 바꾸지 않았다.
+- 실제 버튼 드래그·수동 크기 조절은 **SKIP(입력 권한 없음)**, 실제 혼합 배율 다중 모니터는 **미검증**이다. 자동 병합을 보류하며 권한이 허용된 환경에서 `entrance-interaction-smoke.py`를 격리 앱으로 실행한 후 리뷰해야 한다. 기존 앱 설치·교체·재시작은 수행하지 않았다.
+
+### 후속 요구: 최소 1초 대기
+
+- 표시 직후 1초간 마우스가 움직여도 자동 이동하지 않는다. 이때 감지한 움직임은 기억했다가 1초 후 출발하며, 움직임이 없으면 계속 대기한다. 타이머는 네이티브 표시 완료 뒤 시작한다.
+- 새 단위 테스트는 기존 코드에서 100ms 시점의 조기 출발로 실패했다(`hold-red.log`). 수정 후 999ms 대기·1000ms 출발·420ms 이동, 조기 이동 후 원래 포인터 위치로 돌아오는 경우를 포함해 Rust 29 + Node 9 테스트가 통과했다. 타입·Clippy·포맷·release 빌드도 통과했다.
+- 격리 실앱에서 조기 포인터 이동 후 14회 연속 불투명·위치 불변 및 최소 대기 후 도착을 확인했다(`hold-live-pass.log`). 최초 테스트는 무작위 목적지가 커서 아래에 있어 opacity 1.0을 반환했다. 외부 포인터 반투명 검사 전에 커서를 노트 밖 화면 모서리로 옮기도록 테스트 조건만 바로잡고 assertion은 유지했다.
+- 사용자 확인용 격리 테스트 앱을 별도 실행한다. 기존 설치 앱·노트는 그대로 유지한다. 실제 버튼 이벤트 권한 제약과 다중 모니터 미검증 범위는 이전과 같다.
+
+## v0.2.2 Apple Silicon 릴리스
+
+- 커서 근처 등장·최소 1초 불투명 대기·마우스 이동 후 배치·빠른 CLI 응답을 v0.2.2로 배포한다. 미병합 PR #6 변경은 포함하지 않는다.
+- package.json·npm lock·Cargo package/lock·Tauri 버전을 0.2.2로 맞췄다.
+- Rust 29 + Node 9, Clippy·Rustfmt·JS·diff 검사와 `npm run build:release`(arm64 app·DMG) 통과.
+- DMG 무결성 검사, 읽기 전용 마운트 앱의 `codesign --verify --deep --strict`, 버전 0.2.2, arm64, 빌드 앱과 바이너리 바이트 일치, CLI `--help`를 확인했다. 검증 후 마운트를 해제했다.
+- DMG와 SHA256SUMS.txt, 검증 메타데이터를 로컬 `~/Library/Application Support/Floatnote/releases/v0.2.2/`에 보관한다. 코드·게이트 원본 로그는 `~/Library/Logs/floatnote-is2-7/`에 보관한다.
+- 애드혹 서명이며 Developer ID·공증 및 다른 Mac의 최초 설치는 미검증이다. 자동화 드래그·실제 다중 모니터 미검증 한계는 이전 기록과 같다.
+
+## v0.2.3 통합·릴리스
+
+- 사용자 명시 승인으로 PR #6 병합·push·릴리스·로컬 설치 및 해당 워크스페이스 삭제를 진행한다. Medium의 자동 병합이 아닌 사용자 승인 병합이다.
+- 최신 main `dc8990e`의 커서 근처 등장·최소 1초 대기를 유지하며 통합했다. 충돌은 검증 문서의 두 기록을 모두 보존하여 해결했다. 모든 패키지 버전을 0.2.3으로 맞췄다.
+- Rust 36 + Node 12, cargo check, Clippy·Rustfmt·JS 문법 통과. `npm run build:release`는 샌드박스에서 DMG 생성이 실패했고 권한을 허용한 동일 명령으로 app·DMG 생성이 완료됐다. 원시 실패 로그와 성공 로그를 모두 보존한다.
+- 앱 및 DMG 내부 앱의 애드혹 서명, DMG 무결성, 내부 버전 0.2.3, 바이너리 바이트 일치와 CLI --help를 확인했다. Developer ID·공증은 제공하지 않는다.
+- 최종 release 실행 파일에서 IPC 문자열만 같은 길이의 별도 namespace로 교체·애드혹 서명하여 native 격리 검증했다. 최소 1초 대기와 등장 회귀 모두 PASS. 등장 중 본문 변경은 독립적인 3초 불투명을 유지해야 하므로 기존 스모크의 즉시 0.5 기대를 1.0 및 기한 후 0.5 검사로 교체했다.
+- `CGWarpMouseCursorPosition`은 실제 커서 위치를 이동시킬 수 있지만, `CGPreflightPostEventAccess`가 false이면 WebView에 합성 pointer 이벤트를 전달하지 못한다. 좌표 일치만으로 이벤트 전달을 단정했던 검사 실패를 보존했고, 권한 확인을 추가하여 이 경우만 SKIP한다. 실제 커서 접촉·강조 색상·편집/복사/워프/수동 크기 UI 한계는 남아 있다.
+- 검증 로그는 `/tmp/floatnote-is2-5/release-*`, `entrance-hold-smoke-release.log`, `entrance-smoke-release.log`, `update-feedback-smoke-release.log`에 있으며 삭제 전 `~/Library/Logs/floatnote-is2-5/`로 보존한다. 원본 감사 ref와 시도 이력도 번들로 보존한다.
+- 로컬 배포는 기존 메모·초안·위치·숨김 보존을 위해 앱 설치 파일을 교체하되 실행 중인 기존 프로세스는 재시작하지 않는다. 설치 버전은 다음 앱 재시작부터 적용된다. 이전 앱과 메모 snapshot을 로컬 private 백업에 남긴다.

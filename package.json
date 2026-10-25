@@ -1,6 +1,6 @@
 {
   "name": "floatnote",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "private": true,
   "scripts": {
     "build": "tauri build --bundles app",

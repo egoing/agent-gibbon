@@ -48,8 +48,12 @@ let args = CommandLine.arguments
 if args[1] == "pointer" {
  let p = CGEvent(source:nil)!.location
  print("\(p.x) \(p.y)")
+} else if args[1] == "input-access" {
+ print(CGPreflightPostEventAccess())
 } else if args[1] == "move" {
- CGEvent(mouseEventSource:nil, mouseType:.mouseMoved, mouseCursorPosition:CGPoint(x:Double(args[2])!, y:Double(args[3])!), mouseButton:.left)!.post(tap:.cghidEventTap)
+ let point = CGPoint(x:Double(args[2])!, y:Double(args[3])!)
+ CGWarpMouseCursorPosition(point)
+ CGEvent(mouseEventSource:nil, mouseType:.mouseMoved, mouseCursorPosition:point, mouseButton:.left)!.post(tap:.cghidEventTap)
 } else {
  let all = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as! [[String:Any]]
  let filtered = all.enumerated().compactMap { index, w -> [String:Any]? in
@@ -88,7 +92,7 @@ if args[1] == "pointer" {
         body = '# 변경 확인\n\n유지하는 문단\n\n이전 문단'
         cli('open', a, '--markdown', body); created.append(a)
         cli('open', b, '--markdown', '다른 노트'); created.append(b)
-        native('move', '5', '40'); time.sleep(.6)
+        native('move', '5', '40'); time.sleep(1.6)
         before = cli('inspect', a)
         assert not before['feedback_active'] and abs(windows()[a]['alpha'] - .5) < .01
         assert windows()[b]['order'] < windows()[a]['order']
@@ -124,7 +128,8 @@ if args[1] == "pointer" {
         time.sleep(.6)
         actual_pointer = [float(v) for v in native('pointer').split()]
         expected_pointer = [rect['X'] + rect['Width'] / 2, rect['Y'] + rect['Height'] / 2]
-        if all(abs(actual - expected) < 2 for actual, expected in zip(actual_pointer, expected_pointer)):
+        event_access = native('input-access') == 'true'
+        if event_access and all(abs(actual - expected) < 2 for actual, expected in zip(actual_pointer, expected_pointer)):
             assert cli('inspect', a)['highlight_revision'] is None, 'pointer contact did not acknowledge highlight'
             native('move', '5', '40'); time.sleep(.2)
             cli('update', a, '--markdown', changed + ' 다시 변경')
@@ -138,7 +143,7 @@ if args[1] == "pointer" {
             time.sleep(3.0)
             passed('highlight survives opacity expiry, real pointer contact acknowledges it, opacity deadline remains independent')
         else:
-            print('SKIP: pointer acknowledgement; CGEvent movement was not delivered (requested=' + str(expected_pointer) + ', actual=' + str(actual_pointer) + ')', flush=True)
+            print('SKIP: pointer acknowledgement; synthetic event access=' + str(event_access) + ', requested=' + str(expected_pointer) + ', actual=' + str(actual_pointer), flush=True)
         if os.environ.get('FLOATNOTE_TEST_UI') == '1':
             # Unpinned notes still move forward without changing pin or focus.
             ui('click button "상단 고정" of ' + root(a)); time.sleep(.25)

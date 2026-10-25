@@ -128,7 +128,7 @@ async function refresh() {
 document.addEventListener('mousedown', (event) => {
   if (event.button !== 0 || event.target.closest('button, #editor, #error, #warp-tip, .resize')) return;
   event.preventDefault();
-  win.startDragging().catch(failure);
+  invoke('drag_note').catch(failure);
 });
 for (const grip of document.querySelectorAll('.resize')) {
   grip.addEventListener('mousedown', (event) => {
