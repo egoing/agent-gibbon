@@ -12,6 +12,13 @@ use tauri::{
 
 fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     let menu = Menu::new(app).map_err(|e| e.to_string())?;
+    if let Some(label) = &crate::instance::current().label {
+        menu.append(
+            &MenuItem::with_id(app, "dev-instance", label, false, None::<&str>)
+                .map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())?;
+    }
     let front = MenuItem::with_id(app, "bring-visible", "열린 메모 앞으로", true, None::<&str>)
         .map_err(|e| e.to_string())?;
     menu.append(&front).map_err(|e| e.to_string())?;
@@ -60,7 +67,10 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
     TrayIconBuilder::with_id("floatnote")
         .icon(icon())
         .icon_as_template(true)
-        .tooltip("Floatnote — 메모 열기")
+        .tooltip(format!(
+            "{} — 메모 열기",
+            crate::instance::current().title()
+        ))
         .menu(&menu(app)?)
         .show_menu_on_left_click(true)
         .on_menu_event(|app, event| {

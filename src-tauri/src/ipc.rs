@@ -15,7 +15,7 @@ use std::{
 pub fn directory() -> Result<PathBuf, String> {
     // A short path avoids Darwin's 104-byte Unix socket path limit.
     let uid = unsafe { libc::geteuid() };
-    let path = PathBuf::from(format!("/tmp/floatnote-{uid}"));
+    let path = crate::instance::current().directory(uid);
     let mut builder = fs::DirBuilder::new();
     builder.mode(0o700);
     match builder.create(&path) {
@@ -37,7 +37,9 @@ pub struct Endpoint {
 }
 impl Endpoint {
     pub fn bind() -> Result<Option<Self>, String> {
-        let dir = directory()?;
+        Self::bind_in(directory()?)
+    }
+    fn bind_in(dir: PathBuf) -> Result<Option<Self>, String> {
         let lock = OpenOptions::new()
             .read(true)
             .write(true)
@@ -116,4 +118,33 @@ pub fn read_request(stream: &mut UnixStream) -> Result<Request, String> {
 }
 pub fn error(message: impl ToString) -> Value {
     json!({"ok": false, "error": message.to_string()})
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn independent_locks_and_stale_socket_recovery() {
+        let root =
+            std::env::temp_dir().join(format!("floatnote-endpoint-test-{}", std::process::id()));
+        let a = root.join("a");
+        let b = root.join("b");
+        fs::create_dir_all(&a).unwrap();
+        fs::create_dir_all(&b).unwrap();
+        let first = Endpoint::bind_in(a.clone()).unwrap().unwrap();
+        let second = Endpoint::bind_in(b.clone()).unwrap().unwrap();
+        assert!(Endpoint::bind_in(a.clone()).unwrap().is_none());
+        assert!(UnixStream::connect(a.join("app.sock")).is_ok());
+        assert!(UnixStream::connect(b.join("app.sock")).is_ok());
+        drop(first);
+        assert!(!a.join("app.sock").exists());
+        assert!(UnixStream::connect(b.join("app.sock")).is_ok());
+        // A crashed process can leave its socket but cannot retain the flock.
+        let stale = UnixListener::bind(a.join("app.sock")).unwrap();
+        drop(stale);
+        let restarted = Endpoint::bind_in(a).unwrap().unwrap();
+        drop(restarted);
+        drop(second);
+        fs::remove_dir_all(root).unwrap();
+    }
 }

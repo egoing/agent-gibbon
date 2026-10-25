@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { themeFor } from '../ui/theme.mjs';
 
-async function setup(storage = new Map()) {
+async function setup(storage = new Map(), instance = {}) {
   const elements = new Map();
   const element = id => {
     if (!elements.has(id)) elements.set(id, {
@@ -43,7 +43,7 @@ async function setup(storage = new Map()) {
         if (command === 'toggle_fold') { folded = !folded; return folded; }
         if (command === 'warp_note' && warpError) throw warpError;
         if (command === 'poll_warp') { const result = contact; contact = false; return result; }
-        if (command === 'snapshot') return { note: { ...note }, always_on_top: true, feedback_active: feedbackActive, highlight_revision: highlightRevision };
+        if (command === 'snapshot') return { ...instance, note: { ...note }, always_on_top: true, feedback_active: feedbackActive, highlight_revision: highlightRevision };
         if (command === 'acknowledge_feedback') {
           if (highlightRevision !== args.revision) return false;
           highlightRevision = null; return true;
@@ -237,4 +237,23 @@ test('explicit button folds and unfolds without Control and updates its label', 
   assert.equal(app.classes.has('folded'), false);
   assert.equal(app.element('fold-toggle').attributes['aria-label'], '메모 접기');
   assert.equal(app.element('fold-toggle').attributes['aria-expanded'], 'true');
+});
+
+
+test('development labels and tip preferences stay separate from installed notes', async () => {
+  const storage = new Map();
+  const installed = await setup(storage);
+  const a = await setup(storage, { instance: 'dev-a', dev_label: 'DEV same · aaaaaaaa' });
+  const b = await setup(storage, { instance: 'dev-b', dev_label: 'DEV same · bbbbbbbb' });
+  assert.equal(installed.element('dev-instance').hidden, true);
+  assert.equal(a.element('dev-instance').hidden, false);
+  assert.equal(a.element('dev-instance').textContent, 'DEV same · aaaaaaaa');
+  a.update({ title: '제목' });
+  await a.refresh();
+  assert.equal(a.element('fold-title').textContent, '[DEV same · aaaaaaaa] 제목');
+  a.element('warp-tip-dismiss').listeners.click();
+  assert.equal(storage.get('floatnote.warp-tip-dismissed:dev-a'), 'true');
+  assert.equal(storage.has('floatnote.warp-tip-dismissed'), false);
+  assert.equal(storage.has('floatnote.warp-tip-dismissed:dev-b'), false);
+  assert.equal(b.element('dev-instance').textContent, 'DEV same · bbbbbbbb');
 });

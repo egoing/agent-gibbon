@@ -82,3 +82,6 @@ body.folded #fold-toggle svg { width: 10px; height: 10px; }
 
 #fold-toggle svg { transform: rotate(180deg); }
 body.folded #fold-toggle svg { transform: none; }
+
+#dev-instance { font-size: 10px; opacity: .75; overflow-wrap: anywhere; margin-bottom: 3px; }
+body.folded #dev-instance { display: none; }

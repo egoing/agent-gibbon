@@ -66,11 +66,22 @@ CLI 실행 파일: `src-tauri/target/release/floatnote`
 프로젝트의 `scripts/floatnote`는 release 실행 파일을 우선 사용하고 없으면 debug 실행 파일을 사용합니다. 다른 디렉터리에서도 절대 경로로 호출할 수 있습니다. Apple 배포 서명·공증은 설정하지 않았습니다. 다운로드한 배포판은 macOS 보안 확인에서 차단될 수 있습니다.
 
 ```sh
-# 개발 모드: 별도 프론트엔드 서버가 필요하지 않습니다.
+# 워크트리별 개발 앱 (프론트엔드 서버 없이 Rust 변경 감시)
 npm run dev
-# 개발 실행 파일만 만들기
-cargo build --manifest-path src-tauri/Cargo.toml
+# 또는 실행 파일만 빌드한 뒤 CLI open으로 해당 개발 앱 시작
+npm run dev:build
+./scripts/floatnote-dev open --id sample --markdown '이 워크트리의 메모'
+./scripts/floatnote-dev inspect --id sample
+npm run dev:info
 ```
+
+개발 실행과 `scripts/floatnote-dev`는 실제 워크트리 절대 경로(심볼릭 링크 해소)의 SHA-256 앞 24자리로 같은 `dev-…` ID를 계산합니다. 호출한 현재 디렉터리나 브랜치 이름에는 의존하지 않습니다. 경로를 옮기면 ID도 달라집니다. 소켓과 중복 실행 잠금은 `/tmp/floatnote-{uid}-{개발ID}/`로 분리됩니다. 개발 창에는 `DEV 워크트리이름 · 짧은해시`, 메뉴에는 같은 구분이 표시됩니다.
+
+개발 CLI는 해당 워크트리의 `src-tauri/target/debug/floatnote`만 사용하고, 빌드 출처를 확인합니다. release·설치본으로 대체하지 않습니다. 개발 실행기는 `CARGO_TARGET_DIR`를 해당 워크트리로 고정하며 `FLOATNOTE_INSTANCE`·`FLOATNOTE_DEV_NAME`을 자동 전달합니다. 이 변수는 직접 지정할 필요가 없습니다. 기본 호스트 debug 빌드를 지원하며 `npm run dev -- --no-watch`로 감시를 끌 수 있습니다. 다른 프로필·타깃·runner 옵션은 지원하지 않습니다.
+
+기존 `scripts/floatnote`와 환경변수 없이 실행한 설치 앱은 기본 `/tmp/floatnote-{uid}/` 통신 경로를 유지합니다. 개발 검증에는 반드시 `scripts/floatnote-dev`를 사용하세요. `close`는 해당 메모를 숨길 뿐이며, `npm run dev`의 종료는 그 실행에서 시작한 개발 앱에만 적용됩니다. CLI가 자동 시작한 앱은 개발 바이너리 경로로 프로세스를 식별해 종료하세요. 이름만으로 모든 앱을 일괄 종료하지 마세요.
+
+메모·창 상태는 프로세스별로 독립적이지만, `--file`로 같은 원본 파일을 연결하면 파일 자체는 공유됩니다. 동시에 편집할 테스트 파일도 워크트리별로 준비하세요. 두 워크트리를 각각 빌드하고 개발 앱이 실행되지 않은 상태에서 `python3 scripts/isolation-smoke.py --peer /절대경로/다른워크트리`로 동시 실행 회귀를 확인할 수 있습니다. 기존 기본 앱은 실행 중이어야 하며 검증은 기존 앱을 종료하지 않습니다.
 
 앱 아이콘은 `assets/icon.svg`를 바탕으로 Tauri CLI로 생성했습니다.
 
