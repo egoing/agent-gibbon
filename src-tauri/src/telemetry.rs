@@ -1,30 +1,28 @@
 //! Only fixed diagnostics leave the app; note content and error messages stay local.
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-pub fn init() -> sentry::ClientInitGuard {
-    let dsn = std::env::var("AGENT_GIBBON_SENTRY_DSN")
-        .ok()
-        .or_else(|| std::env::var("FLOATNOTE_SENTRY_DSN").ok())
-        .or_else(|| option_env!("AGENT_GIBBON_SENTRY_DSN").map(str::to_owned))
-        .or_else(|| option_env!("FLOATNOTE_SENTRY_DSN").map(str::to_owned))
-        .unwrap_or_else(|| include_str!("../sentry-dsn.txt").trim().to_owned())
-        .parse()
-        .ok();
-    sentry::init(sentry::ClientOptions {
-        dsn,
+// Never initialize the SDK without a build-time DSN: sentry::init otherwise
+// falls back to the unrelated SENTRY_DSN environment variable.
+fn production_dsn(disabled_build: bool, embedded: Option<&str>) -> Option<sentry::types::Dsn> {
+    if disabled_build {
+        return None;
+    }
+    embedded?.trim().parse().ok()
+}
+
+pub fn init() -> Option<sentry::ClientInitGuard> {
+    let dsn = production_dsn(
+        cfg!(any(debug_assertions, test)),
+        option_env!("AGENT_GIBBON_SENTRY_DSN"),
+    )?;
+    Some(sentry::init(sentry::ClientOptions {
+        dsn: Some(dsn),
         release: sentry::release_name!(),
-        environment: Some(
-            if cfg!(debug_assertions) {
-                "development"
-            } else {
-                "production"
-            }
-            .into(),
-        ),
+        environment: Some("production".into()),
         send_default_pii: false,
         before_send: Some(std::sync::Arc::new(sanitize)),
         ..Default::default()
-    })
+    }))
 }
 
 fn sanitize(
@@ -73,15 +71,20 @@ pub fn report_frontend_error(kind: &str) {
 mod tests {
     use super::*;
 
+    const TEST_DSN: &str = "https://public@example.invalid/1";
+
     #[test]
-    #[ignore = "Sends one fixed diagnostic to Sentry; run explicitly to verify delivery"]
-    fn live_sentry_delivery() {
-        let guard = init();
-        assert!(guard.is_enabled());
-        let event =
-            sentry::capture_message("Agent Gibbon Sentry connection test", sentry::Level::Error);
-        assert!(!event.is_nil());
-        assert!(guard.flush(Some(std::time::Duration::from_secs(10))));
+    fn development_and_tests_never_enable_collection() {
+        assert!(production_dsn(true, Some(TEST_DSN)).is_none());
+        assert!(init().is_none());
+    }
+
+    #[test]
+    fn production_requires_a_valid_embedded_dsn() {
+        for value in [None, Some(""), Some("  "), Some("invalid")] {
+            assert!(production_dsn(false, value).is_none());
+        }
+        assert!(production_dsn(false, Some(TEST_DSN)).is_some());
     }
 
     #[test]

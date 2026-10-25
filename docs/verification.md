@@ -432,3 +432,12 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 두 Mac에 /Applications/Agent Gibbon.app을 설치하고 설치본 서명·버전·바이너리 일치·기존 메모 CLI 조회를 확인했다. 덮어쓰기 뒤 macOS 서명 캐시로 실행이 종료되는 현상을 해결하기 위해 새 번들을 별도 경로에 준비한 뒤 기존 앱을 백업 경로로 이동하고 교체했다. 기존 프로세스를 종료하지 않아 메모·초안·숨김을 보존했으며 새 버전은 다음 앱 실행부터 적용된다.
 - 기존 앱과 메모 snapshot·설치 자산은 ~/Library/Application Support/Agent Gibbon/releases/v0.2.7/, 검증 로그는 ~/Library/Logs/agent-gibbon-v0.2.7/에 보존한다.
 - Developer ID 서명·공증 및 전체 UI 회귀는 이번 배포에서 수행하지 않았다. Conf 4 / Risk Medium.
+
+
+## 공식 배포 빌드에만 Sentry 수집 허용 (2026-10-25)
+
+- 기본 DSN 파일과 런타임 DSN 재지정/구형 환경변수 호환을 제거했다. release 빌드에 `AGENT_GIBBON_SENTRY_DSN`을 주입한 경우만 SDK를 초기화하며, debug 및 test 빌드는 항상 초기화를 건너뛴다. 유효한 내장 DSN이 없으면 `sentry::init`을 호출하지 않아 SDK의 일반 `SENTRY_DSN` 자동 적용도 차단한다.
+- Apple Silicon arm64, Rust/Cargo 1.91.1, Node 26.0.0, npm 11.12.1, Tauri CLI 2.12.1에서 Rust 44개 및 Node 18개 테스트, Clippy, Rustfmt, diff 검사를 통과했다. 기존 실제 전송 테스트는 테스트 빌드 수집 금지 정책에 따라 전송 없는 조건 검증으로 교체했다.
+- `npm run dev:build` 및 DSN 환경변수를 제거한 `npm run build`의 release 앱 번들 생성을 통과했다. `scripts/agent-gibbon-dev`로 테스트 노트의 open/update/close/inspect 및 숨김·본문을 확인했다. 실행 환경에는 실제 서비스가 아닌 example.invalid 테스트 DSN을 제공했다. 직접 시작한 개발 앱 PID만 종료했으며 설치 앱은 변경하지 않았다.
+- 유효한 release DSN 조건은 단위 테스트로 확인했다. 공식 DSN을 주입한 배포판의 실제 Sentry 수신 및 네트워크 캡처 검증, Intel 빌드, 앱 공증은 수행하지 않았다. 배포 담당자는 다음 공식 빌드에 DSN을 주입하고 실제 수신을 별도로 확인해야 한다. 이번 결과물은 설치·배포하지 않았다.
+- Conf 3 / Risk Low: 수집 조건은 단위 테스트로 검증했고 개발 CLI의 실제 실행도 확인했지만 공식 서비스 전송은 미검증이다.

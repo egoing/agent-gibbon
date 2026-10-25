@@ -1,6 +1,6 @@
 # Agent Gibbon
 
-에이전트가 CLI로 갱신하는 작은 플로팅 Markdown 메모. Tauri 2 + Rust + 시스템 WebView로 동작하며 웹 서버 없이 동작합니다. Sentry로 앱 오류 진단 정보를 전송합니다. 메모는 로컬에 유지됩니다.
+에이전트가 CLI로 갱신하는 작은 플로팅 Markdown 메모. Tauri 2 + Rust + 시스템 WebView로 동작하며 웹 서버 없이 동작합니다. 공식 배포판은 Sentry로 앱 오류 진단 정보를 전송합니다. 개발·테스트 및 DSN 없이 빌드한 앱은 전송하지 않습니다. 메모는 로컬에 유지됩니다.
 
 ## 지원 기능
 
@@ -187,7 +187,7 @@ python3 scripts/macos-tray-smoke.py
 
 ## 배포판 제작과 설치
 
-설치 파일은 [GitHub Releases](https://github.com/egoing/agent-gibbon/releases)에서 받습니다. 비공개 저장소이므로 저장소 접근 권한이 필요합니다.
+설치 파일은 [GitHub Releases](https://github.com/egoing/agent-gibbon/releases)에서 받습니다. 공개 저장소에서 다운로드할 수 있습니다.
 
 ```sh
 npm run build:release
@@ -219,26 +219,20 @@ npm run build:release
 
 [Sentry Rust SDK](https://docs.sentry.io/platforms/rust/)로 앱 프로세스의 Rust panic과 WebView의 처리되지 않은 오류·Promise rejection을 수집합니다. 네이티브 크래시 덤프, 정상적으로 처리한 CLI/편집 오류, 성능 추적과 세션 리플레이는 수집하지 않습니다.
 
-기본 연결은 개인 조직 `egoing-personal`의 기존 `floatnote` 프로젝트입니다. `src-tauri/sentry-dsn.txt`에는 관리 권한이 없는 공개 수신용 DSN만 포함됩니다. 인증 토큰은 저장하지 않습니다.
+오류 수집은 **release 빌드에 유효한 `AGENT_GIBBON_SENTRY_DSN`을 빌드 시 주입한 경우에만** 켜집니다. 개발(debug)·테스트 빌드는 DSN이 있어도 SDK를 초기화하지 않습니다. 일반 소스 빌드에는 기본 DSN이 없으며, 실행 환경의 `SENTRY_DSN`이나 과거 `FLOATNOTE_SENTRY_DSN`으로 켤 수 없습니다.
 
-다른 프로젝트를 사용하려면 DSN을 환경변수로 지정하세요. `.env`는 자동 로드하지 않습니다.
+공식 배포 담당자는 배포 환경에서 공개 수신용 DSN을 주입한 뒤 빌드합니다. 관리용 인증 토큰을 넣으면 안 됩니다. `.env`는 자동 로드하지 않습니다.
 
 ```sh
-export AGENT_GIBBON_SENTRY_DSN='https://PUBLIC_KEY@HOST/PROJECT_ID'
-npm run build
+# 배포 환경에서 AGENT_GIBBON_SENTRY_DSN을 주입한 뒤 실행
+npm run build:release
 ```
 
-빌드 때 지정한 DSN은 앱 번들에 포함되므로 Finder에서 실행해도 적용됩니다. 실행 시 같은 환경변수를 지정하면 빌드 설정보다 우선하며, 빈 값은 수집을 끕니다. 환경변수를 지정하지 않으면 기본 프로젝트로 전송하고, 빈 값이나 잘못된 값은 수집을 끕니다. DSN은 이벤트 수신 주소이며 Sentry 관리용 인증 토큰을 넣으면 안 됩니다.
+주입된 DSN은 앱에 포함되므로 사용자의 추가 설정 없이 Finder 실행에도 적용됩니다. DSN을 생략하거나 빈 값·잘못된 값을 주입한 빌드는 수집하지 않습니다. 실행 시 DSN을 바꾸는 기능은 지원하지 않습니다. 공식 배포 전 빌드 환경의 DSN 설정을 확인하세요. `environment: production`은 분류용이며, 실제 전송 허용 여부는 위 빌드 조건으로 결정합니다.
 
 메모 본문·제목·상태·연결 파일 경로·CLI 인수는 오류 수집에 전달하지 않습니다. Rust panic 메시지와 소스 문맥은 전송 전에 제거하고 WebView는 오류 종류만 고정 문구로 전달합니다. WebView 보고는 프로세스당 20건으로 제한합니다. 릴리스 버전, 실행 환경, SDK가 제공하는 OS/런타임 정보와 Rust 스택 정보는 진단에 사용됩니다. 서버는 네트워크 연결의 IP 주소를 볼 수 있습니다.
 
-고정 진단 이벤트의 실제 전송은 다음 명령으로 명시적으로 실행합니다(일반 테스트에서는 생략).
-
-```sh
-cargo test --manifest-path src-tauri/Cargo.toml telemetry::tests::live_sentry_delivery -- --ignored
-```
-
-WebView 개발자 도구에서는 `window.dispatchEvent(new Event('error'))`로 고정된 테스트 이벤트를 생성하고 Sentry에서 `WebView uncaught error` 수신을 확인할 수 있습니다. 실제 앱을 중단시키거나 메모를 변경하지 않습니다.
+자동 테스트는 네트워크 전송 없이 개발·테스트 차단과 release DSN 조건 및 개인정보 제거를 검증합니다. 실제 수신 확인은 DSN을 주입한 공식 release 앱에서 별도로 수행해야 합니다. 기존 `live_sentry_delivery` 테스트는 테스트 빌드 수집 금지 정책에 따라 제거했습니다.
 
 ## Agent Gibbon 이름 전환
 
@@ -246,4 +240,9 @@ WebView 개발자 도구에서는 `window.dispatchEvent(new Event('error'))`로 
 
 기존 메모와 설정을 보존하기 위해 앱 식별자 `org.egoing.floatnote`, Unix socket 디렉터리 `/tmp/floatnote-<uid>`, 안내 숨김 설정 키는 유지합니다. 실행 중인 Floatnote에도 새 CLI로 접근할 수 있습니다. 설치 파일을 교체해도 실행 중인 앱은 자동 종료하지 않으며, 새 표시 이름과 기능은 다음 앱 시작부터 적용됩니다. 앱 종료 시 메모가 초기화되므로 필요한 내용을 먼저 저장하세요.
 
-`AGENT_GIBBON_SENTRY_DSN`을 우선 사용하며 기존 `FLOATNOTE_SENTRY_DSN`도 호환됩니다. 과거 검증 로그·릴리스 이름과 Sentry 프로젝트 이름은 이전 기록과의 연결을 위해 보존합니다.
+Sentry DSN은 빌드 시 `AGENT_GIBBON_SENTRY_DSN`만 사용합니다. 기존 `FLOATNOTE_SENTRY_DSN` 호환과 실행 시 DSN 재지정은 지원하지 않습니다. 과거 검증 로그·릴리스 이름과 Sentry 프로젝트 이름은 이전 기록과의 연결을 위해 보존합니다.
+
+
+## 라이선스
+
+Agent Gibbon의 소스 코드는 [MIT 라이선스](LICENSE)로 공개합니다. 저작권 및 라이선스 고지를 유지하는 조건으로 사용·수정·재배포·상업적 활용이 가능합니다. 포함되거나 연결된 외부 라이브러리에는 각 프로젝트의 라이선스가 별도로 적용됩니다.
