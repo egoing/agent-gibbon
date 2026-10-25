@@ -326,3 +326,14 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - `CGWarpMouseCursorPosition`은 실제 커서 위치를 이동시킬 수 있지만, `CGPreflightPostEventAccess`가 false이면 WebView에 합성 pointer 이벤트를 전달하지 못한다. 좌표 일치만으로 이벤트 전달을 단정했던 검사 실패를 보존했고, 권한 확인을 추가하여 이 경우만 SKIP한다. 실제 커서 접촉·강조 색상·편집/복사/워프/수동 크기 UI 한계는 남아 있다.
 - 검증 로그는 `/tmp/floatnote-is2-5/release-*`, `entrance-hold-smoke-release.log`, `entrance-smoke-release.log`, `update-feedback-smoke-release.log`에 있으며 삭제 전 `~/Library/Logs/floatnote-is2-5/`로 보존한다. 원본 감사 ref와 시도 이력도 번들로 보존한다.
 - 로컬 배포는 기존 메모·초안·위치·숨김 보존을 위해 앱 설치 파일을 교체하되 실행 중인 기존 프로세스는 재시작하지 않는다. 설치 버전은 다음 앱 재시작부터 적용된다. 이전 앱과 메모 snapshot을 로컬 private 백업에 남긴다.
+
+## Sentry 오류 수집 (2026-10-25)
+
+- macOS arm64, Node v24.21.0, Rust 1.91.1에서 확인했습니다.
+- `npm test`: Rust 37개, Node 13개 통과. 오류 메시지의 민감정보 제거와 WebView의 고정 오류 종류 전달·IPC 실패 처리를 검증했습니다.
+- `npm run check`, Rustfmt, JavaScript 문법 검사, `git diff --check` 통과.
+- `npm run build`: macOS 앱 번들 생성 및 새 release CLI `--help` JSON 응답 확인.
+- `egoing-personal` 개인 조직의 `investing-bot`과 같은 팀에 `floatnote` 프로젝트를 생성하고 공개 수신 DSN을 기본값으로 연결했습니다.
+- 명시적 실제 전송 테스트 `telemetry::tests::live_sentry_delivery` 1개 통과. Sentry에서 `FLOATNOTE-1` (`Floatnote Sentry connection test`, 릴리스 `floatnote@0.2.3`, environment `development`) 이벤트 수신을 직접 확인했습니다: https://egoing-personal.sentry.io/issues/7811173579/
+- DSN 반영 후 일반 테스트 50개 통과(실제 전송 테스트 1개는 기본 생략), Clippy·Rustfmt·앱 빌드를 다시 통과했습니다. 기존 앱 프로세스와 사용자 메모는 유지했으며, 새 번들은 빌드 산출물 경로에 생성했습니다.
+- Conf 5(실제 SDK 전송·수신) / Risk Medium: 외부 서비스로 진단 이벤트를 전송합니다. 실제 WebView에서 오류를 유발하는 E2E는 수행하지 않았습니다.

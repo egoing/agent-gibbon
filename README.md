@@ -1,6 +1,6 @@
 # Floatnote
 
-에이전트가 CLI로 갱신하는 작은 플로팅 Markdown 메모. Tauri 2 + Rust + 시스템 WebView로 동작하며 웹 서버나 클라우드를 사용하지 않습니다.
+에이전트가 CLI로 갱신하는 작은 플로팅 Markdown 메모. Tauri 2 + Rust + 시스템 WebView로 동작하며 웹 서버 없이 동작합니다. Sentry로 앱 오류 진단 정보를 전송합니다. 메모는 로컬에 유지됩니다.
 
 ## 지원 기능
 
@@ -188,3 +188,28 @@ DMG를 열어 **Floatnote.app을 Applications로 복사**한 후 실행합니다
 새 패널은 내용을 측정한 크기로 커서 옆에서 등장합니다. 내용·글자 크기가 바뀌면 가로 300 고정, 세로 48~420 논리 픽셀 범위에서 다시 맞추며, 최대 높이를 넘는 본문은 스크롤합니다. 화면이 작으면 작업 영역 안으로 자동 크기를 제한합니다.
 
 사용자가 가장자리를 드래그하면 해당 창은 앱을 종료할 때까지 수동 크기를 유지합니다. 이후 내용 갱신이나 숨김·복원으로 자동 크기를 덮어쓰지 않습니다. 수동 조절은 자동 범위 밖으로도 가능하며, 조작 버튼을 위한 하한 144×32 논리 픽셀만 적용하고 최대 크기는 제한하지 않습니다. 사용자가 크게 만든 공간은 그대로 유지합니다.
+
+## Sentry 오류 수집
+
+[Sentry Rust SDK](https://docs.sentry.io/platforms/rust/)로 앱 프로세스의 Rust panic과 WebView의 처리되지 않은 오류·Promise rejection을 수집합니다. 네이티브 크래시 덤프, 정상적으로 처리한 CLI/편집 오류, 성능 추적과 세션 리플레이는 수집하지 않습니다.
+
+기본 연결은 개인 조직 `egoing-personal`의 `floatnote` 프로젝트입니다. `src-tauri/sentry-dsn.txt`에는 관리 권한이 없는 공개 수신용 DSN만 포함됩니다. 인증 토큰은 저장하지 않습니다.
+
+다른 프로젝트를 사용하려면 DSN을 환경변수로 지정하세요. `.env`는 자동 로드하지 않습니다.
+
+```sh
+export FLOATNOTE_SENTRY_DSN='https://PUBLIC_KEY@HOST/PROJECT_ID'
+npm run build
+```
+
+빌드 때 지정한 DSN은 앱 번들에 포함되므로 Finder에서 실행해도 적용됩니다. 실행 시 같은 환경변수를 지정하면 빌드 설정보다 우선하며, 빈 값은 수집을 끕니다. 환경변수를 지정하지 않으면 기본 프로젝트로 전송하고, 빈 값이나 잘못된 값은 수집을 끕니다. DSN은 이벤트 수신 주소이며 Sentry 관리용 인증 토큰을 넣으면 안 됩니다.
+
+메모 본문·제목·상태·연결 파일 경로·CLI 인수는 오류 수집에 전달하지 않습니다. Rust panic 메시지와 소스 문맥은 전송 전에 제거하고 WebView는 오류 종류만 고정 문구로 전달합니다. WebView 보고는 프로세스당 20건으로 제한합니다. 릴리스 버전, 실행 환경, SDK가 제공하는 OS/런타임 정보와 Rust 스택 정보는 진단에 사용됩니다. 서버는 네트워크 연결의 IP 주소를 볼 수 있습니다.
+
+고정 진단 이벤트의 실제 전송은 다음 명령으로 명시적으로 실행합니다(일반 테스트에서는 생략).
+
+```sh
+cargo test --manifest-path src-tauri/Cargo.toml telemetry::tests::live_sentry_delivery -- --ignored
+```
+
+WebView 개발자 도구에서는 `window.dispatchEvent(new Event('error'))`로 고정된 테스트 이벤트를 생성하고 Sentry에서 `WebView uncaught error` 수신을 확인할 수 있습니다. 실제 앱을 중단시키거나 메모를 변경하지 않습니다.
