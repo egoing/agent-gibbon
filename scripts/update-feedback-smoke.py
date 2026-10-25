@@ -116,8 +116,29 @@ if args[1] == "pointer" {
         cli('update', a, '--markdown', changed + '!')
         time.sleep(2.0)
         assert abs(windows()[a]['alpha'] - .5) < .01, 'same body/metadata restarted feedback or native expiry failed'
-        assert not cli('inspect', a)['feedback_active']
+        expired = cli('inspect', a)
+        assert not expired['feedback_active'] and expired['highlight_revision'] is not None
         passed('last actual change + 3 seconds, stale deadline immunity, metadata/same-body no restart')
+        rect = windows()[a]['bounds']
+        native('move', str(rect['X'] + rect['Width'] / 2), str(rect['Y'] + rect['Height'] / 2))
+        time.sleep(.6)
+        actual_pointer = [float(v) for v in native('pointer').split()]
+        expected_pointer = [rect['X'] + rect['Width'] / 2, rect['Y'] + rect['Height'] / 2]
+        if all(abs(actual - expected) < 2 for actual, expected in zip(actual_pointer, expected_pointer)):
+            assert cli('inspect', a)['highlight_revision'] is None, 'pointer contact did not acknowledge highlight'
+            native('move', '5', '40'); time.sleep(.2)
+            cli('update', a, '--markdown', changed + ' 다시 변경')
+            time.sleep(.45)
+            rect = windows()[a]['bounds']
+            native('move', str(rect['X'] + rect['Width'] / 2), str(rect['Y'] + rect['Height'] / 2))
+            time.sleep(.4)
+            native('move', '5', '40'); time.sleep(.2)
+            acknowledged = cli('inspect', a)
+            assert acknowledged['highlight_revision'] is None and acknowledged['feedback_active'] and acknowledged['opacity'] == 1
+            time.sleep(3.0)
+            passed('highlight survives opacity expiry, real pointer contact acknowledges it, opacity deadline remains independent')
+        else:
+            print('SKIP: pointer acknowledgement; CGEvent movement was not delivered (requested=' + str(expected_pointer) + ', actual=' + str(actual_pointer) + ')', flush=True)
         if os.environ.get('FLOATNOTE_TEST_UI') == '1':
             # Unpinned notes still move forward without changing pin or focus.
             ui('click button "상단 고정" of ' + root(a)); time.sleep(.25)
@@ -133,8 +154,9 @@ if args[1] == "pointer" {
         result = cli('update', a, '--markdown', '숨긴 갱신')
         assert not result['visible'] and not result['feedback_active'] and a not in windows()
         cli('open', a)
-        assert not cli('inspect', a)['feedback_active']
-        passed('hide clears feedback, hidden update stays hidden, reopen uses entrance only')
+        reopened = cli('inspect', a)
+        assert not reopened['feedback_active'] and reopened['highlight_revision'] is not None
+        passed('hide clears opacity only, hidden update stays hidden, reopen preserves highlight')
         result = cli('update', a, '--markdown', '')
         assert result['feedback_active'] and result['note']['removed'] and result['note']['html'] == ''
         if os.environ.get('FLOATNOTE_TEST_UI') == '1':
@@ -143,12 +165,13 @@ if args[1] == "pointer" {
             assert '이전 내용 삭제됨' in contents, contents
             time.sleep(3.1)
             contents = ui('get entire contents of window ' + json.dumps('Floatnote — ' + a))
-            assert '이전 내용 삭제됨' not in contents
-            passed('deletion-only empty body notice appears and expires in real WebView')
+            assert '이전 내용 삭제됨' in contents
+            passed('deletion-only empty body notice remains after opacity expiry in real WebView')
         else:
             time.sleep(3.2)
-            assert not cli('inspect', a)['feedback_active']
-            passed('empty-body deletion feedback expires through real CLI')
+            deletion = cli('inspect', a)
+            assert not deletion['feedback_active'] and deletion['highlight_revision'] is not None
+            passed('empty-body deletion highlight remains after opacity expiry through real CLI')
             print('SKIP: visual highlight/deletion notice, editor and copy UI (Accessibility/Screen Recording unavailable)', flush=True)
     finally:
         for note_id in created:

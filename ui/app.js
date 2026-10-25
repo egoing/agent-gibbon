@@ -6,6 +6,9 @@ const $ = (id) => document.getElementById(id);
 let revision = -1;
 let latestNote;
 let displayedHtml;
+let highlightRevision = null;
+let acknowledging = false;
+let acknowledgedRevision = -1;
 let editing = false;
 let saving = false;
 let editRevision;
@@ -110,12 +113,13 @@ async function refresh() {
       revision = state.note.revision;
       needsFit = true;
     }
-    const html = state.feedback_active ? state.note.change_html : state.note.html;
+    highlightRevision = (state.highlight_revision ?? -1) > acknowledgedRevision ? state.highlight_revision : null;
+    const html = highlightRevision !== null ? state.note.change_html : state.note.html;
     if (displayedHtml !== html) {
       $('content').innerHTML = html;
       displayedHtml = html;
     }
-    $('change-notice').hidden = !state.feedback_active || !state.note.removed;
+    $('change-notice').hidden = highlightRevision === null || !state.note.removed;
     $('pin').setAttribute('aria-pressed', String(state.always_on_top));
     await fitContent();
   } catch (error) { failure(error); }
@@ -164,9 +168,29 @@ $('copy').addEventListener('click', async () => {
 $('content').addEventListener('click', (event) => { if (event.target.closest('a')) event.preventDefault(); });
 refresh();
 
-for (const event of ['pointerenter', 'pointerleave']) {
-  document.documentElement.addEventListener(event, () => invoke('sync_opacity').catch(failure));
+async function acknowledgeFeedback() {
+  if (highlightRevision === null || acknowledging) return;
+  const observed = highlightRevision;
+  acknowledging = true;
+  try {
+    const accepted = await invoke('acknowledge_feedback', { revision: observed });
+    if (accepted) acknowledgedRevision = Math.max(acknowledgedRevision, observed);
+    if (accepted && highlightRevision === observed) {
+      highlightRevision = null;
+      displayedHtml = latestNote.html;
+      $('content').innerHTML = displayedHtml;
+      $('change-notice').hidden = true;
+    }
+  } catch (error) { failure(error); }
+  finally { acknowledging = false; }
 }
+for (const event of ['pointerenter', 'pointermove']) {
+  document.documentElement.addEventListener(event, async () => {
+    await acknowledgeFeedback();
+    if (event === 'pointerenter') invoke('sync_opacity').catch(failure);
+  });
+}
+document.documentElement.addEventListener('pointerleave', () => invoke('sync_opacity').catch(failure));
 
 const warpTipKey = 'floatnote.warp-tip-dismissed';
 let warpTipDismissed = false;

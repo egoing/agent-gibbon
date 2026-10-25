@@ -187,7 +187,7 @@ fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<V
     let position = win.outer_position().map_err(|e| e.to_string())?;
     let size = win.outer_size().map_err(|e| e.to_string())?;
     Ok(
-        json!({"ok":true,"id":id,"note":note,"feedback_active":feedback_active,"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        json!({"ok":true,"id":id,"note":note,"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     )
 }
 #[tauri::command]
@@ -304,6 +304,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             hide_note,
             toggle_pin,
             sync_opacity,
+            feedback::acknowledge_feedback,
             save_note,
             warp::warp_note,
             warp::poll_warp,

@@ -159,6 +159,8 @@ test('feedback persists after opacity expiry until pointer contact, preserving d
   await app.pointers.pointerenter();
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
   assert.equal(app.element('change-notice').hidden, true);
+  app.highlight(2); await app.refresh(); // An already in-flight snapshot may be stale.
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
   assert.equal(app.element('markdown').value, '초안');
   app.update({ revision: 3, color: '#ffffff' }); await app.refresh();
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
