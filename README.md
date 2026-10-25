@@ -39,6 +39,8 @@
 
 - 접힌 메모는 포인터가 밖에 있을 때 불투명도 80%로 표시하여 펼친 메모(50%)보다 선명하게 유지한다. 포인터를 올리거나 변경 알림이 진행 중이면 100%로 표시한다.
 
+- 펼친 상태에는 접기 아이콘, 접힌 상태에는 펼치기 아이콘을 표시한다. 아이콘에 포인터를 올리면 Control + 포인터 접촉으로 접기·펼치기를 전환하는 단축키 안내가 툴팁으로 표시된다.
+
 ## 워프
 
 - 좌우 화살표 아이콘을 누르거나 macOS에서 Alt(⌥ Option)를 누른 채 포인터를 노트에 올리면 현재 모니터의 반대편으로 이동한다. 노트 중심으로 좌우를 판정하고, 화면 가장자리에서 8px 간격과 처음 열린 세로 위치를 사용한다. 화면·크기가 바뀌면 작업 영역 안으로 위치를 제한한다.
@@ -174,7 +176,7 @@ python3 scripts/macos-tray-smoke.py
 npm run build:release
 ```
 
-호스트 CPU용 앱과 DMG를 `src-tauri/target/release/bundle/`에 만듭니다. v0.2.4은 Apple Silicon용 `dmg/Floatnote_0.2.4_aarch64.dmg`를 제공합니다. 기존 Intel Mac용 v0.1.0은 이전 릴리스에서 받을 수 있습니다. v0.2.4의 Intel 빌드는 제공하지 않습니다.
+호스트 CPU용 앱과 DMG를 `src-tauri/target/release/bundle/`에 만듭니다. v0.2.5는 Apple Silicon용 `dmg/Floatnote_0.2.5_aarch64.dmg`를 제공합니다. 기존 Intel Mac용 v0.1.0은 이전 릴리스에서 받을 수 있습니다. v0.2.5의 Intel 빌드는 제공하지 않습니다.
 
 DMG를 열어 **Floatnote.app을 Applications로 복사**한 후 실행합니다. 이 배포판은 Apple Developer ID 서명·공증을 하지 않았습니다. 신뢰하는 출처에서 받은 파일인지 확인한 후 macOS의 **시스템 설정 → 개인정보 보호 및 보안 → 그래도 열기** 절차가 필요할 수 있습니다.
 
@@ -220,5 +222,3 @@ cargo test --manifest-path src-tauri/Cargo.toml telemetry::tests::live_sentry_de
 ```
 
 WebView 개발자 도구에서는 `window.dispatchEvent(new Event('error'))`로 고정된 테스트 이벤트를 생성하고 Sentry에서 `WebView uncaught error` 수신을 확인할 수 있습니다. 실제 앱을 중단시키거나 메모를 변경하지 않습니다.
-
-펼친 상태에는 접기 아이콘, 접힌 상태에는 펼치기 아이콘을 표시한다. 아이콘에 포인터를 올리면 Control + 포인터 접촉으로 접기·펼치기를 전환하는 단축키 안내가 툴팁으로 표시된다.

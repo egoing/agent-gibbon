@@ -372,3 +372,15 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - Rust 36 + Node 14 테스트, Clippy·Rustfmt·JS 문법·diff 및 app 빌드 통과. Node 테스트는 버튼의 양방향 전환·접근성 이름·펼침 상태·단축키 툴팁 문구를 검증했다.
 - `/tmp/floatnote-fold-buttons/`의 격리 앱에서 펼친 상태의 접기 버튼과 접힌 상태의 펼치기 버튼을 실제 클릭해 전환을 확인했다. 이전 크기 복원·12px 높이·불투명도·Control 전환 검증도 통과했다. 툴팁의 실제 화면 출현은 별도로 자동 검증하지 않았다.
 - 새 미리보기 창을 실행하고 이전 미리보기만 숨겼다. 기존 설치본과 다른 사용자 메모는 유지했다.
+
+
+## v0.2.5 접기 기능 통합·릴리스
+
+- 사용자 명시 승인으로 접기 기능 커밋·최신 main 통합·PR 병합·릴리스·설치 및 folding 워크스페이스 삭제를 진행한다. v0.2.4의 변경 표시와 Sentry 통합을 보존했다. 문서와 CSS의 충돌은 양쪽 기능을 유지하도록 해결했다.
+- 패키지·npm lock·Cargo package/lock·Tauri 버전을 0.2.5로 맞췄다. Apple Silicon arm64, Rust 1.91.1, Node 24.21.0 환경이다.
+- 통합 후 Rust 38 + Node 15 테스트 통과, 실제 Sentry 전송 테스트 1개는 기본 생략했다. Clippy·Rustfmt·JS 문법·diff 검사 및 app·DMG 빌드를 통과했다.
+- 최종 release 바이너리 사본에서 IPC 경로만 같은 길이의 별도 namespace로 바꾸고 애드혹 서명하여 격리 검증했다. 실제 접기/펼치기 버튼 클릭과 Control 접촉 전환·중복 토글 방지·12px 높이·0.8/0.5 불투명도·이전 크기 복원·접힘 중 갱신·창별 독립 상태를 확인했다.
+- DMG 무결성, 내부 앱 서명·버전 0.2.5·빌드 바이너리 일치 및 CLI --help를 확인했다. 검증용 마운트는 해제했다. Developer ID 서명·공증·Intel·다중 모니터 배율 변경 및 툴팁 픽셀 자동 검증은 미수행이다.
+- 설치는 기존 앱과 메모 snapshot을 로컬 private 경로에 백업하고 앱 파일을 교체한다. 기존 프로세스는 초안·위치·숨김 보존을 위해 유지하며 새 버전은 다음 재시작부터 적용한다.
+- 릴리스 파일·이전 앱·메모 snapshot은 `~/Library/Application Support/Floatnote/releases/v0.2.5/`, 테스트 로그·격리 검증 도구는 `~/Library/Logs/floatnote-v0.2.5/`에 보존한다. 설치와 게시 확인 후 Orca CLI로 이번 folding 워크스페이스만 삭제한다.
+- Conf 4 / Risk Medium: main에서 통합한 기존 Sentry 외부 오류 수집을 포함한다. 접기 기능 자체는 국소적이며 복구 가능하다.
