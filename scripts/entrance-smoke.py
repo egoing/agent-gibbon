@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Cursor entrance acceptance test. Requires an isolated app binary/socket.
-FLOATNOTE_TEST_BIN must point to a separately isolated QA instance, never the user app.
-FLOATNOTE_POINTER_BIN is the compiled entrance-pointer.swift helper.
+AGENT_GIBBON_TEST_BIN must point to a separately isolated QA instance, never the user app.
+AGENT_GIBBON_POINTER_BIN is the compiled entrance-pointer.swift helper.
 Only unique notes are created; the pointer and frontmost application are restored.
 """
 import json
@@ -10,8 +10,8 @@ import subprocess
 import time
 import uuid
 
-BIN = os.environ['FLOATNOTE_TEST_BIN']
-POINTER = os.environ['FLOATNOTE_POINTER_BIN']
+BIN = os.environ['AGENT_GIBBON_TEST_BIN']
+POINTER = os.environ['AGENT_GIBBON_POINTER_BIN']
 assert 'qa7' in BIN, 'Use a separately isolated qa7 binary'
 
 def pointer(*args):

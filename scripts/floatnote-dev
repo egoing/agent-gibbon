@@ -1,4 +1,5 @@
 #!/bin/sh
+# Compatibility entry point for the former project name.
 set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)
-exec node "$root/scripts/dev.mjs" cli "$@"
+exec "$root/scripts/agent-gibbon-dev" "$@"

@@ -45,14 +45,14 @@ def live(path):
 
 
 def call(root, *args, ok=True, cwd="/"):
-    result = subprocess.run([str(root / 'scripts/floatnote-dev'), *args], cwd=cwd, capture_output=True, text=True, timeout=30)
+    result = subprocess.run([str(root / 'scripts/agent-gibbon-dev'), *args], cwd=cwd, capture_output=True, text=True, timeout=30)
     data = json.loads(result.stdout)
     assert data['ok'] is ok and (result.returncode == 0) is ok, (result.stderr, data)
     return data
 
 
 def pid_for(binary):
-    # Cargo runs target/debug/floatnote with a relative argv[0]. Resolve by the
+    # Cargo runs target/debug/agent-gibbon with a relative argv[0]. Resolve by the
     # executable vnode, not a process-name match that could select another app.
     result = subprocess.run(['lsof', '-t', binary], capture_output=True, text=True)
     pids = sorted({int(pid) for pid in result.stdout.split()})

@@ -7,7 +7,7 @@ export function devInstance(root) {
   root = realpathSync(root);
   const id = `dev-${createHash('sha256').update(root).digest('hex').slice(0, 24)}`;
   return { root, id, name: basename(root), target: join(root, 'src-tauri/target'),
-    binary: join(root, 'src-tauri/target/debug/floatnote') };
+    binary: join(root, 'src-tauri/target/debug/agent-gibbon') };
 }
 export function devEnvironment(instance, inherited = process.env) {
   return { ...inherited, FLOATNOTE_INSTANCE: instance.id,

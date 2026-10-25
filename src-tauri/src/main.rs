@@ -282,8 +282,8 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
         Action::Open => {
             if existing.as_ref().is_none_or(|note| note.revision == 0) {
                 sizing::prepare(&win)?;
-            } else if let Err(error) = entrance::show(&win, None) {
-                return Err(error);
+            } else {
+                entrance::show(&win, None)?;
             }
         }
         Action::Close => {
@@ -416,7 +416,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
 }
 
 fn parse(args: &[String]) -> Result<Request, String> {
-    let action = match args.first().map(String::as_str) { Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: floatnote open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
+    let action = match args.first().map(String::as_str) { Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
         action,
         source_path: None,
@@ -500,7 +500,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
                     break stream;
                 }
                 if start.elapsed() > Duration::from_secs(15) {
-                    return Err("앱 시작에 실패했습니다. floatnote --serve로 진단하세요".into());
+                    return Err("앱 시작에 실패했습니다. agent-gibbon --serve로 진단하세요".into());
                 }
                 std::thread::sleep(Duration::from_millis(100));
             }
@@ -549,7 +549,7 @@ fn main() {
         )
     } else if args == ["--help"] || args == ["-h"] {
         Ok(
-            json!({"ok":true,"usage":"floatnote open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--file PATH|- | --markdown TEXT]; floatnote close|inspect [--id ID]; floatnote list","note":"open만 앱을 시작하거나 창을 생성·복원합니다. ID 생략 시 main, close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
+            json!({"ok":true,"usage":"agent-gibbon open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open만 앱을 시작하거나 창을 생성·복원합니다. ID 생략 시 main, close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
         )
     } else {
         cli(&args)

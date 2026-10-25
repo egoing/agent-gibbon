@@ -38,8 +38,8 @@ impl Instance {
     pub fn title(&self) -> String {
         self.label
             .as_ref()
-            .map(|label| format!("Floatnote [{label}]"))
-            .unwrap_or_else(|| "Floatnote".into())
+            .map(|label| format!("Agent Gibbon [{label}]"))
+            .unwrap_or_else(|| "Agent Gibbon".into())
     }
 }
 static INSTANCE: OnceLock<Instance> = OnceLock::new();
@@ -68,7 +68,7 @@ mod tests {
             instance.directory(501).to_str().unwrap(),
             "/tmp/floatnote-501"
         );
-        assert_eq!(instance.title(), "Floatnote");
+        assert_eq!(instance.title(), "Agent Gibbon");
         assert!(instance.label.is_none());
     }
     #[test]

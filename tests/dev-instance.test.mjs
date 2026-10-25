@@ -15,7 +15,7 @@ test('canonical paths, not cwd or basename, determine stable instance IDs', () =
     assert.equal(a.id, 'dev-' + createHash('sha256').update(a.root).digest('hex').slice(0, 24));
     assert.deepEqual(devInstance(join(temp, 'alias')), a);
     assert.notEqual(devInstance(join(temp, 'b/same')).id, a.id);
-    assert.equal(a.binary, join(a.root, 'src-tauri/target/debug/floatnote'));
+    assert.equal(a.binary, join(a.root, 'src-tauri/target/debug/agent-gibbon'));
     const env = devEnvironment(a, { FLOATNOTE_INSTANCE: 'wrong', CARGO_TARGET_DIR: '/shared', KEEP: 'yes' });
     assert.equal(env.FLOATNOTE_INSTANCE, a.id);
     assert.equal(env.CARGO_TARGET_DIR, a.target);
@@ -36,9 +36,9 @@ test('development CLI rejects missing, old and foreign binaries without release 
     const run = () => spawnSync(process.execPath, [join(temp, 'scripts/dev.mjs'), 'cli', 'open', '--markdown', '한글 $literal'], {
       cwd: '/', encoding: 'utf8', env: { ...process.env, FLOATNOTE_INSTANCE: 'foreign', CARGO_TARGET_DIR: '/foreign' },
     });
-    writeFileSync(join(temp, 'src-tauri/target/release/floatnote'), '#!/bin/sh\necho release-must-not-run\n', { mode: 0o755 });
+    writeFileSync(join(temp, 'src-tauri/target/release/agent-gibbon'), '#!/bin/sh\necho release-must-not-run\n', { mode: 0o755 });
     assert.equal(run().status, 1);
-    const binary = join(temp, 'src-tauri/target/debug/floatnote');
+    const binary = join(temp, 'src-tauri/target/debug/agent-gibbon');
     writeFileSync(binary, '#!/bin/sh\necho \'{"ok":false,"error":"old binary"}\'\n', { mode: 0o755 });
     assert.match(JSON.parse(run().stdout).error, /현재 워크트리/);
     writeFileSync(binary, `#!/usr/bin/env node

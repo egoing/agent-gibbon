@@ -1,19 +1,19 @@
 ---
-name: floatnote
-description: Floatnote CLI로 플로팅 Markdown 메모 창을 생성·조회·갱신·숨기고 창별 색상을 지정한다. 플로팅 메모 조작이 필요할 때 사용한다.
+name: agent-gibbon
+description: Agent Gibbon CLI로 플로팅 Markdown 메모 창을 생성·조회·갱신·숨기고 창별 색상을 지정한다. 플로팅 메모 조작이 필요할 때 사용한다.
 ---
 
-# Floatnote 사용
+# Agent Gibbon 사용
 
-저장소 루트의 `scripts/floatnote`를 사용한다. 다른 디렉터리에서는 절대 경로로 호출한다. 실행 파일이 없으면 README의 빌드 절차를 수행한다. 셸 인수는 안전하게 인용하고, 긴 Markdown은 파일 또는 표준입력으로 전달한다.
+저장소 루트의 `scripts/agent-gibbon`을 사용한다. 설치 앱은 `"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon"`으로도 호출할 수 있다. 다른 디렉터리에서는 절대 경로로 호출한다. 실행 파일이 없으면 README의 빌드 절차를 수행한다. 셸 인수는 안전하게 인용하고, 긴 Markdown은 파일 또는 표준입력으로 전달한다.
 
 ```sh
-./scripts/floatnote list
-./scripts/floatnote open --id my-note --title '메모' --color '#fff1b8' --file examples/progress.md
-./scripts/floatnote update --id my-note --status '갱신됨' --file examples/progress.md
-./scripts/floatnote update --id my-note --color '#dcecff'
-./scripts/floatnote inspect --id my-note
-./scripts/floatnote close --id my-note
+./scripts/agent-gibbon list
+./scripts/agent-gibbon open --id my-note --title '메모' --color '#fff1b8' --file examples/progress.md
+./scripts/agent-gibbon update --id my-note --status '갱신됨' --file examples/progress.md
+./scripts/agent-gibbon update --id my-note --color '#dcecff'
+./scripts/agent-gibbon inspect --id my-note
+./scripts/agent-gibbon close --id my-note
 ```
 
 - `--id`는 영문·숫자·하이픈·밑줄 1~64자이며 대소문자를 구분한다. 생략하면 기본 창 `main`을 대상으로 한다. 같은 ID는 같은 창을 재사용하고 다른 ID는 별도 창을 만든다.
@@ -21,11 +21,11 @@ description: Floatnote CLI로 플로팅 Markdown 메모 창을 생성·조회·�
 - `--color '#RRGGBB'`는 창 전체 배경색이다. 글자색은 자동 선택된다. 기본색은 `#20252e`, 생략하면 보존한다. 빈 문자열·색상 이름·알파값은 허용하지 않는다.
 - 최초 표시와 사용자의 명시적인 복원 요청에만 `open`을 사용한다. `open`은 필요하면 앱과 해당 창을 생성한다. 없는 ID에 대한 `update`·`close`·`inspect`는 실패한다.
 - 새 창과 숨긴 창을 열면 커서가 있는 모니터에서 커서를 가리지 않는 가까운 위치에 12 논리 px 여백을 두고 완전 불투명하게 대기한다. 표시 후 첫 1초는 마우스가 움직여도 자동 이동하지 않고, 그동안 이동이 감지됐다면 1초가 지난 뒤 기존 배치 목적지까지 420ms cubic ease-out으로 이동한다. 마우스를 움직이지 않았다면 계속 기다리다가 이동이 감지되면 출발한다. 이미 보이는 창에는 반복하지 않는다. CLI `open`은 표시 준비만 기다리고 반환하며 마우스 이동을 기다리지 않는다. 응답의 `animating: true`는 대기 또는 이동 중을 뜻한다. 화면 경계·음수 좌표·화면 배율을 고려하며, 크기를 유지한 채 안전한 공간을 확보할 수 없으면 목적지에 바로 표시한다. 이동 중 직접 드래그하면 자동 이동을 중단하고, 숨기면 원래 목적지를 보존한다.
-- 새 창은 화면 오른쪽부터 배치하고 겹치지 않는 세로 위치를 무작위로 선택한다. 오른쪽 열이 차면 왼쪽 빈 열을 찾는다. 보이는 Floatnote 창과 화면 가장자리를 피해 8px 간격을 유지한다. 현재 모니터에 공간이 없으면 다른 모니터를 확인하고, 모든 모니터가 부족하면 겹치는 면적이 가장 작은 위치를 사용한다. 숨긴 창은 배치 장애물에서 제외하며 기존 창을 복원할 때도 다른 창과 이동 중인 창의 목적지를 피해서 배치를 다시 계산한다.
+- 새 창은 화면 오른쪽부터 배치하고 겹치지 않는 세로 위치를 무작위로 선택한다. 오른쪽 열이 차면 왼쪽 빈 열을 찾는다. 보이는 Agent Gibbon 창과 화면 가장자리를 피해 8px 간격을 유지한다. 현재 모니터에 공간이 없으면 다른 모니터를 확인하고, 모든 모니터가 부족하면 겹치는 면적이 가장 작은 위치를 사용한다. 숨긴 창은 배치 장애물에서 제외하며 기존 창을 복원할 때도 다른 창과 이동 중인 창의 목적지를 피해서 배치를 다시 계산한다.
 - 제목·상태·갱신 시각은 CLI 메타데이터이고 화면에는 본문과 aA·연필·복사·워프·핀·닫기 버튼을 표시한다. 화면에 필요한 제목·상태는 Markdown 본문에 넣는다. 체크박스 행은 목록 점·들여쓰기 없이 표시된다.
 - 진행 변경은 `update`로 보낸다. 숨긴 창은 그대로 숨겨진 채 내용만 갱신된다. 갱신 실패를 `open`으로 자동 대체하지 않는다.
 - 생략한 제목·본문·상태는 기존 값을 유지한다. 이 세 필드의 빈 문자열은 해당 필드를 비운다. 창별 내용·색상·위치·크기·숨김·상단 고정은 서로 독립적이다.
-- 사용자는 메뉴 막대의 Floatnote 아이콘에서 `열린 메모 앞으로` 또는 개별 메모를 선택해 창을 복원할 수 있다. 열린 메모 앞으로는 숨긴 창을 열지 않으며, 개별 선택은 해당 창만 명시적으로 복원한다.
+- 사용자는 메뉴 막대의 Agent Gibbon 아이콘에서 `열린 메모 앞으로` 또는 개별 메모를 선택해 창을 복원할 수 있다. 열린 메모 앞으로는 숨긴 창을 열지 않으며, 개별 선택은 해당 창만 명시적으로 복원한다.
 - `close`는 숨기기다. 프로세스가 유지되어 이후 갱신을 받을 수 있다.
 - 종료 코드와 JSON의 `ok`를 확인한다. `inspect`로 가시성·위치·크기·포커스·상단 고정과 내용을 읽을 수 있다. 메모 원문이나 민감한 내용을 외부로 전송하지 않는다.
 - 창 전체를 드래그해 이동한다. 버튼·편집 영역·크기 조절 가장자리는 제외한다. 본문은 선택 대신 복사 버튼으로 전체 텍스트를 클립보드에 복사할 수 있다.
@@ -84,7 +84,7 @@ macOS에서는 포인터가 노트 밖에 있으면 창 전체가 50% 반투명�
 
 ## 워크트리 개발 실행
 
-- 설치 앱·일반 실행에는 위의 `scripts/floatnote`를 사용한다. 개발 테스트에는 `npm run dev:build` 후 `scripts/floatnote-dev`를 사용하거나 `npm run dev`로 개발 앱을 실행한다. `npm run dev -- --no-watch`는 Rust 변경 감시를 끈다.
+- 설치 앱·일반 실행에는 위의 `scripts/agent-gibbon`를 사용한다. 개발 테스트에는 `npm run dev:build` 후 `scripts/agent-gibbon-dev`를 사용하거나 `npm run dev`로 개발 앱을 실행한다. `npm run dev -- --no-watch`는 Rust 변경 감시를 끈다.
 - 두 개발 진입점은 워크트리의 실제 절대 경로 해시로 같은 인스턴스를 선택한다. `npm run dev:info`로 ID와 바이너리 경로를 확인한다. 호출 위치가 달라도 해당 스크립트의 워크트리를 사용한다.
 - 개발 CLI는 해당 워크트리에서 빌드한 debug 바이너리만 사용한다. 없거나 빌드 출처가 다르면 오류를 반환하므로 `npm run dev:build`로 빌드한다. release 또는 설치 앱으로 자동 대체하지 않는다.
 - 개발 창·메뉴에는 `DEV 워크트리이름 · 짧은해시`가 표시된다. 같은 메모 ID라도 다른 워크트리와 설치 앱의 내용·숨김·수정에는 영향을 주지 않는다. `close`는 프로세스 종료가 아니라 메모 숨기기다.

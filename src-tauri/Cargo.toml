@@ -1,8 +1,8 @@
 [package]
-name = "floatnote"
+name = "agent-gibbon"
 version = "0.2.5"
 edition = "2021"
-default-run = "floatnote"
+default-run = "agent-gibbon"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

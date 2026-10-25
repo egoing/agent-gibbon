@@ -1,4 +1,4 @@
-// Native test input; restore the pointer after targeting only Floatnote controls.
+// Native test input; restore the pointer after targeting only Agent Gibbon controls.
 import Foundation
 import CoreGraphics
 guard CGPreflightPostEventAccess() else {

@@ -8,7 +8,7 @@ import os
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-BIN = str(ROOT / 'scripts/floatnote')
+BIN = str(ROOT / 'scripts/agent-gibbon')
 note_id = 'validation-' + uuid.uuid4().hex[:8]
 
 def cli(*args):

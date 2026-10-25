@@ -1,4 +1,4 @@
-# Floatnote
+# Agent Gibbon
 
 에이전트가 CLI로 갱신하는 작은 플로팅 Markdown 메모. Tauri 2 + Rust + 시스템 WebView로 동작하며 웹 서버 없이 동작합니다. Sentry로 앱 오류 진단 정보를 전송합니다. 메모는 로컬에 유지됩니다.
 
@@ -56,30 +56,30 @@ macOS에서 Rust stable, Node.js/npm, Xcode Command Line Tools 및 macOS SDK가 
 ```sh
 npm ci
 npm run build
-./scripts/floatnote open --title '현재 작업' --status '진행 중' --file examples/progress.md
+./scripts/agent-gibbon open --title '현재 작업' --status '진행 중' --file examples/progress.md
 ```
 
-앱 번들: `src-tauri/target/release/bundle/macos/Floatnote.app`
+앱 번들: `src-tauri/target/release/bundle/macos/Agent Gibbon.app`
 
-CLI 실행 파일: `src-tauri/target/release/floatnote`
+CLI 실행 파일: `src-tauri/target/release/agent-gibbon`
 
-프로젝트의 `scripts/floatnote`는 release 실행 파일을 우선 사용하고 없으면 debug 실행 파일을 사용합니다. 다른 디렉터리에서도 절대 경로로 호출할 수 있습니다. Apple 배포 서명·공증은 설정하지 않았습니다. 다운로드한 배포판은 macOS 보안 확인에서 차단될 수 있습니다.
+프로젝트의 `scripts/agent-gibbon`는 release 실행 파일을 우선 사용하고 없으면 debug 실행 파일을 사용합니다. 다른 디렉터리에서도 절대 경로로 호출할 수 있습니다. Apple 배포 서명·공증은 설정하지 않았습니다. 다운로드한 배포판은 macOS 보안 확인에서 차단될 수 있습니다.
 
 ```sh
 # 워크트리별 개발 앱 (프론트엔드 서버 없이 Rust 변경 감시)
 npm run dev
 # 또는 실행 파일만 빌드한 뒤 CLI open으로 해당 개발 앱 시작
 npm run dev:build
-./scripts/floatnote-dev open --id sample --markdown '이 워크트리의 메모'
-./scripts/floatnote-dev inspect --id sample
+./scripts/agent-gibbon-dev open --id sample --markdown '이 워크트리의 메모'
+./scripts/agent-gibbon-dev inspect --id sample
 npm run dev:info
 ```
 
-개발 실행과 `scripts/floatnote-dev`는 실제 워크트리 절대 경로(심볼릭 링크 해소)의 SHA-256 앞 24자리로 같은 `dev-…` ID를 계산합니다. 호출한 현재 디렉터리나 브랜치 이름에는 의존하지 않습니다. 경로를 옮기면 ID도 달라집니다. 소켓과 중복 실행 잠금은 `/tmp/floatnote-{uid}-{개발ID}/`로 분리됩니다. 개발 창에는 `DEV 워크트리이름 · 짧은해시`, 메뉴에는 같은 구분이 표시됩니다.
+개발 실행과 `scripts/agent-gibbon-dev`는 실제 워크트리 절대 경로(심볼릭 링크 해소)의 SHA-256 앞 24자리로 같은 `dev-…` ID를 계산합니다. 호출한 현재 디렉터리나 브랜치 이름에는 의존하지 않습니다. 경로를 옮기면 ID도 달라집니다. 소켓과 중복 실행 잠금은 `/tmp/floatnote-{uid}-{개발ID}/`로 분리됩니다. 개발 창에는 `DEV 워크트리이름 · 짧은해시`, 메뉴에는 같은 구분이 표시됩니다.
 
-개발 CLI는 해당 워크트리의 `src-tauri/target/debug/floatnote`만 사용하고, 빌드 출처를 확인합니다. release·설치본으로 대체하지 않습니다. 개발 실행기는 `CARGO_TARGET_DIR`를 해당 워크트리로 고정하며 `FLOATNOTE_INSTANCE`·`FLOATNOTE_DEV_NAME`을 자동 전달합니다. 이 변수는 직접 지정할 필요가 없습니다. 기본 호스트 debug 빌드를 지원하며 `npm run dev -- --no-watch`로 감시를 끌 수 있습니다. 다른 프로필·타깃·runner 옵션은 지원하지 않습니다.
+개발 CLI는 해당 워크트리의 `src-tauri/target/debug/agent-gibbon`만 사용하고, 빌드 출처를 확인합니다. release·설치본으로 대체하지 않습니다. 개발 실행기는 `CARGO_TARGET_DIR`를 해당 워크트리로 고정하며 `FLOATNOTE_INSTANCE`·`FLOATNOTE_DEV_NAME`을 자동 전달합니다. 이 변수는 직접 지정할 필요가 없습니다. 로컬 통신 호환성을 위해 내부 변수 이름은 `FLOATNOTE_`를 유지하며, 이전 `scripts/floatnote-dev`는 개발 CLI의 호환 진입점입니다. 기본 호스트 debug 빌드를 지원하며 `npm run dev -- --no-watch`로 감시를 끌 수 있습니다. 다른 프로필·타깃·runner 옵션은 지원하지 않습니다.
 
-기존 `scripts/floatnote`와 환경변수 없이 실행한 설치 앱은 기본 `/tmp/floatnote-{uid}/` 통신 경로를 유지합니다. 개발 검증에는 반드시 `scripts/floatnote-dev`를 사용하세요. `close`는 해당 메모를 숨길 뿐이며, `npm run dev`의 종료는 그 실행에서 시작한 개발 앱에만 적용됩니다. CLI가 자동 시작한 앱은 개발 바이너리 경로로 프로세스를 식별해 종료하세요. 이름만으로 모든 앱을 일괄 종료하지 마세요.
+기존 `scripts/agent-gibbon`과 환경변수 없이 실행한 설치 앱은 기본 `/tmp/floatnote-{uid}/` 통신 경로를 유지합니다. 개발 검증에는 반드시 `scripts/agent-gibbon-dev`를 사용하세요. `close`는 해당 메모를 숨길 뿐이며, `npm run dev`의 종료는 그 실행에서 시작한 개발 앱에만 적용됩니다. CLI가 자동 시작한 앱은 개발 바이너리 경로로 프로세스를 식별해 종료하세요. 이름만으로 모든 앱을 일괄 종료하지 마세요.
 
 메모·창 상태는 프로세스별로 독립적이지만, `--file`로 같은 원본 파일을 연결하면 파일 자체는 공유됩니다. 동시에 편집할 테스트 파일도 워크트리별로 준비하세요. 두 워크트리를 각각 빌드하고 개발 앱이 실행되지 않은 상태에서 `python3 scripts/isolation-smoke.py --peer /절대경로/다른워크트리`로 동시 실행 회귀를 확인할 수 있습니다. 기존 기본 앱은 실행 중이어야 하며 검증은 기존 앱을 종료하지 않습니다.
 
@@ -88,33 +88,33 @@ npm run dev:info
 ## CLI
 
 ```sh
-./scripts/floatnote open --title '구현 작업' --status '진행 중' --file examples/progress.md
-./scripts/floatnote update --status '검증 중'
-printf '# 결과\n- [x] 구현 완료\n- [ ] 리뷰\n' | ./scripts/floatnote update --file -
-./scripts/floatnote close
+./scripts/agent-gibbon open --title '구현 작업' --status '진행 중' --file examples/progress.md
+./scripts/agent-gibbon update --status '검증 중'
+printf '# 결과\n- [x] 구현 완료\n- [ ] 리뷰\n' | ./scripts/agent-gibbon update --file -
+./scripts/agent-gibbon close
 # 숨긴 상태에서 내용만 변경합니다.
-./scripts/floatnote update --markdown '검증이 끝났습니다.' --status '완료'
-./scripts/floatnote open
-./scripts/floatnote inspect
-./scripts/floatnote --help
+./scripts/agent-gibbon update --markdown '검증이 끝났습니다.' --status '완료'
+./scripts/agent-gibbon open
+./scripts/agent-gibbon inspect
+./scripts/agent-gibbon --help
 ```
 
 여러 창은 ID로 구분합니다. ID를 생략하면 기존과 같은 기본 창 `main`을 사용합니다.
 
 ```sh
-./scripts/floatnote open --id research --title '자료' --color '#fff1b8' --markdown '# 조사 메모'
-./scripts/floatnote open --id build --title '구현' --color '#18304a' --markdown '# 구현 메모'
-./scripts/floatnote update --id research --color '#dcecff'
-./scripts/floatnote inspect --id build
-./scripts/floatnote close --id research
-./scripts/floatnote list
+./scripts/agent-gibbon open --id research --title '자료' --color '#fff1b8' --markdown '# 조사 메모'
+./scripts/agent-gibbon open --id build --title '구현' --color '#18304a' --markdown '# 구현 메모'
+./scripts/agent-gibbon update --id research --color '#dcecff'
+./scripts/agent-gibbon inspect --id build
+./scripts/agent-gibbon close --id research
+./scripts/agent-gibbon list
 ```
 
 - ID는 영문·숫자·하이픈·밑줄 1~64자이며 대소문자를 구분합니다. 같은 ID의 `open`은 기존 창을 복원하고 다른 ID는 새 창을 만듭니다.
 - `update`·`close`·`inspect`는 기존 ID만 받습니다. 없는 창은 오류이며 다른 창에 대신 적용하지 않습니다.
 - 색상은 `open`·`update`의 `--color '#RRGGBB'`로 지정합니다. 기본값은 `#20252e`, 생략하면 기존 색상을 유지하며 응답은 소문자로 정규화됩니다. 빈 값·이름·알파 채널은 받지 않습니다. 기본색 복원은 `--color '#20252e'`입니다.
 - 색상은 창 전체 배경에 적용되고 글자색은 대비가 높은 흑백으로 선택됩니다. 코드·버튼 배경도 함께 바뀝니다.
-- 내용·색상·위치·크기·숨김·고정 상태는 창별로 독립적입니다. 새 창은 화면 오른쪽부터 배치하고 겹치지 않는 세로 위치를 무작위로 선택합니다. 오른쪽 열이 차면 왼쪽의 빈 열을 찾고, 현재 모니터에 공간이 없으면 다른 모니터도 확인합니다. 보이는 Floatnote 창 및 화면 가장자리와 8px 간격을 확보하며, 모든 모니터에 빈 공간이 없으면 겹치는 면적이 가장 작은 화면 내 위치에 배치합니다. 숨긴 창은 공간을 점유하지 않습니다. 기존 창을 다시 열 때도 목적지를 새로 계산하고, 이미 보이는 다른 창은 이동시키지 않습니다.
+- 내용·색상·위치·크기·숨김·고정 상태는 창별로 독립적입니다. 새 창은 화면 오른쪽부터 배치하고 겹치지 않는 세로 위치를 무작위로 선택합니다. 오른쪽 열이 차면 왼쪽의 빈 열을 찾고, 현재 모니터에 공간이 없으면 다른 모니터도 확인합니다. 보이는 Agent Gibbon 창 및 화면 가장자리와 8px 간격을 확보하며, 모든 모니터에 빈 공간이 없으면 겹치는 면적이 가장 작은 화면 내 위치에 배치합니다. 숨긴 창은 공간을 점유하지 않습니다. 기존 창을 다시 열 때도 목적지를 새로 계산하고, 이미 보이는 다른 창은 이동시키지 않습니다.
 - `list`는 숨긴 창을 포함해 ID순으로 `id`, `title`, `status`, `color`, `visible`, `always_on_top`을 반환합니다. 본문은 개별 `inspect`로 확인합니다.
 
 `--title`, `--status`, `--markdown` 또는 `--file`은 `open`/`update`에서 사용합니다. 생략한 필드는 보존하며 빈 문자열은 값을 비웁니다. `--markdown`과 `--file`은 함께 쓸 수 없습니다. 요청 전체는 JSON 인코딩 후 1MiB 이하, 제목과 상태는 각각 UTF-8 1024바이트 이하입니다.
@@ -125,9 +125,9 @@ macOS에서는 마우스 포인터가 노트 밖에 있으면 창 전체가 50% 
 
 `inspect`는 실제 창의 가시성·포커스·위치·크기·상단 고정과 현재 메모를 JSON으로 반환합니다. 좌표와 크기는 물리 픽셀입니다. 성공 응답은 네이티브 처리 완료를 뜻하며 화면은 최대 약 350ms 뒤 갱신됩니다. 갱신 시각은 Unix epoch 밀리초로 반환하며 CLI 메타데이터에만 보관합니다. 제목·상태·시각은 본문 공간을 차지하지 않으며 필요한 제목은 Markdown 본문에 작성합니다.
 
-앱이 실행되지 않았다면 `update`, `close`, `inspect`, `list`는 실패합니다. 자동 실행은 `open`만 수행합니다. 닫기 버튼·Escape·네이티브 닫기 요청은 프로세스를 종료하지 않고 창만 숨깁니다. 숨긴 뒤에도 메모 내용을 갱신할 수 있습니다. 직접 앱 번들을 실행하는 것도 명시적인 열기로 취급합니다. 메뉴 막대의 Floatnote 아이콘에서 **열린 메모 앞으로**를 선택하면 보이는 창만 앞으로 가져오며, 아래 개별 메모를 선택하면 숨긴 창도 복원합니다. 이 조작은 고정 상태와 위치를 바꾸지 않습니다.
+앱이 실행되지 않았다면 `update`, `close`, `inspect`, `list`는 실패합니다. 자동 실행은 `open`만 수행합니다. 닫기 버튼·Escape·네이티브 닫기 요청은 프로세스를 종료하지 않고 창만 숨깁니다. 숨긴 뒤에도 메모 내용을 갱신할 수 있습니다. 직접 앱 번들을 실행하는 것도 명시적인 열기로 취급합니다. 메뉴 막대의 Agent Gibbon 아이콘에서 **열린 메모 앞으로**를 선택하면 보이는 창만 앞으로 가져오며, 아래 개별 메모를 선택하면 숨긴 창도 복원합니다. 이 조작은 고정 상태와 위치를 바꾸지 않습니다.
 
-`--file` 원본에 저장한 편집 내용 외의 메모·색상·글자 크기·위치·크기는 메모리에만 보관합니다. `close`는 삭제가 아니므로 숨긴 창도 같은 ID로 다시 열 수 있습니다. 프로세스를 완전히 종료하면 모든 창 상태가 초기화되며, 재부팅 후 자동 실행하지 않습니다. 종료가 필요하면 활성 상태 보기에서 Floatnote 프로세스를 종료할 수 있습니다. 구버전 앱이 실행 중이면 새 CLI의 ID·색상 요청을 처리할 수 없으므로, 필요한 메모를 보존한 후 프로세스를 종료하고 새 실행 파일로 다시 여세요. 시작 오류 진단은 `src-tauri/target/release/floatnote --serve`를 사용합니다.
+`--file` 원본에 저장한 편집 내용 외의 메모·색상·글자 크기·위치·크기는 메모리에만 보관합니다. `close`는 삭제가 아니므로 숨긴 창도 같은 ID로 다시 열 수 있습니다. 프로세스를 완전히 종료하면 모든 창 상태가 초기화되며, 재부팅 후 자동 실행하지 않습니다. 종료가 필요하면 활성 상태 보기에서 Agent Gibbon 프로세스를 종료할 수 있습니다. 구버전 앱이 실행 중이면 새 CLI의 ID·색상 요청을 처리할 수 없으므로, 필요한 메모를 보존한 후 프로세스를 종료하고 새 실행 파일로 다시 여세요. 시작 오류 진단은 `src-tauri/target/release/agent-gibbon --serve`를 사용합니다.
 
 ## 본문 변경 알림
 
@@ -147,7 +147,7 @@ Rust에서 Markdown을 HTML로 변환하고 정리한 뒤 WebView에 전달합�
 
 ## 프로젝트 로컬 스킬
 
-[Floatnote 사용 스킬](.agents/skills/floatnote/SKILL.md)은 에이전트가 실제 CLI의 창 생성·조회·갱신·색상 지정과 숨김 보존 규칙을 담고 있습니다. 작업계획 표시 같은 운영 정책은 사용자 `AGENTS.md`에서 정합니다. 예제는 [examples/progress.md](examples/progress.md)입니다.
+[Agent Gibbon 사용 스킬](.agents/skills/agent-gibbon/SKILL.md)은 에이전트가 실제 CLI의 창 생성·조회·갱신·색상 지정과 숨김 보존 규칙을 담고 있습니다. 작업계획 표시 같은 운영 정책은 사용자 `AGENTS.md`에서 정합니다. 예제는 [examples/progress.md](examples/progress.md)입니다.
 
 ## 검증
 
@@ -181,7 +181,7 @@ python3 scripts/macos-tray-smoke.py
 
 ## 배포판 제작과 설치
 
-설치 파일은 [GitHub Releases](https://github.com/egoing/floatnote/releases)에서 받습니다. 비공개 저장소이므로 저장소 접근 권한이 필요합니다.
+설치 파일은 [GitHub Releases](https://github.com/egoing/agent-gibbon/releases)에서 받습니다. 비공개 저장소이므로 저장소 접근 권한이 필요합니다.
 
 ```sh
 npm run build:release
@@ -189,12 +189,12 @@ npm run build:release
 
 호스트 CPU용 앱과 DMG를 `src-tauri/target/release/bundle/`에 만듭니다. v0.2.5는 Apple Silicon용 `dmg/Floatnote_0.2.5_aarch64.dmg`를 제공합니다. 기존 Intel Mac용 v0.1.0은 이전 릴리스에서 받을 수 있습니다. v0.2.5의 Intel 빌드는 제공하지 않습니다.
 
-DMG를 열어 **Floatnote.app을 Applications로 복사**한 후 실행합니다. 이 배포판은 Apple Developer ID 서명·공증을 하지 않았습니다. 신뢰하는 출처에서 받은 파일인지 확인한 후 macOS의 **시스템 설정 → 개인정보 보호 및 보안 → 그래도 열기** 절차가 필요할 수 있습니다.
+새 빌드의 **Agent Gibbon.app을 Applications로 복사**한 후 실행합니다. 기존 v0.2.5 이하 릴리스 자산은 당시 이름인 Floatnote를 유지합니다. 이 배포판은 Apple Developer ID 서명·공증을 하지 않았습니다. 신뢰하는 출처에서 받은 파일인지 확인한 후 macOS의 **시스템 설정 → 개인정보 보호 및 보안 → 그래도 열기** 절차가 필요할 수 있습니다.
 
 설치된 앱에 포함된 CLI도 사용할 수 있습니다.
 
 ```sh
-/Applications/Floatnote.app/Contents/MacOS/floatnote open --markdown '# 안녕하세요'
+'/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon' open --markdown '# 안녕하세요'
 ```
 
 새 버전으로 교체하기 전 필요한 메모를 저장하고 실행 중인 앱을 종료하세요. 메모·창 상태는 앱 종료 시 초기화됩니다.
@@ -213,12 +213,12 @@ DMG를 열어 **Floatnote.app을 Applications로 복사**한 후 실행합니다
 
 [Sentry Rust SDK](https://docs.sentry.io/platforms/rust/)로 앱 프로세스의 Rust panic과 WebView의 처리되지 않은 오류·Promise rejection을 수집합니다. 네이티브 크래시 덤프, 정상적으로 처리한 CLI/편집 오류, 성능 추적과 세션 리플레이는 수집하지 않습니다.
 
-기본 연결은 개인 조직 `egoing-personal`의 `floatnote` 프로젝트입니다. `src-tauri/sentry-dsn.txt`에는 관리 권한이 없는 공개 수신용 DSN만 포함됩니다. 인증 토큰은 저장하지 않습니다.
+기본 연결은 개인 조직 `egoing-personal`의 기존 `floatnote` 프로젝트입니다. `src-tauri/sentry-dsn.txt`에는 관리 권한이 없는 공개 수신용 DSN만 포함됩니다. 인증 토큰은 저장하지 않습니다.
 
 다른 프로젝트를 사용하려면 DSN을 환경변수로 지정하세요. `.env`는 자동 로드하지 않습니다.
 
 ```sh
-export FLOATNOTE_SENTRY_DSN='https://PUBLIC_KEY@HOST/PROJECT_ID'
+export AGENT_GIBBON_SENTRY_DSN='https://PUBLIC_KEY@HOST/PROJECT_ID'
 npm run build
 ```
 
@@ -233,3 +233,11 @@ cargo test --manifest-path src-tauri/Cargo.toml telemetry::tests::live_sentry_de
 ```
 
 WebView 개발자 도구에서는 `window.dispatchEvent(new Event('error'))`로 고정된 테스트 이벤트를 생성하고 Sentry에서 `WebView uncaught error` 수신을 확인할 수 있습니다. 실제 앱을 중단시키거나 메모를 변경하지 않습니다.
+
+## Agent Gibbon 이름 전환
+
+앱 표시 이름은 **Agent Gibbon**, 저장소·CLI·스킬 이름은 `agent-gibbon`입니다. 기존 `scripts/floatnote`는 새 CLI로 연결하는 호환 진입점입니다.
+
+기존 메모와 설정을 보존하기 위해 앱 식별자 `org.egoing.floatnote`, Unix socket 디렉터리 `/tmp/floatnote-<uid>`, 안내 숨김 설정 키는 유지합니다. 실행 중인 Floatnote에도 새 CLI로 접근할 수 있습니다. 설치 파일을 교체해도 실행 중인 앱은 자동 종료하지 않으며, 새 표시 이름과 기능은 다음 앱 시작부터 적용됩니다. 앱 종료 시 메모가 초기화되므로 필요한 내용을 먼저 저장하세요.
+
+`AGENT_GIBBON_SENTRY_DSN`을 우선 사용하며 기존 `FLOATNOTE_SENTRY_DSN`도 호환됩니다. 과거 검증 로그·릴리스 이름과 Sentry 프로젝트 이름은 이전 기록과의 연결을 위해 보존합니다.
