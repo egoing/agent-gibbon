@@ -426,9 +426,9 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 
 ## v0.2.7 두 CPU 배포·설치 (2026-10-25)
 
-- 이름 전환을 main에 통합한 뒤 다른 작업에서 게시한 v0.2.6 접촉 닫기 변경도 보존했다. 버전 충돌을 피하기 위해 이번 Apple Silicon·Intel 통합 배포는 v0.2.7로 올렸다.
-- 두 CPU에서 Rust 38개·Node 15개 테스트, Clippy, 앱 빌드와 격리 CLI 검증을 통과했다. 실제 Sentry 전송 테스트 1개는 생략했다. 격리 검증은 앱 시작·도움말·두 메모의 독립 내용·숨김 갱신·위치 보존을 확인했다.
+- 이름 전환을 main에 통합한 뒤 다른 작업에서 게시한 v0.2.6 접촉 닫기와 워크트리 개발 인스턴스 분리 변경도 보존했다. 버전 충돌을 피하기 위해 이번 Apple Silicon·Intel 통합 배포는 v0.2.7로 올렸다.
+- 두 CPU에서 Rust 42개·Node 18개 테스트, Clippy, 앱 빌드와 격리 CLI 검증을 통과했다. 실제 Sentry 전송 테스트 1개는 생략했다. 격리 검증은 최종 release 바이너리 원본을 서로 다른 개발 인스턴스로 실행해 앱 시작·도움말·같은 ID 메모의 독립 내용·숨김 갱신·위치 보존을 확인했다.
 - 두 DMG의 hdiutil 무결성, 내부 앱 버전 0.2.7·CPU 종류·애드혹 서명·빌드 번들과 바이너리 일치·CLI 도움말을 확인했다. 검증 마운트는 해제했다. Intel은 Finder 자동화가 대기하여 bundle_dmg.sh의 --skip-jenkins 옵션으로 아이콘 자동 배치를 생략했고 앱과 Applications 바로가기를 포함했다.
-- 두 Mac에 /Applications/Agent Gibbon.app을 설치하고 설치본 서명·버전·바이너리 일치·기존 메모 CLI 조회를 확인했다. 기존 프로세스를 종료하지 않아 메모·초안·숨김을 보존했으며 새 버전은 다음 앱 실행부터 적용된다.
+- 두 Mac에 /Applications/Agent Gibbon.app을 설치하고 설치본 서명·버전·바이너리 일치·기존 메모 CLI 조회를 확인했다. 덮어쓰기 뒤 macOS 서명 캐시로 실행이 종료되는 현상을 해결하기 위해 새 번들을 별도 경로에 준비한 뒤 기존 앱을 백업 경로로 이동하고 교체했다. 기존 프로세스를 종료하지 않아 메모·초안·숨김을 보존했으며 새 버전은 다음 앱 실행부터 적용된다.
 - 기존 앱과 메모 snapshot·설치 자산은 ~/Library/Application Support/Agent Gibbon/releases/v0.2.7/, 검증 로그는 ~/Library/Logs/agent-gibbon-v0.2.7/에 보존한다.
 - Developer ID 서명·공증 및 전체 UI 회귀는 이번 배포에서 수행하지 않았다. Conf 4 / Risk Medium.
