@@ -174,6 +174,8 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
             && cursor.y < f64::from(p.y) + f64::from(size.height);
         let alpha = if hovered || entrance::active(&window) || feedback::active(&window) {
             1.0
+        } else if sizing::folded(&window) {
+            0.8
         } else {
             0.5
         };
@@ -199,7 +201,7 @@ fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<V
     let position = win.outer_position().map_err(|e| e.to_string())?;
     let size = win.outer_size().map_err(|e| e.to_string())?;
     Ok(
-        json!({"ok":true,"id":id,"note":note,"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        json!({"ok":true,"id":id,"note":note,"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"folded": sizing::folded(win), "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     )
 }
 #[tauri::command]
@@ -324,6 +326,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             warp::warp_note,
             warp::poll_warp,
             sizing::fit_note,
+            sizing::poll_fold,
+            sizing::toggle_fold,
             sizing::manual_resize
         ])
         .on_window_event(|win, event| {

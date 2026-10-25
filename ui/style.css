@@ -67,3 +67,18 @@ button:disabled { opacity: .5; cursor: default; }
 #content .change-added { background: #d7f2df; color: #14532d; }
 #content .change-modified { background: #fff0c2; color: #714600; }
 #content .change-removed { background: #fbe0e3; color: #8b2635; text-decoration: line-through; text-decoration-thickness: 1px; }
+
+body.folded #controls > button:not(#fold-toggle),
+body.folded #content, body.folded #editor, body.folded .resize,
+body.folded #warp-tip { display: none !important; }
+body.folded #viewport { overflow: hidden; }
+
+#fold-title { font-size: 10px; line-height: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
+
+body.folded #viewport { padding: 0 2px; }
+body.folded #controls { margin: 0 0 0 3px; padding: 0; }
+body.folded #fold-toggle { width: 12px; height: 10px; padding: 0; border-radius: 0; }
+body.folded #fold-toggle svg { width: 10px; height: 10px; }
+
+#fold-toggle svg { transform: rotate(180deg); }
+body.folded #fold-toggle svg { transform: none; }
