@@ -1,5 +1,7 @@
 mod entrance;
 mod feedback;
+mod focus;
+mod instance;
 mod ipc;
 mod model;
 mod placement;
@@ -36,7 +38,8 @@ fn window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindow, Stri
 fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindow, String> {
     let mut config = app.config().app.windows[0].clone();
     config.label = label(id);
-    config.title = format!("Agent Gibbon — {id}");
+    config.title = format!("{} — {id}", instance::current().title());
+    focus::remember(app, &config.label);
     tauri::WebviewWindowBuilder::from_config(app, &config)
         .map_err(|e| e.to_string())?
         .build()
@@ -153,6 +156,7 @@ fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
         unsafe {
             sync_opacity(win.clone())?;
             (&*(ptr as *const objc2_app_kit::NSWindow)).orderFrontRegardless();
+            focus::restore(win);
         }
         Ok(())
     }
@@ -201,7 +205,7 @@ fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<V
     let position = win.outer_position().map_err(|e| e.to_string())?;
     let size = win.outer_size().map_err(|e| e.to_string())?;
     Ok(
-        json!({"ok":true,"id":id,"note":note,"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"folded": sizing::folded(win), "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        json!({"ok":true,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"folded": sizing::folded(win), "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     )
 }
 #[tauri::command]
@@ -265,6 +269,9 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
     }
     let mut next = existing.clone().unwrap_or_default();
     next.apply(&request)?;
+    if matches!(request.action, Action::Open) {
+        focus::remember(app, &label(&id));
+    }
     let win = if existing.is_some() {
         window(app, &id)?
     } else {
@@ -301,11 +308,17 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
 }
 fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     let _sentry = telemetry::init();
+    let initial_focus = if initial_open {
+        focus::Targets::initial()
+    } else {
+        focus::Targets::default()
+    };
     let builder = tauri::Builder::default();
     #[cfg(target_os = "macos")]
     let builder = builder.activate_ignoring_other_apps(false);
     let app = builder
         .plugin(tauri_plugin_clipboard_manager::init())
+        .manage(initial_focus)
         .manage(warp::Warps::default())
         .manage(feedback::Feedbacks::default())
         .manage(entrance::Entrances::default())
@@ -344,6 +357,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .setup(move |app| {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            if let Some(win) = app.get_webview_window("main") {
+                win.set_title(&format!("{} — main", instance::current().title()))?;
+            }
             tray::install(app.handle())?;
             if initial_open {
                 apply(
@@ -515,6 +531,10 @@ fn cli(args: &[String]) -> Result<Value, String> {
     Ok(response)
 }
 fn main() {
+    if let Err(error) = instance::init() {
+        println!("{}", ipc::error(error));
+        std::process::exit(1);
+    }
     let args: Vec<_> = std::env::args().skip(1).collect();
     let result = if args.is_empty() || args == ["--serve"] {
         match ipc::Endpoint::bind() {
@@ -523,6 +543,10 @@ fn main() {
             Ok(None) => Ok(json!({"ok":true,"already_running":true})),
             Err(e) => Err(e),
         }
+    } else if args == ["--instance-info"] {
+        Ok(
+            json!({"ok":true,"instance":instance::current().id,"dev_label":instance::current().label,"manifest_dir":env!("CARGO_MANIFEST_DIR")}),
+        )
     } else if args == ["--help"] || args == ["-h"] {
         Ok(
             json!({"ok":true,"usage":"agent-gibbon open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open만 앱을 시작하거나 창을 생성·복원합니다. ID 생략 시 main, close는 숨기기입니다. 색상은 #RRGGBB입니다."}),

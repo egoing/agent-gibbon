@@ -100,7 +100,10 @@ async function refresh() {
   try {
     const state = await invoke('snapshot');
     latestNote = state.note;
-    $('fold-title').textContent = state.note.title;
+    $('dev-instance').hidden = !state.dev_label;
+    $('dev-instance').textContent = state.dev_label || '';
+    warpTipKey = state.instance ? `floatnote.warp-tip-dismissed:${state.instance}` : 'floatnote.warp-tip-dismissed';
+    $('fold-title').textContent = state.dev_label ? `[${state.dev_label}] ${state.note.title}` : state.note.title;
     $('fold-title').title = state.note.title;
     $('edit').disabled = editing;
     if (revision !== state.note.revision) {
@@ -194,7 +197,7 @@ for (const event of ['pointerenter', 'pointermove']) {
 }
 document.documentElement.addEventListener('pointerleave', () => invoke('sync_opacity').catch(failure));
 
-const warpTipKey = 'floatnote.warp-tip-dismissed';
+let warpTipKey = 'floatnote.warp-tip-dismissed';
 let warpTipDismissed = false;
 let warpTipTimer;
 function isWarpTipDismissed() {

@@ -2,6 +2,23 @@
 
 검증일: 2026-10-10 (Asia/Seoul)
 
+## 워크트리별 개발 인스턴스 분리 (2026-10-25)
+
+- 후속 `main` 통합 검증: Agent Gibbon 이름 전환과 v0.2.6 접촉 닫기 기능을 모두 보존했습니다. 개발 실행 파일·문서는 `agent-gibbon`으로 맞췄고 `scripts/floatnote-dev`는 호환 래퍼로 유지했습니다. 통합 상태에서 Rust 42개·Node 18개, Clippy, debug·release 빌드와 두 워크트리 실제 동시 실행·포커스·설치 앱 불변 검증을 다시 통과했습니다.
+
+- 환경: macOS arm64, Rust/Cargo 1.91.1, Node 24.21.0, npm 11.19.0, Tauri CLI 2.12.1. Intel Mac 실행은 이번에 검증하지 않았습니다.
+- 실제 절대 경로의 SHA-256 앞 24자리를 사용하는 개발 실행기를 추가했습니다. 개발 CLI는 debug 바이너리의 빌드 출처를 확인하며, release·설치본으로 대체하지 않습니다. 환경변수 미지정 설치 앱의 `/tmp/floatnote-{uid}` 경로는 유지됩니다.
+- `npm test`: Rust 42개와 Node 18개 통과. 기존 Sentry 실전송 테스트 1개는 의도적인 ignore 상태로 실행하지 않았습니다. Rustfmt·Clippy(`-D warnings`)·diff 공백 검사 통과. 두 워크트리의 debug 빌드와 release macOS 앱 번들 빌드 통과. 배포 서명·공증은 이번 검증 범위에 포함하지 않았습니다.
+- 현재 워크트리와 HEAD에서 만든 임시 detached 워크트리에 동일 변경을 적용하고 각각 빌드했습니다. `scripts/isolation-smoke.py`로 A는 개발 CLI 자동 시작, B는 `npm run dev -- --no-watch`로 동시에 실행했습니다. 같은 메모 ID의 서로 다른 내용, 부분 갱신, 숨김 유지, 별도 원본 파일 연결, 독립 중복 실행 잠금, A 종료·재시작 후 B 유지, 기본 앱의 모든 메모 내용·위치·크기·숨김·포커스·핀 보존을 확인했습니다. `/` 디렉터리에서 개발 CLI를 호출해 호출 위치 독립성도 검증했습니다.
+- 네이티브 활성 앱 확인을 추가해 CLI 자동 시작·npm 개발 실행·새 창 생성·갱신에서 이전 앱이 유지됨을 검증했습니다. 현재 Wry의 WKWebView 생성 경로는 앱 활성화를 요청하므로, 첫 표시 시점에 이전 앱을 복원하도록 보완했습니다. 창 생성 도중 사용자가 제3의 앱으로 이동했으면 덮어쓰지 않습니다. 별도 실환경 반복 확인에서 보이는 메모의 메타데이터 갱신 시 위치·크기·포커스 유지도 통과했습니다. 이 검증은 명령 완료 후 상태를 확인하며, 생성 도중의 순간적인 활성화 전환을 완전히 없앤다는 보장은 아닙니다.
+- 개발 창의 `DEV isolate-dev · 65069dd1` 표시를 네이티브 창 캡처로 확인했습니다. 설치 앱의 본문에는 개발 표시를 추가하지 않으며, 접힌 제목과 트레이에도 개발 인스턴스를 표시합니다. 단축키 안내의 localStorage 키도 인스턴스별로 분리했습니다.
+- 기존 설치 앱과 `name` 워크트리의 파일·프로세스는 변경하지 않았습니다. 검증에서 시작한 개발 프로세스만 종료했고, 임시 워크트리는 정리했습니다. 기존 전체 UI 회귀 스크립트(드래그·편집 버튼·트레이 클릭)는 이번에 재실행하지 않았으며, 핵심 CLI 동시 실행과 새 창 포커스·개발 표시를 실제 환경에서 검증했습니다.
+- 같은 `--file` 원본을 지정하면 파일 자체는 공유됩니다. 워크트리 이동 시 개발 ID도 바뀌며, 개발 실행기는 호스트 debug 빌드만 지원합니다. Conf 5 / Risk Medium: IPC 선택과 앱 상태에 관여하지만 변경 범위는 로컬이며 복구 가능합니다.
+
+재현: 두 워크트리에서 `npm run dev:build`를 실행하고 해당 개발 앱이 꺼진 상태에서 `python3 scripts/isolation-smoke.py --peer /다른/워크트리`를 실행합니다. 기본 설치 앱은 실행 중이어야 합니다. 테스트는 기존 개발 앱이 감지되면 중단하며, 다른 앱을 종료하지 않습니다.
+
+공식 API 근거: [Tauri CLI의 dev·no-dev-server 옵션](https://v2.tauri.app/reference/cli/), [macOS 활성 앱 조회](https://developer.apple.com/documentation/appkit/nsworkspace/frontmostapplication), [앱 활성화 API](https://developer.apple.com/documentation/appkit/nsrunningapplication?language=objc).
+
 ## 편집 기능 재검증 (2026-10-14)
 
 - `npm test` 26개(Rust 21 + Node 5), Clippy, Rustfmt, JS/Python 문법과 diff 검사를 다시 통과했습니다.
