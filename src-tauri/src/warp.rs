@@ -104,6 +104,16 @@ pub fn warp_note(window: tauri::WebviewWindow, state: State<Warps>) -> Result<()
     move_note(&window, warp)
 }
 
+pub(crate) fn close_shortcut_pressed() -> bool {
+    #[cfg(target_os = "macos")]
+    {
+        use objc2_app_kit::{NSEvent, NSEventModifierFlags as Flags};
+        NSEvent::modifierFlags_class().contains(Flags::Control | Flags::Option | Flags::Command)
+    }
+    #[cfg(not(target_os = "macos"))]
+    false
+}
+
 #[tauri::command]
 pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bool, String> {
     #[cfg(target_os = "macos")]
@@ -126,6 +136,14 @@ pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bo
         && cursor.y >= p.y as f64
         && cursor.x < p.x as f64 + s.width as f64
         && cursor.y < p.y as f64 + s.height as f64;
+    // Closing takes priority over Option warp and Control fold.
+    if close_shortcut_pressed() {
+        warp.contact = Contact::default();
+        if inside {
+            crate::hide_note(window)?;
+        }
+        return Ok(false);
+    }
     // Native hit testing also works while the WebView is inactive.
     if inside {
         if let Some(revision) = crate::feedback::highlight_revision(&window) {

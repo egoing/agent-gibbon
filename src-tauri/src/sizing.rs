@@ -167,7 +167,8 @@ pub fn toggle_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, S
 pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, String> {
     #[cfg(target_os = "macos")]
     let control = objc2_app_kit::NSEvent::modifierFlags_class()
-        .contains(objc2_app_kit::NSEventModifierFlags::Control);
+        .contains(objc2_app_kit::NSEventModifierFlags::Control)
+        && !crate::warp::close_shortcut_pressed();
     #[cfg(not(target_os = "macos"))]
     let control = false;
     let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
