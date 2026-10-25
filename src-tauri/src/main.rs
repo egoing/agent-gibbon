@@ -1,4 +1,5 @@
 mod entrance;
+mod feedback;
 mod ipc;
 mod model;
 mod placement;
@@ -159,7 +160,7 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
             && cursor.y >= f64::from(p.y)
             && cursor.x < f64::from(p.x) + f64::from(size.width)
             && cursor.y < f64::from(p.y) + f64::from(size.height);
-        let alpha = if hovered || entrance::active(&window) {
+        let alpha = if hovered || entrance::active(&window) || feedback::active(&window) {
             1.0
         } else {
             0.5
@@ -182,10 +183,11 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
 }
 fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<Value, String> {
     let opacity = sync_opacity(win.clone())?;
+    let feedback_active = feedback::active(win);
     let position = win.outer_position().map_err(|e| e.to_string())?;
     let size = win.outer_size().map_err(|e| e.to_string())?;
     Ok(
-        json!({"ok":true,"id":id,"note":note,"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        json!({"ok":true,"id":id,"note":note,"feedback_active":feedback_active,"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     )
 }
 #[tauri::command]
@@ -205,11 +207,14 @@ fn save_note(
     let id = window.label().strip_prefix("note-").unwrap_or("main");
     let mut notes = notes.lock().map_err(|e| e.to_string())?;
     let note = notes.get_mut(id).ok_or("메모를 찾을 수 없습니다")?;
+    let before = note.clone();
     note.save_edit(markdown, expected_revision)?;
+    feedback::changed(&window, Some(&before), note)?;
     Ok(note.clone())
 }
 #[tauri::command]
 fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
+    feedback::clear(&window);
     sizing::cancel(&window);
     entrance::finish(&window)?;
     window.hide().map_err(|e| e.to_string())
@@ -251,6 +256,7 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
     } else {
         create_window(app, &id)?
     };
+    feedback::changed(&win, existing.as_ref(), &next)?;
     match request.action {
         Action::Open => {
             if existing.as_ref().is_none_or(|note| note.revision == 0) {
@@ -260,6 +266,7 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
             }
         }
         Action::Close => {
+            feedback::clear(&win);
             sizing::cancel(&win);
             entrance::finish(&win)?;
             win.hide().map_err(|e| e.to_string())?;
@@ -285,6 +292,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     let app = builder
         .plugin(tauri_plugin_clipboard_manager::init())
         .manage(warp::Warps::default())
+        .manage(feedback::Feedbacks::default())
         .manage(entrance::Entrances::default())
         .manage(sizing::Sizes::default())
         .manage(Mutex::new(BTreeMap::from([(
@@ -306,6 +314,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 api.prevent_close();
                 if let Some(webview) = win.app_handle().get_webview_window(win.label()) {
+                    feedback::clear(&webview);
                     sizing::cancel(&webview);
                     let _ = entrance::finish(&webview);
                 }

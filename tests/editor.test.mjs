@@ -19,6 +19,7 @@ async function setup(storage = new Map()) {
   const timers = [];
   const calls = [];
   let note = { revision: 1, markdown: '# 원문', html: '<h1>원문</h1>', color: '#20252e' };
+  let feedbackActive = false;
   let saveError;
   let warpError;
   let contact = false;
@@ -35,11 +36,11 @@ async function setup(storage = new Map()) {
         calls.push([command, args]);
         if (command === 'warp_note' && warpError) throw warpError;
         if (command === 'poll_warp') { const result = contact; contact = false; return result; }
-        if (command === 'snapshot') return { note: { ...note }, always_on_top: true };
+        if (command === 'snapshot') return { note: { ...note }, always_on_top: true, feedback_active: feedbackActive };
         if (command === 'save_note') {
           if (saveError) throw saveError;
           assert.equal(args.expectedRevision, note.revision);
-          note = { ...note, markdown: args.markdown, html: '<p>저장됨</p>', revision: note.revision + 1 };
+          note = { ...note, markdown: args.markdown, html: args.markdown === note.markdown ? note.html : '<p>저장됨</p>', revision: note.revision + 1 };
           return note;
         }
       } },
@@ -50,6 +51,7 @@ async function setup(storage = new Map()) {
   await new Promise(setImmediate);
   return { element, styles, events, calls, refresh: () => timers.find(fn => fn.name === 'refresh')(),
     pollWarp: () => timers.find(fn => fn.name === 'pollWarp')(),
+    feedback: active => { feedbackActive = active; },
     contact: () => { contact = true; }, failWarp: error => { warpError = error; },
     update: patch => { note = { ...note, ...patch }; }, failSave: error => { saveError = error; } };
 }
@@ -135,4 +137,33 @@ test('failed warp reports error without showing success help or losing draft', a
   assert.equal(app.element('error').textContent, '화면이 작습니다');
   assert.equal(app.element('warp-tip').hidden, true);
   assert.equal(app.element('markdown').value, '작성 중');
+});
+
+
+test('feedback expires without revision changes and metadata never restarts it', async () => {
+  const app = await setup();
+  app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>', removed: true });
+  app.feedback(true); await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
+  assert.equal(app.element('change-notice').hidden, false);
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '초안';
+  app.feedback(false); await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+  assert.equal(app.element('change-notice').hidden, true);
+  assert.equal(app.element('markdown').value, '초안');
+  app.update({ revision: 3, color: '#ffffff' }); await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+});
+
+
+test('feedback never reappears when an expired change is saved without editing', async () => {
+  const app = await setup();
+  app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>' });
+  app.feedback(false); await app.refresh();
+  app.element('edit').listeners.click();
+  await app.element('save').listeners.click();
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+  await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
 });

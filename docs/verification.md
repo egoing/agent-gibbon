@@ -245,3 +245,24 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 자동 폭 통일·중앙 3초 대기·재열기 목적지 재계산을 v0.2.1로 배포한다. Apple Silicon용 앱·DMG에 애드혹 서명을 적용하고, 설치 후 메모 내용·원본 연결·숨김 상태를 복원한다.
 
 - v0.2.1 Rust 23개·Node 7개·Clippy·포맷·문법 검사 통과. Apple Silicon 앱·DMG 생성 후 앱 서명, DMG 무결성, 내부 앱 버전 0.2.1과 빌드 바이너리 SHA-256 일치를 확인했다. CLI --help 실행도 통과했다.
+
+## 2026-10-25 본문 변경 알림 — 이슈 #5 / PR #6
+
+- 기준 `ff0712c4421364ff9a60ce132123ddafb01be8d8`, red `cd2b6a2a930b1eeda2519ae2e15b18629ead9d82`. 최초 기준 트리에서 회귀·타입·린트·빌드를 실행했고 모두 통과했습니다. 기존 실패 제외는 0건입니다.
+- 환경: Apple Silicon arm64, Rust/Cargo 1.91.1, Node 24.21.0, npm 11.19.0, Tauri CLI 2.12.1. 기존 사용자 앱은 종료·교체하지 않았습니다.
+- 요구사항 테스트 4개가 `change_html`/삭제 표시 부재로 실제 실패한 뒤 테스트 전용 red 커밋을 push했습니다. 원본 `/tmp/floatnote-is2-5/red.log`. 기존 red 테스트의 assertion은 유지했습니다.
+- 신규 게이트: `cargo test --manifest-path src-tauri/Cargo.toml feedback` 및 `node --test --test-name-pattern=feedback tests/editor.test.mjs`. 회귀: `npm test`. 타입: `cargo check --manifest-path src-tauri/Cargo.toml --all-targets`. 린트: `npm run check`, Rustfmt, JS/Python 문법, diff 공백. 빌드: `npm run build`.
+- 단위 검증: 변경 행·분리된 변경 사이 유지 행, 체크리스트·표·여러 줄 코드, 삭제-only·빈 본문·초기 표시, 메타데이터·동일 본문, HTML 안전성, 편집 저장, 큰 본문의 제한된 비교, 창별 기한·연속 갱신·만료, revision 변경 없는 강조 해제와 초안 유지.
+- 실환경 격리: 작업 경로의 `src-tauri/target/is2-instance`에 현재 소스를 복사하고 **IPC 디렉터리와 앱 식별자만** 변경해 별도 debug 실행 파일을 빌드했습니다. 기존 앱의 IPC `/tmp/floatnote-<uid>`와 구분되는 `/tmp/floatnote-is2-5-<uid>`를 사용했습니다. UI와 기능 소스는 같으며 이 격리 변경은 배포 소스에 포함하지 않습니다.
+- 실제 macOS/CLI 통과: CoreGraphics PID·좌표로 테스트 창을 식별하여 전면 순서와 alpha 확인, 다른 앱 포커스·좌표·크기·핀 유지, 다른 창 alpha 불변, 마지막 실제 변경부터 3초 복귀, 오래된 기한이 새 알림을 끊지 않음, 메타데이터/동일 본문 무연장, 숨김 중 갱신·재열기에서 이전 효과 없음, 빈 본문 삭제 효과 만료. 원본 `/tmp/floatnote-is2-5/native-feedback-cli.log`.
+- UI 한계: osascript 접근성 권한 오류(-1728), CoreGraphics 창 제목 비공개, Orca 연결에서도 해당 프로세스 창 목록이 비어 있어 **강조 색상/삭제 안내의 실제 화면·복사 버튼·편집/워프/수동 크기 UI·핀 해제 상태의 전면 순서**는 이번 환경에서 확인하지 못했습니다. 초기 UI 실행 실패 로그는 `/tmp/floatnote-is2-5/native-feedback.log`. 제목 대신 PID·좌표로 native 순서를 검증했으며 UI assertion은 `FLOATNOTE_TEST_UI=1`로 별도 보존했습니다. UI 미검증을 통과로 계산하지 않습니다.
+- 재현: 격리 인스턴스에 `FLOATNOTE_TEST_BIN`, `FLOATNOTE_TEST_PROCESS`, 필요시 `FLOATNOTE_TEST_PID`를 지정하고 `python3 scripts/update-feedback-smoke.py`를 실행합니다. 접근성 권한이 있는 환경은 `FLOATNOTE_TEST_UI=1`, 스크린샷 권한도 있으면 `FLOATNOTE_TEST_SCREENSHOT=/tmp/feedback.png`를 지정합니다. 기존 `editor-ui-smoke.py`, `warp-ui-smoke.py`도 같은 격리 바이너리 환경변수로 실행할 수 있습니다.
+- 원본 baseline/final 명령·종료 코드는 `/tmp/floatnote-is2-5/baseline.json`, `final.json`, 각 `baseline-*.log`, `final-*.log`에 있습니다. 최초 baseline은 덮어쓰지 않았습니다.
+- 사전/최종 Risk Medium: 창 순서와 native/UI 상태 상호작용. 자동 병합하지 않고 사전 리뷰로 제출합니다. Conf 5는 위에 명시한 실제 네이티브 동작 범위에 한정하며 UI 미검증 범위는 별도입니다.
+- 공식 API 근거: [Tauri WebviewWindow](https://docs.rs/tauri/latest/tauri/webview/struct.WebviewWindow.html), [NSWindow orderFrontRegardless](https://developer.apple.com/documentation/appkit/nswindow/orderfrontregardless()). 기존 포커스 비탈취 전면 배치 경로를 재사용했습니다.
+
+### is2 커버리지 대조
+
+2026-10-25 실사용, egoing/floatnote #5 / PR #6, Codex CLI 0.164.0(현재 담당 세션), Orca 1.4.239. 스킬 커버리지 표와 대조한 이번 실행의 증거는 **Medium 프런트엔드·백엔드 작업 → 자동 병합 보류 → Ready PR** 경로입니다. red/green·5종 게이트·실제 native 검증·독립 감사의 결과를 PR에 기록합니다. 새 터미널 준비는 반복하지 않았고 기존 base ref를 유지했습니다. 권한 제한 UI는 미검증입니다. 독립 감사가 동일 본문 저장 시 만료된 강조가 재등장하는 결함을 발견했고, 재현 테스트를 추가해 실패를 기록한 뒤 1회 수정 재시도를 수행했습니다. mock은 실제 모델의 동일 본문 저장 동작에 맞게 보완했고 기존 assertion은 유지했습니다. 의심 발동·rebase 충돌·자동 병합·롤백 경로는 이번에 검증하지 않았습니다. 공유 스킬 원본의 유지보수는 작업 범위가 아니므로 원본 표를 수정하지 않고 이 프로젝트 기록을 남깁니다.
+
+- 감사 후 보완: 저장 직후에는 원본 렌더링을 표시하고, 다음 snapshot의 실제 효과 상태로 강조 여부를 결정합니다. 추가 테스트가 실제 실패한 원본은 `/tmp/floatnote-is2-5/audit-red.log`, 보완 후 5종 게이트 원본은 `retry1.json`, `retry1-*.log`입니다. 앞선 final 로그는 이전 시도 증거로 그대로 보존했습니다.

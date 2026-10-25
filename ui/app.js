@@ -5,6 +5,7 @@ const win = window.__TAURI__.window.getCurrentWindow();
 const $ = (id) => document.getElementById(id);
 let revision = -1;
 let latestNote;
+let displayedHtml;
 let editing = false;
 let saving = false;
 let editRevision;
@@ -76,7 +77,9 @@ async function save() {
   $('markdown').readOnly = true;
   try {
     latestNote = await invoke('save_note', { markdown: $('markdown').value, expectedRevision: editRevision });
+    // Only snapshot knows whether retained change_html is still active.
     $('content').innerHTML = latestNote.html;
+    displayedHtml = $('content').innerHTML;
     revision = latestNote.revision;
     endEditing();
   } catch (error) { failure(error); }
@@ -103,10 +106,16 @@ async function refresh() {
       document.documentElement.style.setProperty('--panel', theme.panel);
       $('viewport').setAttribute('aria-label', state.note.title || '메모 내용');
       // HTML is generated and sanitized in Rust; no user HTML reaches this sink.
-      $('content').innerHTML = state.note.html;
+      // Feedback rendering is synchronized below even when revision is unchanged.
       revision = state.note.revision;
       needsFit = true;
     }
+    const html = state.feedback_active ? state.note.change_html : state.note.html;
+    if (displayedHtml !== html) {
+      $('content').innerHTML = html;
+      displayedHtml = html;
+    }
+    $('change-notice').hidden = !state.feedback_active || !state.note.removed;
     $('pin').setAttribute('aria-pressed', String(state.always_on_top));
     await fitContent();
   } catch (error) { failure(error); }
