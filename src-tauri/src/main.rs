@@ -358,6 +358,14 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::manual_resize
         ])
         .on_window_event(|win, event| {
+            #[cfg(target_os = "macos")]
+            if let tauri::WindowEvent::Resized(_) = event {
+                if let Some(webview) = win.app_handle().get_webview_window(win.label()) {
+                    if let Err(error) = sizing::native_resize(&webview) {
+                        eprintln!("수동 크기 기록 실패: {error}");
+                    }
+                }
+            }
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 api.prevent_close();
                 if let Some(webview) = win.app_handle().get_webview_window(win.label()) {

@@ -31,6 +31,19 @@ pub fn cancel(window: &WebviewWindow) {
     }
 }
 
+// macOS may handle the native resize border before the WebView's grip handler.
+// Record only live user resizing, never programmatic fit/fold/placement changes.
+#[cfg(target_os = "macos")]
+pub fn native_resize(window: &WebviewWindow) -> Result<(), String> {
+    let ptr = window.ns_window().map_err(|e| e.to_string())?;
+    // SAFETY: the window event callback runs on the main thread and Tauri owns it.
+    let live = unsafe { (&*(ptr as *const objc2_app_kit::NSWindow)).inLiveResize() };
+    if live {
+        manual_resize(window.clone(), window.state::<Sizes>())?;
+    }
+    Ok(())
+}
+
 #[tauri::command]
 pub fn manual_resize(window: WebviewWindow, sizes: State<Sizes>) -> Result<(), String> {
     crate::entrance::cancel(&window)?;
@@ -149,6 +162,17 @@ fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
             .set_size(LogicalSize::new(size.width, 12.0))
             .map_err(|e| e.to_string())?;
         state.expanded = Some(size);
+    }
+    Ok(())
+}
+
+// Idempotent entrance action: never unfold an already folded note.
+pub fn fold_for_entrance(window: &WebviewWindow) -> Result<(), String> {
+    let sizes = window.state::<Sizes>();
+    let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
+    let state = states.entry(window.label().into()).or_default();
+    if state.expanded.is_none() {
+        toggle(window, state)?;
     }
     Ok(())
 }

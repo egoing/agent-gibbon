@@ -473,3 +473,16 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 입력 검증에는 macOS 이벤트 전송 권한이 필요하다. 실행 전 modifier 키를 놓고 테스트 중 마우스와 키보드를 조작하지 않는다. `npm run dev:build` 후 실행하며, 다른 개발 노트는 숨긴 상태여야 한다.
 - 이번 실환경 검증은 다른 앱에 포커스를 둔 접촉을 확인했다. 여러 배율의 모니터 간 이동과 앱 내부 이벤트 경로를 별도로 재현하지는 않았다. 설치 앱 교체와 두 워크트리 격리 회귀는 수행하지 않았다.
 - 설계 참고: [Apple NSEvent 이벤트 모니터](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/EventOverview/MonitoringEvents/MonitoringEvents.html), [Tauri Rust 명령](https://v2.tauri.app/develop/calling-rust/).
+
+## 2026-10-25 등장 방향 선택
+
+- 표시 당시 커서에서 우세 축으로 8 논리 px 이상 이동한 첫 방향을 고정한다. 두 축이 같으면 수평을 우선한다. 첫 1초 동안도 선택을 기억하지만 실행하지 않으며, 이후 반전해도 바꾸지 않는다. 정지·미세 떨림에는 계속 대기한다.
+- 좌우는 표시 시작 시 커서 모니터의 작업 영역 가장자리(8 논리 px 여백)로 420ms cubic ease-out 이동한다. 위는 기존 펼친 크기를 저장하여 접고 오른쪽으로 이동하며, 이미 접혔으면 그대로 유지한다. 아래는 등장 상태를 취소한 뒤 X 버튼의 숨김 경로를 호출하여 현재 위치·본문을 보존한다. 일반 사용 중에는 반복하지 않는다.
+- tick은 해당 등장 세대의 상태를 잠금 밖에서 소유한 채 접기·숨김을 호출한다. 숨김/재열기 후 이전 세대의 프레임이 새 등장 동작을 실행하지 않도록 기존 세대 검사도 유지한다. 화면 좌표/배율 변환과 직접 조작 취소 경로를 재사용한다.
+- 실제 회귀에서 macOS 네이티브 테두리 크기 조절이 WebView의 수동 크기 기록을 우회하여 재열기 후 자동 크기로 돌아가는 문제를 확인했다. `WindowEvent::Resized`에서 `NSWindow.inLiveResize`인 경우에만 수동 조절을 기록하도록 보완했다. 자동 크기·접기·배치가 수동 크기로 잘못 기록되지 않으며 최종 실제 검증을 통과했다. API 근거: [Tauri WindowEvent](https://docs.rs/tauri/2.12.2/tauri/enum.WindowEvent.html), [Apple NSWindow.inLiveResize](https://developer.apple.com/documentation/appkit/nswindow/inliveresize), 설치된 objc2-app-kit 0.3.2 바인딩.
+- 환경: macOS 15.6.1 arm64, rustc/cargo 1.91.1, Node v24.21.0, npm 11.19.0, tauri-cli 2.12.1. 런타임 tauri 2.12.2.
+- 통과: `npm test`(Rust 49 통과/외부 전송 테스트 1 무시, Node 18 통과), `npm run check`, Rustfmt, `node --check ui/app.js`, Python 문법 검사, `git diff --check`, `npm run dev:build`.
+- `python3 scripts/entrance-direction-smoke.py` 최종 통과: 실제 개발 CLI와 macOS 포인터 이동으로 네 방향, 1초 대기 중 정지, 첫 방향 반전 무시, 1초 이후 미세 떨림 대기, 420ms 동작 종료, 포커스 비탈취, 반복 open 무동작, 숨김 갱신·복원, 접힌 채 재열기·위 방향 재실행·펼치기, 실제 드래그 취소, 네이티브 수동 크기 조절 후 접기/펼치기 크기 복원 확인. 입력 도구는 드래그 시작 전 포인터도 해당 좌표로 옮겨 합성 이벤트와 실제 커서 좌표를 일치시킨다.
+- smoke는 이 워크트리의 `scripts/agent-gibbon-dev`만 호출하며 고유 테스트 노트를 숨기고 포인터를 복원한다. 자신이 시작한 정확한 개발 바이너리의 PID만 종료한다. 설치 앱·다른 워크트리 프로세스와 원래 세션 작업 파일은 변경하지 않았다. 작업 시작부터 있던 `package-lock.json` 변경도 보존했다.
+- 한계: 실제 입력 검증은 기본 모니터에서 수행했다. 음수 좌표·혼합 배율 변환은 Rust 테스트로 확인했으나 서로 다른 배율의 실제 모니터를 오가는 등장, 모니터 연결 해제, Intel 실행, 편집 초안 UI·워프 버튼 전체 회귀 및 두 워크트리 동시 격리 검증은 미실행이다. 방향을 명시한 가장자리 이동은 다른 노트와 겹칠 수 있다. 커밋·병합·배포는 수행하지 않았다.
+- Conf 4 / Risk Low: 개발 앱의 실제 입력 회귀 통과, 변경은 로컬 창 동작이며 쉽게 복구 가능.

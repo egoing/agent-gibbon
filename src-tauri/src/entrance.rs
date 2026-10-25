@@ -20,6 +20,9 @@ struct Flight {
     expected: Point,
     started: Instant,
     motion: Motion,
+    area: (f64, f64, f64, f64),
+    monitor_scale: f64,
+    action_started: bool,
 }
 #[derive(Default)]
 pub struct Entrances(Mutex<BTreeMap<String, Flight>>);
@@ -65,19 +68,49 @@ fn move_to(window: &WebviewWindow, p: Point) -> Result<(), String> {
     window.set_position(position).map_err(|e| e.to_string())
 }
 
-// Keep the note still for at least one second after showing. Remember early
-// pointer movement, but a timer alone never starts the 420ms flight.
+#[derive(Clone, Copy, Debug, PartialEq)]
+enum Direction {
+    Left,
+    Right,
+    Up,
+    Down,
+}
+fn direction(anchor: Point, pointer: Point, threshold: f64) -> Option<Direction> {
+    let dx = pointer.x - anchor.x;
+    let dy = pointer.y - anchor.y;
+    if dx.abs().max(dy.abs()) < threshold {
+        return None;
+    }
+    // Equal diagonals prefer horizontal movement over folding/hiding.
+    Some(if dx.abs() >= dy.abs() {
+        if dx < 0.0 {
+            Direction::Left
+        } else {
+            Direction::Right
+        }
+    } else if dy < 0.0 {
+        Direction::Up
+    } else {
+        Direction::Down
+    })
+}
+
+// Latch the first deliberate movement, even during the minimum one-second hold.
+// A timer or later reversal never chooses a new direction.
 struct Motion {
     shown_at: Instant,
-    pointer_moved: bool,
+    direction: Option<Direction>,
+    threshold: f64,
     anchor: Point,
     moving_since: Option<Instant>,
 }
 impl Motion {
     fn progress(&mut self, pointer: Point, now: Instant) -> Option<f64> {
-        self.pointer_moved |= pointer != self.anchor;
+        if self.direction.is_none() {
+            self.direction = direction(self.anchor, pointer, self.threshold);
+        }
         if self.moving_since.is_none()
-            && self.pointer_moved
+            && self.direction.is_some()
             && now.duration_since(self.shown_at) >= Duration::from_secs(1)
         {
             self.moving_since = Some(now);
@@ -201,6 +234,8 @@ pub fn show(window: &WebviewWindow, destination: Option<Destination>) -> Result<
     let size = window.outer_size().map_err(|e| e.to_string())?;
     let scale = coordinate_scale(window.scale_factor().map_err(|e| e.to_string())?);
     let mut start = None;
+    let mut entrance_area = (0.0, 0.0, 0.0, 0.0);
+    let mut monitor_scale = 1.0;
     for monitor in window.available_monitors().map_err(|e| e.to_string())? {
         let s = coordinate_scale(monitor.scale_factor());
         let p = point(*monitor.position(), monitor.scale_factor());
@@ -214,13 +249,15 @@ pub fn show(window: &WebviewWindow, destination: Option<Destination>) -> Result<
         }
         let area = monitor.work_area();
         let p = point(area.position, monitor.scale_factor());
+        entrance_area = (
+            p.x,
+            p.y,
+            f64::from(area.size.width) / s,
+            f64::from(area.size.height) / s,
+        );
+        monitor_scale = monitor.scale_factor();
         start = nearby(
-            (
-                p.x,
-                p.y,
-                f64::from(area.size.width) / s,
-                f64::from(area.size.height) / s,
-            ),
+            entrance_area,
             (
                 f64::from(size.width) / scale,
                 f64::from(size.height) / scale,
@@ -248,9 +285,13 @@ pub fn show(window: &WebviewWindow, destination: Option<Destination>) -> Result<
                 destination,
                 expected: start,
                 started,
+                area: entrance_area,
+                monitor_scale,
+                action_started: false,
                 motion: Motion {
                     shown_at: started,
-                    pointer_moved: false,
+                    direction: None,
+                    threshold: 8.0 * monitor_scale / coordinate_scale(monitor_scale),
                     anchor,
                     moving_since: None,
                 },
@@ -295,14 +336,16 @@ pub fn show(window: &WebviewWindow, destination: Option<Destination>) -> Result<
 fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, String> {
     let state = window.state::<Entrances>();
     let mut flights = state.0.lock().map_err(|e| e.to_string())?;
-    let Some(flight) = flights.get_mut(window.label()) else {
-        return Ok(false);
-    };
-    if flight.started != started {
+    if flights
+        .get(window.label())
+        .is_none_or(|f| f.started != started)
+    {
         return Ok(false);
     }
+    // Own this generation outside the lock: fold/hide share cancellation paths.
+    let mut flight = flights.remove(window.label()).unwrap();
+    drop(flights);
     if !near(position(window)?, flight.expected) {
-        flights.remove(window.label());
         return Ok(false);
     }
     let hidden = !window.is_visible().map_err(|e| e.to_string())?;
@@ -310,10 +353,58 @@ fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, 
         1.0
     } else {
         let Some(t) = flight.motion.progress(cursor(window)?, Instant::now()) else {
+            state
+                .0
+                .lock()
+                .map_err(|e| e.to_string())?
+                .insert(window.label().into(), flight);
             return Ok(true);
         };
         t
     };
+    if !hidden && !flight.action_started {
+        flight.action_started = true;
+        let direction = flight.motion.direction.expect("motion requires direction");
+        if direction == Direction::Down {
+            // The flight is already cancelled, so the shared X-button path hides
+            // at the current position instead of finishing at the old target.
+            crate::hide_note(window.clone())?;
+            return Ok(false);
+        }
+        if direction == Direction::Up {
+            crate::sizing::fold_for_entrance(window)?;
+        }
+        let scale = window.scale_factor().map_err(|e| e.to_string())?;
+        let size = window.outer_size().map_err(|e| e.to_string())?;
+        let s = coordinate_scale(scale);
+        let gap = 8.0 * flight.monitor_scale / coordinate_scale(flight.monitor_scale);
+        let target = edge_target(
+            flight.area,
+            (f64::from(size.width) / s, f64::from(size.height) / s),
+            start,
+            direction,
+            gap,
+        );
+        let ds = coordinate_scale(flight.monitor_scale);
+        flight.destination = Destination {
+            position: PhysicalPosition::new(
+                (target.x * ds).round() as i32,
+                (target.y * ds).round() as i32,
+            ),
+            scale: flight.monitor_scale,
+            size: tauri::PhysicalSize::new(
+                (f64::from(size.width) / s * ds).round() as u32,
+                (f64::from(size.height) / s * ds).round() as u32,
+            ),
+        };
+        crate::warp::remember(
+            window.app_handle(),
+            window,
+            flight.destination.position.y.into(),
+            (flight.area.1 * ds).round() as i32,
+            flight.monitor_scale,
+        )?;
+    }
     let ease = 1.0 - (1.0 - t).powi(3);
     let destination = point(flight.destination.position, flight.destination.scale);
     let next = Point::new(
@@ -323,15 +414,114 @@ fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, 
     move_to(window, next)?;
     flight.expected = next;
     if t >= 1.0 {
-        flights.remove(window.label());
         return Ok(false);
     }
+    state
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .insert(window.label().into(), flight);
     Ok(true)
+}
+
+fn edge_target(
+    (x, y, w, h): (f64, f64, f64, f64),
+    (nw, nh): (f64, f64),
+    start: Point,
+    direction: Direction,
+    gap: f64,
+) -> Point {
+    let right = (x + w - nw - gap).max(x + gap);
+    let bottom = (y + h - nh - gap).max(y + gap);
+    Point::new(
+        if direction == Direction::Left {
+            x + gap
+        } else {
+            right
+        },
+        start.y.clamp(y + gap, bottom),
+    )
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn jitter_dominant_axis_and_equal_diagonals() {
+        let anchor = Point::new(-100.0, 200.0);
+        for (dx, dy, expected) in [
+            (7.9, -7.9, None),
+            (8.0, 8.0, Some(Direction::Right)),
+            (-8.0, -8.0, Some(Direction::Left)),
+            (9.0, -10.0, Some(Direction::Up)),
+            (-9.0, 10.0, Some(Direction::Down)),
+        ] {
+            assert_eq!(
+                direction(anchor, Point::new(anchor.x + dx, anchor.y + dy), 8.0),
+                expected
+            );
+        }
+    }
+    #[test]
+    fn first_direction_survives_reversal_before_and_after_hold() {
+        for (pointer, expected) in [
+            (Point::new(-10.0, 0.0), Direction::Left),
+            (Point::new(10.0, 0.0), Direction::Right),
+            (Point::new(0.0, -10.0), Direction::Up),
+            (Point::new(0.0, 10.0), Direction::Down),
+        ] {
+            let now = Instant::now();
+            let mut motion = Motion {
+                shown_at: now,
+                direction: None,
+                threshold: 8.0,
+                anchor: Point::new(0.0, 0.0),
+                moving_since: None,
+            };
+            assert_eq!(motion.progress(Point::new(1.0, 1.0), now), None);
+            assert_eq!(motion.direction, None);
+            assert_eq!(
+                motion.progress(pointer, now + Duration::from_millis(100)),
+                None
+            );
+            assert_eq!(
+                motion.progress(
+                    Point::new(-pointer.x, -pointer.y),
+                    now + Duration::from_secs(1)
+                ),
+                Some(0.0)
+            );
+            assert_eq!(motion.direction, Some(expected));
+            assert_eq!(
+                motion.progress(motion.anchor, now + Duration::from_millis(1420)),
+                Some(1.0)
+            );
+            assert_eq!(motion.direction, Some(expected));
+        }
+    }
+    #[test]
+    fn edge_targets_preserve_height_and_clamp_negative_work_areas() {
+        let area = (-1600.0, -900.0, 1600.0, 900.0);
+        let start = Point::new(-800.0, -400.0);
+        assert_eq!(
+            edge_target(area, (300.0, 200.0), start, Direction::Left, 8.0),
+            Point::new(-1592.0, -400.0)
+        );
+        assert_eq!(
+            edge_target(area, (300.0, 200.0), start, Direction::Right, 8.0),
+            Point::new(-308.0, -400.0)
+        );
+        assert_eq!(
+            edge_target(
+                area,
+                (300.0, 12.0),
+                Point::new(-800.0, -10.0),
+                Direction::Up,
+                8.0
+            ),
+            Point::new(-308.0, -20.0)
+        );
+    }
     #[test]
     fn corners_and_negative_monitor_origin_keep_clearance() {
         let area = (-1600.0, -900.0, 1600.0, 900.0);
@@ -383,7 +573,8 @@ mod tests {
         let now = Instant::now();
         let mut motion = Motion {
             shown_at: now,
-            pointer_moved: false,
+            direction: None,
+            threshold: 8.0,
             anchor: Point::new(100.0, 100.0),
             moving_since: None,
         };
@@ -392,7 +583,7 @@ mod tests {
             None
         );
         let moved = now + Duration::from_secs(3601);
-        assert_eq!(motion.progress(Point::new(100.5, 100.0), moved), Some(0.0));
+        assert_eq!(motion.progress(Point::new(108.0, 100.0), moved), Some(0.0));
         assert_eq!(
             motion.progress(motion.anchor, moved + Duration::from_millis(210)),
             Some(0.5)
@@ -407,7 +598,8 @@ mod tests {
         let now = Instant::now();
         let mut motion = Motion {
             shown_at: now,
-            pointer_moved: false,
+            direction: None,
+            threshold: 8.0,
             anchor: Point::new(100.0, 100.0),
             moving_since: None,
         };
