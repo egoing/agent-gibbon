@@ -7,3 +7,9 @@ target/
 !.env.example
 src-tauri/gen/schemas/
 __pycache__/
+
+.vercel/
+
+# The website is buildless; its dist directory contains maintained source.
+!website/dist/
+!website/dist/**

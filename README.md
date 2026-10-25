@@ -1,5 +1,7 @@
 # Agent Gibbon
 
+[English](README.en.md) · [홈페이지](https://agentgibbon.com/) · [다운로드](https://github.com/egoing/agent-gibbon/releases/latest) · [설치와 CLI 안내](https://agentgibbon.com/guide/)
+
 에이전트가 CLI로 갱신하는 작은 플로팅 Markdown 메모. Tauri 2 + Rust + 시스템 WebView로 동작하며 웹 서버 없이 동작합니다. 공식 배포판은 Sentry로 앱 오류 진단 정보를 전송합니다. 개발·테스트 및 DSN 없이 빌드한 앱은 전송하지 않습니다. 메모는 로컬에 유지됩니다.
 
 ## 지원 기능
@@ -162,9 +164,9 @@ macOS에서는 마우스 포인터가 노트 밖에 있으면 창 전체가 50% 
 
 Rust에서 Markdown을 HTML로 변환하고 정리한 뒤 WebView에 전달합니다. HTML 입력을 실행하지 않으며 체크리스트는 ☑/☐로 표시합니다. 이미지와 링크 이동은 지원하지 않습니다. CSP와 최소 창 조작 권한을 적용했습니다.
 
-## 프로젝트 로컬 스킬
+## 에이전트용 사용 스킬
 
-[Agent Gibbon 사용 스킬](.agents/skills/agent-gibbon/SKILL.md)은 에이전트가 실제 CLI의 창 생성·조회·갱신·색상 지정과 숨김 보존 규칙을 담고 있습니다. 작업계획 표시 같은 운영 정책은 사용자 `AGENTS.md`에서 정합니다. 예제는 [examples/progress.md](examples/progress.md)입니다.
+[Agent Gibbon 사용 스킬](.agents/skills/agent-gibbon/SKILL.md)은 설치된 macOS 앱의 실행 경로와 메모 생성·조회·갱신·색상 지정·숨김 보존 규칙을 담고 있습니다. 앱 소스나 개발 빌드 없이 사용할 수 있으며, 개발 실행 절차는 위의 빌드와 실행 절을 따릅니다. 작업계획 표시 같은 운영 정책은 사용자 `AGENTS.md`에서 정합니다. 예제는 [examples/progress.md](examples/progress.md)입니다.
 
 ## 검증
 
@@ -262,3 +264,7 @@ Sentry DSN은 빌드 시 `AGENT_GIBBON_SENTRY_DSN`만 사용합니다. 기존 `F
 ## 라이선스
 
 Agent Gibbon의 소스 코드는 [MIT 라이선스](LICENSE)로 공개합니다. 저작권 및 라이선스 고지를 유지하는 조건으로 사용·수정·재배포·상업적 활용이 가능합니다. 포함되거나 연결된 외부 라이브러리에는 각 프로젝트의 라이선스가 별도로 적용됩니다.
+
+## 홈페이지 운영
+
+[공식 홈페이지](https://agentgibbon.com/)는 Vercel에서 `website/dist/`의 정적 파일을 배포합니다. Cloudflare는 DNS를 관리합니다. 배포 설정·검색 등록 상태·검증 기록은 [홈페이지 운영 문서](website/README.md)를 참고하세요. 데스크톱 앱 빌드와 홈페이지 배포는 별개입니다.
