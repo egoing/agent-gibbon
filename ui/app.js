@@ -119,7 +119,6 @@ async function refresh() {
       $('content').innerHTML = html;
       displayedHtml = html;
     }
-    $('change-notice').hidden = highlightRevision === null || !state.note.removed;
     $('pin').setAttribute('aria-pressed', String(state.always_on_top));
     await fitContent();
   } catch (error) { failure(error); }
@@ -177,9 +176,9 @@ async function acknowledgeFeedback() {
     if (accepted) acknowledgedRevision = Math.max(acknowledgedRevision, observed);
     if (accepted && highlightRevision === observed) {
       highlightRevision = null;
+      needsFit = true;
       displayedHtml = latestNote.html;
       $('content').innerHTML = displayedHtml;
-      $('change-notice').hidden = true;
     }
   } catch (error) { failure(error); }
   finally { acknowledging = false; }
