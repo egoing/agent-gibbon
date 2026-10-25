@@ -62,6 +62,8 @@ button:disabled { opacity: .5; cursor: default; }
 #warp-tip > div { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
 #warp-tip button { width: auto; height: auto; min-height: 22px; font: inherit; padding: 2px 5px; text-decoration: underline; }
 
-/* Marks have no extra metrics: feedback never changes text or measured size. */
-#content mark { background: #ffe082; color: #231b00; border-radius: 2px; }
-#change-notice { position: fixed; bottom: 3px; right: 3px; padding: 2px 5px; border-radius: 3px; background: #ffe082; color: #231b00; font-size: 11px; pointer-events: none; }
+/* Distinct muted backgrounds retain contrast on every note color. */
+#content mark { border-radius: 2px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+#content .change-added { background: #d7f2df; color: #14532d; }
+#content .change-modified { background: #fff0c2; color: #714600; }
+#content .change-removed { background: #fbe0e3; color: #8b2635; text-decoration: line-through; text-decoration-thickness: 1px; }
