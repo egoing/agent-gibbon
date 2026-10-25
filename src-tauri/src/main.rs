@@ -7,6 +7,7 @@ mod model;
 mod placement;
 mod sizing;
 mod source;
+mod storage;
 mod telemetry;
 mod tray;
 mod warp;
@@ -208,7 +209,7 @@ fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<V
     let position = win.outer_position().map_err(|e| e.to_string())?;
     let size = win.outer_size().map_err(|e| e.to_string())?;
     Ok(
-        json!({"ok":true,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"folded": sizing::folded(win), "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        json!({"ok":true,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"folded": sizing::folded(win), "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     )
 }
 #[tauri::command]
@@ -229,7 +230,12 @@ fn save_note(
     let mut notes = notes.lock().map_err(|e| e.to_string())?;
     let note = notes.get_mut(id).ok_or("메모를 찾을 수 없습니다")?;
     let before = note.clone();
-    note.save_edit(markdown, expected_revision)?;
+    window.app_handle().state::<storage::Store>().save_edit(
+        id,
+        note,
+        markdown,
+        expected_revision,
+    )?;
     feedback::changed(&window, Some(&before), note)?;
     Ok(note.clone())
 }
@@ -275,6 +281,9 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
     next.apply(&request)?;
     if matches!(request.action, Action::Open) {
         focus::remember(app, &label(&id));
+    }
+    if matches!(request.action, Action::Open | Action::Update) {
+        app.state::<storage::Store>().save(&id, &next)?;
     }
     let win = if existing.is_some() {
         window(app, &id)?
@@ -365,6 +374,29 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             if let Some(win) = app.get_webview_window("main") {
                 win.set_title(&format!("{} — main", instance::current().title()))?;
+            }
+            let instance = instance::current().id.as_deref();
+            let data_dir = app.path().app_data_dir()?;
+            let root = if instance.is_some() {
+                data_dir.clone()
+            } else {
+                app.path().document_dir()?
+            };
+            let store = storage::Store::new(root, instance);
+            store.migrate_from(&data_dir.join("notes").join(instance.unwrap_or("default")))?;
+            let restored = store.load()?;
+            let ids: Vec<_> = restored
+                .keys()
+                .filter(|id| id.as_str() != "main")
+                .cloned()
+                .collect();
+            app.state::<AppNotes>()
+                .lock()
+                .map_err(|e| e.to_string())?
+                .extend(restored);
+            app.manage(store);
+            for id in ids {
+                create_window(app.handle(), &id)?;
             }
             tray::install(app.handle())?;
             if initial_open {
