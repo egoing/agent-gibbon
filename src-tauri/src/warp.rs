@@ -12,11 +12,11 @@ pub type Warps = Mutex<BTreeMap<String, Warp>>;
 // A move must not create another contact by itself, even if a large note
 // still covers the pointer. Re-arm after release or a real exit of the pointer.
 #[derive(Default)]
-struct Contact {
+pub(crate) struct Contact {
     blocked_at: Option<(f64, f64)>,
 }
 impl Contact {
-    fn trigger(&mut self, alt: bool, inside: bool, cursor: (f64, f64)) -> bool {
+    pub(crate) fn trigger(&mut self, alt: bool, inside: bool, cursor: (f64, f64)) -> bool {
         if !alt || (!inside && self.blocked_at != Some(cursor)) {
             self.blocked_at = None;
         }

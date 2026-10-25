@@ -14,8 +14,9 @@ let saving = false;
 let editRevision;
 let needsFit = true;
 let fitting = false;
+let folded = false;
 async function fitContent() {
-  if (!needsFit || fitting || editing) return;
+  if (!needsFit || fitting || editing || folded) return;
   fitting = true;
   // Measure natural flow independently of the current window height.
   const measure = $('viewport').cloneNode(true);
@@ -99,6 +100,8 @@ async function refresh() {
   try {
     const state = await invoke('snapshot');
     latestNote = state.note;
+    $('fold-title').textContent = state.note.title;
+    $('fold-title').title = state.note.title;
     $('edit').disabled = editing;
     if (revision !== state.note.revision) {
       const theme = themeFor(state.note.color);
@@ -132,7 +135,7 @@ document.addEventListener('mousedown', (event) => {
 });
 for (const grip of document.querySelectorAll('.resize')) {
   grip.addEventListener('mousedown', (event) => {
-    if (event.button !== 0) return;
+    if (event.button !== 0 || folded) return;
     needsFit = false;
     // Start native resizing inside the original mouse gesture.
     invoke('manual_resize').catch(failure);
@@ -228,3 +231,25 @@ async function pollWarp() {
   setTimeout(pollWarp, 100);
 }
 pollWarp();
+
+
+function displayFold(value) {
+  value = Boolean(value);
+  if (folded === value) return;
+  folded = value;
+  document.body.classList.toggle('folded', folded);
+  $('fold-toggle').setAttribute('aria-expanded', String(!folded));
+  $('fold-toggle').setAttribute('aria-label', folded ? '메모 펼치기' : '메모 접기');
+  $('fold-toggle').title = `${folded ? '메모 펼치기' : '메모 접기'} · Control을 누른 채 메모에 포인터를 올리면 접기·펼치기 전환`;
+  $('fold-title').hidden = !folded;
+}
+$('fold-toggle').addEventListener('click', async () => {
+  try { displayFold(await invoke('toggle_fold')); }
+  catch (error) { failure(error); }
+});
+async function pollFold() {
+  try { displayFold(await invoke('poll_fold')); }
+  catch (error) { failure(error); }
+  setTimeout(pollFold, 100);
+}
+pollFold();

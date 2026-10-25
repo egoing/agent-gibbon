@@ -4,6 +4,8 @@ use tauri::{LogicalSize, Manager, State, WebviewWindow};
 #[derive(Default)]
 struct SizeState {
     manual: bool,
+    expanded: Option<LogicalSize<f64>>,
+    contact: crate::warp::Contact,
     placed: bool,
     pending: bool,
 }
@@ -32,13 +34,12 @@ pub fn cancel(window: &WebviewWindow) {
 #[tauri::command]
 pub fn manual_resize(window: WebviewWindow, sizes: State<Sizes>) -> Result<(), String> {
     crate::entrance::cancel(&window)?;
-    sizes
-        .0
-        .lock()
-        .map_err(|e| e.to_string())?
-        .entry(window.label().into())
-        .or_default()
-        .manual = true;
+    let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
+    let state = states.entry(window.label().into()).or_default();
+    if state.expanded.is_some() {
+        return Err("접힌 메모는 펼친 뒤 크기를 조절하세요".into());
+    }
+    state.manual = true;
     Ok(())
 }
 
@@ -57,7 +58,7 @@ pub fn fit_note(
     }
     let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
     let state = states.entry(window.label().into()).or_default();
-    if state.manual {
+    if state.manual || state.expanded.is_some() {
         return Ok(true);
     }
     let monitor = window
@@ -116,4 +117,74 @@ pub fn fit_note(
         }
     }
     Ok(true)
+}
+
+pub fn folded(window: &WebviewWindow) -> bool {
+    window
+        .state::<Sizes>()
+        .0
+        .lock()
+        .ok()
+        .and_then(|states| states.get(window.label()).map(|s| s.expanded.is_some()))
+        .unwrap_or(false)
+}
+
+fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
+    crate::entrance::cancel(window)?;
+    if let Some(size) = state.expanded {
+        window.set_size(size).map_err(|e| e.to_string())?;
+        window
+            .set_min_size(Some(LogicalSize::new(144.0, 32.0)))
+            .map_err(|e| e.to_string())?;
+        state.expanded = None;
+    } else {
+        let size = window
+            .inner_size()
+            .map_err(|e| e.to_string())?
+            .to_logical::<f64>(window.scale_factor().map_err(|e| e.to_string())?);
+        window
+            .set_min_size(Some(LogicalSize::new(144.0, 12.0)))
+            .map_err(|e| e.to_string())?;
+        window
+            .set_size(LogicalSize::new(size.width, 12.0))
+            .map_err(|e| e.to_string())?;
+        state.expanded = Some(size);
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn toggle_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, String> {
+    let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
+    let state = states.entry(window.label().into()).or_default();
+    let cursor = window.cursor_position().map_err(|e| e.to_string())?;
+    state.contact.trigger(true, true, (cursor.x, cursor.y));
+    toggle(&window, state)?;
+    Ok(state.expanded.is_some())
+}
+
+#[tauri::command]
+pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, String> {
+    #[cfg(target_os = "macos")]
+    let control = objc2_app_kit::NSEvent::modifierFlags_class()
+        .contains(objc2_app_kit::NSEventModifierFlags::Control);
+    #[cfg(not(target_os = "macos"))]
+    let control = false;
+    let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
+    let state = states.entry(window.label().into()).or_default();
+    if !window.is_visible().map_err(|e| e.to_string())? {
+        state.contact = crate::warp::Contact::default();
+        return Ok(state.expanded.is_some());
+    }
+    let cursor = window.cursor_position().map_err(|e| e.to_string())?;
+    let p = window.outer_position().map_err(|e| e.to_string())?;
+    let s = window.outer_size().map_err(|e| e.to_string())?;
+    let inside = cursor.x >= p.x as f64
+        && cursor.y >= p.y as f64
+        && cursor.x < p.x as f64 + s.width as f64
+        && cursor.y < p.y as f64 + s.height as f64;
+    if state.contact.trigger(control, inside, (cursor.x, cursor.y)) {
+        toggle(&window, state)?;
+    }
+    Ok(state.expanded.is_some())
 }

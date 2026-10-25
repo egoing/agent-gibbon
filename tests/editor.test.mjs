@@ -25,10 +25,13 @@ async function setup(storage = new Map()) {
   let saveError;
   let warpError;
   let contact = false;
+  let folded = false;
+  const classes = new Set();
   const context = vm.createContext({
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
     themeFor, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
+      body: { classList: { toggle(name, value) { if (value) classes.add(name); else classes.delete(name); } } },
       getElementById: element, querySelectorAll: () => [],
       addEventListener(type, listener) { events[type] = listener; },
       documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener(type, listener) { pointers[type] = listener; } },
@@ -36,6 +39,8 @@ async function setup(storage = new Map()) {
     window: { __TAURI__: {
       core: { async invoke(command, args) {
         calls.push([command, args]);
+        if (command === 'poll_fold') return folded;
+        if (command === 'toggle_fold') { folded = !folded; return folded; }
         if (command === 'warp_note' && warpError) throw warpError;
         if (command === 'poll_warp') { const result = contact; contact = false; return result; }
         if (command === 'snapshot') return { note: { ...note }, always_on_top: true, feedback_active: feedbackActive, highlight_revision: highlightRevision };
@@ -55,7 +60,9 @@ async function setup(storage = new Map()) {
   });
   vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace("import { themeFor } from './theme.mjs';", ''), context);
   await new Promise(setImmediate);
-  return { element, styles, events, calls, pointers, highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
+  return { element, styles, events, calls, pointers, classes,
+    fold: value => { folded = value; },
+    pollFold: () => timers.find(fn => fn.name === 'pollFold')(), highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
     pollWarp: () => timers.find(fn => fn.name === 'pollWarp')(),
     feedback: active => { feedbackActive = active; },
     contact: () => { contact = true; }, failWarp: error => { warpError = error; },
@@ -192,4 +199,44 @@ test('next body replaces previous highlight and pointer movement acknowledges on
   await app.pointers.pointermove();
   assert.equal(app.element('content').innerHTML, '<p>다음 변경</p>');
   assert.equal(other.element('content').innerHTML, '<p><mark>첫 변경</mark></p>');
+});
+
+
+test('fold contact preserves editor drafts and restores through the unfold button', async () => {
+  const app = await setup();
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '저장하지 않은 초안';
+  app.update({ title: '작은 제목' });
+  await app.refresh();
+  app.fold(true);
+  await app.pollFold();
+  assert.equal(app.classes.has('folded'), true);
+  assert.equal(app.element('fold-toggle').hidden, false);
+  assert.equal(app.element('fold-title').textContent, '작은 제목');
+  assert.equal(app.element('fold-title').hidden, false);
+  app.update({ revision: 2, markdown: 'CLI 갱신' });
+  await app.refresh();
+  await app.pollFold();
+  assert.equal(app.classes.has('folded'), true);
+  assert.equal(app.element('markdown').value, '저장하지 않은 초안');
+  await app.element('fold-toggle').listeners.click();
+  assert.equal(app.classes.has('folded'), false);
+  assert.equal(app.element('fold-toggle').attributes['aria-label'], '메모 접기');
+  assert.equal(app.element('fold-title').hidden, true);
+  assert.equal(app.element('editor').hidden, false);
+  assert.equal(app.element('markdown').value, '저장하지 않은 초안');
+});
+
+
+test('explicit button folds and unfolds without Control and updates its label', async () => {
+  const app = await setup();
+  await app.element('fold-toggle').listeners.click();
+  assert.equal(app.classes.has('folded'), true);
+  assert.equal(app.element('fold-toggle').attributes['aria-label'], '메모 펼치기');
+  assert.equal(app.element('fold-toggle').attributes['aria-expanded'], 'false');
+  assert.match(app.element('fold-toggle').title, /Control.*포인터.*접기·펼치기/);
+  await app.element('fold-toggle').listeners.click();
+  assert.equal(app.classes.has('folded'), false);
+  assert.equal(app.element('fold-toggle').attributes['aria-label'], '메모 접기');
+  assert.equal(app.element('fold-toggle').attributes['aria-expanded'], 'true');
 });
