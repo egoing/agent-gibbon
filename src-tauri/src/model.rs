@@ -86,6 +86,8 @@ pub struct Note {
     pub title: String,
     pub color: String,
     pub html: String,
+    pub change_html: String,
+    pub removed: bool,
     pub markdown: String,
     pub source_path: Option<String>,
     pub status: String,
@@ -98,6 +100,8 @@ impl Default for Note {
             title: "Floatnote".into(),
             color: "#20252e".into(),
             html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),
+            change_html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),
+            removed: false,
             markdown: "작업 내용을 기다리고 있습니다.".into(),
             source_path: None,
             status: "대기".into(),
@@ -146,6 +150,14 @@ impl Note {
             self.title = title.clone();
         }
         if let Some(markdown) = &request.markdown {
+            if self.revision == 0 {
+                self.change_html = render(markdown);
+                self.removed = false;
+            } else if self.markdown != *markdown {
+                let (ranges, removed) = changed_lines(&self.markdown, markdown);
+                self.change_html = render_changes(markdown, &ranges);
+                self.removed = removed;
+            }
             self.html = render(markdown);
             self.markdown = markdown.clone();
             self.source_path = request.source_path.clone();
@@ -160,6 +172,71 @@ impl Note {
         self.revision += 1;
         Ok(())
     }
+}
+
+// Line-based LCS keeps unchanged islands. Bound quadratic work for 1 MiB
+// requests; large inputs use ordered matching (moved lines count as changes).
+fn changed_lines(old: &str, new: &str) -> (Vec<std::ops::Range<usize>>, bool) {
+    let a: Vec<_> = old.split_inclusive('\n').collect();
+    let b: Vec<_> = new.split_inclusive('\n').collect();
+    let mut matched = vec![false; b.len()];
+    let mut kept = 0;
+    if a.len().saturating_mul(b.len()) <= 262_144 {
+        let width = b.len() + 1;
+        let mut lengths = vec![0u32; (a.len() + 1) * width];
+        for i in (0..a.len()).rev() {
+            for j in (0..b.len()).rev() {
+                lengths[i * width + j] =
+                    if a[i].trim_end_matches(['\r', '\n']) == b[j].trim_end_matches(['\r', '\n']) {
+                        1 + lengths[(i + 1) * width + j + 1]
+                    } else {
+                        lengths[(i + 1) * width + j].max(lengths[i * width + j + 1])
+                    };
+            }
+        }
+        let (mut i, mut j) = (0, 0);
+        while i < a.len() && j < b.len() {
+            if a[i].trim_end_matches(['\r', '\n']) == b[j].trim_end_matches(['\r', '\n']) {
+                matched[j] = true;
+                kept += 1;
+                i += 1;
+                j += 1;
+            } else if lengths[(i + 1) * width + j] >= lengths[i * width + j + 1] {
+                i += 1;
+            } else {
+                j += 1;
+            }
+        }
+    } else {
+        let mut positions = std::collections::HashMap::<&str, Vec<usize>>::new();
+        for (i, line) in a.iter().enumerate() {
+            positions
+                .entry(line.trim_end_matches(['\r', '\n']))
+                .or_default()
+                .push(i);
+        }
+        let mut next = 0;
+        for (j, line) in b.iter().enumerate() {
+            if let Some(indices) = positions.get(line.trim_end_matches(['\r', '\n'])) {
+                if let Some(&i) = indices.get(indices.partition_point(|&i| i < next)) {
+                    matched[j] = true;
+                    kept += 1;
+                    next = i + 1;
+                }
+            }
+        }
+    }
+    let mut offset = 0;
+    let ranges = b
+        .iter()
+        .enumerate()
+        .filter_map(|(i, line)| {
+            let start = offset;
+            offset += line.len();
+            (!matched[i]).then_some(start..offset)
+        })
+        .collect();
+    (ranges, kept < a.len())
 }
 
 // Markdown accepts plain text, so reject only a likely missing task-list marker.
@@ -206,15 +283,25 @@ fn validate_markdown(markdown: &str) -> Result<(), String> {
 }
 
 pub fn render(markdown: &str) -> String {
-    let mut events: Vec<_> = Parser::new_ext(
+    render_changes(markdown, &[])
+}
+
+fn render_changes(markdown: &str, changes: &[std::ops::Range<usize>]) -> String {
+    let (mut events, ranges): (Vec<_>, Vec<_>) = Parser::new_ext(
         markdown,
         Options::ENABLE_TASKLISTS | Options::ENABLE_STRIKETHROUGH | Options::ENABLE_TABLES,
     )
-    .map(|event| match event {
-        Event::Html(raw) | Event::InlineHtml(raw) => Event::Text(raw),
-        other => other,
+    .into_offset_iter()
+    .map(|(event, range)| {
+        (
+            match event {
+                Event::Html(raw) | Event::InlineHtml(raw) => Event::Text(raw),
+                other => other,
+            },
+            range,
+        )
     })
-    .collect();
+    .unzip();
     // Annotate only lists whose direct items are all tasks; ordinary and mixed
     // lists retain their indentation. Raw user HTML was escaped above.
     let mut lists: Vec<(usize, Vec<bool>)> = Vec::new();
@@ -257,10 +344,50 @@ pub fn render(markdown: &str) -> String {
             _ => (),
         }
     }
+    // Only parser-produced text/code receives marks. Never splice markup into
+    // Markdown or sanitized HTML; generated tags pass through the same sanitizer.
+    let mut decorated = Vec::new();
+    for (event, range) in events.into_iter().zip(ranges) {
+        let intersects = |range: &std::ops::Range<usize>| {
+            changes
+                .get(changes.partition_point(|c| c.end <= range.start))
+                .is_some_and(|c| c.start < range.end)
+        };
+        match event {
+            Event::Text(text) if intersects(&range) => {
+                if markdown.get(range.clone()) == Some(text.as_ref()) {
+                    let mut offset = range.start;
+                    for line in text.split_inclusive('\n') {
+                        let end = offset + line.len();
+                        let marked = intersects(&(offset..end));
+                        if marked {
+                            decorated.push(Event::Html("<mark>".into()));
+                        }
+                        decorated.push(Event::Text(line.to_string().into()));
+                        if marked {
+                            decorated.push(Event::Html("</mark>".into()));
+                        }
+                        offset = end;
+                    }
+                } else {
+                    decorated.push(Event::Html("<mark>".into()));
+                    decorated.push(Event::Text(text));
+                    decorated.push(Event::Html("</mark>".into()));
+                }
+            }
+            Event::Code(text) if intersects(&range) => {
+                decorated.push(Event::Html("<mark>".into()));
+                decorated.push(Event::Code(text));
+                decorated.push(Event::Html("</mark>".into()));
+            }
+            other => decorated.push(other),
+        }
+    }
     let mut output = String::new();
-    html::push_html(&mut output, events.into_iter());
+    html::push_html(&mut output, decorated.into_iter());
     // No images, navigation, arbitrary HTML or executable URL schemes.
     ammonia::Builder::default()
+        .add_tags(&["mark"])
         .add_tag_attributes("ul", &["class"])
         .add_tag_attributes("li", &["class"])
         .rm_tags(&["img"])
@@ -272,6 +399,112 @@ pub fn render(markdown: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn changed_note(old: &str, new: &str) -> Note {
+        let mut note = Note::default();
+        for (action, body) in [("open", old), ("update", new)] {
+            note.apply(
+                &serde_json::from_value(serde_json::json!({"action":action,"markdown":body}))
+                    .unwrap(),
+            )
+            .unwrap();
+        }
+        note
+    }
+    fn highlighted(note: &Note) -> String {
+        serde_json::to_value(note).unwrap()["change_html"]
+            .as_str()
+            .expect("changed content has a separate safe highlight rendering")
+            .to_string()
+    }
+    #[test]
+    fn feedback_deletion_keeps_remaining_line_unmarked_and_large_diff_is_bounded() {
+        let note = changed_note("유지\n\n삭제", "유지");
+        assert_eq!(highlighted(&note), note.html);
+        let old = (0..1000).map(|i| format!("행 {i}\n")).collect::<String>();
+        let new = old.replace("행 500\n", "새 행\n");
+        let (ranges, removed) = changed_lines(&old, &new);
+        assert_eq!(ranges.len(), 1);
+        assert_eq!(&new[ranges[0].clone()], "새 행\n");
+        assert!(removed);
+    }
+    #[test]
+    fn feedback_marks_changed_lines_without_polluting_source_or_plain_html() {
+        let note = changed_note("유지\n\n이전\n\n끝", "유지\n\n변경\n\n끝");
+        let html = highlighted(&note);
+        assert!(html.contains("<mark>변경</mark>"), "{html}");
+        assert!(!html.contains("<mark>유지") && !html.contains("<mark>끝"));
+        assert_eq!(note.markdown, "유지\n\n변경\n\n끝");
+        assert_eq!(note.html, render(&note.markdown));
+        assert!(!note.html.contains("<mark>"));
+    }
+    #[test]
+    fn feedback_preserves_unchanged_middle_and_handles_tasks_tables_code() {
+        for (old, new, keep, change) in [
+            (
+                "- [ ] 대기\n- [x] 유지",
+                "- [x] 대기\n- [x] 유지",
+                "유지",
+                "☑ ",
+            ),
+            (
+                "|a|b|\n|-|-|\n|유지|이전|",
+                "|a|b|\n|-|-|\n|유지|변경|",
+                "<th>a</th>",
+                "변경",
+            ),
+            (
+                "```\n유지\n이전\n```",
+                "```\n유지\n변경\n```",
+                "유지",
+                "변경",
+            ),
+            ("a\n\n유지\n\nb", "c\n\n유지\n\nd", "유지", "c"),
+        ] {
+            let html = highlighted(&changed_note(old, new));
+            assert!(html.contains("<mark>"), "{html}");
+            assert!(html.contains(change), "{html}");
+            assert!(!html.contains(&format!("<mark>{keep}")), "{html}");
+        }
+    }
+    #[test]
+    fn feedback_deletion_empty_initial_same_and_metadata() {
+        for (old, new) in [("유지\n\n삭제", "유지"), ("삭제", "")] {
+            let note = changed_note(old, new);
+            let value = serde_json::to_value(&note).unwrap();
+            assert_eq!(value["removed"], true);
+            assert!(!highlighted(&note).contains("삭제"));
+        }
+        let mut note = Note::default();
+        note.apply(
+            &serde_json::from_value(serde_json::json!({"action":"open","markdown":"첫 표시"}))
+                .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(highlighted(&note), note.html);
+        let same = changed_note("유지", "유지");
+        assert_eq!(highlighted(&same), same.html);
+        let mut note = changed_note("이전", "변경");
+        let before = highlighted(&note);
+        note.apply(
+            &serde_json::from_value(
+                serde_json::json!({"action":"update","status":"완료","color":"#ffffff"}),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(highlighted(&note), before);
+    }
+    #[test]
+    fn feedback_html_is_sanitized_and_editor_uses_same_diff() {
+        let mut note = changed_note(
+            "이전",
+            "<script>evil()</script>\n\n![x](https://example.com)\n\n[x](javascript:evil())",
+        );
+        let html = highlighted(&note);
+        assert!(!html.contains("<script") && !html.contains("<img") && !html.contains("href="));
+        note.save_edit("편집".into(), note.revision).unwrap();
+        assert!(highlighted(&note).contains("<mark>편집</mark>"));
+    }
     #[test]
     fn editor_saves_source_and_rejects_stale_or_invalid_changes() {
         let folder =

@@ -17,8 +17,11 @@ async function setup(storage = new Map()) {
   const styles = {};
   const events = {};
   const timers = [];
+  const pointers = {};
   const calls = [];
   let note = { revision: 1, markdown: '# 원문', html: '<h1>원문</h1>', color: '#20252e' };
+  let feedbackActive = false;
+  let highlightRevision = null;
   let saveError;
   let warpError;
   let contact = false;
@@ -28,18 +31,22 @@ async function setup(storage = new Map()) {
     document: {
       getElementById: element, querySelectorAll: () => [],
       addEventListener(type, listener) { events[type] = listener; },
-      documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener() {} },
+      documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener(type, listener) { pointers[type] = listener; } },
     },
     window: { __TAURI__: {
       core: { async invoke(command, args) {
         calls.push([command, args]);
         if (command === 'warp_note' && warpError) throw warpError;
         if (command === 'poll_warp') { const result = contact; contact = false; return result; }
-        if (command === 'snapshot') return { note: { ...note }, always_on_top: true };
+        if (command === 'snapshot') return { note: { ...note }, always_on_top: true, feedback_active: feedbackActive, highlight_revision: highlightRevision };
+        if (command === 'acknowledge_feedback') {
+          if (highlightRevision !== args.revision) return false;
+          highlightRevision = null; return true;
+        }
         if (command === 'save_note') {
           if (saveError) throw saveError;
           assert.equal(args.expectedRevision, note.revision);
-          note = { ...note, markdown: args.markdown, html: '<p>저장됨</p>', revision: note.revision + 1 };
+          note = { ...note, markdown: args.markdown, html: args.markdown === note.markdown ? note.html : '<p>저장됨</p>', revision: note.revision + 1 };
           return note;
         }
       } },
@@ -48,8 +55,9 @@ async function setup(storage = new Map()) {
   });
   vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace("import { themeFor } from './theme.mjs';", ''), context);
   await new Promise(setImmediate);
-  return { element, styles, events, calls, refresh: () => timers.find(fn => fn.name === 'refresh')(),
+  return { element, styles, events, calls, pointers, highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
     pollWarp: () => timers.find(fn => fn.name === 'pollWarp')(),
+    feedback: active => { feedbackActive = active; },
     contact: () => { contact = true; }, failWarp: error => { warpError = error; },
     update: patch => { note = { ...note, ...patch }; }, failSave: error => { saveError = error; } };
 }
@@ -135,4 +143,53 @@ test('failed warp reports error without showing success help or losing draft', a
   assert.equal(app.element('error').textContent, '화면이 작습니다');
   assert.equal(app.element('warp-tip').hidden, true);
   assert.equal(app.element('markdown').value, '작성 중');
+});
+
+
+test('feedback persists after opacity expiry until pointer contact, preserving drafts', async () => {
+  const app = await setup();
+  app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>', removed: true });
+  app.highlight(2); app.feedback(true); await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
+  assert.equal(app.element('change-notice').hidden, false);
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '초안';
+  app.feedback(false); await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
+  await app.pointers.pointerenter();
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+  assert.equal(app.element('change-notice').hidden, true);
+  app.highlight(2); await app.refresh(); // An already in-flight snapshot may be stale.
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+  assert.equal(app.element('markdown').value, '초안');
+  app.update({ revision: 3, color: '#ffffff' }); await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+});
+
+
+test('feedback never reappears when an expired change is saved without editing', async () => {
+  const app = await setup();
+  app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>' });
+  app.feedback(false); await app.refresh();
+  app.element('edit').listeners.click();
+  await app.element('save').listeners.click();
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+  await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+});
+
+
+test('next body replaces previous highlight and pointer movement acknowledges only that note', async () => {
+  const app = await setup();
+  const other = await setup();
+  for (const instance of [app, other]) {
+    instance.update({ revision: 2, markdown: '첫 변경', html: '<p>첫 변경</p>', change_html: '<p><mark>첫 변경</mark></p>' });
+    instance.highlight(2); await instance.refresh();
+  }
+  app.update({ revision: 3, markdown: '다음 변경', html: '<p>다음 변경</p>', change_html: '<p><mark>다음 변경</mark></p>' });
+  app.highlight(3); await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<p><mark>다음 변경</mark></p>');
+  await app.pointers.pointermove();
+  assert.equal(app.element('content').innerHTML, '<p>다음 변경</p>');
+  assert.equal(other.element('content').innerHTML, '<p><mark>첫 변경</mark></p>');
 });

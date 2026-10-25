@@ -62,7 +62,11 @@ try:
     assert same_position(cli('inspect', ids[0]), state), 'update moved waiting note'
     pointer('move', x - 10, y)
     landed = wait_done(ids[0])
-    assert landed['opacity'] == .5 and not landed['focused'], landed
+    # A body update has its own three-second opacity hold, independent of entrance.
+    assert landed['opacity'] == 1.0 and landed['feedback_active'] and not landed['focused'], landed
+    time.sleep(3.1)
+    pointer('move', 0, 0)
+    assert cli('inspect', ids[0])['opacity'] == .5
     assert not same_position(landed, state), 'note did not travel to destination'
     time.sleep(.8)
     fitted = cli('inspect', ids[0])
