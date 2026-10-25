@@ -34,7 +34,7 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
 }
 
 pub fn refresh(app: &tauri::AppHandle) -> Result<(), String> {
-    if let Some(tray) = app.tray_by_id("floatnote") {
+    if let Some(tray) = app.tray_by_id("agent-gibbon") {
         tray.set_menu(Some(menu(app)?)).map_err(|e| e.to_string())?;
     }
     Ok(())
@@ -57,10 +57,10 @@ fn icon() -> tauri::image::Image<'static> {
 }
 
 pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
-    TrayIconBuilder::with_id("floatnote")
+    TrayIconBuilder::with_id("agent-gibbon")
         .icon(icon())
         .icon_as_template(true)
-        .tooltip("Floatnote — 메모 열기")
+        .tooltip("Agent Gibbon — 메모 열기")
         .menu(&menu(app)?)
         .show_menu_on_left_click(true)
         .on_menu_event(|app, event| {
@@ -89,8 +89,8 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 Ok(())
             };
             if let Err(error) = result {
-                if let Some(tray) = app.tray_by_id("floatnote") {
-                    let _ = tray.set_tooltip(Some(format!("Floatnote: {error}")));
+                if let Some(tray) = app.tray_by_id("agent-gibbon") {
+                    let _ = tray.set_tooltip(Some(format!("Agent Gibbon: {error}")));
                 }
             }
         })

@@ -10,7 +10,7 @@ import tempfile
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-BIN = str(ROOT / 'scripts/floatnote')
+BIN = str(ROOT / 'scripts/agent-gibbon')
 
 
 def cli(*args):
@@ -28,17 +28,17 @@ def active():
 
 
 def ref(note_id):
-    return 'window ' + json.dumps('Floatnote — ' + note_id, ensure_ascii=False)
+    return 'window ' + json.dumps('Agent Gibbon — ' + note_id, ensure_ascii=False)
 
 
 def contents(note_id):
-    return apple('tell application "System Events" to tell process "floatnote" to get entire contents of ' + ref(note_id))
+    return apple('tell application "System Events" to tell process "agent-gibbon" to get entire contents of ' + ref(note_id))
 
 
 def click(note_id, control):
     title = cli('inspect', '--id', note_id)['note']['title'] or '메모 내용'
     root = 'group ' + json.dumps(title, ensure_ascii=False) + ' of UI element 1 of scroll area 1 of group 1 of group 1 of ' + ref(note_id)
-    apple(f'tell application "System Events" to tell process "floatnote" to click {control} of {root}')
+    apple(f'tell application "System Events" to tell process "agent-gibbon" to click {control} of {root}')
     time.sleep(0.3)
 
 
@@ -63,7 +63,7 @@ try:
         assert present in text and absent not in text, text
         assert '갱신' not in text
     # Drag from rendered text, then empty body space; no tiny handle or modifier.
-    frame = apple('tell application "System Events" to tell process "floatnote" to get {position, size} of ' + ref(a))
+    frame = apple('tell application "System Events" to tell process "agent-gibbon" to get {position, size} of ' + ref(a))
     x, y, width, height = map(float, frame.split(','))
     before_drag = cli('inspect', '--id', a)
     subprocess.run(['/usr/bin/swift', str(ROOT / 'scripts/macos-input.swift'), 'drag', str(x + 60), str(y + 33), str(x + 100), str(y + 53)], check=True, capture_output=True, timeout=15)
@@ -71,14 +71,14 @@ try:
     after_drag = cli('inspect', '--id', a)
     assert after_drag['position'] != before_drag['position'], 'dragging rendered text did not move the window'
     assert cli('inspect', '--id', b)['position'] == second['position']
-    frame = apple('tell application "System Events" to tell process "floatnote" to get {position, size} of ' + ref(a))
+    frame = apple('tell application "System Events" to tell process "agent-gibbon" to get {position, size} of ' + ref(a))
     x, y, width, height = map(float, frame.split(','))
     subprocess.run(['/usr/bin/swift', str(ROOT / 'scripts/macos-input.swift'), 'drag', str(x + width / 2), str(y + height - 30), str(x + width / 2 + 20), str(y + height - 10)], check=True, capture_output=True, timeout=15)
     time.sleep(.4)
     after_blank_drag = cli('inspect', '--id', a)
     assert after_blank_drag['position'] != after_drag['position'], 'dragging empty body space did not move the window'
 
-    frame = apple('tell application "System Events" to tell process "floatnote" to get {position, size} of ' + ref(a))
+    frame = apple('tell application "System Events" to tell process "agent-gibbon" to get {position, size} of ' + ref(a))
     x, y, width, height = map(float, frame.split(','))
     subprocess.run(['/usr/bin/swift', str(ROOT / 'scripts/macos-input.swift'), 'drag', str(x + width - 2), str(y + height - 2), str(x + width + 28), str(y + height + 18)], check=True, capture_output=True, timeout=15)
     time.sleep(.4)
@@ -86,7 +86,7 @@ try:
     assert after_resize['size']['width'] > after_drag['size']['width']
     assert after_resize['size']['height'] > after_drag['size']['height']
     assert cli('inspect', '--id', b)['size'] == second['size']
-    with tempfile.TemporaryDirectory(prefix='floatnote-clipboard-') as folder:
+    with tempfile.TemporaryDirectory(prefix='agent-gibbon-clipboard-') as folder:
         saved = str(Path(folder) / 'clipboard.plist')
         helper = str(ROOT / 'scripts/macos-clipboard.swift')
         subprocess.run(['/usr/bin/swift', helper, 'save', saved], check=True, capture_output=True, timeout=15)

@@ -7,11 +7,11 @@ import subprocess
 import time
 import uuid
 
-BIN = os.environ['FLOATNOTE_TEST_BIN']
-POINTER = os.environ['FLOATNOTE_POINTER_BIN']
-INPUT = os.environ['FLOATNOTE_INPUT_BIN']
-PROCESS = os.environ.get('FLOATNOTE_TEST_PROCESS', 'floatnote-qa7')
-assert 'qa7' in BIN and PROCESS == 'floatnote-qa7'
+BIN = os.environ['AGENT_GIBBON_TEST_BIN']
+POINTER = os.environ['AGENT_GIBBON_POINTER_BIN']
+INPUT = os.environ['AGENT_GIBBON_INPUT_BIN']
+PROCESS = os.environ.get('AGENT_GIBBON_TEST_PROCESS', 'agent-gibbon-qa7')
+assert 'qa7' in BIN and PROCESS == 'agent-gibbon-qa7'
 
 def apple(text):
     return subprocess.check_output(['osascript', '-e', text], text=True, timeout=15).strip()

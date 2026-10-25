@@ -6,8 +6,8 @@ import subprocess
 import time
 import uuid
 
-BIN = os.environ['FLOATNOTE_TEST_BIN']
-POINTER = os.environ['FLOATNOTE_POINTER_BIN']
+BIN = os.environ['AGENT_GIBBON_TEST_BIN']
+POINTER = os.environ['AGENT_GIBBON_POINTER_BIN']
 assert 'qa7' in BIN
 
 def cli(action, note, *args):

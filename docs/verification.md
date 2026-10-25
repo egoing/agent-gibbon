@@ -384,3 +384,16 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 설치는 기존 앱과 메모 snapshot을 로컬 private 경로에 백업하고 앱 파일을 교체한다. 기존 프로세스는 초안·위치·숨김 보존을 위해 유지하며 새 버전은 다음 재시작부터 적용한다.
 - 릴리스 파일·이전 앱·메모 snapshot은 `~/Library/Application Support/Floatnote/releases/v0.2.5/`, 테스트 로그·격리 검증 도구는 `~/Library/Logs/floatnote-v0.2.5/`에 보존한다. 설치와 게시 확인 후 Orca CLI로 이번 folding 워크스페이스만 삭제한다.
 - Conf 4 / Risk Medium: main에서 통합한 기존 Sentry 외부 오류 수집을 포함한다. 접기 기능 자체는 국소적이며 복구 가능하다.
+
+
+## Agent Gibbon 이름 전환 (2026-10-25)
+
+- 앱 표시명은 Agent Gibbon, 저장소·CLI·스킬 이름은 agent-gibbon으로 전환했다. GitHub 저장소의 private 상태를 확인했다. 이전 scripts/floatnote는 새 CLI로 연결하는 호환 진입점이다.
+- 기존 메모와 설정을 위해 앱 식별자, Unix socket 디렉터리와 UI 설정 키를 유지했다. 새 Sentry 환경변수를 우선하고 이전 환경변수도 지원한다.
+- Apple Silicon MacBook(Cargo 1.91.1)과 Intel iMac Pro(Cargo 1.97.1)에서 각각 Rust 38개 및 Node 15개 테스트, Clippy와 앱 빌드를 통과했다. 실제 Sentry 전송 테스트 1개는 기본 생략했다. 최신 Clippy가 발견한 기존 오류 전파 구문은 동작이 같은 `?` 구문으로 정리했다.
+- 두 컴퓨터에서 release 바이너리 사본의 IPC 경로만 같은 길이의 별도 경로로 바꾸고 애드혹 서명하여 격리 검증했다. 새 프로세스 실행, 두 메모의 독립 내용, 숨김 갱신과 위치 보존, CLI 도움말을 확인했다. 검증 프로세스만 종료했다.
+- 각 컴퓨터의 /Applications/Agent Gibbon.app을 설치하고 서명 검사 및 빌드 번들 내부 바이너리와 바이트 일치를 확인했다. 새 CLI와 호환 CLI의 도움말, 기존 프로세스 메모 조회도 통과했다. 기존 앱은 실행 상태로 보존했고 새 UI 이름은 다음 앱 시작부터 적용된다.
+- 두 컴퓨터의 소스 파일 해시가 일치함을 확인했다. 저장소 실경로와 새 Orca 등록 경로는 ~/dev/project/agent-gibbon, 새 워크트리 기본 경로는 ~/orca/workspaces/agent-gibbon이다. Agents·Codex·Claude의 설치 스킬은 새 저장소의 스킬을 가리킨다.
+- Orca 기존 등록은 'Agent Gibbon · 이전 대화'로 보존했다. 이전 경로는 호환 심볼릭 링크로 유지한다. 이전 대화 로그의 경로를 다시 쓰거나 기존 세션 등록을 삭제하지 않았다.
+- 이번 검증에서 전체 버튼·트레이·접기·워프 UI 회귀 및 Developer ID 서명·공증, 새 DMG 배포는 수행하지 않았다. 로그는 각 컴퓨터의 ~/Library/Logs/agent-gibbon-rename-20261025/에 있다.
+- Conf 4 / Risk Medium: 두 CPU 환경에서 실제 앱 검증을 수행했으며 경로·설치·Orca 등록 변경은 호환 경로와 기존 등록을 통해 복구 가능하다.

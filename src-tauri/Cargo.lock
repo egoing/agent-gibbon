@@ -18,6 +18,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 
 [[package]]
+name = "agent-gibbon"
+version = "0.2.5"
+dependencies = [
+ "ammonia",
+ "fs2",
+ "libc",
+ "objc2-app-kit",
+ "pulldown-cmark",
+ "sentry",
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-clipboard-manager",
+]
+
+[[package]]
 name = "aho-corasick"
 version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -930,23 +947,6 @@ dependencies = [
  "crc32fast",
  "miniz_oxide 0.9.1",
  "zlib-rs",
-]
-
-[[package]]
-name = "floatnote"
-version = "0.2.5"
-dependencies = [
- "ammonia",
- "fs2",
- "libc",
- "objc2-app-kit",
- "pulldown-cmark",
- "sentry",
- "serde",
- "serde_json",
- "tauri",
- "tauri-build",
- "tauri-plugin-clipboard-manager",
 ]
 
 [[package]]

@@ -8,7 +8,7 @@ import subprocess
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-BIN = str(ROOT / 'scripts/floatnote')
+BIN = str(ROOT / 'scripts/agent-gibbon')
 
 
 def call(*args, ok=True):

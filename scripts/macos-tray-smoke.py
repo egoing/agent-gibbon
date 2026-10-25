@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def cli(*args):
-    d = json.loads(subprocess.check_output([str(ROOT / 'scripts/floatnote'), *args], text=True, timeout=25))
+    d = json.loads(subprocess.check_output([str(ROOT / 'scripts/agent-gibbon'), *args], text=True, timeout=25))
     assert d['ok'], d
     return d
 
@@ -20,13 +20,13 @@ def apple(script):
 
 
 def choose(label):
-    frame = apple('tell application "System Events" to tell process "floatnote" to get {position, size} of menu bar item 1 of menu bar 2')
+    frame = apple('tell application "System Events" to tell process "agent-gibbon" to get {position, size} of menu bar item 1 of menu bar 2')
     x, y, w, h = map(float, frame.split(','))
     subprocess.run(['/usr/bin/swift', str(ROOT / 'scripts/macos-input.swift'), 'click', str(x + w / 2), str(y + h / 2)], check=True, capture_output=True, timeout=15)
     # Background inspection/status updates must not replace and dismiss the open menu.
     cli('inspect', '--id', note_id)
     cli('update', '--id', note_id, '--status', '메뉴 열림 중 갱신')
-    apple('tell application "System Events" to tell process "floatnote" to click menu item ' + json.dumps(label, ensure_ascii=False) + ' of menu 1 of menu bar item 1 of menu bar 2')
+    apple('tell application "System Events" to tell process "agent-gibbon" to click menu item ' + json.dumps(label, ensure_ascii=False) + ' of menu 1 of menu bar item 1 of menu bar 2')
     time.sleep(.5)
 
 

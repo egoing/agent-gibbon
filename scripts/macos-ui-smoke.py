@@ -8,7 +8,7 @@ import subprocess
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-BIN = str(ROOT / 'scripts/floatnote')
+BIN = str(ROOT / 'scripts/agent-gibbon')
 
 def cli(*args):
     data = json.loads(subprocess.check_output([BIN, *args], text=True, timeout=25))
@@ -26,12 +26,12 @@ opened = cli('open', '--title', 'UI 검증', '--file', str(ROOT / 'examples/prog
 time.sleep(2)
 assert active() == front, 'open changed foreground app'
 assert not opened['focused'], 'run this test with another app focused'
-content = apple('tell application "System Events" to tell process "floatnote" to get entire contents of window \"Floatnote\"')
+content = apple('tell application "System Events" to tell process "agent-gibbon" to get entire contents of window \"Agent Gibbon\"')
 for expected in ('☑ 단일 플로팅 메모', '☐ 실제 작업에서 사용성 확인'):
     assert expected in content, expected
 def click(control):
-    root = 'group "UI 검증" of UI element 1 of scroll area 1 of group 1 of group 1 of window "Floatnote"'
-    apple(f'tell application "System Events" to tell process "floatnote" to click {control} of {root}')
+    root = 'group "UI 검증" of UI element 1 of scroll area 1 of group 1 of group 1 of window "Agent Gibbon"'
+    apple(f'tell application "System Events" to tell process "agent-gibbon" to click {control} of {root}')
     time.sleep(0.3)
 click('checkbox "상단 고정"')
 assert cli('inspect')['always_on_top'] != opened['always_on_top']
