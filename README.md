@@ -182,9 +182,9 @@ python3 scripts/macos-tray-smoke.py
 npm run build:release
 ```
 
-호스트 CPU용 앱과 DMG를 `src-tauri/target/release/bundle/`에 만듭니다. v0.2.5는 Apple Silicon용 `dmg/Floatnote_0.2.5_aarch64.dmg`를 제공합니다. 기존 Intel Mac용 v0.1.0은 이전 릴리스에서 받을 수 있습니다. v0.2.5의 Intel 빌드는 제공하지 않습니다.
+호스트 CPU용 앱과 DMG를 `src-tauri/target/release/bundle/`에 만듭니다. v0.2.6는 Apple Silicon용 `dmg/Floatnote_0.2.6_aarch64.dmg`를 제공합니다. 기존 Intel Mac용 v0.1.0은 이전 릴리스에서 받을 수 있습니다. v0.2.6의 Intel 빌드는 제공하지 않습니다.
 
-새 빌드의 **Agent Gibbon.app을 Applications로 복사**한 후 실행합니다. 기존 v0.2.5 이하 릴리스 자산은 당시 이름인 Floatnote를 유지합니다. 이 배포판은 Apple Developer ID 서명·공증을 하지 않았습니다. 신뢰하는 출처에서 받은 파일인지 확인한 후 macOS의 **시스템 설정 → 개인정보 보호 및 보안 → 그래도 열기** 절차가 필요할 수 있습니다.
+새 빌드의 **Agent Gibbon.app을 Applications로 복사**한 후 실행합니다. 기존 v0.2.6 이하 릴리스 자산은 당시 이름인 Floatnote를 유지합니다. 이 배포판은 Apple Developer ID 서명·공증을 하지 않았습니다. 신뢰하는 출처에서 받은 파일인지 확인한 후 macOS의 **시스템 설정 → 개인정보 보호 및 보안 → 그래도 열기** 절차가 필요할 수 있습니다.
 
 설치된 앱에 포함된 CLI도 사용할 수 있습니다.
 
