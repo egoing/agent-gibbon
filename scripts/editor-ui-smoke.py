@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Exercise editor controls on macOS; touches only unique notes and temporary files.
-Set FLOATNOTE_TEST_BIN / FLOATNOTE_TEST_PROCESS for an isolated app instance.
+Set AGENT_GIBBON_TEST_BIN / AGENT_GIBBON_TEST_PROCESS for an isolated app instance.
 """
 import json
 import os
@@ -11,8 +11,8 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-BIN = os.environ.get('FLOATNOTE_TEST_BIN', str(ROOT / 'scripts/floatnote'))
-PROCESS = os.environ.get('FLOATNOTE_TEST_PROCESS', 'floatnote')
+BIN = os.environ.get('AGENT_GIBBON_TEST_BIN', str(ROOT / 'scripts/agent-gibbon'))
+PROCESS = os.environ.get('AGENT_GIBBON_TEST_PROCESS', 'agent-gibbon')
 
 def apple(code):
     return subprocess.check_output(['osascript', '-e', code], text=True, timeout=15).strip()
@@ -26,7 +26,7 @@ def cli(action, note_id, *args):
     return data
 
 def root(note_id):
-    return 'group "Floatnote" of UI element 1 of scroll area 1 of group 1 of group 1 of window ' + json.dumps('Floatnote — ' + note_id, ensure_ascii=False)
+    return 'group "Agent Gibbon" of UI element 1 of scroll area 1 of group 1 of group 1 of window ' + json.dumps('Agent Gibbon — ' + note_id, ensure_ascii=False)
 
 def editor(note_id):
     return 'group "Markdown 편집" of ' + root(note_id)
@@ -44,7 +44,7 @@ def draft(note_id):
     return ui('get value of text area "Markdown 원문" of ' + editor(note_id))
 
 def contents(note_id):
-    return ui('get entire contents of window ' + json.dumps('Floatnote — ' + note_id, ensure_ascii=False))
+    return ui('get entire contents of window ' + json.dumps('Agent Gibbon — ' + note_id, ensure_ascii=False))
 
 def passed(message):
     print('PASS: ' + message, flush=True)
@@ -54,7 +54,7 @@ ids = ['editor-test-' + uuid.uuid4().hex[:8] for _ in range(2)]
 a, b = ids
 created = []
 try:
-    with tempfile.TemporaryDirectory(prefix='floatnote-editor-smoke-') as folder:
+    with tempfile.TemporaryDirectory(prefix='agent-gibbon-editor-smoke-') as folder:
         path = Path(folder) / '한글 메모.md'
         path.write_text('# 원본\n- [ ] 편집 대기')
         first = cli('open', a, '--file', str(path)); created.append(a)

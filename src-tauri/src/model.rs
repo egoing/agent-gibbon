@@ -97,7 +97,7 @@ pub struct Note {
 impl Default for Note {
     fn default() -> Self {
         Self {
-            title: "Floatnote".into(),
+            title: "Agent Gibbon".into(),
             color: "#20252e".into(),
             html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),
             change_html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),
@@ -629,7 +629,7 @@ mod tests {
     #[test]
     fn editor_saves_source_and_rejects_stale_or_invalid_changes() {
         let folder =
-            std::env::temp_dir().join(format!("floatnote-edit-test-{}", std::process::id()));
+            std::env::temp_dir().join(format!("agent-gibbon-edit-test-{}", std::process::id()));
         std::fs::create_dir(&folder).unwrap();
         let path = folder.join("note.md");
         std::fs::write(&path, "원문").unwrap();

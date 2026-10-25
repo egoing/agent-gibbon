@@ -2,8 +2,10 @@
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 pub fn init() -> sentry::ClientInitGuard {
-    let dsn = std::env::var("FLOATNOTE_SENTRY_DSN")
+    let dsn = std::env::var("AGENT_GIBBON_SENTRY_DSN")
         .ok()
+        .or_else(|| std::env::var("FLOATNOTE_SENTRY_DSN").ok())
+        .or_else(|| option_env!("AGENT_GIBBON_SENTRY_DSN").map(str::to_owned))
         .or_else(|| option_env!("FLOATNOTE_SENTRY_DSN").map(str::to_owned))
         .unwrap_or_else(|| include_str!("../sentry-dsn.txt").trim().to_owned())
         .parse()
@@ -31,8 +33,8 @@ fn sanitize(
     event.message = event.message.map(|message| match message.as_str() {
         "WebView uncaught error"
         | "WebView unhandled promise rejection"
-        | "Floatnote Sentry connection test" => message,
-        _ => "Floatnote internal error".into(),
+        | "Agent Gibbon Sentry connection test" => message,
+        _ => "Agent Gibbon internal error".into(),
     });
     for exception in event.exception.values.iter_mut() {
         exception.value = Some("Error details withheld for privacy".into());
@@ -77,7 +79,7 @@ mod tests {
         let guard = init();
         assert!(guard.is_enabled());
         let event =
-            sentry::capture_message("Floatnote Sentry connection test", sentry::Level::Error);
+            sentry::capture_message("Agent Gibbon Sentry connection test", sentry::Level::Error);
         assert!(!event.is_nil());
         assert!(guard.flush(Some(std::time::Duration::from_secs(10))));
     }

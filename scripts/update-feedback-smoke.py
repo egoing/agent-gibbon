@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Native macOS feedback verification against an explicitly isolated instance.
-FLOATNOTE_TEST_BIN and FLOATNOTE_TEST_PROCESS are required. Uses only unique notes,
+AGENT_GIBBON_TEST_BIN and AGENT_GIBBON_TEST_PROCESS are required. Uses only unique notes,
 restores pointer/front app, and hides test notes. Never stops an existing app.
 """
 import json
@@ -11,8 +11,8 @@ import tempfile
 import time
 import uuid
 
-BIN = os.environ['FLOATNOTE_TEST_BIN']
-PROCESS = os.environ['FLOATNOTE_TEST_PROCESS']
+BIN = os.environ['AGENT_GIBBON_TEST_BIN']
+PROCESS = os.environ['AGENT_GIBBON_TEST_PROCESS']
 
 def apple(code):
     return subprocess.check_output(['osascript', '-e', code], text=True, timeout=15).strip()
@@ -38,7 +38,7 @@ original_front = front()
 prefix = 'feedback-' + uuid.uuid4().hex[:8]
 a, b = prefix + '-a', prefix + '-b'
 created = []
-with tempfile.TemporaryDirectory(prefix='floatnote-feedback-native-') as folder:
+with tempfile.TemporaryDirectory(prefix='agent-gibbon-feedback-native-') as folder:
     folder = Path(folder)
     swift = folder / 'native.swift'
     swift.write_text(r'''
@@ -72,8 +72,8 @@ if args[1] == "pointer" {
     pointer = native('pointer').split()
     def windows():
         args = ['windows', prefix]
-        if os.environ.get('FLOATNOTE_TEST_PID'):
-            args.append(os.environ['FLOATNOTE_TEST_PID'])
+        if os.environ.get('AGENT_GIBBON_TEST_PID'):
+            args.append(os.environ['AGENT_GIBBON_TEST_PID'])
         raw = json.loads(native(*args))  # Capture before inspect can synchronize alpha.
         result = {}
         for note_id in (a, b):
@@ -85,7 +85,7 @@ if args[1] == "pointer" {
                     result[note_id] = w
         return result
     def root(note_id):
-        return 'group "Floatnote" of UI element 1 of scroll area 1 of group 1 of group 1 of window ' + json.dumps('Floatnote — ' + note_id)
+        return 'group "Agent Gibbon" of UI element 1 of scroll area 1 of group 1 of group 1 of window ' + json.dumps('Agent Gibbon — ' + note_id)
     def ui(code):
         return apple(f'tell application "System Events" to tell process {json.dumps(PROCESS)} to {code}')
     try:
@@ -109,8 +109,8 @@ if args[1] == "pointer" {
         assert 'change-modified">유지하는' not in result['note']['change_html']
         assert '<mark ' not in result['note']['html'] and result['note']['markdown'] == changed
         time.sleep(.45)
-        if os.environ.get('FLOATNOTE_TEST_SCREENSHOT'):
-            subprocess.run(['screencapture', '-x', '-l', str(native_state[a]['id']), os.environ['FLOATNOTE_TEST_SCREENSHOT']], check=True)
+        if os.environ.get('AGENT_GIBBON_TEST_SCREENSHOT'):
+            subprocess.run(['screencapture', '-x', '-l', str(native_state[a]['id']), os.environ['AGENT_GIBBON_TEST_SCREENSHOT']], check=True)
         passed('native order/alpha, focus/position/pin preservation, isolated safe rendering payload and clean source')
         time.sleep(max(0, 2.0 - (time.monotonic() - started)))
         cli('update', a, '--markdown', changed + '!')
@@ -146,7 +146,7 @@ if args[1] == "pointer" {
             passed('highlight survives opacity expiry, real pointer contact acknowledges it, opacity deadline remains independent')
         else:
             print('SKIP: pointer acknowledgement; synthetic event access=' + str(event_access) + ', requested=' + str(expected_pointer) + ', actual=' + str(actual_pointer), flush=True)
-        if os.environ.get('FLOATNOTE_TEST_UI') == '1':
+        if os.environ.get('AGENT_GIBBON_TEST_UI') == '1':
             # Unpinned notes still move forward without changing pin or focus.
             ui('click button "상단 고정" of ' + root(a)); time.sleep(.25)
             before = cli('inspect', a)
@@ -166,12 +166,12 @@ if args[1] == "pointer" {
         passed('hide clears opacity only, hidden update stays hidden, reopen preserves highlight')
         result = cli('update', a, '--markdown', '')
         assert result['feedback_active'] and result['note']['removed'] and result['note']['html'] == ''
-        if os.environ.get('FLOATNOTE_TEST_UI') == '1':
+        if os.environ.get('AGENT_GIBBON_TEST_UI') == '1':
             time.sleep(.45)
-            contents = ui('get entire contents of window ' + json.dumps('Floatnote — ' + a))
+            contents = ui('get entire contents of window ' + json.dumps('Agent Gibbon — ' + a))
             assert '숨긴 갱신' in contents and '이전 내용 삭제됨' not in contents, contents
             time.sleep(3.1)
-            contents = ui('get entire contents of window ' + json.dumps('Floatnote — ' + a))
+            contents = ui('get entire contents of window ' + json.dumps('Agent Gibbon — ' + a))
             assert '숨긴 갱신' in contents and '이전 내용 삭제됨' not in contents
             passed('deleted text remains struck through after opacity expiry in real WebView')
         else:

@@ -4,7 +4,7 @@ let offset = CommandLine.arguments.lastIndex(of: "--").map { $0 + 1 } ?? 1
 let title = CommandLine.arguments[offset]
 func info() -> [String: Any] {
     let windows = CGWindowListCopyWindowInfo(.optionAll, kCGNullWindowID) as! [[String: Any]]
-    return windows.first { $0[kCGWindowOwnerName as String] as? String == "floatnote" && $0[kCGWindowName as String] as? String == title }!
+    return windows.first { $0[kCGWindowOwnerName as String] as? String == "agent-gibbon" && $0[kCGWindowName as String] as? String == title }!
 }
 let original = CGEvent(source: nil)!.location
 func move(_ point: CGPoint) {
