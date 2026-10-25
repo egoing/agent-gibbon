@@ -480,3 +480,20 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 환경: arm64 macOS, Node v24.21.0, Rust 1.91.1. `npm test`: Rust 47 통과·외부 전송 테스트 1 무시, JavaScript 18 통과. `npm run check`, `npm run dev:build`, `git diff --check` 통과.
 - 실제 `scripts/agent-gibbon-dev` CLI로 7개 생성 후 여섯 색상과 반복 확인, 숨긴 상태의 본문 갱신과 색상 유지, 재열기 색상 유지, 명시 색상 정규화, 개발 앱 종료·재실행 후 저장 색상·숨김 복원과 다음 순환 색상 확인. 검증에서 시작한 정확한 개발 바이너리 PID만 종료했다.
 - Conf 5(실제 개발 앱 CLI 검증), Risk Low. 설치 앱은 교체하지 않았다. 육안 색상 비교와 두 워크트리 격리 회귀는 이번에 수행하지 않았다.
+
+## 공식 배포 빌드에만 Sentry 수집 허용 (2026-10-25)
+
+- 기본 DSN 파일과 런타임 DSN 재지정/구형 환경변수 호환을 제거했다. release 빌드에 `AGENT_GIBBON_SENTRY_DSN`을 주입한 경우만 SDK를 초기화하며, debug 및 test 빌드는 항상 초기화를 건너뛴다. 유효한 내장 DSN이 없으면 `sentry::init`을 호출하지 않아 SDK의 일반 `SENTRY_DSN` 자동 적용도 차단한다.
+- Apple Silicon arm64, Rust/Cargo 1.91.1, Node 26.0.0, npm 11.12.1, Tauri CLI 2.12.1에서 Rust 44개 및 Node 18개 테스트, Clippy, Rustfmt, diff 검사를 통과했다. 기존 실제 전송 테스트는 테스트 빌드 수집 금지 정책에 따라 전송 없는 조건 검증으로 교체했다.
+- `npm run dev:build` 및 DSN 환경변수를 제거한 `npm run build`의 release 앱 번들 생성을 통과했다. `scripts/agent-gibbon-dev`로 테스트 노트의 open/update/close/inspect 및 숨김·본문을 확인했다. 실행 환경에는 실제 서비스가 아닌 example.invalid 테스트 DSN을 제공했다. 직접 시작한 개발 앱 PID만 종료했으며 설치 앱은 변경하지 않았다.
+- 유효한 release DSN 조건은 단위 테스트로 확인했다. 공식 DSN을 주입한 배포판의 실제 Sentry 수신 및 네트워크 캡처 검증, Intel 빌드, 앱 공증은 수행하지 않았다. 배포 담당자는 다음 공식 빌드에 DSN을 주입하고 실제 수신을 별도로 확인해야 한다. 이번 결과물은 설치·배포하지 않았다.
+- Conf 3 / Risk Low: 수집 조건은 단위 테스트로 검증했고 개발 CLI의 실제 실행도 확인했지만 공식 서비스 전송은 미검증이다.
+
+
+## MIT 공개 준비와 최신 main 통합 (2026-10-25)
+
+- MIT LICENSE와 npm/Cargo 라이선스 메타데이터를 추가하고 비공개 저장소 다운로드 안내를 제거했다. 기존 의존성에는 각 라이선스를 유지한다.
+- 원격 main의 영속 저장·접촉 감지·홈페이지·자동 색상 변경을 별도 oss-publication 워크스페이스에서 통합했다. 검증 문서의 추가 기록 충돌은 양쪽 내용을 모두 보존했다. 원래 작업 폴더의 개발 표시 이름 관련 미커밋 변경은 포함하지 않았다.
+- 통합본 Rust 49개·Node 18개 테스트 및 Clippy 통과. 검증용 Cargo 아티팩트 캐시만 기존 target을 재사용했으며 통합 워크스페이스의 개발 앱을 실행하거나 기존 개발 바이너리를 대체하지 않았다.
+- 공개 전 Git 이력 391개 blob에서 대표 비밀키 패턴을 검사해 일치 없음. 문서 스크린샷 두 개와 릴리스 자산 목록을 확인했다. 이는 전용 비밀정보 탐지·모든 바이너리 내용 감사의 대체가 아니다.
+- Conf 3 / Risk Medium: 공개 전환은 Git 이력과 기존 릴리스까지 외부에서 접근 가능하게 한다. 기존 배포 앱은 재제작·교체하지 않았다.
