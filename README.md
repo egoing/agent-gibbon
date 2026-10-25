@@ -86,7 +86,9 @@ npm run dev:build
 npm run dev:info
 ```
 
-개발 실행과 `scripts/agent-gibbon-dev`는 실제 워크트리 절대 경로(심볼릭 링크 해소)의 SHA-256 앞 24자리로 같은 `dev-…` ID를 계산합니다. 호출한 현재 디렉터리나 브랜치 이름에는 의존하지 않습니다. 경로를 옮기면 ID도 달라집니다. 소켓과 중복 실행 잠금은 `/tmp/floatnote-{uid}-{개발ID}/`로 분리됩니다. 개발 창에는 `DEV 워크트리이름 · 짧은해시`, 메뉴에는 같은 구분이 표시됩니다.
+개발 실행과 `scripts/agent-gibbon-dev`는 실제 워크트리 절대 경로(심볼릭 링크 해소)의 SHA-256 앞 24자리로 같은 `dev-…` ID를 계산합니다. 호출한 현재 디렉터리나 브랜치 이름에는 의존하지 않습니다. 경로를 옮기면 ID도 달라집니다. 소켓과 중복 실행 잠금은 `/tmp/floatnote-{uid}-{개발ID}/`로 분리됩니다. 개발 창에는 `DEV 브랜치명 · 짧은해시`, 메뉴에는 같은 구분이 표시됩니다.
+
+개발 표시의 브랜치명은 앱 시작 시 읽습니다. 브랜치를 전환하면 앱을 다시 시작해야 표시가 바뀝니다. Detached HEAD에서는 `detached@커밋해시`, Git 정보를 읽을 수 없으면 작업 폴더명을 표시합니다.
 
 개발 CLI는 해당 워크트리의 `src-tauri/target/debug/agent-gibbon`만 사용하고, 빌드 출처를 확인합니다. release·설치본으로 대체하지 않습니다. 개발 실행기는 `CARGO_TARGET_DIR`를 해당 워크트리로 고정하며 `FLOATNOTE_INSTANCE`·`FLOATNOTE_DEV_NAME`을 자동 전달합니다. 이 변수는 직접 지정할 필요가 없습니다. 로컬 통신 호환성을 위해 내부 변수 이름은 `FLOATNOTE_`를 유지하며, 이전 `scripts/floatnote-dev`는 개발 CLI의 호환 진입점입니다. 기본 호스트 debug 빌드를 지원하며 `npm run dev -- --no-watch`로 감시를 끌 수 있습니다. 다른 프로필·타깃·runner 옵션은 지원하지 않습니다.
 

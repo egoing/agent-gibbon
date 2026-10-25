@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { realpathSync } from 'node:fs';
 import { basename, join } from 'node:path';
 
@@ -6,7 +7,13 @@ import { basename, join } from 'node:path';
 export function devInstance(root) {
   root = realpathSync(root);
   const id = `dev-${createHash('sha256').update(root).digest('hex').slice(0, 24)}`;
-  return { root, id, name: basename(root), target: join(root, 'src-tauri/target'),
+  const branch = spawnSync('git', ['-C', root, 'symbolic-ref', '--quiet', '--short', 'HEAD'], { encoding: 'utf8' });
+  let name = branch.status === 0 ? branch.stdout.trim() : '';
+  if (!name) {
+    const head = spawnSync('git', ['-C', root, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8' });
+    name = head.status === 0 ? `detached@${head.stdout.trim()}` : basename(root);
+  }
+  return { root, id, name, target: join(root, 'src-tauri/target'),
     binary: join(root, 'src-tauri/target/debug/agent-gibbon') };
 }
 export function devEnvironment(instance, inherited = process.env) {
