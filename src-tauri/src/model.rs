@@ -110,7 +110,19 @@ impl Default for Note {
         }
     }
 }
+// Swatches sampled from the supplied Apple Stickies menu screenshot.
+const NOTE_COLORS: [&str; 6] = [
+    "#fee93e", "#89f0ff", "#84fe83", "#ffb2b1", "#9cb6ff", "#dadada",
+];
+
 impl Note {
+    pub fn with_palette_color(created_count: usize) -> Self {
+        Self {
+            color: NOTE_COLORS[created_count % NOTE_COLORS.len()].into(),
+            ..Self::default()
+        }
+    }
+
     pub fn save_edit(&mut self, markdown: String, expected_revision: u64) -> Result<(), String> {
         if self.revision != expected_revision {
             return Err(
@@ -845,5 +857,35 @@ mod tests {
         assert_eq!(nested.matches("class=\"task-list\"").count(), 1);
         let loose = render("- [x] 첫째\n\n- [ ] 둘째");
         assert_eq!(loose.matches("class=\"task-item\"").count(), 2);
+    }
+}
+
+#[cfg(test)]
+mod palette_tests {
+    use super::*;
+
+    #[test]
+    fn palette_cycles_and_explicit_color_survives_updates() {
+        for index in 0..18 {
+            let mut note = Note::with_palette_color(index);
+            assert_eq!(note.color, NOTE_COLORS[index % 6]);
+            let mut request = Request {
+                action: Action::Open,
+                id: None,
+                title: None,
+                status: None,
+                markdown: Some("새 메모".into()),
+                source_path: None,
+                color: None,
+            };
+            note.apply(&request).unwrap();
+            assert_eq!(note.color, NOTE_COLORS[index % 6]);
+            request.color = Some("#ABCDEF".into());
+            note.apply(&request).unwrap();
+            request.action = Action::Update;
+            request.color = None;
+            note.apply(&request).unwrap();
+            assert_eq!(note.color, "#abcdef");
+        }
     }
 }
