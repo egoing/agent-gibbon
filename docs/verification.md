@@ -473,3 +473,10 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 입력 검증에는 macOS 이벤트 전송 권한이 필요하다. 실행 전 modifier 키를 놓고 테스트 중 마우스와 키보드를 조작하지 않는다. `npm run dev:build` 후 실행하며, 다른 개발 노트는 숨긴 상태여야 한다.
 - 이번 실환경 검증은 다른 앱에 포커스를 둔 접촉을 확인했다. 여러 배율의 모니터 간 이동과 앱 내부 이벤트 경로를 별도로 재현하지는 않았다. 설치 앱 교체와 두 워크트리 격리 회귀는 수행하지 않았다.
 - 설계 참고: [Apple NSEvent 이벤트 모니터](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/EventOverview/MonitoringEvents/MonitoringEvents.html), [Tauri Rust 명령](https://v2.tauri.app/develop/calling-rust/).
+
+## 2026-10-25 새 노트 자동 색상
+
+- 제공된 스티커 메뉴 이미지의 RGB 표본으로 노랑·파랑·초록·분홍·보라·회색 순환을 추가했다. 저장된 노트 수를 기준으로 하며 시작 시 빈 main 자리표시는 제외한다. 명시 색상은 우선하고 기존 노트는 변경하지 않는다.
+- 환경: arm64 macOS, Node v24.21.0, Rust 1.91.1. `npm test`: Rust 47 통과·외부 전송 테스트 1 무시, JavaScript 18 통과. `npm run check`, `npm run dev:build`, `git diff --check` 통과.
+- 실제 `scripts/agent-gibbon-dev` CLI로 7개 생성 후 여섯 색상과 반복 확인, 숨긴 상태의 본문 갱신과 색상 유지, 재열기 색상 유지, 명시 색상 정규화, 개발 앱 종료·재실행 후 저장 색상·숨김 복원과 다음 순환 색상 확인. 검증에서 시작한 정확한 개발 바이너리 PID만 종료했다.
+- Conf 5(실제 개발 앱 CLI 검증), Risk Low. 설치 앱은 교체하지 않았다. 육안 색상 비교와 두 워크트리 격리 회귀는 이번에 수행하지 않았다.
