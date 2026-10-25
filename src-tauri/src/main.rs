@@ -46,7 +46,7 @@ fn place_new_window(
     app: &tauri::AppHandle,
     win: &tauri::WebviewWindow,
     requested_size: Option<tauri::LogicalSize<f64>>,
-) -> Result<tauri::PhysicalPosition<i32>, String> {
+) -> Result<entrance::Destination, String> {
     use std::hash::{BuildHasher, Hasher};
     let random = std::collections::hash_map::RandomState::new()
         .build_hasher()
@@ -58,16 +58,19 @@ fn place_new_window(
         if other.label() == win.label() || !other.is_visible().map_err(|e| e.to_string())? {
             continue;
         }
-        let p = entrance::destination(other)
-            .map(Ok)
-            .unwrap_or_else(|| other.outer_position().map_err(|e| e.to_string()))?;
-        let s = other.outer_size().map_err(|e| e.to_string())?;
-        occupied.push(placement::Rect {
-            x: p.x.into(),
-            y: p.y.into(),
-            width: s.width.into(),
-            height: s.height.into(),
-        });
+        let rect = if let Some(destination) = entrance::destination(other) {
+            destination.rect()
+        } else {
+            let p = other.outer_position().map_err(|e| e.to_string())?;
+            let s = other.outer_size().map_err(|e| e.to_string())?;
+            placement::Rect {
+                x: p.x.into(),
+                y: p.y.into(),
+                width: s.width.into(),
+                height: s.height.into(),
+            }
+        };
+        occupied.push(rect);
     }
     let mut monitors = win.available_monitors().map_err(|e| e.to_string())?;
     if let Some(current) = win.current_monitor().map_err(|e| e.to_string())? {
@@ -113,7 +116,11 @@ fn place_new_window(
             ))
             .map_err(|e| e.to_string())?;
             warp::remember(app, win, rect.y, work.position.y, monitor.scale_factor())?;
-            return Ok(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32));
+            return Ok(entrance::Destination {
+                position: tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32),
+                size: tauri::PhysicalSize::new(rect.width as u32, rect.height as u32),
+                scale: monitor.scale_factor(),
+            });
         }
     }
     if let Some((_, rect, work_y, scale)) = fallback {
@@ -125,7 +132,11 @@ fn place_new_window(
         ))
         .map_err(|e| e.to_string())?;
         warp::remember(app, win, rect.y, work_y, scale)?;
-        return Ok(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32));
+        return Ok(entrance::Destination {
+            position: tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32),
+            size: tauri::PhysicalSize::new(rect.width as u32, rect.height as u32),
+            scale,
+        });
     }
     Err("패널을 배치할 수 있는 화면이 없습니다".into())
 }
@@ -293,6 +304,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         )])))
         .invoke_handler(tauri::generate_handler![
             snapshot,
+            entrance::drag_note,
             hide_note,
             toggle_pin,
             sync_opacity,
@@ -464,8 +476,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
     };
     let response = ipc::exchange(stream, &request)?;
     if matches!(request.action, Action::Open) && response["ok"] == true {
-        // Initial content measurement may be pending before the entrance starts.
-        std::thread::sleep(Duration::from_millis(950));
+        // Wait only for initial measurement/show, never for pointer movement.
         let inspect = Request {
             source_path: None,
             action: Action::Inspect,
@@ -478,7 +489,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
         let deadline = Instant::now() + Duration::from_secs(5);
         loop {
             let state = ipc::exchange(ipc::connect()?, &inspect)?;
-            if state["animating"] != true || Instant::now() >= deadline {
+            if state["visible"] == true || Instant::now() >= deadline {
                 return Ok(state);
             }
             std::thread::sleep(Duration::from_millis(100));

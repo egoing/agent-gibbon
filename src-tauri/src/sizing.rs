@@ -31,7 +31,7 @@ pub fn cancel(window: &WebviewWindow) {
 
 #[tauri::command]
 pub fn manual_resize(window: WebviewWindow, sizes: State<Sizes>) -> Result<(), String> {
-    crate::entrance::finish(&window)?;
+    crate::entrance::cancel(&window)?;
     sizes
         .0
         .lock()
@@ -78,7 +78,7 @@ pub fn fit_note(
         if state.pending {
             let next = window.clone();
             std::thread::spawn(move || {
-                // Let native move/resize notifications settle before centering.
+                // Let native move/resize notifications settle before showing beside the cursor.
                 std::thread::sleep(std::time::Duration::from_millis(20));
                 let app = next.app_handle().clone();
                 let _ = app.run_on_main_thread(move || {
