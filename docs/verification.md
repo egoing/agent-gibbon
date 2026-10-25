@@ -432,3 +432,13 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 두 Mac에 /Applications/Agent Gibbon.app을 설치하고 설치본 서명·버전·바이너리 일치·기존 메모 CLI 조회를 확인했다. 덮어쓰기 뒤 macOS 서명 캐시로 실행이 종료되는 현상을 해결하기 위해 새 번들을 별도 경로에 준비한 뒤 기존 앱을 백업 경로로 이동하고 교체했다. 기존 프로세스를 종료하지 않아 메모·초안·숨김을 보존했으며 새 버전은 다음 앱 실행부터 적용된다.
 - 기존 앱과 메모 snapshot·설치 자산은 ~/Library/Application Support/Agent Gibbon/releases/v0.2.7/, 검증 로그는 ~/Library/Logs/agent-gibbon-v0.2.7/에 보존한다.
 - Developer ID 서명·공증 및 전체 UI 회귀는 이번 배포에서 수행하지 않았다. Conf 4 / Risk Medium.
+
+## 2026-10-25 열린 메모 메뉴 표시
+
+- 개별 메뉴에 네이티브 체크 표시를 사용하고 `✓ 열린 메모` 범례를 추가했다. 실제 창 가시성으로 표시하며 접힌 창도 열린 상태로 취급한다.
+- CLI 열기/숨기기, 닫기 버튼, 접촉 닫기, 창 닫기 요청에서 상태를 동기화한다. 체크된 항목 재선택도 기존 복원 동작을 유지한다. 가시성만 변경할 때는 메뉴를 재생성하지 않는다.
+- 환경: macOS arm64, Node v24.21.0, rustc 1.91.1.
+- 통과: `npm run dev:build`, `npm test`, `npm run check`, `cargo fmt --manifest-path src-tauri/Cargo.toml -- --check`, `git diff --check`.
+- 워크트리 전용 개발 CLI로 최초 열기·숨기기·재열기·반복 열기·숨긴 상태 갱신을 확인했다. 실제 창의 숨기기 버튼 클릭 후 CLI에서 `visible: false`를 확인했다.
+- 제한: 메뉴 막대 자동화에서 메뉴를 펼치지 못해 체크 표시의 실제 렌더링 및 메뉴 항목 클릭 회귀는 미검증이다. 다른 워크트리와 설치 앱은 교체하거나 종료하지 않았다.
+- Conf 3 / Risk Low: 테스트 및 개발 앱 기본 동작 통과, 최종 메뉴 시각 검증은 남아 있다.

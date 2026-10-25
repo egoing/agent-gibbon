@@ -5,10 +5,12 @@ use crate::{
     show_without_focus, AppNotes,
 };
 use tauri::{
-    menu::{Menu, MenuItem, PredefinedMenuItem},
+    menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem},
     tray::TrayIconBuilder,
     Manager,
 };
+
+type TrayMenu = std::sync::Mutex<Option<Menu<tauri::Wry>>>;
 
 fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     let menu = Menu::new(app).map_err(|e| e.to_string())?;
@@ -24,6 +26,11 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     menu.append(&front).map_err(|e| e.to_string())?;
     menu.append(&PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?)
         .map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(app, "visibility-legend", "✓ 열린 메모", false, None::<&str>)
+            .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
     let state = app.state::<AppNotes>();
     let notes = state.lock().map_err(|e| e.to_string())?;
     for (id, note) in notes.iter() {
@@ -33,8 +40,12 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         } else {
             format!("{title} ({id})")
         };
-        let item = MenuItem::with_id(app, format!("note:{id}"), text, true, None::<&str>)
+        let visible = crate::window(app, id)?
+            .is_visible()
             .map_err(|e| e.to_string())?;
+        let item =
+            CheckMenuItem::with_id(app, format!("note:{id}"), text, true, visible, None::<&str>)
+                .map_err(|e| e.to_string())?;
         menu.append(&item).map_err(|e| e.to_string())?;
     }
     Ok(menu)
@@ -42,7 +53,31 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
 
 pub fn refresh(app: &tauri::AppHandle) -> Result<(), String> {
     if let Some(tray) = app.tray_by_id("agent-gibbon") {
-        tray.set_menu(Some(menu(app)?)).map_err(|e| e.to_string())?;
+        let menu = menu(app)?;
+        tray.set_menu(Some(menu.clone()))
+            .map_err(|e| e.to_string())?;
+        *app.state::<TrayMenu>().lock().map_err(|e| e.to_string())? = Some(menu);
+    }
+    Ok(())
+}
+
+// Update marks in place so background work never dismisses an open menu.
+pub fn sync_visibility(app: &tauri::AppHandle) -> Result<(), String> {
+    let Some(state) = app.try_state::<TrayMenu>() else {
+        return Ok(());
+    };
+    let guard = state.lock().map_err(|e| e.to_string())?;
+    if let Some(menu) = guard.as_ref() {
+        for item in menu.items().map_err(|e| e.to_string())? {
+            if let Some(check) = item.as_check_menuitem() {
+                if let Some(id) = check.id().as_ref().strip_prefix("note:") {
+                    let visible = crate::window(app, id)?
+                        .is_visible()
+                        .map_err(|e| e.to_string())?;
+                    check.set_checked(visible).map_err(|e| e.to_string())?;
+                }
+            }
+        }
     }
     Ok(())
 }
@@ -64,6 +99,8 @@ fn icon() -> tauri::image::Image<'static> {
 }
 
 pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
+    let initial_menu = menu(app)?;
+    app.manage(TrayMenu::new(Some(initial_menu.clone())));
     TrayIconBuilder::with_id("agent-gibbon")
         .icon(icon())
         .icon_as_template(true)
@@ -71,7 +108,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             "{} — 메모 열기",
             crate::instance::current().title()
         ))
-        .menu(&menu(app)?)
+        .menu(&initial_menu)
         .show_menu_on_left_click(true)
         .on_menu_event(|app, event| {
             let result = if event.id.as_ref() == "bring-visible" {
@@ -98,6 +135,8 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             } else {
                 Ok(())
             };
+            // Native check items toggle on click; visibility is the source of truth.
+            let result = result.and(sync_visibility(app));
             if let Err(error) = result {
                 if let Some(tray) = app.tray_by_id("agent-gibbon") {
                     let _ = tray.set_tooltip(Some(format!("Agent Gibbon: {error}")));

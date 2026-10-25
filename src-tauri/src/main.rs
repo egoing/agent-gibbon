@@ -158,10 +158,13 @@ fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
             (&*(ptr as *const objc2_app_kit::NSWindow)).orderFrontRegardless();
             focus::restore(win);
         }
-        Ok(())
+        tray::sync_visibility(win.app_handle())
     }
     #[cfg(not(target_os = "macos"))]
-    win.show().map_err(|e| e.to_string())
+    {
+        win.show().map_err(|e| e.to_string())?;
+        tray::sync_visibility(win.app_handle())
+    }
 }
 // Native alpha blends the entire window, including its background and controls.
 // Called by synchronous commands and the IPC main-thread handler only.
@@ -235,7 +238,8 @@ fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
     feedback::clear(&window);
     sizing::cancel(&window);
     entrance::finish(&window)?;
-    window.hide().map_err(|e| e.to_string())
+    window.hide().map_err(|e| e.to_string())?;
+    tray::sync_visibility(window.app_handle())
 }
 #[tauri::command]
 fn toggle_pin(window: tauri::WebviewWindow) -> Result<(), String> {
@@ -291,6 +295,7 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
             sizing::cancel(&win);
             entrance::finish(&win)?;
             win.hide().map_err(|e| e.to_string())?;
+            tray::sync_visibility(app)?;
         }
         Action::Update | Action::Inspect | Action::List => (),
     }
@@ -352,6 +357,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     let _ = entrance::finish(&webview);
                 }
                 let _ = win.hide();
+                let _ = tray::sync_visibility(win.app_handle());
             }
         })
         .setup(move |app| {
