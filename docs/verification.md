@@ -272,3 +272,12 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 새 단위 테스트는 기존 코드에서 100ms 시점의 조기 출발로 실패했다(`hold-red.log`). 수정 후 999ms 대기·1000ms 출발·420ms 이동, 조기 이동 후 원래 포인터 위치로 돌아오는 경우를 포함해 Rust 29 + Node 9 테스트가 통과했다. 타입·Clippy·포맷·release 빌드도 통과했다.
 - 격리 실앱에서 조기 포인터 이동 후 14회 연속 불투명·위치 불변 및 최소 대기 후 도착을 확인했다(`hold-live-pass.log`). 최초 테스트는 무작위 목적지가 커서 아래에 있어 opacity 1.0을 반환했다. 외부 포인터 반투명 검사 전에 커서를 노트 밖 화면 모서리로 옮기도록 테스트 조건만 바로잡고 assertion은 유지했다.
 - 사용자 확인용 격리 테스트 앱을 별도 실행한다. 기존 설치 앱·노트는 그대로 유지한다. 실제 버튼 이벤트 권한 제약과 다중 모니터 미검증 범위는 이전과 같다.
+
+## v0.2.2 Apple Silicon 릴리스
+
+- 커서 근처 등장·최소 1초 불투명 대기·마우스 이동 후 배치·빠른 CLI 응답을 v0.2.2로 배포한다. 미병합 PR #6 변경은 포함하지 않는다.
+- package.json·npm lock·Cargo package/lock·Tauri 버전을 0.2.2로 맞췄다.
+- Rust 29 + Node 9, Clippy·Rustfmt·JS·diff 검사와 `npm run build:release`(arm64 app·DMG) 통과.
+- DMG 무결성 검사, 읽기 전용 마운트 앱의 `codesign --verify --deep --strict`, 버전 0.2.2, arm64, 빌드 앱과 바이너리 바이트 일치, CLI `--help`를 확인했다. 검증 후 마운트를 해제했다.
+- DMG와 SHA256SUMS.txt, 검증 메타데이터를 로컬 `~/Library/Application Support/Floatnote/releases/v0.2.2/`에 보관한다. 코드·게이트 원본 로그는 `~/Library/Logs/floatnote-is2-7/`에 보관한다.
+- 애드혹 서명이며 Developer ID·공증 및 다른 Mac의 최초 설치는 미검증이다. 자동화 드래그·실제 다중 모니터 미검증 한계는 이전 기록과 같다.
