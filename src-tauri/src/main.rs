@@ -399,6 +399,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 create_window(app.handle(), &id)?;
             }
             tray::install(app.handle())?;
+            #[cfg(target_os = "macos")]
+            sizing::install_contact_monitor(app.handle());
             if initial_open {
                 apply(
                     app.handle(),

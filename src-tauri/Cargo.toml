@@ -22,4 +22,6 @@ sentry = { version = "0.42", default-features = false, features = ["reqwest", "r
 custom-protocol = ["tauri/custom-protocol"]
 
 [target.'cfg(target_os = "macos")'.dependencies]
-objc2-app-kit = { version = "0.3", default-features = false, features = ["NSWindow", "NSEvent", "NSWorkspace", "NSRunningApplication", "libc", "objc2-core-foundation"] }
+block2 = "0.6"
+objc2 = "0.6"
+objc2-app-kit = { version = "0.3", default-features = false, features = ["block2", "NSWindow", "NSEvent", "NSWorkspace", "NSRunningApplication", "libc", "objc2-core-foundation"] }

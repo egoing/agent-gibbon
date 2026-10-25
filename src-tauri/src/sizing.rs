@@ -157,8 +157,8 @@ fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
 pub fn toggle_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, String> {
     let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
     let state = states.entry(window.label().into()).or_default();
-    let cursor = window.cursor_position().map_err(|e| e.to_string())?;
-    state.contact.trigger(true, true, (cursor.x, cursor.y));
+    let (cursor, _) = contact_geometry(&window)?;
+    state.contact.trigger(true, true, cursor);
     toggle(&window, state)?;
     Ok(state.expanded.is_some())
 }
@@ -177,15 +177,119 @@ pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, Str
         state.contact = crate::warp::Contact::default();
         return Ok(state.expanded.is_some());
     }
-    let cursor = window.cursor_position().map_err(|e| e.to_string())?;
-    let p = window.outer_position().map_err(|e| e.to_string())?;
-    let s = window.outer_size().map_err(|e| e.to_string())?;
-    let inside = cursor.x >= p.x as f64
-        && cursor.y >= p.y as f64
-        && cursor.x < p.x as f64 + s.width as f64
-        && cursor.y < p.y as f64 + s.height as f64;
-    if state.contact.trigger(control, inside, (cursor.x, cursor.y)) {
+    let (cursor, rect) = contact_geometry(&window)?;
+    let inside = contains_contact(rect, cursor, state.expanded.is_some());
+    if state.contact.trigger(control, inside, cursor) {
         toggle(&window, state)?;
     }
     Ok(state.expanded.is_some())
+}
+
+// All values share desktop logical coordinates, including mixed-DPI displays.
+type ContactGeometry = ((f64, f64), (f64, f64, f64, f64));
+fn contact_geometry(window: &WebviewWindow) -> Result<ContactGeometry, String> {
+    #[cfg(target_os = "macos")]
+    {
+        let ptr = window.ns_window().map_err(|e| e.to_string())?;
+        // SAFETY: synchronous commands and event monitors run on the main thread;
+        // Tauri owns the window throughout this borrow.
+        let frame = unsafe { (&*(ptr as *const objc2_app_kit::NSWindow)).frame() };
+        let cursor = objc2_app_kit::NSEvent::mouseLocation();
+        Ok((
+            (cursor.x, cursor.y),
+            (
+                frame.origin.x,
+                frame.origin.y,
+                frame.size.width,
+                frame.size.height,
+            ),
+        ))
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        let c = window.cursor_position().map_err(|e| e.to_string())?;
+        let p = window.outer_position().map_err(|e| e.to_string())?;
+        let s = window.outer_size().map_err(|e| e.to_string())?;
+        Ok((
+            (c.x, c.y),
+            (p.x as f64, p.y as f64, s.width as f64, s.height as f64),
+        ))
+    }
+}
+
+fn contains_contact(
+    (x, y, w, h): (f64, f64, f64, f64),
+    (cx, cy): (f64, f64),
+    folded: bool,
+) -> bool {
+    let margin = if folded { 4.0 } else { 0.0 };
+    cx >= x - margin && cy >= y - margin && cx < x + w + margin && cy < y + h + margin
+}
+
+#[cfg(target_os = "macos")]
+pub fn install_contact_monitor(app: &tauri::AppHandle) {
+    use block2::RcBlock;
+    use objc2::{rc::Retained, runtime::AnyObject};
+    use objc2_app_kit::{NSEvent, NSEventMask};
+    use std::{cell::RefCell, ptr::NonNull};
+    // Monitor tokens remain owned on the main thread for the app lifetime.
+    struct Monitor(Retained<AnyObject>);
+    impl Drop for Monitor {
+        fn drop(&mut self) {
+            // SAFETY: this token came from an NSEvent monitor registration.
+            unsafe { NSEvent::removeMonitor(&self.0) };
+        }
+    }
+    thread_local! { static MONITORS: RefCell<Vec<Monitor>> = const { RefCell::new(Vec::new()) }; }
+    fn sample(app: &tauri::AppHandle) {
+        for window in app.webview_windows().into_values() {
+            if let Err(error) = poll_fold(window.clone(), window.state::<Sizes>()) {
+                eprintln!("접촉 감지 실패: {error}");
+            }
+        }
+    }
+    let mask = NSEventMask::MouseMoved
+        | NSEventMask::LeftMouseDragged
+        | NSEventMask::RightMouseDragged
+        | NSEventMask::OtherMouseDragged
+        | NSEventMask::FlagsChanged;
+    let handle = app.clone();
+    let global = RcBlock::new(move |_: NonNull<NSEvent>| sample(&handle));
+    let handle = app.clone();
+    let local = RcBlock::new(move |event: NonNull<NSEvent>| {
+        sample(&handle);
+        event.as_ptr()
+    });
+    let global = NSEvent::addGlobalMonitorForEventsMatchingMask_handler(mask, &global);
+    // SAFETY: the local handler returns the original valid event unchanged.
+    let local = unsafe { NSEvent::addLocalMonitorForEventsMatchingMask_handler(mask, &local) };
+    MONITORS.with(|tokens| {
+        tokens
+            .borrow_mut()
+            .extend(global.into_iter().chain(local).map(Monitor));
+    });
+}
+
+#[cfg(test)]
+mod contact_tests {
+    use super::*;
+    #[test]
+    fn folded_margin_handles_small_title_and_negative_coordinates() {
+        let rect = (-300., -100., 300., 12.);
+        assert!(contains_contact(rect, (-150., -103.), true));
+        assert!(!contains_contact(rect, (-150., -103.), false));
+        assert!(!contains_contact(rect, (-150., -105.), true));
+        assert!(!contains_contact(rect, (5., -95.), true));
+    }
+    #[test]
+    fn rapid_exit_and_reentry_rearms_without_bouncing_after_resize() {
+        let mut contact = crate::warp::Contact::default();
+        assert!(contact.trigger(true, true, (100., 100.)));
+        assert!(!contact.trigger(true, false, (100., 100.)));
+        assert!(!contact.trigger(true, false, (100., 80.)));
+        assert!(contact.trigger(true, true, (100., 100.)));
+        assert!(!contact.trigger(true, true, (101., 100.)));
+        assert!(!contact.trigger(false, true, (101., 100.)));
+        assert!(contact.trigger(true, true, (101., 100.)));
+    }
 }
