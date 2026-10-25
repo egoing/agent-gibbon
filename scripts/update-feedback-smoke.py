@@ -105,9 +105,9 @@ if args[1] == "pointer" {
         assert native_state[a]['order'] < native_state[b]['order'], native_state
         assert native_state[a]['alpha'] == 1 and native_state[b]['alpha'] == .5
         assert front() == active_app
-        assert '<mark>바뀐 문단</mark>' in result['note']['change_html']
-        assert '<mark>유지하는' not in result['note']['change_html']
-        assert '<mark>' not in result['note']['html'] and result['note']['markdown'] == changed
+        assert '<mark class="change-modified">바뀐 문단</mark>' in result['note']['change_html']
+        assert 'change-modified">유지하는' not in result['note']['change_html']
+        assert '<mark ' not in result['note']['html'] and result['note']['markdown'] == changed
         time.sleep(.45)
         if os.environ.get('FLOATNOTE_TEST_SCREENSHOT'):
             subprocess.run(['screencapture', '-x', '-l', str(native_state[a]['id']), os.environ['FLOATNOTE_TEST_SCREENSHOT']], check=True)
@@ -129,8 +129,10 @@ if args[1] == "pointer" {
         actual_pointer = [float(v) for v in native('pointer').split()]
         expected_pointer = [rect['X'] + rect['Width'] / 2, rect['Y'] + rect['Height'] / 2]
         event_access = native('input-access') == 'true'
-        if event_access and all(abs(actual - expected) < 2 for actual, expected in zip(actual_pointer, expected_pointer)):
-            assert cli('inspect', a)['highlight_revision'] is None, 'pointer contact did not acknowledge highlight'
+        if all(abs(actual - expected) < 2 for actual, expected in zip(actual_pointer, expected_pointer)):
+            contact_state = cli('inspect', a)
+            assert contact_state['highlight_revision'] is None, 'pointer contact did not acknowledge highlight'
+            assert contact_state['focused'] == expired['focused'] and front() == active_app, 'hover changed focus'
             native('move', '5', '40'); time.sleep(.2)
             cli('update', a, '--markdown', changed + ' 다시 변경')
             time.sleep(.45)
@@ -167,17 +169,17 @@ if args[1] == "pointer" {
         if os.environ.get('FLOATNOTE_TEST_UI') == '1':
             time.sleep(.45)
             contents = ui('get entire contents of window ' + json.dumps('Floatnote — ' + a))
-            assert '이전 내용 삭제됨' in contents, contents
+            assert '숨긴 갱신' in contents and '이전 내용 삭제됨' not in contents, contents
             time.sleep(3.1)
             contents = ui('get entire contents of window ' + json.dumps('Floatnote — ' + a))
-            assert '이전 내용 삭제됨' in contents
-            passed('deletion-only empty body notice remains after opacity expiry in real WebView')
+            assert '숨긴 갱신' in contents and '이전 내용 삭제됨' not in contents
+            passed('deleted text remains struck through after opacity expiry in real WebView')
         else:
             time.sleep(3.2)
             deletion = cli('inspect', a)
             assert not deletion['feedback_active'] and deletion['highlight_revision'] is not None
             passed('empty-body deletion highlight remains after opacity expiry through real CLI')
-            print('SKIP: visual highlight/deletion notice, editor and copy UI (Accessibility/Screen Recording unavailable)', flush=True)
+            print('SKIP: visual highlight/struck-through deletion, editor and copy UI (Accessibility/Screen Recording unavailable)', flush=True)
     finally:
         for note_id in created:
             cli('close', note_id)

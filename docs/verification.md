@@ -326,3 +326,15 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - `CGWarpMouseCursorPosition`은 실제 커서 위치를 이동시킬 수 있지만, `CGPreflightPostEventAccess`가 false이면 WebView에 합성 pointer 이벤트를 전달하지 못한다. 좌표 일치만으로 이벤트 전달을 단정했던 검사 실패를 보존했고, 권한 확인을 추가하여 이 경우만 SKIP한다. 실제 커서 접촉·강조 색상·편집/복사/워프/수동 크기 UI 한계는 남아 있다.
 - 검증 로그는 `/tmp/floatnote-is2-5/release-*`, `entrance-hold-smoke-release.log`, `entrance-smoke-release.log`, `update-feedback-smoke-release.log`에 있으며 삭제 전 `~/Library/Logs/floatnote-is2-5/`로 보존한다. 원본 감사 ref와 시도 이력도 번들로 보존한다.
 - 로컬 배포는 기존 메모·초안·위치·숨김 보존을 위해 앱 설치 파일을 교체하되 실행 중인 기존 프로세스는 재시작하지 않는다. 설치 버전은 다음 앱 재시작부터 적용된다. 이전 앱과 메모 snapshot을 로컬 private 백업에 남긴다.
+
+
+## v0.2.4 변경 표시·마우스 확인 및 릴리스
+
+- 추가는 녹색, 수정은 호박색, 삭제된 이전 행은 붉은색 배경과 취소선으로 표시한다. 별도 삭제 안내를 제거했다. 삭제 전후 텍스트는 안전한 Markdown 렌더링을 거치며 원문과 최종 HTML은 최신 내용만 유지한다.
+- 비활성 WebView에서도 네이티브 포인터 좌표로 접촉을 확인한다. 확인은 포커스나 3초 불투명 기한을 바꾸지 않는다.
+- 환경: Apple Silicon arm64, Rust 1.91.1, Node 24.21.0, Tauri CLI 2.12.1. Rust 37 + Node 12 테스트, Clippy, Rustfmt, diff 검사와 app·DMG 빌드 통과.
+- 최종 v0.2.4 release 앱 사본의 IPC namespace만 격리하여 네이티브 검증했다. 전면 순서·불투명 기한·동일 본문/메타데이터 무효과·포커스/핀/위치 보존·숨김 갱신·빈 본문 삭제 표시 유지가 통과했다. 합성 입력 권한 없이 실제 커서 좌표 접촉으로 강조가 해제되고 기존 전면 앱과 포커스가 유지되는 것을 확인했다.
+- 접근성 UI를 통한 핀 버튼·편집·복사 및 색상/취소선 픽셀 검증은 미실행이다. 다른 Mac·Intel·다중 모니터 검증은 수행하지 않았다.
+- DMG 무결성, 내부 앱 애드혹 서명, 버전 0.2.4, 빌드 앱과 내부 바이너리 바이트 일치, CLI --help 통과. Developer ID 서명·공증은 제공하지 않는다.
+- 사용자 승인으로 PR 병합·비공개 GitHub 릴리즈·로컬 설치를 진행한다. 실행 중인 기존 앱은 메모 보존을 위해 재시작하지 않으며 새 버전은 다음 시작부터 적용된다. 설치 전 메모 snapshot·이전 앱과 릴리즈 파일은 로컬 private 백업에 보존한다.
+- 검증 로그: ~/Library/Logs/floatnote-v0.2.4/. 릴리즈·백업: ~/Library/Application Support/Floatnote/releases/v0.2.4/.
