@@ -432,3 +432,22 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 두 Mac에 /Applications/Agent Gibbon.app을 설치하고 설치본 서명·버전·바이너리 일치·기존 메모 CLI 조회를 확인했다. 덮어쓰기 뒤 macOS 서명 캐시로 실행이 종료되는 현상을 해결하기 위해 새 번들을 별도 경로에 준비한 뒤 기존 앱을 백업 경로로 이동하고 교체했다. 기존 프로세스를 종료하지 않아 메모·초안·숨김을 보존했으며 새 버전은 다음 앱 실행부터 적용된다.
 - 기존 앱과 메모 snapshot·설치 자산은 ~/Library/Application Support/Agent Gibbon/releases/v0.2.7/, 검증 로그는 ~/Library/Logs/agent-gibbon-v0.2.7/에 보존한다.
 - Developer ID 서명·공증 및 전체 UI 회귀는 이번 배포에서 수행하지 않았다. Conf 4 / Risk Medium.
+
+
+## 2026-10-25 Markdown 영속 저장
+
+- 환경: macOS arm64, Node v24.21.0, rustc 1.91.1.
+- 메모별 `.md`에 본문과 HTML 주석 메타데이터를 함께 원자적으로 저장. 개발 인스턴스별 경로 분리, 대소문자 ID 구분, 저장 파일 0600 권한.
+- `npm run dev:build` 성공. `npm test`: Rust 44 통과·외부 전송 테스트 1 무시, JavaScript 18 통과. `npm run check` 통과.
+- `python3 scripts/persistence-smoke.py` 실제 개발 앱 검증 통과: 파일 내용·권한·개발 저장 경로, 숨김 중 갱신, 프로세스 종료/재실행 후 본문·제목·색상·상태 복원, 숨김 유지, 명시적 재열기. 실행기가 확인한 현재 워크트리 바이너리만 시작·종료하고 테스트 파일만 제거.
+- 단위 검증: 한글·빈 본문·주석 구분자 포함 제목, 대소문자 ID, 인스턴스 분리, 손상 파일 오류, 편집 저장, stale revision 거부, 저장소 실패 시 연결 원본과 메모 롤백.
+- 제한: 실제 연필 버튼 UI 조작은 미실행(같은 저장 경로의 Rust 테스트 수행). 저장소와 연결 원본 사이 강제 종료 원자성, 전원 장애, 두 워크트리 동시 실행 회귀는 검증하지 않음. 저장된 메모는 숨겨 복원하며 창 배치·핀·글자 크기·초안은 영속화하지 않음.
+- Conf 5(실제 개발 앱 저장/재시작 경로), Risk Medium(영속 데이터 변경). 설치 앱은 교체하지 않음.
+
+
+### 노트별 폴더 구조 후속 검증
+
+- 설치 경로: 문서 폴더의 `agent-gibbon/docs/<ID>/index.md`. 개발 경로: 앱 데이터의 `notes/dev-<해시>/docs/<ID>/index.md`. 대문자만 이스케이프하여 소문자 ID의 가독성과 대소문자 구분을 유지.
+- 이전 평면 파일을 원본 보존 복사하며 기존 대상은 덮어쓰지 않는 이관 테스트 통과. 같은 폴더에 다른 파일이 있어도 메모 복원 성공.
+- `npm run dev:build`, `npm test`(Rust 44 통과/1 무시, JS 18 통과), `npm run check`, 실제 `scripts/persistence-smoke.py` 통과. smoke에서 `docs/<ID>/index.md`와 개발 인스턴스 경로를 검증.
+- 이미지 기능 및 날짜 메타데이터 추가 없음. 설치 앱 교체 및 실제 사용자 Documents 경로 쓰기는 수행하지 않음. Conf 5는 개발 앱의 저장/재실행 경로 기준, Risk Medium.
