@@ -1,6 +1,10 @@
 // Native test input; restore the pointer after targeting only Floatnote controls.
 import Foundation
 import CoreGraphics
+guard CGPreflightPostEventAccess() else {
+    fputs("INPUT_UNAVAILABLE: macOS event posting permission denied; no native click/drag was sent.\n", stderr)
+    exit(77)
+}
 let offset = CommandLine.arguments.lastIndex(of: "--").map { $0 + 1 } ?? 1
 let args = Array(CommandLine.arguments.dropFirst(offset))
 let original = CGEvent(source: nil)!.location
