@@ -5,6 +5,7 @@ mod model;
 mod placement;
 mod sizing;
 mod source;
+mod telemetry;
 mod tray;
 mod warp;
 use model::{Action, Note, Request, MAX_REQUEST};
@@ -299,6 +300,7 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
     response
 }
 fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
+    let _sentry = telemetry::init();
     let builder = tauri::Builder::default();
     #[cfg(target_os = "macos")]
     let builder = builder.activate_ignoring_other_apps(false);
@@ -314,6 +316,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         )])))
         .invoke_handler(tauri::generate_handler![
             snapshot,
+            telemetry::report_frontend_error,
             entrance::drag_note,
             hide_note,
             toggle_pin,

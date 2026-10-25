@@ -1,6 +1,6 @@
 [package]
 name = "floatnote"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 default-run = "floatnote"
 
@@ -16,6 +16,7 @@ pulldown-cmark = "0.13"
 ammonia = "4"
 fs2 = "0.4"
 libc = "0.2"
+sentry = { version = "0.42", default-features = false, features = ["reqwest", "rustls", "panic", "contexts"] }
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

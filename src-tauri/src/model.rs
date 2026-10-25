@@ -155,7 +155,7 @@ impl Note {
                 self.removed = false;
             } else if self.markdown != *markdown {
                 let (ranges, removed) = changed_lines(&self.markdown, markdown);
-                self.change_html = render_changes(markdown, &ranges);
+                self.change_html = render_diff(&self.markdown, markdown, &ranges);
                 self.removed = removed;
             }
             self.html = render(markdown);
@@ -177,9 +177,20 @@ impl Note {
 // Line-based LCS keeps unchanged islands. Bound quadratic work for 1 MiB
 // requests; large inputs use ordered matching (moved lines count as changes).
 fn changed_lines(old: &str, new: &str) -> (Vec<std::ops::Range<usize>>, bool) {
+    let (added, removed, _) = line_changes(old, new);
+    (added, removed)
+}
+
+type LineChanges = (
+    Vec<std::ops::Range<usize>>,
+    bool,
+    Vec<std::ops::Range<usize>>,
+);
+fn line_changes(old: &str, new: &str) -> LineChanges {
     let a: Vec<_> = old.split_inclusive('\n').collect();
     let b: Vec<_> = new.split_inclusive('\n').collect();
     let mut matched = vec![false; b.len()];
+    let mut matched_old = vec![false; a.len()];
     let mut kept = 0;
     if a.len().saturating_mul(b.len()) <= 262_144 {
         let width = b.len() + 1;
@@ -198,6 +209,7 @@ fn changed_lines(old: &str, new: &str) -> (Vec<std::ops::Range<usize>>, bool) {
         while i < a.len() && j < b.len() {
             if a[i].trim_end_matches(['\r', '\n']) == b[j].trim_end_matches(['\r', '\n']) {
                 matched[j] = true;
+                matched_old[i] = true;
                 kept += 1;
                 i += 1;
                 j += 1;
@@ -220,6 +232,7 @@ fn changed_lines(old: &str, new: &str) -> (Vec<std::ops::Range<usize>>, bool) {
             if let Some(indices) = positions.get(line.trim_end_matches(['\r', '\n'])) {
                 if let Some(&i) = indices.get(indices.partition_point(|&i| i < next)) {
                     matched[j] = true;
+                    matched_old[i] = true;
                     kept += 1;
                     next = i + 1;
                 }
@@ -236,7 +249,83 @@ fn changed_lines(old: &str, new: &str) -> (Vec<std::ops::Range<usize>>, bool) {
             (!matched[i]).then_some(start..offset)
         })
         .collect();
-    (ranges, kept < a.len())
+    let mut offset = 0;
+    let deleted = a
+        .iter()
+        .enumerate()
+        .filter_map(|(i, line)| {
+            let start = offset;
+            offset += line.len();
+            (!matched_old[i]).then_some(start..offset)
+        })
+        .collect();
+    (ranges, kept < a.len(), deleted)
+}
+
+// Merge removed source lines at their original anchors before parsing Markdown.
+// All source still passes through the normal escaping and sanitization pipeline.
+fn render_diff(old: &str, new: &str, additions: &[std::ops::Range<usize>]) -> String {
+    let (_, _, deletions) = line_changes(old, new);
+    let lines = |text: &str| {
+        let mut offset = 0;
+        text.split_inclusive('\n')
+            .map(|line| {
+                let start = offset;
+                offset += line.len();
+                (start, line.to_string())
+            })
+            .collect::<Vec<_>>()
+    };
+    let contains = |ranges: &[std::ops::Range<usize>], offset: usize| {
+        ranges
+            .get(ranges.partition_point(|r| r.end <= offset))
+            .is_some_and(|r| r.contains(&offset))
+    };
+    let a = lines(old);
+    let b = lines(new);
+    let mut merged = String::new();
+    let mut ranges = Vec::new();
+    let mut kinds = Vec::new();
+    let (mut i, mut j) = (0, 0);
+    while i < a.len() || j < b.len() {
+        let start = merged.len();
+        while i < a.len() && contains(&deletions, a[i].0) {
+            merged.push_str(&a[i].1);
+            if !merged.ends_with('\n') {
+                merged.push('\n');
+            }
+            i += 1;
+        }
+        let removed = merged.len() > start;
+        if removed {
+            ranges.push(start..merged.len());
+            kinds.push("removed");
+        }
+        while j < b.len() && contains(additions, b[j].0) {
+            let start = merged.len();
+            merged.push_str(&b[j].1);
+            if !merged.ends_with('\n') {
+                merged.push('\n');
+            }
+            ranges.push(start..merged.len());
+            kinds.push(if removed { "modified" } else { "added" });
+            j += 1;
+        }
+        if i < a.len() && j < b.len() {
+            merged.push_str(&b[j].1);
+            if !merged.ends_with('\n') {
+                merged.push('\n');
+            }
+            i += 1;
+            j += 1;
+        } else if i < a.len() && !contains(&deletions, a[i].0) {
+            i += 1;
+        } else if j < b.len() && !contains(additions, b[j].0) {
+            merged.push_str(&b[j].1);
+            j += 1;
+        }
+    }
+    render_styled(&merged, &ranges, &kinds)
 }
 
 // Markdown accepts plain text, so reject only a likely missing task-list marker.
@@ -287,6 +376,14 @@ pub fn render(markdown: &str) -> String {
 }
 
 fn render_changes(markdown: &str, changes: &[std::ops::Range<usize>]) -> String {
+    render_styled(markdown, changes, &vec!["modified"; changes.len()])
+}
+
+fn render_styled(markdown: &str, changes: &[std::ops::Range<usize>], kinds: &[&str]) -> String {
+    let mark = |range: &std::ops::Range<usize>| {
+        let index = changes.partition_point(|c| c.end <= range.start);
+        format!("<mark class=\"change-{}\">", kinds[index])
+    };
     let (mut events, ranges): (Vec<_>, Vec<_>) = Parser::new_ext(
         markdown,
         Options::ENABLE_TASKLISTS | Options::ENABLE_STRIKETHROUGH | Options::ENABLE_TABLES,
@@ -361,7 +458,7 @@ fn render_changes(markdown: &str, changes: &[std::ops::Range<usize>]) -> String 
                         let end = offset + line.len();
                         let marked = intersects(&(offset..end));
                         if marked {
-                            decorated.push(Event::Html("<mark>".into()));
+                            decorated.push(Event::Html(mark(&(offset..end)).into()));
                         }
                         decorated.push(Event::Text(line.to_string().into()));
                         if marked {
@@ -370,13 +467,13 @@ fn render_changes(markdown: &str, changes: &[std::ops::Range<usize>]) -> String 
                         offset = end;
                     }
                 } else {
-                    decorated.push(Event::Html("<mark>".into()));
+                    decorated.push(Event::Html(mark(&range).into()));
                     decorated.push(Event::Text(text));
                     decorated.push(Event::Html("</mark>".into()));
                 }
             }
             Event::Code(text) if intersects(&range) => {
-                decorated.push(Event::Html("<mark>".into()));
+                decorated.push(Event::Html(mark(&range).into()));
                 decorated.push(Event::Code(text));
                 decorated.push(Event::Html("</mark>".into()));
             }
@@ -388,6 +485,7 @@ fn render_changes(markdown: &str, changes: &[std::ops::Range<usize>]) -> String 
     // No images, navigation, arbitrary HTML or executable URL schemes.
     ammonia::Builder::default()
         .add_tags(&["mark"])
+        .add_tag_attributes("mark", &["class"])
         .add_tag_attributes("ul", &["class"])
         .add_tag_attributes("li", &["class"])
         .rm_tags(&["img"])
@@ -417,9 +515,25 @@ mod tests {
             .to_string()
     }
     #[test]
+    fn feedback_distinguishes_additions_replacements_and_deletions() {
+        let added = changed_note("유지\n", "유지\n추가\n");
+        assert!(added.change_html.contains("change-added"));
+        assert!(!added.change_html.contains("change-removed"));
+        let replaced = changed_note("처음\n이전\n끝\n", "처음\n수정\n끝\n");
+        assert!(replaced.change_html.contains("change-removed\">이전"));
+        assert!(replaced.change_html.contains("change-modified\">수정"));
+        assert!(
+            replaced.change_html.find("이전").unwrap() < replaced.change_html.find("수정").unwrap()
+        );
+        assert!(!replaced.html.contains("이전"));
+        let deleted = changed_note("삭제", "");
+        assert!(deleted.change_html.contains("change-removed\">삭제"));
+        assert!(deleted.html.is_empty());
+    }
+    #[test]
     fn feedback_deletion_keeps_remaining_line_unmarked_and_large_diff_is_bounded() {
         let note = changed_note("유지\n\n삭제", "유지");
-        assert_eq!(highlighted(&note), note.html);
+        assert!(highlighted(&note).contains("change-removed"));
         let old = (0..1000).map(|i| format!("행 {i}\n")).collect::<String>();
         let new = old.replace("행 500\n", "새 행\n");
         let (ranges, removed) = changed_lines(&old, &new);
@@ -431,11 +545,14 @@ mod tests {
     fn feedback_marks_changed_lines_without_polluting_source_or_plain_html() {
         let note = changed_note("유지\n\n이전\n\n끝", "유지\n\n변경\n\n끝");
         let html = highlighted(&note);
-        assert!(html.contains("<mark>변경</mark>"), "{html}");
-        assert!(!html.contains("<mark>유지") && !html.contains("<mark>끝"));
+        assert!(
+            html.contains("<mark class=\"change-modified\">변경</mark>"),
+            "{html}"
+        );
+        assert!(!html.contains("change-modified\">유지") && !html.contains("change-modified\">끝"));
         assert_eq!(note.markdown, "유지\n\n변경\n\n끝");
         assert_eq!(note.html, render(&note.markdown));
-        assert!(!note.html.contains("<mark>"));
+        assert!(!note.html.contains("<mark class="));
     }
     #[test]
     fn feedback_preserves_unchanged_middle_and_handles_tasks_tables_code() {
@@ -461,9 +578,12 @@ mod tests {
             ("a\n\n유지\n\nb", "c\n\n유지\n\nd", "유지", "c"),
         ] {
             let html = highlighted(&changed_note(old, new));
-            assert!(html.contains("<mark>"), "{html}");
+            assert!(html.contains("<mark class="), "{html}");
             assert!(html.contains(change), "{html}");
-            assert!(!html.contains(&format!("<mark>{keep}")), "{html}");
+            assert!(
+                !html.contains(&format!("change-modified\">{keep}")),
+                "{html}"
+            );
         }
     }
     #[test]
@@ -472,7 +592,8 @@ mod tests {
             let note = changed_note(old, new);
             let value = serde_json::to_value(&note).unwrap();
             assert_eq!(value["removed"], true);
-            assert!(!highlighted(&note).contains("삭제"));
+            assert!(highlighted(&note).contains("삭제"));
+            assert!(highlighted(&note).contains("change-removed"));
         }
         let mut note = Note::default();
         note.apply(
@@ -503,7 +624,7 @@ mod tests {
         let html = highlighted(&note);
         assert!(!html.contains("<script") && !html.contains("<img") && !html.contains("href="));
         note.save_edit("편집".into(), note.revision).unwrap();
-        assert!(highlighted(&note).contains("<mark>편집</mark>"));
+        assert!(highlighted(&note).contains("<mark class=\"change-modified\">편집</mark>"));
     }
     #[test]
     fn editor_saves_source_and_rejects_stale_or_invalid_changes() {
