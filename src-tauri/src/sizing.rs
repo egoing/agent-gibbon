@@ -227,7 +227,7 @@ pub fn toggle_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, S
     let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
     let state = states.entry(window.label().into()).or_default();
     let (cursor, _) = contact_geometry(&window)?;
-    state.contact.trigger(true, true, cursor);
+    state.contact.block(cursor);
     toggle(&window, state)?;
     Ok(state.expanded.is_some())
 }
@@ -251,7 +251,12 @@ pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, Str
     }
     let (cursor, rect) = contact_geometry(&window)?;
     let inside = contains_contact(rect, cursor, state.expanded.is_some());
-    if state.contact.trigger(control, inside, cursor) {
+    if state.contact.trigger(
+        control,
+        inside,
+        window.is_focused().map_err(|e| e.to_string())?,
+        cursor,
+    ) {
         toggle(&window, state)?;
     }
     Ok(state.expanded.is_some())
@@ -362,12 +367,13 @@ mod contact_tests {
     #[test]
     fn rapid_exit_and_reentry_rearms_without_bouncing_after_resize() {
         let mut contact = crate::warp::Contact::default();
-        assert!(contact.trigger(true, true, (100., 100.)));
-        assert!(!contact.trigger(true, false, (100., 100.)));
-        assert!(!contact.trigger(true, false, (100., 80.)));
-        assert!(contact.trigger(true, true, (100., 100.)));
-        assert!(!contact.trigger(true, true, (101., 100.)));
-        assert!(!contact.trigger(false, true, (101., 100.)));
-        assert!(contact.trigger(true, true, (101., 100.)));
+        assert!(!contact.trigger(true, false, false, (100., 80.)));
+        assert!(contact.trigger(true, true, false, (100., 100.)));
+        assert!(!contact.trigger(true, false, false, (100., 100.)));
+        assert!(!contact.trigger(true, false, false, (100., 80.)));
+        assert!(contact.trigger(true, true, false, (100., 100.)));
+        assert!(!contact.trigger(true, true, false, (101., 100.)));
+        assert!(!contact.trigger(false, true, false, (101., 100.)));
+        assert!(!contact.trigger(true, true, false, (101., 100.)));
     }
 }
