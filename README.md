@@ -62,6 +62,8 @@
 
 ## 빌드와 실행
 
+Windows 개발·빌드 절차와 플랫폼 차이는 [Windows 안내](docs/windows.md)를 참고하세요.
+
 macOS에서 Rust stable, Node.js/npm, Xcode Command Line Tools 및 macOS SDK가 필요합니다. CPU 아키텍처는 호스트 기본값을 사용합니다.
 
 ```sh
@@ -206,6 +208,8 @@ python3 scripts/macos-tray-smoke.py
 - [Tauri capabilities](https://v2.tauri.app/security/capabilities/)
 
 ## 배포판 제작과 설치
+
+버전 갱신·태그 기반 3종 설치 파일 자동 배포는 [자동 릴리스 안내](docs/releases.md)를 참고하세요.
 
 설치 파일은 [GitHub Releases](https://github.com/egoing/agent-gibbon/releases)에서 받습니다. 공개 저장소에서 다운로드할 수 있습니다.
 

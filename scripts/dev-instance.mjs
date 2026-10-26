@@ -14,7 +14,7 @@ export function devInstance(root) {
     name = head.status === 0 ? `detached@${head.stdout.trim()}` : basename(root);
   }
   return { root, id, name, target: join(root, 'src-tauri/target'),
-    binary: join(root, 'src-tauri/target/debug/agent-gibbon') };
+    binary: join(root, `src-tauri/target/debug/agent-gibbon${process.platform === 'win32' ? '.exe' : ''}`) };
 }
 export function devEnvironment(instance, inherited = process.env) {
   return { ...inherited, FLOATNOTE_INSTANCE: instance.id,

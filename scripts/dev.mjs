@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, realpathSync } from 'node:fs';
@@ -21,7 +22,7 @@ if (mode === 'info') {
   try {
     const info = JSON.parse(probe.stdout);
     valid = probe.status === 0 && info.instance === instance.id
-      && realpathSync(info.manifest_dir) === `${instance.root}/src-tauri`;
+      && realpathSync(info.manifest_dir) === realpathSync(join(instance.root, 'src-tauri'));
   } catch { /* Old or foreign binaries must never reach the installed socket. */ }
   if (!valid) {
     console.log(JSON.stringify({ ok: false, error: '현재 워크트리의 개발 바이너리가 아닙니다. npm run dev:build로 다시 빌드하세요.' }));
@@ -38,8 +39,8 @@ if (mode === 'info') {
     console.error('개발 실행은 --no-watch만 추가로 지원합니다.');
     process.exit(1);
   }
-  command = `${instance.root}/node_modules/.bin/tauri`;
-  commandArgs = ['dev', '--no-dev-server', ...args, '--', '--target-dir', instance.target];
+  command = process.execPath;
+  commandArgs = [join(instance.root, 'node_modules/@tauri-apps/cli/tauri.js'), 'dev', '--no-dev-server', ...args, '--', '--target-dir', instance.target];
 } else {
   console.error('사용법: node scripts/dev.mjs dev|build|cli|info');
   process.exit(1);

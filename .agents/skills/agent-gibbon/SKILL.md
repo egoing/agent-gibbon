@@ -1,6 +1,6 @@
 ---
 name: agent-gibbon
-description: macOS에 설치된 Agent Gibbon 앱으로 플로팅 Markdown 메모를 만들고 조회·갱신·숨긴다. 사용자가 화면 위 메모나 기존 메모 변경을 요청할 때 사용한다.
+description: macOS 또는 Windows에 설치된 Agent Gibbon 앱으로 플로팅 Markdown 메모를 만들고 조회·갱신·숨긴다. 사용자가 화면 위 메모나 기존 메모 변경을 요청할 때 사용한다.
 ---
 
 # Agent Gibbon 사용
@@ -21,6 +21,12 @@ description: macOS에 설치된 Agent Gibbon 앱으로 플로팅 Markdown 메모
 ```
 
 설치 버전에 따라 제공 기능이 다를 수 있다. 명령 옵션은 해당 실행 파일의 `--help`, 결과 필드는 실제 JSON 응답으로 확인한다. 최신 소스에만 있는 기능을 설치 앱도 지원한다고 가정하지 않는다.
+
+## Windows
+
+Windows 설치 파일과 개발 절차는 저장소의 `docs/windows.md`를 참고합니다. 설치한 `agent-gibbon.exe`의 실제 경로를 확인해 PowerShell에서 `& '실행 파일 절대 경로' list`처럼 호출합니다. CLI 명령과 창 상태 보존 규칙은 macOS와 같습니다. 설치 위치를 추측해 다른 실행 파일을 호출하지 않습니다.
+
+개발 테스트는 해당 워크트리의 `scripts/agent-gibbon-dev.cmd`를 사용합니다. 편집 저장은 Ctrl+S이며 macOS 전용 보조키·포인터 접촉 기능 대신 화면 버튼을 사용합니다.
 
 ## 창과 상태 보존
 

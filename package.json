@@ -6,10 +6,14 @@
     "build": "tauri build --bundles app",
     "dev": "node scripts/dev.mjs dev",
     "check": "cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings",
-    "test": "cargo test --manifest-path src-tauri/Cargo.toml && node --test tests/*.test.mjs",
+    "test": "cargo test --manifest-path src-tauri/Cargo.toml && node scripts/test-ui.mjs",
     "build:release": "tauri build --bundles app,dmg",
     "dev:build": "node scripts/dev.mjs build",
-    "dev:info": "node scripts/dev.mjs info"
+    "dev:info": "node scripts/dev.mjs info",
+    "build:windows": "tauri build --bundles nsis",
+    "test:ui": "node scripts/test-ui.mjs",
+    "version:check": "node scripts/release-version.mjs check",
+    "version:set": "node scripts/release-version.mjs set"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.0.0"
