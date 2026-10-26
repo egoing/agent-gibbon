@@ -258,14 +258,13 @@ fn save_note(
     let id = window.label().strip_prefix("note-").unwrap_or("main");
     let mut notes = notes.lock().map_err(|e| e.to_string())?;
     let note = notes.get_mut(id).ok_or("메모를 찾을 수 없습니다")?;
-    let before = note.clone();
     window.app_handle().state::<storage::Store>().save_edit(
         id,
         note,
         markdown,
         expected_revision,
     )?;
-    feedback::changed(&window, Some(&before), note)?;
+    feedback::edited(&window)?;
     Ok(note.clone())
 }
 #[tauri::command]

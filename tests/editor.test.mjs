@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { themeFor } from '../ui/theme.mjs';
 
-async function setup(storage = new Map(), instance = {}) {
+async function setup(storage = new Map(), instance = {}, initialNote = {}) {
   const elements = new Map();
   const element = id => {
     if (!elements.has(id)) elements.set(id, {
@@ -22,7 +22,7 @@ async function setup(storage = new Map(), instance = {}) {
   const timers = [];
   const pointers = {};
   const calls = [];
-  let note = { revision: 1, markdown: '# 원문', html: '<h1>원문</h1>', color: '#20252e' };
+  let note = { revision: 1, markdown: '# 원문', html: '<h1>원문</h1>', color: '#20252e', ...initialNote };
   let feedbackActive = false;
   let highlightRevision = null;
   let saveError;
@@ -367,4 +367,44 @@ test('folded click ignores secondary buttons and coalesces pending clicks', asyn
   assert.equal(app.classes.has('folded'), false);
   await app.events.click({ button: 0, preventDefault() { assert.fail('expanded content click'); } });
   assert.equal(app.calls.filter(([name]) => name === 'toggle_fold').length, 1);
+});
+
+
+test('region text note opens a blank editor once, preserves drafts and saves normally', async () => {
+  const app = await setup(new Map(), {}, { edit_on_open: true, markdown: '', html: '' });
+  assert.equal(app.element('editor').hidden, false);
+  assert.equal(app.element('markdown').value, '');
+  assert.equal(app.calls.some(([name]) => name === 'fit_note'), false);
+  app.element('markdown').value = '새 메모';
+  await app.refresh();
+  assert.equal(app.element('markdown').value, '새 메모');
+  await app.element('save').listeners.click();
+  assert.equal(app.element('editor').hidden, true);
+  await app.refresh();
+  assert.equal(app.element('editor').hidden, true);
+  assert.equal(app.calls.find(([name]) => name === 'save_note')[1].markdown, '새 메모');
+});
+
+test('canceling the initial region editor does not reopen it on polling', async () => {
+  const app = await setup(new Map(), {}, { edit_on_open: true, markdown: '', html: '' });
+  app.element('cancel').listeners.click();
+  await app.refresh();
+  assert.equal(app.element('editor').hidden, true);
+});
+
+
+test('direct save immediately clears existing diff controls', async () => {
+  const app = await setup();
+  app.highlight(1);
+  await app.refresh();
+  assert.equal(app.element('diff-actions').hidden, false);
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '직접 수정';
+  await app.element('save').listeners.click();
+  assert.equal(app.element('diff-actions').hidden, true);
+  assert.equal(app.element('clear-diff').hidden, true);
+  app.update({ revision: 3, html: '<p>외부 수정</p>', change_html: '<mark>외부 수정</mark>' });
+  app.highlight(3);
+  await app.refresh();
+  assert.equal(app.element('diff-actions').hidden, false);
 });

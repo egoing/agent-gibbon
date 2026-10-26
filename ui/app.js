@@ -10,6 +10,7 @@ let highlightRevision = null;
 let acknowledging = false;
 let acknowledgedRevision = -1;
 let editing = false;
+let initialEditHandled = false;
 let saving = false;
 let editRevision;
 let needsFit = true;
@@ -58,7 +59,7 @@ function endEditing() {
   fitContent();
   $('edit').focus();
 }
-$('edit').addEventListener('click', () => {
+function beginEditing() {
   if (!latestNote || editing) return;
   editing = true;
   editRevision = latestNote.revision;
@@ -71,7 +72,8 @@ $('edit').addEventListener('click', () => {
   $('edit').disabled = true;
   $('error').hidden = true;
   $('markdown').focus();
-});
+}
+$('edit').addEventListener('click', beginEditing);
 $('cancel').addEventListener('click', endEditing);
 async function save() {
   if (!editing || saving) return;
@@ -81,7 +83,11 @@ async function save() {
   $('markdown').readOnly = true;
   try {
     latestNote = await invoke('save_note', { markdown: $('markdown').value, expectedRevision: editRevision });
-    // Only snapshot knows whether retained change_html is still active.
+    highlightRevision = null;
+    acknowledgedRevision = latestNote.revision;
+    $('clear-diff').hidden = true;
+    $('diff-actions').hidden = true;
+    // Direct saves confirm the content; subsequent external revisions can highlight again.
     $('content').innerHTML = latestNote.html;
     displayedHtml = $('content').innerHTML;
     revision = latestNote.revision;
@@ -139,6 +145,10 @@ async function refresh() {
       displayedHtml = html;
     }
     $('pin').setAttribute('aria-pressed', String(state.always_on_top));
+    if (!initialEditHandled) {
+      initialEditHandled = true;
+      if (state.note.edit_on_open && !state.note.capture) beginEditing();
+    }
     await fitContent();
   } catch (error) { failure(error); }
   setTimeout(refresh, 350);
