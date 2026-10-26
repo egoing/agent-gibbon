@@ -15,11 +15,8 @@ fn frontmost() -> Option<i64> {
     #[cfg(windows)]
     {
         let handle = unsafe { GetForegroundWindow() };
-        let mut pid = 0;
-        unsafe {
-            GetWindowThreadProcessId(handle, &mut pid);
-        }
-        (handle != 0 && pid != std::process::id()).then_some(handle as i64)
+        // Another note in this process is also a valid foreground target.
+        (handle != 0).then_some(handle as i64)
     }
     #[cfg(not(any(target_os = "macos", windows)))]
     None
@@ -31,7 +28,10 @@ impl Targets {
         targets
     }
     fn remember(&self, label: &str) {
-        if let Some(pid) = frontmost().filter(|pid| *pid != std::process::id() as i64) {
+        let previous = frontmost();
+        #[cfg(target_os = "macos")]
+        let previous = previous.filter(|pid| *pid != std::process::id() as i64);
+        if let Some(pid) = previous {
             self.0.lock().unwrap().entry(label.into()).or_insert(pid);
         }
     }
@@ -63,11 +63,9 @@ pub fn restore(window: &tauri::WebviewWindow) {
     #[cfg(windows)]
     if let Some(handle) = previous {
         let foreground = unsafe { GetForegroundWindow() };
-        let mut pid = 0;
-        unsafe {
-            GetWindowThreadProcessId(foreground, &mut pid);
-        }
-        if pid == std::process::id() {
+        // Restore only if this particular construction stole focus. A user
+        // switch to another note or another app must never be overridden.
+        if window.hwnd().is_ok_and(|own| own.0 as isize == foreground) {
             unsafe {
                 SetForegroundWindow(handle as isize);
             }
@@ -79,19 +77,5 @@ pub fn restore(window: &tauri::WebviewWindow) {
 #[link(name = "user32")]
 extern "system" {
     fn GetForegroundWindow() -> isize;
-    fn GetWindowThreadProcessId(window: isize, process: *mut u32) -> u32;
     fn SetForegroundWindow(window: isize) -> i32;
-    fn ShowWindow(window: isize, command: i32) -> i32;
-}
-
-#[cfg(windows)]
-pub fn show_without_focus(window: &tauri::WebviewWindow) -> Result<(), String> {
-    let handle = window.hwnd().map_err(|e| e.to_string())?;
-    window.show().map_err(|e| e.to_string())?;
-    // SW_SHOWNOACTIVATE displays the note without making it the foreground window.
-    unsafe {
-        ShowWindow(handle.0 as isize, 4);
-    }
-    restore(window);
-    Ok(())
 }

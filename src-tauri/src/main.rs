@@ -15,6 +15,8 @@ mod warp;
 mod windows_contact;
 #[cfg(windows)]
 mod windows_process;
+#[cfg(windows)]
+mod windows_window;
 use model::{Action, Note, Request, MAX_REQUEST};
 use serde_json::{json, Value};
 #[cfg(unix)]
@@ -46,10 +48,15 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
     config.label = label(id);
     config.title = format!("{} — {id}", instance::current().title());
     focus::remember(app, &config.label);
-    tauri::WebviewWindowBuilder::from_config(app, &config)
+    let window = tauri::WebviewWindowBuilder::from_config(app, &config)
         .map_err(|e| e.to_string())?
         .build()
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+    // Restored notes stay hidden; do not retain their startup foreground target
+    // until a much later open. Protect WebView construction itself as well.
+    #[cfg(windows)]
+    focus::restore(&window);
+    Ok(window)
 }
 // Window APIs and monitor work areas use physical pixels. Convert the new
 // window's logical size per monitor so mixed-DPI displays retain its size.
@@ -169,7 +176,11 @@ fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
     #[cfg(not(target_os = "macos"))]
     {
         #[cfg(windows)]
-        focus::show_without_focus(win)?;
+        {
+            windows_window::show_without_focus(win)?;
+            sync_opacity(win.clone())?;
+            focus::restore(win);
+        }
         #[cfg(not(windows))]
         win.show().map_err(|e| e.to_string())?;
         tray::sync_visibility(win.app_handle())
@@ -179,7 +190,7 @@ fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
 // Called by synchronous commands and the IPC main-thread handler only.
 #[tauri::command]
 fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
-    #[cfg(target_os = "macos")]
+    #[cfg(any(target_os = "macos", windows))]
     {
         let cursor = window.cursor_position().map_err(|e| e.to_string())?;
         let p = window.outer_position().map_err(|e| e.to_string())?;
@@ -195,17 +206,21 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
         } else {
             0.5
         };
+        #[cfg(target_os = "macos")]
         let ptr = window.ns_window().map_err(|e| e.to_string())?;
         // SAFETY: Tauri owns the live NSWindow, borrowed only on the main thread.
+        #[cfg(target_os = "macos")]
         unsafe {
             let native = &*(ptr as *const objc2_app_kit::NSWindow);
             if native.alphaValue() != alpha {
                 native.setAlphaValue(alpha);
             }
         }
+        #[cfg(windows)]
+        windows_window::set_opacity(&window, alpha)?;
         Ok(alpha)
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(not(any(target_os = "macos", windows)))]
     {
         let _ = window;
         Ok(1.0)
@@ -312,6 +327,10 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
     } else {
         create_window(app, &id)?
     };
+    #[cfg(windows)]
+    if matches!(request.action, Action::Open) {
+        focus::remember(app, win.label());
+    }
     feedback::changed(&win, existing.as_ref(), &next)?;
     match request.action {
         Action::Open => {
