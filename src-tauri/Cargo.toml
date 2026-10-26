@@ -18,6 +18,9 @@ ammonia = "4"
 fs2 = "0.4"
 libc = "0.2"
 sentry = { version = "0.42", default-features = false, features = ["reqwest", "rustls", "panic", "contexts"] }
+tauri-plugin-global-shortcut = "2"
+xcap = "0.7"
+base64 = "0.22"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
@@ -29,3 +32,16 @@ objc2-app-kit = { version = "0.3", default-features = false, features = ["block2
 
 [target.'cfg(windows)'.dependencies]
 uds_windows = "1.2.1"
+
+# Full-screen pixel conversion/encoding must remain responsive in dev builds.
+# Keep application code unoptimized for debugging.
+[profile.dev.package.xcap]
+opt-level = 2
+[profile.dev.package.image]
+opt-level = 2
+[profile.dev.package.png]
+opt-level = 2
+[profile.dev.package.fdeflate]
+opt-level = 2
+[profile.dev.package.base64]
+opt-level = 2

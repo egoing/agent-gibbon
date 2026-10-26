@@ -46,9 +46,10 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 4px 0; }
 [hidden] { display: none !important; }
 #editor { clear: both; height: calc(100% - 25px); min-height: 38px; display: flex; flex-direction: column; gap: 3px; cursor: default; }
 #markdown { flex: 1; min-height: 0; width: 100%; resize: none; padding: 3px; font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--border); user-select: text; -webkit-user-select: text; cursor: text; }
-#editor-actions { display: flex; align-items: center; gap: 4px; font-size: 11px; }
-#save-target { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-#editor-actions button { width: auto; min-width: 30px; font-size: 11px; }
+#markdown:focus { outline: none; box-shadow: none; }
+#editor-actions, #diff-actions { display: flex; align-items: center; gap: 4px; font-size: 11px; }
+#save-target, #diff-status { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+#editor-actions button, #diff-actions button { width: auto; min-width: 30px; font-size: 11px; }
 button:disabled { opacity: .5; cursor: default; }
 #n, #s { height: 3px; left: 7px; right: 7px; cursor: ns-resize; }
 #n { top: 0; } #s { bottom: 0; }
@@ -72,6 +73,7 @@ body.folded #controls > button:not(#fold-toggle),
 body.folded #content, body.folded #editor, body.folded .resize,
 body.folded #warp-tip, body.folded #diff-actions { display: none !important; }
 body.folded #viewport { overflow: hidden; }
+body.folded, body.folded:active { cursor: pointer; }
 
 #fold-title { font-size: 10px; line-height: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
 
@@ -86,13 +88,21 @@ body.folded #fold-toggle svg { transform: none; }
 #dev-instance { font-size: 10px; opacity: .75; overflow-wrap: anywhere; margin-bottom: 3px; }
 body.folded #dev-instance { display: none; }
 
-/* Reserve a separate row so the floating menu never covers note content. */
-#diff-actions { flex: none; display: flex; justify-content: center; padding: 6px 8px 8px; cursor: default; }
-#diff-menu { position: relative; display: flex; align-items: center; gap: 2px; max-width: 100%; padding: 3px; border-radius: 10px; background: var(--panel); box-shadow: 0 2px 8px #00000014; }
-#diff-menu::before { content: ''; position: absolute; inset: 0; border: 1px solid var(--foreground); opacity: .14; border-radius: inherit; pointer-events: none; }
-#diff-status { padding: 0 8px; font-size: 11px; line-height: 16px; white-space: nowrap; opacity: .65; }
-#clear-diff { flex: none; gap: 4px; width: auto; height: 28px; padding: 4px 7px; border-radius: 7px; font: inherit; font-size: 11px; line-height: 16px; font-weight: 600; }
-#clear-diff svg { width: 12px; height: 12px; stroke-width: 2; }
-#clear-diff:hover { background: var(--background); outline: none; }
-#clear-diff:focus-visible { background: var(--background); outline: 1px solid var(--foreground); outline-offset: 1px; }
-#clear-diff:active { transform: translateY(1px); }
+/* Image geometry is the window geometry: chrome never participates in layout. */
+body.image-note:not(.folded) { border: 0; }
+body.image-note:not(.folded) #viewport { position: absolute; inset: 0; padding: 0; overflow: hidden; }
+body.image-note:not(.folded) #content { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+body.image-note #content img { display: block; width: 100%; height: 100%; object-fit: contain; }
+body.image-note:not(.folded) #controls { position: absolute; top: 3px; right: 3px; z-index: 2; margin: 0; background: var(--background); border-radius: 4px; }
+body.image-note:not(.folded) #dev-instance { position: absolute; bottom: 3px; left: 3px; z-index: 2; max-width: calc(100% - 6px); margin: 0; background: var(--background); }
+body.image-note :is(#font-size, #edit, #copy) { display: none; }
+body.image-note :is(#warp-tip, #error) { position: absolute; bottom: 0; left: 0; right: 0; z-index: 3; }
+
+/* Shared chrome: discoverable at rest, immediate rollover without activation. */
+body :is(#controls, #dev-instance) { opacity: .35; }
+body:hover :is(#controls, #dev-instance),
+body.pointer-over :is(#controls, #dev-instance),
+body:has(:focus-visible) :is(#controls, #dev-instance) { opacity: 1; }
+
+/* Match the editor action row while reserving space below the note content. */
+#diff-actions { flex: none; padding: 0 3px 3px; cursor: default; }

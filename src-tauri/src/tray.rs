@@ -21,6 +21,28 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         )
         .map_err(|e| e.to_string())?;
     }
+    menu.append(
+        &MenuItem::with_id(
+            app,
+            "capture-image",
+            "영역 캡처 · Ctrl+Shift+1",
+            true,
+            None::<&str>,
+        )
+        .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(
+            app,
+            "capture-text",
+            "영역 텍스트 노트 · Ctrl+Shift+2",
+            true,
+            None::<&str>,
+        )
+        .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
     let front = MenuItem::with_id(app, "bring-visible", "열린 메모 앞으로", true, None::<&str>)
         .map_err(|e| e.to_string())?;
     menu.append(&front).map_err(|e| e.to_string())?;
@@ -48,6 +70,13 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
                 .map_err(|e| e.to_string())?;
         menu.append(&item).map_err(|e| e.to_string())?;
     }
+    menu.append(&PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?)
+        .map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(app, "quit-app", "Agent Gibbon 종료", true, None::<&str>)
+            .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
     Ok(menu)
 }
 
@@ -111,7 +140,17 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
         .menu(&initial_menu)
         .show_menu_on_left_click(true)
         .on_menu_event(|app, event| {
-            let result = if event.id.as_ref() == "bring-visible" {
+            if event.id.as_ref() == "quit-app" {
+                app.exit(0);
+                return;
+            }
+            let result = if event.id.as_ref() == "capture-image" {
+                crate::capture::trigger(app, crate::capture::SelectionMode::Image);
+                Ok(())
+            } else if event.id.as_ref() == "capture-text" {
+                crate::capture::trigger(app, crate::capture::SelectionMode::Text);
+                Ok(())
+            } else if event.id.as_ref() == "bring-visible" {
                 app.webview_windows().values().try_for_each(|win| {
                     if win.is_visible().map_err(|e| e.to_string())? {
                         show_without_focus(win)?;

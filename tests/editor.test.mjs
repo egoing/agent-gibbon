@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { themeFor } from '../ui/theme.mjs';
 
-async function setup(storage = new Map(), instance = {}) {
+async function setup(storage = new Map(), instance = {}, initialNote = {}) {
   const elements = new Map();
   const element = id => {
     if (!elements.has(id)) elements.set(id, {
@@ -18,10 +18,11 @@ async function setup(storage = new Map(), instance = {}) {
   };
   const styles = {};
   const events = {};
+  const nativeEvents = {};
   const timers = [];
   const pointers = {};
   const calls = [];
-  let note = { revision: 1, markdown: '# 원문', html: '<h1>원문</h1>', color: '#20252e' };
+  let note = { revision: 1, markdown: '# 원문', html: '<h1>원문</h1>', color: '#20252e', ...initialNote };
   let feedbackActive = false;
   let highlightRevision = null;
   let saveError;
@@ -42,6 +43,7 @@ async function setup(storage = new Map(), instance = {}) {
       documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener(type, listener) { pointers[type] = listener; } },
     },
     window: { __TAURI__: {
+      event: { async listen(name, handler) { nativeEvents[name] = handler; return () => {}; } },
       core: { async invoke(command, args) {
         calls.push([command, args]);
         if (command === 'set_editing') {
@@ -71,7 +73,7 @@ async function setup(storage = new Map(), instance = {}) {
   });
   vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace("import { themeFor } from './theme.mjs';", ''), context);
   await new Promise(setImmediate);
-  return { element, styles, events, calls, pointers, classes,
+  return { element, styles, events, calls, pointers, classes, nativeEvents,
     failEditingSync: error => { editingSyncError = error; },
     holdEditingSync: () => { let resume; editingBarrier = new Promise(resolve => { resume = resolve; }); return resume; },
     fold: value => { folded = value; },
@@ -325,6 +327,16 @@ test('development labels and tip preferences stay separate from installed notes'
   assert.equal(b.element('dev-instance').textContent, 'DEV same · bbbbbbbb');
 });
 
+test('native rollover updates chrome without a DOM click or pointer event', async () => {
+  const app = await setup();
+  const html = app.element('content').innerHTML;
+  app.nativeEvents['note-pointer-over']({ payload: true });
+  assert.equal(app.classes.has('pointer-over'), true);
+  app.nativeEvents['note-pointer-over']({ payload: false });
+  assert.equal(app.classes.has('pointer-over'), false);
+  assert.equal(app.element('content').innerHTML, html);
+  assert.equal(app.calls.some(([name]) => name === 'drag_note'), false);
+});
 
 test('clear diff button stays hidden without changes and stale clicks preserve newer revisions', async () => {
   const app = await setup();
@@ -369,4 +381,83 @@ test('failed confirmation keeps cumulative changes and allows retry', async () =
   assert.equal(app.element('diff-actions').hidden, true);
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
   assert.equal(app.element('error').hidden, true);
+});
+
+test('folded note opens from title, blank space, border and icon without starting a drag', async () => {
+  const app = await setup();
+  for (const id of ['fold-title', 'viewport', 'body', 'fold-toggle']) {
+    app.fold(true);
+    await app.pollFold();
+    let stopped = false;
+    const event = { button: 0, target: app.element(id),
+      preventDefault() {}, stopPropagation() { stopped = true; } };
+    const before = app.calls.filter(([name]) => name === 'toggle_fold').length;
+    app.events.mousedown(event);
+    await app.events.click(event);
+    if (!stopped && id === 'fold-toggle') await app.element(id).listeners.click();
+    assert.equal(stopped, true);
+    assert.equal(app.classes.has('folded'), false);
+    assert.equal(app.calls.filter(([name]) => name === 'toggle_fold').length, before + 1);
+  }
+  assert.equal(app.calls.filter(([name]) => name === 'drag_note').length, 0);
+});
+
+test('folded click ignores secondary buttons and coalesces pending clicks', async () => {
+  const app = await setup();
+  app.fold(true);
+  await app.pollFold();
+  for (const button of [1, 2]) {
+    app.events.click({ button, preventDefault() { assert.fail('non-primary click'); } });
+  }
+  assert.equal(app.classes.has('folded'), true);
+  const event = { button: 0, preventDefault() {}, stopPropagation() {} };
+  await Promise.all([app.events.click(event), app.events.click(event)]);
+  assert.equal(app.calls.filter(([name]) => name === 'toggle_fold').length, 1);
+  assert.equal(app.classes.has('folded'), false);
+  await app.events.click({ button: 0, preventDefault() { assert.fail('expanded content click'); } });
+  assert.equal(app.calls.filter(([name]) => name === 'toggle_fold').length, 1);
+});
+
+
+test('region text note opens a blank editor once, preserves drafts and saves normally', async () => {
+  const app = await setup(new Map(), {}, { edit_on_open: true, markdown: '', html: '' });
+  assert.equal(app.element('editor').hidden, false);
+  assert.equal(app.element('markdown').value, '');
+  const protection = app.calls.findIndex(([name, args]) => name === 'set_editing' && args.editing);
+  const focus = app.calls.findIndex(([name, id]) => name === 'focus' && id === 'markdown');
+  assert.ok(protection >= 0 && protection < focus, 'initial region editor must register native shortcut protection before focus');
+  assert.equal(app.calls.some(([name]) => name === 'fit_note'), false);
+  app.element('markdown').value = '새 메모';
+  await app.refresh();
+  assert.equal(app.element('markdown').value, '새 메모');
+  assert.equal(app.calls.filter(([name]) => name === 'set_editing').length, 1, 'polling must not restart the initial editor');
+  await app.element('save').listeners.click();
+  assert.equal(app.element('editor').hidden, true);
+  await app.refresh();
+  assert.equal(app.element('editor').hidden, true);
+  assert.equal(app.calls.find(([name]) => name === 'save_note')[1].markdown, '새 메모');
+});
+
+test('canceling the initial region editor does not reopen it on polling', async () => {
+  const app = await setup(new Map(), {}, { edit_on_open: true, markdown: '', html: '' });
+  await app.element('cancel').listeners.click();
+  await app.refresh();
+  assert.equal(app.element('editor').hidden, true);
+});
+
+
+test('direct save immediately clears existing diff controls', async () => {
+  const app = await setup();
+  app.highlight(1);
+  await app.refresh();
+  assert.equal(app.element('diff-actions').hidden, false);
+  await app.element('edit').listeners.click();
+  app.element('markdown').value = '직접 수정';
+  await app.element('save').listeners.click();
+  assert.equal(app.element('diff-actions').hidden, true);
+  assert.equal(app.element('clear-diff').hidden, true);
+  app.update({ revision: 3, html: '<p>외부 수정</p>', change_html: '<mark>외부 수정</mark>' });
+  app.highlight(3);
+  await app.refresh();
+  assert.equal(app.element('diff-actions').hidden, false);
 });

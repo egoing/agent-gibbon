@@ -10,13 +10,14 @@ let highlightRevision = null;
 let acknowledging = false;
 let acknowledgedRevision = -1;
 let editing = false;
+let initialEditHandled = false;
 let saving = false;
 let editRevision;
 let needsFit = true;
 let fitting = false;
 let folded = false;
 async function fitContent() {
-  if (!needsFit || fitting || editing || folded) return;
+  if (latestNote?.capture || !needsFit || fitting || editing || folded) return;
   fitting = true;
   // Measure natural flow independently of the current window height.
   const measure = $('viewport').cloneNode(true);
@@ -60,7 +61,7 @@ async function endEditing() {
   $('edit').focus();
 }
 let startingEdit = false;
-$('edit').addEventListener('click', async () => {
+async function beginEditing() {
   if (!latestNote || editing || startingEdit) return;
   startingEdit = true;
   try {
@@ -80,7 +81,8 @@ $('edit').addEventListener('click', async () => {
     $('markdown').focus();
   } catch (error) { failure(error); }
   finally { startingEdit = false; }
-});
+}
+$('edit').addEventListener('click', beginEditing);
 $('cancel').addEventListener('click', () => endEditing().catch(failure));
 async function save() {
   if (!editing || saving) return;
@@ -90,7 +92,11 @@ async function save() {
   $('markdown').readOnly = true;
   try {
     latestNote = await invoke('save_note', { markdown: $('markdown').value, expectedRevision: editRevision });
-    // Only snapshot knows whether retained change_html is still active.
+    highlightRevision = null;
+    acknowledgedRevision = latestNote.revision;
+    $('clear-diff').hidden = true;
+    $('diff-actions').hidden = true;
+    // Direct saves confirm the content; subsequent external revisions can highlight again.
     $('content').innerHTML = latestNote.html;
     displayedHtml = $('content').innerHTML;
     revision = latestNote.revision;
@@ -109,12 +115,16 @@ async function refresh() {
   try {
     const state = await invoke('snapshot');
     latestNote = state.note;
+    document.body.classList.toggle('pointer-over', !!state.hovered);
     $('dev-instance').hidden = !state.dev_label;
     $('dev-instance').textContent = state.dev_label || '';
     warpTipKey = state.instance ? `floatnote.warp-tip-dismissed:${state.instance}` : 'floatnote.warp-tip-dismissed';
     $('fold-title').textContent = state.dev_label ? `[${state.dev_label}] ${state.note.title}` : state.note.title;
     $('fold-title').title = state.note.title;
-    $('edit').disabled = editing;
+    $('edit').disabled = editing || !!state.note.capture;
+    $('font-size').disabled = !!state.note.capture;
+    $('copy').disabled = !!state.note.capture;
+    document.body.classList.toggle('image-note', !!state.note.capture);
     if (revision !== state.note.revision) {
       const theme = themeFor(state.note.color);
       document.documentElement.style.setProperty('--background', state.note.color);
@@ -135,15 +145,25 @@ async function refresh() {
     const html = highlightRevision !== null ? state.note.change_html : state.note.html;
     if (displayedHtml !== html) {
       $('content').innerHTML = html;
+      if (state.note.capture) {
+        const img = document.createElement('img');
+        img.alt = '화면 캡처'; img.draggable = false;
+        img.src = await invoke('note_image');
+        $('content').replaceChildren(img);
+      }
       displayedHtml = html;
     }
     $('pin').setAttribute('aria-pressed', String(state.always_on_top));
+    if (!initialEditHandled) {
+      initialEditHandled = true;
+      if (state.note.edit_on_open && !state.note.capture) await beginEditing();
+    }
     await fitContent();
   } catch (error) { failure(error); }
   setTimeout(refresh, 350);
 }
 document.addEventListener('mousedown', (event) => {
-  if (event.button !== 0 || event.target.closest('button, #editor, #error, #warp-tip, #diff-actions, .resize')) return;
+  if (folded || event.button !== 0 || event.target.closest('button, #editor, #error, #warp-tip, #diff-actions, .resize')) return;
   event.preventDefault();
   invoke('drag_note').catch(failure);
 });
@@ -183,6 +203,10 @@ $('copy').addEventListener('click', async () => {
   } catch (error) { failure(error); }
 });
 $('content').addEventListener('click', (event) => { if (event.target.closest('a')) event.preventDefault(); });
+// Native movement arrives even when WKWebView belongs to a background app.
+window.__TAURI__.event.listen('note-pointer-over', ({ payload }) => {
+  document.body.classList.toggle('pointer-over', payload);
+}).catch(failure);
 refresh();
 
 $('clear-diff').addEventListener('click', async () => {
@@ -262,10 +286,22 @@ function displayFold(value) {
   $('fold-toggle').title = `${folded ? '메모 펼치기' : '메모 접기'} · Control을 누른 채 메모에 포인터를 올리면 접기·펼치기 전환`;
   $('fold-title').hidden = !folded;
 }
-$('fold-toggle').addEventListener('click', async () => {
+let changingFold = false;
+async function toggleFold() {
+  if (changingFold) return;
+  changingFold = true;
   try { displayFold(await invoke('toggle_fold')); }
   catch (error) { failure(error); }
-});
+  finally { changingFold = false; }
+}
+// Capture folded clicks before the icon handler so one click toggles only once.
+document.addEventListener('click', (event) => {
+  if (!folded || event.button !== 0) return;
+  event.preventDefault();
+  event.stopPropagation();
+  return toggleFold();
+}, true);
+$('fold-toggle').addEventListener('click', toggleFold);
 async function pollFold() {
   try { displayFold(await invoke('poll_fold')); }
   catch (error) { failure(error); }

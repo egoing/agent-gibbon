@@ -19,6 +19,8 @@ fn entry_type_is_directory(path: &Path) -> Result<bool, String> {
 pub struct Store(pub PathBuf);
 #[derive(Serialize, Deserialize)]
 struct Metadata {
+    #[serde(default)]
+    capture: Option<crate::capture::ImageNote>,
     title: String,
     color: String,
     status: String,
@@ -86,6 +88,7 @@ impl Store {
             builder.mode(0o700);
             builder.create(path.parent().ok_or("메모 폴더가 없습니다")?)?;
             let meta = Metadata {
+                capture: note.capture.clone(),
                 title: note.title.clone(),
                 color: note.color.clone(),
                 status: note.status.clone(),
@@ -137,6 +140,8 @@ impl Store {
     ) -> Result<(), String> {
         let mut next = note.clone();
         next.save_edit(markdown, revision)?;
+        // A successful direct edit confirms the complete content the user just saved.
+        next.acknowledge_changes();
         if let Err(error) = self.save(id, &next) {
             if let Some(path) = &note.source_path {
                 crate::source::save(path, &next.markdown, &note.markdown)
@@ -240,6 +245,7 @@ impl Store {
             source_path: meta.source_path,
             markdown: Some(markdown.into()),
         })?;
+        note.capture = meta.capture;
         note.updated_at = meta.updated_at;
         note.revision = meta.revision.max(1);
         note.restore_change_base(meta.change_base)?;
@@ -285,6 +291,38 @@ mod tests {
             .save_edit("확인 후\n".into(), confirmed.revision)
             .unwrap();
         assert_eq!(confirmed.change_base.as_deref(), Some("최종\n"));
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn direct_save_confirms_pending_diff_even_when_text_is_unchanged() {
+        let root = std::env::temp_dir().join(format!("gibbon-direct-edit-{}", std::process::id()));
+        let store = Store(root.clone());
+        let mut note = Note::default();
+        for body in ["원본", "외부 변경"] {
+            note.apply(
+                &serde_json::from_value(serde_json::json!({
+                    "action": "update", "markdown": body
+                }))
+                .unwrap(),
+            )
+            .unwrap();
+        }
+        assert!(note.has_pending_changes());
+        let revision = note.revision;
+        store
+            .save_edit("direct", &mut note, "외부 변경".into(), revision)
+            .unwrap();
+        assert!(!note.has_pending_changes());
+        assert!(!store.load().unwrap()["direct"].has_pending_changes());
+        note.apply(
+            &serde_json::from_value(serde_json::json!({
+                "action": "update", "markdown": "다음 외부 변경"
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(note.change_base.as_deref(), Some("외부 변경"));
         fs::remove_dir_all(root).unwrap();
     }
 
@@ -340,6 +378,25 @@ mod tests {
         migrated.migrate_from(&legacy).unwrap();
         assert_eq!(migrated.load().unwrap()["Ab"].markdown, "");
         assert!(legacy.join("4162.md").exists());
+        note.capture = Some(crate::capture::ImageNote {
+            x: -200.0,
+            y: 50.0,
+            width: 320.0,
+            height: 180.0,
+        });
+        store.save("image", &note).unwrap();
+        let image = store
+            .load()
+            .unwrap()
+            .remove("image")
+            .unwrap()
+            .capture
+            .unwrap();
+        assert_eq!(
+            (image.x, image.y, image.width, image.height),
+            (-200.0, 50.0, 320.0, 180.0)
+        );
+        fs::remove_file(store.path("image")).unwrap();
         let loaded = store.load().unwrap();
         assert_eq!(loaded.len(), 2);
         assert!(loaded["Ab"].markdown.starts_with("# 한글"));
@@ -371,7 +428,11 @@ mod failure_tests {
         };
         let store = Store::new(root.clone(), None);
         store.save_edit("edit", &mut note, "new".into(), 0).unwrap();
-        assert_eq!(store.load().unwrap()["edit"].markdown, "new");
+        let restored = store.load().unwrap();
+        assert_eq!(restored["edit"].markdown, "new");
+        assert!(!note.has_pending_changes());
+        assert!(!restored["edit"].has_pending_changes());
+        assert_eq!(note.change_html, note.html);
         assert_eq!(fs::read_to_string(&source).unwrap(), "new");
         assert!(store
             .save_edit("edit", &mut note, "stale".into(), 0)

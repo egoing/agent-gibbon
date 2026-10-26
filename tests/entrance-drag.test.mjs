@@ -34,6 +34,7 @@ async function setup(storage = new Map()) {
       documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener() {} },
     },
     window: { __TAURI__: {
+      event: { async listen() { return () => {}; } },
       core: { async invoke(command, args) {
         calls.push([command, args]);
         if (command === 'warp_note' && warpError) throw warpError;

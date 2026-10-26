@@ -83,6 +83,17 @@ pub fn clear(window: &WebviewWindow) {
         deadlines.remove(window.label());
     }
 }
+// Direct editor saves are already reviewed; clear both retained and transient feedback.
+pub fn edited(window: &WebviewWindow) -> Result<(), String> {
+    window
+        .state::<Feedbacks>()
+        .highlights
+        .lock()
+        .map_err(|e| e.to_string())?
+        .remove(window.label());
+    clear(window);
+    Ok(())
+}
 pub fn changed(
     window: &WebviewWindow,
     before: Option<&crate::model::Note>,
