@@ -553,3 +553,17 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - macOS ARM64·Intel 및 Windows x64 검증·패키징 워크플로 추가. 일반 브랜치 push와 수동 실행은 빌드만 수행하고, 버전 태그 push는 모든 빌드 성공 뒤 설치 파일 세 개와 체크섬을 Draft에 업로드하고 공개합니다.
 - 버전 갱신 및 일치 검사, 누락·빈 파일·다른 버전·예상 외 파일 차단과 SHA-256 생성 테스트를 추가했습니다. 로컬 Node 테스트 21개, 버전 검사, actionlint와 diff 검사 통과.
 - 실제 태그에 의한 공개·Sentry 수신·배포 서명은 이 검증에 포함하지 않습니다. 기존 Windows 실환경 검증 범위는 위 기록을 참고하세요.
+
+## Rust 빌드 캐시 저장·복원 검증 — 2026-10-26
+
+- `Swatinem/rust-cache`를 Rust 도구 설치 뒤에 추가하고 `src-tauri -> target` 및 플랫폼별 target 키를 설정했습니다. Cargo 다운로드와 의존성 컴파일 결과를 캐시하며 앱·설치 파일 재빌드와 모든 검증은 유지합니다.
+- `127c23d`의 [첫 실행](https://github.com/egoing/agent-gibbon/actions/runs/40252362011/attempts/1)과 [동일 커밋 재실행](https://github.com/egoing/agent-gibbon/actions/runs/40252362011/attempts/2)을 비교했습니다. 첫 실행은 세 플랫폼 캐시 저장 성공, 재실행은 모두 `full match: true` 및 `Cache restored successfully`를 확인했습니다.
+- 두 실행 모두 Rust·Node 테스트, Rustfmt, Clippy, 설치 파일 빌드·artifact 업로드 성공. 일반 브랜치 실행으로 공개 릴리스는 생략했습니다. actionlint·diff 검사도 통과했습니다.
+
+| 플랫폼 | 캐시 없는 첫 실행 | 캐시 복원 재실행 | 단축률 |
+|---|---:|---:|---:|
+| macOS ARM64 | 7분 18초 | 2분 9초 | 70.5% |
+| macOS Intel | 16분 51초 | 3분 10초 | 81.2% |
+| Windows x64 | 11분 37초 | 2분 47초 | 76.0% |
+
+시간은 각 build job의 시작부터 종료까지로, 도구 설치·캐시 복원/저장·테스트·패키징·업로드를 포함하고 runner 대기 시간은 제외합니다. 동일 커밋 두 실행의 관측값이며 runner 성능·Rust/의존성 변경·브랜치별 접근 범위에 따라 이후 시간과 적중 여부는 달라집니다. 실제 태그 공개 동작이나 앱 UI를 이 단계에서 재검증하지 않았습니다.
