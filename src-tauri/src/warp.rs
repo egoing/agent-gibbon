@@ -6,6 +6,8 @@ use tauri::{Manager, State};
 pub struct Warp {
     initial_y: f64,
     contact: Contact,
+    #[cfg(windows)]
+    native_warped: bool,
 }
 pub type Warps = Mutex<BTreeMap<String, Warp>>;
 
@@ -110,16 +112,53 @@ pub(crate) fn close_shortcut_pressed() -> bool {
         use objc2_app_kit::{NSEvent, NSEventModifierFlags as Flags};
         NSEvent::modifierFlags_class().contains(Flags::Control | Flags::Option | Flags::Command)
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    {
+        crate::windows_contact::modifiers().close()
+    }
+    #[cfg(not(any(target_os = "macos", windows)))]
     false
 }
 
 #[tauri::command]
 pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bool, String> {
+    let warped = poll(&window, &state)?;
+    #[cfg(windows)]
+    {
+        // Keep the existing frontend shortcut hint when native polling moved
+        // the note before the WebView timer had a chance to sample input.
+        let mut warps = state.lock().map_err(|e| e.to_string())?;
+        let native = warps
+            .get_mut(window.label())
+            .is_some_and(|warp| std::mem::take(&mut warp.native_warped));
+        Ok(warped || native)
+    }
+    #[cfg(not(windows))]
+    Ok(warped)
+}
+
+#[cfg(windows)]
+pub fn poll_native(window: &tauri::WebviewWindow) -> Result<(), String> {
+    let state = window.state::<Warps>();
+    if poll(window, &state)? {
+        if let Some(warp) = state
+            .lock()
+            .map_err(|e| e.to_string())?
+            .get_mut(window.label())
+        {
+            warp.native_warped = true;
+        }
+    }
+    Ok(())
+}
+
+fn poll(window: &tauri::WebviewWindow, state: &Warps) -> Result<bool, String> {
     #[cfg(target_os = "macos")]
     let alt = objc2_app_kit::NSEvent::modifierFlags_class()
         .contains(objc2_app_kit::NSEventModifierFlags::Option);
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    let alt = crate::windows_contact::modifiers().alt;
+    #[cfg(not(any(target_os = "macos", windows)))]
     let alt = false;
     let mut warps = state.lock().map_err(|e| e.to_string())?;
     let Some(warp) = warps.get_mut(window.label()) else {
@@ -140,12 +179,12 @@ pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bo
     if close_shortcut_pressed() {
         warp.contact = Contact::default();
         if inside {
-            crate::hide_note(window)?;
+            crate::hide_note(window.clone())?;
         }
         return Ok(false);
     }
     if warp.contact.trigger(alt, inside, (cursor.x, cursor.y)) {
-        move_note(&window, warp)?;
+        move_note(window, warp)?;
         return Ok(true);
     }
     Ok(false)

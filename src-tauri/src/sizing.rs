@@ -193,7 +193,12 @@ pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, Str
     let control = objc2_app_kit::NSEvent::modifierFlags_class()
         .contains(objc2_app_kit::NSEventModifierFlags::Control)
         && !crate::warp::close_shortcut_pressed();
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    let control = {
+        let modifiers = crate::windows_contact::modifiers();
+        modifiers.control && !modifiers.close()
+    };
+    #[cfg(not(any(target_os = "macos", windows)))]
     let control = false;
     let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
     let state = states.entry(window.label().into()).or_default();
@@ -209,7 +214,8 @@ pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, Str
     Ok(state.expanded.is_some())
 }
 
-// All values share desktop logical coordinates, including mixed-DPI displays.
+// All values share a logical coordinate space. On Windows, convert the cursor
+// and frame with the same window scale so the folded margin remains 4 DIP.
 type ContactGeometry = ((f64, f64), (f64, f64, f64, f64));
 fn contact_geometry(window: &WebviewWindow) -> Result<ContactGeometry, String> {
     #[cfg(target_os = "macos")]
@@ -234,9 +240,15 @@ fn contact_geometry(window: &WebviewWindow) -> Result<ContactGeometry, String> {
         let c = window.cursor_position().map_err(|e| e.to_string())?;
         let p = window.outer_position().map_err(|e| e.to_string())?;
         let s = window.outer_size().map_err(|e| e.to_string())?;
+        let scale = window.scale_factor().map_err(|e| e.to_string())?;
         Ok((
-            (c.x, c.y),
-            (p.x as f64, p.y as f64, s.width as f64, s.height as f64),
+            (c.x / scale, c.y / scale),
+            (
+                p.x as f64 / scale,
+                p.y as f64 / scale,
+                s.width as f64 / scale,
+                s.height as f64 / scale,
+            ),
         ))
     }
 }

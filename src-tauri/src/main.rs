@@ -12,6 +12,8 @@ mod telemetry;
 mod tray;
 mod warp;
 #[cfg(windows)]
+mod windows_contact;
+#[cfg(windows)]
 mod windows_process;
 use model::{Action, Note, Request, MAX_REQUEST};
 use serde_json::{json, Value};
@@ -430,6 +432,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             tray::install(app.handle())?;
             #[cfg(target_os = "macos")]
             sizing::install_contact_monitor(app.handle());
+            #[cfg(windows)]
+            windows_contact::install(app.handle());
             if initial_open {
                 apply(
                     app.handle(),
