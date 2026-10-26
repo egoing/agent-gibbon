@@ -134,7 +134,7 @@ async function refresh() {
   setTimeout(refresh, 350);
 }
 document.addEventListener('mousedown', (event) => {
-  if (event.button !== 0 || event.target.closest('button, #editor, #error, #warp-tip, #diff-actions, .resize')) return;
+  if (folded || event.button !== 0 || event.target.closest('button, #editor, #error, #warp-tip, #diff-actions, .resize')) return;
   event.preventDefault();
   invoke('drag_note').catch(failure);
 });
@@ -253,10 +253,22 @@ function displayFold(value) {
   $('fold-toggle').title = `${folded ? '메모 펼치기' : '메모 접기'} · Control을 누른 채 메모에 포인터를 올리면 접기·펼치기 전환`;
   $('fold-title').hidden = !folded;
 }
-$('fold-toggle').addEventListener('click', async () => {
+let changingFold = false;
+async function toggleFold() {
+  if (changingFold) return;
+  changingFold = true;
   try { displayFold(await invoke('toggle_fold')); }
   catch (error) { failure(error); }
-});
+  finally { changingFold = false; }
+}
+// Capture folded clicks before the icon handler so one click toggles only once.
+document.addEventListener('click', (event) => {
+  if (!folded || event.button !== 0) return;
+  event.preventDefault();
+  event.stopPropagation();
+  return toggleFold();
+}, true);
+$('fold-toggle').addEventListener('click', toggleFold);
 async function pollFold() {
   try { displayFold(await invoke('poll_fold')); }
   catch (error) { failure(error); }
