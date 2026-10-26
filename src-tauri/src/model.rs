@@ -94,6 +94,8 @@ pub struct Note {
     pub status: String,
     pub updated_at: u64,
     pub revision: u64,
+    #[serde(skip)]
+    pub change_base: Option<String>,
 }
 impl Default for Note {
     fn default() -> Self {
@@ -109,6 +111,7 @@ impl Default for Note {
             status: "대기".into(),
             updated_at: 0,
             revision: 0,
+            change_base: None,
         }
     }
 }
@@ -123,6 +126,31 @@ impl Note {
             color: NOTE_COLORS[created_count % NOTE_COLORS.len()].into(),
             ..Self::default()
         }
+    }
+
+    pub fn has_pending_changes(&self) -> bool {
+        self.change_base.is_some()
+    }
+
+    pub fn acknowledge_changes(&mut self) {
+        self.change_base = None;
+        self.change_html = self.html.clone();
+        self.removed = false;
+    }
+
+    pub fn restore_change_base(&mut self, base: Option<String>) -> Result<(), String> {
+        if let Some(base) = base.filter(|base| base != &self.markdown) {
+            if base.len() as u64 > MAX_REQUEST {
+                return Err("저장된 변경 비교 기준은 1MiB 이하여야 합니다".into());
+            }
+            let (ranges, removed) = changed_lines(&base, &self.markdown);
+            self.change_html = render_diff(&base, &self.markdown, &ranges);
+            self.removed = removed;
+            self.change_base = Some(base);
+        } else {
+            self.acknowledge_changes();
+        }
+        Ok(())
     }
 
     pub fn save_edit(&mut self, markdown: String, expected_revision: u64) -> Result<(), String> {
@@ -168,9 +196,15 @@ impl Note {
                 self.change_html = render(markdown);
                 self.removed = false;
             } else if self.markdown != *markdown {
-                let (ranges, removed) = changed_lines(&self.markdown, markdown);
-                self.change_html = render_diff(&self.markdown, markdown, &ranges);
+                let base = self
+                    .change_base
+                    .get_or_insert_with(|| self.markdown.clone());
+                let (ranges, removed) = changed_lines(base, markdown);
+                self.change_html = render_diff(base, markdown, &ranges);
                 self.removed = removed;
+                if base == markdown {
+                    self.change_base = None;
+                }
             }
             self.html = render(markdown);
             self.markdown = markdown.clone();
@@ -528,6 +562,67 @@ mod tests {
             .expect("changed content has a separate safe highlight rendering")
             .to_string()
     }
+    #[test]
+    fn cumulative_diff_keeps_unconfirmed_changes_and_omits_intermediate_versions() {
+        let mut note = changed_note("원본\n유지\n", "중간\n유지\n추가\n");
+        note.apply(
+            &serde_json::from_value(serde_json::json!({
+                "action": "update", "markdown": "최종\n유지\n추가\n"
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        assert!(note.change_html.contains("change-removed\">원본"));
+        assert!(note.change_html.contains("change-modified\">최종"));
+        assert!(note.change_html.contains("change-added\">추가"));
+        assert!(!note.change_html.contains("중간"));
+        assert!(!note.change_html.contains("change-modified\">유지"));
+    }
+
+    #[test]
+    fn confirmation_advances_baseline_and_reverts_remove_only_net_changes() {
+        let mut note = changed_note("첫째\n둘째\n", "변경1\n변경2\n");
+        note.save_edit("첫째\n변경2\n".into(), note.revision)
+            .unwrap();
+        assert!(!note.change_html.contains("변경1"));
+        assert!(note.change_html.contains("change-removed\">둘째"));
+        assert!(note.has_pending_changes());
+        note.acknowledge_changes();
+        assert!(!note.has_pending_changes());
+        assert_eq!(note.change_html, note.html);
+        note.save_edit("첫째\n최종\n".into(), note.revision)
+            .unwrap();
+        assert_eq!(note.change_base.as_deref(), Some("첫째\n변경2\n"));
+        assert!(note.change_html.contains("change-removed\">변경2"));
+        assert!(!note.change_html.contains("둘째"));
+        note.save_edit("첫째\n변경2\n".into(), note.revision)
+            .unwrap();
+        assert!(!note.has_pending_changes());
+        assert_eq!(note.change_html, note.html);
+        assert!(!note.removed);
+    }
+
+    #[test]
+    fn pending_baselines_survive_metadata_same_body_and_remain_note_local() {
+        let mut note = changed_note("원본", "첫 변경");
+        let other = changed_note("다른 원본", "다른 변경");
+        note.apply(
+            &serde_json::from_value(serde_json::json!({
+                "action": "update", "markdown": "첫 변경", "title": "새 제목"
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(note.change_base.as_deref(), Some("원본"));
+        note.acknowledge_changes();
+        assert!(other.has_pending_changes());
+        assert_eq!(other.change_base.as_deref(), Some("다른 원본"));
+        assert!(serde_json::to_value(&other)
+            .unwrap()
+            .get("change_base")
+            .is_none());
+    }
+
     #[test]
     fn feedback_distinguishes_additions_replacements_and_deletions() {
         let added = changed_note("유지\n", "유지\n추가\n");

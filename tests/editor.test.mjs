@@ -11,6 +11,8 @@ async function setup(storage = new Map(), instance = {}) {
       hidden: false, disabled: false, value: '', dataset: {}, listeners: {}, attributes: {},
       addEventListener(type, listener) { this.listeners[type] = listener; },
       setAttribute(key, value) { this.attributes[key] = value; }, focus() {},
+      getBoundingClientRect() { return { width: 298, height: this.hidden ? 0 : 42 }; },
+      cloneNode() { return { style: {}, getBoundingClientRect: () => ({ width: 298, height: 120 }), remove() {} }; },
     });
     return elements.get(id);
   };
@@ -24,6 +26,7 @@ async function setup(storage = new Map(), instance = {}) {
   let feedbackActive = false;
   let highlightRevision = null;
   let saveError;
+  let acknowledgementError;
   let warpError;
   let contact = false;
   let folded = false;
@@ -32,7 +35,7 @@ async function setup(storage = new Map(), instance = {}) {
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
     themeFor, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
-      body: { classList: { toggle(name, value) { if (value) classes.add(name); else classes.delete(name); } } },
+      body: { appendChild() {}, classList: { toggle(name, value) { if (value) classes.add(name); else classes.delete(name); } } },
       getElementById: element, querySelectorAll: () => [],
       addEventListener(type, listener) { events[type] = listener; },
       documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener(type, listener) { pointers[type] = listener; } },
@@ -47,6 +50,7 @@ async function setup(storage = new Map(), instance = {}) {
         if (command === 'poll_warp') { const result = contact; contact = false; return result; }
         if (command === 'snapshot') return { ...instance, note: { ...note }, always_on_top: true, feedback_active: feedbackActive, highlight_revision: highlightRevision };
         if (command === 'acknowledge_feedback') {
+          if (acknowledgementError) throw acknowledgementError;
           if (highlightRevision !== args.revision) return false;
           highlightRevision = null; return true;
         }
@@ -67,6 +71,7 @@ async function setup(storage = new Map(), instance = {}) {
     pollFold: () => timers.find(fn => fn.name === 'pollFold')(), highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
     pollWarp: () => timers.find(fn => fn.name === 'pollWarp')(),
     feedback: active => { feedbackActive = active; },
+    failAcknowledgement: error => { acknowledgementError = error; },
     contact: () => { contact = true; }, failWarp: error => { warpError = error; },
     update: patch => { note = { ...note, ...patch }; }, failSave: error => { saveError = error; } };
 }
@@ -155,7 +160,7 @@ test('failed warp reports error without showing success help or losing draft', a
 });
 
 
-test('feedback persists after opacity expiry until pointer contact, preserving drafts', async () => {
+test('feedback persists after opacity expiry and pointer contact until button click, preserving drafts', async () => {
   const app = await setup();
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>', removed: true });
   app.highlight(2); app.feedback(true); await app.refresh();
@@ -165,12 +170,14 @@ test('feedback persists after opacity expiry until pointer contact, preserving d
   app.feedback(false); await app.refresh();
   assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
   await app.pointers.pointerenter();
-  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
-  app.highlight(2); await app.refresh(); // An already in-flight snapshot may be stale.
+  assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
+  await app.element('clear-diff').listeners.click();
+  app.highlight(2); await app.refresh(); // Ignore a stale snapshot after acknowledgement.
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
   assert.equal(app.element('markdown').value, '초안');
   app.update({ revision: 3, color: '#ffffff' }); await app.refresh();
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+  assert.equal(app.element('error').hidden, true);
 });
 
 
@@ -183,20 +190,31 @@ test('feedback never reappears when an expired change is saved without editing',
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
   await app.refresh();
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+  assert.equal(app.element('error').hidden, true);
 });
 
 
-test('next body replaces previous highlight and pointer movement acknowledges only that note', async () => {
+test('next body persists through rollover until explicit button click and affects only that note', async () => {
   const app = await setup();
   const other = await setup();
   for (const instance of [app, other]) {
     instance.update({ revision: 2, markdown: '첫 변경', html: '<p>첫 변경</p>', change_html: '<p><mark>첫 변경</mark></p>' });
     instance.highlight(2); await instance.refresh();
   }
+  await app.pointers.pointerenter();
   app.update({ revision: 3, markdown: '다음 변경', html: '<p>다음 변경</p>', change_html: '<p><mark>다음 변경</mark></p>' });
   app.highlight(3); await app.refresh();
   assert.equal(app.element('content').innerHTML, '<p><mark>다음 변경</mark></p>');
-  await app.pointers.pointermove();
+  await app.pointers.pointermove?.();
+  await app.events.focus?.();
+  await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<p><mark>다음 변경</mark></p>');
+  await app.pointers.pointerleave();
+  await app.pointers.pointerenter();
+  assert.equal(app.element('content').innerHTML, '<p><mark>다음 변경</mark></p>');
+  assert.equal(app.element('clear-diff').hidden, false);
+  await app.element('clear-diff').listeners.click();
+  assert.equal(app.element('clear-diff').hidden, true);
   assert.equal(app.element('content').innerHTML, '<p>다음 변경</p>');
   assert.equal(other.element('content').innerHTML, '<p><mark>첫 변경</mark></p>');
 });
@@ -269,4 +287,49 @@ test('native rollover updates chrome without a DOM click or pointer event', asyn
   assert.equal(app.classes.has('pointer-over'), false);
   assert.equal(app.element('content').innerHTML, html);
   assert.equal(app.calls.some(([name]) => name === 'drag_note'), false);
+});
+
+test('clear diff button stays hidden without changes and stale clicks preserve newer revisions', async () => {
+  const app = await setup();
+  assert.equal(app.element('clear-diff').hidden, true);
+  app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>' });
+  app.highlight(2); await app.refresh();
+  app.highlight(3); // A newer backend update arrived before the button request.
+  await app.element('clear-diff').listeners.click();
+  assert.equal(app.element('clear-diff').hidden, false);
+  assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
+  assert.equal(app.element('clear-diff').disabled, false);
+});
+
+
+test('bottom action reserves height and releases it when changes are cleared', async () => {
+  const app = await setup();
+  assert.equal(app.element('diff-actions').hidden, true);
+  app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>' });
+  app.highlight(2); await app.refresh();
+  assert.equal(app.element('diff-actions').hidden, false);
+  assert.equal(app.calls.filter(([name]) => name === 'fit_note').at(-1)[1].height, 164);
+  app.events.mousedown({ button: 0, target: { closest: selector => selector.includes('#diff-actions') }, preventDefault() { assert.fail('menu must not drag the note'); } });
+  assert.equal(app.calls.some(([name]) => name === 'drag_note'), false);
+  await app.element('clear-diff').listeners.click();
+  assert.equal(app.element('diff-actions').hidden, true);
+  assert.equal(app.calls.filter(([name]) => name === 'fit_note').at(-1)[1].height, 122);
+});
+
+
+test('failed confirmation keeps cumulative changes and allows retry', async () => {
+  const app = await setup();
+  app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>누적 변경</mark></p>' });
+  app.highlight(2); await app.refresh();
+  app.failAcknowledgement('메모 저장 실패');
+  await app.element('clear-diff').listeners.click();
+  assert.equal(app.element('content').innerHTML, '<p><mark>누적 변경</mark></p>');
+  assert.equal(app.element('diff-actions').hidden, false);
+  assert.equal(app.element('clear-diff').disabled, false);
+  assert.equal(app.element('error').textContent, '메모 저장 실패');
+  app.failAcknowledgement(null);
+  await app.element('clear-diff').listeners.click();
+  assert.equal(app.element('diff-actions').hidden, true);
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+  assert.equal(app.element('error').hidden, true);
 });

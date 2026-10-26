@@ -30,7 +30,7 @@ async function fitContent() {
   document.body.appendChild(measure);
   const rect = measure.getBoundingClientRect();
   const width = Math.ceil(rect.width + 2);
-  const height = Math.ceil(rect.height + 2);
+  const height = Math.ceil(rect.height + $('diff-actions').getBoundingClientRect().height + 2);
   measure.remove();
   try { needsFit = !await invoke('fit_note', { width, height }); }
   catch (error) { failure(error); }
@@ -124,6 +124,9 @@ async function refresh() {
       needsFit = true;
     }
     highlightRevision = (state.highlight_revision ?? -1) > acknowledgedRevision ? state.highlight_revision : null;
+    $('clear-diff').hidden = highlightRevision === null;
+    $('diff-actions').hidden = highlightRevision === null;
+    $('clear-diff').disabled = acknowledging;
     const html = highlightRevision !== null ? state.note.change_html : state.note.html;
     if (displayedHtml !== html) {
       $('content').innerHTML = html;
@@ -141,7 +144,7 @@ async function refresh() {
   setTimeout(refresh, 350);
 }
 document.addEventListener('mousedown', (event) => {
-  if (event.button !== 0 || event.target.closest('button, #editor, #error, #warp-tip, .resize')) return;
+  if (event.button !== 0 || event.target.closest('button, #editor, #error, #warp-tip, #diff-actions, .resize')) return;
   event.preventDefault();
   invoke('drag_note').catch(failure);
 });
@@ -187,28 +190,33 @@ window.__TAURI__.event.listen('note-pointer-over', ({ payload }) => {
 }).catch(failure);
 refresh();
 
-async function acknowledgeFeedback() {
+$('clear-diff').addEventListener('click', async () => {
   if (highlightRevision === null || acknowledging) return;
   const observed = highlightRevision;
   acknowledging = true;
+  $('clear-diff').disabled = true;
   try {
     const accepted = await invoke('acknowledge_feedback', { revision: observed });
     if (accepted) acknowledgedRevision = Math.max(acknowledgedRevision, observed);
     if (accepted && highlightRevision === observed) {
       highlightRevision = null;
-      needsFit = true;
       displayedHtml = latestNote.html;
       $('content').innerHTML = displayedHtml;
+      $('clear-diff').hidden = true;
+      $('diff-actions').hidden = true;
+      $('error').hidden = true;
+      needsFit = true;
+      await fitContent();
     }
   } catch (error) { failure(error); }
-  finally { acknowledging = false; }
-}
-for (const event of ['pointerenter', 'pointermove']) {
-  document.documentElement.addEventListener(event, async () => {
-    await acknowledgeFeedback();
-    if (event === 'pointerenter') invoke('sync_opacity').catch(failure);
-  });
-}
+  finally {
+    acknowledging = false;
+    $('clear-diff').disabled = false;
+  }
+});
+
+// Pointer contact only updates opacity; diff acknowledgement is explicit.
+document.documentElement.addEventListener('pointerenter', () => invoke('sync_opacity').catch(failure));
 document.documentElement.addEventListener('pointerleave', () => invoke('sync_opacity').catch(failure));
 
 let warpTipKey = 'floatnote.warp-tip-dismissed';
