@@ -35,3 +35,13 @@ git push origin v0.2.8
 macOS는 기존 애드혹 서명을 유지하며 Developer ID 서명·공증과 Windows 코드 서명은 구성하지 않았습니다. 사용자 설치 경고가 발생할 수 있습니다. 이 워크플로는 GitHub Releases 배포를 자동화하며 설치된 앱의 자동 업데이트 기능을 추가하지 않습니다.
 
 공식 참고: [Tauri GitHub 배포](https://v2.tauri.app/distribute/pipelines/github/), [GitHub 호스팅 runner](https://docs.github.com/en/actions/reference/runners/github-hosted-runners), [GitHub CLI 릴리스 생성](https://cli.github.com/manual/gh_release_create).
+
+## 빌드 캐시
+
+npm 캐시와 별도로 `Swatinem/rust-cache`를 Rust 도구 설치 뒤에 실행합니다. Cargo 다운로드와 `src-tauri/target`의 의존성 컴파일 결과를 GitHub Actions 캐시 저장 공간에 보관합니다. 캐시는 Git 소스나 릴리스 자산에 포함되지 않습니다.
+
+OS·CPU·대상 triple·Rust 도구 버전·Cargo 매니페스트와 lockfile 등에 따라 캐시를 구분합니다. 앱 자체와 설치 파일은 매번 다시 빌드하며, 테스트·Clippy도 생략하지 않습니다. 캐시가 없거나 호환되지 않으면 전체 빌드를 수행하므로 첫 실행은 캐시를 채우는 시간이 추가될 수 있습니다.
+
+캐시는 GitHub의 브랜치 접근 범위를 따릅니다. 다른 브랜치의 캐시를 항상 쓸 수 있는 것은 아니며, 기본 브랜치에서 생성한 캐시는 후속 브랜치·태그 실행이 재사용할 수 있습니다. 캐시 삭제·용량 제한·도구나 의존성 변경으로 다시 생성될 수 있습니다. 인증 정보·환경 파일·서명 키는 캐시 대상으로 추가하지 않습니다.
+
+참고: [Rust cache 공식 설명](https://github.com/Swatinem/rust-cache), [GitHub Actions 캐시 접근 범위](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#restrictions-for-accessing-a-cache).
