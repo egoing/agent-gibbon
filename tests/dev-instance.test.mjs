@@ -10,12 +10,12 @@ test('canonical paths, not cwd or basename, determine stable instance IDs', () =
   const temp = mkdtempSync(join(tmpdir(), 'floatnote-test-'));
   try {
     for (const dir of ['a/same', 'b/same']) mkdirSync(join(temp, dir), { recursive: true });
-    symlinkSync(join(temp, 'a/same'), join(temp, 'alias'));
+    symlinkSync(join(temp, 'a/same'), join(temp, 'alias'), process.platform === 'win32' ? 'junction' : 'dir');
     const a = devInstance(join(temp, 'a/same'));
     assert.equal(a.id, 'dev-' + createHash('sha256').update(a.root).digest('hex').slice(0, 24));
     assert.deepEqual(devInstance(join(temp, 'alias')), a);
     assert.notEqual(devInstance(join(temp, 'b/same')).id, a.id);
-    assert.equal(a.binary, join(a.root, 'src-tauri/target/debug/agent-gibbon'));
+    assert.equal(a.binary, join(a.root, `src-tauri/target/debug/agent-gibbon${process.platform === 'win32' ? '.exe' : ''}`));
     const env = devEnvironment(a, { FLOATNOTE_INSTANCE: 'wrong', CARGO_TARGET_DIR: '/shared', KEEP: 'yes' });
     assert.equal(env.FLOATNOTE_INSTANCE, a.id);
     assert.equal(env.CARGO_TARGET_DIR, a.target);
@@ -23,7 +23,7 @@ test('canonical paths, not cwd or basename, determine stable instance IDs', () =
   } finally { rmSync(temp, { recursive: true, force: true }); }
 });
 
-test('development CLI rejects missing, old and foreign binaries without release fallback', async () => {
+test('development CLI rejects missing, old and foreign binaries without release fallback', { skip: process.platform === 'win32' && 'POSIX executable fixtures; Windows uses native CLI smoke tests' }, async () => {
   const { copyFileSync, writeFileSync } = await import('node:fs');
   const { spawnSync } = await import('node:child_process');
   const temp = mkdtempSync(join(tmpdir(), 'floatnote launcher '));

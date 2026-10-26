@@ -11,8 +11,11 @@ mod storage;
 mod telemetry;
 mod tray;
 mod warp;
+#[cfg(windows)]
+mod windows_process;
 use model::{Action, Note, Request, MAX_REQUEST};
 use serde_json::{json, Value};
+#[cfg(unix)]
 use std::os::unix::process::CommandExt;
 use std::{
     collections::BTreeMap,
@@ -163,6 +166,9 @@ fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
     }
     #[cfg(not(target_os = "macos"))]
     {
+        #[cfg(windows)]
+        focus::show_without_focus(win)?;
+        #[cfg(not(windows))]
         win.show().map_err(|e| e.to_string())?;
         tray::sync_visibility(win.app_handle())
     }
@@ -547,6 +553,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
                 .stderr(Stdio::null());
             // Detach the GUI from short-lived agent/terminal command sessions.
             // SAFETY: setsid is async-signal-safe and touches no Rust state after fork.
+            #[cfg(unix)]
             unsafe {
                 child.pre_exec(|| {
                     if libc::setsid() == -1 {
@@ -555,6 +562,14 @@ fn cli(args: &[String]) -> Result<Value, String> {
                     Ok(())
                 });
             }
+            #[cfg(windows)]
+            {
+                use std::os::windows::process::CommandExt;
+                child.creation_flags(0x08000000); // CREATE_NO_WINDOW
+            }
+            #[cfg(windows)]
+            windows_process::spawn(&mut child).map_err(|e| e.to_string())?;
+            #[cfg(not(windows))]
             child.spawn().map_err(|e| e.to_string())?;
             let start = Instant::now();
             loop {
@@ -598,6 +613,13 @@ fn main() {
         std::process::exit(1);
     }
     let args: Vec<_> = std::env::args().skip(1).collect();
+    // Explorer launches should leave only the detached GUI, not a console window.
+    #[cfg(windows)]
+    let args = if args.is_empty() {
+        vec!["open".to_string()]
+    } else {
+        args
+    };
     let result = if args.is_empty() || args == ["--serve"] {
         match ipc::Endpoint::bind() {
             Ok(Some(endpoint)) => serve(endpoint, args.is_empty()).map(|_| json!({"ok":true})),

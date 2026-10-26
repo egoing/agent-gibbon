@@ -1,0 +1,139 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+    branches: ['**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - id: version
+        name: Check versions and tag
+        env:
+          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+        run: |
+          if [ -n "$RELEASE_TAG" ]; then
+            VERSION=$(node scripts/release-version.mjs check "$RELEASE_TAG")
+          else
+            VERSION=$(node scripts/release-version.mjs check)
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            target: aarch64-apple-darwin
+            bundles: app,dmg
+            asset: macos-arm64
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+            bundles: app,dmg
+            asset: macos-x64
+          - runner: windows-2022
+            target: x86_64-pc-windows-msvc
+            bundles: nsis
+            asset: windows-x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install Rust tools
+        shell: bash
+        run: |
+          rustup update stable --no-self-update
+          rustup default stable
+          rustup component add clippy rustfmt
+          rustup target add '${{ matrix.target }}'
+      - name: Restore Rust dependency cache
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          workspaces: src-tauri -> target
+          key: ${{ matrix.target }}
+          cache-bin: false
+      - run: npm ci
+      - run: cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
+      - run: cargo test --locked --manifest-path src-tauri/Cargo.toml
+      - run: npm run test:ui
+      - run: cargo clippy --locked --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+      - name: Build installers
+        shell: bash
+        env:
+          AGENT_GIBBON_SENTRY_DSN: ${{ secrets.AGENT_GIBBON_SENTRY_DSN || vars.AGENT_GIBBON_SENTRY_DSN }}
+        run: |
+          if [ -z "$AGENT_GIBBON_SENTRY_DSN" ]; then
+            echo '::warning::Sentry DSN is not configured; these binaries will not send diagnostics.'
+          fi
+          npm exec tauri build -- --target '${{ matrix.target }}' --bundles '${{ matrix.bundles }}' -- --locked
+      - name: Collect installers
+        shell: bash
+        run: |
+          mkdir -p release-assets
+          for file in src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*.exe; do
+            if [ -f "$file" ]; then cp "$file" release-assets/; fi
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-${{ matrix.asset }}
+          path: release-assets/*
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [validate, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: installer-*
+          path: release-assets
+          merge-multiple: true
+      - name: Validate complete asset set and generate checksums
+        env:
+          RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+        run: node scripts/release-assets.mjs release-assets "$RELEASE_VERSION"
+      - name: Upload to draft, then publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          # A failed upload leaves a draft for inspection. Never replace an existing release.
+          gh release create "$RELEASE_TAG" --verify-tag --draft --title "Agent Gibbon $RELEASE_TAG" --generate-notes
+          gh release upload "$RELEASE_TAG" release-assets/*
+          gh release edit "$RELEASE_TAG" --draft=false --latest

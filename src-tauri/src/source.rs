@@ -1,7 +1,8 @@
+#[cfg(unix)]
+use std::os::unix::fs::OpenOptionsExt;
 use std::{
     fs,
     io::Write,
-    os::unix::fs::OpenOptionsExt,
     path::Path,
     sync::atomic::{AtomicU64, Ordering},
 };
@@ -31,10 +32,11 @@ pub fn save(path: &str, expected: &str, replacement: &str) -> Result<(), String>
         std::process::id(),
         SERIAL.fetch_add(1, Ordering::Relaxed)
     ));
-    let mut file = fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .mode(0o600)
+    let mut options = fs::OpenOptions::new();
+    options.write(true).create_new(true);
+    #[cfg(unix)]
+    options.mode(0o600);
+    let mut file = options
         .open(&temporary)
         .map_err(|e| format!("저장 파일 생성 실패: {e}"))?;
     let result = (|| {

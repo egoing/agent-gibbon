@@ -28,7 +28,8 @@ Give your agent the [CLI skill](.agents/skills/agent-gibbon/SKILL.md), or ask it
 - Optional source-file connection using `--file`; external changes require an explicit update.
 - Local CLI communication without a web server, account, or cloud sync.
 - Current source saves notes locally; source features can be newer than the latest downloadable release.
-- macOS is the documented distribution platform. Windows and Linux releases are not currently provided.
+- Published v0.2.7 assets cover macOS. Source now supports Windows x64 packaging; future version tags build macOS ARM64/Intel DMGs and a Windows installer together. Linux packaging is not provided.
+- See the [automated release guide](docs/releases.md) for version bumps, tag-triggered releases, and build-only manual runs.
 
 ## Build from source
 
@@ -51,3 +52,7 @@ Official release builds may send application error diagnostics through Sentry. C
 ## License
 
 [MIT](LICENSE). Commercial use, modification, and redistribution are permitted subject to the license notice.
+
+## Windows development
+
+See the [Windows development and build guide](docs/windows.md) for prerequisites, isolated development CLI, NSIS packaging, and platform limitations. Validation evidence is recorded in [verification](docs/verification.md).

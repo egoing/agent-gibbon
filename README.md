@@ -62,6 +62,8 @@
 
 ## 빌드와 실행
 
+Windows 개발·빌드 절차와 플랫폼 차이는 [Windows 안내](docs/windows.md)를 참고하세요.
+
 macOS에서 Rust stable, Node.js/npm, Xcode Command Line Tools 및 macOS SDK가 필요합니다. CPU 아키텍처는 호스트 기본값을 사용합니다.
 
 ```sh
@@ -206,6 +208,10 @@ python3 scripts/macos-tray-smoke.py
 - [Tauri capabilities](https://v2.tauri.app/security/capabilities/)
 
 ## 배포판 제작과 설치
+
+버전은 `npm run version:set -- X.Y.Z`로 npm·Cargo·Tauri와 lockfile을 함께 갱신하고 `npm run version:check`로 확인합니다. 해당 커밋의 `vX.Y.Z` 태그를 push하면 macOS Apple Silicon·Intel DMG와 Windows x64 설치 EXE를 자동 빌드합니다. 세 플랫폼 모두 테스트·Rustfmt·Clippy·빌드에 성공한 뒤 설치 파일 세 개와 `SHA256SUMS.txt`를 Draft에 업로드하고 공개합니다. 기존 공개 파일은 덮어쓰지 않습니다.
+
+일반 브랜치 push와 수동 실행은 검증·빌드만 수행합니다. Rust 의존성 캐시는 GitHub Actions에 저장하며, 앱·설치 파일은 다시 빌드하고 테스트도 유지합니다. 캐시를 소스 저장소에 커밋하지 않습니다. 배포용 Sentry DSN 설정과 서명 제한, 실패 시 처리 등 상세 절차는 [자동 릴리스 안내](docs/releases.md)를 참고하세요.
 
 설치 파일은 [GitHub Releases](https://github.com/egoing/agent-gibbon/releases)에서 받습니다. 공개 저장소에서 다운로드할 수 있습니다.
 

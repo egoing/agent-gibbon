@@ -16,3 +16,11 @@
 - 기존 설치 앱과 다른 워크트리의 프로세스를 종료하지 않는다. 검증에서 직접 시작한 프로세스만 정확한 바이너리 경로와 PID로 식별해 종료한다. `close`는 메모 숨기기이며 프로세스 종료가 아니다. 사용자 포커스·창 위치·숨김 상태를 보존한다.
 - 같은 메모 ID는 인스턴스별로 독립적이지만 `--file`로 연결한 원본 파일은 공유될 수 있으므로 테스트 파일도 워크트리별로 분리한다.
 - 격리 회귀는 두 워크트리를 각각 빌드한 뒤 `python3 scripts/isolation-smoke.py --peer /다른/워크트리/절대경로`로 확인한다. 두 개발 앱은 실행되지 않은 상태여야 하며 기존 기본 앱은 실행 중이어야 한다. 상세 실행법은 [README](README.md), CLI 사용법은 [로컬 스킬](.agents/skills/agent-gibbon/SKILL.md), 검증 범위와 한계는 [검증 기록](docs/verification.md)을 따른다.
+
+## 버전과 릴리스
+
+- 상세 절차와 현재 배포 조건은 [자동 릴리스 안내](docs/releases.md), 실행 설정은 `.github/workflows/release.yml`을 따른다.
+- 버전은 `npm run version:set -- X.Y.Z`로 npm·Cargo·Tauri와 lockfile을 함께 올리고 `npm run version:check`로 확인한다. 버전 변경만으로 공개하지 않으며, 배포할 커밋에 일치하는 `vX.Y.Z` 태그를 push하면 자동 릴리스가 시작된다. 기존 태그·공개 릴리스 자산을 덮어쓰지 않는다.
+- macOS ARM64·Intel DMG와 Windows x64 NSIS EXE의 테스트·Rustfmt·Clippy·빌드가 모두 성공하고 설치 파일 세 개와 체크섬이 준비된 뒤에만 공개한다. 일반 브랜치 push와 수동 실행은 검증·빌드만 수행한다.
+- 플랫폼별 Rust 의존성 캐시는 GitHub Actions에 저장한다. 캐시 적중 여부와 관계없이 테스트·검사 및 앱·설치 파일 재빌드를 유지하며, 인증 정보·환경 파일·서명 키는 캐시에 넣지 않는다.
+- 공식 오류 수집 DSN은 Actions secret/variable `AGENT_GIBBON_SENTRY_DSN`으로 빌드 시 주입한다. 누락 시 수집이 꺼진 빌드를 만들며, Developer ID 서명·공증·Windows 코드 서명은 별도 구성 사항이다. 실제 실행하지 않은 설치·UI·공개 배포 검증을 통과로 기록하지 않는다.
