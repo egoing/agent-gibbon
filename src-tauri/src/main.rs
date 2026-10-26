@@ -395,6 +395,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             capture::finish_capture,
             capture::cancel_capture,
             capture::note_image,
+            capture::copy_note_image,
             telemetry::report_frontend_error,
             entrance::drag_note,
             hide_note,

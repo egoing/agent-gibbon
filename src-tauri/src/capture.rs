@@ -482,6 +482,11 @@ fn create_note(app: &tauri::AppHandle, bytes: Vec<u8>, bounds: ImageNote) -> Res
 }
 #[tauri::command]
 pub fn note_image(window: WebviewWindow) -> Result<String, String> {
+    Ok(data(&note_image_bytes(&window)?))
+}
+
+// Resolve only the caller's app-created capture; no frontend path is accepted.
+fn note_image_bytes(window: &WebviewWindow) -> Result<Vec<u8>, String> {
     let id = window
         .label()
         .strip_prefix("note-")
@@ -495,18 +500,39 @@ pub fn note_image(window: WebviewWindow) -> Result<String, String> {
     {
         return Err("이미지 메모가 아닙니다".into());
     }
-    let bytes = std::fs::read(
+    std::fs::read(
         window
             .state::<crate::storage::Store>()
             .path(id)
             .with_file_name("capture.png"),
     )
-    .map_err(err)?;
-    Ok(data(&bytes))
+    .map_err(err)
+}
+
+#[tauri::command]
+pub fn copy_note_image(window: WebviewWindow) -> Result<(), String> {
+    use tauri_plugin_clipboard_manager::ClipboardExt;
+    let bytes = note_image_bytes(&window)?;
+    let image = tauri::image::Image::from_bytes(&bytes).map_err(err)?;
+    window
+        .app_handle()
+        .clipboard()
+        .write_image(&image)
+        .map_err(err)
 }
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn clipboard_png_decode_preserves_rgba_and_dimensions() {
+        let pixels = vec![255, 0, 40, 255, 0, 200, 70, 128];
+        let original = RgbaImage::from_raw(2, 1, pixels.clone()).unwrap();
+        let encoded = png(&original).unwrap();
+        let decoded = tauri::image::Image::from_bytes(&encoded).unwrap();
+        assert_eq!((decoded.width(), decoded.height()), (2, 1));
+        assert_eq!(decoded.rgba(), pixels);
+        assert!(tauri::image::Image::from_bytes(b"invalid PNG").is_err());
+    }
     #[test]
     fn text_selection_creates_empty_editable_note_without_image() {
         let note = empty_text_note();

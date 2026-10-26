@@ -28,6 +28,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
   let saveError;
   let acknowledgementError;
   let warpError;
+  let copyError;
   let contact = false;
   let folded = false;
   const classes = new Set();
@@ -35,12 +36,15 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
     themeFor, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
+      createElement() { return { style: {}, setAttribute() {}, remove() {},
+        get innerText() { return this.innerHTML.replace(/<[^>]+>/g, '').trim(); } }; },
       body: { appendChild() {}, classList: { toggle(name, value) { if (value) classes.add(name); else classes.delete(name); } } },
       getElementById: element, querySelectorAll: () => [],
       addEventListener(type, listener) { events[type] = listener; },
       documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener(type, listener) { pointers[type] = listener; } },
     },
     window: { __TAURI__: {
+      clipboardManager: { async writeText(text) { if (copyError) throw copyError; calls.push(['clipboard-text', text]); } },
       event: { async listen(name, handler) { nativeEvents[name] = handler; return () => {}; } },
       core: { async invoke(command, args) {
         calls.push([command, args]);
@@ -67,6 +71,8 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
   vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace("import { themeFor } from './theme.mjs';", ''), context);
   await new Promise(setImmediate);
   return { element, styles, events, calls, pointers, classes, nativeEvents,
+    failCopy: error => { copyError = error; },
+    expireCopy: () => timers.find(fn => fn.toString().includes("delete $('copy').dataset.copied"))(),
     fold: value => { folded = value; },
     pollFold: () => timers.find(fn => fn.name === 'pollFold')(), highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
     pollWarp: () => timers.find(fn => fn.name === 'pollWarp')(),
@@ -407,4 +413,48 @@ test('direct save immediately clears existing diff controls', async () => {
   app.highlight(3);
   await app.refresh();
   assert.equal(app.element('diff-actions').hidden, false);
+});
+
+
+test('copy uses the latest rendered note without confirming or copying deleted diff text', async () => {
+  const app = await setup(undefined, {}, { html: '<p>최신 본문</p>', change_html: '<del>이전 본문</del><p>최신 본문</p>' });
+  app.highlight(1);
+  await app.refresh();
+  const before = app.element('content').innerHTML;
+  await app.element('copy').listeners.click();
+  assert.deepEqual(app.calls.find(([name]) => name === 'clipboard-text'), ['clipboard-text', '최신 본문']);
+  assert.equal(app.element('content').innerHTML, before);
+  assert.equal(app.element('diff-actions').hidden, false);
+  assert.equal(app.calls.some(([name]) => name === 'acknowledge_feedback'), false);
+  assert.equal(app.element('copy-status').hidden, false);
+  app.events.keydown({ key: 'c', metaKey: true, preventDefault() {} });
+  await new Promise(setImmediate);
+  assert.equal(app.calls.filter(([name]) => name === 'clipboard-text').length, 2);
+  app.expireCopy();
+  assert.equal(app.element('copy-status').hidden, true);
+  app.element('edit').listeners.click();
+  let prevented = false;
+  app.events.keydown({ key: 'c', ctrlKey: true, preventDefault() { prevented = true; } });
+  assert.equal(prevented, false);
+  assert.equal(app.calls.filter(([name]) => name === 'clipboard-text').length, 2);
+});
+
+test('capture copy invokes native image writing without fetching a data URL', async () => {
+  const app = await setup();
+  app.update({ capture: { width: 100, height: 50 } });
+  await app.refresh();
+  await app.element('copy').listeners.click();
+  assert.equal(app.calls.filter(([name]) => name === 'copy_note_image').length, 1);
+  assert.equal(app.calls.some(([name]) => name === 'clipboard-text'), false);
+  assert.equal(app.element('copy-status').hidden, false);
+});
+
+test('failed clipboard write reports the error without showing success feedback', async () => {
+  const app = await setup();
+  app.element('copy-status').hidden = true;
+  app.failCopy('클립보드 실패');
+  await app.element('copy').listeners.click();
+  assert.equal(app.element('copy-status').hidden, true);
+  assert.equal(app.element('copy').dataset.copied, undefined);
+  assert.equal(app.element('error').textContent, '클립보드 실패');
 });
