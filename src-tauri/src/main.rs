@@ -543,6 +543,8 @@ fn parse(args: &[String]) -> Result<Request, String> {
 }
 fn cli(args: &[String]) -> Result<Value, String> {
     let request = parse(args)?;
+    // Report invalid local IPC configuration before auto-launch/retry can hide it.
+    ipc::directory()?;
     let stream = match ipc::connect() {
         Ok(stream) => stream,
         Err(_) if matches!(request.action, Action::Open) => {
