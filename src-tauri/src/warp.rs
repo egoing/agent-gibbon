@@ -172,6 +172,11 @@ pub fn poll_native(window: &tauri::WebviewWindow) -> Result<(), String> {
 }
 
 fn poll(window: &tauri::WebviewWindow, state: &Warps) -> Result<bool, String> {
+    // Frozen selection must not move or hide notes behind the overlay. Folding
+    // already pauses during capture; apply the same rule to warp and close.
+    if crate::capture::active(window.app_handle()) {
+        return Ok(false);
+    }
     #[cfg(target_os = "macos")]
     let alt = objc2_app_kit::NSEvent::modifierFlags_class()
         .contains(objc2_app_kit::NSEventModifierFlags::Option);

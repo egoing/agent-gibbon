@@ -71,7 +71,9 @@ fn set_image_ratio(window: &WebviewWindow, size: Option<LogicalSize<f64>>) -> Re
         ratio.height = size.map_or(0.0, |s| s.height);
         native.setContentAspectRatio(ratio);
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    crate::windows_window::set_image_ratio(window, size)?;
+    #[cfg(not(any(target_os = "macos", windows)))]
     let _ = (window, size);
     Ok(())
 }

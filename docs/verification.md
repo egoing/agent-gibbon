@@ -1,5 +1,20 @@
 # Floatnote 검증 기록
 
+## 2026-10-26 최신 main 병합 후 Windows 호환성 회귀
+
+- 이전 Windows 통합 검증 기준은 `a3eda85`이며 직전 기록 커밋은 `a14c04c`였다. 작업 트리가 깨끗한 상태에서 `git pull --ff-only origin main`을 실행했으나 로컬 Windows 수정과 main이 분기되어 fast-forward는 실패했다. 가져온 main `ca62089`를 병합하고 README·main·sizing·warp·편집 UI/테스트의 충돌을 해결하여 `1b10bf5`로 커밋했다. 기존 Windows 수정 커밋을 재작성하지 않았다.
+- 가져온 기능은 영역 캡처 이미지 메모·영역 지정 빈 편집기, 직접 편집 후 변경 표시 정리, 접힌 메모 전체 클릭 펼치기, 비포커스 상태의 실제 외부→내부 보조키 진입 조건, macOS Dock 아이콘·종료 메뉴다. Node 20.11.0/npm 10.2.4, Rust/Cargo 1.99.1 MSVC, Python 3.10.11 환경에서 검증했다.
+- 새 Contact 규칙을 Windows 네이티브 확인 경로와 통합했다. 내부에서 키 누르기·해제/재누름·포커스 상실은 동작하지 않으며, 비포커스 상태에서 실제 포인터 재진입이 필요하다. 포커스된 메모의 모든 접촉 단축키를 억제하되 화면 버튼은 작동한다. 캡처 중에는 접기뿐 아니라 워프·접촉 숨기기도 멈추며 선택 오버레이에는 메모 반투명도를 적용하지 않는다.
+- 실제 Ctrl+Shift+1/Escape는 처음부터 통과했으나 영역 선택 뒤 새 WebView 생성에서 앱이 멈추는 Windows 교착을 재현했다. Tauri 공식 `WebviewWindowBuilder`의 동기 명령 경고를 확인하고 `finish_capture`를 비동기 명령으로 바꿨다. WebView IPC 콜백을 벗어난 후 전체 완료 작업을 메인 스레드에 큐잉하고 채널로 결과를 기다린다. AppKit 및 Windows HWND subclass의 소유 스레드 조건을 유지한다.
+- 재검증에서 캡처 PNG의 선택 크기와 중앙·모서리 원본 흰 픽셀, Ctrl+Shift+2 자동 빈 편집기·한글 Ctrl+S 저장, 접힌 메모 본문 클릭 펼치기가 통과했다. 테스트는 별도 PID의 불투명한 단색 창 내부만 선택하며 클립보드를 사용하지 않는다. 첫 교착 테스트의 잔여 이미지 파일 2개와 빈 폴더는 앱 종료 후 정확한 생성 ID로 비재귀 정리했다. 기존 `white-screen-check`는 변경하지 않았다.
+- 이미지 비율 고정은 가져온 main에서 macOS만 구현되어 있었다. Windows에서는 기존 HWND subclass의 `WM_SIZING`에서 실제 클라이언트 비율을 보정했다. 8방향의 반대편 앵커·최소 2DIP·텍스트 메모 비영향·접기 때 제약 해제/펼치기 복구를 숨김 HWND의 실제 메시지로 검증했다.
+- 실제 테스트에서 캡처 메모가 `440×260` 대신 `440×297`로 생성되는 Windows 프레임 계산 차이도 재현했다. Tauri의 숨김 창 크기 계산을 그대로 사용하지 않고 현재 클라이언트/외곽 영역을 측정하여 네이티브 크기를 적용하고 표시 때 보존한다. 이어서 오버레이의 클라이언트 원점이 모니터에서 `(+9,+1)` 어긋나 저장 원점도 밀리는 문제를 확인했다. 선택 오버레이와 생성 이미지·빈 메모의 클라이언트 사각형을 물리 화면 좌표에 맞추고 제한된 횟수로 재확인한다. 캡처 메모의 재열기는 원본 캡처 위치로 되돌리지 않고 사용자의 현재 위치·크기를 보존한다.
+- 최종 `python scripts/windows-capture-smoke.py --interact`: 단일 모니터 125% DPI에서 선택 창 client `(0,0,1920,1080)`, 생성 메모 client `(740,410,440,260)`, 저장 원점 `(740,410)` 일치. 단색 검증의 좌표 식별 한계를 보완한 비대칭 흑백 패턴으로 PNG 6,165픽셀의 원본 색·alpha·좌표·배율을 비교하여 불일치 0개를 확인했다. 실제 이미지 드래그 `440×260 → 340×201`, 접기·펼치기 후 `240×142`로 비율을 유지했다. Escape 후 이전 fixture 포커스 복원, 이미지 생성의 포커스 유지, 빈 편집기·한글 저장·접힌 본문 클릭도 통과했다. 두 번째 드래그는 펼침 응답 뒤 접근성의 접기 버튼이 나타나 리사이즈 UI가 갱신될 때까지 기다린다.
+- 기존 실제 편집/연결 원본 한글 저장/수동 크기 보존, 네이티브 alpha/포커스/반복 숨김·재열기, 새 접촉 규칙 전체 회귀와 CLI/저장/재시작 검증이 통과했다. 접촉 검사에서 UIA Invoke 뒤 즉시 결과를 읽는 불안정성을 확인해 자기 HWND의 접근성 이름·영역을 조회한 실제 클릭과 제한 시간 내 네이티브 상태 확인으로 보완했다.
+- 최종 자동 검사: Rust 74개, UI 37개 통과/Windows POSIX fixture 1개 생략. Clippy 모든 target 경고 금지, Rustfmt, 버전 `0.2.7` 정합성, diff 검사, 개발 빌드, Windows x64 NSIS 빌드 통과. 설치 파일은 `src-tauri/target/release/bundle/nsis/Agent Gibbon_0.2.7_x64-setup.exe`(약 2.82MiB)다. 기존 설치 앱 PID 25956과 사용자 메모는 변경하지 않았으며 새 설치 파일을 설치하거나 태그·릴리스를 공개하지 않았다.
+- 한계: Windows 10/ARM64, 실제 다중 모니터·혼합 DPI, 관리자/보안 데스크톱, macOS 실행은 검증하지 않았다. 새 종료 메뉴의 실제 클릭과 macOS Dock 표시, 캡처 메모를 프로세스 재시작한 뒤 최초로 다시 표시하는 UI 흐름은 미검증이다. 일반 텍스트 메모의 CLI 재시작 복원은 통과했다.
+- 참고: [Tauri Windows 동기 명령의 WebView 생성 제한](https://docs.rs/tauri/latest/tauri/webview/struct.WebviewWindowBuilder.html), [WM_SIZING](https://learn.microsoft.com/en-us/windows/win32/winmsg/wm-sizing), [GetWindowRect](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getwindowrect).
+
 ## 2026-10-26 설치 앱 흰 화면 확인과 복구
 
 - 사용자 화면에서 흰 메모 창이 보인다는 보고를 받았다. 최초 조회 시 실행 중인 앱은 이전 설치 검증 경로 `C:\Users\egoin\AppData\Local\AgentGibbonValidation-20261026\agent-gibbon.exe`였고 최신 `a3eda85` release 파일과 해시가 달랐다. 다음 화면 조회 전에 기존 프로세스가 종료되어 원래 흰 화면의 WebView 상태와 정확한 원인은 확인하지 못했다.

@@ -286,6 +286,36 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
         #[cfg(not(target_os = "macos"))]
         overlay.set_focus().map_err(err)?;
     }
+    #[cfg(windows)]
+    {
+        // Complete show/focus frame recalculation before aligning each WebView
+        // viewport to its source monitor. Native outer borders must not shift
+        // the CSS selection coordinates relative to the captured pixels.
+        let screens = app
+            .state::<Captures>()
+            .0
+            .lock()
+            .map_err(err)?
+            .iter()
+            .map(|(label, s)| {
+                (
+                    label.clone(),
+                    s.bounds.x,
+                    s.bounds.y,
+                    s.image.width(),
+                    s.image.height(),
+                )
+            })
+            .collect::<Vec<_>>();
+        for (label, x, y, width, height) in screens {
+            let overlay = app.get_webview_window(&label).ok_or("캡처 창이 없습니다")?;
+            crate::windows_window::set_client_rect(
+                &overlay,
+                tauri::PhysicalPosition::new(x.round() as i32, y.round() as i32),
+                tauri::PhysicalSize::new(width, height),
+            )?;
+        }
+    }
     Ok(())
 }
 #[tauri::command]
@@ -341,7 +371,30 @@ fn crop_rect(
     Ok((left, top, right - left, bottom - top))
 }
 #[tauri::command]
-pub fn finish_capture(
+pub async fn finish_capture(
+    window: WebviewWindow,
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+) -> Result<(), String> {
+    // Windows WebView2 cannot construct another WebView inside its synchronous
+    // IPC callback. An async command first leaves that callback, then queues the
+    // entire native operation on the HWND owner thread (also required by AppKit
+    // and SetWindowSubclass). Await an async channel without blocking that thread.
+    let app = window.app_handle().clone();
+    let (result, mut receiver) = tauri::async_runtime::channel(1);
+    app.run_on_main_thread(move || {
+        let _ = result.try_send(finish_capture_on_main(window, x, y, width, height));
+    })
+    .map_err(err)?;
+    receiver
+        .recv()
+        .await
+        .ok_or_else(|| "영역 선택 완료 응답이 종료되었습니다".to_string())?
+}
+
+fn finish_capture_on_main(
     window: WebviewWindow,
     x: f64,
     y: f64,
@@ -389,6 +442,16 @@ pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
         .map_err(err)?;
     crate::sizing::constrain_image(win, bounds.width, bounds.height)?;
     set_position(win, bounds.x, bounds.y)?;
+    #[cfg(windows)]
+    {
+        let scale = win.scale_factor().map_err(err)?;
+        crate::windows_window::set_client_rect(
+            win,
+            tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
+            tauri::LogicalSize::new(bounds.width, bounds.height).to_physical::<u32>(scale),
+        )
+    }
+    #[cfg(not(windows))]
     win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
         .map_err(err)
 }
@@ -420,8 +483,19 @@ fn create_text_note(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), Str
     win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
         .map_err(err)?;
     set_position(&win, bounds.x, bounds.y)?;
+    #[cfg(windows)]
+    crate::windows_window::set_client_rect(
+        &win,
+        tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
+        tauri::LogicalSize::new(bounds.width, bounds.height)
+            .to_physical::<u32>(win.scale_factor().map_err(err)?),
+    )?;
+    #[cfg(not(windows))]
     win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
         .map_err(err)?;
+    #[cfg(windows)]
+    crate::show_without_focus(&win)?;
+    #[cfg(not(windows))]
     win.show().map_err(err)?;
     win.set_focus().map_err(err)?;
     crate::tray::refresh(app)
