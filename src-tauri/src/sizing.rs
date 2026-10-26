@@ -9,6 +9,7 @@ struct SizeState {
     contact: crate::warp::Contact,
     placed: bool,
     pending: bool,
+    presentation: crate::entrance::Presentation,
 }
 #[derive(Default)]
 pub struct Sizes(Mutex<BTreeMap<String, SizeState>>);
@@ -44,15 +45,15 @@ fn set_image_ratio(window: &WebviewWindow, size: Option<LogicalSize<f64>>) -> Re
     Ok(())
 }
 
-pub fn prepare(window: &WebviewWindow) -> Result<(), String> {
-    window
-        .state::<Sizes>()
-        .0
-        .lock()
-        .map_err(|e| e.to_string())?
-        .entry(window.label().into())
-        .or_default()
-        .pending = true;
+pub fn prepare(
+    window: &WebviewWindow,
+    presentation: crate::entrance::Presentation,
+) -> Result<(), String> {
+    let sizes = window.state::<Sizes>();
+    let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
+    let state = states.entry(window.label().into()).or_default();
+    state.pending = true;
+    state.presentation = presentation;
     Ok(())
 }
 pub fn cancel(window: &WebviewWindow) {
@@ -124,18 +125,20 @@ pub fn fit_note(
         if state.pending {
             let next = window.clone();
             std::thread::spawn(move || {
-                // Let native move/resize notifications settle before showing beside the cursor.
+                // Let native move/resize notifications settle before the first show.
                 std::thread::sleep(std::time::Duration::from_millis(20));
                 let app = next.app_handle().clone();
                 let _ = app.run_on_main_thread(move || {
                     let should_show = if let Ok(mut states) = next.state::<Sizes>().0.lock() {
                         let state = states.entry(next.label().into()).or_default();
-                        std::mem::take(&mut state.pending)
+                        std::mem::take(&mut state.pending).then_some(state.presentation)
                     } else {
-                        false
+                        None
                     };
-                    if should_show {
-                        if let Err(error) = crate::entrance::show(&next, Some(destination)) {
+                    if let Some(presentation) = should_show {
+                        if let Err(error) =
+                            crate::entrance::show(&next, Some(destination), presentation)
+                        {
                             eprintln!("패널 표시 실패: {error}");
                         }
                     }
