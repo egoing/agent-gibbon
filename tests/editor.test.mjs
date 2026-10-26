@@ -16,6 +16,7 @@ async function setup(storage = new Map(), instance = {}) {
   };
   const styles = {};
   const events = {};
+  const nativeEvents = {};
   const timers = [];
   const pointers = {};
   const calls = [];
@@ -37,6 +38,7 @@ async function setup(storage = new Map(), instance = {}) {
       documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener(type, listener) { pointers[type] = listener; } },
     },
     window: { __TAURI__: {
+      event: { async listen(name, handler) { nativeEvents[name] = handler; return () => {}; } },
       core: { async invoke(command, args) {
         calls.push([command, args]);
         if (command === 'poll_fold') return folded;
@@ -60,7 +62,7 @@ async function setup(storage = new Map(), instance = {}) {
   });
   vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace("import { themeFor } from './theme.mjs';", ''), context);
   await new Promise(setImmediate);
-  return { element, styles, events, calls, pointers, classes,
+  return { element, styles, events, calls, pointers, classes, nativeEvents,
     fold: value => { folded = value; },
     pollFold: () => timers.find(fn => fn.name === 'pollFold')(), highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
     pollWarp: () => timers.find(fn => fn.name === 'pollWarp')(),
@@ -256,4 +258,15 @@ test('development labels and tip preferences stay separate from installed notes'
   assert.equal(storage.has('floatnote.warp-tip-dismissed'), false);
   assert.equal(storage.has('floatnote.warp-tip-dismissed:dev-b'), false);
   assert.equal(b.element('dev-instance').textContent, 'DEV same · bbbbbbbb');
+});
+
+test('native rollover updates chrome without a DOM click or pointer event', async () => {
+  const app = await setup();
+  const html = app.element('content').innerHTML;
+  app.nativeEvents['note-pointer-over']({ payload: true });
+  assert.equal(app.classes.has('pointer-over'), true);
+  app.nativeEvents['note-pointer-over']({ payload: false });
+  assert.equal(app.classes.has('pointer-over'), false);
+  assert.equal(app.element('content').innerHTML, html);
+  assert.equal(app.calls.some(([name]) => name === 'drag_note'), false);
 });

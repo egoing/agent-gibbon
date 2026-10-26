@@ -83,6 +83,7 @@ impl Request {
 
 #[derive(Clone, Serialize)]
 pub struct Note {
+    pub capture: Option<crate::capture::ImageNote>,
     pub title: String,
     pub color: String,
     pub html: String,
@@ -97,6 +98,7 @@ pub struct Note {
 impl Default for Note {
     fn default() -> Self {
         Self {
+            capture: None,
             title: "Agent Gibbon".into(),
             color: "#20252e".into(),
             html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),

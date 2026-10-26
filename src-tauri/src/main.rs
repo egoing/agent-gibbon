@@ -1,3 +1,4 @@
+mod capture;
 mod entrance;
 mod feedback;
 mod focus;
@@ -24,9 +25,10 @@ use std::{
     sync::{mpsc, Mutex},
     time::{Duration, Instant},
 };
-use tauri::{Manager, State};
+use tauri::{Emitter, Manager, State};
 
 type AppNotes = Mutex<BTreeMap<String, Note>>;
+type PointerStates = Mutex<BTreeMap<String, bool>>;
 fn label(id: &str) -> String {
     if id == "main" {
         "main".into()
@@ -173,19 +175,40 @@ fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
         tray::sync_visibility(win.app_handle())
     }
 }
+fn pointer_over(window: &tauri::WebviewWindow) -> Result<bool, String> {
+    if !window.is_visible().map_err(|e| e.to_string())? {
+        return Ok(false);
+    }
+    let cursor = window.cursor_position().map_err(|e| e.to_string())?;
+    let p = window.outer_position().map_err(|e| e.to_string())?;
+    let size = window.outer_size().map_err(|e| e.to_string())?;
+    Ok(cursor.x >= f64::from(p.x)
+        && cursor.y >= f64::from(p.y)
+        && cursor.x < f64::from(p.x) + f64::from(size.width)
+        && cursor.y < f64::from(p.y) + f64::from(size.height))
+}
+fn sync_pointer(window: &tauri::WebviewWindow) -> Result<bool, String> {
+    let hovered = pointer_over(window)?;
+    let changed = window
+        .state::<PointerStates>()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .insert(window.label().into(), hovered)
+        != Some(hovered);
+    if changed {
+        window
+            .emit("note-pointer-over", hovered)
+            .map_err(|e| e.to_string())?;
+    }
+    Ok(hovered)
+}
 // Native alpha blends the entire window, including its background and controls.
 // Called by synchronous commands and the IPC main-thread handler only.
 #[tauri::command]
 fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
+    let hovered = sync_pointer(&window)?;
     #[cfg(target_os = "macos")]
     {
-        let cursor = window.cursor_position().map_err(|e| e.to_string())?;
-        let p = window.outer_position().map_err(|e| e.to_string())?;
-        let size = window.outer_size().map_err(|e| e.to_string())?;
-        let hovered = cursor.x >= f64::from(p.x)
-            && cursor.y >= f64::from(p.y)
-            && cursor.x < f64::from(p.x) + f64::from(size.width)
-            && cursor.y < f64::from(p.y) + f64::from(size.height);
         let alpha = if hovered || entrance::active(&window) || feedback::active(&window) {
             1.0
         } else if sizing::folded(&window) {
@@ -205,7 +228,7 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
     }
     #[cfg(not(target_os = "macos"))]
     {
-        let _ = window;
+        let _ = (window, hovered);
         Ok(1.0)
     }
 }
@@ -215,7 +238,7 @@ fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<V
     let position = win.outer_position().map_err(|e| e.to_string())?;
     let size = win.outer_size().map_err(|e| e.to_string())?;
     Ok(
-        json!({"ok":true,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"folded": sizing::folded(win), "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        json!({"ok":true,"hovered":pointer_over(win)?,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"folded": sizing::folded(win), "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     )
 }
 #[tauri::command]
@@ -315,6 +338,8 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
         Action::Open => {
             if existing.as_ref().is_none_or(|note| note.revision == 0) {
                 sizing::prepare(&win)?;
+            } else if next.capture.is_some() {
+                show_without_focus(&win)?;
             } else {
                 entrance::show(&win, None)?;
             }
@@ -352,6 +377,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     let builder = builder.activate_ignoring_other_apps(false);
     let app = builder
         .plugin(tauri_plugin_clipboard_manager::init())
+        .manage(capture::Captures::default())
+        .manage(PointerStates::default())
         .manage(initial_focus)
         .manage(warp::Warps::default())
         .manage(feedback::Feedbacks::default())
@@ -363,6 +390,12 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         )])))
         .invoke_handler(tauri::generate_handler![
             snapshot,
+            capture::capture_screen,
+            capture::capture_ready,
+            capture::capture_failed,
+            capture::finish_capture,
+            capture::cancel_capture,
+            capture::note_image,
             telemetry::report_frontend_error,
             entrance::drag_note,
             hide_note,
@@ -378,6 +411,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::manual_resize
         ])
         .on_window_event(|win, event| {
+            if win.label().starts_with("capture-") {
+                return;
+            }
             #[cfg(target_os = "macos")]
             if let tauri::WindowEvent::Resized(_) = event {
                 if let Some(webview) = win.app_handle().get_webview_window(win.label()) {
@@ -424,9 +460,19 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 .extend(restored);
             app.manage(store);
             for id in ids {
-                create_window(app.handle(), &id)?;
+                let win = create_window(app.handle(), &id)?;
+                let capture = app
+                    .state::<AppNotes>()
+                    .lock()
+                    .map_err(|e| e.to_string())?
+                    .get(&id)
+                    .and_then(|n| n.capture.clone());
+                if let Some(bounds) = capture {
+                    capture::place(&win, &bounds)?;
+                }
             }
             tray::install(app.handle())?;
+            capture::install(app.handle())?;
             #[cfg(target_os = "macos")]
             sizing::install_contact_monitor(app.handle());
             if initial_open {

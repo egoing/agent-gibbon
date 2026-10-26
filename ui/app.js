@@ -16,7 +16,7 @@ let needsFit = true;
 let fitting = false;
 let folded = false;
 async function fitContent() {
-  if (!needsFit || fitting || editing || folded) return;
+  if (latestNote?.capture || !needsFit || fitting || editing || folded) return;
   fitting = true;
   // Measure natural flow independently of the current window height.
   const measure = $('viewport').cloneNode(true);
@@ -100,12 +100,16 @@ async function refresh() {
   try {
     const state = await invoke('snapshot');
     latestNote = state.note;
+    document.body.classList.toggle('pointer-over', !!state.hovered);
     $('dev-instance').hidden = !state.dev_label;
     $('dev-instance').textContent = state.dev_label || '';
     warpTipKey = state.instance ? `floatnote.warp-tip-dismissed:${state.instance}` : 'floatnote.warp-tip-dismissed';
     $('fold-title').textContent = state.dev_label ? `[${state.dev_label}] ${state.note.title}` : state.note.title;
     $('fold-title').title = state.note.title;
-    $('edit').disabled = editing;
+    $('edit').disabled = editing || !!state.note.capture;
+    $('font-size').disabled = !!state.note.capture;
+    $('copy').disabled = !!state.note.capture;
+    document.body.classList.toggle('image-note', !!state.note.capture);
     if (revision !== state.note.revision) {
       const theme = themeFor(state.note.color);
       document.documentElement.style.setProperty('--background', state.note.color);
@@ -123,6 +127,12 @@ async function refresh() {
     const html = highlightRevision !== null ? state.note.change_html : state.note.html;
     if (displayedHtml !== html) {
       $('content').innerHTML = html;
+      if (state.note.capture) {
+        const img = document.createElement('img');
+        img.alt = '화면 캡처'; img.draggable = false;
+        img.src = await invoke('note_image');
+        $('content').replaceChildren(img);
+      }
       displayedHtml = html;
     }
     $('pin').setAttribute('aria-pressed', String(state.always_on_top));
@@ -171,6 +181,10 @@ $('copy').addEventListener('click', async () => {
   } catch (error) { failure(error); }
 });
 $('content').addEventListener('click', (event) => { if (event.target.closest('a')) event.preventDefault(); });
+// Native movement arrives even when WKWebView belongs to a background app.
+window.__TAURI__.event.listen('note-pointer-over', ({ payload }) => {
+  document.body.classList.toggle('pointer-over', payload);
+}).catch(failure);
 refresh();
 
 async function acknowledgeFeedback() {

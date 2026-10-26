@@ -26,11 +26,13 @@ async function setup(storage = new Map()) {
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
     themeFor, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
+      body: { classList: { toggle() {} } },
       getElementById: element, querySelectorAll: () => [],
       addEventListener(type, listener) { events[type] = listener; },
       documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener() {} },
     },
     window: { __TAURI__: {
+      event: { async listen() { return () => {}; } },
       core: { async invoke(command, args) {
         calls.push([command, args]);
         if (command === 'warp_note' && warpError) throw warpError;

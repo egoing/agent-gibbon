@@ -19,6 +19,8 @@ fn entry_type_is_directory(path: &Path) -> Result<bool, String> {
 pub struct Store(pub PathBuf);
 #[derive(Serialize, Deserialize)]
 struct Metadata {
+    #[serde(default)]
+    capture: Option<crate::capture::ImageNote>,
     title: String,
     color: String,
     status: String,
@@ -84,6 +86,7 @@ impl Store {
             builder.mode(0o700);
             builder.create(path.parent().ok_or("메모 폴더가 없습니다")?)?;
             let meta = Metadata {
+                capture: note.capture.clone(),
                 title: note.title.clone(),
                 color: note.color.clone(),
                 status: note.status.clone(),
@@ -229,6 +232,7 @@ impl Store {
             source_path: meta.source_path,
             markdown: Some(markdown.into()),
         })?;
+        note.capture = meta.capture;
         note.updated_at = meta.updated_at;
         note.revision = meta.revision.max(1);
         Ok((id, note))
@@ -290,6 +294,25 @@ mod tests {
         migrated.migrate_from(&legacy).unwrap();
         assert_eq!(migrated.load().unwrap()["Ab"].markdown, "");
         assert!(legacy.join("4162.md").exists());
+        note.capture = Some(crate::capture::ImageNote {
+            x: -200.0,
+            y: 50.0,
+            width: 320.0,
+            height: 180.0,
+        });
+        store.save("image", &note).unwrap();
+        let image = store
+            .load()
+            .unwrap()
+            .remove("image")
+            .unwrap()
+            .capture
+            .unwrap();
+        assert_eq!(
+            (image.x, image.y, image.width, image.height),
+            (-200.0, 50.0, 320.0, 180.0)
+        );
+        fs::remove_file(store.path("image")).unwrap();
         let loaded = store.load().unwrap();
         assert_eq!(loaded.len(), 2);
         assert!(loaded["Ab"].markdown.starts_with("# 한글"));

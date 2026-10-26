@@ -4,6 +4,7 @@ use tauri::{LogicalSize, Manager, State, WebviewWindow};
 #[derive(Default)]
 struct SizeState {
     manual: bool,
+    image_size: Option<LogicalSize<f64>>,
     expanded: Option<LogicalSize<f64>>,
     contact: crate::warp::Contact,
     placed: bool,
@@ -11,6 +12,37 @@ struct SizeState {
 }
 #[derive(Default)]
 pub struct Sizes(Mutex<BTreeMap<String, SizeState>>);
+
+// The native constraint applies during live dragging, without resize-event corrections.
+pub fn constrain_image(window: &WebviewWindow, width: f64, height: f64) -> Result<(), String> {
+    let size = LogicalSize::new(width, height);
+    set_image_ratio(window, Some(size))?;
+    window
+        .state::<Sizes>()
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .entry(window.label().into())
+        .or_default()
+        .image_size = Some(size);
+    Ok(())
+}
+
+fn set_image_ratio(window: &WebviewWindow, size: Option<LogicalSize<f64>>) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let ptr = window.ns_window().map_err(|e| e.to_string())?;
+        // SAFETY: creation and synchronous fold commands execute on the main thread.
+        let native = unsafe { &*(ptr as *const objc2_app_kit::NSWindow) };
+        let mut ratio = native.contentAspectRatio();
+        ratio.width = size.map_or(0.0, |s| s.width);
+        ratio.height = size.map_or(0.0, |s| s.height);
+        native.setContentAspectRatio(ratio);
+    }
+    #[cfg(not(target_os = "macos"))]
+    let _ = (window, size);
+    Ok(())
+}
 
 pub fn prepare(window: &WebviewWindow) -> Result<(), String> {
     window
@@ -147,16 +179,29 @@ fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
     if let Some(size) = state.expanded {
         window.set_size(size).map_err(|e| e.to_string())?;
         window
-            .set_min_size(Some(LogicalSize::new(144.0, 32.0)))
+            .set_min_size(Some(if state.image_size.is_some() {
+                LogicalSize::new(2.0, 2.0)
+            } else {
+                LogicalSize::new(144.0, 32.0)
+            }))
             .map_err(|e| e.to_string())?;
+        set_image_ratio(window, state.image_size)?;
         state.expanded = None;
     } else {
         let size = window
             .inner_size()
             .map_err(|e| e.to_string())?
             .to_logical::<f64>(window.scale_factor().map_err(|e| e.to_string())?);
+        set_image_ratio(window, None)?;
         window
-            .set_min_size(Some(LogicalSize::new(144.0, 12.0)))
+            .set_min_size(Some(LogicalSize::new(
+                if state.image_size.is_some() {
+                    2.0
+                } else {
+                    144.0
+                },
+                12.0,
+            )))
             .map_err(|e| e.to_string())?;
         window
             .set_size(LogicalSize::new(size.width, 12.0))
@@ -189,6 +234,9 @@ pub fn toggle_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, S
 
 #[tauri::command]
 pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, String> {
+    if crate::capture::active(window.app_handle()) {
+        return Ok(folded(&window));
+    }
     #[cfg(target_os = "macos")]
     let control = objc2_app_kit::NSEvent::modifierFlags_class()
         .contains(objc2_app_kit::NSEventModifierFlags::Control)
@@ -266,9 +314,15 @@ pub fn install_contact_monitor(app: &tauri::AppHandle) {
     }
     thread_local! { static MONITORS: RefCell<Vec<Monitor>> = const { RefCell::new(Vec::new()) }; }
     fn sample(app: &tauri::AppHandle) {
+        if crate::capture::active(app) {
+            return;
+        }
         for window in app.webview_windows().into_values() {
             if let Err(error) = poll_fold(window.clone(), window.state::<Sizes>()) {
                 eprintln!("접촉 감지 실패: {error}");
+            }
+            if let Err(error) = crate::sync_opacity(window) {
+                eprintln!("롤오버 표시 실패: {error}");
             }
         }
     }
