@@ -59,6 +59,13 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
                 .map_err(|e| e.to_string())?;
         menu.append(&item).map_err(|e| e.to_string())?;
     }
+    menu.append(&PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?)
+        .map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(app, "quit-app", "Agent Gibbon 종료", true, None::<&str>)
+            .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
     Ok(menu)
 }
 
@@ -122,6 +129,10 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
         .menu(&initial_menu)
         .show_menu_on_left_click(true)
         .on_menu_event(|app, event| {
+            if event.id.as_ref() == "quit-app" {
+                app.exit(0);
+                return;
+            }
             let result = if event.id.as_ref() == "capture-image" {
                 crate::capture::trigger(app);
                 Ok(())
