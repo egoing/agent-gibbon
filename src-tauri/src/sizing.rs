@@ -31,8 +31,8 @@ pub fn cancel(window: &WebviewWindow) {
     }
 }
 
-// macOS may handle the native resize border before the WebView's grip handler.
-// Record only live user resizing, never programmatic fit/fold/placement changes.
+// Native resize borders can handle input before the WebView's grip handler.
+// Record user resizing only, never programmatic fit/fold/placement changes.
 #[cfg(target_os = "macos")]
 pub fn native_resize(window: &WebviewWindow) -> Result<(), String> {
     let ptr = window.ns_window().map_err(|e| e.to_string())?;
@@ -40,6 +40,30 @@ pub fn native_resize(window: &WebviewWindow) -> Result<(), String> {
     let live = unsafe { (&*(ptr as *const objc2_app_kit::NSWindow)).inLiveResize() };
     if live {
         manual_resize(window.clone(), window.state::<Sizes>())?;
+    }
+    Ok(())
+}
+
+#[cfg(windows)]
+pub fn native_resize(window: &WebviewWindow) -> Result<(), String> {
+    let sizes = window.state::<Sizes>();
+    // Programmatic set_size can synchronously reenter Resized while fit/fold
+    // owns this lock. Leave the native signal for the next event/fit/frame.
+    let Ok(mut states) = sizes.0.try_lock() else {
+        return Ok(());
+    };
+    if !crate::windows_window::take_native_resize(window)? {
+        return Ok(());
+    }
+    let state = states.entry(window.label().into()).or_default();
+    let folded = state.expanded.is_some();
+    if !folded {
+        state.manual = true;
+    }
+    drop(states);
+    crate::entrance::cancel(window)?;
+    if folded {
+        return Err("접힌 메모는 펼친 뒤 크기를 조절하세요".into());
     }
     Ok(())
 }
@@ -63,6 +87,9 @@ pub fn fit_note(
     width: f64,
     height: f64,
 ) -> Result<bool, String> {
+    // Consume a user drag before a queued WebView fit can restore automatic size.
+    #[cfg(windows)]
+    native_resize(&window)?;
     if !width.is_finite() || !height.is_finite() {
         return Err("유효하지 않은 패널 크기입니다".into());
     }

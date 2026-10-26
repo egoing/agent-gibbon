@@ -55,7 +55,10 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
     // Restored notes stay hidden; do not retain their startup foreground target
     // until a much later open. Protect WebView construction itself as well.
     #[cfg(windows)]
-    focus::restore(&window);
+    {
+        windows_window::install_resize_observer(&window)?;
+        focus::restore(&window);
+    }
     Ok(window)
 }
 // Window APIs and monitor work areas use physical pixels. Convert the new
@@ -71,6 +74,18 @@ fn place_new_window(
         .finish();
     let size = win.outer_size().map_err(|e| e.to_string())?;
     let scale = win.scale_factor().map_err(|e| e.to_string())?;
+    #[cfg(windows)]
+    let requested_size = {
+        // Requested fit dimensions describe the WebView, while placement and
+        // Destination reserve the entire HWND including its native resize frame.
+        let inner = win.inner_size().map_err(|e| e.to_string())?;
+        requested_size.map(|requested| {
+            tauri::LogicalSize::new(
+                requested.width + f64::from(size.width.saturating_sub(inner.width)) / scale,
+                requested.height + f64::from(size.height.saturating_sub(inner.height)) / scale,
+            )
+        })
+    };
     let mut occupied = Vec::new();
     for other in app.webview_windows().values() {
         if other.label() == win.label() || !other.is_visible().map_err(|e| e.to_string())? {
@@ -128,11 +143,11 @@ fn place_new_window(
         if let Some(rect) = placement::find_space(area, target, random, &occupied, gap) {
             win.set_position(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32))
                 .map_err(|e| e.to_string())?;
-            win.set_size(tauri::PhysicalSize::new(
-                rect.width as u32,
-                rect.height as u32,
-            ))
-            .map_err(|e| e.to_string())?;
+            let size = tauri::PhysicalSize::new(rect.width as u32, rect.height as u32);
+            #[cfg(windows)]
+            windows_window::set_outer_size(win, size)?;
+            #[cfg(not(windows))]
+            win.set_size(size).map_err(|e| e.to_string())?;
             warp::remember(app, win, rect.y, work.position.y, monitor.scale_factor())?;
             return Ok(entrance::Destination {
                 position: tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32),
@@ -144,11 +159,11 @@ fn place_new_window(
     if let Some((_, rect, work_y, scale)) = fallback {
         win.set_position(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32))
             .map_err(|e| e.to_string())?;
-        win.set_size(tauri::PhysicalSize::new(
-            rect.width as u32,
-            rect.height as u32,
-        ))
-        .map_err(|e| e.to_string())?;
+        let size = tauri::PhysicalSize::new(rect.width as u32, rect.height as u32);
+        #[cfg(windows)]
+        windows_window::set_outer_size(win, size)?;
+        #[cfg(not(windows))]
+        win.set_size(size).map_err(|e| e.to_string())?;
         warp::remember(app, win, rect.y, work_y, scale)?;
         return Ok(entrance::Destination {
             position: tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32),
@@ -399,7 +414,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::manual_resize
         ])
         .on_window_event(|win, event| {
-            #[cfg(target_os = "macos")]
+            #[cfg(any(target_os = "macos", windows))]
             if let tauri::WindowEvent::Resized(_) = event {
                 if let Some(webview) = win.app_handle().get_webview_window(win.label()) {
                     if let Err(error) = sizing::native_resize(&webview) {
@@ -422,6 +437,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             if let Some(win) = app.get_webview_window("main") {
+                #[cfg(windows)]
+                windows_window::install_resize_observer(&win)?;
                 win.set_title(&format!("{} — main", instance::current().title()))?;
             }
             let instance = instance::current().id.as_deref();

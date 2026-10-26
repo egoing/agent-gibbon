@@ -334,6 +334,9 @@ pub fn show(window: &WebviewWindow, destination: Option<Destination>) -> Result<
     Ok(())
 }
 fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, String> {
+    // A native border drag must take ownership before the next animation frame.
+    #[cfg(windows)]
+    crate::sizing::native_resize(window)?;
     let state = window.state::<Entrances>();
     let mut flights = state.0.lock().map_err(|e| e.to_string())?;
     if flights
