@@ -407,6 +407,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             let store = storage::Store::new(root, instance);
             store.migrate_from(&data_dir.join("notes").join(instance.unwrap_or("default")))?;
             let restored = store.load()?;
+            app.state::<feedback::Feedbacks>().restore(&restored)?;
             let ids: Vec<_> = restored
                 .keys()
                 .filter(|id| id.as_str() != "main")

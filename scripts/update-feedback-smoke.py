@@ -131,7 +131,7 @@ if args[1] == "pointer" {
         event_access = native('input-access') == 'true'
         if all(abs(actual - expected) < 2 for actual, expected in zip(actual_pointer, expected_pointer)):
             contact_state = cli('inspect', a)
-            assert contact_state['highlight_revision'] is None, 'pointer contact did not acknowledge highlight'
+            assert contact_state['highlight_revision'] is not None, 'pointer contact cleared unconfirmed changes'
             assert contact_state['focused'] == expired['focused'] and front() == active_app, 'hover changed focus'
             native('move', '5', '40'); time.sleep(.2)
             cli('update', a, '--markdown', changed + ' 다시 변경')
@@ -140,12 +140,13 @@ if args[1] == "pointer" {
             native('move', str(rect['X'] + rect['Width'] / 2), str(rect['Y'] + rect['Height'] / 2))
             time.sleep(.4)
             native('move', '5', '40'); time.sleep(.2)
-            acknowledged = cli('inspect', a)
-            assert acknowledged['highlight_revision'] is None and acknowledged['feedback_active'] and acknowledged['opacity'] == 1
+            pending = cli('inspect', a)
+            assert pending['highlight_revision'] is not None and pending['feedback_active'] and pending['opacity'] == 1
+            assert '이전 문단' in pending['note']['change_html'], 'cumulative baseline was replaced'
             time.sleep(3.0)
-            passed('highlight survives opacity expiry, real pointer contact acknowledges it, opacity deadline remains independent')
+            passed('highlight survives opacity expiry, real pointer contact preserves it, opacity deadline remains independent')
         else:
-            print('SKIP: pointer acknowledgement; synthetic event access=' + str(event_access) + ', requested=' + str(expected_pointer) + ', actual=' + str(actual_pointer), flush=True)
+            print('SKIP: pointer preservation; synthetic event access=' + str(event_access) + ', requested=' + str(expected_pointer) + ', actual=' + str(actual_pointer), flush=True)
         if os.environ.get('AGENT_GIBBON_TEST_UI') == '1':
             # Unpinned notes still move forward without changing pin or focus.
             ui('click button "상단 고정" of ' + root(a)); time.sleep(.25)
@@ -169,10 +170,10 @@ if args[1] == "pointer" {
         if os.environ.get('AGENT_GIBBON_TEST_UI') == '1':
             time.sleep(.45)
             contents = ui('get entire contents of window ' + json.dumps('Agent Gibbon — ' + a))
-            assert '숨긴 갱신' in contents and '이전 내용 삭제됨' not in contents, contents
+            assert '이전 문단' in contents and '숨긴 갱신' not in contents and '이전 내용 삭제됨' not in contents, contents
             time.sleep(3.1)
             contents = ui('get entire contents of window ' + json.dumps('Agent Gibbon — ' + a))
-            assert '숨긴 갱신' in contents and '이전 내용 삭제됨' not in contents
+            assert '이전 문단' in contents and '숨긴 갱신' not in contents and '이전 내용 삭제됨' not in contents
             passed('deleted text remains struck through after opacity expiry in real WebView')
         else:
             time.sleep(3.2)

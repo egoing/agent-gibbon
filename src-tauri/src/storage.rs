@@ -24,6 +24,8 @@ struct Metadata {
     source_path: Option<String>,
     updated_at: u64,
     revision: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    change_base: Option<String>,
 }
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 const PREFIX: &str = "<!-- agent-gibbon-v1\n";
@@ -62,6 +64,7 @@ impl Store {
                 source_path: note.source_path.clone(),
                 updated_at: note.updated_at,
                 revision: note.revision,
+                change_base: note.change_base.clone(),
             };
             let metadata = serde_json::to_string(&meta)?
                 .replace('<', "\\u003c")
@@ -89,6 +92,14 @@ impl Store {
         })();
         result.map_err(|e| format!("메모 저장 실패: {e}"))
     }
+    pub fn acknowledge_changes(&self, id: &str, note: &mut Note) -> Result<(), String> {
+        let mut next = note.clone();
+        next.acknowledge_changes();
+        self.save(id, &next)?;
+        *note = next;
+        Ok(())
+    }
+
     pub fn save_edit(
         &self,
         id: &str,
@@ -203,6 +214,7 @@ impl Store {
         })?;
         note.updated_at = meta.updated_at;
         note.revision = meta.revision.max(1);
+        note.restore_change_base(meta.change_base)?;
         Ok((id, note))
     }
 }
@@ -210,6 +222,44 @@ impl Store {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn cumulative_baseline_survives_restart_and_confirmation_is_transactional() {
+        let root = std::env::temp_dir().join(format!("gibbon-baseline-{}", std::process::id()));
+        let store = Store(root.clone());
+        let mut note = Note::default();
+        for body in ["원본\n", "중간\n", "최종\n"] {
+            note.apply(
+                &serde_json::from_value(serde_json::json!({
+                    "action": "update", "markdown": body
+                }))
+                .unwrap(),
+            )
+            .unwrap();
+        }
+        store.save("pending", &note).unwrap();
+        let mut restored = store.load().unwrap().remove("pending").unwrap();
+        assert_eq!(restored.change_base.as_deref(), Some("원본\n"));
+        assert_eq!(restored.change_html, note.change_html);
+        assert!(!restored.change_html.contains("중간"));
+        let blocked = root.join("blocked");
+        fs::write(&blocked, "not a directory").unwrap();
+        assert!(Store(blocked)
+            .acknowledge_changes("pending", &mut restored)
+            .is_err());
+        assert!(restored.has_pending_changes());
+        assert_eq!(restored.change_base, note.change_base);
+        store.acknowledge_changes("pending", &mut restored).unwrap();
+        let mut confirmed = store.load().unwrap().remove("pending").unwrap();
+        assert!(!confirmed.has_pending_changes());
+        assert_eq!(confirmed.revision, note.revision);
+        assert_eq!(confirmed.markdown, note.markdown);
+        confirmed
+            .save_edit("확인 후\n".into(), confirmed.revision)
+            .unwrap();
+        assert_eq!(confirmed.change_base.as_deref(), Some("최종\n"));
+        fs::remove_dir_all(root).unwrap();
+    }
+
     #[test]
     fn roundtrip_and_isolation() {
         let root = std::env::temp_dir().join(format!("gibbon-store-{}", std::process::id()));

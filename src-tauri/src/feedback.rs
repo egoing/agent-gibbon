@@ -12,6 +12,24 @@ pub struct Feedbacks {
     highlights: Mutex<BTreeMap<String, u64>>,
 }
 
+impl Feedbacks {
+    pub fn restore(&self, notes: &BTreeMap<String, crate::model::Note>) -> Result<(), String> {
+        let mut highlights = self.highlights.lock().map_err(|e| e.to_string())?;
+        for (id, note) in notes {
+            sync_highlight(&mut highlights, &crate::label(id), note);
+        }
+        Ok(())
+    }
+}
+
+fn sync_highlight(highlights: &mut BTreeMap<String, u64>, label: &str, note: &crate::model::Note) {
+    if note.has_pending_changes() {
+        highlights.insert(label.into(), note.revision);
+    } else {
+        highlights.remove(label);
+    }
+}
+
 pub fn highlight_revision(window: &WebviewWindow) -> Option<u64> {
     window
         .state::<Feedbacks>()
@@ -32,8 +50,20 @@ fn acknowledge(highlights: &mut BTreeMap<String, u64>, label: &str, revision: u6
 
 #[tauri::command]
 pub fn acknowledge_feedback(window: WebviewWindow, revision: u64) -> Result<bool, String> {
+    // Keep the same notes -> feedback lock order as snapshot and save_note.
+    let notes = window.state::<crate::AppNotes>();
+    let mut notes = notes.lock().map_err(|e| e.to_string())?;
+    let id = window.label().strip_prefix("note-").unwrap_or("main");
+    let note = notes.get_mut(id).ok_or("메모를 찾을 수 없습니다")?;
     let state = window.state::<Feedbacks>();
     let mut highlights = state.highlights.lock().map_err(|e| e.to_string())?;
+    if highlights.get(window.label()) != Some(&revision) {
+        return Ok(false);
+    }
+    // Persist first: a failed save must leave both the baseline and highlight intact.
+    window
+        .state::<crate::storage::Store>()
+        .acknowledge_changes(id, note)?;
     Ok(acknowledge(&mut highlights, window.label(), revision))
 }
 
@@ -61,13 +91,13 @@ pub fn changed(
     if before.is_none_or(|note| note.revision == 0 || note.markdown == after.markdown) {
         return Ok(());
     }
-    // Replace the previous change even while hidden, without revealing the note.
-    window
-        .state::<Feedbacks>()
-        .highlights
-        .lock()
-        .map_err(|e| e.to_string())?
-        .insert(window.label().into(), after.revision);
+    // Replace the rendering revision while retaining the last confirmed baseline.
+    // A full revert has no pending changes and removes the confirmation menu.
+    {
+        let state = window.state::<Feedbacks>();
+        let mut highlights = state.highlights.lock().map_err(|e| e.to_string())?;
+        sync_highlight(&mut highlights, window.label(), after);
+    }
     if !window.is_visible().map_err(|e| e.to_string())? {
         return Ok(());
     }
@@ -123,6 +153,32 @@ pub fn changed(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn restored_pending_notes_have_highlights_without_attention_and_reverts_clear_them() {
+        let mut note = crate::model::Note::default();
+        for body in ["원본", "변경"] {
+            note.apply(
+                &serde_json::from_value(serde_json::json!({
+                    "action": "update", "markdown": body
+                }))
+                .unwrap(),
+            )
+            .unwrap();
+        }
+        let state = Feedbacks::default();
+        state
+            .restore(&BTreeMap::from([("a".into(), note.clone())]))
+            .unwrap();
+        assert_eq!(
+            state.highlights.lock().unwrap().get("note-a"),
+            Some(&note.revision)
+        );
+        assert!(state.deadlines.lock().unwrap().is_empty());
+        note.save_edit("원본".into(), note.revision).unwrap();
+        sync_highlight(&mut state.highlights.lock().unwrap(), "note-a", &note);
+        assert!(state.highlights.lock().unwrap().is_empty());
+    }
+
     #[test]
     fn acknowledgement_is_revision_guarded_and_does_not_touch_opacity() {
         let state = Feedbacks::default();

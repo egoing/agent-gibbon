@@ -13,7 +13,7 @@
 body { user-select: none; -webkit-user-select: none; cursor: grab; margin: 0; height: 100vh; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
 #viewport { flex: 1; min-height: 0; padding: 3px; overflow: auto; overflow-wrap: anywhere; }
 /* Float reserves only the first lines: later text regains the full width. */
-#controls { float: right; display: flex; gap: 1px; margin: 0 0 2px 4px; padding: 1px; }
+#controls { position: relative; z-index: 1; float: right; display: flex; gap: 1px; margin: 0 0 2px 4px; padding: 1px; }
 #content { display: contents; }
 button { display: inline-flex; align-items: center; justify-content: center; width: 19px; height: 19px; padding: 2px; border: 0; border-radius: 3px; color: inherit; background: transparent; cursor: pointer; }
 button svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
@@ -70,7 +70,7 @@ button:disabled { opacity: .5; cursor: default; }
 
 body.folded #controls > button:not(#fold-toggle),
 body.folded #content, body.folded #editor, body.folded .resize,
-body.folded #warp-tip { display: none !important; }
+body.folded #warp-tip, body.folded #diff-actions { display: none !important; }
 body.folded #viewport { overflow: hidden; }
 
 #fold-title { font-size: 10px; line-height: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
@@ -85,3 +85,14 @@ body.folded #fold-toggle svg { transform: none; }
 
 #dev-instance { font-size: 10px; opacity: .75; overflow-wrap: anywhere; margin-bottom: 3px; }
 body.folded #dev-instance { display: none; }
+
+/* Reserve a separate row so the floating menu never covers note content. */
+#diff-actions { flex: none; display: flex; justify-content: center; padding: 6px 8px 8px; cursor: default; }
+#diff-menu { position: relative; display: flex; align-items: center; gap: 2px; max-width: 100%; padding: 3px; border-radius: 10px; background: var(--panel); box-shadow: 0 2px 8px #00000014; }
+#diff-menu::before { content: ''; position: absolute; inset: 0; border: 1px solid var(--foreground); opacity: .14; border-radius: inherit; pointer-events: none; }
+#diff-status { padding: 0 8px; font-size: 11px; line-height: 16px; white-space: nowrap; opacity: .65; }
+#clear-diff { flex: none; gap: 4px; width: auto; height: 28px; padding: 4px 7px; border-radius: 7px; font: inherit; font-size: 11px; line-height: 16px; font-weight: 600; }
+#clear-diff svg { width: 12px; height: 12px; stroke-width: 2; }
+#clear-diff:hover { background: var(--background); outline: none; }
+#clear-diff:focus-visible { background: var(--background); outline: 1px solid var(--foreground); outline-offset: 1px; }
+#clear-diff:active { transform: translateY(1px); }

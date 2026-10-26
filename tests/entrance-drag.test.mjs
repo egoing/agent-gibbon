@@ -11,6 +11,8 @@ async function setup(storage = new Map()) {
       hidden: false, disabled: false, value: '', dataset: {}, listeners: {}, attributes: {},
       addEventListener(type, listener) { this.listeners[type] = listener; },
       setAttribute(key, value) { this.attributes[key] = value; }, focus() {},
+      getBoundingClientRect() { return { width: 298, height: this.hidden ? 0 : 42 }; },
+      cloneNode() { return { style: {}, getBoundingClientRect: () => ({ width: 298, height: 120 }), remove() {} }; },
     });
     return elements.get(id);
   };
@@ -26,6 +28,7 @@ async function setup(storage = new Map()) {
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
     themeFor, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
+      body: { appendChild() {}, classList: { toggle() {} } },
       getElementById: element, querySelectorAll: () => [],
       addEventListener(type, listener) { events[type] = listener; },
       documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener() {} },
