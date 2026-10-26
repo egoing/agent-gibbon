@@ -6,22 +6,41 @@ use tauri::{Manager, State};
 pub struct Warp {
     initial_y: f64,
     contact: Contact,
+    close_contact: Contact,
 }
 pub type Warps = Mutex<BTreeMap<String, Warp>>;
 
-// A move must not create another contact by itself, even if a large note
-// still covers the pointer. Re-arm after release or a real exit of the pointer.
+// Require an observed outside-to-inside transition. Window movement alone must
+// not re-arm contact; the pointer must actually leave at a different position.
 #[derive(Default)]
 pub(crate) struct Contact {
     blocked_at: Option<(f64, f64)>,
+    was_outside: bool,
 }
 impl Contact {
-    pub(crate) fn trigger(&mut self, alt: bool, inside: bool, cursor: (f64, f64)) -> bool {
-        if !alt || (!inside && self.blocked_at != Some(cursor)) {
+    pub(crate) fn block(&mut self, cursor: (f64, f64)) {
+        self.blocked_at = Some(cursor);
+        self.was_outside = false;
+    }
+
+    pub(crate) fn trigger(
+        &mut self,
+        pressed: bool,
+        inside: bool,
+        focused: bool,
+        cursor: (f64, f64),
+    ) -> bool {
+        let entered = inside && self.was_outside;
+        self.was_outside = !inside;
+        if !inside && self.blocked_at != Some(cursor) {
             self.blocked_at = None;
         }
-        if alt && inside && self.blocked_at.is_none() {
-            self.blocked_at = Some(cursor);
+        if focused {
+            self.block(cursor);
+            return false;
+        }
+        if pressed && entered && self.blocked_at.is_none() {
+            self.block(cursor);
             true
         } else {
             false
@@ -100,7 +119,7 @@ pub fn warp_note(window: tauri::WebviewWindow, state: State<Warps>) -> Result<()
         .get_mut(window.label())
         .ok_or("최초 위치가 아직 준비되지 않았습니다")?;
     let cursor = window.cursor_position().map_err(|e| e.to_string())?;
-    warp.contact.blocked_at = Some((cursor.x, cursor.y));
+    warp.contact.block((cursor.x, cursor.y));
     move_note(&window, warp)
 }
 
@@ -127,6 +146,7 @@ pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bo
     };
     if !window.is_visible().map_err(|e| e.to_string())? {
         warp.contact = Contact::default();
+        warp.close_contact = Contact::default();
         return Ok(false);
     }
     let cursor = window.cursor_position().map_err(|e| e.to_string())?;
@@ -136,15 +156,20 @@ pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bo
         && cursor.y >= p.y as f64
         && cursor.x < p.x as f64 + s.width as f64
         && cursor.y < p.y as f64 + s.height as f64;
-    // Closing takes priority over Option warp and Control fold.
-    if close_shortcut_pressed() {
-        warp.contact = Contact::default();
-        if inside {
-            crate::hide_note(window)?;
-        }
+    let focused = window.is_focused().map_err(|e| e.to_string())?;
+    let closing = close_shortcut_pressed();
+    let close = warp
+        .close_contact
+        .trigger(closing, inside, focused, (cursor.x, cursor.y));
+    let moving = warp
+        .contact
+        .trigger(alt && !closing, inside, focused, (cursor.x, cursor.y));
+    // Observe all contacts even when closing takes priority.
+    if close {
+        crate::hide_note(window)?;
         return Ok(false);
     }
-    if warp.contact.trigger(alt, inside, (cursor.x, cursor.y)) {
+    if moving {
         move_note(&window, warp)?;
         return Ok(true);
     }
@@ -177,15 +202,43 @@ mod tests {
         assert!(destination(area, note, 70, 8).is_err());
     }
     #[test]
-    fn contact_does_not_bounce_and_rearms_after_real_exit_or_release() {
+    fn contact_requires_entry_and_does_not_retrigger_on_key_press_inside() {
         let mut c = Contact::default();
-        assert!(!c.trigger(false, true, (10., 20.)));
-        assert!(c.trigger(true, true, (10., 20.)));
-        assert!(!c.trigger(true, false, (10., 20.)));
-        assert!(!c.trigger(true, true, (11., 20.)));
-        assert!(!c.trigger(true, false, (30., 20.)));
-        assert!(c.trigger(true, true, (40., 20.)));
-        assert!(!c.trigger(false, true, (40., 20.)));
-        assert!(c.trigger(true, true, (40., 20.)));
+        assert!(!c.trigger(true, true, false, (10., 20.)));
+        assert!(!c.trigger(false, true, false, (10., 20.)));
+        assert!(!c.trigger(true, true, false, (10., 20.)));
+        assert!(!c.trigger(true, false, false, (0., 20.)));
+        assert!(c.trigger(true, true, false, (10., 20.)));
+        assert!(!c.trigger(false, true, false, (10., 20.)));
+        assert!(!c.trigger(true, true, false, (10., 20.)));
+    }
+
+    #[test]
+    fn movement_does_not_bounce_but_real_exit_rearms() {
+        let mut c = Contact::default();
+        assert!(!c.trigger(true, false, false, (0., 20.)));
+        assert!(c.trigger(true, true, false, (10., 20.)));
+        assert!(!c.trigger(true, false, false, (10., 20.)));
+        assert!(!c.trigger(true, true, false, (11., 20.)));
+        assert!(!c.trigger(true, false, false, (30., 20.)));
+        assert!(c.trigger(true, true, false, (40., 20.)));
+    }
+
+    #[test]
+    fn focused_note_and_focus_loss_inside_do_not_trigger() {
+        let mut c = Contact::default();
+        assert!(!c.trigger(true, false, true, (0., 20.)));
+        assert!(!c.trigger(true, true, true, (10., 20.)));
+        assert!(!c.trigger(true, true, false, (10., 20.)));
+        assert!(!c.trigger(true, false, false, (0., 20.)));
+        assert!(c.trigger(true, true, false, (10., 20.)));
+    }
+
+    #[test]
+    fn entering_without_key_then_pressing_inside_does_not_trigger() {
+        let mut c = Contact::default();
+        assert!(!c.trigger(false, false, false, (0., 20.)));
+        assert!(!c.trigger(false, true, false, (10., 20.)));
+        assert!(!c.trigger(true, true, false, (11., 20.)));
     }
 }
