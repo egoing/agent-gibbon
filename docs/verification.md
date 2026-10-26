@@ -725,3 +725,12 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - `python3 scripts/entrance-direction-smoke.py` 최종 통과: 실제 개발 CLI와 macOS 입력으로 상하좌우 오른쪽 도착, 표시·펼침 유지, 최소 대기·반전·미세 떨림, 반복 open 무이동, 숨김 갱신·재열기, 드래그 취소·수동 크기 보존, 세 메모 동시 등장 후 겹침 없음 확인.
 - 초기 검증 두 차례는 open 직후 네이티브 좌표 확정 전 응답을 기준으로 대기·드래그를 검사하여 실패했다. 짧은 안정화 후 inspect로 좌표를 다시 읽도록 검증 스크립트를 보정했고 최종 전체 실행이 통과했다. 테스트 메모를 숨기고 커서를 복원했으며 이번 검증에서 시작한 정확한 개발 바이너리 PID만 종료했다.
 - 한계: 실제 다중 모니터·혼합 배율, Windows·Intel 실행은 미검증이다. 설치 앱 교체·배포·커밋은 하지 않았다. Conf 4 / Risk Low.
+
+### 2026-10-26 — 최신 본문·캡처 이미지 복사와 하단 성공 안내
+
+- 텍스트는 최신 `note.html`을 화면 밖 DOM에서 `innerText`로 읽어 기존 렌더링 텍스트 형식을 유지한다. 보이는 누적 diff, 확인 기준과 메뉴는 변경하지 않는다. 버튼과 ⌘C/Ctrl+C가 같은 경로를 사용하고 편집 중 기본 선택 복사는 유지한다.
+- 이미지 복사는 Rust가 호출 창의 앱 생성 `capture.png`만 읽고 Tauri clipboard-manager로 기록한다. CSP가 차단하는 `fetch(data:...)`를 제거했으며 CSP를 넓히지 않았다. JavaScript 이미지 리소스·이미지 쓰기 권한도 추가하지 않는다.
+- 성공 안내는 하단 `role=status`에 1.2초 표시하고 사라진다. 전체 밝기 flash는 사용하지 않고 레이아웃·이미지 비율·창 크기에 영향을 주지 않는다.
+- macOS arm64, Node 24.21.0/Rust 1.91.1: Rust 66개·UI 39개 테스트, Clippy, Rustfmt, JavaScript 구문, 개발 빌드와 diff 공백 검사 통과. PNG→RGBA 치수·바이트 보존 및 잘못된 이미지 거부, 최신 텍스트·diff 보존, 버튼·단축키·편집기 기본 복사·성공 만료·실패 안내를 확인했다.
+- Chromium `scripts/copy-layout-smoke.py`에서 제목·문단·목록·코드·표의 기존 `innerText` 동일성, 하단 확인 버튼 hit-test, diff와 viewport 유지, 알림 만료, 이미지 영역 크기 유지를 확인했다. 기존 `scripts/diff-action-layout-smoke.py`도 통과했다.
+- 워크트리 개발 CLI `list`와 `inspect --id main` 성공. 기존 개발 프로세스는 재시작하지 않았으므로 새 빌드의 실제 macOS WebView·OS 클립보드 붙여넣기와 Windows 실행은 미검증이다. 기존 메모의 숨김 상태와 실행 프로세스를 보존했다. Conf 4 / Risk Low.
