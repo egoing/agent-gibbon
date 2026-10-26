@@ -2,6 +2,15 @@
 
 검증일: 2026-10-10 (Asia/Seoul)
 
+## 화면 재구성 중 AppKit 크래시 완화 (2026-10-27)
+
+- v0.2.7 보고서 `D007C9E8-E177-4854-9248-5EC8BDFFA593`의 실행 파일 UUID가 설치본과 일치합니다. 동일 macOS 15.6.1 (24G90)에서 `atos`로 `_reactToDisplayChanges:` → `_adjustWindowToScreen` → `_setFrameCommon:display:fromServer:` → `_adjustNeedsDisplayRegionForNewFrame:` 경로를 확인했습니다. SIGTRAP은 메인 스레드 AppKit 내부에서 발생했습니다.
+- 접기 시 `setContentAspectRatio(0, 0)` 호출을 제거하고 `setContentResizeIncrements(1, 1)`로 비율 제약을 해제합니다. 펼칠 때 이미지의 원래 비율을 다시 설정하는 동작은 유지합니다. [Apple 비율·크기 증분 설명](https://developer.apple.com/documentation/appkit/nswindow/aspectratio)과 [동일한 영 비율 설정 후 SIGTRAP 재현 보고](https://github.com/libsdl-org/SDL/issues/14229)를 근거로 한 완화입니다.
+- 한계: 보고서만으로 사고 당시 접힌 창이나 화면 변경 원인을 특정할 수 없습니다. 별도 AppKit 창에서 접기·크기 조정·펼치기를 10회 수행한 비교 실험은 수정 방식과 기존 방식 모두 통과했으므로, 원본 크래시 재현·해결 확정으로 간주하지 않습니다. 실제 모니터 연결·해제와 절전 복귀는 미검증입니다.
+- macOS arm64, Rust 1.91.1, Node 24.21.0에서 Rust 64개·UI 39개 테스트, Clippy, Rustfmt, diff 공백 검사와 워크트리 개발 debug 빌드 통과. 설치 앱 바이너리는 교체하지 않았습니다.
+- 실제 개발 앱에서 `python3 scripts/fold-contact-smoke.py` 통과: 20ms 접촉 10회 접기·펼치기, 접힌 창의 접촉 여유, 위치·크기·포커스·고정·본문 보존과 숨긴 메모 유지 확인. 첫 실행은 System Events 미실행 오류로 실패했고, 테스트에서 시작한 개발 프로세스만 정리한 뒤 System Events를 시작하여 재실행했습니다. 마지막 테스트가 만든 개발 프로세스는 자체 정리됐습니다.
+- Conf 4 (실제 접기·펼치기 회귀) / Risk Low. 원본 크래시 원인의 확정과 해결 검증은 보류합니다.
+
 ## 보조키 접촉 진입 조건 (2026-10-26)
 
 - 커서가 노트 밖에서 안으로 들어올 때만 Option 이동·Control 접기·세 키 조합 닫기를 허용합니다. 노트 안에서 키를 누르거나 다시 누르기, 포커스된 노트, 안에 머문 채 포커스 해제로는 실행하지 않습니다.
