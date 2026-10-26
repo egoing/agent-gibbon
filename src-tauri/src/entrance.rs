@@ -8,6 +8,13 @@ use tauri::{Manager, PhysicalPosition, WebviewWindow};
 
 type Point = PhysicalPosition<f64>;
 
+#[derive(Clone, Copy, Default)]
+pub enum Presentation {
+    #[default]
+    Cursor,
+    Direct,
+}
+
 #[derive(Clone, Copy)]
 pub struct Destination {
     pub position: PhysicalPosition<i32>,
@@ -221,7 +228,11 @@ fn near(a: Point, b: Point) -> bool {
     (a.x - b.x).abs() <= 2.0 && (a.y - b.y).abs() <= 2.0
 }
 
-pub fn show(window: &WebviewWindow, destination: Option<Destination>) -> Result<(), String> {
+pub fn show(
+    window: &WebviewWindow,
+    destination: Option<Destination>,
+    presentation: Presentation,
+) -> Result<(), String> {
     if window.is_visible().map_err(|e| e.to_string())? {
         return crate::show_without_focus(window);
     }
@@ -230,6 +241,10 @@ pub fn show(window: &WebviewWindow, destination: Option<Destination>) -> Result<
         Some(p) => p,
         None => crate::place_new_window(window.app_handle(), window, None)?,
     };
+    // Placement is complete while hidden. Direct user opens need no cursor wait.
+    if matches!(presentation, Presentation::Direct) {
+        return crate::show_without_focus(window);
+    }
     let anchor = cursor(window)?;
     let size = window.outer_size().map_err(|e| e.to_string())?;
     let scale = coordinate_scale(window.scale_factor().map_err(|e| e.to_string())?);

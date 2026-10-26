@@ -283,6 +283,16 @@ fn toggle_pin(window: tauri::WebviewWindow) -> Result<(), String> {
         .map_err(|e| e.to_string())
 }
 fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
+    apply_with_presentation(app, request, entrance::Presentation::Cursor)
+}
+fn apply_direct(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
+    apply_with_presentation(app, request, entrance::Presentation::Direct)
+}
+fn apply_with_presentation(
+    app: &tauri::AppHandle,
+    request: Request,
+    presentation: entrance::Presentation,
+) -> Result<Value, String> {
     request.validate()?;
     let state = app.state::<AppNotes>();
     if matches!(request.action, Action::List) {
@@ -337,11 +347,11 @@ fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
     match request.action {
         Action::Open => {
             if existing.as_ref().is_none_or(|note| note.revision == 0) {
-                sizing::prepare(&win)?;
+                sizing::prepare(&win, presentation)?;
             } else if next.capture.is_some() {
                 show_without_focus(&win)?;
             } else {
-                entrance::show(&win, None)?;
+                entrance::show(&win, None, presentation)?;
             }
         }
         Action::Close => {
@@ -477,7 +487,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             #[cfg(target_os = "macos")]
             sizing::install_contact_monitor(app.handle());
             if initial_open {
-                apply(
+                apply_direct(
                     app.handle(),
                     Request {
                         source_path: None,
@@ -556,7 +566,7 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
         }
     }
     if !visible {
-        apply(
+        apply_direct(
             app,
             Request {
                 action: Action::Open,

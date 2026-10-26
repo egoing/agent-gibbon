@@ -1,6 +1,6 @@
 // 메뉴 막대에서 보이는 창을 앞으로 가져오거나 숨긴 창을 개별 복원한다.
 use crate::{
-    apply,
+    apply_direct,
     model::{Action, Request},
     show_without_focus, AppNotes,
 };
@@ -144,7 +144,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                     Ok::<_, String>(())
                 })
             } else if let Some(id) = event.id.as_ref().strip_prefix("note:") {
-                apply(
+                apply_direct(
                     app,
                     Request {
                         source_path: None,
