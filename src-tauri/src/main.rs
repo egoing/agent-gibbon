@@ -435,7 +435,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         })
         .setup(move |app| {
             #[cfg(target_os = "macos")]
-            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            app.set_activation_policy(tauri::ActivationPolicy::Regular);
             if let Some(win) = app.get_webview_window("main") {
                 win.set_title(&format!("{} — main", instance::current().title()))?;
             }
@@ -526,7 +526,49 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         })
         .build(tauri::generate_context!())
         .map_err(|e| e.to_string())?;
-    app.run(|_, _| {});
+    app.run(|_app, _event| {
+        #[cfg(target_os = "macos")]
+        if let tauri::RunEvent::Reopen { .. } = _event {
+            if let Err(error) = reopen_from_icon(_app) {
+                eprintln!("앱 아이콘으로 메모를 열지 못했습니다: {error}");
+            }
+        }
+    });
+    Ok(())
+}
+
+#[cfg(target_os = "macos")]
+fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
+    let mut visible = false;
+    // Only note windows count; capture overlays must not prevent reopening.
+    let ids: Vec<_> = app
+        .state::<AppNotes>()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .keys()
+        .cloned()
+        .collect();
+    for id in ids {
+        let win = window(app, &id)?;
+        if win.is_visible().map_err(|e| e.to_string())? {
+            show_without_focus(&win)?;
+            visible = true;
+        }
+    }
+    if !visible {
+        apply(
+            app,
+            Request {
+                action: Action::Open,
+                id: None,
+                color: None,
+                title: None,
+                markdown: None,
+                source_path: None,
+                status: None,
+            },
+        )?;
+    }
     Ok(())
 }
 

@@ -675,3 +675,19 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - 통합본 Rust 60개·UI 31개 테스트, Clippy, Rustfmt, 버전 일치 검사, 개발 빌드 및 diff 검사 통과.
 - 병합 후 실제 UI 재실행은 수행하지 않았다. 네이티브 드래그 검증은 앞 절의 병합 전 결과이며 Windows 비율 고정은 미지원이다.
 - 기존 package-lock.json 정렬 변경은 커밋에서 제외하고 보존한다.
+
+## 2026-10-26 · macOS 앱 실행 아이콘
+
+- 환경: Apple Silicon arm64, Node v24.21.0, Cargo 1.91.1.
+- macOS activation policy를 Regular로 변경하여 Dock에 앱 아이콘 표시. Reopen 이벤트에서 열린 메모만 앞으로 가져오고, 모두 숨겨졌으면 main 메모를 복원.
+- `npm run dev:build`, `npm run build`, `npm test` (Rust 63 + UI 33), `npm run check`, `git diff --check` 통과. 설치 앱의 `codesign --verify --deep --strict` 통과(로컬 ad-hoc 서명, 공증 아님).
+- 격리된 개발 앱에서 실제 Dock AXPress로 main 복원, 반복 클릭 시 위치·크기·핀 보존, 다른 숨긴 메모의 숨김 유지 확인. 개발 CLI는 `scripts/agent-gibbon-dev` 사용. 이번 검증에서 시작한 개발 프로세스만 종료.
+- 기존 설치 앱을 로컬 백업한 뒤 `/Applications/Agent Gibbon.app`에 새 빌드 설치. Dock의 ‘Dock에 유지’를 선택하고 persistent-apps의 경로 확인. 이번 작업에서 시작한 설치 앱을 종료한 상태에서 고정된 Dock 아이콘 클릭으로 새 프로세스 실행 및 main 표시 확인.
+- Windows 실행 검증과 macOS 공증은 수행하지 않음. 배포 태그·릴리스 및 저장소 커밋은 생성하지 않음.
+
+## 2026-10-26 · 메뉴 막대의 앱 종료
+
+- 메뉴 막대 아이콘의 메모 목록 뒤에 구분선과 `Agent Gibbon 종료` 추가. Tauri `AppHandle::exit(0)`으로 현재 인스턴스를 종료하며, 기존 메모 닫기/숨기기 동작은 유지.
+- `npm run dev:build`, `npm run build`, `npm run check`, Rustfmt 검사 통과.
+- 개발 인스턴스의 실제 메뉴를 클릭하여 종료 항목 존재, 해당 프로세스 소멸, 개발 CLI list 실패 확인. 개발 CLI로 재실행 후 저장된 검증 메모 본문 복원 확인.
+- 기존 설치본을 백업하고 새 앱을 설치·실행. Windows 실환경 종료 검증은 미수행. 저장하지 않은 편집 초안은 기존 종료 동작처럼 유지되지 않음.
