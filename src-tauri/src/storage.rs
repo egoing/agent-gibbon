@@ -140,6 +140,8 @@ impl Store {
     ) -> Result<(), String> {
         let mut next = note.clone();
         next.save_edit(markdown, revision)?;
+        // A successful direct edit confirms the complete content the user just saved.
+        next.acknowledge_changes();
         if let Err(error) = self.save(id, &next) {
             if let Some(path) = &note.source_path {
                 crate::source::save(path, &next.markdown, &note.markdown)
@@ -293,6 +295,38 @@ mod tests {
     }
 
     #[test]
+    fn direct_save_confirms_pending_diff_even_when_text_is_unchanged() {
+        let root = std::env::temp_dir().join(format!("gibbon-direct-edit-{}", std::process::id()));
+        let store = Store(root.clone());
+        let mut note = Note::default();
+        for body in ["원본", "외부 변경"] {
+            note.apply(
+                &serde_json::from_value(serde_json::json!({
+                    "action": "update", "markdown": body
+                }))
+                .unwrap(),
+            )
+            .unwrap();
+        }
+        assert!(note.has_pending_changes());
+        let revision = note.revision;
+        store
+            .save_edit("direct", &mut note, "외부 변경".into(), revision)
+            .unwrap();
+        assert!(!note.has_pending_changes());
+        assert!(!store.load().unwrap()["direct"].has_pending_changes());
+        note.apply(
+            &serde_json::from_value(serde_json::json!({
+                "action": "update", "markdown": "다음 외부 변경"
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(note.change_base.as_deref(), Some("외부 변경"));
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
     fn windows_reserved_ids_roundtrip_without_case_collisions() {
         let root = std::env::temp_dir().join(format!("gibbon-reserved-{}", std::process::id()));
         let store = Store(root.clone());
@@ -394,7 +428,11 @@ mod failure_tests {
         };
         let store = Store::new(root.clone(), None);
         store.save_edit("edit", &mut note, "new".into(), 0).unwrap();
-        assert_eq!(store.load().unwrap()["edit"].markdown, "new");
+        let restored = store.load().unwrap();
+        assert_eq!(restored["edit"].markdown, "new");
+        assert!(!note.has_pending_changes());
+        assert!(!restored["edit"].has_pending_changes());
+        assert_eq!(note.change_html, note.html);
         assert_eq!(fs::read_to_string(&source).unwrap(), "new");
         assert!(store
             .save_edit("edit", &mut note, "stale".into(), 0)

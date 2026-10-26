@@ -19,7 +19,13 @@ pub struct ImageNote {
     pub width: f64,
     pub height: f64,
 }
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum SelectionMode {
+    Image,
+    Text,
+}
 struct Screen {
+    mode: SelectionMode,
     ready: bool,
     image: RgbaImage,
     bounds: ImageNote,
@@ -66,17 +72,27 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
         .global_shortcut()
         .on_shortcut("Ctrl+Shift+1", |app, _, event| {
             if event.state() == ShortcutState::Pressed {
-                trigger(app);
+                trigger(app, SelectionMode::Image);
             }
         })
     {
         eprintln!("캡처 단축키 등록 실패 (메뉴에서 실행 가능): {error}");
     }
+    if let Err(error) = app
+        .global_shortcut()
+        .on_shortcut("Ctrl+Shift+2", |app, _, event| {
+            if event.state() == ShortcutState::Pressed {
+                trigger(app, SelectionMode::Text);
+            }
+        })
+    {
+        eprintln!("영역 노트 단축키 등록 실패 (메뉴에서 실행 가능): {error}");
+    }
     Ok(())
 }
 static LAUNCH_QUEUED: AtomicBool = AtomicBool::new(false);
 
-pub fn trigger(app: &tauri::AppHandle) {
+pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
     trace("trigger");
     if LAUNCH_QUEUED.swap(true, Ordering::AcqRel) {
         return;
@@ -88,7 +104,7 @@ pub fn trigger(app: &tauri::AppHandle) {
         let handle = app.clone();
         if app
             .run_on_main_thread(move || {
-                launch(&handle);
+                launch(&handle, mode);
                 LAUNCH_QUEUED.store(false, Ordering::Release);
             })
             .is_err()
@@ -97,8 +113,8 @@ pub fn trigger(app: &tauri::AppHandle) {
         }
     });
 }
-fn launch(app: &tauri::AppHandle) {
-    if let Err(error) = begin(app) {
+fn launch(app: &tauri::AppHandle, mode: SelectionMode) {
+    if let Err(error) = begin(app, mode) {
         cleanup(app);
         if let Some(tray) = app.tray_by_id("agent-gibbon") {
             let _ = tray.set_tooltip(Some(format!(
@@ -121,7 +137,7 @@ extern "C" {
     fn CGPreflightScreenCaptureAccess() -> bool;
     fn CGRequestScreenCaptureAccess() -> bool;
 }
-fn begin(app: &tauri::AppHandle) -> Result<(), String> {
+fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
     trace("begin");
     #[cfg(target_os = "macos")]
     // Called only by an explicit capture action. Never capture a wallpaper-only
@@ -143,6 +159,7 @@ fn begin(app: &tauri::AppHandle) -> Result<(), String> {
         screens.insert(
             format!("capture-{index}"),
             Screen {
+                mode,
                 ready: false,
                 image: monitor.capture_image().map_err(err)?,
                 bounds: ImageNote {
@@ -167,7 +184,10 @@ fn begin(app: &tauri::AppHandle) -> Result<(), String> {
             &label,
             tauri::WebviewUrl::App("capture.html".into()),
         )
-        .title("영역 캡처 — Escape로 취소")
+        .title(match mode {
+            SelectionMode::Image => "영역 캡처 — Escape로 취소",
+            SelectionMode::Text => "빈 노트 영역 선택 — Escape로 취소",
+        })
         .decorations(false)
         .resizable(false)
         .always_on_top(true)
@@ -341,7 +361,13 @@ pub fn finish_capture(
             scale
         };
         (
-            png(&image::imageops::crop_imm(&s.image, px, py, pw, ph).to_image())?,
+            if s.mode == SelectionMode::Image {
+                Some(png(
+                    &image::imageops::crop_imm(&s.image, px, py, pw, ph).to_image()
+                )?)
+            } else {
+                None
+            },
             ImageNote {
                 x: s.bounds.x + x * offset,
                 y: s.bounds.y + y * offset,
@@ -350,9 +376,12 @@ pub fn finish_capture(
             },
         )
     };
-    let result = create_note(app, bytes, bounds);
+    // Restore the previous app before the new editor deliberately takes focus.
     cleanup(app);
-    result
+    match bytes {
+        Some(bytes) => create_note(app, bytes, bounds),
+        None => create_text_note(app, bounds),
+    }
 }
 pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
     crate::sizing::manual_resize(win.clone(), win.state::<crate::sizing::Sizes>())?;
@@ -362,6 +391,40 @@ pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
     set_position(win, bounds.x, bounds.y)?;
     win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
         .map_err(err)
+}
+fn empty_text_note() -> crate::Note {
+    crate::Note {
+        title: "새 노트".into(),
+        markdown: String::new(),
+        html: String::new(),
+        change_html: String::new(),
+        edit_on_open: true,
+        revision: 1,
+        ..crate::Note::default()
+    }
+}
+fn create_text_note(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), String> {
+    let stamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(err)?
+        .as_nanos();
+    let id = format!("text-{stamp}");
+    let note = empty_text_note();
+    app.state::<crate::storage::Store>().save(&id, &note)?;
+    let win = crate::create_window(app, &id)?;
+    app.state::<crate::AppNotes>()
+        .lock()
+        .map_err(err)?
+        .insert(id, note);
+    crate::sizing::manual_resize(win.clone(), win.state::<crate::sizing::Sizes>())?;
+    win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
+        .map_err(err)?;
+    set_position(&win, bounds.x, bounds.y)?;
+    win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
+        .map_err(err)?;
+    win.show().map_err(err)?;
+    win.set_focus().map_err(err)?;
+    crate::tray::refresh(app)
 }
 fn create_note(app: &tauri::AppHandle, bytes: Vec<u8>, bounds: ImageNote) -> Result<(), String> {
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -444,6 +507,14 @@ pub fn note_image(window: WebviewWindow) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn text_selection_creates_empty_editable_note_without_image() {
+        let note = empty_text_note();
+        assert!(note.capture.is_none());
+        assert!(note.markdown.is_empty() && note.html.is_empty() && note.change_html.is_empty());
+        assert!(note.edit_on_open);
+        assert_eq!(note.revision, 1);
+    }
     #[test]
     fn preview_preserves_dimensions_and_rgba_bytes() {
         let pixels = vec![255, 0, 1, 255, 2, 3, 254, 255];

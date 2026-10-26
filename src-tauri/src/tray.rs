@@ -32,6 +32,17 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         .map_err(|e| e.to_string())?,
     )
     .map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(
+            app,
+            "capture-text",
+            "영역 텍스트 노트 · Ctrl+Shift+2",
+            true,
+            None::<&str>,
+        )
+        .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
     let front = MenuItem::with_id(app, "bring-visible", "열린 메모 앞으로", true, None::<&str>)
         .map_err(|e| e.to_string())?;
     menu.append(&front).map_err(|e| e.to_string())?;
@@ -134,7 +145,10 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 return;
             }
             let result = if event.id.as_ref() == "capture-image" {
-                crate::capture::trigger(app);
+                crate::capture::trigger(app, crate::capture::SelectionMode::Image);
+                Ok(())
+            } else if event.id.as_ref() == "capture-text" {
+                crate::capture::trigger(app, crate::capture::SelectionMode::Text);
                 Ok(())
             } else if event.id.as_ref() == "bring-visible" {
                 app.webview_windows().values().try_for_each(|win| {
