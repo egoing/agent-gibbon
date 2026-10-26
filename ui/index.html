@@ -17,6 +17,13 @@
 <textarea id="markdown" aria-label="Markdown 원문" spellcheck="false"></textarea>
 <div id="editor-actions"><span id="save-target"></span><button id="cancel">취소</button><button id="save">저장</button></div>
 </section>
-</main><aside id="warp-tip" hidden aria-label="워프 단축키 안내"><span role="status">Alt(⌥)를 누른 채 노트에 포인터를 올리면 반대편으로 워프합니다.</span><div><button id="warp-tip-dismiss">다시 보지 않기</button><button id="warp-tip-close" aria-label="워프 안내 닫기">닫기</button></div></aside><div id="error" role="alert" hidden></div>
+</main>
+<div id="diff-actions" role="group" aria-label="변경 표시 메뉴" hidden>
+<div id="diff-menu">
+<span id="diff-status">변경사항</span>
+<button id="clear-diff" aria-label="변경사항 확인 · 변경 표시 지우기" title="변경사항 확인 · 변경 표시만 지웁니다" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg><span>확인</span></button>
+</div>
+</div>
+<aside id="warp-tip" hidden aria-label="워프 단축키 안내"><span role="status">Alt(⌥)를 누른 채 노트에 포인터를 올리면 반대편으로 워프합니다.</span><div><button id="warp-tip-dismiss">다시 보지 않기</button><button id="warp-tip-close" aria-label="워프 안내 닫기">닫기</button></div></aside><div id="error" role="alert" hidden></div>
 <div class="resize" data-direction="North" id="n"></div><div class="resize" data-direction="South" id="s"></div><div class="resize" data-direction="East" id="e"></div><div class="resize" data-direction="West" id="w"></div><div class="resize corner" data-direction="NorthWest" id="nw"></div><div class="resize corner" data-direction="NorthEast" id="ne"></div><div class="resize corner" data-direction="SouthWest" id="sw"></div><div class="resize corner" data-direction="SouthEast" id="se"></div>
 </body></html>

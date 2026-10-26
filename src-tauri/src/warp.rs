@@ -144,12 +144,6 @@ pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bo
         }
         return Ok(false);
     }
-    // Native hit testing also works while the WebView is inactive.
-    if inside {
-        if let Some(revision) = crate::feedback::highlight_revision(&window) {
-            crate::feedback::acknowledge_feedback(window.clone(), revision)?;
-        }
-    }
     if warp.contact.trigger(alt, inside, (cursor.x, cursor.y)) {
         move_note(&window, warp)?;
         return Ok(true);
