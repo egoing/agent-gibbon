@@ -211,17 +211,6 @@ fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
     Ok(())
 }
 
-// Idempotent entrance action: never unfold an already folded note.
-pub fn fold_for_entrance(window: &WebviewWindow) -> Result<(), String> {
-    let sizes = window.state::<Sizes>();
-    let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
-    let state = states.entry(window.label().into()).or_default();
-    if state.expanded.is_none() {
-        toggle(window, state)?;
-    }
-    Ok(())
-}
-
 #[tauri::command]
 pub fn toggle_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, String> {
     let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
