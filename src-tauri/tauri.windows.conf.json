@@ -1,0 +1,20 @@
+{
+  "bundle": {
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": [
+          "Korean",
+          "English"
+        ],
+        "displayLanguageSelector": true
+      }
+    }
+  }
+}

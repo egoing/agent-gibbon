@@ -300,7 +300,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 ## 2026-10-25 커서 근처 등장 — 이슈 #7
 
 - 기준 SHA `ff0712c4421364ff9a60ce132123ddafb01be8d8`에서 baseline을 캡처했다. `npm test`(Rust 23 + Node 7), `cargo check --all-targets`, Clippy·Rustfmt·JS 문법·diff 검사, `npm run build` 모두 통과했으며 제외한 기존 실패는 없다.
-- 환경: Apple Silicon arm64, Rust/Cargo 1.91.1, Node 24.21.0, npm 11.19.0, Tauri Rust 2.12.2. 원본 로그는 `/Users/egoinglee/Library/Logs/floatnote-is2-7`에 보존한다.
+- 환경: Apple Silicon arm64, Rust/Cargo 1.91.1, Node 24.21.0, npm 11.19.0, Tauri Rust 2.12.2.
 - TDD red: `scripts/entrance-smoke.py`를 실제 기준 release 앱의 격리 사본에서 실행했다. `open`이 3.589초 동안 대기하여 2.5초 반환 상한 assertion이 실패했다. red ref는 `refs/is2/red/7`에 보존한다.
 - 실제 앱 검증은 release 실행 파일 사본의 IPC 디렉터리 문자열만 같은 길이의 `/tmp/floatnot7-`로 교체하고 애드혹 서명한 `floatnote-qa7` 프로세스에서 수행했다. 테스트가 만든 프로세스만 종료하며 사용자 앱을 재시작·교체하지 않았다. 테스트는 고유 ID 메모만 만들고 커서·전면 앱을 복원한다.
 - 최초 green: Rust 27 + Node 7, 타입·린트·빌드 통과. 실제 커서 오른쪽 하단에서 왼쪽 위 여백, 3.6초 이상 위치 불변과 opacity 1.0, 즉시 CLI 반환, 이미 보이는 창의 open/갱신 유지, 마우스 이동 후 목적지 이동·opacity 0.5, 지연된 자동 크기 적용, 숨김/복원/취소/창 독립성 통과.
@@ -350,8 +350,8 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - `npm test`: Rust 37개, Node 13개 통과. 오류 메시지의 민감정보 제거와 WebView의 고정 오류 종류 전달·IPC 실패 처리를 검증했습니다.
 - `npm run check`, Rustfmt, JavaScript 문법 검사, `git diff --check` 통과.
 - `npm run build`: macOS 앱 번들 생성 및 새 release CLI `--help` JSON 응답 확인.
-- `egoing-personal` 개인 조직의 `investing-bot`과 같은 팀에 `floatnote` 프로젝트를 생성하고 공개 수신 DSN을 기본값으로 연결했습니다.
-- 명시적 실제 전송 테스트 `telemetry::tests::live_sentry_delivery` 1개 통과. Sentry에서 `FLOATNOTE-1` (`Floatnote Sentry connection test`, 릴리스 `floatnote@0.2.3`, environment `development`) 이벤트 수신을 직접 확인했습니다: https://egoing-personal.sentry.io/issues/7811173579/
+- 오류 수집 프로젝트를 생성하고 공개 수신 DSN을 기본값으로 연결했습니다.
+- 명시적 실제 전송 테스트 `telemetry::tests::live_sentry_delivery` 1개 통과. Sentry에서 테스트 이벤트 수신을 직접 확인했습니다(릴리스 `floatnote@0.2.3`, environment `development`).
 - DSN 반영 후 일반 테스트 50개 통과(실제 전송 테스트 1개는 기본 생략), Clippy·Rustfmt·앱 빌드를 다시 통과했습니다. 기존 앱 프로세스와 사용자 메모는 유지했으며, 새 번들은 빌드 산출물 경로에 생성했습니다.
 - Conf 5(실제 SDK 전송·수신) / Risk Medium: 외부 서비스로 진단 이벤트를 전송합니다. 실제 WebView에서 오류를 유발하는 E2E는 수행하지 않았습니다.
 
@@ -550,3 +550,59 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 실앱 확인: 비활성 개발 창에서 실제 좌표 클릭으로 diff와 메뉴가 사라지고 본문·위치가 유지됨을 CLI와 WebView 접근성 트리로 확인했다. Orca 도구가 클릭 후 창 축소에 따른 포커스 확인 오류를 보고한 시도도 재클릭하지 않고 CLI와 새 화면을 읽어 성공 여부를 검증했다.
 - 실제 개발 CLI로 A→B→C, 숨김·메타데이터 갱신, 프로세스 재시작 후 기준 유지, 실제 버튼 클릭 후 C→D, C로 복귀 시 diff 제거, 다시 C→D→E 누적을 모두 확인했다. 직접 시작한 정확한 워크트리 PID만 재시작했다. 최종 테스트 메모는 사용자가 확인할 수 있도록 개발 앱에 남겼으며 위치를 이전 테스트 위치로 복원했다.
 - 기존 feedback smoke의 롤오버·삭제 기준 assertion도 새 요구사항에 맞췄다. 해당 전체 스크립트, 설치 앱 교체, 두 워크트리 격리 회귀는 이번에 실행하지 않았다. Conf 5(실앱 클릭·누적·재시작), Risk Medium(확인 기준 저장과 상태 관리).
+
+## Windows 지원 검증 — 2026-10-26
+
+### 환경과 재현 명령
+
+Windows 11 Home 10.0.26200 x64, Rust/Cargo 1.99.1(MSVC), Node 20.11.0, npm 10.2.4, Visual Studio Build Tools 2022 17.14.42(C++·Windows SDK), WebView2 155.0.4283.62에서 검증했습니다. 개발환경 구성은 [Windows 안내](windows.md)를 따릅니다. 원격 제어 도구는 앱의 실행·빌드 의존성이 아닙니다.
+
+```powershell
+npm.cmd ci
+npm.cmd test
+npm.cmd run check
+npm.cmd run dev:build
+node scripts/windows-smoke.mjs
+npm.cmd run build:windows
+# 생성한 설치 파일을 설치한 뒤 실제 실행 파일 경로를 지정합니다.
+node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
+```
+
+### 결과
+
+- Windows Rust 테스트 52개, Node 테스트 17개와 Clippy 통과. POSIX 실행 파일 fixture 테스트 1개는 Windows에서 제외하고 실제 Windows 바이너리로 CLI를 검증했습니다.
+- 개발 앱과 NSIS로 설치한 배포판에서 CLI 자동 시작, 한글 Markdown, 두 창의 독립 갱신, 포커스·위치 보존, 숨김 후 갱신, 저장 파일, 오류 입력 시 상태 보존, 재열기를 확인했습니다.
+- 재시작 후 메모 내용·숨김 상태 복원과 인자 없는 실행 시 main 메모 표시·포커스 보존을 확인했습니다.
+- 설치 앱과 개발 앱에 동일한 ID의 서로 다른 메모를 생성해 인스턴스·저장 경로·본문 분리를 확인했습니다. 테스트 메모는 검증 종료 시 숨겼습니다.
+- NSIS x64 설치 파일 생성 및 현재 사용자 설치 성공. 서명과 공개 릴리스는 수행하지 않았습니다.
+- macOS 회귀: Rust 53개, Node 18개, Clippy 통과. Windows 예약 장치 이름 인코딩은 Windows에만 적용하여 기존 macOS 저장 경로를 보존합니다.
+
+### 한계
+
+원격 화면 제어 권한이 없어 화면 캡처·버튼 클릭·편집·트레이 메뉴의 실제 UI 검증은 미실행입니다. Windows 10, ARM64, 다중 모니터·혼합 DPI와 두 Windows 개발 워크트리 간 격리는 별도로 검증하지 않았습니다.
+
+## 태그 기반 자동 릴리스 — 2026-10-26
+
+- macOS ARM64·Intel 및 Windows x64 검증·패키징 워크플로 추가. 일반 브랜치 push와 수동 실행은 빌드만 수행하고, 버전 태그 push는 모든 빌드 성공 뒤 설치 파일 세 개와 체크섬을 Draft에 업로드하고 공개합니다.
+- 버전 갱신 및 일치 검사, 누락·빈 파일·다른 버전·예상 외 파일 차단과 SHA-256 생성 테스트를 추가했습니다. 로컬 Node 테스트 21개, 버전 검사, actionlint와 diff 검사 통과.
+- 실제 태그에 의한 공개·Sentry 수신·배포 서명은 이 검증에 포함하지 않습니다. 기존 Windows 실환경 검증 범위는 위 기록을 참고하세요.
+
+## Rust 빌드 캐시 저장·복원 검증 — 2026-10-26
+
+- `Swatinem/rust-cache`를 Rust 도구 설치 뒤에 추가하고 `src-tauri -> target` 및 플랫폼별 target 키를 설정했습니다. Cargo 다운로드와 의존성 컴파일 결과를 캐시하며 앱·설치 파일 재빌드와 모든 검증은 유지합니다.
+- `127c23d`의 [첫 실행](https://github.com/egoing/agent-gibbon/actions/runs/40252362011/attempts/1)과 [동일 커밋 재실행](https://github.com/egoing/agent-gibbon/actions/runs/40252362011/attempts/2)을 비교했습니다. 첫 실행은 세 플랫폼 캐시 저장 성공, 재실행은 모두 `full match: true` 및 `Cache restored successfully`를 확인했습니다.
+- 두 실행 모두 Rust·Node 테스트, Rustfmt, Clippy, 설치 파일 빌드·artifact 업로드 성공. 일반 브랜치 실행으로 공개 릴리스는 생략했습니다. actionlint·diff 검사도 통과했습니다.
+
+| 플랫폼 | 캐시 없는 첫 실행 | 캐시 복원 재실행 | 단축률 |
+|---|---:|---:|---:|
+| macOS ARM64 | 7분 18초 | 2분 9초 | 70.5% |
+| macOS Intel | 16분 51초 | 3분 10초 | 81.2% |
+| Windows x64 | 11분 37초 | 2분 47초 | 76.0% |
+
+시간은 각 build job의 시작부터 종료까지로, 도구 설치·캐시 복원/저장·테스트·패키징·업로드를 포함하고 runner 대기 시간은 제외합니다. 동일 커밋 두 실행의 관측값이며 runner 성능·Rust/의존성 변경·브랜치별 접근 범위에 따라 이후 시간과 적중 여부는 달라집니다. 실제 태그 공개 동작이나 앱 UI를 이 단계에서 재검증하지 않았습니다.
+
+### 누적 diff 병합 전 통합 검증
+
+- 사용자 지시로 이번 작업을 커밋하고 최신 origin/main의 Windows 지원·세 플랫폼 빌드 워크플로를 통합했다. 저장 테스트와 검증 기록 충돌은 양쪽 내용을 보존했다.
+- 통합본 Rust 58개·Node 24개 테스트, Clippy, Rustfmt, 버전 일치 검사, 개발 빌드 및 diff 검사 통과. 기존 package-lock.json의 미커밋 정렬 변경은 제외·보존했다.
+- 통합 후 실제 UI를 다시 실행하지 않았으며, 실제 클릭·누적 기준·재시작 검증은 위 기록을 따른다. 브랜치 push는 검증·빌드만 실행하며 공개 릴리스 태그를 만들지 않는다.

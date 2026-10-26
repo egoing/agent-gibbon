@@ -770,15 +770,19 @@ mod tests {
     #[test]
     fn inline_update_detaches_file_and_editor_preserves_metadata() {
         let mut note = Note::default();
+        let source = std::env::temp_dir()
+            .join("unused.md")
+            .to_string_lossy()
+            .into_owned();
         let request = serde_json::from_value(serde_json::json!({
-            "action":"open", "markdown":"본문", "source_path":"/tmp/unused.md", "title":"제목", "color":"#ffeeaa"
+            "action":"open", "markdown":"본문", "source_path":source, "title":"제목", "color":"#ffeeaa"
         })).unwrap();
         note.apply(&request).unwrap();
         let request =
             serde_json::from_value(serde_json::json!({"action":"update", "status":"상태"}))
                 .unwrap();
         note.apply(&request).unwrap();
-        assert_eq!(note.source_path.as_deref(), Some("/tmp/unused.md"));
+        assert_eq!(note.source_path.as_deref(), Some(source.as_str()));
         let request =
             serde_json::from_value(serde_json::json!({"action":"update", "markdown":"직접 입력"}))
                 .unwrap();

@@ -4,14 +4,19 @@ use serde_json::{json, Value};
 use std::{
     fs::{self, File, OpenOptions},
     io::{Read, Write},
-    os::unix::{
-        fs::{DirBuilderExt, MetadataExt, OpenOptionsExt},
-        net::{UnixListener, UnixStream},
-    },
     path::PathBuf,
     time::Duration,
 };
 
+#[cfg(unix)]
+use std::os::unix::{
+    fs::{DirBuilderExt, MetadataExt, OpenOptionsExt},
+    net::{UnixListener, UnixStream},
+};
+#[cfg(windows)]
+use uds_windows::{UnixListener, UnixStream};
+
+#[cfg(unix)]
 pub fn directory() -> Result<PathBuf, String> {
     // A short path avoids Darwin's 104-byte Unix socket path limit.
     let uid = unsafe { libc::geteuid() };
@@ -30,6 +35,26 @@ pub fn directory() -> Result<PathBuf, String> {
     Ok(path)
 }
 
+#[cfg(windows)]
+pub fn directory() -> Result<PathBuf, String> {
+    let root = std::env::var_os("LOCALAPPDATA").ok_or("LOCALAPPDATA is unavailable")?;
+    let path = PathBuf::from(root).join("AgentGibbon").join(
+        crate::instance::current()
+            .id
+            .as_deref()
+            .unwrap_or("installed"),
+    );
+    fs::create_dir_all(&path).map_err(|e| e.to_string())?;
+    if fs::symlink_metadata(&path)
+        .map_err(|e| e.to_string())?
+        .file_type()
+        .is_symlink()
+    {
+        return Err("IPC directory cannot be a symbolic link".into());
+    }
+    Ok(path)
+}
+
 pub struct Endpoint {
     pub listener: UnixListener,
     _lock: File,
@@ -40,18 +65,18 @@ impl Endpoint {
         Self::bind_in(directory()?)
     }
     fn bind_in(dir: PathBuf) -> Result<Option<Self>, String> {
-        let lock = OpenOptions::new()
-            .read(true)
-            .write(true)
-            .create(true)
-            .truncate(false)
-            .mode(0o600)
-            .custom_flags(libc::O_NOFOLLOW)
+        let mut options = OpenOptions::new();
+        options.read(true).write(true).create(true).truncate(false);
+        #[cfg(unix)]
+        options.mode(0o600).custom_flags(libc::O_NOFOLLOW);
+        let lock = options
             .open(dir.join("app.lock"))
             .map_err(|e| e.to_string())?;
         match lock.try_lock_exclusive() {
             Ok(()) => (),
-            Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => return Ok(None),
+            Err(e) if e.raw_os_error() == fs2::lock_contended_error().raw_os_error() => {
+                return Ok(None)
+            }
             Err(e) => return Err(e.to_string()),
         }
         let path = dir.join("app.sock");

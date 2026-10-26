@@ -1,11 +1,12 @@
 //! One atomically replaced Markdown document per note, isolated by instance.
 use crate::model::{Action, Note, Request};
 use serde::{Deserialize, Serialize};
+#[cfg(unix)]
+use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt};
 use std::{
     collections::BTreeMap,
     fs,
     io::Write,
-    os::unix::fs::{DirBuilderExt, OpenOptionsExt},
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
 };
@@ -38,10 +39,36 @@ impl Store {
     }
     pub fn path(&self, id: &str) -> PathBuf {
         // Escape uppercase only: readable IDs without case collisions on macOS.
+        let reserved = cfg!(windows)
+            && matches!(
+                id.to_ascii_lowercase().as_str(),
+                "con"
+                    | "prn"
+                    | "aux"
+                    | "nul"
+                    | "com1"
+                    | "com2"
+                    | "com3"
+                    | "com4"
+                    | "com5"
+                    | "com6"
+                    | "com7"
+                    | "com8"
+                    | "com9"
+                    | "lpt1"
+                    | "lpt2"
+                    | "lpt3"
+                    | "lpt4"
+                    | "lpt5"
+                    | "lpt6"
+                    | "lpt7"
+                    | "lpt8"
+                    | "lpt9"
+            );
         let name: String = id
             .bytes()
             .map(|b| {
-                if b.is_ascii_uppercase() {
+                if b.is_ascii_uppercase() || reserved {
                     format!("~{b:02x}")
                 } else {
                     char::from(b).to_string()
@@ -53,10 +80,11 @@ impl Store {
     pub fn save(&self, id: &str, note: &Note) -> Result<(), String> {
         let result = (|| -> Result<(), Box<dyn std::error::Error>> {
             let path = self.path(id);
-            fs::DirBuilder::new()
-                .recursive(true)
-                .mode(0o700)
-                .create(path.parent().ok_or("메모 폴더가 없습니다")?)?;
+            let mut builder = fs::DirBuilder::new();
+            builder.recursive(true);
+            #[cfg(unix)]
+            builder.mode(0o700);
+            builder.create(path.parent().ok_or("메모 폴더가 없습니다")?)?;
             let meta = Metadata {
                 title: note.title.clone(),
                 color: note.color.clone(),
@@ -74,11 +102,11 @@ impl Store {
                 std::process::id(),
                 SERIAL.fetch_add(1, Ordering::Relaxed)
             ));
-            let mut file = fs::OpenOptions::new()
-                .write(true)
-                .create_new(true)
-                .mode(0o600)
-                .open(&temp)?;
+            let mut options = fs::OpenOptions::new();
+            options.write(true).create_new(true);
+            #[cfg(unix)]
+            options.mode(0o600);
+            let mut file = options.open(&temp)?;
             let result = (|| -> Result<(), Box<dyn std::error::Error>> {
                 write!(file, "{PREFIX}{metadata}\n-->\n{}", note.markdown)?;
                 file.sync_all()?;
@@ -186,7 +214,7 @@ impl Store {
                         return Err("잘못된 폴더명".into());
                     }
                     let b = u8::from_str_radix(&hex, 16).map_err(|e| e.to_string())?;
-                    if !b.is_ascii_uppercase() {
+                    if !b.is_ascii_alphanumeric() {
                         return Err("잘못된 폴더명".into());
                     }
                     id.push(char::from(b));
@@ -260,6 +288,26 @@ mod tests {
         fs::remove_dir_all(root).unwrap();
     }
 
+    #[test]
+    fn windows_reserved_ids_roundtrip_without_case_collisions() {
+        let root = std::env::temp_dir().join(format!("gibbon-reserved-{}", std::process::id()));
+        let store = Store(root.clone());
+        let ids = ["con", "CON", "Con", "aux", "nul", "prn", "com1", "lpt9"];
+        for id in ids {
+            let note = Note {
+                markdown: id.into(),
+                ..Note::default()
+            };
+            store.save(id, &note).unwrap();
+            store.save(id, &note).unwrap();
+        }
+        let notes = store.load().unwrap();
+        assert_eq!(notes.len(), ids.len());
+        for id in ids {
+            assert_eq!(notes[id].markdown, id);
+        }
+        fs::remove_dir_all(root).unwrap();
+    }
     #[test]
     fn roundtrip_and_isolation() {
         let root = std::env::temp_dir().join(format!("gibbon-store-{}", std::process::id()));

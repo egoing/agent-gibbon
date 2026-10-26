@@ -27,6 +27,7 @@ impl Instance {
             label,
         })
     }
+    #[cfg(any(unix, test))]
     pub fn directory(&self, uid: u32) -> std::path::PathBuf {
         let suffix = self
             .id
