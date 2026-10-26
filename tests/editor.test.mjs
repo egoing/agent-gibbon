@@ -333,3 +333,38 @@ test('failed confirmation keeps cumulative changes and allows retry', async () =
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
   assert.equal(app.element('error').hidden, true);
 });
+
+test('folded note opens from title, blank space, border and icon without starting a drag', async () => {
+  const app = await setup();
+  for (const id of ['fold-title', 'viewport', 'body', 'fold-toggle']) {
+    app.fold(true);
+    await app.pollFold();
+    let stopped = false;
+    const event = { button: 0, target: app.element(id),
+      preventDefault() {}, stopPropagation() { stopped = true; } };
+    const before = app.calls.filter(([name]) => name === 'toggle_fold').length;
+    app.events.mousedown(event);
+    await app.events.click(event);
+    if (!stopped && id === 'fold-toggle') await app.element(id).listeners.click();
+    assert.equal(stopped, true);
+    assert.equal(app.classes.has('folded'), false);
+    assert.equal(app.calls.filter(([name]) => name === 'toggle_fold').length, before + 1);
+  }
+  assert.equal(app.calls.filter(([name]) => name === 'drag_note').length, 0);
+});
+
+test('folded click ignores secondary buttons and coalesces pending clicks', async () => {
+  const app = await setup();
+  app.fold(true);
+  await app.pollFold();
+  for (const button of [1, 2]) {
+    app.events.click({ button, preventDefault() { assert.fail('non-primary click'); } });
+  }
+  assert.equal(app.classes.has('folded'), true);
+  const event = { button: 0, preventDefault() {}, stopPropagation() {} };
+  await Promise.all([app.events.click(event), app.events.click(event)]);
+  assert.equal(app.calls.filter(([name]) => name === 'toggle_fold').length, 1);
+  assert.equal(app.classes.has('folded'), false);
+  await app.events.click({ button: 0, preventDefault() { assert.fail('expanded content click'); } });
+  assert.equal(app.calls.filter(([name]) => name === 'toggle_fold').length, 1);
+});

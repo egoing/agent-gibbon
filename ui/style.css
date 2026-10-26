@@ -72,6 +72,7 @@ body.folded #controls > button:not(#fold-toggle),
 body.folded #content, body.folded #editor, body.folded .resize,
 body.folded #warp-tip, body.folded #diff-actions { display: none !important; }
 body.folded #viewport { overflow: hidden; }
+body.folded, body.folded:active { cursor: pointer; }
 
 #fold-title { font-size: 10px; line-height: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
 
