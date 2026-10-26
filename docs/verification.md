@@ -1,5 +1,13 @@
 # Floatnote 검증 기록
 
+## 2026-10-26 설치 앱 흰 화면 확인과 복구
+
+- 사용자 화면에서 흰 메모 창이 보인다는 보고를 받았다. 최초 조회 시 실행 중인 앱은 이전 설치 검증 경로 `C:\Users\egoin\AppData\Local\AgentGibbonValidation-20261026\agent-gibbon.exe`였고 최신 `a3eda85` release 파일과 해시가 달랐다. 다음 화면 조회 전에 기존 프로세스가 종료되어 원래 흰 화면의 WebView 상태와 정확한 원인은 확인하지 못했다.
+- 현재 워크트리 debug 앱을 개발 CLI로 실행하고, 최신 release를 별도로 실행하여 실제 화면과 접근성 트리에서 한글 본문·도구 버튼이 표시됨을 확인했다. CLI 상태만으로 화면 성공을 판단하지 않았다. GUI 확인은 `computer-use` 스킬의 Orca 창별 캡처·접근성 조회로 수행했고 입력·클립보드 조작은 하지 않았다.
+- 기존 설치 실행 파일을 `src-tauri/target/white-screen-investigation/installed-before-20261026-172244.exe`로 백업하고, 테스트 프로세스가 종료된 상태에서 최신 release로 교체했다. 설치 경로 파일과 빌드 파일의 SHA-256 일치를 확인했다. 메모 저장 파일은 교체하지 않았다.
+- 설치 경로에서 기존 `main`을 열어 기존 본문 ‘작업 내용을 기다리고 있습니다.’와 도구 버튼이 실제 화면에 표시됨을 확인했다. 복구된 설치 앱은 실행 상태로 두었다. 다른 기존 메모는 자동으로 열지 않았다. 앱 소스 변경·재빌드·원격 push는 수행하지 않았다.
+- 확인용 `white-screen-check`(개발)와 `release-screen-check`(설치) 메모는 숨겼다. 자동 승인 검토가 후속 삭제 명령을 `blocked by policy`로 거절하여 두 확인용 저장 파일은 남겼다. 거절된 명령은 실행되지 않았으며 복구된 앱을 종료하지 않았다.
+
 ## 2026-10-26 Windows 기능별 워크트리 구현과 통합 검증
 
 - 작업 전에 검증 기록만 임시 보관하고 `git pull --ff-only origin main`으로 `b0a4bef`를 반영한 뒤 기록을 복원했다. 최신 main에는 이미 Windows 기본 빌드·CLI·저장 지원이 있었으므로 아래 pull 전 실패 기록과 구분한다.
