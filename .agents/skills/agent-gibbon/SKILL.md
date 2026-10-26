@@ -26,7 +26,7 @@ description: macOS 또는 Windows에 설치된 Agent Gibbon 앱으로 플로팅 
 
 Windows 설치 파일과 개발 절차는 저장소의 `docs/windows.md`를 참고합니다. 설치한 `agent-gibbon.exe`의 실제 경로를 확인해 PowerShell에서 `& '실행 파일 절대 경로' list`처럼 호출합니다. CLI 명령과 창 상태 보존 규칙은 macOS와 같습니다. 설치 위치를 추측해 다른 실행 파일을 호출하지 않습니다.
 
-개발 테스트는 해당 워크트리의 `scripts/agent-gibbon-dev.cmd`를 사용합니다. 편집 저장은 Ctrl+S이며 macOS 전용 보조키·포인터 접촉 기능 대신 화면 버튼을 사용합니다.
+개발 테스트는 해당 워크트리의 `scripts/agent-gibbon-dev.cmd`를 사용합니다. 편집 저장은 Ctrl+S입니다. 접촉 기능을 지원하는 버전에서는 Ctrl + 포인터로 접기·펼치기, Alt + 포인터로 반대편 이동, Ctrl+Alt+Win + 포인터로 숨기기를 사용할 수 있습니다. 화면 버튼도 사용할 수 있습니다.
 
 ## 창과 상태 보존
 

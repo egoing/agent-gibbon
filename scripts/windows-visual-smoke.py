@@ -12,6 +12,7 @@ import subprocess
 import shutil
 import time
 import uuid
+from windows_uia import control_center
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--interact', action='store_true')
@@ -74,7 +75,7 @@ def idle_keys():
     assert not any(user.GetAsyncKeyState(key) & 0x8000 for key in (16, 17, 18, 91, 92, 1, 2)), '사용자 입력 중: 검증 중단'
 
 
-def native(state):
+def native(state, check_alpha=True):
     found = []
     callback = C.WINFUNCTYPE(W.BOOL, W.HWND, W.LPARAM)
 
@@ -91,6 +92,8 @@ def native(state):
     hwnd = found[0]
     if hwnd not in handles:
         handles.append(hwnd)
+    if not check_alpha:
+        return hwnd
     key, alpha, flags = W.DWORD(), C.c_ubyte(), W.DWORD()
     assert user.GetLayeredWindowAttributes(hwnd, C.byref(key), C.byref(alpha), C.byref(flags)), C.get_last_error()
     assert alpha.value == int(state['opacity'] * 255 + .5), (alpha.value, state)
@@ -116,7 +119,8 @@ try:
     assert probe.returncode != 0, '이 워크트리 개발 앱을 먼저 종료하세요. 기존 앱은 검증에서 종료하지 않습니다.'
     state = cli('open', '--id', ids[0], '--markdown', '# Visual alpha test')
     assert state['visible'] and not state['focused']
-    hwnd = native(state)
+    # Register ownership before alpha assertions so a regression still cleans up.
+    hwnd = native(state, check_alpha=False)
     pid = W.DWORD()
     user.GetWindowThreadProcessId(hwnd, C.byref(pid))
     process = kernel.OpenProcess(0x100001 | 0x1000, False, pid.value)
@@ -125,6 +129,7 @@ try:
     assert kernel.QueryFullProcessImageNameW(process, 0, image_path, C.byref(length))
     assert Path(image_path.value).resolve() == binary.resolve(), image_path.value
     owned_process = process
+    native(state)
     stable_focus()
     peer = cli('open', '--id', ids[1], '--markdown', 'Independent note')
     native(peer)
@@ -156,20 +161,19 @@ try:
         native(state)
         stable_focus()
         time.sleep(3.2)
+        # Read HWND directly before inspect (which itself synchronizes alpha).
+        native({**state, 'opacity': .5})
         state = cli('inspect', '--id', ids[0])
         assert not state['feedback_active'] and state['opacity'] == .5, state
         native(state)
         p, size = state['position'], state['size']
         move(p['x'] + size['width'] / 2, p['y'] + size['height'] / 2)
+        native({**state, 'opacity': 1})
         state = cli('inspect', '--id', ids[0])
         assert state['opacity'] == 1, state
         native(state)
         stable_focus()
-        scale = user.GetDpiForWindow(hwnd) / 96
-        client, origin = W.RECT(), W.POINT()
-        assert user.GetClientRect(hwnd, C.byref(client))
-        assert user.ClientToScreen(hwnd, C.byref(origin))
-        move(origin.x + client.right - 135 * scale, origin.y + 15 * scale)
+        move(*control_center(hwnd, '메모 접기'))
         point = W.POINT()
         user.GetCursorPos(C.byref(point))
         assert user.GetAncestor(user.WindowFromPoint(point), 2) == hwnd, '다른 창 위 입력 방지'
@@ -180,6 +184,7 @@ try:
         state = cli('inspect', '--id', ids[0])
         assert state['folded'], state
         move(original_cursor.x, original_cursor.y)
+        native({**state, 'opacity': .8})
         state = cli('inspect', '--id', ids[0])
         assert state['opacity'] == .8, state
         native(state)

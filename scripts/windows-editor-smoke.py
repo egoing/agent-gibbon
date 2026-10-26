@@ -15,6 +15,7 @@ import sys
 import tempfile
 import time
 import uuid
+from windows_uia import control_center, control_rect
 
 ROOT = Path(__file__).resolve().parents[1]
 BINARY = ROOT / 'src-tauri/target/debug/agent-gibbon.exe'
@@ -85,6 +86,8 @@ def main():
     user.SetCursorPos.argtypes = [C.c_int, C.c_int]
     user.GetDpiForWindow.argtypes = [W.HWND]
     user.GetDpiForWindow.restype = W.UINT
+    user.GetClientRect.argtypes = [W.HWND, C.POINTER(W.RECT)]
+    user.ClientToScreen.argtypes = [W.HWND, C.POINTER(W.POINT)]
     user.WindowFromPoint.argtypes = [W.POINT]
     user.WindowFromPoint.restype = W.HWND
     user.GetAncestor.argtypes = [W.HWND, W.UINT]
@@ -183,10 +186,17 @@ def main():
         try:
             send(0x11)
             injected_keys.add(0x11)
+            # A human holds Ctrl before pressing the letter; native pointer
+            # shortcuts must not fold a focused editor during this interval.
+            time.sleep(.15)
+            assert not cli('inspect')['folded'], '편집 중 Ctrl 키가 메모를 접었습니다.'
             send(key)
             injected_keys.add(key)
             send(key, flags=2, release=True)
             injected_keys.discard(key)
+            if key == 0x53:
+                time.sleep(.3)
+                assert not cli('inspect')['folded'], '저장 직후 유지한 Ctrl 키가 메모를 접었습니다.'
         finally:
             if 0x11 in injected_keys:
                 send(0x11, flags=2, release=True)
@@ -214,9 +224,7 @@ def main():
             time.sleep(.15)
 
     def fold_button(state):
-        scale = user.GetDpiForWindow(hwnd) / 96
-        right = state['position']['x'] + state['size']['width']
-        return right - (9 if state['folded'] else 135) * scale, state['position']['y'] + (6 if state['folded'] else 15) * scale
+        return control_center(hwnd, '메모 펼치기' if state['folded'] else '메모 접기')
 
     try:
         try:
@@ -237,9 +245,8 @@ def main():
         wait_state(lambda value: not value['animating'], '등장 애니메이션 완료')
         state = cli('inspect')
         scale = user.GetDpiForWindow(hwnd) / 96
-        # CSS controls are 19 DIP wide with a 1 DIP gap; edit is fifth from right.
-        click(state['position']['x'] + state['size']['width'] - 95 * scale,
-              state['position']['y'] + 15 * scale, activate_from=original_foreground)
+        click(*control_center(hwnd, '메모 편집'), activate_from=original_foreground)
+        control_rect(hwnd, 'Markdown 원문')  # Confirm that the editor really opened.
         chord(0x41)  # Ctrl+A, editor textarea is focused by its own click handler.
         type_text(replacement)
         chord(0x53)  # Ctrl+S, invoke the real UI save path.

@@ -1,5 +1,70 @@
 # Floatnote 검증 기록
 
+## 2026-10-26 Windows 기능별 워크트리 구현과 통합 검증
+
+- 작업 전에 검증 기록만 임시 보관하고 `git pull --ff-only origin main`으로 `b0a4bef`를 반영한 뒤 기록을 복원했다. 최신 main에는 이미 Windows 기본 빌드·CLI·저장 지원이 있었으므로 아래 pull 전 실패 기록과 구분한다.
+- 사용자 요청대로 별도 워크트리 세 개에서 작업했다. `egoing/windows-contact`는 Sol high로 접촉 단축키·편집 충돌 보호, `egoing/windows-visual`은 Sol high로 반투명·포커스·네이티브 수동 크기 보존, `egoing/windows-runtime`은 Sol medium으로 CLI·저장·격리 및 실제 편집 회귀를 담당했다. 부모 에이전트가 결과와 코드를 검토하고 추가 수정을 배정한 뒤 `egoing/window-test`에 통합했다. 원격 push·태그·공개 배포는 수행하지 않았다.
+- 환경: Windows 11 Home 10.0.26200 x64, Rust/Cargo 1.99.1 MSVC, Node 20.11.0, npm 10.2.4, Tauri CLI 2.12.1/Tauri 2.12.2, Python 3.10.11.
+
+### 구현 및 검토
+
+- Ctrl 접기·펼치기, Alt 워프, Ctrl+Alt+Win 숨기기를 구현했다. 16ms 네이티브 입력 확인은 대기 작업을 하나로 제한하며 창별 Contact 상태를 공유한다. 숨기기 우선순위, 실제 이탈·키 해제 후 재무장, 접힌 창의 4 DIP 여유, 기존 워프 안내를 유지한다.
+- Windows 전체 창 alpha는 기본 0.5, 접힘 0.8, hover·등장·변경 알림 중 1.0이다. 표시 때 Tauri 가시성 상태를 유지하면서 활성화를 억제하고, 창 생성 직후와 재표시의 포커스 복원을 보완했다. 부모가 기존 네이티브 루프에 약 100ms마다 보이는 창의 alpha 동기화를 연결했다.
+- 리뷰 중 macOS `frontmost` 자기 PID 필터 변경이 복원 조건을 무력화할 수 있는 부분을 수정하여 기존 macOS 조건을 유지했다. Windows는 다른 메모 HWND도 복원 대상으로 기억하며 사용자가 다른 창으로 전환한 경우 개입하지 않는다.
+- 실제 가장자리 드래그 이후 자동 크기로 돌아가는 Windows 회귀를 재현하고 수정했다. `WM_SIZING`만 원자적 신호로 기록하고, Resized/다음 fit/등장 frame에서 수동 크기를 반영한다. 네이티브 콜백에서는 앱 잠금이나 창 조작을 하지 않으며 창 파괴 때 해제한다. 프로그램 크기 변경은 수동 조절로 기록하지 않는다.
+- 재열기 때 외곽 크기를 클라이언트 크기로 전달하여 Windows 테두리가 중복 가산되는 문제도 수정했다. 배치 예약은 외곽 크기를 유지하고 Windows HWND 외곽 크기를 정확하게 적용한다.
+- 통합 중 Ctrl+A·Ctrl+S와 접촉 접기의 충돌을 재현했다. 프런트엔드가 편집 상태를 등록한 뒤 입력에 포커스를 주고, Windows의 활성 편집 창에서는 Ctrl 접기만 억제한다. 저장·취소 때 Ctrl이 계속 눌려 있으면 해제/재진입까지 접촉을 소비한다. 다른 앱 포커스에서의 접촉, 화면 버튼, macOS 동작은 유지한다.
+- 긴 Windows IPC 경로는 UTF-8 107바이트 제한을 선행 검증하여 일반적인 앱 시작 실패로 가리지 않는다. 사용자 격리 경로는 변경하지 않았다.
+
+### 최종 통합본 검증
+
+- `npm test`: Rust 62개 통과, Node 25개 통과/Windows POSIX 실행 fixture 1개 제외. Clippy `--all-targets -- -D warnings`, Rustfmt, 개발 빌드 통과.
+- `python scripts/windows-contact-smoke.py`: 45ms Ctrl 접촉 6회, 반복 방지, 접힌 여유 영역, Alt 이탈·재진입, 세 키 숨기기 우선순위, 본문·크기·위치·고정·외부 포커스·숨김 갱신, 활성 편집 Ctrl+A/Ctrl+S와 저장 후 Ctrl 유지·해제 재무장 통과. 편집 진입은 자기 HWND 안의 접근성 이름과 InvokePattern/SetFocus로 확인했다.
+- `python scripts/windows-visual-smoke.py --interact`: 실제 HWND alpha 128/204/255와 CLI 값 일치, 최초/추가 창의 외부 foreground 보존, 반복 숨김·재열기 3회, 숨김 갱신 위치 보존, 실제 접기 버튼 통과. hover·접힘·feedback 만료는 `inspect`가 alpha를 바꾸기 전에 HWND를 직접 읽어 확인했다. WebView 타이머도 작동하므로 네이티브 타이머만 따로 중단·분리한 검증은 아니다.
+- `python scripts/windows-editor-smoke.py --interact`: 접근성 이름으로 찾은 실제 연필 버튼 클릭, Ctrl을 150ms 유지한 후 전체 선택, 한글 Unicode 입력, Ctrl+S 후 Ctrl 300ms 유지, 메모와 연결 원본 파일 저장 통과. 실제 native edge drag `393×134 → 336×190` 뒤 update/close/open/fold/unfold 모두 `336×190` 유지와 본문 보존 통과.
+- `node scripts/windows-runtime-smoke.mjs 'C:\Users\egoin\.codex\worktrees\2411\window-test'`: 두 개발 인스턴스의 같은 ID 본문·저장·재시작 격리, 한글 표준입력, 숨김 갱신 위치·포커스, 잘못된 입력 보존, 한글·공백 원본 경로 및 연결 해제, 중복 실행 잠금, 재시작 복원 통과. 긴 한글 LOCALAPPDATA 경로는 GUI 실행 없이 즉시 오류를 반환한다.
+- `npm run build:windows`: 최종 통합본 Windows x64 NSIS 설치 파일 생성 성공(`src-tauri/target/release/bundle/nsis/Agent Gibbon_0.2.7_x64-setup.exe`, 약 2.73 MiB). 이번 결과물을 설치하거나 서명·공개 배포하지 않았다.
+- 테스트는 각 워크트리의 개발 CLI만 사용했다. 생성 UUID 메모/원본 파일과 자신이 시작한 정확한 바이너리·PID를 정리하고 포인터를 복원했다. 기존 설치 검증 앱 PID 20168은 종료·교체하지 않았다.
+
+### 한계와 테스트 중 부작용
+
+- Windows 10/ARM64, 실제 다중 모니터·혼합 DPI, 관리자 앱·보안 데스크톱, macOS 실행 회귀는 미검증이다. 16ms 폴링보다 짧은 임의 접촉이나 OS 스케줄링 지연을 모두 보장하지 않는다. 긴 사용자 프로필 경로는 명확히 실패하도록 안내하며 경로 제한 자체를 제거하지 않았다.
+- 초기 고정 좌표 테스트에서 스크롤바와 비클라이언트 테두리로 버튼 좌표가 어긋났다. 편집 버튼 대신 복사 버튼을 누른 가능성이 있어 이전 클립보드 내용 보존은 확인하지 못했고 사용자에게 알렸다. 원래 값을 읽거나 보관하지 않아 추정 복원을 시도하지 않았다. 최종 테스트는 자기 HWND의 UI Automation 이름으로 컨트롤을 찾고 실제 편집 진입을 확인한 뒤 입력한다.
+- API 근거: [GetAsyncKeyState](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getasynckeystate), [SetLayeredWindowAttributes](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setlayeredwindowattributes), [WM_SIZING](https://learn.microsoft.com/en-us/windows/win32/winmsg/wm-sizing), [SetWindowSubclass](https://learn.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-setwindowsubclass), [UI Automation 요소 조회](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-obtainingelements), 설치된 Tauri/Tao/Wry 바인딩과 구현.
+
+## 2026-10-26 Windows 11 호환성 검증 — pull 전 e57cb38
+
+이 절은 최신 main을 반영하기 전 코드의 기록이다. 이후 `b0a4bef`를 pull하여 Windows 기본 지원을 반영했고, 개발 빌드와 Rust 57개·Node 23개 테스트(1개 POSIX fixture 제외), Clippy·Rustfmt·버전 검사가 통과했다. 아래의 빌드 실패는 현재 코드의 결론으로 사용하지 않는다.
+
+- 환경: Windows 11 Home 10.0.26200 64-bit, x86_64-pc-windows-msvc, Node v20.11.0, npm 10.2.4, rustc 1.99.1, cargo 1.99.1, Tauri CLI 2.12.1. README의 현재 빌드·배포 안내는 macOS 기준이다.
+- 결론: 현재 소스로 Windows 실행 파일을 빌드할 수 없다. 실제 창·CLI 통신·저장·재시작은 검증하지 못했다. 이번 작업에서는 Windows 지원 구현을 변경하지 않았다.
+
+### 직접 실행한 검증
+
+| 명령 | 결과 |
+| --- | --- |
+| `npm ci` | 성공 |
+| `npm run dev:info` | 성공, 워크트리별 개발 ID 반환 |
+| `npm run dev -- --no-watch` | 의존성 설치 후에도 `node_modules/.bin/tauri` 실행 시 `ENOENT` |
+| `npm run build` | `--bundles app` 거부, Windows CLI의 허용값은 `msi`, `nsis` |
+| `npm run build:release` | `--bundles app,dmg`의 `app` 거부 |
+| `npm run dev:build` | `src-tauri/icons/icon.ico` 누락으로 Windows 리소스 생성 실패 |
+| `npm test` | 같은 아이콘 누락으로 실패, Rust 테스트 및 후속 Node 테스트 미실행 |
+| `npm run check` | 같은 아이콘 누락으로 실패 |
+| `node scripts/dev.mjs cli inspect --id windows-test` | 개발 바이너리가 없어 `ok:false`, 종료 코드 1 |
+
+- 후속 오류 확인을 위해 Windows 기본 아이콘으로 `src-tauri/target/windows-diagnostic.ico`를 만들고, 해당 명령 프로세스의 `TAURI_CONFIG`에만 `{"bundle":{"icon":["target/windows-diagnostic.ico"]}}`를 지정해 `npm run dev:build`를 실행했다. 소스·기본 설정은 수정하지 않았다. 아이콘 단계를 통과한 뒤 Rust 컴파일 오류 15개로 실패했다: `ipc.rs`, `source.rs`, `storage.rs`, `main.rs`의 `std::os::unix`, `geteuid`, `O_NOFOLLOW`, `setsid`, `mode`, `uid`, `pre_exec`. 로컬 IPC, 파일 권한 처리, GUI 분리 실행에 플랫폼별 구현이 필요하다. 진단용 아이콘은 빌드 산출물 폴더에만 존재한다.
+- PowerShell에서 `$testFiles = @(Get-ChildItem tests/*.test.mjs | ForEach-Object FullName); node --test @testFiles` 실행: 18개 중 17개 통과, 1개 실패. 실패는 `tests/dev-instance.test.mjs:54`의 정상 개발 바이너리 허용 검사다. 테스트의 가짜 바이너리도 Unix shebang 실행을 전제로 하므로 이 실패만으로 실제 Windows 바이너리의 동작을 단정하지 않는다. 통과 항목은 편집·초안·글자 크기·접기 버튼·피드백·테마 등의 Node 모의 환경 테스트이며 실제 WebView2 UI 검증은 아니다.
+- `node --test tests/*.test.mjs`는 현재 Node/Windows 조합에서 glob을 확장하지 못해 파일을 찾지 못한다. Rust 빌드를 고쳐도 `npm test`의 후속 Node 명령에 이 문제가 남는다.
+
+### 소스에서 확인한 Windows 대응 필요 사항
+
+- `scripts/dev-instance.mjs:17`: 개발 바이너리 경로에 `.exe`가 없다. `scripts/dev.mjs:24`: 출처 검사에서 Windows 경로와 `/src-tauri`를 붙인 경로를 문자열 비교한다. `scripts/dev.mjs:41`: Tauri 실행 방식도 Windows 대응이 필요하다.
+- macOS 외 환경에서는 Ctrl 접촉 접기(`sizing.rs:197`), Alt 접촉 워프(`warp.rs:123`), 조합키 접촉 닫기(`warp.rs:114`) 판정이 항상 false다. 포인터에 따른 창 반투명 효과도 `main.rs`의 비-macOS 분기에서 항상 불투명도 1.0을 반환한다. 이 기능들은 README에도 macOS 동작으로 기술되어 있다.
+- 이전 앱 포커스 기억·복원은 `focus.rs`에서 macOS에만 구현되어 있다. Windows의 실제 포커스 보존 여부는 실행 가능한 빌드에서 별도로 확인해야 한다.
+- 기존 CLI 진입점은 POSIX 셸 스크립트이며, 다수의 실제 UI smoke는 `osascript`, Swift 또는 Unix 사용자 ID·소켓 경로에 의존한다. Windows용 실제 동작 검증 경로도 필요하다.
+- 앱 실행 단계에 도달하지 않아 사용자 창·메모·포커스 조작과 기존 프로세스 종료는 수행하지 않았다. 설치·배포·커밋은 수행하지 않았다.
+
 검증일: 2026-10-10 (Asia/Seoul)
 
 ## 워크트리별 개발 인스턴스 분리 (2026-10-25)

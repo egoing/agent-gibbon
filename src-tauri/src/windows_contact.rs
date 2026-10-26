@@ -4,7 +4,7 @@ use std::{
         atomic::{AtomicBool, Ordering},
         Arc,
     },
-    time::Duration,
+    time::{Duration, Instant},
 };
 use tauri::Manager;
 
@@ -43,6 +43,7 @@ pub fn install(app: &tauri::AppHandle) {
     let app = app.clone();
     std::thread::spawn(move || {
         let pending = Arc::new(AtomicBool::new(false));
+        let mut last_opacity = Instant::now();
         loop {
             std::thread::sleep(Duration::from_millis(16));
             // Never accumulate main-thread work while native dialogs or window
@@ -52,6 +53,10 @@ pub fn install(app: &tauri::AppHandle) {
             }
             let finished = pending.clone();
             let handle = app.clone();
+            let refresh_opacity = last_opacity.elapsed() >= Duration::from_millis(100);
+            if refresh_opacity {
+                last_opacity = Instant::now();
+            }
             if app
                 .run_on_main_thread(move || {
                     for window in handle.webview_windows().into_values() {
@@ -65,6 +70,14 @@ pub fn install(app: &tauri::AppHandle) {
                             window.state::<crate::sizing::Sizes>(),
                         ) {
                             eprintln!("포인터 접기 감지 실패: {error}");
+                        }
+                        // Background WebViews can throttle JavaScript timers.
+                        // Keep hover alpha and native style recovery responsive
+                        // without adding another thread or showing hidden notes.
+                        if refresh_opacity && window.is_visible().unwrap_or(false) {
+                            if let Err(error) = crate::sync_opacity(window) {
+                                eprintln!("창 반투명도 동기화 실패: {error}");
+                            }
                         }
                     }
                     finished.store(false, Ordering::Release);

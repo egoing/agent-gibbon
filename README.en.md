@@ -2,7 +2,7 @@
 
 [한국어](README.md) · [Website](https://agentgibbon.com/en/) · [Download](https://github.com/egoing/agent-gibbon/releases/latest)
 
-An open-source floating Markdown note app for macOS, created and updated by AI agents through a local CLI. Keep coding progress, checklists, and research notes beside your work without moving keyboard focus away from your editor.
+An open-source floating Markdown note app for macOS and Windows, created and updated by AI agents through a local CLI. Keep coding progress, checklists, and research notes beside your work without moving keyboard focus away from your editor.
 
 ## Install
 
@@ -56,3 +56,5 @@ Official release builds may send application error diagnostics through Sentry. C
 ## Windows development
 
 See the [Windows development and build guide](docs/windows.md) for prerequisites, isolated development CLI, NSIS packaging, and platform limitations. Validation evidence is recorded in [verification](docs/verification.md).
+
+Windows supports Ctrl + pointer contact to fold, Alt + pointer contact to move across the screen, and Ctrl+Alt+Win + pointer contact to hide. Notes become translucent when the pointer is outside, while showing and updating notes preserves keyboard focus in your current app.
