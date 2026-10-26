@@ -55,32 +55,26 @@ with tempfile.TemporaryDirectory(prefix='gibbon-direction-') as temp:
             move(cx, cy)
             start = cli('open', note, '--markdown', '# 방향 검증\n\n본문 보존')
             assert start['visible'] and start['animating'] and not start['focused'], start
+            # Native window geometry can settle just after the open response.
+            time.sleep(.1)
+            start = cli('inspect', note)
             move(cx + dx, cy + dy)
             early = cli('inspect', note)
-            assert early['position'] == start['position'] and early['animating'], early
-            # Reversal in the hold must not replace the first direction.
+            assert early['position'] == start['position'] and early['animating'], (start, early)
+            # Reversal in the hold must not cancel the pending movement.
             move(cx - dx, cy - dy)
             end = landed(note)
             assert not end['focused'] and end['note']['markdown'] == start['note']['markdown'], end
-            if direction == 'down':
-                assert not end['visible'] and end['position'] == start['position'], (start, end)
-                cli('update', note, '--markdown', '숨김 갱신')
-                assert not cli('inspect', note)['visible']
-            else:
-                assert end['visible'], end
-                x = end['position']['x'] / scale
-                if direction == 'left':
-                    assert abs(x - 8) <= 2, end
-                else:
-                    assert abs(x + end['size']['width'] / scale - (original['width'] - 8)) <= 2, end
-                if direction == 'up':
-                    assert end['folded'] and abs(end['size']['height'] / scale - 12) <= 1, end
-                else:
-                    assert not end['folded'] and end['size'] == start['size'], end
-                move(cx, cy + 80)
-                stable = cli('open', note)
-                assert not stable['animating'] and stable['position'] == end['position'], stable
+            assert end['visible'] and not end['folded'], end
+            assert end['size'] == start['size'], end
+            x = end['position']['x'] / scale
+            assert abs(x + end['size']['width'] / scale - (original['width'] - 8)) <= 2, end
+            move(cx, cy + 80)
+            stable = cli('open', note)
+            assert not stable['animating'] and stable['position'] == end['position'], stable
             cli('close', note)
+            cli('update', note, '--markdown', '숨김 갱신')
+            assert not cli('inspect', note)['visible']
             move(cx, cy)
             reopened = cli('open', note)
             assert reopened['visible'] and reopened['animating'], reopened
@@ -93,20 +87,15 @@ with tempfile.TemporaryDirectory(prefix='gibbon-direction-') as temp:
             if direction != 'up':
                 move(cx + 24, cy)
             restored = landed(note)
-            assert restored['visible'] and restored['folded'] == (direction == 'up'), restored
-            if direction == 'up':
-                assert restored['size'] == end['size'], restored
-                x, y, w, h = frame(restored)
-                native('click', x + w - 8, y + 5)
-                time.sleep(.3)
-                expanded = cli('inspect', note)
-                assert not expanded['folded'] and expanded['size'] == start['size'], expanded
+            assert restored['visible'] and not restored['folded'], restored
             cli('close', note)
             print('PASS:', direction, 'hold/reversal/action/reopen/jitter/one-shot', flush=True)
         note = 'direction-drag-' + uuid.uuid4().hex[:10]
         notes.append(note)
         move(cx, cy)
         start = cli('open', note, '--markdown', '# 직접 조작' + '\n\n본문' * 6)
+        time.sleep(.1)
+        start = cli('inspect', note)
         x, y, w, h = frame(start)
         native('drag', x + 40, y + 50, x + 100, y + 80)
         time.sleep(.6)
@@ -124,14 +113,24 @@ with tempfile.TemporaryDirectory(prefix='gibbon-direction-') as temp:
         move(cx, cy)
         cli('open', note)
         move(cx, cy - 24)
-        folded = landed(note)
-        assert folded['folded'], folded
-        x, y, w, h = frame(folded)
-        native('click', x + w - 8, y + 5)
-        time.sleep(.3)
-        expanded = cli('inspect', note)
-        assert not expanded['folded'] and expanded['size'] == resized['size'], (resized, expanded)
-        print('PASS: native drag cancellation; manual size survives upward fold and unfold', flush=True)
+        restored = landed(note)
+        assert not restored['folded'] and restored['size'] == resized['size'], (resized, restored)
+        cli('close', note)
+        print('PASS: native drag cancellation; manual size survives movement', flush=True)
+        # Concurrent entrances must reserve distinct empty destinations.
+        occupied = []
+        move(cx, cy)
+        for _ in range(3):
+            note = 'space-' + uuid.uuid4().hex[:10]
+            notes.append(note)
+            cli('open', note, '--markdown', '# 빈 공간 검증')
+            occupied.append(note)
+        move(cx - 24, cy)
+        rectangles = [frame(landed(note)) for note in occupied]
+        for i, (x, y, w, h) in enumerate(rectangles):
+            for ox, oy, ow, oh in rectangles[:i]:
+                assert x + w <= ox or ox + ow <= x or y + h <= oy or oy + oh <= y, rectangles
+        print('PASS: concurrent entrances reserve non-overlapping destinations', flush=True)
     finally:
         for note in notes:
             subprocess.run([CLI, 'close', '--id', note], capture_output=True)
