@@ -411,6 +411,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::fit_note,
             sizing::poll_fold,
             sizing::toggle_fold,
+            sizing::set_editing,
             sizing::manual_resize
         ])
         .on_window_event(|win, event| {

@@ -47,7 +47,8 @@ $('font-size').addEventListener('click', () => {
   $('font-size').title = `글자 크기 ${size}px · 클릭하여 변경`;
   $('font-size').setAttribute('aria-label', `글자 크기 ${size}px, 클릭하여 변경`);
 });
-function endEditing() {
+async function endEditing() {
+  await invoke('set_editing', { editing: false });
   editing = false;
   $('editor').hidden = true;
   $('content').hidden = false;
@@ -58,21 +59,29 @@ function endEditing() {
   fitContent();
   $('edit').focus();
 }
-$('edit').addEventListener('click', () => {
-  if (!latestNote || editing) return;
-  editing = true;
-  editRevision = latestNote.revision;
-  $('markdown').value = latestNote.markdown;
-  $('save-target').textContent = latestNote.source_path ? '원본 파일에 저장' : '메모에 저장';
-  $('save-target').title = latestNote.source_path || '앱 종료 시 초기화됩니다';
-  $('content').hidden = true;
-  $('editor').hidden = false;
-  $('copy').disabled = true;
-  $('edit').disabled = true;
-  $('error').hidden = true;
-  $('markdown').focus();
+let startingEdit = false;
+$('edit').addEventListener('click', async () => {
+  if (!latestNote || editing || startingEdit) return;
+  startingEdit = true;
+  try {
+    // Register editing before focusing the textarea so native Ctrl sampling
+    // cannot interpret selection/save shortcuts as a pointer fold.
+    await invoke('set_editing', { editing: true });
+    editing = true;
+    editRevision = latestNote.revision;
+    $('markdown').value = latestNote.markdown;
+    $('save-target').textContent = latestNote.source_path ? '원본 파일에 저장' : '메모에 저장';
+    $('save-target').title = latestNote.source_path || '앱 종료 시 초기화됩니다';
+    $('content').hidden = true;
+    $('editor').hidden = false;
+    $('copy').disabled = true;
+    $('edit').disabled = true;
+    $('error').hidden = true;
+    $('markdown').focus();
+  } catch (error) { failure(error); }
+  finally { startingEdit = false; }
 });
-$('cancel').addEventListener('click', endEditing);
+$('cancel').addEventListener('click', () => endEditing().catch(failure));
 async function save() {
   if (!editing || saving) return;
   saving = true;
@@ -85,7 +94,7 @@ async function save() {
     $('content').innerHTML = latestNote.html;
     displayedHtml = $('content').innerHTML;
     revision = latestNote.revision;
-    endEditing();
+    await endEditing();
   } catch (error) { failure(error); }
   finally {
     saving = false;
@@ -149,15 +158,15 @@ for (const grip of document.querySelectorAll('.resize')) {
 }
 $('pin').addEventListener('click', () => invoke('toggle_pin').catch(failure));
 $('close').addEventListener('click', () => invoke('hide_note').catch(failure));
-document.addEventListener('keydown', (event) => {
+document.addEventListener('keydown', async (event) => {
   if (event.key === 'Escape') {
     event.preventDefault();
-    if (editing) { if (!saving) endEditing(); }
+    if (editing) { if (!saving) await endEditing().catch(failure); }
     else invoke('hide_note').catch(failure);
   }
   if (editing && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
     event.preventDefault();
-    save();
+    await save();
   }
 });
 let copyFeedback;

@@ -6,11 +6,47 @@ struct SizeState {
     manual: bool,
     expanded: Option<LogicalSize<f64>>,
     contact: crate::warp::Contact,
+    editing: bool,
     placed: bool,
     pending: bool,
 }
 #[derive(Default)]
 pub struct Sizes(Mutex<BTreeMap<String, SizeState>>);
+
+#[tauri::command]
+pub fn set_editing(
+    window: WebviewWindow,
+    sizes: State<Sizes>,
+    editing: bool,
+) -> Result<(), String> {
+    let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
+    let state = states.entry(window.label().into()).or_default();
+    #[cfg(windows)]
+    if state.editing && !editing && crate::windows_contact::modifiers().control {
+        // A quick Ctrl+S can finish before the next native sample. Latch it
+        // before leaving the editor so that saving cannot immediately fold.
+        let (cursor, rect) = contact_geometry(&window)?;
+        state.contact.trigger(
+            true,
+            contains_contact(rect, cursor, state.expanded.is_some()),
+            cursor,
+        );
+    }
+    state.editing = editing;
+    Ok(())
+}
+
+fn contact_trigger(
+    contact: &mut crate::warp::Contact,
+    control: bool,
+    inside: bool,
+    cursor: (f64, f64),
+    editing_focused: bool,
+) -> bool {
+    // Still consume contacts while typing: leaving the editor with Ctrl held
+    // must wait for a release or a real pointer exit/reentry before folding.
+    contact.trigger(control, inside, cursor) && !editing_focused
+}
 
 pub fn prepare(window: &WebviewWindow) -> Result<(), String> {
     window
@@ -235,7 +271,9 @@ pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, Str
     }
     let (cursor, rect) = contact_geometry(&window)?;
     let inside = contains_contact(rect, cursor, state.expanded.is_some());
-    if state.contact.trigger(control, inside, cursor) {
+    let editing_focused =
+        cfg!(windows) && state.editing && window.is_focused().map_err(|e| e.to_string())?;
+    if contact_trigger(&mut state.contact, control, inside, cursor, editing_focused) {
         toggle(&window, state)?;
     }
     Ok(state.expanded.is_some())
@@ -336,6 +374,92 @@ pub fn install_contact_monitor(app: &tauri::AppHandle) {
 #[cfg(test)]
 mod contact_tests {
     use super::*;
+    #[test]
+    fn editor_shortcuts_wait_for_release_or_real_reentry_after_editing_ends() {
+        let mut contact = crate::warp::Contact::default();
+        assert!(!contact_trigger(
+            &mut contact,
+            true,
+            true,
+            (100., 100.),
+            true
+        ));
+        // Saving/cancelling or switching focus with Ctrl held cannot fold.
+        assert!(!contact_trigger(
+            &mut contact,
+            true,
+            true,
+            (100., 100.),
+            false
+        ));
+        assert!(!contact_trigger(
+            &mut contact,
+            true,
+            true,
+            (101., 100.),
+            false
+        ));
+        assert!(!contact_trigger(
+            &mut contact,
+            true,
+            false,
+            (100., 80.),
+            false
+        ));
+        assert!(contact_trigger(
+            &mut contact,
+            true,
+            true,
+            (100., 100.),
+            false
+        ));
+        assert!(!contact_trigger(
+            &mut contact,
+            false,
+            true,
+            (100., 100.),
+            false
+        ));
+        assert!(contact_trigger(
+            &mut contact,
+            true,
+            true,
+            (100., 100.),
+            false
+        ));
+    }
+    #[test]
+    fn editor_in_another_app_does_not_disable_pointer_shortcuts() {
+        let mut contact = crate::warp::Contact::default();
+        assert!(contact_trigger(
+            &mut contact,
+            true,
+            true,
+            (100., 100.),
+            false
+        ));
+        assert!(!contact_trigger(
+            &mut contact,
+            false,
+            true,
+            (100., 100.),
+            true
+        ));
+        assert!(!contact_trigger(
+            &mut contact,
+            true,
+            true,
+            (100., 100.),
+            true
+        ));
+        assert!(!contact_trigger(
+            &mut contact,
+            true,
+            true,
+            (100., 100.),
+            false
+        ));
+    }
     #[test]
     fn folded_margin_handles_small_title_and_negative_coordinates() {
         let rect = (-300., -100., 300., 12.);

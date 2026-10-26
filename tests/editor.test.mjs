@@ -10,7 +10,7 @@ async function setup(storage = new Map(), instance = {}) {
     if (!elements.has(id)) elements.set(id, {
       hidden: false, disabled: false, value: '', dataset: {}, listeners: {}, attributes: {},
       addEventListener(type, listener) { this.listeners[type] = listener; },
-      setAttribute(key, value) { this.attributes[key] = value; }, focus() {},
+      setAttribute(key, value) { this.attributes[key] = value; }, focus() { calls.push(['focus', id]); },
       getBoundingClientRect() { return { width: 298, height: this.hidden ? 0 : 42 }; },
       cloneNode() { return { style: {}, getBoundingClientRect: () => ({ width: 298, height: 120 }), remove() {} }; },
     });
@@ -25,6 +25,8 @@ async function setup(storage = new Map(), instance = {}) {
   let feedbackActive = false;
   let highlightRevision = null;
   let saveError;
+  let editingSyncError;
+  let editingBarrier = Promise.resolve();
   let acknowledgementError;
   let warpError;
   let contact = false;
@@ -42,6 +44,11 @@ async function setup(storage = new Map(), instance = {}) {
     window: { __TAURI__: {
       core: { async invoke(command, args) {
         calls.push([command, args]);
+        if (command === 'set_editing') {
+          await editingBarrier;
+          if (editingSyncError) throw editingSyncError;
+          return;
+        }
         if (command === 'poll_fold') return folded;
         if (command === 'toggle_fold') { folded = !folded; return folded; }
         if (command === 'warp_note' && warpError) throw warpError;
@@ -65,6 +72,8 @@ async function setup(storage = new Map(), instance = {}) {
   vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace("import { themeFor } from './theme.mjs';", ''), context);
   await new Promise(setImmediate);
   return { element, styles, events, calls, pointers, classes,
+    failEditingSync: error => { editingSyncError = error; },
+    holdEditingSync: () => { let resume; editingBarrier = new Promise(resolve => { resume = resolve; }); return resume; },
     fold: value => { folded = value; },
     pollFold: () => timers.find(fn => fn.name === 'pollFold')(), highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
     pollWarp: () => timers.find(fn => fn.name === 'pollWarp')(),
@@ -73,6 +82,46 @@ async function setup(storage = new Map(), instance = {}) {
     contact: () => { contact = true; }, failWarp: error => { warpError = error; },
     update: patch => { note = { ...note, ...patch }; }, failSave: error => { saveError = error; } };
 }
+
+test('editor waits for native shortcut protection before focus and keeps it through saving', async () => {
+  const app = await setup();
+  const allowEditing = app.holdEditingSync();
+  const starting = app.element('edit').listeners.click();
+  assert.equal(app.calls.some(([command, id]) => command === 'focus' && id === 'markdown'), false);
+  allowEditing();
+  await starting;
+  assert.equal(app.calls.some(([command, id]) => command === 'focus' && id === 'markdown'), true);
+  app.element('markdown').value = '보호된 초안';
+  const allowEnding = app.holdEditingSync();
+  const saving = app.element('save').listeners.click();
+  await new Promise(setImmediate);
+  assert.equal(app.element('editor').hidden, false, 'keep editor active until native Ctrl contact is latched');
+  assert.deepEqual(app.calls.filter(([command]) => command === 'set_editing').map(([, args]) => args.editing), [true, false]);
+  allowEnding();
+  await saving;
+  assert.equal(app.element('editor').hidden, true);
+  assert.equal(app.element('content').innerHTML, '<p>저장됨</p>');
+});
+
+test('failed native editor transitions do not focus an unprotected editor or discard a draft', async () => {
+  const app = await setup();
+  app.element('editor').hidden = true;
+  app.failEditingSync('편집 상태 동기화 실패');
+  await app.element('edit').listeners.click();
+  assert.equal(app.element('editor').hidden, true);
+  assert.equal(app.calls.some(([command, id]) => command === 'focus' && id === 'markdown'), false);
+  app.failEditingSync(null);
+  await app.element('edit').listeners.click();
+  app.element('markdown').value = '보존할 초안';
+  app.failEditingSync('편집 종료 동기화 실패');
+  await app.element('cancel').listeners.click();
+  assert.equal(app.element('editor').hidden, false);
+  assert.equal(app.element('markdown').value, '보존할 초안');
+  assert.equal(app.element('error').textContent, '편집 종료 동기화 실패');
+  app.failEditingSync(null);
+  await app.element('cancel').listeners.click();
+  assert.equal(app.element('editor').hidden, true);
+});
 
 test('font sizes cycle four steps and remain selected across note updates', async () => {
   const app = await setup();
@@ -89,7 +138,7 @@ test('font sizes cycle four steps and remain selected across note updates', asyn
 
 test('editing preserves drafts on polling and failed saves; cancel reveals latest note', async () => {
   const app = await setup();
-  app.element('edit').listeners.click();
+  await app.element('edit').listeners.click();
   assert.equal(app.element('markdown').value, '# 원문');
   app.element('markdown').value = '작성 중';
   app.update({ revision: 2, html: '<p>외부 갱신</p>' });
@@ -102,23 +151,23 @@ test('editing preserves drafts on polling and failed saves; cancel reveals lates
   assert.equal(app.element('error').textContent, '메모 충돌');
   assert.equal(app.element('markdown').value, '작성 중');
   assert.equal(app.element('editor').hidden, false);
-  app.element('cancel').listeners.click();
+  await app.element('cancel').listeners.click();
   assert.equal(app.element('editor').hidden, true);
   assert.equal(app.element('content').innerHTML, '<p>외부 갱신</p>');
 });
 
 test('save returns to rendered content; editor input never drags the window; Escape cancels', async () => {
   const app = await setup();
-  app.element('edit').listeners.click();
+  await app.element('edit').listeners.click();
   app.events.mousedown({ button: 0, target: { closest: selector => selector.includes('#editor') }, preventDefault() { assert.fail('editor must accept native selection'); } });
   assert.equal(app.calls.some(([name]) => name === 'drag'), false);
   app.element('markdown').value = '편집됨';
   await app.element('save').listeners.click();
   assert.equal(app.element('content').innerHTML, '<p>저장됨</p>');
   assert.equal(app.element('editor').hidden, true);
-  app.element('edit').listeners.click();
+  await app.element('edit').listeners.click();
   assert.equal(app.element('markdown').value, '편집됨');
-  app.events.keydown({ key: 'Escape', preventDefault() {} });
+  await app.events.keydown({ key: 'Escape', preventDefault() {} });
   assert.equal(app.element('editor').hidden, true);
   assert.equal(app.calls.some(([name]) => name === 'hide_note'), false);
 });
@@ -148,7 +197,7 @@ test('warp click/contact show help; dismissal persists across notes and reloads'
 test('failed warp reports error without showing success help or losing draft', async () => {
   const app = await setup();
   app.element('warp-tip').hidden = true;
-  app.element('edit').listeners.click();
+  await app.element('edit').listeners.click();
   app.element('markdown').value = '작성 중';
   app.failWarp('화면이 작습니다');
   await app.element('warp').listeners.click();
@@ -163,7 +212,7 @@ test('feedback persists after opacity expiry and pointer contact until button cl
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>', removed: true });
   app.highlight(2); app.feedback(true); await app.refresh();
   assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
-  app.element('edit').listeners.click();
+  await app.element('edit').listeners.click();
   app.element('markdown').value = '초안';
   app.feedback(false); await app.refresh();
   assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
@@ -183,7 +232,7 @@ test('feedback never reappears when an expired change is saved without editing',
   const app = await setup();
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>' });
   app.feedback(false); await app.refresh();
-  app.element('edit').listeners.click();
+  await app.element('edit').listeners.click();
   await app.element('save').listeners.click();
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
   await app.refresh();
@@ -220,7 +269,7 @@ test('next body persists through rollover until explicit button click and affect
 
 test('fold contact preserves editor drafts and restores through the unfold button', async () => {
   const app = await setup();
-  app.element('edit').listeners.click();
+  await app.element('edit').listeners.click();
   app.element('markdown').value = '저장하지 않은 초안';
   app.update({ title: '작은 제목' });
   await app.refresh();

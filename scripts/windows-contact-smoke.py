@@ -37,6 +37,7 @@ def main():
     user.SetProcessDpiAwarenessContext.argtypes = [wintypes.HANDLE]
     user.SetProcessDpiAwarenessContext(ctypes.c_void_p(-4))
     user.GetForegroundWindow.restype = wintypes.HWND
+    user.SetForegroundWindow.argtypes = [wintypes.HWND]
     user.FindWindowW.argtypes = [wintypes.LPCWSTR, wintypes.LPCWSTR]
     user.FindWindowW.restype = wintypes.HWND
     user.GetDpiForWindow.argtypes = [wintypes.HWND]
@@ -50,11 +51,13 @@ def main():
     original = wintypes.POINT()
     assert user.GetCursorPos(ctypes.byref(original))
     foreground = user.GetForegroundWindow()
+    original_foreground = foreground
     before = pids()
     assert not before, 'Stop this worktree development app before running this smoke test'
     note = 'win-contact-' + uuid.uuid4().hex[:8]
     created = False
     storage = None
+    handle = None
 
     def cli(action, *args):
         result = subprocess.run(
@@ -85,6 +88,32 @@ def main():
 
     def point(state):
         return state['position']['x'] + 30 * scale, state['position']['y'] + 6 * scale
+
+    def accessible_control(name, invoke=False, focus=False):
+        # Query only this test HWND's accessibility subtree. Scrollbars can
+        # shift the toolbar, so guessing a button coordinate is insufficient.
+        literal = name.replace("'", "''")
+        action = '$element.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke(); ' if invoke else ''
+        if focus:
+            action += '$element.SetFocus(); '
+        command = (
+            'Add-Type -AssemblyName UIAutomationClient; '
+            'Add-Type -AssemblyName UIAutomationTypes; '
+            f'$root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]{handle}); '
+            '$condition = [System.Windows.Automation.PropertyCondition]::new('
+            f"[System.Windows.Automation.AutomationElement]::NameProperty, '{literal}'); "
+            '$element = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition); '
+            "if ($null -eq $element) { throw 'Test control not found' }; "
+            f'{action}'
+            '$rect = $element.Current.BoundingRectangle; '
+            '@{x=$rect.X; y=$rect.Y; width=$rect.Width; height=$rect.Height; '
+            'offscreen=$element.Current.IsOffscreen} | ConvertTo-Json -Compress')
+        result = subprocess.run(['powershell', '-NoProfile', '-Command', command],
+                                capture_output=True, encoding='utf-8', timeout=20)
+        assert result.returncode == 0, result.stderr
+        rect = json.loads(result.stdout)
+        assert not rect['offscreen'] and rect['width'] > 0 and rect['height'] > 0, rect
+        return rect
 
     try:
         opened = cli('open', '--title', 'Windows 접촉 검증', '--markdown', '# 접촉 검증 본문 보존')
@@ -168,10 +197,48 @@ def main():
         assert not state_after()['visible'], 'Hidden update reopened the note'
         modifiers(set())
         print('PASS: Ctrl+Alt+Win close priority and hidden update', flush=True)
+
+        reopen_anchor = wintypes.POINT()
+        assert user.GetCursorPos(ctypes.byref(reopen_anchor))
+        cli('open')
+        move(reopen_anchor.x + 40, reopen_anchor.y)
+        deadline = time.monotonic() + 6
+        while cli('inspect')['animating']:
+            assert time.monotonic() < deadline, 'Reopened entrance did not finish'
+            time.sleep(.1)
+        current = cli('inspect')
+        # Activate only this test note's own verified pencil control.
+        assert user.GetForegroundWindow() == original_foreground
+        accessible_control('메모 편집', invoke=True)
+        accessible_control('Markdown 원문', focus=True)
+        assert user.GetForegroundWindow() == handle, 'Test editor did not receive focus'
+        # Move into the actual textarea before pressing Control.
+        textarea = accessible_control('Markdown 원문')
+        move(textarea['x'] + textarea['width'] / 2, textarea['y'] + textarea['height'] / 2)
+        foreground = handle
+        modifiers({0x11})
+        assert not state_after(.2)['folded'], 'Editor Ctrl key folded the note'
+        user.keybd_event(0x41, 0, 0, 0)  # Ctrl+A in the real textarea
+        user.keybd_event(0x41, 0, 2, 0)
+        assert not state_after()['folded'], 'Editor selection folded the note'
+        revision = current['note']['revision']
+        user.keybd_event(0x53, 0, 0, 0)  # Keep Control held after Ctrl+S
+        user.keybd_event(0x53, 0, 2, 0)
+        saved = state_after(.3)
+        assert saved['note']['revision'] > revision, 'Ctrl+S did not save from the editor'
+        assert saved['note']['markdown'] == current['note']['markdown']
+        assert not saved['folded'], 'Leaving editor with Ctrl held folded the note'
+        modifiers(set())
+        modifiers({0x11})
+        assert state_after()['folded'], 'Ctrl release/repress did not rearm after saving'
+        modifiers(set())
+        print('PASS: focused editor Ctrl+A/Ctrl+S and held-Ctrl save transition', flush=True)
     finally:
         try:
             modifiers(set())
             move(original.x, original.y)
+            if user.GetForegroundWindow() == handle:
+                user.SetForegroundWindow(original_foreground)
             if created:
                 try:
                     cli('close')
