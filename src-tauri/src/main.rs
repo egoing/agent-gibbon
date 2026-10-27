@@ -1,5 +1,6 @@
 mod capture;
 mod entrance;
+mod export;
 mod feedback;
 mod focus;
 mod instance;
@@ -386,6 +387,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     let builder = builder.activate_ignoring_other_apps(false);
     let app = builder
         .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(capture::Captures::default())
         .manage(PointerStates::default())
         .manage(initial_focus)
@@ -413,6 +415,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sync_opacity,
             feedback::acknowledge_feedback,
             save_note,
+            export::export_note,
             warp::warp_note,
             warp::poll_warp,
             sizing::fit_note,

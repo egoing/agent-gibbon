@@ -486,7 +486,7 @@ pub fn note_image(window: WebviewWindow) -> Result<String, String> {
 }
 
 // Resolve only the caller's app-created capture; no frontend path is accepted.
-fn note_image_bytes(window: &WebviewWindow) -> Result<Vec<u8>, String> {
+pub(crate) fn note_image_bytes(window: &WebviewWindow) -> Result<Vec<u8>, String> {
     let id = window
         .label()
         .strip_prefix("note-")

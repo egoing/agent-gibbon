@@ -12,6 +12,8 @@ let acknowledgedRevision = -1;
 let editing = false;
 let initialEditHandled = false;
 let saving = false;
+let exporting = false;
+let exportFeedback;
 let editRevision;
 let needsFit = true;
 let fitting = false;
@@ -101,6 +103,24 @@ async function save() {
   }
 }
 $('save').addEventListener('click', save);
+async function exportNote() {
+  if (!latestNote || exporting || saving) return;
+  exporting = true;
+  $('export').disabled = true;
+  $('error').hidden = true;
+  $('export-status').hidden = true;
+  try {
+    const path = await invoke('export_note', { markdown: editing ? $('markdown').value : null });
+    if (path) {
+      $('export-status').textContent = `저장했습니다: ${path}`;
+      $('export-status').hidden = false;
+      clearTimeout(exportFeedback);
+      exportFeedback = setTimeout(() => { $('export-status').hidden = true; }, 3000);
+    }
+  } catch (error) { failure(error); }
+  finally { exporting = false; $('export').disabled = false; }
+}
+$('export').addEventListener('click', exportNote);
 function failure(error) { $('error').textContent = String(error); $('error').hidden = false; }
 async function refresh() {
   try {
@@ -183,9 +203,9 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
     copyNote();
   }
-  if (editing && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
     event.preventDefault();
-    save();
+    exportNote();
   }
 });
 let copyFeedback;
