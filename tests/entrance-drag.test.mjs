@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { themeFor } from '../ui/theme.mjs';
+import { feedbackView, durations } from '../ui/feedback-state.mjs';
 
 async function setup(storage = new Map()) {
   const elements = new Map();
@@ -26,7 +27,7 @@ async function setup(storage = new Map()) {
   let contact = false;
   const context = vm.createContext({
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
-    themeFor, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
+    themeFor, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
       body: { appendChild() {}, classList: { toggle() {} } },
       getElementById: element, querySelectorAll: () => [],
@@ -50,7 +51,7 @@ async function setup(storage = new Map()) {
       window: { getCurrentWindow: () => ({ startDragging: async () => calls.push(['drag']) }) },
     } },
   });
-  vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace("import { themeFor } from './theme.mjs';", ''), context);
+  vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace(/^import .*;$/gm, ''), context);
   await new Promise(setImmediate);
   return { element, styles, events, calls, refresh: () => timers.find(fn => fn.name === 'refresh')(),
     pollWarp: () => timers.find(fn => fn.name === 'pollWarp')(),

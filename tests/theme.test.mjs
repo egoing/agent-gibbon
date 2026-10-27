@@ -28,3 +28,13 @@ test('sampled RGB space has at least 4.5:1 text contrast', () => {
     }
   }
 });
+
+test('error text retains contrast on saturated memo colors', () => {
+  const luminance = hex => hex.slice(1).match(/../g).map(c => parseInt(c, 16) / 255)
+    .map(c => c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4)
+    .reduce((sum, c, i) => sum + c * [.2126, .7152, .0722][i], 0);
+  for (const background of ['#ff0000', '#00ff00', '#0000ff', '#fff5cf', '#20252e', '#777777']) {
+    const text = luminance(themeFor(background).error), surface = luminance(background);
+    assert.ok((Math.max(text, surface) + .05) / (Math.min(text, surface) + .05) >= 4.5);
+  }
+});

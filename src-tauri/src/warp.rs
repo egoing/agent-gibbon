@@ -70,7 +70,7 @@ pub fn remember(
 
 fn destination(area: Rect, current: Rect, initial_y: i64, gap: i64) -> Result<(i32, i32), String> {
     if current.width > area.width - 2 * gap || current.height > area.height - 2 * gap {
-        return Err("노트가 화면보다 큽니다. 크기를 줄인 후 워프하세요".into());
+        return Err("메모가 화면보다 큽니다. 크기를 줄인 후 워프하세요".into());
     }
     let on_left = current.x * 2 + current.width < area.x * 2 + area.width;
     let x = if on_left {
@@ -87,7 +87,7 @@ fn move_note(window: &tauri::WebviewWindow, warp: &mut Warp) -> Result<(), Strin
     let monitor = window
         .current_monitor()
         .map_err(|e| e.to_string())?
-        .ok_or("노트가 있는 모니터를 찾을 수 없습니다")?;
+        .ok_or("메모가 있는 모니터를 찾을 수 없습니다")?;
     let area = monitor.work_area();
     let p = window.outer_position().map_err(|e| e.to_string())?;
     let s = window.outer_size().map_err(|e| e.to_string())?;

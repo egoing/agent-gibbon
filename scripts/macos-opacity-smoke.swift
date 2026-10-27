@@ -9,7 +9,7 @@ func info() -> [String: Any] {
 let original = CGEvent(source: nil)!.location
 func move(_ point: CGPoint) {
     CGEvent(mouseEventSource: nil, mouseType: .mouseMoved, mouseCursorPosition: point, mouseButton: .left)!.post(tap: .cghidEventTap)
-    Thread.sleep(forTimeInterval: 0.8)
+    Thread.sleep(forTimeInterval: 2.9)
 }
 defer { move(original) }
 let bounds = info()[kCGWindowBounds as String] as! [String: CGFloat]

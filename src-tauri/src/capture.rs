@@ -86,7 +86,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             }
         })
     {
-        eprintln!("영역 노트 단축키 등록 실패 (메뉴에서 실행 가능): {error}");
+        eprintln!("영역 메모 단축키 등록 실패 (메뉴에서 실행 가능): {error}");
     }
     Ok(())
 }
@@ -186,7 +186,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
         )
         .title(match mode {
             SelectionMode::Image => "영역 캡처 — Escape로 취소",
-            SelectionMode::Text => "빈 노트 영역 선택 — Escape로 취소",
+            SelectionMode::Text => "빈 메모 영역 선택 — Escape로 취소",
         })
         .decorations(false)
         .resizable(false)
@@ -394,7 +394,7 @@ pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
 }
 fn empty_text_note() -> crate::Note {
     crate::Note {
-        title: "새 노트".into(),
+        title: "새 메모".into(),
         markdown: String::new(),
         html: String::new(),
         change_html: String::new(),

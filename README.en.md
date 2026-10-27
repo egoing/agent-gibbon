@@ -28,7 +28,8 @@ Give your agent the [CLI skill](.agents/skills/agent-gibbon/SKILL.md), or ask it
 ## Features and scope
 
 - Multiple note IDs, independent colors, Markdown tables, code, and checklists.
-- Floating windows with manual editing, copying, folding, and pinning.
+- Memo Windows with manual editing, copying, folding, and pinning.
+- Compact Toast and Action Bar feedback outside each Memo Window; messages wrap within its width without reducing content space.
 - Optional source-file connection using `--file`; external changes require an explicit update.
 - Local CLI communication without a web server, account, or cloud sync.
 - Current source saves notes locally; source features can be newer than the latest downloadable release.

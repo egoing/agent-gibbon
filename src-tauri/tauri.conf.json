@@ -23,12 +23,14 @@
         "alwaysOnTop": true,
         "skipTaskbar": true,
         "acceptFirstMouse": true,
-        "minimizable": false
+        "minimizable": false,
+        "transparent": true
       }
     ],
     "security": {
       "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'"
-    }
+    },
+    "macOSPrivateApi": true
   },
   "bundle": {
     "active": true,

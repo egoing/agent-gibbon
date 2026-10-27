@@ -36,7 +36,7 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         &MenuItem::with_id(
             app,
             "capture-text",
-            "영역 텍스트 노트 · Ctrl+Shift+2",
+            "영역 텍스트 메모 · Ctrl+Shift+2",
             true,
             None::<&str>,
         )
@@ -152,7 +152,9 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 Ok(())
             } else if event.id.as_ref() == "bring-visible" {
                 app.webview_windows().values().try_for_each(|win| {
-                    if win.is_visible().map_err(|e| e.to_string())? {
+                    if !crate::feedback_window::is_surface(win.label())
+                        && win.is_visible().map_err(|e| e.to_string())?
+                    {
                         show_without_focus(win)?;
                     }
                     Ok::<_, String>(())

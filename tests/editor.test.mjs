@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { themeFor } from '../ui/theme.mjs';
+import { feedbackView, durations } from '../ui/feedback-state.mjs';
 
 async function setup(storage = new Map(), instance = {}, initialNote = {}) {
   const elements = new Map();
@@ -11,6 +12,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
       hidden: false, disabled: false, value: '', dataset: {}, listeners: {}, attributes: {},
       addEventListener(type, listener) { this.listeners[type] = listener; },
       setAttribute(key, value) { this.attributes[key] = value; }, focus() {},
+      setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; },
       getBoundingClientRect() { return { width: 298, height: this.hidden ? 0 : 42 }; },
       cloneNode() { return { style: {}, getBoundingClientRect: () => ({ width: 298, height: 120 }), remove() {} }; },
     });
@@ -33,7 +35,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
   const classes = new Set();
   const context = vm.createContext({
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
-    themeFor, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
+    themeFor, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
       body: { appendChild() {}, classList: { toggle(name, value) { if (value) classes.add(name); else classes.delete(name); } } },
       getElementById: element, querySelectorAll: () => [],
@@ -41,6 +43,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
       documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener(type, listener) { pointers[type] = listener; } },
     },
     window: { __TAURI__: {
+      clipboardManager: { async writeText() {} },
       event: { async listen(name, handler) { nativeEvents[name] = handler; return () => {}; } },
       core: { async invoke(command, args) {
         calls.push([command, args]);
@@ -61,12 +64,15 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
           return note;
         }
       } },
-      window: { getCurrentWindow: () => ({ startDragging: async () => calls.push(['drag']) }) },
+      window: { getCurrentWindow: () => ({ label: 'memo-test', startDragging: async () => calls.push(['drag']) }) },
     } },
   });
-  vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace("import { themeFor } from './theme.mjs';", ''), context);
+  vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace(/^import .*;$/gm, ''), context);
   await new Promise(setImmediate);
-  return { element, styles, events, calls, pointers, classes, nativeEvents,
+  const action = async payload => { await nativeEvents['feedback-action']({ payload: { owner: 'memo-test', action: payload, revision: view().revision } }); await new Promise(setImmediate); };
+  const view = () => calls.filter(([name]) => name === 'present_feedback').at(-1)?.[1].view;
+  return { element, styles, events, calls, pointers, classes, nativeEvents, action, view,
+    expireNotice: async () => { timers.filter(fn => fn.name === 'clearNotice').at(-1)?.(); await new Promise(setImmediate); },
     fold: value => { folded = value; },
     pollFold: () => timers.find(fn => fn.name === 'pollFold')(), highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
     pollWarp: () => timers.find(fn => fn.name === 'pollWarp')(),
@@ -98,13 +104,13 @@ test('editing preserves drafts on polling and failed saves; cancel reveals lates
   await app.refresh();
   assert.equal(app.element('markdown').value, '작성 중');
   app.failSave('메모 충돌');
-  await app.element('save').listeners.click();
+  await app.action('save');
   await app.refresh();
-  assert.equal(app.element('error').hidden, false);
-  assert.equal(app.element('error').textContent, '메모 충돌');
+  assert.equal(!app.view().error, false);
+  assert.equal(app.view().message, '메모 충돌');
   assert.equal(app.element('markdown').value, '작성 중');
   assert.equal(app.element('editor').hidden, false);
-  app.element('cancel').listeners.click();
+  await app.action('cancel');
   assert.equal(app.element('editor').hidden, true);
   assert.equal(app.element('content').innerHTML, '<p>외부 갱신</p>');
 });
@@ -115,7 +121,7 @@ test('save returns to rendered content; editor input never drags the window; Esc
   app.events.mousedown({ button: 0, target: { closest: selector => selector.includes('#editor') }, preventDefault() { assert.fail('editor must accept native selection'); } });
   assert.equal(app.calls.some(([name]) => name === 'drag'), false);
   app.element('markdown').value = '편집됨';
-  await app.element('save').listeners.click();
+  await app.action('save');
   assert.equal(app.element('content').innerHTML, '<p>저장됨</p>');
   assert.equal(app.element('editor').hidden, true);
   app.element('edit').listeners.click();
@@ -126,36 +132,13 @@ test('save returns to rendered content; editor input never drags the window; Esc
 });
 
 
-test('warp click/contact show help; dismissal persists across notes and reloads', async () => {
-  const storage = new Map();
-  const app = await setup(storage);
-  app.element('warp-tip').hidden = true;
-  await app.element('warp').listeners.click();
-  assert.equal(app.calls.some(([name]) => name === 'warp_note'), true);
-  assert.equal(app.element('warp-tip').hidden, false);
-  app.element('warp-tip-close').listeners.click();
-  assert.equal(app.element('warp-tip').hidden, true);
-  app.contact(); await app.pollWarp();
-  assert.equal(app.element('warp-tip').hidden, false);
-  app.element('warp-tip-dismiss').listeners.click();
-  assert.equal(app.element('warp-tip').hidden, true);
-  const another = await setup(storage);
-  another.element('warp-tip').hidden = true;
-  await another.element('warp').listeners.click();
-  assert.equal(another.element('warp-tip').hidden, true);
-  app.contact(); await app.pollWarp();
-  assert.equal(app.element('warp-tip').hidden, true);
-});
-
 test('failed warp reports error without showing success help or losing draft', async () => {
   const app = await setup();
-  app.element('warp-tip').hidden = true;
   app.element('edit').listeners.click();
   app.element('markdown').value = '작성 중';
   app.failWarp('화면이 작습니다');
   await app.element('warp').listeners.click();
-  assert.equal(app.element('error').textContent, '화면이 작습니다');
-  assert.equal(app.element('warp-tip').hidden, true);
+  assert.equal(app.view().message, '화면이 작습니다');
   assert.equal(app.element('markdown').value, '작성 중');
 });
 
@@ -171,13 +154,16 @@ test('feedback persists after opacity expiry and pointer contact until button cl
   assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
   await app.pointers.pointerenter();
   assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
-  await app.element('clear-diff').listeners.click();
+  await app.action('acknowledge'); // Editing must keep the unread revision.
+  assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
+  await app.action('cancel');
+  await app.action('acknowledge');
   app.highlight(2); await app.refresh(); // Ignore a stale snapshot after acknowledgement.
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
   assert.equal(app.element('markdown').value, '초안');
   app.update({ revision: 3, color: '#ffffff' }); await app.refresh();
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
-  assert.equal(app.element('error').hidden, true);
+  assert.equal(!app.view().error, true);
 });
 
 
@@ -186,11 +172,11 @@ test('feedback never reappears when an expired change is saved without editing',
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>' });
   app.feedback(false); await app.refresh();
   app.element('edit').listeners.click();
-  await app.element('save').listeners.click();
+  await app.action('save');
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
   await app.refresh();
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
-  assert.equal(app.element('error').hidden, true);
+  assert.equal(!app.view().error, true);
 });
 
 
@@ -212,9 +198,9 @@ test('next body persists through rollover until explicit button click and affect
   await app.pointers.pointerleave();
   await app.pointers.pointerenter();
   assert.equal(app.element('content').innerHTML, '<p><mark>다음 변경</mark></p>');
-  assert.equal(app.element('clear-diff').hidden, false);
-  await app.element('clear-diff').listeners.click();
-  assert.equal(app.element('clear-diff').hidden, true);
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
+  await app.action('acknowledge');
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
   assert.equal(app.element('content').innerHTML, '<p>다음 변경</p>');
   assert.equal(other.element('content').innerHTML, '<p><mark>첫 변경</mark></p>');
 });
@@ -260,24 +246,6 @@ test('explicit button folds and unfolds without Control and updates its label', 
 });
 
 
-test('development labels and tip preferences stay separate from installed notes', async () => {
-  const storage = new Map();
-  const installed = await setup(storage);
-  const a = await setup(storage, { instance: 'dev-a', dev_label: 'DEV same · aaaaaaaa' });
-  const b = await setup(storage, { instance: 'dev-b', dev_label: 'DEV same · bbbbbbbb' });
-  assert.equal(installed.element('dev-instance').hidden, true);
-  assert.equal(a.element('dev-instance').hidden, false);
-  assert.equal(a.element('dev-instance').textContent, 'DEV same · aaaaaaaa');
-  a.update({ title: '제목' });
-  await a.refresh();
-  assert.equal(a.element('fold-title').textContent, '[DEV same · aaaaaaaa] 제목');
-  a.element('warp-tip-dismiss').listeners.click();
-  assert.equal(storage.get('floatnote.warp-tip-dismissed:dev-a'), 'true');
-  assert.equal(storage.has('floatnote.warp-tip-dismissed'), false);
-  assert.equal(storage.has('floatnote.warp-tip-dismissed:dev-b'), false);
-  assert.equal(b.element('dev-instance').textContent, 'DEV same · bbbbbbbb');
-});
-
 test('native rollover updates chrome without a DOM click or pointer event', async () => {
   const app = await setup();
   const html = app.element('content').innerHTML;
@@ -291,28 +259,27 @@ test('native rollover updates chrome without a DOM click or pointer event', asyn
 
 test('clear diff button stays hidden without changes and stale clicks preserve newer revisions', async () => {
   const app = await setup();
-  assert.equal(app.element('clear-diff').hidden, true);
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>' });
   app.highlight(2); await app.refresh();
   app.highlight(3); // A newer backend update arrived before the button request.
-  await app.element('clear-diff').listeners.click();
-  assert.equal(app.element('clear-diff').hidden, false);
+  await app.action('acknowledge');
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
   assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
-  assert.equal(app.element('clear-diff').disabled, false);
+  assert.equal(app.view().buttons.find(b => b.id === 'acknowledge').disabled, false);
 });
 
 
-test('bottom action reserves height and releases it when changes are cleared', async () => {
+test('external action never consumes memo height', async () => {
   const app = await setup();
-  assert.equal(app.element('diff-actions').hidden, true);
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>' });
   app.highlight(2); await app.refresh();
-  assert.equal(app.element('diff-actions').hidden, false);
-  assert.equal(app.calls.filter(([name]) => name === 'fit_note').at(-1)[1].height, 164);
-  app.events.mousedown({ button: 0, target: { closest: selector => selector.includes('#diff-actions') }, preventDefault() { assert.fail('menu must not drag the note'); } });
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
+  assert.equal(app.calls.filter(([name]) => name === 'fit_note').at(-1)[1].height, 122);
   assert.equal(app.calls.some(([name]) => name === 'drag_note'), false);
-  await app.element('clear-diff').listeners.click();
-  assert.equal(app.element('diff-actions').hidden, true);
+  await app.action('acknowledge');
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
   assert.equal(app.calls.filter(([name]) => name === 'fit_note').at(-1)[1].height, 122);
 });
 
@@ -322,16 +289,16 @@ test('failed confirmation keeps cumulative changes and allows retry', async () =
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>누적 변경</mark></p>' });
   app.highlight(2); await app.refresh();
   app.failAcknowledgement('메모 저장 실패');
-  await app.element('clear-diff').listeners.click();
+  await app.action('acknowledge');
   assert.equal(app.element('content').innerHTML, '<p><mark>누적 변경</mark></p>');
-  assert.equal(app.element('diff-actions').hidden, false);
-  assert.equal(app.element('clear-diff').disabled, false);
-  assert.equal(app.element('error').textContent, '메모 저장 실패');
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
+  assert.equal(app.view().buttons.find(b => b.id === 'acknowledge').disabled, false);
+  assert.equal(app.view().message, '메모 저장 실패');
   app.failAcknowledgement(null);
-  await app.element('clear-diff').listeners.click();
-  assert.equal(app.element('diff-actions').hidden, true);
+  await app.action('acknowledge');
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
-  assert.equal(app.element('error').hidden, true);
+  assert.equal(!app.view().error, true);
 });
 
 test('folded note opens from title, blank space, border and icon without starting a drag', async () => {
@@ -378,7 +345,7 @@ test('region text note opens a blank editor once, preserves drafts and saves nor
   app.element('markdown').value = '새 메모';
   await app.refresh();
   assert.equal(app.element('markdown').value, '새 메모');
-  await app.element('save').listeners.click();
+  await app.action('save');
   assert.equal(app.element('editor').hidden, true);
   await app.refresh();
   assert.equal(app.element('editor').hidden, true);
@@ -387,7 +354,7 @@ test('region text note opens a blank editor once, preserves drafts and saves nor
 
 test('canceling the initial region editor does not reopen it on polling', async () => {
   const app = await setup(new Map(), {}, { edit_on_open: true, markdown: '', html: '' });
-  app.element('cancel').listeners.click();
+  await app.action('cancel');
   await app.refresh();
   assert.equal(app.element('editor').hidden, true);
 });
@@ -397,14 +364,100 @@ test('direct save immediately clears existing diff controls', async () => {
   const app = await setup();
   app.highlight(1);
   await app.refresh();
-  assert.equal(app.element('diff-actions').hidden, false);
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
   app.element('edit').listeners.click();
   app.element('markdown').value = '직접 수정';
-  await app.element('save').listeners.click();
-  assert.equal(app.element('diff-actions').hidden, true);
-  assert.equal(app.element('clear-diff').hidden, true);
+  await app.action('save');
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
   app.update({ revision: 3, html: '<p>외부 수정</p>', change_html: '<mark>외부 수정</mark>' });
   app.highlight(3);
   await app.refresh();
-  assert.equal(app.element('diff-actions').hidden, false);
+  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
+});
+
+test('temporary copy notice restores acknowledgement; editing owns the action slot', async () => {
+  const app = await setup();
+  app.highlight(1); await app.refresh();
+  await app.element('copy').listeners.click();
+  assert.equal(app.view().message, '복사했습니다');
+  assert.deepEqual(app.view().buttons.map(b => b.id), ['acknowledge']);
+  await app.expireNotice();
+  assert.equal(app.view().message, '변경사항');
+  app.element('edit').listeners.click();
+  await new Promise(setImmediate);
+  await app.element('warp').listeners.click();
+  assert.deepEqual(app.view().buttons.map(b => b.id), ['cancel', 'save']);
+  assert.match(app.view().message, /Option/);
+  await app.action('cancel');
+  assert.deepEqual(app.view().buttons.map(b => b.id), ['acknowledge']);
+});
+
+test('save success becomes Toast; save error retains actions and outranks tips', async () => {
+  const app = await setup();
+  app.element('edit').listeners.click();
+  app.failSave('원본 파일이 외부에서 변경되었습니다');
+  await app.action('save');
+  await app.element('warp').listeners.click();
+  assert.equal(app.view().error, true);
+  assert.match(app.view().message, /원본 파일/);
+  assert.deepEqual(app.view().buttons.map(b => b.id), ['cancel', 'save']);
+  app.failSave(null);
+  await app.action('save');
+  assert.equal(app.view().message, '저장했습니다');
+  assert.equal(app.view().buttons.length, 0);
+  await app.expireNotice();
+  assert.equal(app.view().message, '');
+});
+
+test('development labels remain distinct from installed memo content', async () => {
+  const app = await setup(new Map(), { dev_label: 'DEV design-system', instance: 'dev-a' });
+  assert.equal(app.element('dev-instance').textContent, 'DEV');
+  assert.equal(app.element('dev-instance').attributes['aria-label'], 'DEV design-system');
+  assert.equal(app.element('dev-instance').hidden, false);
+  assert.equal(app.element('content').innerHTML, '<h1>원문</h1>');
+});
+
+test('delayed surface acknowledgement cannot acknowledge a newer rendered revision', async () => {
+  const app = await setup();
+  app.highlight(2); await app.refresh();
+  app.highlight(3); await app.refresh();
+  await app.nativeEvents['feedback-action']({ payload: { owner: 'memo-test', action: 'acknowledge', revision: 2 } });
+  assert.equal(app.calls.some(([name]) => name === 'acknowledge_feedback'), false);
+});
+
+test('hidden memo defers companion creation until its native window is visible', async () => {
+  const instance = { visible: false };
+  const app = await setup(new Map(), instance);
+  app.highlight(2); await app.refresh();
+  assert.equal(app.calls.some(([name]) => name === 'present_feedback'), false);
+  instance.visible = true;
+  await app.refresh();
+  assert.deepEqual(app.view().buttons.map(b => b.id), ['acknowledge']);
+});
+
+ test('foreign Feedback actions cannot save another memo draft', async () => {
+  const app = await setup();
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '보존할 초안';
+  await app.nativeEvents['feedback-action']({ payload: { owner: 'other-window', action: 'save' } });
+  assert.equal(app.element('editor').hidden, false);
+  assert.equal(app.element('markdown').value, '보존할 초안');
+});
+
+test('connected outline follows its own companion and restores after hiding', async () => {
+  const app = await setup();
+  const connection = app.nativeEvents['feedback-connection'];
+  connection({ payload: { owner: 'other', edge: 'below' } });
+  assert.equal(app.classes.has('feedback-below'), false);
+  connection({ payload: { owner: 'memo-test', edge: 'below', width: 100, memoWidth: 300, memoHeight: 160 } });
+  assert.equal(app.element('connected-outline').hidden, false);
+  assert.equal(app.classes.has('feedback-below'), true);
+  assert.match(app.element('connected-path').attributes.d, /M 200 159.5/);
+  connection({ payload: { owner: 'memo-test', edge: 'above', width: 300, memoWidth: 300, memoHeight: 160 } });
+  assert.equal(app.classes.has('feedback-full'), true);
+  assert.equal(app.element('connected-path').attributes.transform, 'translate(0 160) scale(1 -1)');
+  connection({ payload: { owner: 'memo-test', edge: 'none' } });
+  assert.equal(app.element('connected-outline').hidden, true);
+  assert.equal(app.classes.has('feedback-above'), false);
 });

@@ -1,0 +1,18 @@
+:root { font: var(--font-ui)/var(--line-ui) -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; color: var(--foreground); background: transparent; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { overflow-x: hidden; overflow-y: auto; }
+body { margin: 0; cursor: default; background: transparent; }
+#feedback { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; column-gap: 12px; row-gap: 8px; width: max-content; max-width: 100%; padding: var(--feedback-padding); border: var(--surface-border) solid var(--border); border-radius: var(--surface-radius); background: var(--background); }
+#message { flex: 1 1 auto; overflow-wrap: anywhere; min-width: 0; white-space: pre-wrap; }
+#message:empty, #actions:empty { display: none; }
+#actions { display: flex; gap: var(--button-gap); margin-left: auto; flex: 0 0 auto; }
+button { height: var(--action-height); padding: 0 var(--action-padding); font: inherit; color: inherit; background: transparent; border: 0; border-radius: var(--button-radius); cursor: pointer; }
+button.primary { font-weight: 600; background: var(--primary); }
+button:hover { background: var(--primary); }
+button:focus-visible { outline: 2px solid var(--foreground); outline-offset: -2px; }
+button:disabled { opacity: .5; cursor: default; }
+#feedback.error #message { color: var(--error); }
+#feedback.error #message::before { content: '⚠ '; }
+
+#feedback[data-edge="below"] { border-top: 0; border-top-left-radius: 0; border-top-right-radius: 0; padding-bottom: 6px; }
+#feedback[data-edge="above"] { border-bottom: 0; border-bottom-left-radius: 0; border-bottom-right-radius: 0; padding-top: 6px; }

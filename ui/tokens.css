@@ -1,0 +1,14 @@
+:root {
+  --font-ui: 11px;
+  --line-ui: 1.4;
+  --icon-size: 14px;
+  --toolbar-target: 24px;
+  --action-height: 22px;
+  --action-padding: 6px;
+  --button-gap: 6px;
+  --surface-radius: 4px;
+  --button-radius: 3px;
+  --surface-border: 1px;
+  --surface-shadow: 0 2px 6px rgb(0 0 0 / 12%);
+  --feedback-padding: 7px 10px;
+}

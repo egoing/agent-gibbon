@@ -1,27 +1,25 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Gibbon</title><link rel="stylesheet" href="style.css"><script src="telemetry.js"></script><script type="module" src="app.js"></script></head>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Gibbon</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="style.css"><script src="telemetry.js"></script><script type="module" src="app.js"></script></head>
 <body>
+<div id="memo-surface">
 <main id="viewport" aria-label="메모 내용">
-<div id="controls">
+<div id="controls" role="toolbar" aria-label="Toolbar">
+<span id="dev-instance" hidden></span>
 <button id="fold-toggle" aria-label="메모 접기" aria-expanded="true" title="메모 접기 · Control을 누른 채 메모에 포인터를 올리면 접기·펼치기 전환"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
 <button id="font-size" aria-label="글자 크기 12px, 클릭하여 변경" title="글자 크기 12px · 클릭하여 변경"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11v9M9 13c-2-4-7-2-7 2s5 6 7 2M12 20l4.5-16L21 20M14 14h5"/></svg></button>
 <button id="edit" aria-label="메모 편집" title="메모 편집" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16-1 5 5-1L21 7l-4-4L4 16Zm10-10 4 4"/></svg></button>
-<button id="copy" aria-label="본문 복사" title="본문 복사"><svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="1"/><path d="M16 8V3H3v13h5"/></svg><svg class="copied-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg></button>
-<button id="warp" aria-label="반대편으로 워프" title="반대편으로 워프 · Alt(⌥) + 노트에 포인터"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16M20 4v16M7 9h10l-3-3M17 15H7l3 3"/></svg></button>
+<button id="copy" aria-label="본문 복사" title="본문 복사"><svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="1"/><path d="M16 8V3H3v13h5"/></svg></button>
+<button id="warp" aria-label="반대편으로 워프" title="반대편으로 워프 · Alt(⌥) + 메모에 포인터"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16M20 4v16M7 9h10l-3-3M17 15H7l3 3"/></svg></button>
 <button id="pin" aria-label="상단 고정" aria-pressed="true" title="상단 고정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 7 4 4v2H5v-2l4-4-1-7Z"/><path d="M12 16v6"/></svg></button><button id="close" aria-label="메모 숨기기" title="메모 숨기기 · macOS: Ctrl+Option(Alt)+Command(Win) + 포인터 접촉"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
 </div>
 <div id="fold-title" hidden></div>
-<div id="dev-instance" hidden></div>
 <div id="content"><p>작업 내용을 기다리고 있습니다.</p></div>
 <section id="editor" hidden aria-label="Markdown 편집">
 <textarea id="markdown" aria-label="Markdown 원문" spellcheck="false"></textarea>
-<div id="editor-actions"><span id="save-target"></span><button id="cancel">취소</button><button id="save">저장</button></div>
 </section>
 </main>
-<div id="diff-actions" role="group" aria-label="변경 표시 메뉴" hidden>
-<span id="diff-status">내용이 변경되었습니다.</span>
-<button id="clear-diff" aria-label="변경사항 확인 · 변경 표시 지우기" title="변경사항 확인 · 변경 표시만 지웁니다" hidden>확인</button>
 </div>
-<aside id="warp-tip" hidden aria-label="워프 단축키 안내"><span role="status">Alt(⌥)를 누른 채 노트에 포인터를 올리면 반대편으로 워프합니다.</span><div><button id="warp-tip-dismiss">다시 보지 않기</button><button id="warp-tip-close" aria-label="워프 안내 닫기">닫기</button></div></aside><div id="error" role="alert" hidden></div>
+<svg id="connected-outline" aria-hidden="true" hidden><path id="connected-path"/></svg>
+<div id="tooltip" role="tooltip" hidden></div>
 <div class="resize" data-direction="North" id="n"></div><div class="resize" data-direction="South" id="s"></div><div class="resize" data-direction="East" id="e"></div><div class="resize" data-direction="West" id="w"></div><div class="resize corner" data-direction="NorthWest" id="nw"></div><div class="resize corner" data-direction="NorthEast" id="ne"></div><div class="resize corner" data-direction="SouthWest" id="sw"></div><div class="resize corner" data-direction="SouthEast" id="se"></div>
 </body></html>
