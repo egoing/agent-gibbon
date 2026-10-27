@@ -4,6 +4,10 @@
 
 An open-source floating Markdown note app for macOS, created and updated by AI agents through a local CLI. Keep coding progress, checklists, and research notes beside your work without moving keyboard focus away from your editor.
 
+## Design system
+
+The [design system and visual mockups](docs/design-system.md) define shared terminology, components, styles, and behavior (Korean explanations with English terms). Update the document and affected mockups when UI rules change, and include a link in the delivery summary. Adopted design and implementation status are tracked separately.
+
 ## Install
 
 Download the Apple Silicon (`aarch64`) or Intel (`x64`) DMG from GitHub Releases and move Agent Gibbon to Applications. Apple distribution signing and notarization are not configured; macOS may block the downloaded application.
