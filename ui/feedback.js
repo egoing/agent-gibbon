@@ -36,6 +36,8 @@ async function refresh() {
     surface.style.maxWidth = `${state.max_width}px`;
     document.body.style.width = `${state.max_width}px`;
     const rect = surface.getBoundingClientRect();
+    // Fill the rounded native width: max-content can leave a fractional blank edge.
+    surface.style.width = `${Math.ceil(rect.width)}px`;
     document.body.style.width = `${Math.ceil(rect.width)}px`;
     const layout = await invoke('layout_feedback', { width: Math.ceil(rect.width), height: Math.ceil(rect.height) });
     surface.dataset.edge = layout.edge;
