@@ -2,7 +2,7 @@
 * { box-sizing: border-box; }
 html { overflow-x: hidden; overflow-y: auto; }
 body { margin: 0; cursor: default; background: transparent; }
-#feedback { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; column-gap: 12px; row-gap: 8px; width: max-content; max-width: 100%; padding: var(--feedback-padding); border: var(--surface-border) solid var(--border); border-radius: var(--surface-radius); background: var(--background); }
+#feedback { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; column-gap: 12px; row-gap: 8px; width: max-content; max-width: 100%; padding: var(--feedback-padding); border: var(--surface-border) solid transparent; border-radius: var(--surface-radius); background: var(--background); }
 #message { flex: 1 1 auto; overflow-wrap: anywhere; min-width: 0; white-space: pre-wrap; }
 #message:empty, #actions:empty { display: none; }
 #actions { display: flex; gap: var(--button-gap); margin-left: auto; flex: 0 0 auto; }
