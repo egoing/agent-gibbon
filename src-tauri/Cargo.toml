@@ -9,7 +9,7 @@ default-run = "agent-gibbon"
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = ["tray-icon", "macos-private-api"] }
+tauri = { version = "2", features = ["tray-icon", "macos-private-api", "image-png"] }
 tauri-plugin-clipboard-manager = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -21,6 +21,8 @@ sentry = { version = "0.42", default-features = false, features = ["reqwest", "r
 tauri-plugin-global-shortcut = "2"
 xcap = "0.7"
 base64 = "0.22"
+tauri-plugin-dialog = "2"
+tempfile = "3"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

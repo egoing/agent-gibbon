@@ -251,11 +251,12 @@ pub fn layout_feedback(
     Ok(connection)
 }
 fn accepts_action(view: &View, action: &str, revision: Option<u64>) -> bool {
-    (action != "acknowledge" || view.revision == revision)
-        && view
-            .buttons
-            .iter()
-            .any(|button| button.id == action && !button.disabled)
+    (action == "export" && (!view.message.is_empty() || !view.buttons.is_empty()))
+        || (action != "acknowledge" || view.revision == revision)
+            && view
+                .buttons
+                .iter()
+                .any(|button| button.id == action && !button.disabled)
 }
 
 #[tauri::command]

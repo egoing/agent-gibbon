@@ -45,6 +45,6 @@ async function refresh() {
 function report(error) { console.error('Feedback:', error); }
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') invoke('feedback_action', { action: 'cancel', revision: renderedRevision }).catch(report);
-  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') { event.preventDefault(); invoke('feedback_action', { action: 'save', revision: renderedRevision }).catch(report); }
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') { event.preventDefault(); invoke('feedback_action', { action: 'export', revision: renderedRevision }).catch(report); }
 });
 refresh();

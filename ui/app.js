@@ -13,6 +13,7 @@ let acknowledgedRevision = -1;
 let editing = false;
 let initialEditHandled = false;
 let saving = false;
+let exporting = false;
 let editRevision;
 let needsFit = true;
 let fitting = false;
@@ -130,6 +131,19 @@ async function publishFeedback() {
   catch (error) { console.error('Feedback 창 표시 실패:', error); }
   finally { publishing = false; if (publishAgain) { publishAgain = false; publishFeedback(); } }
 }
+async function exportNote() {
+  if (!latestNote || exporting || saving) return;
+  exporting = true;
+  $('export').disabled = true;
+  try {
+    const path = await invoke('export_note', { markdown: editing ? $('markdown').value : null });
+    if (path) {
+      notify(`저장했습니다: ${path}`);
+    }
+  } catch (error) { failure(error); }
+  finally { exporting = false; $('export').disabled = false; }
+}
+$('export').addEventListener('click', exportNote);
 async function refresh() {
   try {
     const state = await invoke('snapshot');
@@ -145,7 +159,9 @@ async function refresh() {
     $('fold-title').title = state.note.title;
     $('edit').disabled = editing || !!state.note.capture;
     $('font-size').disabled = !!state.note.capture;
-    $('copy').disabled = editing || !!state.note.capture;
+    $('copy').disabled = editing;
+    $('copy').title = state.note.capture ? '이미지 복사' : '본문 복사';
+    $('copy').setAttribute('aria-label', $('copy').title);
     document.body.classList.toggle('image-note', !!state.note.capture);
     if (revision !== state.note.revision) {
       const theme = themeFor(state.note.color);
@@ -204,17 +220,41 @@ document.addEventListener('keydown', (event) => {
     if (editing) { if (!saving) endEditing(); }
     else invoke('hide_note').catch(failure);
   }
-  if (editing && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+  if (!editing && latestNote && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'c') {
     event.preventDefault();
-    save();
+    copyNote();
+  }
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+    event.preventDefault();
+    exportNote();
   }
 });
-$('copy').addEventListener('click', async () => {
+// Render the current sanitized HTML offscreen: innerText retains the existing
+// rendered-text format without ever touching the visible diff or its baseline.
+function currentPlainText() {
+  const source = document.createElement('div');
+  source.innerHTML = latestNote.html;
+  Object.assign(source.style, {
+    position: 'fixed', left: '-10000px', top: '0',
+    width: `${$('viewport').clientWidth}px`, pointerEvents: 'none',
+  });
+  source.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(source);
+  try { return source.innerText; }
+  finally { source.remove(); }
+}
+async function copyNote() {
+  if (!latestNote || editing) return;
   try {
-    await window.__TAURI__.clipboardManager.writeText($('content').innerText);
+    if (latestNote.capture) {
+      await invoke('copy_note_image');
+    } else {
+      await window.__TAURI__.clipboardManager.writeText(currentPlainText());
+    }
     notify('복사했습니다');
   } catch (error) { failure(error); }
-});
+}
+$('copy').addEventListener('click', copyNote);
 $('content').addEventListener('click', (event) => { if (event.target.closest('a')) event.preventDefault(); });
 // Native movement arrives even when WKWebView belongs to a background app.
 window.__TAURI__.event.listen('note-pointer-over', ({ payload }) => {
@@ -307,6 +347,7 @@ window.__TAURI__.event.listen('feedback-action', ({ payload }) => {
   if (payload.owner !== win.label) return;
   const action = payload.action;
   if (action === 'acknowledge' && payload.revision !== highlightRevision) return;
+  if (action === 'export') return exportNote();
   if (action === 'save') return save();
   else if (action === 'cancel' && editing && !saving) return endEditing();
   else if (action === 'acknowledge' && !editing) return acknowledge();

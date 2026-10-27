@@ -35,10 +35,21 @@ fn set_image_ratio(window: &WebviewWindow, size: Option<LogicalSize<f64>>) -> Re
         let ptr = window.ns_window().map_err(|e| e.to_string())?;
         // SAFETY: creation and synchronous fold commands execute on the main thread.
         let native = unsafe { &*(ptr as *const objc2_app_kit::NSWindow) };
-        let mut ratio = native.contentAspectRatio();
-        ratio.width = size.map_or(0.0, |s| s.width);
-        ratio.height = size.map_or(0.0, |s| s.height);
-        native.setContentAspectRatio(ratio);
+        if let Some(size) = size {
+            let mut ratio = native.contentAspectRatio();
+            ratio.width = size.width;
+            ratio.height = size.height;
+            native.setContentAspectRatio(ratio);
+        } else {
+            // A zero aspect ratio can leave AppKit with invalid geometry and
+            // SIGTRAP on a later resize or display reconfiguration. Resize
+            // increments and aspect ratio are mutually exclusive constraints;
+            // unit increments restore unconstrained resizing.
+            let mut increments = native.contentResizeIncrements();
+            increments.width = 1.0;
+            increments.height = 1.0;
+            native.setContentResizeIncrements(increments);
+        }
     }
     #[cfg(not(target_os = "macos"))]
     let _ = (window, size);

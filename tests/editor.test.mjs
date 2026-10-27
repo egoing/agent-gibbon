@@ -28,8 +28,11 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
   let feedbackActive = false;
   let highlightRevision = null;
   let saveError;
+  let exportResult = null;
+  let exportError;
   let acknowledgementError;
   let warpError;
+  let copyError;
   let contact = false;
   let folded = false;
   const classes = new Set();
@@ -37,13 +40,16 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
     themeFor, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
+      createElement() { return { style: {}, setAttribute() {}, remove() {}, get innerText() { return this.innerHTML.replace(/<[^>]+>/g, '').trim(); } }; },
+      createElement() { return { style: {}, setAttribute() {}, remove() {},
+        get innerText() { return this.innerHTML.replace(/<[^>]+>/g, '').trim(); } }; },
       body: { appendChild() {}, classList: { toggle(name, value) { if (value) classes.add(name); else classes.delete(name); } } },
       getElementById: element, querySelectorAll: () => [],
       addEventListener(type, listener) { events[type] = listener; },
       documentElement: { style: { setProperty(key, value) { styles[key] = value; } }, addEventListener(type, listener) { pointers[type] = listener; } },
     },
     window: { __TAURI__: {
-      clipboardManager: { async writeText() {} },
+      clipboardManager: { async writeText(text) { if (copyError) throw copyError; calls.push(['clipboard-text', text]); } },
       event: { async listen(name, handler) { nativeEvents[name] = handler; return () => {}; } },
       core: { async invoke(command, args) {
         calls.push([command, args]);
@@ -57,6 +63,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
           if (highlightRevision !== args.revision) return false;
           highlightRevision = null; return true;
         }
+        if (command === 'export_note') { if (exportError) throw exportError; return exportResult; }
         if (command === 'save_note') {
           if (saveError) throw saveError;
           assert.equal(args.expectedRevision, note.revision);
@@ -71,7 +78,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
   await new Promise(setImmediate);
   const action = async payload => { await nativeEvents['feedback-action']({ payload: { owner: 'memo-test', action: payload, revision: view().revision } }); await new Promise(setImmediate); };
   const view = () => calls.filter(([name]) => name === 'present_feedback').at(-1)?.[1].view;
-  return { element, styles, events, calls, pointers, classes, nativeEvents, action, view,
+  return { exportResult: value => { exportResult = value; }, failExport: error => { exportError = error; }, failCopy: error => { copyError = error; }, element, styles, events, calls, pointers, classes, nativeEvents, action, view,
     expireNotice: async () => { timers.filter(fn => fn.name === 'clearNotice').at(-1)?.(); await new Promise(setImmediate); },
     fold: value => { folded = value; },
     pollFold: () => timers.find(fn => fn.name === 'pollFold')(), highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
@@ -460,4 +467,100 @@ test('connected outline follows its own companion and restores after hiding', as
   connection({ payload: { owner: 'memo-test', edge: 'none' } });
   assert.equal(app.element('connected-outline').hidden, true);
   assert.equal(app.classes.has('feedback-above'), false);
+});
+
+
+test('copy uses the latest rendered note without confirming or copying deleted diff text', async () => {
+  const app = await setup(undefined, {}, { html: '<p>최신 본문</p>', change_html: '<del>이전 본문</del><p>최신 본문</p>' });
+  app.highlight(1);
+  await app.refresh();
+  const before = app.element('content').innerHTML;
+  await app.element('copy').listeners.click();
+  assert.deepEqual(app.calls.find(([name]) => name === 'clipboard-text'), ['clipboard-text', '최신 본문']);
+  assert.equal(app.element('content').innerHTML, before);
+  assert.deepEqual(app.view().buttons.map(b => b.id), ['acknowledge']);
+  assert.equal(app.calls.some(([name]) => name === 'acknowledge_feedback'), false);
+  assert.equal(app.view().message, '복사했습니다');
+  app.events.keydown({ key: 'c', metaKey: true, preventDefault() {} });
+  await new Promise(setImmediate);
+  assert.equal(app.calls.filter(([name]) => name === 'clipboard-text').length, 2);
+  await app.expireNotice();
+  assert.equal(app.view().message, '변경사항');
+  app.element('edit').listeners.click();
+  let prevented = false;
+  app.events.keydown({ key: 'c', ctrlKey: true, preventDefault() { prevented = true; } });
+  assert.equal(prevented, false);
+  assert.equal(app.calls.filter(([name]) => name === 'clipboard-text').length, 2);
+});
+
+test('capture copy invokes native image writing without fetching a data URL', async () => {
+  const app = await setup();
+  app.update({ capture: { width: 100, height: 50 } });
+  await app.refresh();
+  await app.element('copy').listeners.click();
+  assert.equal(app.calls.filter(([name]) => name === 'copy_note_image').length, 1);
+  assert.equal(app.calls.some(([name]) => name === 'clipboard-text'), false);
+  assert.equal(app.view().message, '복사했습니다');
+});
+
+test('failed clipboard write reports the error without showing success feedback', async () => {
+  const app = await setup();
+  app.failCopy('클립보드 실패');
+  await app.element('copy').listeners.click();
+  assert.equal(app.view().message, '클립보드 실패');
+  assert.equal(app.view().error, true);
+});
+
+
+test('Cmd+S and Ctrl+S export viewing notes and toolbar exports the current draft', async () => {
+  const app = await setup();
+  for (const modifier of ['metaKey', 'ctrlKey']) {
+    let prevented = false;
+    app.events.keydown({ key: 's', [modifier]: true, preventDefault() { prevented = true; } });
+    await new Promise(setImmediate);
+    assert.equal(prevented, true);
+    assert.equal(app.calls.at(-1)[0], 'export_note');
+    assert.equal(app.calls.at(-1)[1].markdown, null);
+  }
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '# 저장할 초안';
+  app.exportResult('/tmp/note.md');
+  await app.element('export').listeners.click();
+  assert.equal(app.calls.filter(([name]) => name === 'export_note').at(-1)[1].markdown, '# 저장할 초안');
+  assert.equal(app.element('editor').hidden, false);
+  assert.equal(app.view().message, '저장했습니다: /tmp/note.md');
+  assert.equal(app.calls.some(([name]) => name === 'save_note'), false);
+});
+
+test('cancel and export failure preserve draft and allow retry', async () => {
+  const app = await setup();
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '초안';
+  await app.element('export').listeners.click();
+  assert.notEqual(app.view().message, '저장했습니다');
+  app.failExport('쓰기 실패');
+  await app.element('export').listeners.click();
+  assert.equal(app.view().message, '쓰기 실패');
+  assert.equal(app.element('markdown').value, '초안');
+  assert.equal(app.element('export').disabled, false);
+});
+
+test('repeated shortcuts open only one export dialog', async () => {
+  const app = await setup();
+  const event = { key: 's', ctrlKey: true, preventDefault() {} };
+  app.events.keydown(event);
+  app.events.keydown(event);
+  await new Promise(setImmediate);
+  assert.equal(app.calls.filter(([name]) => name === 'export_note').length, 1);
+});
+
+test('Feedback export shortcut targets its own memo draft', async () => {
+  const app = await setup();
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '내보낼 초안';
+  await app.nativeEvents['feedback-action']({ payload: { owner: 'other', action: 'export' } });
+  assert.equal(app.calls.some(([name]) => name === 'export_note'), false);
+  await app.nativeEvents['feedback-action']({ payload: { owner: 'memo-test', action: 'export' } });
+  assert.equal(app.calls.filter(([name]) => name === 'export_note').at(-1)[1].markdown, '내보낼 초안');
+  assert.equal(app.element('editor').hidden, false);
 });

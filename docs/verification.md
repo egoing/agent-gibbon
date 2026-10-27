@@ -17,6 +17,14 @@
 - 실제 화면에서 발견한 Feedback 가로/세로 스크롤바와 중복 복사 아이콘을 수정하고 다시 확인했다. 화면 위쪽 전환·음수 모니터 좌표·공간 부족은 Rust 배치 테스트로 검증했다.
 - Intel·Windows 실행, 혼합 배율 다중 화면의 실제 드래그, 전체 VoiceOver 탐색, release 패키징은 미실행이다. 설치된 앱은 교체하지 않았다.
 - Conf 4 / Risk Medium: 네이티브 보조 창과 UI 상태 전환을 변경하며, 실제 검증은 macOS 개발 환경 범위다.
+## 화면 재구성 중 AppKit 크래시 완화 (2026-10-27)
+
+- v0.2.7 보고서 `D007C9E8-E177-4854-9248-5EC8BDFFA593`의 실행 파일 UUID가 설치본과 일치합니다. 동일 macOS 15.6.1 (24G90)에서 `atos`로 `_reactToDisplayChanges:` → `_adjustWindowToScreen` → `_setFrameCommon:display:fromServer:` → `_adjustNeedsDisplayRegionForNewFrame:` 경로를 확인했습니다. SIGTRAP은 메인 스레드 AppKit 내부에서 발생했습니다.
+- 접기 시 `setContentAspectRatio(0, 0)` 호출을 제거하고 `setContentResizeIncrements(1, 1)`로 비율 제약을 해제합니다. 펼칠 때 이미지의 원래 비율을 다시 설정하는 동작은 유지합니다. [Apple 비율·크기 증분 설명](https://developer.apple.com/documentation/appkit/nswindow/aspectratio)과 [동일한 영 비율 설정 후 SIGTRAP 재현 보고](https://github.com/libsdl-org/SDL/issues/14229)를 근거로 한 완화입니다.
+- 한계: 보고서만으로 사고 당시 접힌 창이나 화면 변경 원인을 특정할 수 없습니다. 별도 AppKit 창에서 접기·크기 조정·펼치기를 10회 수행한 비교 실험은 수정 방식과 기존 방식 모두 통과했으므로, 원본 크래시 재현·해결 확정으로 간주하지 않습니다. 실제 모니터 연결·해제와 절전 복귀는 미검증입니다.
+- macOS arm64, Rust 1.91.1, Node 24.21.0에서 Rust 64개·UI 39개 테스트, Clippy, Rustfmt, diff 공백 검사와 워크트리 개발 debug 빌드 통과. 설치 앱 바이너리는 교체하지 않았습니다.
+- 실제 개발 앱에서 `python3 scripts/fold-contact-smoke.py` 통과: 20ms 접촉 10회 접기·펼치기, 접힌 창의 접촉 여유, 위치·크기·포커스·고정·본문 보존과 숨긴 메모 유지 확인. 첫 실행은 System Events 미실행 오류로 실패했고, 테스트에서 시작한 개발 프로세스만 정리한 뒤 System Events를 시작하여 재실행했습니다. 마지막 테스트가 만든 개발 프로세스는 자체 정리됐습니다.
+- Conf 4 (실제 접기·펼치기 회귀) / Risk Low. 원본 크래시 원인의 확정과 해결 검증은 보류합니다.
 
 ## 보조키 접촉 진입 조건 (2026-10-26)
 
@@ -761,3 +769,27 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - 상하 7px·좌우 10px Padding, 버튼 사이 6px, 안내와 버튼 사이 12px, 줄바꿈 시 8px 간격 적용. 한 줄 Action Bar의 네이티브 높이는 36px이다. 첫 표시부터 연결형 크기로 측정한다.
 - Rust 66개·UI 42개, Clippy, 개발 빌드, 실제 macOS Feedback 회귀 통과. 새 외곽선 이벤트의 메모별 격리·상하 배치·전체 폭·숨김 복원을 UI 테스트로 확인했다. 실제 창에서 편집·저장·확인·144px 오류 줄바꿈·핀·접기·숨김을 검증하고 문서에 캡처를 첨부했다.
 - 시안과의 차이: 연결 중 전체 외곽 그림자는 생략하며 안쪽 꺾임은 직각이다. Windows·Intel 실화면은 미검증. 기존 사용 중인 메모 상태를 확인·보존하고 검증용 메모만 숨겼다. 커밋하지 않았다.
+### 2026-10-26 — 최신 본문·캡처 이미지 복사와 하단 성공 안내
+
+- 텍스트는 최신 `note.html`을 화면 밖 DOM에서 `innerText`로 읽어 기존 렌더링 텍스트 형식을 유지한다. 보이는 누적 diff, 확인 기준과 메뉴는 변경하지 않는다. 버튼과 ⌘C/Ctrl+C가 같은 경로를 사용하고 편집 중 기본 선택 복사는 유지한다.
+- 이미지 복사는 Rust가 호출 창의 앱 생성 `capture.png`만 읽고 Tauri clipboard-manager로 기록한다. CSP가 차단하는 `fetch(data:...)`를 제거했으며 CSP를 넓히지 않았다. JavaScript 이미지 리소스·이미지 쓰기 권한도 추가하지 않는다.
+- 성공 안내는 하단 `role=status`에 1.2초 표시하고 사라진다. 전체 밝기 flash는 사용하지 않고 레이아웃·이미지 비율·창 크기에 영향을 주지 않는다.
+- macOS arm64, Node 24.21.0/Rust 1.91.1: Rust 66개·UI 39개 테스트, Clippy, Rustfmt, JavaScript 구문, 개발 빌드와 diff 공백 검사 통과. PNG→RGBA 치수·바이트 보존 및 잘못된 이미지 거부, 최신 텍스트·diff 보존, 버튼·단축키·편집기 기본 복사·성공 만료·실패 안내를 확인했다.
+- Chromium `scripts/copy-layout-smoke.py`에서 제목·문단·목록·코드·표의 기존 `innerText` 동일성, 하단 확인 버튼 hit-test, diff와 viewport 유지, 알림 만료, 이미지 영역 크기 유지를 확인했다. 기존 `scripts/diff-action-layout-smoke.py`도 통과했다.
+- 워크트리 개발 CLI `list`와 `inspect --id main` 성공. 기존 개발 프로세스는 재시작하지 않았으므로 새 빌드의 실제 macOS WebView·OS 클립보드 붙여넣기와 Windows 실행은 미검증이다. 기존 메모의 숨김 상태와 실행 프로세스를 보존했다. Conf 4 / Risk Low.
+
+
+## 2026-10-27 파일 내보내기
+
+- Ctrl+S / Cmd+S 및 툴바 저장 버튼으로 텍스트는 Markdown, 캡처는 원본 PNG를 선택한 경로에 저장. 편집 중에는 초안을 내보내고 메모/원본 연결은 유지.
+- Rust 테스트 66개, UI 테스트 42개 통과. UTF-8·바이너리 보존, 기존 파일 교체, 실패 시 임시 파일 정리, 단축키·초안·취소·오류·중복 실행 방지 확인.
+- Rustfmt, Clippy(all-targets, warnings deny), 워크트리 개발 빌드 통과(macOS ARM64).
+- 격리 개발 CLI open/close 및 실제 툴바 → macOS 저장 창 → /tmp/export-smoke.md 저장 후 원문 일치 확인. Cmd+S로 저장 창 재진입 및 Escape 취소 확인. 검증용 개발 프로세스만 종료.
+- 미검증: 실제 캡처 PNG의 저장 대화상자 전체 경로, Windows 네이티브 대화상자 및 설치본. Ctrl+S는 UI 자동 테스트로 검증.
+- Conf 4 / Risk Low.
+
+## 2026-10-27 디자인 시스템과 최신 main 통합
+
+- 파일 저장과 최신 본문·이미지 복사 기능을 Connected Feedback과 통합했다. 내보내기·복사 결과와 오류는 공통 Feedback에 표시한다. 메모와 Feedback에서 ⌘S/Ctrl+S는 동일하게 파일 저장 대화상자를 연다.
+- Rust 69개·UI 49개 테스트, Clippy, Rustfmt, 워크트리 개발 빌드와 실제 macOS Feedback 회귀 통과. 최신 본문 복사·이미지 복사 호출·초안 내보내기·오류·메모별 단축키 격리는 UI 테스트로 확인했다.
+- `scripts/copy-layout-smoke.py`는 Chromium 프로세스가 30초 내 응답하지 않아 미검증이다. Windows·Intel 실화면 및 병합된 버전의 파일 저장 대화상자·실제 이미지 클립보드는 이번에 실행하지 않았다.
