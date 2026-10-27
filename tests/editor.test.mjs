@@ -5,13 +5,13 @@ import vm from 'node:vm';
 import { themeFor } from '../ui/theme.mjs';
 import { feedbackView, durations } from '../ui/feedback-state.mjs';
 
-async function setup(storage = new Map(), instance = {}, initialNote = {}) {
+async function setup(storage = new Map(), instance = {}, initialNote = {}, platform = "MacIntel") {
   const elements = new Map();
   const element = id => {
     if (!elements.has(id)) elements.set(id, {
       hidden: false, disabled: false, value: '', dataset: {}, listeners: {}, attributes: {},
       addEventListener(type, listener) { this.listeners[type] = listener; },
-      setAttribute(key, value) { this.attributes[key] = value; }, focus() {},
+      setAttribute(key, value) { this.attributes[key] = value; }, removeAttribute(key) { delete this.attributes[key]; }, focus() {},
       setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; },
       getBoundingClientRect() { return { width: 298, height: this.hidden ? 0 : 42 }; },
       cloneNode() { return { style: {}, getBoundingClientRect: () => ({ width: 298, height: 120 }), remove() {} }; },
@@ -37,6 +37,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
   let folded = false;
   const classes = new Set();
   const context = vm.createContext({
+    navigator: { platform },
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
     themeFor, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
@@ -245,7 +246,9 @@ test('explicit button folds and unfolds without Control and updates its label', 
   assert.equal(app.classes.has('folded'), true);
   assert.equal(app.element('fold-toggle').attributes['aria-label'], '메모 펼치기');
   assert.equal(app.element('fold-toggle').attributes['aria-expanded'], 'false');
-  assert.match(app.element('fold-toggle').title, /Control.*포인터.*접기·펼치기/);
+  assert.equal(app.element('fold-toggle').title, '메모 펼치기');
+  assert.match(app.view().message, /Control.*포인터/);
+  assert.equal(app.view().folded_tip, true);
   await app.element('fold-toggle').listeners.click();
   assert.equal(app.classes.has('folded'), false);
   assert.equal(app.element('fold-toggle').attributes['aria-label'], '메모 접기');
@@ -458,14 +461,14 @@ test('connected outline follows its own companion and restores after hiding', as
   connection({ payload: { owner: 'other', edge: 'below' } });
   assert.equal(app.classes.has('feedback-below'), false);
   connection({ payload: { owner: 'memo-test', edge: 'below', width: 100, memoWidth: 300, memoHeight: 160 } });
-  assert.equal(app.element('connected-outline').hidden, false);
   assert.equal(app.classes.has('feedback-below'), true);
+  assert.equal('hidden' in app.element('connected-outline').attributes, false);
   assert.match(app.element('connected-path').attributes.d, /M 200 159.5/);
   connection({ payload: { owner: 'memo-test', edge: 'above', width: 300, memoWidth: 300, memoHeight: 160 } });
   assert.equal(app.classes.has('feedback-full'), true);
   assert.equal(app.element('connected-path').attributes.transform, 'translate(0 160) scale(1 -1)');
   connection({ payload: { owner: 'memo-test', edge: 'none' } });
-  assert.equal(app.element('connected-outline').hidden, true);
+  assert.equal('hidden' in app.element('connected-outline').attributes, true);
   assert.equal(app.classes.has('feedback-above'), false);
 });
 
@@ -563,4 +566,16 @@ test('Feedback export shortcut targets its own memo draft', async () => {
   await app.nativeEvents['feedback-action']({ payload: { owner: 'memo-test', action: 'export' } });
   assert.equal(app.calls.filter(([name]) => name === 'export_note').at(-1)[1].markdown, '내보낼 초안');
   assert.equal(app.element('editor').hidden, false);
+});
+
+
+test('toolbar shortcuts follow platform and gesture help is shown on button use', async () => {
+  for (const [platform, modifier] of [['MacIntel', '⌘'], ['Win32', 'Ctrl+']]) {
+    const app = await setup(new Map(), {}, {}, platform);
+    assert.equal(app.element('export').title, `파일로 저장 · ${modifier}S`);
+    assert.equal(app.element('copy').title, `본문 복사 · ${modifier}C`);
+    await app.element('warp').listeners.click();
+    if (platform === 'MacIntel') assert.match(app.view().message, /Option.*포인터/);
+    else assert.equal(app.view().message, '');
+  }
 });

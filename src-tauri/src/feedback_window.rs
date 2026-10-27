@@ -18,6 +18,8 @@ pub struct View {
     error: bool,
     buttons: Vec<Button>,
     color: String,
+    #[serde(default)]
+    folded_tip: bool,
 }
 #[derive(Default)]
 pub struct Surfaces(Mutex<BTreeMap<String, View>>);
@@ -168,11 +170,13 @@ pub fn layout_feedback(
         .lock()
         .map_err(|e| e.to_string())?
         .get(parent.label())
-        .is_some_and(|v| !v.message.is_empty() || !v.buttons.is_empty());
+        .is_some_and(|v| {
+            (!v.message.is_empty() || !v.buttons.is_empty())
+                && (!crate::sizing::folded(&parent) || v.folded_tip)
+        });
     if !active
         || !parent.is_visible().map_err(|e| e.to_string())?
         || parent.is_minimized().map_err(|e| e.to_string())?
-        || crate::sizing::folded(&parent)
     {
         hide(&parent);
         return Ok(serde_json::json!({"edge":"none"}));
@@ -210,6 +214,8 @@ pub fn layout_feedback(
     let connection = serde_json::json!({"owner":parent.label(), "edge":edge,
         "width":f64::from(w)/scale, "memoWidth":f64::from(size.width)/scale,
         "memoHeight":f64::from(size.height)/scale});
+    // Transparent companion windows must not cast a separate outline or shadow.
+    window.set_shadow(false).map_err(|e| e.to_string())?;
     parent
         .set_shadow(edge == "none")
         .map_err(|e| e.to_string())?;

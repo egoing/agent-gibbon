@@ -4,6 +4,9 @@ import { feedbackView, durations } from './feedback-state.mjs';
 const { invoke } = window.__TAURI__.core;
 const win = window.__TAURI__.window.getCurrentWindow();
 const $ = (id) => document.getElementById(id);
+const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+const shortcut = key => isMac ? `⌘${key}` : `Ctrl+${key}`;
+$('export').title = `파일로 저장 · ${shortcut('S')}`;
 let revision = -1;
 let latestNote;
 let displayedHtml;
@@ -124,6 +127,8 @@ async function publishFeedback() {
   if (!memoVisible) return;
   if (publishing) { publishAgain = true; return; }
   const view = feedbackView({ editing, saving, acknowledging, highlightRevision, notice, sourcePath: latestNote?.source_path, color: latestNote?.color });
+  view.folded_tip = folded && notice?.kind === 'tip';
+  if (view.folded_tip) view.buttons = [];
   const signature = JSON.stringify(view);
   if (signature === feedbackSignature) return;
   publishing = true;
@@ -160,8 +165,9 @@ async function refresh() {
     $('edit').disabled = editing || !!state.note.capture;
     $('font-size').disabled = !!state.note.capture;
     $('copy').disabled = editing;
-    $('copy').title = state.note.capture ? '이미지 복사' : '본문 복사';
-    $('copy').setAttribute('aria-label', $('copy').title);
+    const copyLabel = state.note.capture ? '이미지 복사' : '본문 복사';
+    $('copy').title = `${copyLabel} · ${shortcut('C')}`;
+    $('copy').setAttribute('aria-label', copyLabel);
     document.body.classList.toggle('image-note', !!state.note.capture);
     if (revision !== state.note.revision) {
       const theme = themeFor(state.note.color);
@@ -291,7 +297,7 @@ document.documentElement.addEventListener('pointerenter', () => invoke('sync_opa
 document.documentElement.addEventListener('pointerleave', () => invoke('sync_opacity').catch(failure));
 
 function showWarpTip() {
-  notify('반대편으로 워프 · macOS: Option + 메모에 포인터', 'tip');
+  if (isMac) notify('Option을 누른 채 메모에 포인터를 올려도 이동할 수 있습니다', 'tip');
 }
 let warping = false;
 $('warp').addEventListener('click', async () => {
@@ -303,7 +309,7 @@ $('warp').addEventListener('click', async () => {
 });
 async function pollWarp() {
   try {
-    if (!warping && await invoke('poll_warp')) showWarpTip();
+    if (!warping) await invoke('poll_warp');
   } catch (error) { failure(error); }
   setTimeout(pollWarp, 100);
 }
@@ -317,14 +323,18 @@ function displayFold(value) {
   document.body.classList.toggle('folded', folded);
   $('fold-toggle').setAttribute('aria-expanded', String(!folded));
   $('fold-toggle').setAttribute('aria-label', folded ? '메모 펼치기' : '메모 접기');
-  $('fold-toggle').title = `${folded ? '메모 펼치기' : '메모 접기'} · Control을 누른 채 메모에 포인터를 올리면 접기·펼치기 전환`;
+  $('fold-toggle').title = folded ? '메모 펼치기' : '메모 접기';
+  publishFeedback();
   $('fold-title').hidden = !folded;
 }
 let changingFold = false;
 async function toggleFold() {
   if (changingFold) return;
   changingFold = true;
-  try { displayFold(await invoke('toggle_fold')); }
+  try {
+    displayFold(await invoke('toggle_fold'));
+    if (isMac) notify('Control을 누른 채 메모에 포인터를 올려도 접거나 펼칠 수 있습니다', 'tip');
+  }
   catch (error) { failure(error); }
   finally { changingFold = false; }
 }
@@ -379,7 +389,8 @@ for (const button of document.querySelectorAll('#controls button')) {
 window.__TAURI__.event.listen('feedback-connection', ({ payload: c }) => {
   if (c.owner !== win.label) return;
   const attached = c.edge === 'below' || c.edge === 'above';
-  $('connected-outline').hidden = !attached;
+  if (attached) $('connected-outline').removeAttribute('hidden');
+  else $('connected-outline').setAttribute('hidden', '');
   document.body.classList.toggle('feedback-below', attached && c.edge === 'below');
   document.body.classList.toggle('feedback-above', attached && c.edge === 'above');
   document.body.classList.toggle('feedback-full', attached && c.width >= c.memoWidth);
