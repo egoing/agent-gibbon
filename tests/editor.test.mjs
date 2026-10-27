@@ -26,6 +26,8 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
   let feedbackActive = false;
   let highlightRevision = null;
   let saveError;
+  let exportResult = null;
+  let exportError;
   let acknowledgementError;
   let warpError;
   let copyError;
@@ -58,6 +60,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
           if (highlightRevision !== args.revision) return false;
           highlightRevision = null; return true;
         }
+        if (command === 'export_note') { if (exportError) throw exportError; return exportResult; }
         if (command === 'save_note') {
           if (saveError) throw saveError;
           assert.equal(args.expectedRevision, note.revision);
@@ -70,7 +73,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}) {
   });
   vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace("import { themeFor } from './theme.mjs';", ''), context);
   await new Promise(setImmediate);
-  return { element, styles, events, calls, pointers, classes, nativeEvents,
+  return { exportResult: value => { exportResult = value; }, failExport: error => { exportError = error; }, element, styles, events, calls, pointers, classes, nativeEvents,
     failCopy: error => { copyError = error; },
     expireCopy: () => timers.find(fn => fn.toString().includes("delete $('copy').dataset.copied"))(),
     fold: value => { folded = value; },
@@ -457,4 +460,47 @@ test('failed clipboard write reports the error without showing success feedback'
   assert.equal(app.element('copy-status').hidden, true);
   assert.equal(app.element('copy').dataset.copied, undefined);
   assert.equal(app.element('error').textContent, '클립보드 실패');
+});
+
+
+test('Cmd+S and Ctrl+S export viewing notes and toolbar exports the current draft', async () => {
+  const app = await setup();
+  for (const modifier of ['metaKey', 'ctrlKey']) {
+    let prevented = false;
+    app.events.keydown({ key: 's', [modifier]: true, preventDefault() { prevented = true; } });
+    await new Promise(setImmediate);
+    assert.equal(prevented, true);
+    assert.equal(app.calls.at(-1)[0], 'export_note');
+    assert.equal(app.calls.at(-1)[1].markdown, null);
+  }
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '# 저장할 초안';
+  app.exportResult('/tmp/note.md');
+  await app.element('export').listeners.click();
+  assert.equal(app.calls.at(-1)[1].markdown, '# 저장할 초안');
+  assert.equal(app.element('editor').hidden, false);
+  assert.equal(app.element('export-status').hidden, false);
+  assert.equal(app.calls.some(([name]) => name === 'save_note'), false);
+});
+
+test('cancel and export failure preserve draft and allow retry', async () => {
+  const app = await setup();
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '초안';
+  await app.element('export').listeners.click();
+  assert.equal(app.element('export-status').hidden, true);
+  app.failExport('쓰기 실패');
+  await app.element('export').listeners.click();
+  assert.equal(app.element('error').textContent, '쓰기 실패');
+  assert.equal(app.element('markdown').value, '초안');
+  assert.equal(app.element('export').disabled, false);
+});
+
+test('repeated shortcuts open only one export dialog', async () => {
+  const app = await setup();
+  const event = { key: 's', ctrlKey: true, preventDefault() {} };
+  app.events.keydown(event);
+  app.events.keydown(event);
+  await new Promise(setImmediate);
+  assert.equal(app.calls.filter(([name]) => name === 'export_note').length, 1);
 });

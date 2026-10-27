@@ -110,3 +110,5 @@ body:has(:focus-visible) :is(#controls, #dev-instance) { opacity: 1; }
 
 /* Match the editor action row while reserving space below the note content. */
 #diff-actions { flex: none; padding: 0 3px 3px; cursor: default; }
+
+#export-status { position: fixed; bottom: 3px; left: 3px; right: 3px; z-index: 4; padding: 3px; background: var(--background); overflow-wrap: anywhere; pointer-events: none; }

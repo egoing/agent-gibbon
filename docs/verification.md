@@ -743,3 +743,13 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - macOS arm64, Node 24.21.0/Rust 1.91.1: Rust 66개·UI 39개 테스트, Clippy, Rustfmt, JavaScript 구문, 개발 빌드와 diff 공백 검사 통과. PNG→RGBA 치수·바이트 보존 및 잘못된 이미지 거부, 최신 텍스트·diff 보존, 버튼·단축키·편집기 기본 복사·성공 만료·실패 안내를 확인했다.
 - Chromium `scripts/copy-layout-smoke.py`에서 제목·문단·목록·코드·표의 기존 `innerText` 동일성, 하단 확인 버튼 hit-test, diff와 viewport 유지, 알림 만료, 이미지 영역 크기 유지를 확인했다. 기존 `scripts/diff-action-layout-smoke.py`도 통과했다.
 - 워크트리 개발 CLI `list`와 `inspect --id main` 성공. 기존 개발 프로세스는 재시작하지 않았으므로 새 빌드의 실제 macOS WebView·OS 클립보드 붙여넣기와 Windows 실행은 미검증이다. 기존 메모의 숨김 상태와 실행 프로세스를 보존했다. Conf 4 / Risk Low.
+
+
+## 2026-10-27 파일 내보내기
+
+- Ctrl+S / Cmd+S 및 툴바 저장 버튼으로 텍스트는 Markdown, 캡처는 원본 PNG를 선택한 경로에 저장. 편집 중에는 초안을 내보내고 메모/원본 연결은 유지.
+- Rust 테스트 66개, UI 테스트 42개 통과. UTF-8·바이너리 보존, 기존 파일 교체, 실패 시 임시 파일 정리, 단축키·초안·취소·오류·중복 실행 방지 확인.
+- Rustfmt, Clippy(all-targets, warnings deny), 워크트리 개발 빌드 통과(macOS ARM64).
+- 격리 개발 CLI open/close 및 실제 툴바 → macOS 저장 창 → /tmp/export-smoke.md 저장 후 원문 일치 확인. Cmd+S로 저장 창 재진입 및 Escape 취소 확인. 검증용 개발 프로세스만 종료.
+- 미검증: 실제 캡처 PNG의 저장 대화상자 전체 경로, Windows 네이티브 대화상자 및 설치본. Ctrl+S는 UI 자동 테스트로 검증.
+- Conf 4 / Risk Low.
