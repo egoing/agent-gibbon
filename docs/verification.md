@@ -793,3 +793,13 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - 파일 저장과 최신 본문·이미지 복사 기능을 Connected Feedback과 통합했다. 내보내기·복사 결과와 오류는 공통 Feedback에 표시한다. 메모와 Feedback에서 ⌘S/Ctrl+S는 동일하게 파일 저장 대화상자를 연다.
 - Rust 69개·UI 49개 테스트, Clippy, Rustfmt, 워크트리 개발 빌드와 실제 macOS Feedback 회귀 통과. 최신 본문 복사·이미지 복사 호출·초안 내보내기·오류·메모별 단축키 격리는 UI 테스트로 확인했다.
 - `scripts/copy-layout-smoke.py`는 Chromium 프로세스가 30초 내 응답하지 않아 미검증이다. Windows·Intel 실화면 및 병합된 버전의 파일 저장 대화상자·실제 이미지 클립보드는 이번에 실행하지 않았다.
+
+## 2026-10-28 — 중심 고정 보조키+휠 크기 조절
+
+- 환경: macOS ARM64, Node v24.21.0, Rust 1.91.1. 워크트리 개발 실행기와 debug 앱으로 검증했으며 설치 앱을 교체하지 않았다.
+- Rust 71개, UI 53개 테스트 통과. Clippy `-D warnings`, Rustfmt, JavaScript 구문 검사, `git diff --check`, `npm run dev:build` 통과.
+- 실제 macOS 개발 앱에 CGEvent 휠 입력을 전달하고 개발 CLI `inspect`로 확인: Command는 가로세로 확대, Control은 너비만 확대, Option은 높이만 확대. 중심 오차는 물리 1px 이내이며 교대 방향 휠 20회 후에도 누적 이동이 없었다. 내용 갱신 후 수동 크기가 유지됐다.
+- 실제 가장자리 드래그 입력 후 `휠 + ⌘ 비율 · Ctrl 좌우 · Option 상하` 안내와 기존 확인 버튼의 공존을 확인했다. `scripts/design-system-smoke.py`로 Feedback 배치·저장·오류·접힘·숨김 회귀도 통과했다.
+- 최초 실환경 검증에서 Tauri 크기 변경 직후 이전 크기를 읽어 중심이 이동하는 문제를 재현했다. macOS에서 네이티브 프레임을 원자적으로 적용하도록 고친 뒤 위 검증을 통과했다. 타 플랫폼은 요청 크기를 기준으로 위치를 계산한다.
+- 미검증: Windows/Intel 실제 입력, 이미지 메모의 축별 휠 조절, 혼합 배율 화면 이동. 최소 크기와 비율 계산·보조키 선택·휠 단위 변환은 자동 테스트로 확인했다.
+- 동작 기준: [디자인 시스템](design-system.md). 기존 Feedback 스타일을 사용하므로 시안 외형·배치 변경 없음.

@@ -1,9 +1,12 @@
 use std::{collections::BTreeMap, sync::Mutex};
+#[cfg(target_os = "macos")]
+use tauri::Emitter;
 use tauri::{LogicalSize, Manager, State, WebviewWindow};
 
 #[derive(Default)]
 struct SizeState {
     manual: bool,
+    wheel_anchor: Option<WheelAnchor>,
     image_size: Option<LogicalSize<f64>>,
     expanded: Option<LogicalSize<f64>>,
     contact: crate::warp::Contact,
@@ -13,6 +16,13 @@ struct SizeState {
 }
 #[derive(Default)]
 pub struct Sizes(Mutex<BTreeMap<String, SizeState>>);
+
+#[derive(Clone, Copy)]
+struct WheelAnchor {
+    position: tauri::PhysicalPosition<i32>,
+    size: tauri::PhysicalSize<u32>,
+    center: (f64, f64),
+}
 
 // The native constraint applies during live dragging, without resize-event corrections.
 pub fn constrain_image(window: &WebviewWindow, width: f64, height: f64) -> Result<(), String> {
@@ -84,6 +94,9 @@ pub fn native_resize(window: &WebviewWindow) -> Result<(), String> {
     let live = unsafe { (&*(ptr as *const objc2_app_kit::NSWindow)).inLiveResize() };
     if live {
         manual_resize(window.clone(), window.state::<Sizes>())?;
+        window
+            .emit_to(window.label(), "manual-resize", window.label())
+            .map_err(|e| e.to_string())?;
     }
     Ok(())
 }
@@ -97,6 +110,141 @@ pub fn manual_resize(window: WebviewWindow, sizes: State<Sizes>) -> Result<(), S
         return Err("접힌 메모는 펼친 뒤 크기를 조절하세요".into());
     }
     state.manual = true;
+    Ok(())
+}
+
+#[derive(Clone, Copy, serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ResizeAxis {
+    Both,
+    Horizontal,
+    Vertical,
+}
+
+fn wheel_size(
+    width: f64,
+    height: f64,
+    delta: f64,
+    axis: ResizeAxis,
+    min: (f64, f64),
+) -> (f64, f64) {
+    let factor = (-delta.clamp(-240.0, 240.0) * 0.002).exp();
+    match axis {
+        ResizeAxis::Both => {
+            let factor = factor.max(min.0 / width).max(min.1 / height);
+            (width * factor, height * factor)
+        }
+        ResizeAxis::Horizontal => ((width * factor).max(min.0), height),
+        ResizeAxis::Vertical => (width, (height * factor).max(min.1)),
+    }
+}
+
+#[tauri::command]
+pub fn wheel_resize(
+    window: WebviewWindow,
+    sizes: State<Sizes>,
+    delta: f64,
+    axis: ResizeAxis,
+) -> Result<(), String> {
+    if !delta.is_finite() {
+        return Err("유효하지 않은 휠 값입니다".into());
+    }
+    if delta == 0.0 || !window.is_visible().map_err(|e| e.to_string())? {
+        return Ok(());
+    }
+    manual_resize(window.clone(), sizes.clone())?;
+    let image = sizes
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .get(window.label())
+        .and_then(|s| s.image_size);
+    let scale = window.scale_factor().map_err(|e| e.to_string())?;
+    let before = window.outer_size().map_err(|e| e.to_string())?;
+    let position = window.outer_position().map_err(|e| e.to_string())?;
+    let center = sizes
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .get(window.label())
+        .and_then(|s| s.wheel_anchor)
+        .filter(|a| a.position == position && a.size == before)
+        .map(|a| a.center)
+        .unwrap_or((
+            f64::from(position.x) + f64::from(before.width) / 2.0,
+            f64::from(position.y) + f64::from(before.height) / 2.0,
+        ));
+    let size = window
+        .inner_size()
+        .map_err(|e| e.to_string())?
+        .to_logical::<f64>(scale);
+    let min = if image.is_some() {
+        (2.0, 2.0)
+    } else {
+        (144.0, 32.0)
+    };
+    let (width, height) = wheel_size(size.width, size.height, delta, axis, min);
+    // Axis-only resizing is explicit even for image memos. Restore their native
+    // drag constraint afterwards; proportional wheel resizing uses the current ratio.
+    if image.is_some() {
+        set_image_ratio(&window, None)?;
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let ptr = window.ns_window().map_err(|e| e.to_string())?;
+        // SAFETY: synchronous Tauri commands execute on the main thread. Set
+        // the complete native frame atomically; Tao's set_size is deferred.
+        let native = unsafe { &*(ptr as *const objc2_app_kit::NSWindow) };
+        let mut frame = native.frame();
+        let new_width = width + f64::from(before.width) / scale - size.width;
+        let new_height = height + f64::from(before.height) / scale - size.height;
+        frame.origin.x += (frame.size.width - new_width) / 2.0
+            + (center.0 - f64::from(position.x) - f64::from(before.width) / 2.0) / scale;
+        frame.origin.y += (frame.size.height - new_height) / 2.0
+            - (center.1 - f64::from(position.y) - f64::from(before.height) / 2.0) / scale;
+        frame.size.width = new_width;
+        frame.size.height = new_height;
+        native.setFrame_display(frame, true);
+        if image.is_some() {
+            set_image_ratio(&window, image)?;
+        }
+    }
+    #[cfg(not(target_os = "macos"))]
+    let (position, after) = {
+        window
+            .set_size(LogicalSize::new(width, height))
+            .map_err(|e| e.to_string())?;
+        // Size changes can be queued by the platform. Use the requested physical
+        // dimensions including the existing frame inset, not a stale size read.
+        let target_width = (width * scale).round() + f64::from(before.width) - size.width * scale;
+        let target_height =
+            (height * scale).round() + f64::from(before.height) - size.height * scale;
+        let position = tauri::PhysicalPosition::new(
+            (center.0 - target_width / 2.0).round() as i32,
+            (center.1 - target_height / 2.0).round() as i32,
+        );
+        window.set_position(position).map_err(|e| e.to_string())?;
+        (
+            position,
+            tauri::PhysicalSize::new(target_width as u32, target_height as u32),
+        )
+    };
+    #[cfg(target_os = "macos")]
+    let (position, after) = (
+        window.outer_position().map_err(|e| e.to_string())?,
+        window.outer_size().map_err(|e| e.to_string())?,
+    );
+    sizes
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .entry(window.label().into())
+        .or_default()
+        .wheel_anchor = Some(WheelAnchor {
+        position,
+        size: after,
+        center,
+    });
     Ok(())
 }
 
@@ -381,5 +529,24 @@ mod contact_tests {
         assert!(!contact.trigger(true, true, false, (101., 100.)));
         assert!(!contact.trigger(false, true, false, (101., 100.)));
         assert!(!contact.trigger(true, true, false, (101., 100.)));
+    }
+}
+
+#[cfg(test)]
+mod wheel_tests {
+    use super::*;
+    #[test]
+    fn proportional_resize_preserves_ratio_at_minimum() {
+        let (w, h) = wheel_size(150.0, 300.0, 240.0, ResizeAxis::Both, (144.0, 32.0));
+        assert_eq!(w, 144.0);
+        assert_eq!(h, 288.0);
+    }
+    #[test]
+    fn independent_axes_and_direction() {
+        let (w, h) = wheel_size(300.0, 200.0, -100.0, ResizeAxis::Horizontal, (144.0, 32.0));
+        assert!(w > 300.0);
+        assert_eq!(h, 200.0);
+        let (w, h) = wheel_size(300.0, 40.0, 240.0, ResizeAxis::Vertical, (144.0, 32.0));
+        assert_eq!((w, h), (300.0, 32.0));
     }
 }

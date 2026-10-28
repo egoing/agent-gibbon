@@ -446,7 +446,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::fit_note,
             sizing::poll_fold,
             sizing::toggle_fold,
-            sizing::manual_resize
+            sizing::manual_resize,
+            sizing::wheel_resize
         ])
         .on_window_event(|win, event| {
             if win.label().starts_with("capture-") || feedback_window::is_surface(win.label()) {

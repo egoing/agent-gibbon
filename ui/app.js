@@ -1,4 +1,5 @@
 'use strict';
+import { wheelRequest, resizeTip } from './resize-shortcut.mjs';
 import { themeFor } from './theme.mjs';
 import { feedbackView, durations } from './feedback-state.mjs';
 const { invoke } = window.__TAURI__.core;
@@ -209,13 +210,29 @@ document.addEventListener('mousedown', (event) => {
   event.preventDefault();
   invoke('drag_note').catch(failure);
 });
+let resizeTipTimer;
+function scheduleResizeTip() {
+  clearTimeout(resizeTipTimer);
+  resizeTipTimer = setTimeout(() => notify(resizeTip(isMac), 'tip'), 300);
+}
+window.__TAURI__.event.listen('manual-resize', ({ payload }) => {
+  if (payload === win.label) scheduleResizeTip();
+}).catch(failure);
+let wheelQueue = Promise.resolve();
+document.addEventListener('wheel', event => {
+  const request = wheelRequest(event);
+  if (!request || folded) return;
+  event.preventDefault();
+  needsFit = false;
+  wheelQueue = wheelQueue.then(() => invoke('wheel_resize', request)).catch(failure);
+}, { passive: false });
 for (const grip of document.querySelectorAll('.resize')) {
   grip.addEventListener('mousedown', (event) => {
     if (event.button !== 0 || folded) return;
     needsFit = false;
     // Start native resizing inside the original mouse gesture.
     invoke('manual_resize').catch(failure);
-    win.startResizeDragging(grip.dataset.direction).catch(failure);
+    win.startResizeDragging(grip.dataset.direction).then(scheduleResizeTip).catch(failure);
   });
 }
 $('pin').addEventListener('click', () => invoke('toggle_pin').catch(failure));
