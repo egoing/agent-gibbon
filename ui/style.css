@@ -98,7 +98,7 @@ body #controls:has(:focus-visible) { opacity: 1; pointer-events: auto; }
 body.folded #controls button { flex-basis: 12px; }
 #editor { height: calc(100% - 30px); }
 #tooltip { position: fixed; z-index: 5; max-width: calc(100vw - 8px); padding: var(--feedback-padding); border: var(--surface-border) solid var(--border); border-radius: var(--surface-radius); background: var(--background); box-shadow: var(--surface-shadow); font: var(--font-ui)/var(--line-ui) -apple-system, BlinkMacSystemFont, sans-serif; overflow-wrap: anywhere; pointer-events: none; }
-button:focus-visible { outline: 2px solid var(--foreground); outline-offset: -2px; }
+#controls button:focus { outline: none; }
 
 body.editing #viewport { display: flex; flex-direction: column; }
 body.editing #editor { flex: 1; height: auto; min-height: 0; }
