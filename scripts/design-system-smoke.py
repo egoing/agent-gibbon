@@ -11,10 +11,15 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 BIN = str(ROOT / 'scripts/agent-gibbon-dev')
 ID = 'feedback-smoke-' + uuid.uuid4().hex[:8]
+INSTANCE = json.loads(subprocess.check_output(['node', str(ROOT / 'scripts/dev.mjs'), 'info'], text=True))
+assert INSTANCE['root'] == str(ROOT)
+print(json.dumps(INSTANCE, ensure_ascii=False), flush=True)
 
 def cli(action, *args):
     data = json.loads(subprocess.check_output([BIN, action, '--id', ID, *args], text=True))
     assert data['ok'], data
+    if action == 'inspect':
+        assert data['instance'] == INSTANCE['id'] and data['id'] == ID, data
     return data
 
 def wait_for(predicate):
@@ -62,6 +67,27 @@ try:
     matches = [int(line.strip().split(None, 1)[0]) for line in processes if line.strip().split(None, 1)[-1] == expected]
     assert len(matches) == 1, matches
     pid = matches[0]
+    print(f'PID={pid}; note={ID}; native title=Agent Gibbon [{label}] — {ID}', flush=True)
+    state = cli('inspect')
+    assert state['note']['markdown'] == '# 원본\n본문', state
+    # First creation and reuse after hidden WebView timers have gone idle must
+    # work without a native move/resize event rescuing the surface.
+    ui('resize', '300', '160')
+    time.sleep(1)
+    for idle in (0, 15, 1):
+        time.sleep(idle)
+        before = cli('inspect')
+        started = time.monotonic()
+        click('메모 편집')
+        state = wait_for(lambda s: s['feedback_surface'] and s['feedback_surface']['visible']
+                         and [b['id'] for b in s['feedback_surface']['view']['buttons']] == ['cancel', 'save'])
+        assert time.monotonic() - started < 3, state
+        assert state['position'] == before['position'] and state['size'] == before['size'], state
+        assert not state['feedback_surface']['focused'], state
+        assert '저장' in ui('dump', feedback=True)
+        click('취소', True)
+        wait_for(lambda s: not s['feedback_surface']['visible'])
+    print('PASS: first edit and repeated edits after 15s hidden show without moving/resizing', flush=True)
     cli('update', '--markdown', '# 변경\n본문')
     state = wait_for(lambda s: s['feedback_surface'] and s['feedback_surface']['visible'] and s['feedback_surface']['size']['height'] == 36 * s['size']['width'] / 300 and s['feedback_surface']['position']['x'] + s['feedback_surface']['size']['width'] == s['position']['x'] + s['size']['width'])
     surface = state['feedback_surface']
