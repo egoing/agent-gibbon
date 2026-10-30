@@ -817,3 +817,17 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - 실행 출처: 작업 루트 `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/issue-14`, `npm run dev:info`의 ID `dev-891816675f30ffa97abd5f0b`, 바이너리 `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/issue-14/src-tauri/target/debug/agent-gibbon`. 해당 개발 CLI의 `inspect --id issue14-check`가 `ok: true`, 같은 `instance`, 본문 `작은 창 Toolbar 검증`을 반환했다. 최종 GUI 검증은 정확한 바이너리 경로의 서버 PID `44416`과 그 PID에 속한 창 제목 `Agent Gibbon [DEV egoing/oystercatcher · 89181667] — issue14-check`를 함께 특정했다. 실제 크기별 포인터 검증은 `/tmp/gibbon-toolbar-native.py`로 수행했고 144×32 캡처는 `/tmp/gibbon-toolbar-native.png`에서 확인했다. 이 임시 파일은 저장소에 포함하지 않는다.
 
 - 병합 검증: 기본 브랜치의 기존 출처 정책·스킬 변경을 보존해 통합한 후 `/Users/egoinglee/dev/project/agent-gibbon`에서 UI 테스트 50개와 Chromium 6개 조합을 다시 통과했다. 이 실행은 브라우저 배치 검증이며 위 워크트리의 실제 개발 앱 검증과 구분한다.
+
+## 편집 시작 Feedback 표시 (2026-10-30)
+
+- 증상: 편집 시작 후 Feedback이 보이지 않다가 메모를 이동하면 표시되는 경우가 있다는 사용자 보고.
+- 코드 확인: `present_feedback`은 상태 저장·창 생성만 하고 실제 표시는 숨겨진 WebView의 100ms 타이머에 의존했다. 반면 이동·크기 변경은 네이티브 `sync`에서 직접 표시했다. 숨긴 WebView의 타이머 지연이 표시를 막을 수 있는 경로를 제거하여 상태 전달 뒤 메인 스레드에서 `sync`를 실행한다. 기존 숨김·접힘·최소화 조건과 포커스 보존을 재사용한다.
+- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/display-feedback-bar`
+- `npm run dev:info`: root는 위 경로, instance `dev-3dc07a98a5ddf93db177d66c`, binary는 위 루트의 `src-tauri/target/debug/agent-gibbon`.
+- 환경: macOS 15.6.1 / arm64, Node v24.21.0, Rust 1.91.1. `npm run dev:build` 후 해당 루트의 개발 CLI로 새 프로세스 실행.
+- 실제 검증: `python3 scripts/design-system-smoke.py` 통과. PID `24163`의 실행 파일 절대 경로를 대조하고, 메모 `feedback-smoke-1b64c38e`의 `inspect.ok`, instance, ID, 원문을 확인했다. Accessibility는 해당 PID와 `Agent Gibbon [DEV egoing/booby · 3dc07a98] — feedback-smoke-1b64c38e` 제목으로 창을 특정했다.
+- 새 회귀: 첫 편집, 취소 후 15초 숨김, 다시 취소 후 1초 숨김의 세 경우에 편집 요청 후 3초 이내 실제 가시성과 취소·저장 구성을 확인했다. 메모 위치·크기 불변, Feedback 비포커스, Accessibility의 저장 버튼도 확인했다. 검증 중 표시를 유도하는 이동·리사이즈는 하지 않았다(반복 시작 전에만 고정 크기 설정).
+- 기존 회귀: 외부 오른쪽 정렬·36px 높이·포커스 비탈취·변경 확인, 초안 저장·Toast 전환, 144px 오류 줄바꿈·초안 보존·핀 동기화, 접기·펼치기·숨긴 상태 갱신 통과. 테스트 메모는 마지막에 숨겼다.
+- 로그: `/tmp/display-feedback-bar-smoke.log` (로컬 임시 기록). 이번 검증은 CLI와 Accessibility 기준이며 화면 캡처는 생성하지 않았다.
+- 추가 검증: UI 테스트 50개, Rust 테스트 69개, Rustfmt, Clippy(`--all-targets -- -D warnings`), 개발 빌드, `git diff --check` 통과.
+- 한계: 수정 전 간헐 증상을 동일 조건에서 재현하여 비교한 것은 아니다. 숨김 타이머의 실제 중단 여부를 계측하지 않았다. Windows·Intel 실행, 설치 앱 교체, 릴리스는 수행하지 않았다. 외형 기준 변경이 없어 SVG·PNG는 유지했다.

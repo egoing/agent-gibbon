@@ -90,9 +90,20 @@ pub async fn present_feedback(window: WebviewWindow, view: View) -> Result<(), S
         .build()
         .map_err(|e| e.to_string())?;
     }
-    if !show {
-        hide(&window);
-    }
+    // A hidden WebView can suspend its refresh timer. Wake the native surface
+    // directly, just as move/resize does, instead of waiting for hidden JS to
+    // show itself. The WebView then measures the current content as usual.
+    // present_feedback is async; AppKit layout must run on the main thread.
+    let parent = window.clone();
+    window
+        .run_on_main_thread(move || {
+            if show {
+                sync(&parent);
+            } else {
+                hide(&parent);
+            }
+        })
+        .map_err(|e| e.to_string())?;
     Ok(())
 }
 #[tauri::command]
