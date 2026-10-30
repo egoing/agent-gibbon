@@ -9,7 +9,7 @@ description: macOS 또는 Windows에 설치된 Agent Gibbon 앱으로 플로팅 
 
 [홈페이지](https://agentgibbon.com/)와 [설치·CLI 안내](https://agentgibbon.com/guide/)를 참고한다. 앱은 [GitHub Releases](https://github.com/egoing/agent-gibbon/releases/latest)에서 내려받아 Applications 폴더에 설치한다. Apple Silicon은 `aarch64`, Intel Mac은 `x64` DMG를 사용한다. 배포판은 Apple 배포 서명·공증이 없어 macOS에서 실행이 차단될 수 있다.
 
-설치 앱의 실행 파일은 `/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon`이다. 경로를 따옴표로 감싸 호출한다. 파일이 없으면 설치 위치를 확인하고 설치 안내를 제공한다. 메모 사용 요청만으로 소스를 빌드하거나 개발 앱을 실행하지 않는다.
+설치 앱의 실행 파일은 `/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon`이다. 경로를 따옴표로 감싸 호출한다. 호출 전에 실행 파일의 존재와 실행 가능 여부를 확인한다. 앱이 없으면 메모 작업을 조용히 건너뛰고 본 작업을 계속한다. 오류·설치 안내·음성 안내·재시도는 하지 않으며, 사용자가 설치나 문제 진단을 요청한 경우에만 설명한다. 메모 사용 요청만으로 소스를 빌드하거나 개발 앱을 실행하지 않는다.
 
 ```sh
 "/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" list
@@ -22,9 +22,18 @@ description: macOS 또는 Windows에 설치된 Agent Gibbon 앱으로 플로팅 
 
 설치 버전에 따라 제공 기능이 다를 수 있다. 명령 옵션은 해당 실행 파일의 `--help`, 결과 필드는 실제 JSON 응답으로 확인한다. 최신 소스에만 있는 기능을 설치 앱도 지원한다고 가정하지 않는다.
 
+## 설치 앱과 개발 앱 선택
+
+- 기본값은 설치 앱이다. 현재 디렉터리가 Agent Gibbon 저장소라는 이유만으로 개발 앱을 선택하지 않는다.
+- 개발자가 특정 워크트리의 개발 앱 사용을 명시하면 지정한 워크트리를 사용한다. Agent Gibbon 자체의 개발·검증 작업 중에는 그 작업이 속한 워크트리를 사용한다.
+- 개발 모드의 모든 메모 명령은 해당 워크트리 절대 경로의 `scripts/agent-gibbon-dev`(Windows는 `scripts/agent-gibbon-dev.cmd`)를 호출한다. 설치 앱이나 debug 바이너리를 직접 호출하지 않는다. 별도 HTTP 서버는 추가하지 않는다.
+- 개발 실행기가 없거나 개발 바이너리가 없으면 조용히 메모 작업을 건너뛴다. 존재 여부는 해당 워크트리의 `npm run dev:info`가 알려 주는 `binary`로 확인한다. 메모 표시를 위해 자동 빌드하거나 다른 워크트리·설치 앱으로 전환하지 않는다. 사용자가 개발 앱 빌드·실행 자체를 요청한 경우에는 그 작업을 수행한다.
+- 앱이 존재하지만 통신 시간 초과·인스턴스 불일치·명령 실패가 발생하면 앱 부재로 취급해 숨기지 않는다. 실패를 알리고 다른 인스턴스로 자동 전환하지 않는다. 개발 검증은 해당 워크트리의 프로젝트 지침에 따라 응답의 인스턴스 출처까지 확인한다.
+- 아래 설치 앱 호출 예제는 설치 모드용이다. 개발 모드에서는 실행 경로만 선택한 워크트리의 개발 스크립트로 바꾸고 같은 명령과 상태 보존 규칙을 적용한다.
+
 ## Windows
 
-Windows 설치 파일과 개발 절차는 저장소의 `docs/windows.md`를 참고합니다. 설치한 `agent-gibbon.exe`의 실제 경로를 확인해 PowerShell에서 `& '실행 파일 절대 경로' list`처럼 호출합니다. CLI 명령과 창 상태 보존 규칙은 macOS와 같습니다. 설치 위치를 추측해 다른 실행 파일을 호출하지 않습니다.
+Windows 설치 파일과 개발 절차는 저장소의 `docs/windows.md`를 참고합니다. 설치한 `agent-gibbon.exe`의 실제 경로를 확인해 PowerShell에서 `& '실행 파일 절대 경로' list`처럼 호출합니다. 앱이 없으면 macOS와 같이 조용히 메모 작업을 건너뜁니다. CLI 명령과 창 상태 보존 규칙은 macOS와 같습니다. 설치 위치를 추측해 다른 실행 파일을 호출하지 않습니다.
 
 개발 테스트는 해당 워크트리의 `scripts/agent-gibbon-dev.cmd`를 사용합니다. 파일 내보내기는 Ctrl+S이며 macOS 전용 보조키·포인터 접촉 기능 대신 화면 버튼을 사용합니다.
 
