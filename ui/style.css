@@ -59,7 +59,8 @@ button:disabled { opacity: .5; cursor: default; }
 #content .change-modified { background: #fff0c2; color: #714600; }
 #content .change-removed { background: #fbe0e3; color: #8b2635; text-decoration: line-through; text-decoration-thickness: 1px; }
 
-body.folded #controls > button:not(#fold-toggle),
+body.folded #toolbar-items > button:not(#fold-toggle),
+body.folded #controls > button,
 body.folded #content, body.folded #editor, body.folded .resize { display: none !important; }
 body.folded #viewport { overflow: hidden; }
 body.folded, body.folded:active { cursor: pointer; }
@@ -93,7 +94,7 @@ body #controls:has(:focus-visible) { opacity: 1; pointer-events: auto; }
 
 /* Shared compact chrome is independent of content font size. */
 #memo-surface { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; overflow: hidden; border: var(--surface-border) solid var(--border); border-radius: var(--surface-radius); background: var(--background); }
-#controls { max-width: calc(100% - 6px); flex-wrap: wrap; justify-content: flex-end; }
+#controls { max-width: calc(100% - 6px); flex-wrap: nowrap; justify-content: flex-end; }
 #controls button { flex: 0 0 var(--toolbar-target); }
 body.folded #controls button { flex-basis: 12px; }
 #editor { height: calc(100% - 30px); }
@@ -109,3 +110,9 @@ body.feedback-below #memo-surface { border-bottom-right-radius: 0; }
 body.feedback-above #memo-surface { border-top-right-radius: 0; }
 body.feedback-below.feedback-full #memo-surface { border-bottom-left-radius: 0; }
 body.feedback-above.feedback-full #memo-surface { border-top-left-radius: 0; }
+
+/* One row fits the 32px minimum height. Paging keeps every action reachable. */
+#toolbar-items { display: flex; gap: 1px; min-width: 0; overflow: hidden; align-items: center; }
+#controls > button { flex-shrink: 0; }
+#controls > button[aria-disabled="true"] { opacity: .4; cursor: default; }
+body.folded #toolbar-items { overflow: visible; }

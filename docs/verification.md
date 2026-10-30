@@ -803,3 +803,17 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - 해당 루트의 절대 경로 개발 CLI로 `list`를 실행했으나 종료 코드 1, `ok: false`, `앱 응답 시간이 초과되었습니다`를 반환했다. 개발 감시 실행이 이미 있으므로 중복 실행·기존 앱 종료·다른 앱으로의 대체를 하지 않았다. 진행 메모도 표시하지 못했다. 시간 초과의 원인은 이번 정책 조사에서 확정하지 않았다.
 - 반영: `AGENTS.md`에 예상 인스턴스와 실제 `inspect` 응답 대조, GUI PID·창 식별 또는 동등한 표식 대조, 재시작 후 재확인, 출처 불명 결과의 통과 보고 금지를 추가했다. 기존 미커밋 정책 변경은 보존했다. 정책 준수로 오인 위험을 줄일 수 있으나 강제적인 런타임 차단은 아니다.
 - 검증: 정책의 명령·필드를 실제 소스와 대조하고 `git diff --check`를 수행했다. 앱 빌드·테스트·GUI 캡처·두 워크트리 격리 회귀는 실행하지 않았다. Conf 1 / Risk Low (문서 정책 변경).
+
+## 작은 창 Toolbar — 이슈 #14 (2026-10-30)
+
+- 환경: macOS Apple Silicon, Node v24.21.0, Rust 1.91.1, v0.2.7 워크트리 개발 앱. 설치 앱·다른 워크트리의 앱은 교체하거나 종료하지 않았다.
+- Toolbar를 한 줄로 제한하고 너비 초과 시 이전·다음 버튼으로 탐색한다. DEV Badge의 소수점 너비로 버튼이 일부 잘리지 않도록 스크롤 좌표를 방향별로 반올림한다. Tab·Shift+Tab은 포커스된 버튼 전체를 노출한다. 본문·네이티브 창 크기를 변경하는 경로는 추가하지 않았다.
+- `npm run test:ui`: 기존 UI 테스트 50개 통과. `npm run dev:build`: 통과. Rust 코드·의존성은 변경하지 않았으며 Rust 테스트·Clippy는 이번 작업에서 실행하지 않았다.
+- `scripts/toolbar-layout-smoke.mjs`: Chromium에서 144×32·144×48·300×80 × DEV Badge 유무의 6개 조합 통과. 포인터 페이지 전환으로 기능 8개 전체 노출, Tab·Shift+Tab, 기본 숨김과 클릭 비활성화, 본문 영역 크기 보존, 접힘·이미지 상태 배치를 확인한다. Tauri와 telemetry 스크립트는 제외하고 실제 Toolbar 모듈·HTML·CSS를 읽는다. Playwright와 Chromium이 필요하며 저장소 의존성은 추가하지 않았다. 예: `PLAYWRIGHT_MODULE=/절대경로/playwright/index.mjs node scripts/toolbar-layout-smoke.mjs`.
+- 실제 개발 앱: 이 워크트리의 `scripts/agent-gibbon-dev`로 만든 테스트 메모만 사용했다. macOS Accessibility로 144×32·144×48·300×80을 설정하고 실제 포인터 이벤트로 이전·다음 탐색과 고정 버튼을 조작했다. 세 크기에서 기능 8개의 클릭 위치에 접근하고 고정 상태 전환 및 창 크기·위치 보존을 확인했다. 144×32 실제 화면 캡처에서 한 줄 배치를 확인했다. AX가 접기 버튼의 SVG를 포함한 큰 경계를 반환하므로 세로 판정은 CSS의 24px 클릭 영역과 실제 캡처를 함께 사용했다. 테스트 메모는 숨겼으며 직접 시작한 개발 프로세스만 종료했다.
+- SVG·PNG [작은 창 시안](design/toolbar-compact.svg)을 함께 작성하고 렌더링 결과를 확인했다. 기준은 [디자인 시스템](design-system.md#작은-창-toolbar--이슈-14-2026-10-30)에 정리했다.
+- 한계: 실제 macOS 앱의 키보드 탐색·VoiceOver 전체 검수, DEV Badge 없는 설치/배포 앱, Windows·Intel 실화면은 미검증이다. Playwright WebKit은 로컬 실행 파일이 없어 실행하지 못했다. 이미지·편집 상태는 브라우저 배치만 확인했고 각 기능의 실제 앱 전체 회귀는 실행하지 않았다. Conf 4 / Risk Low.
+
+- 실행 출처: 작업 루트 `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/issue-14`, `npm run dev:info`의 ID `dev-891816675f30ffa97abd5f0b`, 바이너리 `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/issue-14/src-tauri/target/debug/agent-gibbon`. 해당 개발 CLI의 `inspect --id issue14-check`가 `ok: true`, 같은 `instance`, 본문 `작은 창 Toolbar 검증`을 반환했다. 최종 GUI 검증은 정확한 바이너리 경로의 서버 PID `44416`과 그 PID에 속한 창 제목 `Agent Gibbon [DEV egoing/oystercatcher · 89181667] — issue14-check`를 함께 특정했다. 실제 크기별 포인터 검증은 `/tmp/gibbon-toolbar-native.py`로 수행했고 144×32 캡처는 `/tmp/gibbon-toolbar-native.png`에서 확인했다. 이 임시 파일은 저장소에 포함하지 않는다.
+
+- 병합 검증: 기본 브랜치의 기존 출처 정책·스킬 변경을 보존해 통합한 후 `/Users/egoinglee/dev/project/agent-gibbon`에서 UI 테스트 50개와 Chromium 6개 조합을 다시 통과했다. 이 실행은 브라우저 배치 검증이며 위 워크트리의 실제 개발 앱 검증과 구분한다.
