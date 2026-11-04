@@ -1072,3 +1072,114 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 - 관리 창·터미널 트레이 항목과 stash 항목을 모두 유지했다. 전환 중 알파 소유권을 우선하고, 터미널의 중간 애니메이션 좌표 저장을 억제했다. 관리 창·터미널의 명시적 열기/숨김/닫기는 stash 복원 예약을 해제하도록 통합했다.
 - 병합본에서 `cargo fmt --manifest-path src-tauri/Cargo.toml -- --check`, Clippy `--all-targets -- -D warnings`, `npm test`(Rust **77** / UI **53**), `npm run dev:build` 통과. `npm ci`로 main 의존성을 설치했다.
 - 병합본 네이티브 GUI·Windows·Intel 재검증은 수행하지 않았다. 이전 Mac 증거를 병합본 GUI 통과로 재사용하지 않는다. 사용자 제보와 남은 실환경 검증은 #35~#41에서 계속 추적한다. 병합 통합 변경 기준 **Conf 3 / Risk Medium**.
+
+## 새 창 열기 순서 #34 — 2026-11-05
+
+### 출처와 수정 전 재현
+
+- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order`.
+- 기준 HEAD: `f9fb944c4e3f039b9bbed0ea7a25a913dba96f2c`. 시작 시 미커밋 변경 없음. 아래 통합 전 검증은 해당 기준 위의 이번 변경으로 수행했다.
+- `npm run dev:info`: root는 위 경로, instance `dev-5a3840c5cf7b0e9d4b92dbc0`, binary는 위 루트의 `src-tauri/target/debug/agent-gibbon` 절대 경로. macOS arm64, Rust 1.91.1, Node v24.21.0, Tauri 2.12.2, 단일 Retina 2560×1440 논리 px(배율 2).
+- 모든 앱 통신은 이 루트의 `scripts/agent-gibbon-dev`로 실행했다. `inspect.ok=true`, 응답 instance 일치, ID와 본문 고유 표식을 확인하고 `ps -p <PID> -o comm=`의 절대 바이너리 경로를 대조했다.
+- 수정 전 자체 시작 PID **23841**에서 `issue34-z-first` → `issue34-m-second` → `issue34-a-third`를 순서대로 열었다. 최종 물리 좌표는 모두 x=4520, y가 각각 **480 / 148 / 50**으로 새 A가 앞에 삽입됐다. 진행 메모가 함께 표시 중이었지만 세 검증 창 사이의 역전은 명확하다.
+- `orca computer get-app-state --app pid:23841 --window-id 32441 --json`과 새 창 ID **32445**의 제목·본문 `OPEN34 BEFORE 1 Z` / `OPEN34 BEFORE 3 A`를 대조했다. [첫 창 캡처](verification/open-order-20261105/before-first.png) · [새 창 캡처](verification/open-order-20261105/before-third.png). 캡처는 개별 창이며 전체 화면 합성으로 배치를 주장하지 않는다. 실제 위치는 JSON/네이티브 창 좌표와 함께 확인한다.
+
+### 구현과 통합 전 검증
+
+창 ID 정렬을 세션의 열기 요청 순서로 바꿨다. 비동기 콘텐츠 측정 전에 순서를 예약하며 이미 열린 창/측정 대기 중 반복 열기는 유지한다. 숨긴 창 복원은 마지막에 추가하고 나머지 상대 순서를 보존한다. 영역 생성 창도 등록해 이후 재포함할 때 일관된 순서를 사용한다. 순서 정보는 저장 파일에 추가하지 않는다. 기준과 시안은 [디자인 시스템](design-system.md#메모-자동-배치--확정-2026-11-04) · [SVG](design/placement-zero-gap.svg) · [PNG](design/placement-zero-gap.png)를 함께 갱신했다.
+
+수정 빌드로 재시작한 자체 PID **31059**를 다시 확인했다. `open34-<고유값>-z/y/x/w/v/u`를 역순 ID로 열어 오른쪽 위→아래→왼쪽 열 순서와 겹침 없음을 확인했다. 모든 GUI 캡처는 PID, 정확한 네이티브 제목, CGWindow ID, `inspect` 고유 본문과 대조했다. Orca `list-windows`가 테두리 없는 창을 누락하고 기본 선택이 포커스된 이전 창을 반환하는 경우가 있어, 기존 `auto-layout-native.swift`로 PID/정확한 제목의 ID를 구한 뒤 Orca에 `--window-id`를 지정했다. 잘못 선택된 초기 캡처는 통과로 집계하지 않았다.
+
+| 명령/검증 | 통합 전 결과 |
+|---|---|
+| `npm run test` | Rust **75개**, UI **53개** 통과. 역순 ID·숨김 복원·열 넘김 순서 회귀 3개 추가 |
+| `npm run dev:build` | 성공, 해당 바이너리로 위 PID를 재시작해 실제 확인 |
+| `npm run check` | Clippy, 경고 오류 처리 통과 |
+| `cargo fmt --manifest-path src-tauri/Cargo.toml --check` | 통과 |
+| `npm run version:check` / Python 구문 / `git diff --check` | 0.2.7 일치 / 통과 / 통과 |
+| `python3 scripts/open-order-smoke.py --pid 31059 --report-dir /tmp/gibbon-issue34/after-retry` | 역순 순차 열기·왼쪽 열 넘김·연속 열기·가시 창 갱신/재열기 불변·숨김 갱신 보존/복원 마지막 합류·실제 드래그 제외/장애물 보존 통과 |
+| 포커스 | 외부 앱 PID 16242 유지, 실제 드래그 후에는 검증 메모의 키보드 포커스를 이후 새 열기가 보존. 검사 종료 후 원래 포인터/앱 복원 |
+| 시안 | `rsvg-convert docs/design/placement-zero-gap.svg -o docs/design/placement-zero-gap.png`, 렌더링 육안 확인 |
+
+[정량 증거 JSON](verification/open-order-20261105/report.json)에 수정 전후 root/instance/binary/PID/창 ID/본문 표식·좌표·크기·포커스·검사 결과를 보관했다. [수정 후 첫 창](verification/open-order-20261105/opened-z.png) · [연속 열기의 마지막 창](verification/open-order-20261105/after-last.png) · [복원된 마지막 창](verification/open-order-20261105/restored-tail.png) · [수동 배치 보존](verification/open-order-20261105/manual-preserved.png). 원본 로그는 `/tmp/gibbon-issue34/`에 있으며 재실행 시 같은 폴더를 덮어쓰지 않는다.
+
+### 추가 발견·후속 #43
+
+- **다중 창 재포함 후 전환 중단 의심**: 추가한 12개 가시 창 검사에서 첫 창을 실제 드래그→다음 창 열기→첫 창 내용 갱신으로 재포함→새 창 열기 했을 때 한 번 최종 좌표 순서가 어긋났다. 새 창 `open34-935442-o`도 커서 인근 물리 좌표 (1324,1324), `animating=false`로 관측됐다. 원인은 확정하지 않았으며 순서 기록 결함/기존 전환 처리/검사 부하 중 어느 것인지 단정하지 않는다.
+- 실패 원본: `/tmp/gibbon-issue34/after-final/live.json`, `/tmp/gibbon-issue34/live-after-final.log`; 핵심 상태와 실패 내용은 위 정량 증거 JSON의 `additional_stress_failure`에 남겼다. 별도 5창 격리 실험(`/tmp/gibbon-issue34/debug-reinclude.json`)에서는 재포함된 첫 창이 정상 첫 위치로 돌아갔다. 실패를 통과로 집계하거나 비재현으로 종결하지 않았다.
+- 영향: 여러 메모가 보이는 상태에서 자동 배치 복귀가 중간 프레임에 남을 가능성. 후속 완료 기준: 12창 이상의 재포함·연속 열기에서 실제 최종 좌표가 계산 목적지와 일치하고 전체 상대 순서·겹침 없음·포커스를 보존하며, 전환 중단 원인을 판별하는 증거를 확보한다. 감독자가 [후속 #43](https://github.com/egoing/agent-gibbon/issues/43)을 #34의 실제 자식으로 등록했으며 다음 순차 작업으로 추적한다.
+
+### 범위와 남은 검증
+
+통합 전 핵심 실제 동작은 확인했고 추가 스트레스 실패는 아래 통합 검사에서 재시도했다. CLI 숨김 복원은 실제 확인했으며 메뉴/Dock은 동일 준비 경로를 쓰는 코드 검토 범위다. Windows·Intel Mac·복수 모니터·배포 설치본·교차 워크트리 격리 재검증은 미실행이다. Conf 5(실제로 통과한 macOS 범위) / Risk Medium이며 환경별 미실행 검증이나 최초 스트레스 실패의 원인 규명까지 완료했다는 뜻은 아니다.
+
+
+### 최신 main 통합과 최종 검증
+
+- 감독자 승인으로 구현 커밋 `00a0db6` 뒤에 `origin/main` **661d834a9f09d8d3f5800474d12ab4f48ebeee0e**를 병합했다. `sizing.rs` 충돌은 접어두기가 활성화됐을 때의 원위치 표시 분기를 먼저 보존하고, 일반 준비 경로에서만 열기 순서를 예약하도록 해결했다. 검증 문서 충돌은 양쪽 기록을 모두 보존했다.
+- 통합한 소스로 `npm run test` **Rust 80개 / UI 53개**, `npm run dev:build`, `npm run check`, Rustfmt, 버전 일치(0.2.7), Python 구문, `git diff --check`가 통과했다.
+- 자체 PID 31059만 종료하고 이번 작업이 만든 검증 메모 폴더 43개를 `/tmp/gibbon-issue34/test-storage-before-integration/`로 보관했다. 진행 메모와 사용자 저장 데이터는 변경하지 않았다. 정리 기록은 `/tmp/gibbon-issue34/test-storage-cleanup.json`에 있다.
+- 새 **PID 77460**과 동일 root/instance/binary 경로를 다시 확인했다. `inspect`에는 통합 main의 `stash` 필드도 포함된다. `open34-07e400-*` 고유 본문·정확한 제목으로 GUI를 연결했다. 예: 첫 Z 창 **32596**, 마지막 Q 창 **32623** 등 실제 값은 정량 JSON의 `integration.captures`를 기준으로 한다.
+- `python3 scripts/open-order-smoke.py --pid 77460 --report-dir /tmp/gibbon-issue34/integrated` 종료 **0**, **7개 검사 통과**: 역순 ID 순차 열기/왼쪽 열 넘김/겹침 없음, 가시 재열기·갱신 불변, 숨김 갱신·마지막 복원, 전환 중 연속 열기, 실제 드래그 제외·장애물 보존, 내용 갱신으로 재포함 시 기존 상대 순서 복귀, 이후 열기에서도 다른 숨긴 창·포커스 보존. 외부 앱뿐 아니라 기존 메모의 `focused` 값을 새 열기 전후 비교했다.
+- [통합 첫 창](verification/open-order-20261105/integrated-opened-z.png) · [통합 마지막 창](verification/open-order-20261105/integrated-after-last.png) · [통합 숨김 복원](verification/open-order-20261105/integrated-restored-tail.png) · [통합 수동 배치 보존](verification/open-order-20261105/integrated-manual-preserved.png). 실제 캡처의 본문과 렌더링을 육안 확인했다. 좌표·창 ID·본문 표식·포커스와 각 상태는 [정량 JSON](verification/open-order-20261105/report.json)의 `integration`에 있으며 원본은 `/tmp/gibbon-issue34/integrated/live.json`이다.
+- 앞서 실패했던 12창 재포함 흐름도 이번 통합 실행에서는 통과했다. main 통합과 검증 파일 보관·재시작이 함께 있었으므로 어느 조치가 영향을 줬는지 확정하지 않으며, 최초 실패를 해결됐다고 종결하지 않는다. [후속 #43](https://github.com/egoing/agent-gibbon/issues/43)에서 원인 규명을 계속한다.
+- 최종 정리: 자체 PID **77460**의 정확한 바이너리 경로를 다시 대조한 후 SIGTERM으로 종료하고 프로세스 소멸을 확인했다. 통합 검사 메모 13개는 `/tmp/gibbon-issue34/test-storage-after-integration/`에 보관했고 진행 메모의 완료 기록은 유지했다. 최초 포인터 위치와 전면 앱 PID 16242를 복원했다. 설치 앱·다른 워크트리 프로세스는 종료하지 않았으며 직접 PR 병합은 수행하지 않았다. 정리 상세는 정량 JSON의 `cleanup`에 있다.
+
+- 감독 최종 판정: #34 핵심 수정과 최신 main 통합 검증은 인정하되 간헐적 [#43](https://github.com/egoing/agent-gibbon/issues/43)의 원인이 미확정이므로 **병합 보류**. 변경·보고서를 로컬 한국어 커밋으로 보존하고 원격 push·PR·병합은 하지 않았다. #43은 다음 dispatch에서 순차 처리하며 이번 작업에서는 추가 착수하지 않는다.
+
+## 다중 창 전환 중단 #43 — 2026-11-05
+
+### 결론과 출처
+
+12창 재포함 뒤 커서 근처에 멈추는 현상을 다시 재현했다. **macOS 비동기 위치·크기 쓰기를 완료로 취급한 기대 좌표 판정**이 실제 이동을 잘못 취소했고, **1초 프레임 응답 제한**도 늦은 콜백을 남겨둔 채 작업 스레드를 끝낼 수 있었다. 일반 배치 순서와 사용자 조작 취소 규칙은 유지하면서 프레임 적용·응답 수명을 보완했다. 대량 저장 메모 재시작의 CLI 지연은 [별도 #44](https://github.com/egoing/agent-gibbon/issues/44)로 남긴다.
+
+- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order`, 기준 HEAD `d686db349558b90c3b12df747589a432d6554805`(시작 시 clean).
+- `npm run dev:info`의 root는 위 경로, instance **dev-5a3840c5cf7b0e9d4b92dbc0**, binary는 위 루트의 **src-tauri/target/debug/agent-gibbon** 절대 경로다. macOS arm64, 단일 2560×1440 논리 px Retina 화면, 배율 2.
+- 모든 메모 통신은 이 루트의 `scripts/agent-gibbon-dev`만 사용했다. 매 실제 검사에서 `inspect.ok=true`·instance·ID·고유 본문을 대조하고 `ps`의 정확한 실행 파일 경로/PID를 확인했다. GUI는 `auto-layout-native.swift`의 PID/정확한 제목/CGWindow ID와 `orca computer get-app-state --app pid:<PID> --window-id <ID> --json`을 연결했다.
+- [정량·인과 증거](verification/entrance-stop-20261105/report.json)에 상태·목적지·취소 이유·프레임 수·native 창/본문 표식·검사 실패와 성공을 구분해 보관한다. 원본은 `/tmp/gibbon-issue43/`이며 [수정 전 관측 패치](verification/entrance-stop-20261105/observer-only.patch.gz)와 바이너리 해시도 기록했다.
+
+### 수정 전 제품 결함과 검사 결함
+
+기존 검증 메모 43개의 보관 사본을 이 인스턴스에만 복사하고, 위치·크기 쓰기 동작은 바꾸지 않은 관측 빌드 **PID 5061**로 실행했다. 첫 실행은 숨김 복원 뒤 실제 겹침/중간 정지로 실패했다. 또 한 실행은 빠른 합성 드래그가 제외 플래그만 바꾸고 실제 이동에는 실패해 12창 단계에 이르지 못했으며, 이를 제품의 배치 실패로 집계하지 않았다.
+
+입력 간격을 늘리고 실제 드래그 결과를 확인한 실행에서는 12창 재포함 뒤 **open34-479a5e-o**가 계산 목적지 **(3320,2174), 600×706 물리 px** 대신 **(1324,1324), 600×706**에 남았다. 이전 숨김 복원 단계의 Y도 목적지 (3920,1730) 대신 (1424,1324)에 남았다. **기존 검사는 상대 순서와 겹침만 확인해 이 실행에 7개 통과/exit 0을 반환했다.** 좌표가 틀려도 왼쪽 빈 공간에 있으면 마지막 순서로 보일 수 있으므로 거짓 통과였다.
+
+- [수정 전 O 실제 창](verification/entrance-stop-20261105/before-o.png) · [PID/제목/창 좌표/본문 GUI 원본](verification/entrance-stop-20261105/before-o-gui.json). 네이티브 논리 좌표 (662,662)를 배율 2의 `inspect` 물리 좌표 (1324,1324)와 대조했다. 캡처는 개별 창이며 전체 화면 배치 합성으로 오인하지 않는다.
+- 추적에서 O의 새 세대는 기대 위치 (662,662) 논리 px를 예약했지만 실제 위치는 아직 이전 (1130,319)여서 첫 프레임을 취소했다. 이후 대기 중이던 커서 근처 이동만 반영되어 목적지에 가지 못했다. 다른 세대에서는 실제 (2204,51)가 이전 프레임에 남은 동안 기대 위치만 (2232.205,37.837)로 앞서가 취소된 연속 기록도 확보했다.
+- 설치된 **tao 0.37.1**의 `platform_impl/macos/window.rs`는 `set_outer_position`/`set_inner_size`에서 `util/async.rs`를 호출하고, 해당 구현은 메인 스레드에서도 `DispatchQueue::main().exec_async`로 실제 적용을 미룬다. 따라서 API 성공 반환과 네이티브 반영 완료는 같은 시점이 아니었다. 로컬 설치 소스를 확인했으며 [Tauri API](https://docs.rs/tauri/2.12.2/tauri/webview/struct.WebviewWindow.html#method.set_position)와 [AppKit frame API](https://developer.apple.com/documentation/appkit/nswindow/setframe(_:display:))도 확인했다.
+- 수정 전 세 실행의 완전한 JSONL을 검사한 게이트는 **994프레임, 좌표 불일치 취소 23건, 쓰기 직후 위치 미반영 379건, 마지막 프레임 직후 크기 미반영 26건, exit 1**이었다. 이 수치는 세 실행의 합계이며, 늦게 반영된 모든 크기가 영구적으로 틀렸다는 뜻은 아니다.
+
+### 수정과 관측 보완
+
+1. macOS의 자동 배치·등장·전환·숨김 전 마무리는 메인 스레드에서 `NSWindow.setFrame:display:`로 위치와 크기를 함께 적용한 뒤 기대 좌표를 진행한다. 실제 프레임 반영과 WebView 그리기를 분리하려고 `display=false`를 사용한다. 현재 native frame/top-left 쌍으로 좌표를 변환해 특정 화면 높이·원점·CPU 아키텍처를 가정하지 않는다. macOS 밖의 일반 배치는 기존 물리 좌표 setter 경로를 보존했다.
+2. 첫 동기화 시도 **PID 45482**에서는 1초를 넘은 응답 뒤 작업 스레드가 종료해 T 창만 `animating=true`로 남는 별도 경로도 관측했다. CLI는 응답했고 다른 창은 도착했다. 프레임은 작업자별 하나만 대기시키며, 1초가 지나면 지연을 기록하고 같은 응답을 계속 기다리도록 바꿨다. 세대 교체/직접 조작 취소와 채널 단절의 종료 정책은 유지한다. 늦은 응답 후 계속하기/완료·단절 종료를 단위 테스트로 확인했다.
+3. 최초 observer는 백그라운드 시간초과와 메인 프레임의 포맷 쓰기가 섞여 JSONL을 손상시켰다. 완전한 JSON 버퍼를 직렬화해 한 번에 쓰고, 실시간 읽기는 아직 쓰는 마지막 행만 기다리도록 보완했다. 손상된 첫 after trace는 성공 게이트로 사용하지 않았다. [당시 T 창](verification/entrance-stop-20261105/driver-timeout.png) · [GUI 원본](verification/entrance-stop-20261105/driver-timeout-gui.json).
+4. `open-order-smoke.py --trace-file`은 PID/instance가 일치하는 계산 목적지와 실제 좌표·크기를 비교한다. `--diagnostic-continue`는 실패를 기록하고 다음 단계까지 관측할 수 있지만 실패 종료를 유지한다. 합성 입력 간격은 조절 가능하고 실제 이동을 읽어 확인한다. 정리 IPC 실패도 원래 실패와 함께 보존한다.
+5. `AGENT_GIBBON_ENTRANCE_TRACE=/로컬/파일.jsonl`은 선택적 진단이다. 기본값은 꺼져 있으며 본문·비밀정보는 기록하지 않는다. `check-entrance-trace.py`는 반영 직후 위치/마지막 크기와 취소 이유를 검사한다. 프레임 검사만으로 전체 완주를 주장하지 않고 목적지 검사와 함께 사용한다. 일반 앱의 사용자 작업 이력 저장은 추가하지 않았다.
+
+### 실패 실행과 독립 #44
+
+- 첫 동기화 after PID 45482의 완료되지 않은 검사와 손상 로그를 통과로 집계하지 않았다. 작업자 프로세스가 끊긴 뒤 남은 활성 전환은 위의 별도 receiver 수명 문제로 추적했다.
+- 반복 검사로 저장 **82개 + main placeholder 1개 = CLI 83항목**이 된 상태의 재시작 **PID 65167**에서는 초기 `inspect`와 smoke의 `inspect`가 시간초과로 실패했다. 같은 PID/instance의 후속 `inspect`는 정상 회복했다. `/tmp/gibbon-issue43/after-final.log`, `origin-after-final.json`, `origin-after-final-revalidated.json`, `after-final-sample.txt`가 원본이다.
+- 당시 약 81% CPU를 관측했고 2초 sample의 메인 스레드에는 WebKit IPC/URLSchemeTask 처리 경로가 있었다. 전체 교착이나 특정 성능 원인을 확정하지 않는다. 이 실행은 E2E 통과로 집계하지 않으며 [#44](https://github.com/egoing/agent-gibbon/issues/44)에서 조사한다. 수정한 receiver가 늦은 응답 뒤 같은 세대의 후속 프레임을 처리한 부분 기록은 있으나 이 실행의 최종 완주는 미검증이다.
+- 본 작업이 추가한 중간 테스트 메모 43개만 `/tmp/gibbon-issue43/intermediate-test-notes/`로 보관해 원래 **43개 테스트 메모 + 진행 메모 2개 = 저장 45개** 조건으로 맞췄다. 기존 사용자의 메모를 삭제하거나 다른 인스턴스로 전환하지 않았다.
+
+### 최종 실제 검증
+
+최종 수정의 단독 **PID 73759**에서 open/inspect instance·바이너리 경로를 확인하고 `open34-3832b6-*` 고유 본문으로 GUI를 대조했다. 12창 재포함 뒤 O는 이번에는 **(3320,2174), 600×706 물리 px**에 정확히 도착했다. native 창 **33106**의 논리 좌표 (1660,1087), 300×353px와 일치한다.
+
+| 검증 | 결과 |
+|---|---|
+| `npm run test` | Rust **84개**, UI **53개** 통과. native 좌표 변환·지연 응답 수명 회귀 포함 |
+| `npm run dev:build`, `npm run check` | 개발 빌드·Clippy 통과 |
+| Rustfmt / Python 구문 / 버전 / diff | 통과 / 통과 / 0.2.7 일치 / 통과 |
+| `python3 scripts/open-order-smoke.py --pid 73759 --trace-file /tmp/gibbon-issue43/trace-after-controlled.jsonl --report-dir /tmp/gibbon-issue43/after-controlled` | **exit 0, 7개 검사, 45개 계산 목적지와 실제 좌표·크기 일치** |
+| `python3 scripts/check-entrance-trace.py /tmp/gibbon-issue43/trace-after-controlled.jsonl --report /tmp/gibbon-issue43/trace-after-controlled-summary.json` | **exit 0, 613프레임, 중단 0·위치 미반영 0·마지막 크기 미반영 0**. 유효한 전체 JSONL로 검사 |
+| 보존 | 역순 ID·열 넘김·전환 중 연속 열기·숨김 갱신/복원·수동 드래그 제외/재포함·다른 숨김 창·기존 메모 키보드 포커스·외부 앱 포커스 보존 |
+
+[수정 후 O 창](verification/entrance-stop-20261105/after-o.png) · [정확한 native 창·본문 GUI](verification/entrance-stop-20261105/after-o-gui.json) · [수동 배치 보존](verification/entrance-stop-20261105/after-manual-preserved.png). 이미지와 본문 렌더링을 육안 확인했다. 좌표·목적지·원본 명령과 단계별 상태는 [정량 JSON](verification/entrance-stop-20261105/report.json)에 있다. 최종 코드 검토에서 macOS 밖을 기존 물리 좌표 경로로 명시적으로 격리했고, 검증한 macOS 실행 분기는 변경하지 않았다.
+
+**Conf 5 / Risk Medium**: 단일 macOS arm64 실환경의 위 조건에서 실제 원인·전후 동작을 확인했다. Windows·Intel·실제 복수 모니터/혼합 DPI·이미지/접힘/워프 전체 GUI 회귀는 이번 범위에서 재실행하지 않았다. 대량 저장 메모 재시작/CLI 시간초과 #44는 미해결이며 이 검증으로 해결됐다고 보지 않는다. 420ms 전환·300px/콘텐츠 상한·제외·순서 등 기존 시각 기준은 유지해 SVG/PNG 시안은 변경하지 않았다. [디자인 시스템](design-system.md#메모-자동-배치--확정-2026-11-04)의 적용·검증 상태를 함께 갱신했다.
+
+- 최종 정리: 자체 앱 PID 2329·5061·45482·65167·73759만 종료했고 현재 이 워크트리 바이너리의 실행 프로세스는 0개다. 중간 테스트 폴더 43개와 마지막 복원 부하/검사 폴더 56개를 `/tmp/gibbon-issue43/`에 보관해 원래 앱 저장 상태를 복구했으며 진행 메모는 남겼다. 원래 포인터·전면 앱을 복원했다. 정량 JSON `cleanup`에 정확한 ID/경로가 있다.
+- 최종 검증 뒤 감독자가 #34·#43의 원격 브랜치·PR·CI 확인 후 병합을 명시적으로 승인했다. 아래 작업의 원격 결과는 Orca 완료 보고에 기록하며 #44는 닫지 않는다.

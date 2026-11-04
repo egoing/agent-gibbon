@@ -1,0 +1,57 @@
+{
+  "id": "f3fbba86-e9bc-48c7-9490-1d05a0affe66",
+  "ok": true,
+  "result": {
+    "screenshot": {
+      "height": 706,
+      "width": 600,
+      "scale": 2,
+      "format": "png",
+      "path": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/f3fbba86-e9bc-48c7-9490-1d05a0affe66-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-05T17:26:50.540Z"
+    },
+    "screenshotStatus": {
+      "state": "captured",
+      "metadata": {
+        "engine": "screenCaptureKit",
+        "windowId": 33106
+      }
+    },
+    "snapshot": {
+      "truncation": {
+        "maxDepthReached": false,
+        "truncated": false,
+        "maxDepth": 64,
+        "maxNodes": 1200
+      },
+      "elementCount": 64,
+      "focusedElementId": null,
+      "id": "EC197453-9646-447E-8C13-D7FA216009F9",
+      "window": {
+        "y": 1087,
+        "isMinimized": false,
+        "screenIndex": 0,
+        "id": 33106,
+        "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-o",
+        "x": 1660,
+        "height": 353,
+        "platform": {
+          "layer": 5
+        },
+        "width": 300,
+        "isOffscreen": false
+      },
+      "coordinateSpace": "window",
+      "app": {
+        "pid": 73759,
+        "bundleId": null,
+        "name": "agent-gibbon"
+      },
+      "treeText": "App=agent-gibbon (pid 73759)\nWindow: \"Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-o\", App: agent-gibbon.\n\nShowing the first 45 of 64 elements.\n0 standard window Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-o\n\t1 scroll area\n\t\t2 HTML content Agent Gibbon\n\t\t\t3 container Agent Gibbon\n\t\t\t\t4 toolbar Toolbar\n\t\t\t\t\t5 button (disabled) 이전 도구\n\t\t\t\t\t6 container DEV egoing/issue-34-open-order · 5a3840c5\n\t\t\t\t\t\t7 text DEV\n\t\t\t\t\t8 button (expanded) 메모 접기\n\t\t\t\t\t9 button 글자 크기 12px, 클릭하여 변경\n\t\t\t\t\t10 button 메모 편집\n\t\t\t\t\t11 button 파일로 저장\n\t\t\t\t\t12 button 본문 복사\n\t\t\t\t\t13 button 반대편으로 워프\n\t\t\t\t\t14 toggle button 상단 고정, Value: 1\n\t\t\t\t\t15 button 메모 숨기기\n\t\t\t\t\t16 button (disabled) 다음 도구\n\t\t\t\t17 container\n\t\t\t\t\t18 heading open34-3832b6 o\n\t\t\t\t\t19 text 본문 순서 검증\n\t\t\t\t\t20 text 본문 순서 검증\n\t\t\t\t\t21 text 본문 순서 검증\n\t\t\t\t\t22 text 본문 순서 검증\n\t\t\t\t\t23 text 본문 순서 검증\n\t\t\t\t\t24 text 본문 순서 검증\n\t\t\t\t\t25 text 본문 순서 검증\n\t\t\t\t\t26 text 본문 순서 검증\n\t\t\t\t\t27 text 본문 순서 검증\n\t\t\t\t\t28 text 본문 순서 검증\n\t\t\t\t\t29 text 본문 순서 검증\n\t\t\t\t\t30 text 본문 순서 검증\n\t\t\t\t\t31 text 본문 순서 검증\n\t\t\t\t\t32 text 본문 순서 검증\n\t\t\t\t\t33 text 본문 순서 검증\n\t\t\t\t\t34 text 본문 순서 검증\n\t\t\t\t\t35 text 본문 순서 검증\n\t\t\t\t\t36 text 본문 순서 검증\n\t\t\t\t\t37 text 본문 순서 검증\n\t\t\t\t\t38 text 본문 순서 검증\n\t\t\t\t\t39 text 본문 순서 검증\n\t\t\t\t\t40 text 본문 순서 검증\n\t\t\t\t\t41 text 본문 순서 검증\n\t\t\t\t\t42 text 본문 순서 검증\n\t\t\t\t\t43 text 본문 순서 검증\n\t\t\t\t\t44 text 본문 순서 검증\n\nNo UI element is currently focused."
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  }
+}

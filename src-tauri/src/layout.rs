@@ -1,4 +1,4 @@
-//! Session-only user intent. No event history or persisted geometry.
+//! Session-only user intent and open order. No event history or persisted geometry.
 use crate::{
     entrance::{self, Destination},
     placement::{self, Rect},
@@ -7,6 +7,36 @@ use std::{collections::BTreeMap, sync::Mutex};
 use tauri::{Manager, WebviewWindow};
 #[derive(Default)]
 pub struct Exclusions(Mutex<BTreeMap<String, bool>>);
+#[derive(Default)]
+pub struct OpenOrder(Mutex<Order>);
+
+#[derive(Default)]
+struct Order(Vec<String>);
+impl Order {
+    fn open(&mut self, label: &str, already_open: bool) {
+        if already_open && self.0.iter().any(|entry| entry == label) {
+            return;
+        }
+        self.0.retain(|entry| entry != label);
+        self.0.push(label.into());
+    }
+    fn rank(&self, label: &str) -> usize {
+        self.0
+            .iter()
+            .position(|entry| entry == label)
+            .unwrap_or(usize::MAX)
+    }
+}
+
+// Reserve at request time, before asynchronous content measurement completes.
+// Visible/pending reopens keep their place; a hidden restore joins the tail.
+pub fn register(w: &WebviewWindow, already_open: bool) {
+    w.state::<OpenOrder>()
+        .0
+        .lock()
+        .unwrap()
+        .open(w.label(), already_open);
+}
 pub fn excluded(w: &WebviewWindow) -> bool {
     w.state::<Exclusions>()
         .0
@@ -96,7 +126,11 @@ pub fn reflow(app: &tauri::AppHandle, opened: &WebviewWindow) -> Result<Destinat
                 && (w.label() == opened.label() || w.is_visible().unwrap_or(false))
         })
         .collect();
-    windows.sort_by(|a, b| a.label().cmp(b.label()));
+    {
+        let state = app.state::<OpenOrder>();
+        let order = state.0.lock().unwrap();
+        windows.sort_by_key(|w| order.rank(w.label()));
+    }
     let mut obstacles = Vec::new();
     let mut targets = Vec::new();
     for w in windows {
@@ -207,12 +241,94 @@ pub fn reflow(app: &tauri::AppHandle, opened: &WebviewWindow) -> Result<Destinat
         crate::warp::remember(app, &w, dest.position.y.into(), work_y, scale)?;
         if w.label() == opened.label() {
             entrance::cancel(&w)?;
-            w.set_size(dest.size).map_err(|e| e.to_string())?;
-            w.set_position(dest.position).map_err(|e| e.to_string())?;
+            #[cfg(target_os = "macos")]
+            entrance::place(&w, dest)?;
+            #[cfg(not(target_os = "macos"))]
+            {
+                // Keep the existing physical-coordinate path on other OSes.
+                w.set_size(dest.size).map_err(|e| e.to_string())?;
+                w.set_position(dest.position).map_err(|e| e.to_string())?;
+            }
             result = Some(dest);
         } else {
             entrance::transition(&w, dest)?;
         }
     }
     result.ok_or_else(|| "열 메모의 배치를 계산하지 못했습니다".into())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn sorted(order: &Order, labels: &[&str]) -> Vec<String> {
+        let mut labels: Vec<_> = labels.iter().map(|s| s.to_string()).collect();
+        labels.sort_by_key(|s| order.rank(s));
+        labels
+    }
+
+    #[test]
+    fn reverse_ids_follow_requests_even_when_measurements_finish_in_reverse() {
+        let mut order = Order::default();
+        for label in ["note-z", "note-m", "note-a"] {
+            order.open(label, false);
+        }
+        assert_eq!(
+            sorted(&order, &["note-a", "note-m", "note-z"]),
+            ["note-z", "note-m", "note-a"]
+        );
+        // A repeated open while visible or awaiting measurement is idempotent.
+        order.open("note-z", true);
+        assert_eq!(order.0, ["note-z", "note-m", "note-a"]);
+    }
+
+    #[test]
+    fn hidden_restore_moves_only_that_note_to_the_tail() {
+        let mut order = Order::default();
+        // Restored storage/region creation may register before ordinary opens.
+        for label in ["note-a", "note-m", "note-z"] {
+            order.open(label, true);
+        }
+        for label in ["note-z", "note-m", "note-a"] {
+            order.open(label, false);
+        }
+        order.open("note-m", false);
+        assert_eq!(order.0, ["note-z", "note-a", "note-m"]);
+        // Hidden entries/excluded obstacles do not reorder remaining targets.
+        assert_eq!(sorted(&order, &["note-m", "note-z"]), ["note-z", "note-m"]);
+        order.open("note-a", false);
+        assert_eq!(order.0, ["note-z", "note-m", "note-a"]);
+    }
+
+    #[test]
+    fn request_order_continues_into_left_column() {
+        let mut order = Order::default();
+        for label in ["note-z", "note-y", "note-b", "note-a"] {
+            order.open(label, false);
+        }
+        let labels = sorted(&order, &["note-a", "note-b", "note-y", "note-z"]);
+        let rects = placement::stack(
+            Rect {
+                x: 0,
+                y: 0,
+                width: 600,
+                height: 120,
+            },
+            300,
+            &vec![
+                placement::Item {
+                    width: 300,
+                    min: 60,
+                    max: 60
+                };
+                labels.len()
+            ],
+            &[],
+        );
+        assert_eq!(labels, ["note-z", "note-y", "note-b", "note-a"]);
+        assert_eq!(
+            rects.iter().map(|r| (r.x, r.y)).collect::<Vec<_>>(),
+            [(300, 0), (300, 60), (0, 0), (0, 60)]
+        );
+    }
 }
