@@ -143,7 +143,7 @@ fn memo_icon(bytes: &[u8], visible: bool) -> Result<tauri::image::Image<'static>
     let image = tauri::image::Image::from_bytes(bytes).map_err(|e| e.to_string())?;
     let mut rgba = image.rgba().to_vec();
     if !visible {
-        for pixel in rgba.chunks_exact_mut(4) {
+        for pixel in rgba.as_chunks_mut::<4>().0 {
             pixel[3] = (pixel[3] as f32 * 0.45) as u8;
         }
     }
