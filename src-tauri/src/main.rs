@@ -7,6 +7,8 @@ mod focus;
 mod instance;
 mod ipc;
 mod manager;
+
+mod layout;
 mod model;
 #[cfg(target_os = "macos")]
 mod opacity;
@@ -55,109 +57,6 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
         .map_err(|e| e.to_string())?
         .build()
         .map_err(|e| e.to_string())
-}
-// Window APIs and monitor work areas use physical pixels. Convert the new
-// window's logical size per monitor so mixed-DPI displays retain its size.
-fn place_new_window(
-    app: &tauri::AppHandle,
-    win: &tauri::WebviewWindow,
-    requested_size: Option<tauri::LogicalSize<f64>>,
-) -> Result<entrance::Destination, String> {
-    use std::hash::{BuildHasher, Hasher};
-    let random = std::collections::hash_map::RandomState::new()
-        .build_hasher()
-        .finish();
-    let size = win.outer_size().map_err(|e| e.to_string())?;
-    let scale = win.scale_factor().map_err(|e| e.to_string())?;
-    let mut occupied = Vec::new();
-    for other in app.webview_windows().values() {
-        if feedback_window::is_surface(other.label())
-            || other.label() == win.label()
-            || !other.is_visible().map_err(|e| e.to_string())?
-        {
-            continue;
-        }
-        let rect = if let Some(destination) = entrance::destination(other) {
-            destination.rect()
-        } else {
-            let p = other.outer_position().map_err(|e| e.to_string())?;
-            let s = other.outer_size().map_err(|e| e.to_string())?;
-            placement::Rect {
-                x: p.x.into(),
-                y: p.y.into(),
-                width: s.width.into(),
-                height: s.height.into(),
-            }
-        };
-        occupied.push(rect);
-    }
-    let mut monitors = win.available_monitors().map_err(|e| e.to_string())?;
-    if let Some(current) = win.current_monitor().map_err(|e| e.to_string())? {
-        if let Some(index) = monitors
-            .iter()
-            .position(|m| m.position() == current.position())
-        {
-            monitors.swap(0, index);
-        }
-    }
-    let mut fallback = None;
-    for monitor in monitors {
-        let work = monitor.work_area();
-        let gap = (8.0 * monitor.scale_factor()).round() as i64;
-        let area = placement::Rect {
-            x: i64::from(work.position.x) + gap,
-            y: i64::from(work.position.y) + gap,
-            width: i64::from(work.size.width) - 2 * gap,
-            height: i64::from(work.size.height) - 2 * gap,
-        };
-        let logical = requested_size.unwrap_or(tauri::LogicalSize::new(
-            f64::from(size.width) / scale,
-            f64::from(size.height) / scale,
-        ));
-        let target = (
-            (logical.width * monitor.scale_factor()).round() as i64,
-            (logical.height * monitor.scale_factor()).round() as i64,
-        );
-        if let Some((score, rect)) = placement::least_overlap(area, target, &occupied) {
-            if fallback
-                .as_ref()
-                .is_none_or(|(best, _, _, _)| score < *best)
-            {
-                fallback = Some((score, rect, work.position.y, monitor.scale_factor()));
-            }
-        }
-        if let Some(rect) = placement::find_space(area, target, random, &occupied, gap) {
-            win.set_position(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32))
-                .map_err(|e| e.to_string())?;
-            win.set_size(tauri::PhysicalSize::new(
-                rect.width as u32,
-                rect.height as u32,
-            ))
-            .map_err(|e| e.to_string())?;
-            warp::remember(app, win, rect.y, work.position.y, monitor.scale_factor())?;
-            return Ok(entrance::Destination {
-                position: tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32),
-                size: tauri::PhysicalSize::new(rect.width as u32, rect.height as u32),
-                scale: monitor.scale_factor(),
-            });
-        }
-    }
-    if let Some((_, rect, work_y, scale)) = fallback {
-        win.set_position(tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32))
-            .map_err(|e| e.to_string())?;
-        win.set_size(tauri::PhysicalSize::new(
-            rect.width as u32,
-            rect.height as u32,
-        ))
-        .map_err(|e| e.to_string())?;
-        warp::remember(app, win, rect.y, work_y, scale)?;
-        return Ok(entrance::Destination {
-            position: tauri::PhysicalPosition::new(rect.x as i32, rect.y as i32),
-            size: tauri::PhysicalSize::new(rect.width as u32, rect.height as u32),
-            scale,
-        });
-    }
-    Err("패널을 배치할 수 있는 화면이 없습니다".into())
 }
 // Called only on Tauri's main thread. macOS `show()` makes the window key;
 // ordering it front directly preserves the user's active application.
@@ -274,7 +173,7 @@ fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<V
     let position = win.outer_position().map_err(|e| e.to_string())?;
     let size = win.outer_size().map_err(|e| e.to_string())?;
     Ok(
-        json!({"ok":true,"feedback_surface":feedback_window::inspect(win)?,"hovered":pointer_over(win)?,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"folded": sizing::folded(win), "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        json!({"ok":true,"feedback_surface":feedback_window::inspect(win)?,"hovered":pointer_over(win)?,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"auto_layout_excluded":layout::excluded(win),"layout_pending":sizing::pending(win),"content_height_cap":sizing::content_height(win),"layout_destination":entrance::destination(win).map(|d|json!({"x":d.position.x,"y":d.position.y,"width":d.size.width,"height":d.size.height})),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"folded": sizing::folded(win), "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     )
 }
 #[tauri::command]
@@ -300,20 +199,23 @@ fn save_note(
         markdown,
         expected_revision,
     )?;
+    layout::mark(&window, false);
     feedback::edited(&window)?;
     Ok(note.clone())
 }
 #[tauri::command]
 fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
+    layout::mark(&window, false);
+    sizing::cancel(&window);
     feedback::clear(&window);
     feedback_window::hide(&window);
-    sizing::cancel(&window);
     entrance::finish(&window)?;
     window.hide().map_err(|e| e.to_string())?;
     tray::sync_visibility(window.app_handle())
 }
 #[tauri::command]
 fn toggle_pin(window: tauri::WebviewWindow) -> Result<(), String> {
+    layout::mark(&window, false);
     window
         .set_always_on_top(!window.is_always_on_top().map_err(|e| e.to_string())?)
         .map_err(|e| e.to_string())
@@ -380,20 +282,23 @@ fn apply_with_presentation(
         create_window(app, &id)?
     };
     feedback::changed(&win, existing.as_ref(), &next)?;
+    if matches!(request.action, Action::Open | Action::Close)
+        || (matches!(request.action, Action::Update)
+            && (request.markdown.is_some()
+                || request.title.is_some()
+                || request.status.is_some()
+                || request.color.is_some()))
+    {
+        layout::mark(&win, false);
+    }
     match request.action {
         Action::Open => {
-            if existing.as_ref().is_none_or(|note| note.revision == 0) {
-                sizing::prepare(&win, presentation)?;
-            } else if next.capture.is_some() {
-                show_without_focus(&win)?;
-            } else {
-                entrance::show(&win, None, presentation)?;
-            }
+            sizing::prepare(&win, presentation)?;
         }
         Action::Close => {
+            sizing::cancel(&win);
             feedback::clear(&win);
             feedback_window::hide(&win);
-            sizing::cancel(&win);
             entrance::finish(&win)?;
             win.hide().map_err(|e| e.to_string())?;
             tray::sync_visibility(app)?;
@@ -432,6 +337,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(feedback::Feedbacks::default())
         .manage(feedback_window::Surfaces::default())
         .manage(entrance::Entrances::default())
+        .manage(layout::Exclusions::default())
         .manage(sizing::Sizes::default())
         .manage(Mutex::new(BTreeMap::from([(
             "main".to_string(),
@@ -441,6 +347,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             snapshot,
             manager::manager_notes,
             manager::manager_image,
+            layout::content_action,
             feedback_window::present_feedback,
             feedback_window::feedback_snapshot,
             feedback_window::layout_feedback,
@@ -497,9 +404,10 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 api.prevent_close();
                 if let Some(webview) = win.app_handle().get_webview_window(win.label()) {
+                    layout::mark(&webview, false);
+                    sizing::cancel(&webview);
                     feedback::clear(&webview);
                     feedback_window::hide(&webview);
-                    sizing::cancel(&webview);
                     let _ = entrance::finish(&webview);
                 }
                 let _ = win.hide();

@@ -68,7 +68,7 @@ with tempfile.TemporaryDirectory(prefix='gibbon-direction-') as temp:
             assert end['visible'] and not end['folded'], end
             assert end['size'] == start['size'], end
             x = end['position']['x'] / scale
-            assert abs(x + end['size']['width'] / scale - (original['width'] - 8)) <= 2, end
+            assert abs(x + end['size']['width'] / scale - original['width']) <= 2, end
             move(cx, cy + 80)
             stable = cli('open', note)
             assert not stable['animating'] and stable['position'] == end['position'], stable
@@ -114,9 +114,10 @@ with tempfile.TemporaryDirectory(prefix='gibbon-direction-') as temp:
         cli('open', note)
         move(cx, cy - 24)
         restored = landed(note)
-        assert not restored['folded'] and restored['size'] == resized['size'], (resized, restored)
+        assert not restored['folded'] and restored['size']['width'] == 300 * scale, restored
+        assert restored['size']['height'] <= restored['content_height_cap'] * scale and not restored['auto_layout_excluded'], restored
         cli('close', note)
-        print('PASS: native drag cancellation; manual size survives movement', flush=True)
+        print('PASS: native drag cancellation; explicit hidden reopen returns to content-bounded layout', flush=True)
         # Concurrent entrances must reserve distinct empty destinations.
         occupied = []
         move(cx, cy)

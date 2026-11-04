@@ -255,6 +255,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                         && !crate::feedback_window::is_surface(win.label())
                         && win.is_visible().map_err(|e| e.to_string())?
                     {
+                        crate::layout::mark(win, false);
                         show_without_focus(win)?;
                     }
                     Ok::<_, String>(())
