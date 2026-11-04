@@ -5,7 +5,7 @@ use crate::{
     show_without_focus, AppNotes,
 };
 use tauri::{
-    menu::{CheckMenuItem, Menu, MenuItem, PredefinedMenuItem},
+    menu::{IconMenuItem, Menu, MenuItem, PredefinedMenuItem},
     tray::TrayIconBuilder,
     Manager,
 };
@@ -48,11 +48,6 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     menu.append(&front).map_err(|e| e.to_string())?;
     menu.append(&PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?)
         .map_err(|e| e.to_string())?;
-    menu.append(
-        &MenuItem::with_id(app, "visibility-legend", "✓ 열린 메모", false, None::<&str>)
-            .map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
     let state = app.state::<AppNotes>();
     let notes = state.lock().map_err(|e| e.to_string())?;
     for (id, note) in notes.iter() {
@@ -65,9 +60,22 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         let visible = crate::window(app, id)?
             .is_visible()
             .map_err(|e| e.to_string())?;
-        let item =
-            CheckMenuItem::with_id(app, format!("note:{id}"), text, true, visible, None::<&str>)
-                .map_err(|e| e.to_string())?;
+
+        let bytes: &[u8] = if note.capture.is_some() {
+            include_bytes!("../icons/tabler/photo.png")
+        } else {
+            include_bytes!("../icons/tabler/file-text.png")
+        };
+        let image = memo_icon(bytes, visible)?;
+        let item = IconMenuItem::with_id(
+            app,
+            format!("note:{id}"),
+            text,
+            true,
+            Some(image),
+            None::<&str>,
+        )
+        .map_err(|e| e.to_string())?;
         menu.append(&item).map_err(|e| e.to_string())?;
     }
     menu.append(&PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?)
@@ -77,6 +85,7 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
             .map_err(|e| e.to_string())?,
     )
     .map_err(|e| e.to_string())?;
+    template_icons(app, &menu)?;
     Ok(menu)
 }
 
@@ -98,16 +107,99 @@ pub fn sync_visibility(app: &tauri::AppHandle) -> Result<(), String> {
     let guard = state.lock().map_err(|e| e.to_string())?;
     if let Some(menu) = guard.as_ref() {
         for item in menu.items().map_err(|e| e.to_string())? {
-            if let Some(check) = item.as_check_menuitem() {
+            if let Some(check) = item.as_icon_menuitem() {
                 if let Some(id) = check.id().as_ref().strip_prefix("note:") {
                     let visible = crate::window(app, id)?
                         .is_visible()
                         .map_err(|e| e.to_string())?;
-                    check.set_checked(visible).map_err(|e| e.to_string())?;
+                    let notes = app.state::<AppNotes>();
+                    let notes = notes.lock().map_err(|e| e.to_string())?;
+                    if let Some(note) = notes.get(id) {
+                        let bytes: &[u8] = if note.capture.is_some() {
+                            include_bytes!("../icons/tabler/photo.png")
+                        } else {
+                            include_bytes!("../icons/tabler/file-text.png")
+                        };
+                        check
+                            .set_icon(Some(memo_icon(bytes, visible)?))
+                            .map_err(|e| e.to_string())?;
+                    }
                 }
             }
         }
     }
+    if let Some(menu) = guard.as_ref() {
+        template_icons(app, menu)?;
+    }
+    Ok(())
+}
+
+fn memo_icon(bytes: &[u8], visible: bool) -> Result<tauri::image::Image<'static>, String> {
+    let image = tauri::image::Image::from_bytes(bytes).map_err(|e| e.to_string())?;
+    let mut rgba = image.rgba().to_vec();
+    if !visible {
+        for pixel in rgba.chunks_exact_mut(4) {
+            pixel[3] = (pixel[3] as f32 * 0.45) as u8;
+        }
+    }
+    Ok(tauri::image::Image::new_owned(
+        rgba,
+        image.width(),
+        image.height(),
+    ))
+}
+
+fn template_icons(app: &tauri::AppHandle, menu: &Menu<tauri::Wry>) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let ids = menu
+            .items()
+            .map_err(|e| e.to_string())?
+            .iter()
+            .map(|item| item.id().as_ref().strip_prefix("note:").map(str::to_owned))
+            .collect::<Vec<_>>();
+        let app_handle = app.clone();
+        let menu = menu.clone();
+        app.run_on_main_thread(move || {
+            fn native<T: tauri::menu::ContextMenu>(menu: &T) -> *mut std::ffi::c_void {
+                menu.inner_context().ns_menu()
+            }
+            // The menu owns these objects and all AppKit calls run on the main thread.
+            unsafe {
+                use objc2::{class, msg_send, runtime::AnyObject};
+                let raw = native(&menu) as *mut AnyObject;
+                let count: isize = msg_send![raw, numberOfItems];
+                for index in 0..count {
+                    let item: *mut AnyObject = msg_send![raw, itemAtIndex: index];
+                    if let Some(Some(id)) = ids.get(index as usize) {
+                        let Ok(visible) = crate::window(&app_handle, id).and_then(|win| win.is_visible().map_err(|e| e.to_string())) else { continue; };
+                        if visible {
+                            // Remove the faded attributed title entirely so AppKit restores
+                            // its normal text color, including selection highlighting.
+                            let _: () = msg_send![item, setAttributedTitle: std::ptr::null::<AnyObject>()];
+                        } else {
+                        let title: *mut AnyObject = msg_send![item, title];
+                        let color: *mut AnyObject = msg_send![class!(NSColor), labelColor];
+                        let color: *mut AnyObject = msg_send![color, colorWithAlphaComponent: 0.45f64];
+                        let key: *mut AnyObject = msg_send![class!(NSString), stringWithUTF8String: c"NSColor".as_ptr()];
+                        let attrs: *mut AnyObject = msg_send![class!(NSDictionary), dictionaryWithObject: color, forKey: key];
+                        let attributed: *mut AnyObject = msg_send![class!(NSAttributedString), alloc];
+                        let attributed: *mut AnyObject = msg_send![attributed, initWithString: title, attributes: attrs];
+                        let _: () = msg_send![item, setAttributedTitle: attributed];
+                        let _: () = msg_send![attributed, release];
+                        }
+                    }
+                    let image: *mut AnyObject = msg_send![item, image];
+                    if !image.is_null() {
+                        let _: () = msg_send![image, setTemplate: true];
+                    }
+                }
+            }
+        })
+        .map_err(|e| e.to_string())?;
+    }
+    #[cfg(not(target_os = "macos"))]
+    let _ = (app, menu);
     Ok(())
 }
 
@@ -176,7 +268,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             } else {
                 Ok(())
             };
-            // Native check items toggle on click; visibility is the source of truth.
+            // Visibility is the source of truth for the textual open-state mark.
             let result = result.and(sync_visibility(app));
             if let Err(error) = result {
                 if let Some(tray) = app.tray_by_id("agent-gibbon") {
