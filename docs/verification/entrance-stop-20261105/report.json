@@ -1,0 +1,3347 @@
+{
+  "issue": "https://github.com/egoing/agent-gibbon/issues/43",
+  "base_head": "d686db349558b90c3b12df747589a432d6554805",
+  "origin": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order",
+    "id": "dev-5a3840c5cf7b0e9d4b92dbc0",
+    "name": "egoing/issue-34-open-order",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order/src-tauri/target/debug/agent-gibbon"
+  },
+  "cause": {
+    "position": "Tao 0.37.1 queues macOS position and size writes with GCD exec_async, while entrance tick advances expected immediately and cancels on a stale read.",
+    "driver": "The 1-second frame response timeout abandoned the worker even if its queued callback later retained an active flight.",
+    "checker": "Relative order/overlap checks accepted a window stopped near the cursor; destination comparisons were missing.",
+    "observer": "Concurrent formatted JSON writes interleaved when background timeout events and main-thread frames wrote together; final writer serializes complete buffers."
+  },
+  "before": {
+    "pid": 5061,
+    "loaded_test_note_count": 43,
+    "observer_patch": "observer-only.patch.gz",
+    "observer_binary_sha256": "58bb6bf53766db25f6b8e5721c083b141794539be4793db6ffe99de061ebfef2",
+    "legacy_smoke_outcome": "passed",
+    "false_passes": [
+      {
+        "stage": "restored-tail",
+        "id": "open34-479a5e-y",
+        "actual": {
+          "x": 1424,
+          "y": 1324,
+          "height": 840,
+          "width": 600
+        },
+        "planned": {
+          "x": 3920,
+          "y": 1730,
+          "height": 840,
+          "width": 600
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-479a5e-y",
+          "position": {
+            "x": 1424,
+            "y": 1324
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-479a5e hidden update"
+        },
+        "plan_cutoff_us": 1793812352683267
+      },
+      {
+        "stage": "re-included",
+        "id": "open34-479a5e-o",
+        "actual": {
+          "x": 1324,
+          "y": 1324,
+          "height": 706,
+          "width": 600
+        },
+        "planned": {
+          "x": 3320,
+          "y": 2174,
+          "height": 706,
+          "width": 600
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-479a5e-o",
+          "position": {
+            "x": 1324,
+            "y": 1324
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-479a5e o"
+        },
+        "plan_cutoff_us": 1793812428047564
+      }
+    ],
+    "causal_trace": [
+      {
+        "data": {
+          "anchor": {
+            "x": 650.0,
+            "y": 650.0
+          },
+          "destination": {
+            "x": 3320,
+            "y": 2174
+          },
+          "generation": "Instant { tv_sec: 833238, tv_nsec: 541405541 }",
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "start": {
+            "x": 662.0,
+            "y": 662.0
+          }
+        },
+        "event": "show",
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "pid": 5061,
+        "time_us": 1793812428047564,
+        "window": "note-open34-479a5e-o"
+      },
+      {
+        "data": {
+          "actual": {
+            "x": 1130.0,
+            "y": 319.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 3320,
+                "y": 2174
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 706,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 662.0,
+              "y": 662.0
+            },
+            "generation": "Instant { tv_sec: 833238, tv_nsec: 541405541 }"
+          }
+        },
+        "event": "position-mismatch",
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "pid": 5061,
+        "time_us": 1793812428236812,
+        "window": "note-open34-479a5e-o"
+      },
+      {
+        "data": {
+          "actual": {
+            "x": 1357.0,
+            "y": 511.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 3320,
+                "y": 890
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 840,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 1645.4767724125138,
+              "y": 448.15785609868186
+            },
+            "generation": "Instant { tv_sec: 833256, tv_nsec: 839857000 }"
+          }
+        },
+        "event": "position-mismatch",
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "pid": 5061,
+        "time_us": 1793812446961835,
+        "window": "note-open34-479a5e-o"
+      },
+      {
+        "data": {
+          "actual_after": {
+            "x": 1375.0,
+            "y": 434.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 4520,
+                "y": 50
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 266,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 1375.53354105935,
+              "y": 433.4821386595428
+            },
+            "generation": "Instant { tv_sec: 832780, tv_nsec: 889840500 }"
+          },
+          "next": {
+            "x": 1721.2186131398025,
+            "y": 273.8308866321589
+          },
+          "size_after": {
+            "height": 266,
+            "width": 600
+          },
+          "t": 0.3031953380952381
+        },
+        "event": "frame",
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "pid": 5061,
+        "time_us": 1793811987887494,
+        "window": "note-issue43-progress"
+      },
+      {
+        "data": {
+          "actual_after": {
+            "x": 1721.0,
+            "y": 274.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 4520,
+                "y": 50
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 266,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 1721.2186131398025,
+              "y": 273.8308866321589
+            },
+            "generation": "Instant { tv_sec: 832780, tv_nsec: 889840500 }"
+          },
+          "next": {
+            "x": 2204.8124813867744,
+            "y": 50.4878129097674
+          },
+          "size_after": {
+            "height": 266,
+            "width": 600
+          },
+          "t": 0.6739728190476191
+        },
+        "event": "frame",
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "pid": 5061,
+        "time_us": 1793811988043205,
+        "window": "note-issue43-progress"
+      },
+      {
+        "data": {
+          "actual_after": {
+            "x": 2204.0,
+            "y": 51.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 4520,
+                "y": 50
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 266,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 2204.8124813867744,
+              "y": 50.4878129097674
+            },
+            "generation": "Instant { tv_sec: 832780, tv_nsec: 889840500 }"
+          },
+          "next": {
+            "x": 2232.2050793520684,
+            "y": 37.8368108427062
+          },
+          "size_after": {
+            "height": 266,
+            "width": 600
+          },
+          "t": 0.7406047619047619
+        },
+        "event": "frame",
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "pid": 5061,
+        "time_us": 1793811988071196,
+        "window": "note-issue43-progress"
+      },
+      {
+        "data": {
+          "actual": {
+            "x": 2204.0,
+            "y": 51.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 4520,
+                "y": 50
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 266,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 2232.2050793520684,
+              "y": 37.8368108427062
+            },
+            "generation": "Instant { tv_sec: 832780, tv_nsec: 889840500 }"
+          }
+        },
+        "event": "position-mismatch",
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "pid": 5061,
+        "time_us": 1793811988130684,
+        "window": "note-issue43-progress"
+      }
+    ],
+    "gate": {
+      "trace": "/private/tmp/gibbon-issue43/trace-before.jsonl",
+      "window_prefix": "note-open34-",
+      "frames": 994,
+      "windows": [
+        "note-open34-479a5e-n",
+        "note-open34-479a5e-o",
+        "note-open34-479a5e-p",
+        "note-open34-479a5e-q",
+        "note-open34-479a5e-r",
+        "note-open34-479a5e-s",
+        "note-open34-479a5e-t",
+        "note-open34-479a5e-u",
+        "note-open34-479a5e-v",
+        "note-open34-479a5e-w",
+        "note-open34-479a5e-x",
+        "note-open34-479a5e-y",
+        "note-open34-479a5e-z",
+        "note-open34-4c5124-t",
+        "note-open34-4c5124-u",
+        "note-open34-4c5124-v",
+        "note-open34-4c5124-w",
+        "note-open34-4c5124-x",
+        "note-open34-4c5124-y",
+        "note-open34-4c5124-z",
+        "note-open34-5c29a2-q",
+        "note-open34-5c29a2-r",
+        "note-open34-5c29a2-s",
+        "note-open34-5c29a2-t",
+        "note-open34-5c29a2-u",
+        "note-open34-5c29a2-v",
+        "note-open34-5c29a2-w",
+        "note-open34-5c29a2-x",
+        "note-open34-5c29a2-y",
+        "note-open34-5c29a2-z"
+      ],
+      "interrupted_frames": 23,
+      "unacknowledged_positions": 379,
+      "wrong_final_sizes": 26,
+      "interruption_evidence": [
+        {
+          "data": {
+            "actual": {
+              "x": 1130.0,
+              "y": 319.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 890
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 662.0,
+                "y": 662.0
+              },
+              "generation": "Instant { tv_sec: 832826, tv_nsec: 11055791 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812015648476,
+          "window": "note-open34-4c5124-t"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1960.0,
+              "y": 159.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 50
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 1960.0,
+                "y": 127.96979155187796
+              },
+              "generation": "Instant { tv_sec: 832826, tv_nsec: 10478458 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812015919245,
+          "window": "note-open34-4c5124-u"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 2163.0,
+              "y": 769.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 2240
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 640,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2190.322865171373,
+                "y": 865.6784578755111
+              },
+              "generation": "Instant { tv_sec: 832826, tv_nsec: 10115791 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812015920556,
+          "window": "note-open34-4c5124-v"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 2260.0,
+              "y": 900.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 1600
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 640,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2260.0,
+                "y": 874.6446298641395
+              },
+              "generation": "Instant { tv_sec: 832826, tv_nsec: 9734750 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812015921014,
+          "window": "note-open34-4c5124-w"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 2260.0,
+              "y": 580.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 958
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 642,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2260.0,
+                "y": 552.1394251030914
+              },
+              "generation": "Instant { tv_sec: 832826, tv_nsec: 9293083 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812015921467,
+          "window": "note-open34-4c5124-x"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1843.0,
+              "y": 846.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 1730
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 1911.8070175780554,
+                "y": 857.1609171220715
+              },
+              "generation": "Instant { tv_sec: 832829, tv_nsec: 193342875 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812020151551,
+          "window": "note-open34-4c5124-y"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1130.0,
+              "y": 319.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 890
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 662.0,
+                "y": 662.0
+              },
+              "generation": "Instant { tv_sec: 832999, tv_nsec: 847189000 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812189652940,
+          "window": "note-open34-5c29a2-u"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1130.0,
+              "y": 319.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 890
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 662.0,
+                "y": 662.0
+              },
+              "generation": "Instant { tv_sec: 833009, tv_nsec: 31344458 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812198677523,
+          "window": "note-open34-5c29a2-t"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 2260.0,
+              "y": 479.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 1730
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 712.0,
+                "y": 662.0
+              },
+              "generation": "Instant { tv_sec: 833013, tv_nsec: 73548958 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812202769192,
+          "window": "note-open34-5c29a2-y"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1130.0,
+              "y": 319.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3320,
+                  "y": 50
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 662.0,
+                "y": 662.0
+              },
+              "generation": "Instant { tv_sec: 833029, tv_nsec: 182028500 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812218821340,
+          "window": "note-open34-5c29a2-r"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1130.0,
+              "y": 319.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 890
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 662.0,
+                "y": 662.0
+              },
+              "generation": "Instant { tv_sec: 833157, tv_nsec: 517037208 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812347243642,
+          "window": "note-open34-479a5e-t"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 2260.0,
+              "y": 479.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 1730
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 712.0,
+                "y": 662.0
+              },
+              "generation": "Instant { tv_sec: 833163, tv_nsec: 177829041 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812352964647,
+          "window": "note-open34-479a5e-y"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1130.0,
+              "y": 319.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3320,
+                  "y": 2174
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 706,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 662.0,
+                "y": 662.0
+              },
+              "generation": "Instant { tv_sec: 833238, tv_nsec: 541405541 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812428236812,
+          "window": "note-open34-479a5e-o"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 2260.0,
+              "y": 356.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 318
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 642,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2260.0,
+                "y": 168.98670286326683
+              },
+              "generation": "Instant { tv_sec: 833256, tv_nsec: 836474666 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812446957047,
+          "window": "note-open34-479a5e-w"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 2166.0,
+              "y": 558.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 1600
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 640,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2255.28863156635,
+                "y": 787.8289648797372
+              },
+              "generation": "Instant { tv_sec: 833256, tv_nsec: 837357666 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812446958327,
+          "window": "note-open34-479a5e-u"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 2260.0,
+              "y": 677.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 960
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 640,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2260.0,
+                "y": 489.752733069178
+              },
+              "generation": "Instant { tv_sec: 833256, tv_nsec: 836989166 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812446958765,
+          "window": "note-open34-479a5e-v"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 2168.0,
+              "y": 893.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 2240
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 640,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2255.491059651061,
+                "y": 1108.862917338121
+              },
+              "generation": "Instant { tv_sec: 833256, tv_nsec: 837718041 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812446959199,
+          "window": "note-open34-479a5e-t"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1867.0,
+              "y": 516.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 1466
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 708,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 1955.2750738687782,
+                "y": 721.8491743303165
+              },
+              "generation": "Instant { tv_sec: 833256, tv_nsec: 838759666 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812446959640,
+          "window": "note-open34-479a5e-r"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1960.0,
+              "y": 238.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 50
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 708,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 1960.0,
+                "y": 35.159673277608135
+              },
+              "generation": "Instant { tv_sec: 833256, tv_nsec: 838066083 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812446960064,
+          "window": "note-open34-479a5e-y"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1870.0,
+              "y": 876.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 2174
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 706,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 1955.3859300734457,
+                "y": 1076.1107949733318
+              },
+              "generation": "Instant { tv_sec: 833256, tv_nsec: 839102500 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812446960489,
+          "window": "note-open34-479a5e-q"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1660.0,
+              "y": 236.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3320,
+                  "y": 50
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 1660.0,
+                "y": 35.831043846132275
+              },
+              "generation": "Instant { tv_sec: 833256, tv_nsec: 839502500 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812446960921,
+          "window": "note-open34-479a5e-p"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1960.0,
+              "y": 595.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3920,
+                  "y": 758
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 708,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 1960.0,
+                "y": 389.05756176554576
+              },
+              "generation": "Instant { tv_sec: 833256, tv_nsec: 838417125 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812446961410,
+          "window": "note-open34-479a5e-s"
+        },
+        {
+          "data": {
+            "actual": {
+              "x": 1357.0,
+              "y": 511.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 3320,
+                  "y": 890
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 1645.4767724125138,
+                "y": 448.15785609868186
+              },
+              "generation": "Instant { tv_sec: 833256, tv_nsec: 839857000 }"
+            }
+          },
+          "event": "position-mismatch",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812446961835,
+          "window": "note-open34-479a5e-o"
+        }
+      ],
+      "unacknowledged_examples": [
+        {
+          "data": {
+            "actual_after": {
+              "x": 662.0,
+              "y": 662.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 316
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 662.0,
+                "y": 662.0
+              },
+              "generation": "Instant { tv_sec: 832798, tv_nsec: 994069791 }"
+            },
+            "next": {
+              "x": 867.4532514475734,
+              "y": 597.2012273281746
+            },
+            "size_after": {
+              "height": 840,
+              "width": 600
+            },
+            "t": 0.04483660714285714
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793811989625537,
+          "window": "note-open34-4c5124-z"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 867.0,
+              "y": 598.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 316
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 867.4532514475734,
+                "y": 597.2012273281746
+              },
+              "generation": "Instant { tv_sec: 832798, tv_nsec: 994069791 }"
+            },
+            "next": {
+              "x": 1102.7959060768083,
+              "y": 522.9755089720204
+            },
+            "size_after": {
+              "height": 840,
+              "width": 600
+            },
+            "t": 0.10199712142857144
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793811989649554,
+          "window": "note-open34-4c5124-z"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 1102.0,
+              "y": 523.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 316
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 1102.7959060768083,
+                "y": 522.9755089720204
+              },
+              "generation": "Instant { tv_sec: 832798, tv_nsec: 994069791 }"
+            },
+            "next": {
+              "x": 1673.196678860493,
+              "y": 343.0743891453764
+            },
+            "size_after": {
+              "height": 840,
+              "width": 600
+            },
+            "t": 0.2839028761904762
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793811989725975,
+          "window": "note-open34-4c5124-z"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 1673.0,
+              "y": 343.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 316
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 1673.196678860493,
+                "y": 343.0743891453764
+              },
+              "generation": "Instant { tv_sec: 832798, tv_nsec: 994069791 }"
+            },
+            "next": {
+              "x": 1788.1393963516166,
+              "y": 306.8221177964864
+            },
+            "size_after": {
+              "height": 840,
+              "width": 600
+            },
+            "t": 0.33409494047619054
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793811989747040,
+          "window": "note-open34-4c5124-z"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 1788.0,
+              "y": 307.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 316
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 1788.1393963516166,
+                "y": 306.8221177964864
+              },
+              "generation": "Instant { tv_sec: 832798, tv_nsec: 994069791 }"
+            },
+            "next": {
+              "x": 2135.1521101336907,
+              "y": 197.37630568999998
+            },
+            "size_after": {
+              "height": 840,
+              "width": 600
+            },
+            "t": 0.5725012880952381
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793811989847171,
+          "window": "note-open34-4c5124-z"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 2135.0,
+              "y": 198.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 316
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2135.1521101336907,
+                "y": 197.37630568999998
+              },
+              "generation": "Instant { tv_sec: 832798, tv_nsec: 994069791 }"
+            },
+            "next": {
+              "x": 2168.9573941703393,
+              "y": 186.71431372850373
+            },
+            "size_after": {
+              "height": 840,
+              "width": 600
+            },
+            "t": 0.6152110119047619
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793811989865143,
+          "window": "note-open34-4c5124-z"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 2169.0,
+              "y": 187.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 316
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2168.9573941703393,
+                "y": 186.71431372850373
+              },
+              "generation": "Instant { tv_sec: 832798, tv_nsec: 994069791 }"
+            },
+            "next": {
+              "x": 2209.1962249343396,
+              "y": 174.0232181683935
+            },
+            "size_after": {
+              "height": 840,
+              "width": 600
+            },
+            "t": 0.6832088285714286
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793811989893684,
+          "window": "note-open34-4c5124-z"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 2209.0,
+              "y": 174.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 316
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 840,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2209.1962249343396,
+                "y": 174.0232181683935
+              },
+              "generation": "Instant { tv_sec: 832798, tv_nsec: 994069791 }"
+            },
+            "next": {
+              "x": 2229.2814072255924,
+              "y": 167.68846730807343
+            },
+            "size_after": {
+              "height": 840,
+              "width": 600
+            },
+            "t": 0.7321192452380954
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793811989914226,
+          "window": "note-open34-4c5124-z"
+        }
+      ],
+      "wrong_size_examples": [
+        {
+          "data": {
+            "actual_after": {
+              "x": 2260.0,
+              "y": 800.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 1600
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 640,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2260.0,
+                "y": 800.097334399808
+              },
+              "generation": "Instant { tv_sec: 832809, tv_nsec: 962322791 }"
+            },
+            "next": {
+              "x": 2260.0,
+              "y": 800.0
+            },
+            "size_after": {
+              "height": 642,
+              "width": 600
+            },
+            "t": 1.0
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793811999913390,
+          "window": "note-open34-4c5124-x"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 2260.0,
+              "y": 158.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 316
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 642,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2260.0,
+                "y": 158.0
+              },
+              "generation": "Instant { tv_sec: 832809, tv_nsec: 961196833 }"
+            },
+            "next": {
+              "x": 2260.0,
+              "y": 158.0
+            },
+            "size_after": {
+              "height": 644,
+              "width": 600
+            },
+            "t": 1.0
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793811999914034,
+          "window": "note-open34-4c5124-z"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 2260.0,
+              "y": 479.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 958
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 642,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2260.0,
+                "y": 479.0396746240824
+              },
+              "generation": "Instant { tv_sec: 832809, tv_nsec: 961812916 }"
+            },
+            "next": {
+              "x": 2260.0,
+              "y": 479.0
+            },
+            "size_after": {
+              "height": 644,
+              "width": 600
+            },
+            "t": 1.0
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793811999914697,
+          "window": "note-open34-4c5124-y"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 2251.0,
+              "y": 1090.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 2240
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 640,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2251.550274137481,
+                "y": 1089.339566156004
+              },
+              "generation": "Instant { tv_sec: 832829, tv_nsec: 192087833 }"
+            },
+            "next": {
+              "x": 2260.0,
+              "y": 1120.0
+            },
+            "size_after": {
+              "height": 646,
+              "width": 600
+            },
+            "t": 1.0
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812019146184,
+          "window": "note-open34-4c5124-v"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 2260.0,
+              "y": 158.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 316
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 642,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2260.0,
+                "y": 158.0
+              },
+              "generation": "Instant { tv_sec: 832992, tv_nsec: 279296166 }"
+            },
+            "next": {
+              "x": 2260.0,
+              "y": 158.0
+            },
+            "size_after": {
+              "height": 644,
+              "width": 600
+            },
+            "t": 1.0
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812182219090,
+          "window": "note-open34-5c29a2-z"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 2260.0,
+              "y": 479.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 958
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 642,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2260.0,
+                "y": 479.0001280854152
+              },
+              "generation": "Instant { tv_sec: 832992, tv_nsec: 279708875 }"
+            },
+            "next": {
+              "x": 2260.0,
+              "y": 479.0
+            },
+            "size_after": {
+              "height": 644,
+              "width": 600
+            },
+            "t": 1.0
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812182220893,
+          "window": "note-open34-5c29a2-y"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 2260.0,
+              "y": 800.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 1600
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 640,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2260.0,
+                "y": 800.0000980932879
+              },
+              "generation": "Instant { tv_sec: 832992, tv_nsec: 280082000 }"
+            },
+            "next": {
+              "x": 2260.0,
+              "y": 800.0
+            },
+            "size_after": {
+              "height": 642,
+              "width": 600
+            },
+            "t": 1.0
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812182221616,
+          "window": "note-open34-5c29a2-x"
+        },
+        {
+          "data": {
+            "actual_after": {
+              "x": 2191.0,
+              "y": 871.0
+            },
+            "flight": {
+              "destination": {
+                "position": {
+                  "x": 4520,
+                  "y": 2240
+                },
+                "scale": 2.0,
+                "size": {
+                  "height": 640,
+                  "width": 600
+                }
+              },
+              "expected": {
+                "x": 2191.675503222099,
+                "y": 870.6155867606619
+              },
+              "generation": "Instant { tv_sec: 833009, tv_nsec: 30514958 }"
+            },
+            "next": {
+              "x": 2260.0,
+              "y": 1120.0
+            },
+            "size_after": {
+              "height": 686,
+              "width": 600
+            },
+            "t": 1.0
+          },
+          "event": "frame",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 5061,
+          "time_us": 1793812198996318,
+          "window": "note-open34-5c29a2-v"
+        }
+      ],
+      "ok": false
+    },
+    "captures": {
+      "before-o": {
+        "window": {
+          "isOffscreen": false,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-479a5e-o",
+          "x": 662,
+          "y": 662,
+          "width": 300,
+          "screenIndex": 0,
+          "platform": {
+            "layer": 5
+          },
+          "isMinimized": false,
+          "id": 32799,
+          "height": 353
+        },
+        "pid": 5061,
+        "body_tree": "App=agent-gibbon (pid 5061)\nWindow: \"Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-479a5e-o\", App: agent-gibbon.\n\nShowing the first 45 of 64 elements.\n0 standard window Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-479a5e-o\n\t1 scroll area\n\t\t2 HTML content Agent Gibbon\n\t\t\t3 container Agent Gibbon\n\t\t\t\t4 toolbar Toolbar\n\t\t\t\t\t5 button (disabled) 이전 도구\n\t\t\t\t\t6 container DEV egoing/issue-34-open-order · 5a3840c5\n\t\t\t\t\t\t7 text DEV\n\t\t\t\t\t8 button (expanded) 메모 접기\n\t\t\t\t\t9 button 글자 크기 12px, 클릭하여 변경\n\t\t\t\t\t10 button 메모 편집\n\t\t\t\t\t11 button 파일로 저장\n\t\t\t\t\t12 button 본문 복사\n\t\t\t\t\t13 button 반대편으로 워프\n\t\t\t\t\t14 toggle button 상단 고정, Value: 1\n\t\t\t\t\t15 button 메모 숨기기\n\t\t\t\t\t16 button (disabled) 다음 도구\n\t\t\t\t17 container\n\t\t\t\t\t18 heading open34-479a5e o\n\t\t\t\t\t19 text 본문 순서 검증\n\t\t\t\t\t20 text 본문 순서 검증\n\t\t\t\t\t21 text 본문 순서 검증\n\t\t\t\t\t22 text 본문 순서 검증\n\t\t\t\t\t23 text 본문 순서 검증\n\t\t\t\t\t24 text 본문 순서 검증\n\t\t\t\t\t25 text 본문 순서 검증\n\t\t\t\t\t26 text 본문 순서 검증\n\t\t\t\t\t27 text 본문 순서 검증\n\t\t\t\t\t28 text 본문 순서 검증\n\t\t\t\t\t29 text 본문 순서 검증\n\t\t\t\t\t30 text 본문 순서 검증\n\t\t\t\t\t31 text 본문 순서 검증\n\t\t\t\t\t32 text 본문 순서 검증\n\t\t\t\t\t33 text 본문 순서 검증\n\t\t\t\t\t34 text 본문 순서 검증\n\t\t\t\t\t35 text 본문 순서 검증\n\t\t\t\t\t36 text 본문 순서 검증\n\t\t\t\t\t37 text 본문 순서 검증\n\t\t\t\t\t38 text 본문 순서 검증\n\t\t\t\t\t39 text 본문 순서 검증\n\t\t\t\t\t40 text 본문 순서 검증\n\t\t\t\t\t41 text 본문 순서 검증\n\t\t\t\t\t42 text 본문 순서 검증\n\t\t\t\t\t43 text 본문 순서 검증\n\t\t\t\t\t44 text 본문 순서 검증\n\nNo UI element is currently focused.",
+        "capture": "before-o.png"
+      }
+    },
+    "observer_patch_sha256": "672a153587e08769f057ce528e5e7af3a6275155421f3a4b3f313a0d1bc82faa"
+  },
+  "after": {
+    "pid": 73759,
+    "initial_stored_notes": 45,
+    "initial_restored_test_notes": 43,
+    "outcome": "passed",
+    "checks": [
+      "reverse IDs: sequential open order, left-column wrap, no overlap, focus preserved",
+      "visible reopen/content update preserve order and geometry",
+      "hidden update stays hidden; restore joins tail and preserves other relative order",
+      "rapid opens retarget transitions without reordering; focus preserved",
+      "native manual drag excluded; new open preserves obstacle geometry and current user focus",
+      "content action re-includes at original relative order without immediate geometry change",
+      "unrelated hidden note remains hidden and keeps geometry across later opens"
+    ],
+    "endpoint_comparisons": 45,
+    "states": {
+      "sequential": {
+        "open34-3832b6-z": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-z",
+          "position": {
+            "x": 4520,
+            "y": 250
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 z"
+        },
+        "open34-3832b6-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-y",
+          "position": {
+            "x": 4520,
+            "y": 908
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 y"
+        },
+        "open34-3832b6-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-x",
+          "position": {
+            "x": 4520,
+            "y": 1566
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 x"
+        },
+        "open34-3832b6-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-w",
+          "position": {
+            "x": 4520,
+            "y": 2224
+          },
+          "size": {
+            "height": 656,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 w"
+        },
+        "open34-3832b6-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-v",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 v"
+        },
+        "open34-3832b6-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-u",
+          "position": {
+            "x": 3920,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 u"
+        }
+      },
+      "restored-tail": {
+        "open34-3832b6-z": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-z",
+          "position": {
+            "x": 4520,
+            "y": 250
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 visible update"
+        },
+        "open34-3832b6-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-x",
+          "position": {
+            "x": 4520,
+            "y": 908
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 x"
+        },
+        "open34-3832b6-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-w",
+          "position": {
+            "x": 4520,
+            "y": 1566
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 w"
+        },
+        "open34-3832b6-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-v",
+          "position": {
+            "x": 4520,
+            "y": 2224
+          },
+          "size": {
+            "height": 656,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 v"
+        },
+        "open34-3832b6-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-u",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 u"
+        },
+        "open34-3832b6-t": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-t",
+          "position": {
+            "x": 3920,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 t"
+        },
+        "open34-3832b6-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-y",
+          "position": {
+            "x": 3920,
+            "y": 1730
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 hidden update"
+        }
+      },
+      "rapid": {
+        "open34-3832b6-z": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-z",
+          "position": {
+            "x": 4520,
+            "y": 250
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 visible update"
+        },
+        "open34-3832b6-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-x",
+          "position": {
+            "x": 4520,
+            "y": 908
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 x"
+        },
+        "open34-3832b6-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-w",
+          "position": {
+            "x": 4520,
+            "y": 1566
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 w"
+        },
+        "open34-3832b6-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-v",
+          "position": {
+            "x": 4520,
+            "y": 2224
+          },
+          "size": {
+            "height": 656,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 v"
+        },
+        "open34-3832b6-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-u",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 u"
+        },
+        "open34-3832b6-t": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-t",
+          "position": {
+            "x": 3920,
+            "y": 758
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 t"
+        },
+        "open34-3832b6-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-y",
+          "position": {
+            "x": 3920,
+            "y": 1466
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 hidden update"
+        },
+        "open34-3832b6-s": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-s",
+          "position": {
+            "x": 3920,
+            "y": 2174
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 s"
+        },
+        "open34-3832b6-r": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-r",
+          "position": {
+            "x": 3320,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 r"
+        },
+        "open34-3832b6-q": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-q",
+          "position": {
+            "x": 3320,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 q"
+        }
+      },
+      "manual-excluded": {
+        "open34-3832b6-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-x",
+          "position": {
+            "x": 4520,
+            "y": 250
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 x"
+        },
+        "open34-3832b6-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-w",
+          "position": {
+            "x": 4520,
+            "y": 908
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 w"
+        },
+        "open34-3832b6-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-v",
+          "position": {
+            "x": 4520,
+            "y": 1566
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 v"
+        },
+        "open34-3832b6-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-u",
+          "position": {
+            "x": 4520,
+            "y": 2224
+          },
+          "size": {
+            "height": 656,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 u"
+        },
+        "open34-3832b6-t": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-t",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 t"
+        },
+        "open34-3832b6-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-y",
+          "position": {
+            "x": 3920,
+            "y": 758
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 hidden update"
+        },
+        "open34-3832b6-s": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-s",
+          "position": {
+            "x": 3920,
+            "y": 1466
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 s"
+        },
+        "open34-3832b6-r": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-r",
+          "position": {
+            "x": 3920,
+            "y": 2174
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 r"
+        },
+        "open34-3832b6-q": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-q",
+          "position": {
+            "x": 3320,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 q"
+        },
+        "open34-3832b6-p": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-p",
+          "position": {
+            "x": 3320,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 p"
+        }
+      },
+      "re-included": {
+        "open34-3832b6-z": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-z",
+          "position": {
+            "x": 4520,
+            "y": 250
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": true,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 re-included"
+        },
+        "open34-3832b6-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-x",
+          "position": {
+            "x": 4520,
+            "y": 908
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 x"
+        },
+        "open34-3832b6-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-w",
+          "position": {
+            "x": 4520,
+            "y": 1566
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 w"
+        },
+        "open34-3832b6-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-v",
+          "position": {
+            "x": 4520,
+            "y": 2224
+          },
+          "size": {
+            "height": 656,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 v"
+        },
+        "open34-3832b6-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-u",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 u"
+        },
+        "open34-3832b6-t": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-t",
+          "position": {
+            "x": 3920,
+            "y": 758
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 t"
+        },
+        "open34-3832b6-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-y",
+          "position": {
+            "x": 3920,
+            "y": 1466
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 hidden update"
+        },
+        "open34-3832b6-s": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-s",
+          "position": {
+            "x": 3920,
+            "y": 2174
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 s"
+        },
+        "open34-3832b6-r": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-r",
+          "position": {
+            "x": 3320,
+            "y": 50
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 r"
+        },
+        "open34-3832b6-q": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-q",
+          "position": {
+            "x": 3320,
+            "y": 758
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 q"
+        },
+        "open34-3832b6-p": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-p",
+          "position": {
+            "x": 3320,
+            "y": 1466
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 p"
+        },
+        "open34-3832b6-o": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-3832b6-o",
+          "position": {
+            "x": 3320,
+            "y": 2174
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "content_height_cap": 420.0,
+          "body_marker": "# open34-3832b6 o"
+        }
+      }
+    },
+    "plans": {
+      "sequential": {
+        "open34-3832b6-z": {
+          "x": 4520,
+          "y": 250,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-y": {
+          "x": 4520,
+          "y": 908,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-x": {
+          "x": 4520,
+          "y": 1566,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-w": {
+          "x": 4520,
+          "y": 2224,
+          "height": 656,
+          "width": 600
+        },
+        "open34-3832b6-v": {
+          "x": 3920,
+          "y": 50,
+          "height": 840,
+          "width": 600
+        },
+        "open34-3832b6-u": {
+          "x": 3920,
+          "y": 890,
+          "height": 840,
+          "width": 600
+        }
+      },
+      "restored-tail": {
+        "open34-3832b6-z": {
+          "x": 4520,
+          "y": 250,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-x": {
+          "x": 4520,
+          "y": 908,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-w": {
+          "x": 4520,
+          "y": 1566,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-v": {
+          "x": 4520,
+          "y": 2224,
+          "height": 656,
+          "width": 600
+        },
+        "open34-3832b6-u": {
+          "x": 3920,
+          "y": 50,
+          "height": 840,
+          "width": 600
+        },
+        "open34-3832b6-t": {
+          "x": 3920,
+          "y": 890,
+          "height": 840,
+          "width": 600
+        },
+        "open34-3832b6-y": {
+          "x": 3920,
+          "y": 1730,
+          "height": 840,
+          "width": 600
+        }
+      },
+      "rapid": {
+        "open34-3832b6-z": {
+          "x": 4520,
+          "y": 250,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-x": {
+          "x": 4520,
+          "y": 908,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-w": {
+          "x": 4520,
+          "y": 1566,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-v": {
+          "x": 4520,
+          "y": 2224,
+          "height": 656,
+          "width": 600
+        },
+        "open34-3832b6-u": {
+          "x": 3920,
+          "y": 50,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-t": {
+          "x": 3920,
+          "y": 758,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-y": {
+          "x": 3920,
+          "y": 1466,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-s": {
+          "x": 3920,
+          "y": 2174,
+          "height": 706,
+          "width": 600
+        },
+        "open34-3832b6-r": {
+          "x": 3320,
+          "y": 50,
+          "height": 840,
+          "width": 600
+        },
+        "open34-3832b6-q": {
+          "x": 3320,
+          "y": 890,
+          "height": 840,
+          "width": 600
+        }
+      },
+      "manual-excluded": {
+        "open34-3832b6-x": {
+          "x": 4520,
+          "y": 250,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-w": {
+          "x": 4520,
+          "y": 908,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-v": {
+          "x": 4520,
+          "y": 1566,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-u": {
+          "x": 4520,
+          "y": 2224,
+          "height": 656,
+          "width": 600
+        },
+        "open34-3832b6-t": {
+          "x": 3920,
+          "y": 50,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-y": {
+          "x": 3920,
+          "y": 758,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-s": {
+          "x": 3920,
+          "y": 1466,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-r": {
+          "x": 3920,
+          "y": 2174,
+          "height": 706,
+          "width": 600
+        },
+        "open34-3832b6-q": {
+          "x": 3320,
+          "y": 50,
+          "height": 840,
+          "width": 600
+        },
+        "open34-3832b6-p": {
+          "x": 3320,
+          "y": 890,
+          "height": 840,
+          "width": 600
+        }
+      },
+      "re-included": {
+        "open34-3832b6-z": {
+          "x": 4520,
+          "y": 250,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-x": {
+          "x": 4520,
+          "y": 908,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-w": {
+          "x": 4520,
+          "y": 1566,
+          "height": 658,
+          "width": 600
+        },
+        "open34-3832b6-v": {
+          "x": 4520,
+          "y": 2224,
+          "height": 656,
+          "width": 600
+        },
+        "open34-3832b6-u": {
+          "x": 3920,
+          "y": 50,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-t": {
+          "x": 3920,
+          "y": 758,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-y": {
+          "x": 3920,
+          "y": 1466,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-s": {
+          "x": 3920,
+          "y": 2174,
+          "height": 706,
+          "width": 600
+        },
+        "open34-3832b6-r": {
+          "x": 3320,
+          "y": 50,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-q": {
+          "x": 3320,
+          "y": 758,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-p": {
+          "x": 3320,
+          "y": 1466,
+          "height": 708,
+          "width": 600
+        },
+        "open34-3832b6-o": {
+          "x": 3320,
+          "y": 2174,
+          "height": 706,
+          "width": 600
+        }
+      }
+    },
+    "gate": {
+      "trace": "/private/tmp/gibbon-issue43/trace-after-controlled.jsonl",
+      "window_prefix": "",
+      "frames": 613,
+      "windows": [
+        "note-issue43-progress",
+        "note-open34-3832b6-n",
+        "note-open34-3832b6-o",
+        "note-open34-3832b6-p",
+        "note-open34-3832b6-q",
+        "note-open34-3832b6-r",
+        "note-open34-3832b6-s",
+        "note-open34-3832b6-t",
+        "note-open34-3832b6-u",
+        "note-open34-3832b6-v",
+        "note-open34-3832b6-w",
+        "note-open34-3832b6-x",
+        "note-open34-3832b6-y",
+        "note-open34-3832b6-z"
+      ],
+      "interrupted_frames": 0,
+      "unacknowledged_positions": 0,
+      "wrong_final_sizes": 0,
+      "interruption_evidence": [],
+      "unacknowledged_examples": [],
+      "wrong_size_examples": [],
+      "ok": true
+    },
+    "captures": {
+      "after-o": {
+        "window": {
+          "y": 1087,
+          "isMinimized": false,
+          "screenIndex": 0,
+          "id": 33106,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-o",
+          "x": 1660,
+          "height": 353,
+          "platform": {
+            "layer": 5
+          },
+          "width": 300,
+          "isOffscreen": false
+        },
+        "pid": 73759,
+        "body_tree": "App=agent-gibbon (pid 73759)\nWindow: \"Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-o\", App: agent-gibbon.\n\nShowing the first 45 of 64 elements.\n0 standard window Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-o\n\t1 scroll area\n\t\t2 HTML content Agent Gibbon\n\t\t\t3 container Agent Gibbon\n\t\t\t\t4 toolbar Toolbar\n\t\t\t\t\t5 button (disabled) 이전 도구\n\t\t\t\t\t6 container DEV egoing/issue-34-open-order · 5a3840c5\n\t\t\t\t\t\t7 text DEV\n\t\t\t\t\t8 button (expanded) 메모 접기\n\t\t\t\t\t9 button 글자 크기 12px, 클릭하여 변경\n\t\t\t\t\t10 button 메모 편집\n\t\t\t\t\t11 button 파일로 저장\n\t\t\t\t\t12 button 본문 복사\n\t\t\t\t\t13 button 반대편으로 워프\n\t\t\t\t\t14 toggle button 상단 고정, Value: 1\n\t\t\t\t\t15 button 메모 숨기기\n\t\t\t\t\t16 button (disabled) 다음 도구\n\t\t\t\t17 container\n\t\t\t\t\t18 heading open34-3832b6 o\n\t\t\t\t\t19 text 본문 순서 검증\n\t\t\t\t\t20 text 본문 순서 검증\n\t\t\t\t\t21 text 본문 순서 검증\n\t\t\t\t\t22 text 본문 순서 검증\n\t\t\t\t\t23 text 본문 순서 검증\n\t\t\t\t\t24 text 본문 순서 검증\n\t\t\t\t\t25 text 본문 순서 검증\n\t\t\t\t\t26 text 본문 순서 검증\n\t\t\t\t\t27 text 본문 순서 검증\n\t\t\t\t\t28 text 본문 순서 검증\n\t\t\t\t\t29 text 본문 순서 검증\n\t\t\t\t\t30 text 본문 순서 검증\n\t\t\t\t\t31 text 본문 순서 검증\n\t\t\t\t\t32 text 본문 순서 검증\n\t\t\t\t\t33 text 본문 순서 검증\n\t\t\t\t\t34 text 본문 순서 검증\n\t\t\t\t\t35 text 본문 순서 검증\n\t\t\t\t\t36 text 본문 순서 검증\n\t\t\t\t\t37 text 본문 순서 검증\n\t\t\t\t\t38 text 본문 순서 검증\n\t\t\t\t\t39 text 본문 순서 검증\n\t\t\t\t\t40 text 본문 순서 검증\n\t\t\t\t\t41 text 본문 순서 검증\n\t\t\t\t\t42 text 본문 순서 검증\n\t\t\t\t\t43 text 본문 순서 검증\n\t\t\t\t\t44 text 본문 순서 검증\n\nNo UI element is currently focused.",
+        "capture": "after-o.png"
+      },
+      "after-manual-preserved": {
+        "window": {
+          "isOffscreen": false,
+          "height": 329,
+          "isMinimized": false,
+          "platform": {
+            "layer": 5
+          },
+          "screenIndex": 0,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-z",
+          "x": 1160,
+          "y": 430,
+          "width": 300,
+          "id": 33063
+        },
+        "pid": 73759,
+        "body_tree": "App=agent-gibbon (pid 73759)\nWindow: \"Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-z\", App: agent-gibbon.\n\nShowing the first 45 of 66 elements.\n0 standard window Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-z\n\t1 scroll area\n\t\t2 HTML content Agent Gibbon\n\t\t\t3 container Agent Gibbon\n\t\t\t\t4 toolbar Toolbar\n\t\t\t\t\t5 button (disabled) 이전 도구\n\t\t\t\t\t6 container DEV egoing/issue-34-open-order · 5a3840c5\n\t\t\t\t\t\t114 text DEV\n\t\t\t\t\t8 button (expanded) 메모 접기\n\t\t\t\t\t9 button 글자 크기 12px, 클릭하여 변경\n\t\t\t\t\t10 button 메모 편집\n\t\t\t\t\t11 button 파일로 저장\n\t\t\t\t\t12 button 본문 복사\n\t\t\t\t\t13 button 반대편으로 워프\n\t\t\t\t\t14 toggle button 상단 고정, Value: 1\n\t\t\t\t\t15 button 메모 숨기기\n\t\t\t\t\t16 button (disabled) 다음 도구\n\t\t\t\t17 container\n\t\t\t\t\t65 heading open34-3832b6 z\n\t\t\t\t\t66 text 본문 순서 검증\n\t\t\t\t\t67 heading open34-3832b6 visible update\n\t\t\t\t\t68 text 본문\n\t\t\t\t\t69 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t70 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t71 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t72 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t73 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t74 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t75 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t76 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t77 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t78 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t79 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t80 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t81 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t82 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t83 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t84 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t85 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t86 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t87 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t88 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t89 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t90 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t91 container, Text: 본문 순서 검증 본문\n\nThe focused UI element is 2 HTML content Agent Gibbon.",
+        "capture": "after-manual-preserved.png"
+      }
+    },
+    "manual_input_attempts": [
+      {
+        "delay_ms": 150,
+        "before": [
+          4520,
+          250,
+          600,
+          658
+        ],
+        "after": [
+          2320,
+          860,
+          600,
+          658
+        ],
+        "verified": true
+      }
+    ],
+    "front_before": "16242",
+    "front_after_cleanup": "16242",
+    "cleanup_errors": [],
+    "actual_e2e_binary_sha256": "c7616ac3482ee035656fe965e982508388fd93d9570182a96c5a1fd66682fe7a",
+    "post_e2e_review": "Non-macOS layout retains the original physical setters via cfg; the exercised macOS branch is unchanged. Host tests and Clippy were rerun after this guard."
+  },
+  "intermediate_failures": {
+    "first_after_pid": 45482,
+    "first_after_status": "Incomplete: a worker timed out, a flight stayed active; trace also contains interleaved JSON and is not a passing gate.",
+    "driver_stall_inspect": [
+      {
+        "id": "open34-f4a7bf-v",
+        "ok": true,
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "position": {
+          "x": 4520,
+          "y": 2232
+        },
+        "size": {
+          "height": 648,
+          "width": 600
+        },
+        "animating": false,
+        "layout_pending": false,
+        "layout_destination": null
+      },
+      {
+        "id": "open34-f4a7bf-w",
+        "ok": true,
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "position": {
+          "x": 4520,
+          "y": 1584
+        },
+        "size": {
+          "height": 648,
+          "width": 600
+        },
+        "animating": false,
+        "layout_pending": false,
+        "layout_destination": null
+      },
+      {
+        "id": "open34-f4a7bf-t",
+        "ok": true,
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "position": {
+          "x": 1324,
+          "y": 1324
+        },
+        "size": {
+          "height": 840,
+          "width": 600
+        },
+        "animating": true,
+        "layout_pending": false,
+        "layout_destination": {
+          "height": 840,
+          "width": 600,
+          "x": 3920,
+          "y": 890
+        }
+      }
+    ],
+    "cold_after_pid": 65167,
+    "cold_after_status": "Failed provenance inspect / smoke inspect timeout; not accepted as a passing E2E. Same PID later revalidated.",
+    "cold_load": {
+      "stored_notes": 82,
+      "main_placeholder": 1,
+      "cli_entries": 83
+    },
+    "cold_provenance_failure": {
+      "error": "앱 응답 시간이 초과되었습니다",
+      "ok": false
+    },
+    "sample": "/tmp/gibbon-issue43/after-final-sample.txt",
+    "sample_observation": "Main-thread samples included WebKit IPC and URLSchemeTask handling; this does not establish the cause of the startup latency.",
+    "late_frame_partial_recovery": [
+      {
+        "late": {
+          "data": {
+            "generation": "Instant { tv_sec: 833703, tv_nsec: 820507291 }"
+          },
+          "event": "frame-wait-late",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 65167,
+          "time_us": 1793812894620143,
+          "window": "note-issue43-progress"
+        },
+        "later_frames": 2,
+        "completed_after_late": false
+      },
+      {
+        "late": {
+          "data": {
+            "generation": "Instant { tv_sec: 833703, tv_nsec: 820507291 }"
+          },
+          "event": "frame-wait-late",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 65167,
+          "time_us": 1793812895812271,
+          "window": "note-issue43-progress"
+        },
+        "later_frames": 2,
+        "completed_after_late": false
+      },
+      {
+        "late": {
+          "data": {
+            "generation": "Instant { tv_sec: 833703, tv_nsec: 820507291 }"
+          },
+          "event": "frame-wait-late",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 65167,
+          "time_us": 1793812897685965,
+          "window": "note-issue43-progress"
+        },
+        "later_frames": 2,
+        "completed_after_late": false
+      },
+      {
+        "late": {
+          "data": {
+            "generation": "Instant { tv_sec: 833703, tv_nsec: 820507291 }"
+          },
+          "event": "frame-wait-late",
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "pid": 65167,
+          "time_us": 1793812915445897,
+          "window": "note-issue43-progress"
+        },
+        "later_frames": 0,
+        "completed_after_late": false
+      }
+    ],
+    "follow_up": "https://github.com/egoing/agent-gibbon/issues/44",
+    "cold_main_thread_excerpt": "cold-main-thread-sample.txt"
+  },
+  "commands": {
+    "npm run dev:build": "passed (build-final.log, latest non-macOS guard compiled)",
+    "npm run test": "84 Rust / 53 UI passed (test-final.log, after non-macOS guard)",
+    "npm run check": "passed (clippy-final.log, after non-macOS guard)",
+    "cargo fmt --manifest-path src-tauri/Cargo.toml --check": "passed",
+    "npm run version:check": "0.2.7",
+    "python3 scripts/open-order-smoke.py --pid 73759 --trace-file /tmp/gibbon-issue43/trace-after-controlled.jsonl --report-dir /tmp/gibbon-issue43/after-controlled": "exit 0 / 7 checks / 45 endpoint comparisons",
+    "python3 scripts/check-entrance-trace.py /tmp/gibbon-issue43/trace-after-controlled.jsonl --report /tmp/gibbon-issue43/trace-after-controlled-summary.json": "exit 0 / 613 frames / 0 interruptions / 0 unacknowledged positions / 0 final-size mismatches"
+  },
+  "confidence": 5,
+  "risk": "Medium",
+  "limits": [
+    "macOS arm64 single Retina display only",
+    "Windows/Intel/multiple monitors not executed",
+    "83-entry cold startup/CLI latency remains #44",
+    "Remote actions require the explicit supervisor approval recorded above"
+  ],
+  "cleanup": {
+    "stopped_owned_app_pids": [
+      2329,
+      5061,
+      45482,
+      65167,
+      73759
+    ],
+    "matching_owned_binary_processes": [],
+    "final_archive": "/tmp/gibbon-issue43/final-test-notes",
+    "final_archived_test_ids": [
+      "issue34-a-third",
+      "issue34-debug-a",
+      "issue34-debug-m",
+      "issue34-debug-o",
+      "issue34-debug-p",
+      "issue34-debug-z",
+      "issue34-m-second",
+      "issue34-z-first",
+      "open34-203e04-p",
+      "open34-203e04-q",
+      "open34-203e04-r",
+      "open34-203e04-s",
+      "open34-203e04-t",
+      "open34-203e04-u",
+      "open34-203e04-v",
+      "open34-203e04-w",
+      "open34-203e04-x",
+      "open34-203e04-y",
+      "open34-203e04-z",
+      "open34-3832b6-n",
+      "open34-3832b6-o",
+      "open34-3832b6-p",
+      "open34-3832b6-q",
+      "open34-3832b6-r",
+      "open34-3832b6-s",
+      "open34-3832b6-t",
+      "open34-3832b6-u",
+      "open34-3832b6-v",
+      "open34-3832b6-w",
+      "open34-3832b6-x",
+      "open34-3832b6-y",
+      "open34-3832b6-z",
+      "open34-935442-o",
+      "open34-935442-p",
+      "open34-935442-q",
+      "open34-935442-r",
+      "open34-935442-s",
+      "open34-935442-t",
+      "open34-935442-u",
+      "open34-935442-v",
+      "open34-935442-w",
+      "open34-935442-x",
+      "open34-935442-y",
+      "open34-935442-z",
+      "open34-b55005-o",
+      "open34-b55005-p",
+      "open34-b55005-q",
+      "open34-b55005-r",
+      "open34-b55005-s",
+      "open34-b55005-t",
+      "open34-b55005-u",
+      "open34-b55005-v",
+      "open34-b55005-w",
+      "open34-b55005-x",
+      "open34-b55005-y",
+      "open34-b55005-z"
+    ],
+    "intermediate_archive": "/tmp/gibbon-issue43/intermediate-test-notes",
+    "restored_load_removed": 43,
+    "final_test_notes_archived": 56,
+    "progress_storage": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-5a3840c5cf7b0e9d4b92dbc0/docs/issue43-progress/index.md",
+    "original_front_restored": "16242",
+    "pointer_restored": {
+      "x": 655.5,
+      "height": 1440,
+      "scale": 2,
+      "width": 2560,
+      "y": 1012.48046875
+    }
+  },
+  "remote_approval": {
+    "supervisor_message": "msg_29db4e80feb0",
+    "scope": "Push branch, create PR closing #34 and #43, merge after CI/mergeability checks pass; #44 remains open",
+    "status": "approved after final validation; publication result is reported through orchestration"
+  },
+  "final_build_binary_sha256": "f11d8e8456cb8338879ea2fc669c3e0c1bead31ec1dc184803d47b5056215b81"
+}

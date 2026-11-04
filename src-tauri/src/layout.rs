@@ -241,8 +241,14 @@ pub fn reflow(app: &tauri::AppHandle, opened: &WebviewWindow) -> Result<Destinat
         crate::warp::remember(app, &w, dest.position.y.into(), work_y, scale)?;
         if w.label() == opened.label() {
             entrance::cancel(&w)?;
-            w.set_size(dest.size).map_err(|e| e.to_string())?;
-            w.set_position(dest.position).map_err(|e| e.to_string())?;
+            #[cfg(target_os = "macos")]
+            entrance::place(&w, dest)?;
+            #[cfg(not(target_os = "macos"))]
+            {
+                // Keep the existing physical-coordinate path on other OSes.
+                w.set_size(dest.size).map_err(|e| e.to_string())?;
+                w.set_position(dest.position).map_err(|e| e.to_string())?;
+            }
             result = Some(dest);
         } else {
             entrance::transition(&w, dest)?;

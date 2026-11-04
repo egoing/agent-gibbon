@@ -7,11 +7,16 @@ guard CGPreflightPostEventAccess() else {
 }
 let offset = CommandLine.arguments.lastIndex(of: "--").map { $0 + 1 } ?? 1
 let args = Array(CommandLine.arguments.dropFirst(offset))
+var delay: useconds_t = 60000
+if let index = CommandLine.arguments.firstIndex(of: "--delay-ms"), index + 1 < offset {
+    guard let ms = UInt32(CommandLine.arguments[index + 1]), (10...1000).contains(ms) else { exit(64) }
+    delay = ms * 1000
+}
 let original = CGEvent(source: nil)!.location
 func point(_ offset: Int) -> CGPoint { CGPoint(x: Double(args[offset])!, y: Double(args[offset + 1])!) }
 func post(_ type: CGEventType, _ point: CGPoint) {
     CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left)!.post(tap: .cghidEventTap)
-    usleep(60000)
+    usleep(delay)
 }
 let start = point(1)
 post(.leftMouseDown, start)

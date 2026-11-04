@@ -28,16 +28,33 @@ def frame(state):
     return tuple(state['position'][k] for k in ('x', 'y')) + tuple(state['size'][k] for k in ('width', 'height'))
 
 
+def planned_frames(path, pid, instance, until_us):
+    plans = {}
+    # The writer may be appending the final record while this live reader runs.
+    for line in path.read_text().splitlines(keepends=True):
+        if not line.endswith('\n'):
+            continue
+        row = json.loads(line)
+        if row['pid'] != pid or row['instance'] != instance or row['time_us'] > until_us:
+            continue
+        if row['event'] in ('show', 'transition'):
+            d = row['data']
+            plans[row['window']] = {**d['destination'], **d['size']}
+    return plans
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--pid', type=int, required=True, help='dev PID started by this worker')
     parser.add_argument('--report-dir', type=Path, required=True)
+    parser.add_argument('--diagnostic-continue', action='store_true', help='record layout failures and continue to the 12-note re-inclusion stage; still exits nonzero')
+    parser.add_argument('--trace-file', type=Path, help='also require actual final frames to equal this PID/instance-bound entrance trace plans')
     args = parser.parse_args()
     folder = args.report_dir.resolve()
     folder.mkdir(parents=True, exist_ok=True)
     info = json.loads(run('node', ROOT / 'scripts/dev.mjs', 'info'))
     assert run('ps', '-p', args.pid, '-o', 'comm=').strip() == info['binary']
-    log = {'origin': info, 'pid': args.pid, 'checks': [], 'states': {}, 'captures': {}, 'opens': []}
+    log = {'origin': info, 'pid': args.pid, 'checks': [], 'states': {}, 'captures': {}, 'opens': [], 'layout_violations': [], 'plans': {}, 'snapshot_time_us': {}}
     prefix = 'open34-' + uuid.uuid4().hex[:6]
     ids, windows = [], {}
     original_front = front()
@@ -61,14 +78,19 @@ def main():
         return cli('inspect', note)
 
     def settled():
-        for _ in range(100):
+        deadline = time.monotonic() + 20
+        while time.monotonic() < deadline:
             states = [inspect(note) for note in ids]
             if all(not s['animating'] and not s['layout_pending'] for s in states):
                 return states
             time.sleep(.1)
-        raise AssertionError('layout did not settle')
+        log['unsettled'] = states
+        raise AssertionError('layout did not settle within 20 seconds')
 
     def check(name):
+        if log['layout_violations']:
+            print('OBSERVED (earlier layout failures remain):', name, flush=True)
+            return
         log['checks'].append(name)
         print('PASS:', name, flush=True)
 
@@ -114,14 +136,33 @@ def main():
     def assert_order(expected, name):
         states = {n: inspect(n) for n in expected}
         log['states'][name] = states
-        assert all(s['visible'] and not s['auto_layout_excluded'] for s in states.values())
+        now = time.time_ns() // 1000
+        log['snapshot_time_us'][name] = now
+        violations = []
+        if args.trace_file:
+            plans = planned_frames(args.trace_file, args.pid, info['id'], now)
+            log['plans'][name] = {n: plans.get('note-' + n) for n in expected}
+            for note, state in states.items():
+                plan = plans.get('note-' + note)
+                actual_frame = {**state['position'], **state['size']}
+                if plan is None or actual_frame != plan:
+                    violations.append({'destination_mismatch': note, 'actual': actual_frame, 'planned': plan})
+        if not all(s['visible'] and not s['auto_layout_excluded'] for s in states.values()):
+            violations.append('visibility/exclusion mismatch')
         actual = sorted(expected, key=lambda n: (-states[n]['position']['x'], states[n]['position']['y']))
-        assert actual == expected, (actual, expected)
+        if actual != expected:
+            violations.append({'actual_order': actual, 'expected_order': expected})
         for i, note in enumerate(expected):
             x, y, w, h = frame(states[note])
             for other in expected[:i]:
                 X, Y, W, H = frame(states[other])
-                assert not (x < X + W and X < x + w and y < Y + H and Y < y + h)
+                if x < X + W and X < x + w and y < Y + H and Y < y + h:
+                    violations.append({'overlap': [note, other]})
+        if violations:
+            log['layout_violations'].append({'stage': name, 'violations': violations})
+            if not args.diagnostic_continue:
+                raise AssertionError(violations)
+            print('LAYOUT FAILURE (continuing diagnostics):', name, violations, flush=True)
 
     try:
         expected = [open_note(suffix) for suffix in ('z', 'y', 'x', 'w', 'v', 'u')]
@@ -167,14 +208,20 @@ def main():
         # Orca supplies the PID/window/body-bound before/after GUI evidence.
         mouse = folder / 'mouse'
         subprocess.run(['swiftc', str(ROOT / 'scripts/macos-input.swift'), '-o', str(mouse)], check=True)
-        state = inspect(first)
         scale = original_pointer['scale']
-        x, y, w, h = [v / scale for v in frame(state)]
-        move(x + 40, y + 70)
-        run(mouse, 'drag', x + 40, y + 70, 1200, 500)
-        time.sleep(.3)
-        obstacle = inspect(first)
-        assert obstacle['auto_layout_excluded'] and frame(obstacle) != frame(state), obstacle
+        log['manual_input_attempts'] = []
+        for delay in (150, 350, 700):
+            state = inspect(first)
+            x, y, w, h = [v / scale for v in frame(state)]
+            move(x + 40, y + 70)
+            run(mouse, '--delay-ms', delay, '--', 'drag', x + 40, y + 70, 1200, 500)
+            time.sleep(.3)
+            obstacle = inspect(first)
+            moved = obstacle['auto_layout_excluded'] and frame(obstacle) != frame(state)
+            log['manual_input_attempts'].append({'delay_ms': delay, 'before': frame(state), 'after': frame(obstacle), 'verified': moved})
+            if moved:
+                break
+        assert moved, log['manual_input_attempts']
         capture(first, 'manual-obstacle')
         expected.remove(first)
         focus_before = front()
@@ -204,19 +251,32 @@ def main():
         expected.append(open_note('n'))
         assert not inspect(remaining)['visible'] and frame(inspect(remaining)) == saved
         check('unrelated hidden note remains hidden and keeps geometry across later opens')
+        if log['layout_violations']:
+            raise AssertionError(log['layout_violations'])
         log['outcome'] = 'passed'
     except BaseException as error:
         log['outcome'] = 'failed'
         log['error'] = repr(error)
         raise
     finally:
+        # Preserve the primary failure even when cleanup IPC also times out.
+        (folder / 'live.json').write_text(json.dumps(log, ensure_ascii=False, indent=2))
+        log['cleanup_errors'] = []
         for note in ids:
-            cli('close', note)
+            try:
+                cli('close', note)
+            except Exception as error:
+                log['cleanup_errors'].append({'id': note, 'error': repr(error)})
         move(original_pointer['x'], original_pointer['y'])
         subprocess.run(['osascript', '-e', f'tell application "System Events" to set frontmost of (first application process whose unix id is {original_front}) to true'], capture_output=True)
         log['front_before'] = original_front
         log['front_after_cleanup'] = front()
+        if log['cleanup_errors'] and log.get('outcome') == 'passed':
+            log['outcome'] = 'failed'
+            log['error'] = 'cleanup IPC failed'
         (folder / 'live.json').write_text(json.dumps(log, ensure_ascii=False, indent=2))
+    if log['cleanup_errors']:
+        raise AssertionError(log['cleanup_errors'])
 
 
 if __name__ == '__main__':
