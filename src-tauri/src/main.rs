@@ -54,10 +54,13 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
     config.label = label(id);
     config.title = format!("{} — {id}", instance::current().title());
     focus::remember(app, &config.label);
-    tauri::WebviewWindowBuilder::from_config(app, &config)
+    let win = tauri::WebviewWindowBuilder::from_config(app, &config)
         .map_err(|e| e.to_string())?
         .build()
-        .map_err(|e| e.to_string())
+        .map_err(|e| e.to_string())?;
+    // Region-created notes also have a stable place if later re-included.
+    layout::register(&win, true);
+    Ok(win)
 }
 // Called only on Tauri's main thread. macOS `show()` makes the window key;
 // ordering it front directly preserves the user's active application.
@@ -357,6 +360,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(feedback_window::Surfaces::default())
         .manage(entrance::Entrances::default())
         .manage(layout::Exclusions::default())
+        .manage(layout::OpenOrder::default())
         .manage(sizing::Sizes::default())
         .manage(Mutex::new(BTreeMap::from([(
             "main".to_string(),

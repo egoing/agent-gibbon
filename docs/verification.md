@@ -980,3 +980,43 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 ### 최종 병합 검증 — 2026-11-04
 
 원격 main의 메모 관리 창 변경(93c66da)을 MVP에 통합했다. 명령 등록과 네이티브 이벤트/접촉 제외 조건의 충돌을 두 기능 모두 유지하도록 해결했다. agent-terminal-mvp 루트에서 npm test(Rust 72개·UI 53개), npm run check, npm run dev:build 통과. 실제 입력기 한글 조합과 신규 공통 패널 전체 조작의 최종 실환경 검증은 남아 있다. 성능 후속 작업은 GitHub #18과 하위 #17, #19~#25에서 관리한다.
+
+## 새 창 열기 순서 #34 — 2026-11-05
+
+### 출처와 수정 전 재현
+
+- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order`.
+- 기준 HEAD: `f9fb944c4e3f039b9bbed0ea7a25a913dba96f2c`. 시작 시 미커밋 변경 없음. 아래 통합 전 검증은 해당 기준 위의 이번 변경으로 수행했다.
+- `npm run dev:info`: root는 위 경로, instance `dev-5a3840c5cf7b0e9d4b92dbc0`, binary는 위 루트의 `src-tauri/target/debug/agent-gibbon` 절대 경로. macOS arm64, Rust 1.91.1, Node v24.21.0, Tauri 2.12.2, 단일 Retina 2560×1440 논리 px(배율 2).
+- 모든 앱 통신은 이 루트의 `scripts/agent-gibbon-dev`로 실행했다. `inspect.ok=true`, 응답 instance 일치, ID와 본문 고유 표식을 확인하고 `ps -p <PID> -o comm=`의 절대 바이너리 경로를 대조했다.
+- 수정 전 자체 시작 PID **23841**에서 `issue34-z-first` → `issue34-m-second` → `issue34-a-third`를 순서대로 열었다. 최종 물리 좌표는 모두 x=4520, y가 각각 **480 / 148 / 50**으로 새 A가 앞에 삽입됐다. 진행 메모가 함께 표시 중이었지만 세 검증 창 사이의 역전은 명확하다.
+- `orca computer get-app-state --app pid:23841 --window-id 32441 --json`과 새 창 ID **32445**의 제목·본문 `OPEN34 BEFORE 1 Z` / `OPEN34 BEFORE 3 A`를 대조했다. [첫 창 캡처](verification/open-order-20261105/before-first.png) · [새 창 캡처](verification/open-order-20261105/before-third.png). 캡처는 개별 창이며 전체 화면 합성으로 배치를 주장하지 않는다. 실제 위치는 JSON/네이티브 창 좌표와 함께 확인한다.
+
+### 구현과 통합 전 검증
+
+창 ID 정렬을 세션의 열기 요청 순서로 바꿨다. 비동기 콘텐츠 측정 전에 순서를 예약하며 이미 열린 창/측정 대기 중 반복 열기는 유지한다. 숨긴 창 복원은 마지막에 추가하고 나머지 상대 순서를 보존한다. 영역 생성 창도 등록해 이후 재포함할 때 일관된 순서를 사용한다. 순서 정보는 저장 파일에 추가하지 않는다. 기준과 시안은 [디자인 시스템](design-system.md#메모-자동-배치--확정-2026-11-04) · [SVG](design/placement-zero-gap.svg) · [PNG](design/placement-zero-gap.png)를 함께 갱신했다.
+
+수정 빌드로 재시작한 자체 PID **31059**를 다시 확인했다. `open34-<고유값>-z/y/x/w/v/u`를 역순 ID로 열어 오른쪽 위→아래→왼쪽 열 순서와 겹침 없음을 확인했다. 모든 GUI 캡처는 PID, 정확한 네이티브 제목, CGWindow ID, `inspect` 고유 본문과 대조했다. Orca `list-windows`가 테두리 없는 창을 누락하고 기본 선택이 포커스된 이전 창을 반환하는 경우가 있어, 기존 `auto-layout-native.swift`로 PID/정확한 제목의 ID를 구한 뒤 Orca에 `--window-id`를 지정했다. 잘못 선택된 초기 캡처는 통과로 집계하지 않았다.
+
+| 명령/검증 | 통합 전 결과 |
+|---|---|
+| `npm run test` | Rust **75개**, UI **53개** 통과. 역순 ID·숨김 복원·열 넘김 순서 회귀 3개 추가 |
+| `npm run dev:build` | 성공, 해당 바이너리로 위 PID를 재시작해 실제 확인 |
+| `npm run check` | Clippy, 경고 오류 처리 통과 |
+| `cargo fmt --manifest-path src-tauri/Cargo.toml --check` | 통과 |
+| `npm run version:check` / Python 구문 / `git diff --check` | 0.2.7 일치 / 통과 / 통과 |
+| `python3 scripts/open-order-smoke.py --pid 31059 --report-dir /tmp/gibbon-issue34/after-retry` | 역순 순차 열기·왼쪽 열 넘김·연속 열기·가시 창 갱신/재열기 불변·숨김 갱신 보존/복원 마지막 합류·실제 드래그 제외/장애물 보존 통과 |
+| 포커스 | 외부 앱 PID 16242 유지, 실제 드래그 후에는 검증 메모의 키보드 포커스를 이후 새 열기가 보존. 검사 종료 후 원래 포인터/앱 복원 |
+| 시안 | `rsvg-convert docs/design/placement-zero-gap.svg -o docs/design/placement-zero-gap.png`, 렌더링 육안 확인 |
+
+[정량 증거 JSON](verification/open-order-20261105/report.json)에 수정 전후 root/instance/binary/PID/창 ID/본문 표식·좌표·크기·포커스·검사 결과를 보관했다. [수정 후 첫 창](verification/open-order-20261105/opened-z.png) · [연속 열기의 마지막 창](verification/open-order-20261105/after-last.png) · [복원된 마지막 창](verification/open-order-20261105/restored-tail.png) · [수동 배치 보존](verification/open-order-20261105/manual-preserved.png). 원본 로그는 `/tmp/gibbon-issue34/`에 있으며 재실행 시 같은 폴더를 덮어쓰지 않는다.
+
+### 추가 발견·후속 후보
+
+- **다중 창 재포함 후 전환 중단 의심**: 추가한 12개 가시 창 검사에서 첫 창을 실제 드래그→다음 창 열기→첫 창 내용 갱신으로 재포함→새 창 열기 했을 때 한 번 최종 좌표 순서가 어긋났다. 새 창 `open34-935442-o`도 커서 인근 물리 좌표 (1324,1324), `animating=false`로 관측됐다. 원인은 확정하지 않았으며 순서 기록 결함/기존 전환 처리/검사 부하 중 어느 것인지 단정하지 않는다.
+- 실패 원본: `/tmp/gibbon-issue34/after-final/live.json`, `/tmp/gibbon-issue34/live-after-final.log`; 핵심 상태와 실패 내용은 위 정량 증거 JSON의 `additional_stress_failure`에 남겼다. 별도 5창 격리 실험(`/tmp/gibbon-issue34/debug-reinclude.json`)에서는 재포함된 첫 창이 정상 첫 위치로 돌아갔다. 실패를 통과로 집계하거나 비재현으로 종결하지 않았다.
+- 영향: 여러 메모가 보이는 상태에서 자동 배치 복귀가 중간 프레임에 남을 가능성. 후속 완료 기준: 12창 이상의 재포함·연속 열기에서 실제 최종 좌표가 계산 목적지와 일치하고 전체 상대 순서·겹침 없음·포커스를 보존하며, 전환 중단 원인을 판별하는 증거를 확보한다. 감독자가 중복 확인 후 후속 이슈 발행·순서를 결정한다.
+
+### 범위와 남은 검증
+
+통합 전 핵심 실제 동작은 확인했지만 추가 스트레스 실패는 미해결이다. CLI 숨김 복원은 실제 확인했으며 메뉴/Dock은 동일 준비 경로를 쓰는 코드 검토 범위다. Windows·Intel Mac·복수 모니터·배포 설치본·교차 워크트리 격리 재검증은 미실행이다. 최신 main `661d834`가 같은 창 처리 파일들을 변경했으므로 감독자 지시에 따라 현재 범위 커밋 후 병합·재검증할 예정이다. 현 단계 Conf 5(위에서 실제 통과한 macOS 핵심 범위) / Risk Medium이며 전체 스트레스 회귀 완료를 뜻하지 않는다.

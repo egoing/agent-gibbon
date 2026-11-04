@@ -58,10 +58,9 @@ pub fn prepare(
     window: &WebviewWindow,
     presentation: crate::entrance::Presentation,
 ) -> Result<(), String> {
-    if window.is_visible().map_err(|e| e.to_string())?
-        || image_size(window).is_some()
-        || folded(window)
-    {
+    let visible = window.is_visible().map_err(|e| e.to_string())?;
+    crate::layout::register(window, visible || pending(window));
+    if visible || image_size(window).is_some() || folded(window) {
         return crate::entrance::show(window, None, presentation);
     }
     window

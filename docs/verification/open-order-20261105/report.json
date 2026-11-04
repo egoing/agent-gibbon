@@ -1,0 +1,1163 @@
+{
+  "base_head": "f9fb944c4e3f039b9bbed0ea7a25a913dba96f2c",
+  "origin": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order",
+    "id": "dev-5a3840c5cf7b0e9d4b92dbc0",
+    "name": "egoing/issue-34-open-order",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order/src-tauri/target/debug/agent-gibbon"
+  },
+  "before": {
+    "pid": 23841,
+    "open_order": [
+      "issue34-z-first",
+      "issue34-m-second",
+      "issue34-a-third"
+    ],
+    "states": {
+      "issue34-z-first": {
+        "ok": true,
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "id": "issue34-z-first",
+        "position": {
+          "x": 4520,
+          "y": 480
+        },
+        "size": {
+          "height": 98,
+          "width": 600
+        },
+        "visible": true,
+        "focused": false,
+        "auto_layout_excluded": false,
+        "animating": false,
+        "layout_pending": false,
+        "layout_destination": null,
+        "content_height_cap": 49.0,
+        "always_on_top": true,
+        "body_marker": "# OPEN34 BEFORE 1 Z"
+      },
+      "issue34-m-second": {
+        "ok": true,
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "id": "issue34-m-second",
+        "position": {
+          "x": 4520,
+          "y": 148
+        },
+        "size": {
+          "height": 98,
+          "width": 600
+        },
+        "visible": true,
+        "focused": false,
+        "auto_layout_excluded": false,
+        "animating": false,
+        "layout_pending": false,
+        "layout_destination": null,
+        "content_height_cap": 49.0,
+        "always_on_top": true,
+        "body_marker": "# OPEN34 BEFORE 2 M"
+      },
+      "issue34-a-third": {
+        "ok": true,
+        "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+        "id": "issue34-a-third",
+        "position": {
+          "x": 4520,
+          "y": 50
+        },
+        "size": {
+          "height": 98,
+          "width": 600
+        },
+        "visible": true,
+        "focused": false,
+        "auto_layout_excluded": false,
+        "animating": false,
+        "layout_pending": false,
+        "layout_destination": null,
+        "content_height_cap": 49.0,
+        "always_on_top": true,
+        "body_marker": "# OPEN34 BEFORE 3 A"
+      }
+    },
+    "gui": {
+      "before-first": {
+        "window": {
+          "id": 32441,
+          "isOffscreen": false,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — issue34-z-first",
+          "x": 2260,
+          "width": 300,
+          "screenIndex": 0,
+          "platform": {
+            "layer": 5
+          },
+          "height": 49,
+          "y": 240,
+          "isMinimized": false
+        },
+        "treeText": "App=agent-gibbon (pid 23841)\nWindow: \"Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — issue34-z-first\", App: agent-gibbon.\n\n0 standard window Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — issue34-z-first\n\t1 scroll area\n\t\t2 HTML content Agent Gibbon\n\t\t\t3 container Agent Gibbon\n\t\t\t\t4 toolbar Toolbar\n\t\t\t\t\t5 button (disabled) 이전 도구\n\t\t\t\t\t6 container DEV egoing/issue-34-open-order · 5a3840c5\n\t\t\t\t\t\t20 text DEV\n\t\t\t\t\t8 button (expanded) 메모 접기\n\t\t\t\t\t9 button 글자 크기 12px, 클릭하여 변경\n\t\t\t\t\t10 button 메모 편집\n\t\t\t\t\t11 button 파일로 저장\n\t\t\t\t\t12 button 본문 복사\n\t\t\t\t\t13 button 반대편으로 워프\n\t\t\t\t\t14 toggle button 상단 고정, Value: 1\n\t\t\t\t\t15 button 메모 숨기기\n\t\t\t\t\t16 button (disabled) 다음 도구\n\t\t\t\t17 container\n\t\t\t\t\t18 heading OPEN34 BEFORE 1 Z\n\t\t\t\t\t19 text 첫 번째 · ID 역순 검증\n\nNo UI element is currently focused."
+      },
+      "before-third": {
+        "window": {
+          "screenIndex": 0,
+          "id": 32445,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — issue34-a-third",
+          "height": 49,
+          "isMinimized": false,
+          "y": 25,
+          "x": 2260,
+          "width": 300,
+          "isOffscreen": false,
+          "platform": {
+            "layer": 5
+          }
+        },
+        "treeText": "App=agent-gibbon (pid 23841)\nWindow: \"Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — issue34-a-third\", App: agent-gibbon.\n\n0 standard window Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — issue34-a-third\n\t1 scroll area\n\t\t2 HTML content Agent Gibbon\n\t\t\t3 container Agent Gibbon\n\t\t\t\t4 toolbar Toolbar\n\t\t\t\t\t5 button (disabled) 이전 도구\n\t\t\t\t\t6 container DEV egoing/issue-34-open-order · 5a3840c5\n\t\t\t\t\t\t7 text DEV\n\t\t\t\t\t8 button (expanded) 메모 접기\n\t\t\t\t\t9 button 글자 크기 12px, 클릭하여 변경\n\t\t\t\t\t10 button 메모 편집\n\t\t\t\t\t11 button 파일로 저장\n\t\t\t\t\t12 button 본문 복사\n\t\t\t\t\t13 button 반대편으로 워프\n\t\t\t\t\t14 toggle button 상단 고정, Value: 1\n\t\t\t\t\t15 button 메모 숨기기\n\t\t\t\t\t16 button (disabled) 다음 도구\n\t\t\t\t17 container\n\t\t\t\t\t18 heading OPEN34 BEFORE 3 A\n\t\t\t\t\t19 text 세 번째 · 마지막 다음이어야 함\n\nNo UI element is currently focused."
+      }
+    }
+  },
+  "after_before_integration": {
+    "pid": 31059,
+    "checks": [
+      "reverse IDs: sequential open order, left-column wrap, no overlap, focus preserved",
+      "visible reopen/content update preserve order and geometry",
+      "hidden update stays hidden; restore joins tail and preserves other relative order",
+      "rapid opens retarget transitions without reordering; focus preserved",
+      "native manual drag excluded; new open preserves obstacle geometry and current user focus",
+      "unrelated hidden note remains hidden and keeps geometry across later opens"
+    ],
+    "states": {
+      "sequential": {
+        "open34-b55005-z": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-z",
+          "position": {
+            "x": 4520,
+            "y": 250
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 z"
+        },
+        "open34-b55005-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-y",
+          "position": {
+            "x": 4520,
+            "y": 908
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 y"
+        },
+        "open34-b55005-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-x",
+          "position": {
+            "x": 4520,
+            "y": 1566
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 x"
+        },
+        "open34-b55005-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-w",
+          "position": {
+            "x": 4520,
+            "y": 2224
+          },
+          "size": {
+            "height": 656,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 w"
+        },
+        "open34-b55005-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-v",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 v"
+        },
+        "open34-b55005-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-u",
+          "position": {
+            "x": 3920,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 u"
+        }
+      },
+      "restored-tail": {
+        "open34-b55005-z": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-z",
+          "position": {
+            "x": 4520,
+            "y": 250
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 visible update"
+        },
+        "open34-b55005-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-x",
+          "position": {
+            "x": 4520,
+            "y": 908
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 x"
+        },
+        "open34-b55005-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-w",
+          "position": {
+            "x": 4520,
+            "y": 1566
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 w"
+        },
+        "open34-b55005-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-v",
+          "position": {
+            "x": 4520,
+            "y": 2224
+          },
+          "size": {
+            "height": 656,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 v"
+        },
+        "open34-b55005-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-u",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 u"
+        },
+        "open34-b55005-t": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-t",
+          "position": {
+            "x": 3920,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 t"
+        },
+        "open34-b55005-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-y",
+          "position": {
+            "x": 3920,
+            "y": 1730
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 hidden update"
+        }
+      },
+      "rapid": {
+        "open34-b55005-z": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-z",
+          "position": {
+            "x": 4520,
+            "y": 250
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 visible update"
+        },
+        "open34-b55005-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-x",
+          "position": {
+            "x": 4520,
+            "y": 908
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 x"
+        },
+        "open34-b55005-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-w",
+          "position": {
+            "x": 4520,
+            "y": 1566
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 w"
+        },
+        "open34-b55005-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-v",
+          "position": {
+            "x": 4520,
+            "y": 2224
+          },
+          "size": {
+            "height": 656,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 v"
+        },
+        "open34-b55005-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-u",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 u"
+        },
+        "open34-b55005-t": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-t",
+          "position": {
+            "x": 3920,
+            "y": 758
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 t"
+        },
+        "open34-b55005-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-y",
+          "position": {
+            "x": 3920,
+            "y": 1466
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 hidden update"
+        },
+        "open34-b55005-s": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-s",
+          "position": {
+            "x": 3920,
+            "y": 2174
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 s"
+        },
+        "open34-b55005-r": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-r",
+          "position": {
+            "x": 3320,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 r"
+        },
+        "open34-b55005-q": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-q",
+          "position": {
+            "x": 3320,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 q"
+        }
+      },
+      "manual-excluded": {
+        "open34-b55005-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-x",
+          "position": {
+            "x": 4520,
+            "y": 250
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 x"
+        },
+        "open34-b55005-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-w",
+          "position": {
+            "x": 4520,
+            "y": 908
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 w"
+        },
+        "open34-b55005-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-v",
+          "position": {
+            "x": 4520,
+            "y": 1566
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 v"
+        },
+        "open34-b55005-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-u",
+          "position": {
+            "x": 4520,
+            "y": 2224
+          },
+          "size": {
+            "height": 656,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 u"
+        },
+        "open34-b55005-t": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-t",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 t"
+        },
+        "open34-b55005-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-y",
+          "position": {
+            "x": 3920,
+            "y": 758
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 hidden update"
+        },
+        "open34-b55005-s": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-s",
+          "position": {
+            "x": 3920,
+            "y": 1466
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 s"
+        },
+        "open34-b55005-r": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-r",
+          "position": {
+            "x": 3920,
+            "y": 2174
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 r"
+        },
+        "open34-b55005-q": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-q",
+          "position": {
+            "x": 3320,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 q"
+        },
+        "open34-b55005-p": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-p",
+          "position": {
+            "x": 3320,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 p"
+        }
+      }
+    },
+    "captures": {
+      "opened-z": {
+        "window": {
+          "width": 300,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-b55005-z",
+          "screenIndex": 0,
+          "height": 420,
+          "x": 2260,
+          "id": 32500,
+          "y": 125,
+          "isMinimized": false,
+          "platform": {
+            "layer": 5
+          },
+          "isOffscreen": false
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-z",
+          "position": {
+            "x": 4520,
+            "y": 250
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 z"
+        }
+      },
+      "after-last": {
+        "window": {
+          "isOffscreen": false,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-b55005-q",
+          "height": 420,
+          "platform": {
+            "layer": 5
+          },
+          "x": 1660,
+          "y": 445,
+          "screenIndex": 0,
+          "width": 300,
+          "isMinimized": false,
+          "id": 32527
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-q",
+          "position": {
+            "x": 3320,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 q"
+        }
+      },
+      "restored-tail": {
+        "window": {
+          "y": 865,
+          "width": 300,
+          "isMinimized": false,
+          "screenIndex": 0,
+          "height": 420,
+          "platform": {
+            "layer": 5
+          },
+          "id": 32503,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-b55005-y",
+          "isOffscreen": false,
+          "x": 1960
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-y",
+          "position": {
+            "x": 3920,
+            "y": 1730
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 hidden update"
+        }
+      },
+      "manual-preserved": {
+        "window": {
+          "isMinimized": false,
+          "x": 1160,
+          "id": 32500,
+          "platform": {
+            "layer": 5
+          },
+          "y": 430,
+          "isOffscreen": false,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-b55005-z",
+          "width": 300,
+          "height": 329,
+          "screenIndex": 0
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-b55005-z",
+          "position": {
+            "x": 2320,
+            "y": 860
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "auto_layout_excluded": true,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-b55005 visible update"
+        }
+      }
+    },
+    "front_before": "16242",
+    "front_after_cleanup": "16242"
+  },
+  "commands": {
+    "npm run test": "75 Rust / 53 UI passed",
+    "npm run dev:build": "passed",
+    "npm run check": "passed",
+    "cargo fmt --manifest-path src-tauri/Cargo.toml --check": "passed",
+    "npm run version:check": "0.2.7",
+    "git diff --check": "passed"
+  },
+  "integration": "pending: origin/main 661d834",
+  "additional_stress_failure": {
+    "pid": 31059,
+    "checks_before_failure": [
+      "reverse IDs: sequential open order, left-column wrap, no overlap, focus preserved",
+      "visible reopen/content update preserve order and geometry",
+      "hidden update stays hidden; restore joins tail and preserves other relative order",
+      "rapid opens retarget transitions without reordering; focus preserved",
+      "native manual drag excluded; new open preserves obstacle geometry and current user focus"
+    ],
+    "error": "AssertionError((['open34-935442-x', 'open34-935442-w', 'open34-935442-v', 'open34-935442-z', 'open34-935442-u', 'open34-935442-t', 'open34-935442-y', 'open34-935442-s', 'open34-935442-r', 'open34-935442-q', 'open34-935442-p', 'open34-935442-o'], ['open34-935442-z', 'open34-935442-x', 'open34-935442-w', 'open34-935442-v', 'open34-935442-u', 'open34-935442-t', 'open34-935442-y', 'open34-935442-s', 'open34-935442-r', 'open34-935442-q', 'open34-935442-p', 'open34-935442-o']))",
+    "captures": {
+      "manual-obstacle": {
+        "window": {
+          "y": 430,
+          "height": 329,
+          "isMinimized": false,
+          "screenIndex": 0,
+          "width": 300,
+          "x": 1160,
+          "isOffscreen": false,
+          "id": 32542,
+          "platform": {
+            "layer": 5
+          },
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-935442-z"
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-935442-z",
+          "position": {
+            "x": 2320,
+            "y": 860
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "auto_layout_excluded": true,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-935442 visible update"
+        }
+      },
+      "manual-preserved": {
+        "window": {
+          "isMinimized": false,
+          "height": 329,
+          "id": 32542,
+          "y": 430,
+          "width": 300,
+          "isOffscreen": false,
+          "x": 1160,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-935442-z",
+          "screenIndex": 0,
+          "platform": {
+            "layer": 5
+          }
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-935442-z",
+          "position": {
+            "x": 2320,
+            "y": 860
+          },
+          "size": {
+            "height": 658,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "auto_layout_excluded": true,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-935442 visible update"
+        }
+      },
+      "opened-o": {
+        "window": {
+          "width": 300,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-935442-o",
+          "isOffscreen": false,
+          "platform": {
+            "layer": 5
+          },
+          "height": 353,
+          "id": 32581,
+          "y": 662,
+          "x": 662,
+          "isMinimized": false,
+          "screenIndex": 0
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-935442-o",
+          "position": {
+            "x": 1324,
+            "y": 1324
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "body_marker": "# open34-935442 o"
+        }
+      }
+    },
+    "raw_local": "/tmp/gibbon-issue34/after-final/live.json",
+    "note": "12 visible notes with re-inclusion: a transition stopped at an intermediate location; cause not established. Isolated 5-note re-inclusion succeeded, see /tmp/gibbon-issue34/debug-reinclude.json."
+  }
+}
