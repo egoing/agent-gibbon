@@ -857,6 +857,27 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - 제목 흐림 후속 보정: 열린 항목의 attributed title을 nil로 초기화하고 적용 시점의 가시성을 조회한다. 빌드·Rust 69개 통과. 동일 작업 루트의 PID 71421로 재시작하고 기존 열린 메모 3개의 위치·크기를 AX로 복원했다. inspect main의 instance를 재확인했다. 실제 메뉴 색상 육안 검증은 미완료다.
 - 커밋 전 최종 검증: Rust 69개·UI 50개 테스트, Clippy 전체 대상 경고 없음, Rustfmt 및 git diff 검사 통과. 실제 메뉴 육안 검증의 기존 한계는 유지한다.
 
+
+## 관리 창 최소 구현 (2026-11-04)
+
+- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/manager`
+- `npm run dev:info` instance: `dev-982ea77b921faa21fd43bf4d`
+- binary: 위 루트의 `src-tauri/target/debug/agent-gibbon`
+- `npm test`: Rust 69개, UI 51개 통과. `npm run dev:build`, `node --check ui/manager.js`, Rustfmt 통과.
+- 개발 CLI의 `open / close / inspect / update / inspect`로 `manager-smoke-1104` 검증. 응답 `ok: true`와 instance 일치, 본문 갱신, 숨김과 위치 보존 확인. 검증 메모는 숨김 상태로 남김.
+- GUI 조작과 캡처는 미실행. 관리 창 선택·설정 복귀는 mock DOM 검사이며 실제 WebView 실행 검증으로 간주하지 않는다. Windows·Intel 미검증.
+
+- 후속 정적 검사: `npm run check`(Clippy, 경고 오류 처리) 통과.
+
+
+### 관리 창 제목·불투명 보정
+
+- 같은 루트·instance에서 Rust 70개, UI 51개, 개발 빌드, Clippy 통과.
+- `orca computer list-windows --app pid:52970 --json`에서 window 29645, 제목 `Agent Gibbon [DEV egoing/manager · 982ea77b] — 메모 관리`, native alpha 0.5로 수정 전 문제 확인.
+- 현재 프로세스는 수정 전 빌드다. 사용자 메모가 표시 중이므로 자동 종료하지 않았다. 수정 후 실제 alpha·GUI는 미검증.
+
+- 재실행 검증: 사용자 요청으로 기존 개발 PID 52970만 종료하고 같은 워크트리 개발 CLI로 재실행했다. inspect instance `dev-982ea77b921faa21fd43bf4d` 확인. 새 PID 62385, 관리 창 ID 29698의 native alpha 1 확인. 접근성 트리에서 본문 첫 텍스트 기반 목록 제목과 선택한 상세 헤더, 새로고침 버튼을 확인했다. 이미지·Windows 검증은 미실행이다.
+
 ## 화면 가장자리·메모 간격 0px (2026-11-04)
 
 - 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/position`
@@ -955,3 +976,7 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 사용자 보고로 기본 모드에서도 자모 분리 현상이 남음을 확인했다. WebKit fallback을 추가해 input/insertReplacementText의 임시 textarea 내용을 PTY로 보내지 않고 조합 표시로 유지한다. 독립 WKWebView에 실제 번들 xterm과 adapter를 로드한 합성 이벤트 시험: ㅎ→하→한→한ㄱ→한그→한글 중 output=[], 공백 확정 후 output=['한글 '], 새 ㅎ 후 Ctrl+C 취소 시 추가 한글 전송 없음. 이는 실제 IME/키보드 검증을 대체하지 않는다. 입력 내용은 로깅하지 않는다.
 
 터미널 HTML에 공통 memo-surface/style.css/toolbar.js와 메모의 아이콘·페이지 이동·8방향 크기 핸들을 적용했다. 글자 크기/선택 복사/상단 고정/숨기기 지원. 개발 빌드와 UI 테스트 및 JS 구문 검사를 수행했다. 사용자 세션을 보존하기 위해 재시작하지 않아 새 패널·IME는 아직 실행 앱 미적용이다.
+
+### 최종 병합 검증 — 2026-11-04
+
+원격 main의 메모 관리 창 변경(93c66da)을 MVP에 통합했다. 명령 등록과 네이티브 이벤트/접촉 제외 조건의 충돌을 두 기능 모두 유지하도록 해결했다. agent-terminal-mvp 루트에서 npm test(Rust 72개·UI 53개), npm run check, npm run dev:build 통과. 실제 입력기 한글 조합과 신규 공통 패널 전체 조작의 최종 실환경 검증은 남아 있다. 성능 후속 작업은 GitHub #18과 하위 #17, #19~#25에서 관리한다.
