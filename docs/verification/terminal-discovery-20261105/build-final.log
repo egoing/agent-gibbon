@@ -1,0 +1,6 @@
+
+> agent-gibbon@0.2.7 dev:build
+> node scripts/dev.mjs build
+
+   Compiling agent-gibbon v0.2.7 (/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12.88s

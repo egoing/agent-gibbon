@@ -1,0 +1,104 @@
+{
+  "stopped_own_pids": [
+    50183,
+    50334,
+    50493,
+    60923,
+    62412,
+    62893,
+    63034,
+    64280,
+    65253
+  ],
+  "alive": [],
+  "generated_ids": [
+    "agent-1793833639537185000",
+    "agent-1793833640066801000",
+    "agent-1793833720674534000",
+    "agent-1793833765984961000",
+    "agent-1793833831951440000",
+    "agent-1793833833622089000",
+    "agent-1793833882704752000"
+  ],
+  "environment_after": {
+    "session": {
+      "kCGSSessionOnConsoleKey": true,
+      "kCGSessionLoginDoneKey": true
+    },
+    "front_pid": 49894,
+    "active_status": 0,
+    "pointer": [
+      1120.5,
+      489
+    ],
+    "active_displays": 3
+  },
+  "package_lock_sha256": "952dd9010b1fbd5122c2effd7fe485583ce3e31b4efb9ee47cc579b133333fde",
+  "caffeinate": "  PID COMM\n16291 /usr/bin/caffeinate\n",
+  "moved_own_test_storage": [
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833639537185000",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/projects/agent-1793833639537185000"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793833639537185000.json",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/metadata/agent-1793833639537185000.json"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833640066801000",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/projects/agent-1793833640066801000"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793833640066801000.json",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/metadata/agent-1793833640066801000.json"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833720674534000",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/projects/agent-1793833720674534000"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793833720674534000.json",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/metadata/agent-1793833720674534000.json"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833765984961000",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/projects/agent-1793833765984961000"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793833765984961000.json",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/metadata/agent-1793833765984961000.json"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/projects/agent-1793833831951440000"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793833831951440000.json",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/metadata/agent-1793833831951440000.json"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833833622089000",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/projects/agent-1793833833622089000"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793833833622089000.json",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/metadata/agent-1793833833622089000.json"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833882704752000",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/projects/agent-1793833882704752000"
+    },
+    {
+      "source": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793833882704752000.json",
+      "target": "/tmp/gibbon17-40ca7f-unlocked/test-storage/metadata/agent-1793833882704752000.json"
+    }
+  ],
+  "focus_restore_request": {
+    "pointer": [
+      1340.5,
+      656.5
+    ],
+    "front_pid": 49894
+  },
+  "progress_preserved": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/issue17-unlocked-progress/index.md"
+}

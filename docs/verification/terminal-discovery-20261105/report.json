@@ -1,0 +1,2218 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery",
+  "base": "607431c555af96216ff026685ee08026473b9665",
+  "info": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery",
+    "id": "dev-40ca7f182ba9bf0b29e94b20",
+    "name": "egoing/issue-17-terminal-discovery",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon"
+  },
+  "cases": {
+    "before": {
+      "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery",
+      "app_pid": 76424,
+      "instance": "dev-40ca7f182ba9bf0b29e94b20",
+      "existing_id": "agent-1793819421326872000",
+      "new_id": "agent-1793819436725835000",
+      "create_seconds": 0.23880820896010846,
+      "existing_inspect_seconds_during_discovery": 1.1164516659919173,
+      "new_session": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793819436725835000",
+        "id": "agent-1793819436725835000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": 77403,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": "codex",
+        "pty_size": {
+          "cols": 89,
+          "rows": 28
+        },
+        "running": true,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      },
+      "shell_log": "76618 -ilc\n77308 -ilc\n"
+    },
+    "before-observer-short": {
+      "info": {
+        "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery",
+        "id": "dev-40ca7f182ba9bf0b29e94b20",
+        "name": "egoing/issue-17-terminal-discovery",
+        "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target",
+        "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon"
+      },
+      "pid": 835,
+      "command": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon --serve",
+      "sha256": "019f31cd3e1d8983cbd66fd0bfb50d42ebebcec645211ebbe201175a7d9947e4",
+      "marker": {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 116.0,
+        "dev_label": "DEV egoing/issue-17-terminal-discovery · 40ca7f18",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": 7,
+        "hovered": false,
+        "id": "issue17-progress",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "layout_destination": {
+          "height": 232,
+          "width": 600,
+          "x": 4520,
+          "y": 50
+        },
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">변경 전 실제 지연 재현</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기</mark></li><li class=\"task-item\">☐ 캐시·fallback·동시성 구현</li><li class=\"task-item\">☐ fixture 및 실제 개발 앱 검증</li><li class=\"task-item\">☐ 문서·한국어 커밋·PR 및 병합 전 보고</li></ul>",
+          "color": "#fee93e",
+          "edit_on_open": false,
+          "html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ 변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기</li><li class=\"task-item\">☐ 캐시·fallback·동시성 구현</li><li class=\"task-item\">☐ fixture 및 실제 개발 앱 검증</li><li class=\"task-item\">☐ 문서·한국어 커밋·PR 및 병합 전 보고</li></ul>",
+          "markdown": "# 터미널 탐색 개선 #17\n- [x] 변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기\n- [ ] 캐시·fallback·동시성 구현\n- [ ] fixture 및 실제 개발 앱 검증\n- [ ] 문서·한국어 커밋·PR 및 병합 전 보고",
+          "removed": true,
+          "revision": 8,
+          "source_path": null,
+          "status": "대기",
+          "title": "Agent Gibbon",
+          "updated_at": 1793820296667
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 1334,
+          "y": 1768
+        },
+        "size": {
+          "height": 232,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 1120.0,
+            "y": 367.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/issue17-progress/index.md",
+        "visible": true
+      },
+      "label": "before-observer-short",
+      "limited_path": false,
+      "started": 1793820297.086308,
+      "sessions": [
+        {
+          "id": "agent-1793820297151132000",
+          "create_seconds": 0.07911812502425164,
+          "until_running_seconds": 1.4599561670329422,
+          "inspect": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820297151132000",
+            "id": "agent-1793820297151132000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 1006,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 89,
+              "rows": 26
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "native": {
+            "kCGWindowAlpha": 1,
+            "kCGWindowNumber": 33752,
+            "kCGWindowLayer": 5,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820297151132000",
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowOwnerPID": 835,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowSharingState": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowStoreType": 1
+          },
+          "final": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820297151132000",
+            "id": "agent-1793820297151132000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 1006,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "hidden": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820297151132000",
+            "id": "agent-1793820297151132000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 1006,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": false
+          },
+          "restored": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820297151132000",
+            "id": "agent-1793820297151132000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 1006,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          }
+        },
+        {
+          "id": "agent-1793820298916594000",
+          "create_seconds": 0.07767029094975442,
+          "until_running_seconds": 1.4499194159870967,
+          "inspect": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820298916594000",
+            "id": "agent-1793820298916594000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 1133,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 89,
+              "rows": 26
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "native": {
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowLayer": 5,
+            "kCGWindowOwnerPID": 835,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowStoreType": 1,
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowSharingState": 1,
+            "kCGWindowNumber": 33754,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820298916594000",
+            "kCGWindowAlpha": 1
+          },
+          "final": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820298916594000",
+            "id": "agent-1793820298916594000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 1133,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "hidden": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820298916594000",
+            "id": "agent-1793820298916594000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 1133,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": false
+          },
+          "restored": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820298916594000",
+            "id": "agent-1793820298916594000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 1133,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          }
+        }
+      ],
+      "native": {
+        "screens": [
+          {
+            "scale": 2,
+            "frame": [
+              0,
+              0,
+              2560,
+              1440
+            ],
+            "visible": [
+              0,
+              0,
+              2560,
+              1415
+            ]
+          },
+          {
+            "visible": [
+              344,
+              1440,
+              1920,
+              1080
+            ],
+            "scale": 2,
+            "frame": [
+              344,
+              1440,
+              1920,
+              1080
+            ]
+          }
+        ],
+        "windows": [
+          {
+            "kCGWindowSharingState": 1,
+            "kCGWindowBounds": {
+              "X": 1707,
+              "Height": 24,
+              "Y": 0,
+              "Width": 34
+            },
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowAlpha": 1,
+            "kCGWindowName": "Item-0",
+            "kCGWindowLayer": 25,
+            "kCGWindowNumber": 33749,
+            "kCGWindowOwnerPID": 835,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowStoreType": 1
+          },
+          {
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowLayer": 5,
+            "kCGWindowOwnerPID": 835,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowStoreType": 1,
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowSharingState": 1,
+            "kCGWindowNumber": 33754,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820298916594000",
+            "kCGWindowAlpha": 1
+          },
+          {
+            "kCGWindowAlpha": 1,
+            "kCGWindowNumber": 33752,
+            "kCGWindowLayer": 5,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820297151132000",
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowOwnerPID": 835,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowSharingState": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowStoreType": 1
+          },
+          {
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-progress · Feedback",
+            "kCGWindowAlpha": 1,
+            "kCGWindowStoreType": 1,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowNumber": 33753,
+            "kCGWindowBounds": {
+              "X": 863,
+              "Height": 36,
+              "Y": 1000,
+              "Width": 104
+            },
+            "kCGWindowSharingState": 1,
+            "kCGWindowOwnerPID": 835,
+            "kCGWindowLayer": 5,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerName": "agent-gibbon"
+          },
+          {
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowNumber": 33748,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-progress",
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowSharingState": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowStoreType": 1,
+            "kCGWindowBounds": {
+              "X": 667,
+              "Height": 116,
+              "Y": 884,
+              "Width": 300
+            },
+            "kCGWindowOwnerPID": 835,
+            "kCGWindowLayer": 5,
+            "kCGWindowIsOnscreen": true
+          }
+        ]
+      },
+      "shell_log": "962 -ilc\n1068 -ilc\n",
+      "cli_log": "ready 1006 /Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820297151132000\ninput 1006 GIBBON17_PROBE\ninput 1006 GIBBON17_OBSERVER {\"id\":\"agent-1793820297151132000\",\"instance\":\"dev-40ca7f182ba9bf0b29e94b20\",\"duplicate\":\"이미 시작된 세션입니다. 창을 숨겼다가 복원하세요\",\"before\":{\"cols\":89,\"rows\":28},\"after\":{\"cols\":97,\"rows\":31},\"dom\":{\"height\":428,\"rows\":28,\"cols\":89,\"text\":\"GIBBON17_FAKE_READY                                                                      |GIBBON17_PROBE                                                                           |GIBBON17_ECHO:GIBBON17_PROBE                                                             \"}}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820298677,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820298881,\"infoMs\":2,\"resizeMs\":0.9999999999997726,\"running\":true}\nready 1133 /Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820298916594000\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820300295,\"infoMs\":1210.0000000000005,\"resizeMs\":2.9999999999995453,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820300499,\"infoMs\":1.0000000000004547,\"resizeMs\":0.9999999999995453,\"running\":true}\ninput 1133 GIBBON17_PROBE\ninput 1133 GIBBON17_OBSERVER {\"id\":\"agent-1793820298916594000\",\"instance\":\"dev-40ca7f182ba9bf0b29e94b20\",\"duplicate\":\"이미 시작된 세션입니다. 창을 숨겼다가 복원하세요\",\"before\":{\"cols\":89,\"rows\":28},\"after\":{\"cols\":97,\"rows\":31},\"dom\":{\"height\":428,\"rows\":28,\"cols\":89,\"text\":\"GIBBON17_FAKE_READY                                                                      |GIBBON17_PROBE                                                                           |GIBBON17_ECHO:GIBBON17_PROBE                                                             \"}}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820300624,\"infoMs\":1.0000000000002274,\"resizeMs\":0,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820300703,\"infoMs\":2,\"resizeMs\":0,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820300828,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820300908,\"infoMs\":0.9999999999995453,\"resizeMs\":1,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820301030,\"infoMs\":1,\"resizeMs\":0.9999999999997726,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820301112,\"infoMs\":1.0000000000004547,\"resizeMs\":0,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820301233,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820301314,\"infoMs\":1,\"resizeMs\":1.0000000000004547,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820301438,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820301518,\"infoMs\":2,\"resizeMs\":0,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820301642,\"infoMs\":1.0000000000004547,\"resizeMs\":0.9999999999995453,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820301722,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820301845,\"infoMs\":0,\"resizeMs\":1,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820301926,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820302048,\"infoMs\":1,\"resizeMs\":1.0000000000004547,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820302130,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820302251,\"infoMs\":1.0000000000004547,\"resizeMs\":0.9999999999995453,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820302333,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820302455,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820302536,\"infoMs\":2,\"resizeMs\":0,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820302657,\"infoMs\":1.0000000000004547,\"resizeMs\":0,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820302739,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820302860,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820302941,\"infoMs\":0.9999999999990905,\"resizeMs\":1,\"running\":true}\ninput 1133 GIBBON17_TIMING {\"id\":\"agent-1793820298916594000\",\"time\":1793820303064,\"infoMs\":1.0000000000004547,\"resizeMs\":0.9999999999995453,\"running\":true}\ninput 1006 GIBBON17_TIMING {\"id\":\"agent-1793820297151132000\",\"time\":1793820303145,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\n"
+    },
+    "after-observer": {
+      "info": {
+        "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery",
+        "id": "dev-40ca7f182ba9bf0b29e94b20",
+        "name": "egoing/issue-17-terminal-discovery",
+        "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target",
+        "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon"
+      },
+      "pid": 96323,
+      "command": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon --serve",
+      "sha256": "750db2559a9c4ae7fc180ed3864e2dc6ab693794540571bb373ca3fa64b1c6f1",
+      "marker": {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 116.0,
+        "dev_label": "DEV egoing/issue-17-terminal-discovery · 40ca7f18",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": 5,
+        "hovered": false,
+        "id": "issue17-progress",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "layout_destination": {
+          "height": 232,
+          "width": 600,
+          "x": 4520,
+          "y": 50
+        },
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">변경 전 실제 지연 재현</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기</mark></li><li class=\"task-item\">☐ 캐시·fallback·동시성 구현</li><li class=\"task-item\">☐ fixture 및 실제 개발 앱 검증</li><li class=\"task-item\">☐ 문서·한국어 커밋·PR 및 병합 전 보고</li></ul>",
+          "color": "#fee93e",
+          "edit_on_open": false,
+          "html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ 변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기</li><li class=\"task-item\">☐ 캐시·fallback·동시성 구현</li><li class=\"task-item\">☐ fixture 및 실제 개발 앱 검증</li><li class=\"task-item\">☐ 문서·한국어 커밋·PR 및 병합 전 보고</li></ul>",
+          "markdown": "# 터미널 탐색 개선 #17\n- [x] 변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기\n- [ ] 캐시·fallback·동시성 구현\n- [ ] fixture 및 실제 개발 앱 검증\n- [ ] 문서·한국어 커밋·PR 및 병합 전 보고",
+          "removed": true,
+          "revision": 6,
+          "source_path": null,
+          "status": "대기",
+          "title": "Agent Gibbon",
+          "updated_at": 1793820191355
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 1334,
+          "y": 1768
+        },
+        "size": {
+          "height": 232,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 1120.0,
+            "y": 367.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/issue17-progress/index.md",
+        "visible": true
+      },
+      "label": "after-observer",
+      "limited_path": false,
+      "started": 1793820191.760829,
+      "sessions": [
+        {
+          "id": "agent-1793820191829029000",
+          "create_seconds": 0.08113900001626462,
+          "until_running_seconds": 0.2916444999864325,
+          "inspect": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820191829029000",
+            "id": "agent-1793820191829029000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 96439,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "native": {
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowLayer": 5,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerPID": 96323,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820191829029000",
+            "kCGWindowStoreType": 1,
+            "kCGWindowSharingState": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowNumber": 33732
+          },
+          "final": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820191829029000",
+            "id": "agent-1793820191829029000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 96439,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "hidden": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820191829029000",
+            "id": "agent-1793820191829029000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 96439,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": false
+          },
+          "restored": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820191829029000",
+            "id": "agent-1793820191829029000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 96439,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          }
+        },
+        {
+          "id": "agent-1793820192424182000",
+          "create_seconds": 0.08608554198872298,
+          "until_running_seconds": 0.31691458402201533,
+          "inspect": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820192424182000",
+            "id": "agent-1793820192424182000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 96573,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "native": {
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowStoreType": 1,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820192424182000",
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowSharingState": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowNumber": 33734,
+            "kCGWindowLayer": 5,
+            "kCGWindowOwnerPID": 96323,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowIsOnscreen": true
+          },
+          "final": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820192424182000",
+            "id": "agent-1793820192424182000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 96573,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "hidden": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820192424182000",
+            "id": "agent-1793820192424182000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 96573,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": false
+          },
+          "restored": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820192424182000",
+            "id": "agent-1793820192424182000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 96573,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          }
+        }
+      ],
+      "native": {
+        "windows": [
+          {
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowLayer": 25,
+            "kCGWindowSharingState": 1,
+            "kCGWindowOwnerPID": 96323,
+            "kCGWindowBounds": {
+              "X": 1707,
+              "Height": 24,
+              "Y": 0,
+              "Width": 34
+            },
+            "kCGWindowName": "Item-0",
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowStoreType": 1,
+            "kCGWindowNumber": 33729,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowAlpha": 1
+          },
+          {
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowStoreType": 1,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820192424182000",
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowSharingState": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowNumber": 33734,
+            "kCGWindowLayer": 5,
+            "kCGWindowOwnerPID": 96323,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowIsOnscreen": true
+          },
+          {
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowLayer": 5,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerPID": 96323,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820191829029000",
+            "kCGWindowStoreType": 1,
+            "kCGWindowSharingState": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowNumber": 33732
+          },
+          {
+            "kCGWindowNumber": 33733,
+            "kCGWindowSharingState": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowBounds": {
+              "X": 863,
+              "Height": 36,
+              "Y": 1000,
+              "Width": 104
+            },
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-progress · Feedback",
+            "kCGWindowOwnerPID": 96323,
+            "kCGWindowLayer": 5,
+            "kCGWindowStoreType": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowOwnerName": "agent-gibbon"
+          },
+          {
+            "kCGWindowLayer": 5,
+            "kCGWindowStoreType": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-progress",
+            "kCGWindowNumber": 33728,
+            "kCGWindowBounds": {
+              "X": 667,
+              "Height": 116,
+              "Y": 884,
+              "Width": 300
+            },
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowOwnerPID": 96323,
+            "kCGWindowSharingState": 1,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowAlpha": 1
+          }
+        ],
+        "screens": [
+          {
+            "scale": 2,
+            "visible": [
+              0,
+              0,
+              2560,
+              1415
+            ],
+            "frame": [
+              0,
+              0,
+              2560,
+              1440
+            ]
+          },
+          {
+            "frame": [
+              344,
+              1440,
+              1920,
+              1080
+            ],
+            "visible": [
+              344,
+              1440,
+              1920,
+              1080
+            ],
+            "scale": 2
+          }
+        ]
+      },
+      "shell_log": "",
+      "cli_log": "ready 96439 /Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820191829029000\ninput 96439 GIBBON17_PROBE\ninput 96439 GIBBON17_OBSERVER {\"id\":\"agent-1793820191829029000\",\"instance\":\"dev-40ca7f182ba9bf0b29e94b20\",\"duplicate\":\"이미 시작 중이거나 시작된 세션입니다. 창을 숨겼다가 복원하세요\",\"before\":{\"cols\":89,\"rows\":28},\"after\":{\"cols\":97,\"rows\":31},\"dom\":{\"height\":428,\"rows\":28,\"cols\":89,\"text\":\"GIBBON17_FAKE_READY                                                                      |GIBBON17_PROBE                                                                           |GIBBON17_ECHO:GIBBON17_PROBE                                                             \"}}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820192030,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820192233,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820192439,\"infoMs\":3,\"resizeMs\":1,\"running\":true}\nready 96573 /Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820192424182000\ninput 96573 GIBBON17_PROBE\ninput 96573 GIBBON17_OBSERVER {\"id\":\"agent-1793820192424182000\",\"instance\":\"dev-40ca7f182ba9bf0b29e94b20\",\"duplicate\":\"이미 시작 중이거나 시작된 세션입니다. 창을 숨겼다가 복원하세요\",\"before\":{\"cols\":89,\"rows\":28},\"after\":{\"cols\":97,\"rows\":31},\"dom\":{\"height\":428,\"rows\":28,\"cols\":89,\"text\":\"GIBBON17_FAKE_READY                                                                      |GIBBON17_PROBE                                                                           |GIBBON17_ECHO:GIBBON17_PROBE                                                             \"}}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820192640,\"infoMs\":2,\"resizeMs\":1,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820192642,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820192842,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820192844,\"infoMs\":0,\"resizeMs\":1,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820193045,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820193046,\"infoMs\":0.9999999999997726,\"resizeMs\":0,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820193247,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820193249,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820193451,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820193451,\"infoMs\":0,\"resizeMs\":1,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820193653,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820193653,\"infoMs\":1.0000000000002274,\"resizeMs\":0,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820193856,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820193857,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820194060,\"infoMs\":0.9999999999995453,\"resizeMs\":1,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820194061,\"infoMs\":2,\"resizeMs\":0,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820194263,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820194263,\"infoMs\":0.9999999999997726,\"resizeMs\":0,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820194465,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820194466,\"infoMs\":0,\"resizeMs\":1,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820194668,\"infoMs\":1.0000000000004547,\"resizeMs\":0.9999999999995453,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820194669,\"infoMs\":0,\"resizeMs\":0.9999999999995453,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820194872,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820194872,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820195074,\"infoMs\":1,\"resizeMs\":1.0000000000004547,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820195075,\"infoMs\":0,\"resizeMs\":1,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820195277,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820195277,\"infoMs\":0,\"resizeMs\":1.0000000000004547,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820195480,\"infoMs\":2,\"resizeMs\":0,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820195480,\"infoMs\":2,\"resizeMs\":0,\"running\":true}\ninput 96573 GIBBON17_TIMING {\"id\":\"agent-1793820192424182000\",\"time\":1793820195683,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 96439 GIBBON17_TIMING {\"id\":\"agent-1793820191829029000\",\"time\":1793820195683,\"infoMs\":1,\"resizeMs\":1.0000000000004547,\"running\":true}\n"
+    },
+    "after-limited-observer": {
+      "info": {
+        "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery",
+        "id": "dev-40ca7f182ba9bf0b29e94b20",
+        "name": "egoing/issue-17-terminal-discovery",
+        "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target",
+        "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon"
+      },
+      "pid": 97501,
+      "command": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon --serve",
+      "sha256": "750db2559a9c4ae7fc180ed3864e2dc6ab693794540571bb373ca3fa64b1c6f1",
+      "marker": {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 116.0,
+        "dev_label": "DEV egoing/issue-17-terminal-discovery · 40ca7f18",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": 6,
+        "hovered": false,
+        "id": "issue17-progress",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "layout_destination": {
+          "height": 232,
+          "width": 600,
+          "x": 4520,
+          "y": 50
+        },
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">변경 전 실제 지연 재현</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기</mark></li><li class=\"task-item\">☐ 캐시·fallback·동시성 구현</li><li class=\"task-item\">☐ fixture 및 실제 개발 앱 검증</li><li class=\"task-item\">☐ 문서·한국어 커밋·PR 및 병합 전 보고</li></ul>",
+          "color": "#fee93e",
+          "edit_on_open": false,
+          "html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ 변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기</li><li class=\"task-item\">☐ 캐시·fallback·동시성 구현</li><li class=\"task-item\">☐ fixture 및 실제 개발 앱 검증</li><li class=\"task-item\">☐ 문서·한국어 커밋·PR 및 병합 전 보고</li></ul>",
+          "markdown": "# 터미널 탐색 개선 #17\n- [x] 변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기\n- [ ] 캐시·fallback·동시성 구현\n- [ ] fixture 및 실제 개발 앱 검증\n- [ ] 문서·한국어 커밋·PR 및 병합 전 보고",
+          "removed": true,
+          "revision": 7,
+          "source_path": null,
+          "status": "대기",
+          "title": "Agent Gibbon",
+          "updated_at": 1793820212051
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 1334,
+          "y": 1768
+        },
+        "size": {
+          "height": 232,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 1120.0,
+            "y": 367.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/issue17-progress/index.md",
+        "visible": true
+      },
+      "label": "after-limited-observer",
+      "limited_path": true,
+      "started": 1793820212.459754,
+      "sessions": [
+        {
+          "id": "agent-1793820212528911000",
+          "create_seconds": 0.08617616596166044,
+          "until_running_seconds": 1.4924498329637572,
+          "inspect": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820212528911000",
+            "id": "agent-1793820212528911000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 97911,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 89,
+              "rows": 28
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "native": {
+            "kCGWindowStoreType": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowAlpha": 1,
+            "kCGWindowSharingState": 1,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowLayer": 5,
+            "kCGWindowNumber": 33742,
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowOwnerPID": 97501,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820212528911000"
+          },
+          "final": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820212528911000",
+            "id": "agent-1793820212528911000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 97911,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "hidden": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820212528911000",
+            "id": "agent-1793820212528911000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 97911,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": false
+          },
+          "restored": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820212528911000",
+            "id": "agent-1793820212528911000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 97911,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          }
+        },
+        {
+          "id": "agent-1793820214320905000",
+          "create_seconds": 0.08220750000327826,
+          "until_running_seconds": 0.28362862509675324,
+          "inspect": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820214320905000",
+            "id": "agent-1793820214320905000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 98323,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "native": {
+            "kCGWindowSharingState": 1,
+            "kCGWindowOwnerPID": 97501,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowLayer": 5,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowNumber": 33744,
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowAlpha": 1,
+            "kCGWindowStoreType": 1,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820214320905000"
+          },
+          "final": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820214320905000",
+            "id": "agent-1793820214320905000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 98323,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "hidden": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820214320905000",
+            "id": "agent-1793820214320905000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 98323,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": false
+          },
+          "restored": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820214320905000",
+            "id": "agent-1793820214320905000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 98323,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 97,
+              "rows": 31
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          }
+        }
+      ],
+      "native": {
+        "windows": [
+          {
+            "kCGWindowLayer": 25,
+            "kCGWindowName": "Item-0",
+            "kCGWindowNumber": 33739,
+            "kCGWindowAlpha": 1,
+            "kCGWindowSharingState": 1,
+            "kCGWindowOwnerPID": 97501,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowBounds": {
+              "X": 1707,
+              "Height": 24,
+              "Y": 0,
+              "Width": 34
+            },
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowStoreType": 1
+          },
+          {
+            "kCGWindowSharingState": 1,
+            "kCGWindowOwnerPID": 97501,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowLayer": 5,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowNumber": 33744,
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowAlpha": 1,
+            "kCGWindowStoreType": 1,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820214320905000"
+          },
+          {
+            "kCGWindowStoreType": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowAlpha": 1,
+            "kCGWindowSharingState": 1,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowLayer": 5,
+            "kCGWindowNumber": 33742,
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowOwnerPID": 97501,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820212528911000"
+          },
+          {
+            "kCGWindowSharingState": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowStoreType": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowNumber": 33743,
+            "kCGWindowBounds": {
+              "X": 863,
+              "Height": 36,
+              "Y": 1000,
+              "Width": 104
+            },
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-progress · Feedback",
+            "kCGWindowLayer": 5,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowOwnerPID": 97501
+          },
+          {
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-progress",
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowLayer": 5,
+            "kCGWindowStoreType": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowSharingState": 1,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowAlpha": 1,
+            "kCGWindowBounds": {
+              "X": 667,
+              "Height": 116,
+              "Y": 884,
+              "Width": 300
+            },
+            "kCGWindowNumber": 33738,
+            "kCGWindowOwnerPID": 97501
+          }
+        ],
+        "screens": [
+          {
+            "scale": 2,
+            "frame": [
+              0,
+              0,
+              2560,
+              1440
+            ],
+            "visible": [
+              0,
+              0,
+              2560,
+              1415
+            ]
+          },
+          {
+            "frame": [
+              344,
+              1440,
+              1920,
+              1080
+            ],
+            "visible": [
+              344,
+              1440,
+              1920,
+              1080
+            ],
+            "scale": 2
+          }
+        ]
+      },
+      "shell_log": "97601 -lc\n",
+      "cli_log": "ready 97911 /Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820212528911000\ninput 97911 GIBBON17_PROBE\ninput 97911 GIBBON17_OBSERVER {\"id\":\"agent-1793820212528911000\",\"instance\":\"dev-40ca7f182ba9bf0b29e94b20\",\"duplicate\":\"이미 시작 중이거나 시작된 세션입니다. 창을 숨겼다가 복원하세요\",\"before\":{\"cols\":89,\"rows\":28},\"after\":{\"cols\":97,\"rows\":31},\"dom\":{\"height\":428,\"rows\":28,\"cols\":89,\"text\":\"GIBBON17_FAKE_READY                                                                      |GIBBON17_PROBE                                                                           |GIBBON17_ECHO:GIBBON17_PROBE                                                             \"}}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820214124,\"infoMs\":1.0000000000002274,\"resizeMs\":0,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820214335,\"infoMs\":8,\"resizeMs\":1,\"running\":true}\nready 98323 /Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820214320905000\ninput 98323 GIBBON17_PROBE\ninput 98323 GIBBON17_OBSERVER {\"id\":\"agent-1793820214320905000\",\"instance\":\"dev-40ca7f182ba9bf0b29e94b20\",\"duplicate\":\"이미 시작 중이거나 시작된 세션입니다. 창을 숨겼다가 복원하세요\",\"before\":{\"cols\":89,\"rows\":28},\"after\":{\"cols\":97,\"rows\":31},\"dom\":{\"height\":428,\"rows\":28,\"cols\":89,\"text\":\"GIBBON17_FAKE_READY                                                                      |GIBBON17_PROBE                                                                           |GIBBON17_ECHO:GIBBON17_PROBE                                                             \"}}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820214517,\"infoMs\":1.9999999999999858,\"resizeMs\":2,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820214538,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820214721,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820214741,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820214924,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820214945,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820215127,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820215147,\"infoMs\":0,\"resizeMs\":1,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820215329,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820215350,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820215532,\"infoMs\":1.0000000000002274,\"resizeMs\":0.9999999999997726,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820215553,\"infoMs\":0.9999999999995453,\"resizeMs\":0,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820215736,\"infoMs\":2,\"resizeMs\":0,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820215756,\"infoMs\":0.9999999999995453,\"resizeMs\":1,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820215939,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820215959,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820216142,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820216162,\"infoMs\":1.0000000000004547,\"resizeMs\":0.9999999999995453,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820216345,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820216364,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820216547,\"infoMs\":1.0000000000004547,\"resizeMs\":0,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820216567,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820216750,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820216770,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820216953,\"infoMs\":2,\"resizeMs\":0,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820216974,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820217155,\"infoMs\":1,\"resizeMs\":1.0000000000004547,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820217177,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\ninput 98323 GIBBON17_TIMING {\"id\":\"agent-1793820214320905000\",\"time\":1793820217358,\"infoMs\":1,\"resizeMs\":0,\"running\":true}\ninput 97911 GIBBON17_TIMING {\"id\":\"agent-1793820212528911000\",\"time\":1793820217380,\"infoMs\":1,\"resizeMs\":1,\"running\":true}\n"
+    },
+    "final-pristine": {
+      "info": {
+        "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery",
+        "id": "dev-40ca7f182ba9bf0b29e94b20",
+        "name": "egoing/issue-17-terminal-discovery",
+        "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target",
+        "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon"
+      },
+      "pid": 2915,
+      "command": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon --serve",
+      "sha256": "c8af22a15063f6b9e86ba5348ff54ad53496c13b79cf53a8ce00fa7b136a7ad6",
+      "marker": {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 116.0,
+        "dev_label": "DEV egoing/issue-17-terminal-discovery · 40ca7f18",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": 8,
+        "hovered": false,
+        "id": "issue17-progress",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "layout_destination": {
+          "height": 232,
+          "width": 600,
+          "x": 4520,
+          "y": 50
+        },
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">변경 전 실제 지연 재현</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기</mark></li><li class=\"task-item\">☐ 캐시·fallback·동시성 구현</li><li class=\"task-item\">☐ fixture 및 실제 개발 앱 검증</li><li class=\"task-item\">☐ 문서·한국어 커밋·PR 및 병합 전 보고</li></ul>",
+          "color": "#fee93e",
+          "edit_on_open": false,
+          "html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ 변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기</li><li class=\"task-item\">☐ 캐시·fallback·동시성 구현</li><li class=\"task-item\">☐ fixture 및 실제 개발 앱 검증</li><li class=\"task-item\">☐ 문서·한국어 커밋·PR 및 병합 전 보고</li></ul>",
+          "markdown": "# 터미널 탐색 개선 #17\n- [x] 변경 전 실제 지연 재현: 두 번째 셸 실행, 기존 조회 1.12초 대기\n- [ ] 캐시·fallback·동시성 구현\n- [ ] fixture 및 실제 개발 앱 검증\n- [ ] 문서·한국어 커밋·PR 및 병합 전 보고",
+          "removed": true,
+          "revision": 9,
+          "source_path": null,
+          "status": "대기",
+          "title": "Agent Gibbon",
+          "updated_at": 1793820369080
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 1334,
+          "y": 1768
+        },
+        "size": {
+          "height": 232,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 1120.0,
+            "y": 367.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/issue17-progress/index.md",
+        "visible": true
+      },
+      "label": "final-pristine",
+      "limited_path": true,
+      "started": 1793820369.502402,
+      "sessions": [
+        {
+          "id": "agent-1793820369572072000",
+          "create_seconds": 0.08463554200716317,
+          "until_running_seconds": 1.5540198750095442,
+          "inspect": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820369572072000",
+            "id": "agent-1793820369572072000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 3348,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 89,
+              "rows": 28
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "native": {
+            "kCGWindowLayer": 5,
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowNumber": 33762,
+            "kCGWindowStoreType": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowOwnerPID": 2915,
+            "kCGWindowSharingState": 1,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820369572072000"
+          },
+          "final": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820369572072000",
+            "id": "agent-1793820369572072000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 3348,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 89,
+              "rows": 28
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "hidden": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820369572072000",
+            "id": "agent-1793820369572072000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 3348,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 89,
+              "rows": 28
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": false
+          },
+          "restored": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820369572072000",
+            "id": "agent-1793820369572072000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 3348,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 89,
+              "rows": 28
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          }
+        },
+        {
+          "id": "agent-1793820371426656000",
+          "create_seconds": 0.08754279103595763,
+          "until_running_seconds": 0.29143579106312245,
+          "inspect": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820371426656000",
+            "id": "agent-1793820371426656000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 3436,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 89,
+              "rows": 28
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "native": {
+            "kCGWindowLayer": 5,
+            "kCGWindowAlpha": 1,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowStoreType": 1,
+            "kCGWindowSharingState": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowNumber": 33764,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820371426656000",
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowOwnerPID": 2915
+          },
+          "final": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820371426656000",
+            "id": "agent-1793820371426656000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 3436,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 89,
+              "rows": 28
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          },
+          "hidden": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820371426656000",
+            "id": "agent-1793820371426656000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 3436,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 89,
+              "rows": 28
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": false
+          },
+          "restored": {
+            "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820371426656000",
+            "id": "agent-1793820371426656000",
+            "instance": "dev-40ca7f182ba9bf0b29e94b20",
+            "kind": "agent",
+            "ok": true,
+            "pid": 3436,
+            "position": {
+              "x": 240,
+              "y": 240
+            },
+            "program": "codex",
+            "pty_size": {
+              "cols": 89,
+              "rows": 28
+            },
+            "running": true,
+            "size": {
+              "height": 920,
+              "width": 1440
+            },
+            "title": "에이전트 터미널",
+            "visible": true
+          }
+        }
+      ],
+      "native": {
+        "windows": [
+          {
+            "kCGWindowLayer": 25,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowName": "Item-0",
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowStoreType": 1,
+            "kCGWindowNumber": 33759,
+            "kCGWindowOwnerPID": 2915,
+            "kCGWindowAlpha": 1,
+            "kCGWindowBounds": {
+              "X": 1707,
+              "Height": 24,
+              "Y": 0,
+              "Width": 34
+            },
+            "kCGWindowSharingState": 1,
+            "kCGWindowIsOnscreen": true
+          },
+          {
+            "kCGWindowLayer": 5,
+            "kCGWindowAlpha": 1,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowStoreType": 1,
+            "kCGWindowSharingState": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowNumber": 33764,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820371426656000",
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowOwnerPID": 2915
+          },
+          {
+            "kCGWindowLayer": 5,
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowNumber": 33762,
+            "kCGWindowStoreType": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowOwnerPID": 2915,
+            "kCGWindowSharingState": 1,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820369572072000"
+          },
+          {
+            "kCGWindowSharingState": 1,
+            "kCGWindowNumber": 33763,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowStoreType": 1,
+            "kCGWindowOwnerPID": 2915,
+            "kCGWindowBounds": {
+              "X": 863,
+              "Height": 36,
+              "Y": 1000,
+              "Width": 104
+            },
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-progress · Feedback",
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowLayer": 5,
+            "kCGWindowAlpha": 1,
+            "kCGWindowOwnerName": "agent-gibbon"
+          },
+          {
+            "kCGWindowLayer": 5,
+            "kCGWindowSharingState": 1,
+            "kCGWindowBounds": {
+              "X": 667,
+              "Height": 116,
+              "Y": 884,
+              "Width": 300
+            },
+            "kCGWindowNumber": 33758,
+            "kCGWindowStoreType": 1,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowOwnerPID": 2915,
+            "kCGWindowAlpha": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-progress"
+          }
+        ],
+        "screens": [
+          {
+            "visible": [
+              0,
+              0,
+              2560,
+              1415
+            ],
+            "scale": 2,
+            "frame": [
+              0,
+              0,
+              2560,
+              1440
+            ]
+          },
+          {
+            "visible": [
+              344,
+              1440,
+              1920,
+              1080
+            ],
+            "scale": 2,
+            "frame": [
+              344,
+              1440,
+              1920,
+              1080
+            ]
+          }
+        ]
+      },
+      "shell_log": "3049 -lc\n",
+      "cli_log": "ready 3348 /Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820369572072000\nready 3436 /Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820371426656000\n"
+    },
+    "final-invalidation": {
+      "pid": 2915,
+      "existing": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820369572072000",
+        "id": "agent-1793820369572072000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": 3348,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": "codex",
+        "pty_size": {
+          "cols": 89,
+          "rows": 28
+        },
+        "running": true,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      },
+      "new": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820392725209000",
+        "id": "agent-1793820392725209000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": 5310,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": "codex",
+        "pty_size": {
+          "cols": 89,
+          "rows": 28
+        },
+        "running": true,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      },
+      "existing_inspect_seconds_during_discovery": 0.06711262499447912,
+      "new_until_running_seconds": 1.5083502089837566,
+      "shell_log": "3049 -lc\n5016 -lc\n",
+      "native": {
+        "windows": [
+          {
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowName": "Item-0",
+            "kCGWindowBounds": {
+              "X": 1707,
+              "Height": 24,
+              "Y": 0,
+              "Width": 34
+            },
+            "kCGWindowNumber": 33759,
+            "kCGWindowAlpha": 1,
+            "kCGWindowLayer": 25,
+            "kCGWindowStoreType": 1,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowSharingState": 1,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowOwnerPID": 2915
+          },
+          {
+            "kCGWindowLayer": 5,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820392725209000",
+            "kCGWindowAlpha": 1,
+            "kCGWindowNumber": 33767,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowOwnerPID": 2915,
+            "kCGWindowSharingState": 1,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowStoreType": 1,
+            "kCGWindowMemoryUsage": 2288
+          },
+          {
+            "kCGWindowLayer": 5,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowOwnerPID": 2915,
+            "kCGWindowSharingState": 1,
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowNumber": 33764,
+            "kCGWindowAlpha": 1,
+            "kCGWindowStoreType": 1,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820371426656000"
+          },
+          {
+            "kCGWindowNumber": 33762,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793820369572072000",
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowSharingState": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowOwnerPID": 2915,
+            "kCGWindowLayer": 5,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowBounds": {
+              "X": 120,
+              "Height": 460,
+              "Y": 120,
+              "Width": 720
+            },
+            "kCGWindowStoreType": 1
+          },
+          {
+            "kCGWindowStoreType": 1,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-progress · Feedback",
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowBounds": {
+              "X": 863,
+              "Height": 36,
+              "Y": 1000,
+              "Width": 104
+            },
+            "kCGWindowAlpha": 1,
+            "kCGWindowNumber": 33763,
+            "kCGWindowSharingState": 1,
+            "kCGWindowOwnerPID": 2915,
+            "kCGWindowLayer": 5
+          },
+          {
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowSharingState": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowNumber": 33758,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-progress",
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerPID": 2915,
+            "kCGWindowBounds": {
+              "X": 667,
+              "Height": 116,
+              "Y": 884,
+              "Width": 300
+            },
+            "kCGWindowStoreType": 1,
+            "kCGWindowLayer": 5
+          }
+        ],
+        "screens": [
+          {
+            "visible": [
+              0,
+              0,
+              2560,
+              1415
+            ],
+            "scale": 2,
+            "frame": [
+              0,
+              0,
+              2560,
+              1440
+            ]
+          },
+          {
+            "frame": [
+              344,
+              1440,
+              1920,
+              1080
+            ],
+            "visible": [
+              344,
+              1440,
+              1920,
+              1080
+            ],
+            "scale": 2
+          }
+        ]
+      }
+    }
+  },
+  "verifications": {
+    "rust": 94,
+    "ui": 53,
+    "clippy": "passed",
+    "rustfmt": "passed",
+    "version": "0.2.7",
+    "final_build": "passed",
+    "native_user_input": "unverified",
+    "terminal_body_rendering": "unverified; header-only capture both before and after"
+  },
+  "followups": [
+    50,
+    51
+  ],
+  "merge": "hold",
+  "confidence": 3,
+  "risk": "Medium",
+  "final_source": {
+    "ui_diff_empty": true,
+    "binary_sha256": "c8af22a15063f6b9e86ba5348ff54ad53496c13b79cf53a8ce00fa7b136a7ad6",
+    "terminal_rs_sha256": "c0c8b1012e117e64106e562ed27d9db3101bc3a11acf9e756fa41bfe534d37d5",
+    "discovery_rs_sha256": "01d7d968187b7a4c0fbb77af111129d865d08344ee0150eb635868c60ab1a7f9"
+  },
+  "cleanup": {
+    "app_pid": 2915,
+    "app_processes_remaining": [],
+    "caffeinate_pid": 86875,
+    "caffeinate_stopped": true,
+    "checked_child_pids": [
+      835,
+      1006,
+      1133,
+      2915,
+      3348,
+      3436,
+      5310,
+      76642,
+      77403,
+      88543,
+      92004,
+      96323,
+      96439,
+      96573,
+      97501,
+      97911,
+      98323
+    ],
+    "remaining_child_commands": {},
+    "additional_group_kills": {},
+    "archive": "/tmp/gibbon-issue17/test-storage",
+    "moved": [
+      {
+        "id": "agent-1793819421326872000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793819421326872000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793819421326872000"
+      },
+      {
+        "id": "agent-1793819421326872000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793819421326872000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793819421326872000.json"
+      },
+      {
+        "id": "agent-1793819436725835000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793819436725835000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793819436725835000"
+      },
+      {
+        "id": "agent-1793819436725835000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793819436725835000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793819436725835000.json"
+      },
+      {
+        "id": "agent-1793819964183523000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793819964183523000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793819964183523000"
+      },
+      {
+        "id": "agent-1793819964183523000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793819964183523000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793819964183523000.json"
+      },
+      {
+        "id": "agent-1793820040937769000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820040937769000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820040937769000"
+      },
+      {
+        "id": "agent-1793820040937769000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820040937769000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820040937769000.json"
+      },
+      {
+        "id": "agent-1793820191829029000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820191829029000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820191829029000"
+      },
+      {
+        "id": "agent-1793820191829029000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820191829029000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820191829029000.json"
+      },
+      {
+        "id": "agent-1793820192424182000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820192424182000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820192424182000"
+      },
+      {
+        "id": "agent-1793820192424182000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820192424182000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820192424182000.json"
+      },
+      {
+        "id": "agent-1793820212528911000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820212528911000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820212528911000"
+      },
+      {
+        "id": "agent-1793820212528911000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820212528911000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820212528911000.json"
+      },
+      {
+        "id": "agent-1793820214320905000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820214320905000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820214320905000"
+      },
+      {
+        "id": "agent-1793820214320905000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820214320905000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820214320905000.json"
+      },
+      {
+        "id": "agent-1793820297151132000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820297151132000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820297151132000"
+      },
+      {
+        "id": "agent-1793820297151132000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820297151132000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820297151132000.json"
+      },
+      {
+        "id": "agent-1793820298916594000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820298916594000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820298916594000"
+      },
+      {
+        "id": "agent-1793820298916594000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820298916594000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820298916594000.json"
+      },
+      {
+        "id": "agent-1793820369572072000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820369572072000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820369572072000"
+      },
+      {
+        "id": "agent-1793820369572072000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820369572072000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820369572072000.json"
+      },
+      {
+        "id": "agent-1793820371426656000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820371426656000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820371426656000"
+      },
+      {
+        "id": "agent-1793820371426656000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820371426656000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820371426656000.json"
+      },
+      {
+        "id": "agent-1793820392725209000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820392725209000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820392725209000"
+      },
+      {
+        "id": "agent-1793820392725209000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820392725209000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820392725209000.json"
+      }
+    ],
+    "progress_preserved": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/issue17-progress",
+    "frontmost_pid": 427,
+    "pointer_restored_by_native_helper": true,
+    "other_apps_or_power_settings_changed": false
+  },
+  "pr": "https://github.com/egoing/agent-gibbon/pull/52",
+  "supervisor_decision": "Draft PR, no merge; next #51 then #50"
+}

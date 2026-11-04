@@ -1,0 +1,64 @@
+{
+  "id": "6dd9096b-c3af-48db-bc69-0983f840048f",
+  "ok": true,
+  "result": {
+    "screenshot": null,
+    "snapshot": {
+      "app": {
+        "pid": 50183,
+        "name": "agent-gibbon",
+        "bundleId": null
+      },
+      "elementCount": 14,
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 50183)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000\", App: agent-gibbon.\n\n0 standard window Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000\n\t1 scroll area\n\t\t2 HTML content 에이전트 터미널\n\t\t\t3 text codex · agent-1793833639537185000\n\t\t\t4 toolbar Toolbar\n\t\t\t\t5 button (disabled) 이전 도구\n\t\t\t\t6 button 글자 크기 13px, 클릭하여 변경\n\t\t\t\t7 button 선택한 텍스트 복사\n\t\t\t\t8 toggle button 상단 고정, Value: 1\n\t\t\t\t9 button 터미널 숨기기\n\t\t\t\t10 button (disabled) 다음 도구\n\t\t\t11 container 에이전트 터미널\n\t\t\t\t12 text entry area (settable) Terminal input NATIVE17_A\n\t\t\t\t\t13 text NATIVE17_A\n\nThe focused UI element is 12 text entry area (settable) Terminal input NATIVE17_A.",
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepthReached": false,
+        "maxDepth": 64
+      },
+      "id": "25E01760-206D-48C8-8D88-4A75DF7E1921",
+      "window": {
+        "width": 720,
+        "isMinimized": false,
+        "screenIndex": 0,
+        "y": 120,
+        "isOffscreen": false,
+        "height": 460,
+        "platform": {
+          "layer": 5
+        },
+        "id": 33931,
+        "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000",
+        "x": 120
+      },
+      "focusedElementId": 12
+    },
+    "action": {
+      "actionName": "AXReplaceSelection",
+      "delivery": "background",
+      "fallbackReason": null,
+      "path": "accessibility",
+      "verification": {
+        "property": "focusedText",
+        "state": "verified",
+        "expected": "NATIVE17_A",
+        "actualPreview": "NATIVE17_A"
+      },
+      "targetWindowId": 33931
+    },
+    "screenshotStatus": {
+      "reason": "no_screenshot_flag",
+      "state": "skipped"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854486933397208,
+    "end_ns": 854487220527625,
+    "seconds": 0.287130417
+  }
+}

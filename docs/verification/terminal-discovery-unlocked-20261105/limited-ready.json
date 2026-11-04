@@ -1,0 +1,62 @@
+{
+  "id": "8c3fd196-6fea-430c-a2ae-d0cea8ee06b8",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "app": {
+        "bundleId": null,
+        "name": "agent-gibbon",
+        "pid": 62412
+      },
+      "elementCount": 13,
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 62412)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000\", App: agent-gibbon.\n\n0 standard window Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000\n\t1 scroll area\n\t\t2 HTML content 에이전트 터미널\n\t\t\t3 text codex · agent-1793833831951440000\n\t\t\t4 toolbar Toolbar\n\t\t\t\t5 button (disabled) 이전 도구\n\t\t\t\t6 button 글자 크기 13px, 클릭하여 변경\n\t\t\t\t7 button 선택한 텍스트 복사\n\t\t\t\t8 toggle button 상단 고정, Value: 1\n\t\t\t\t9 button 터미널 숨기기\n\t\t\t\t10 button (disabled) 다음 도구\n\t\t\t11 container 에이전트 터미널\n\t\t\t\t12 text entry area (settable) Terminal input\n\nNo UI element is currently focused.",
+      "truncation": {
+        "maxNodes": 1200,
+        "maxDepthReached": false,
+        "maxDepth": 64,
+        "truncated": false
+      },
+      "id": "2B4AA5DB-84F4-403A-BCBC-CD62A5BE3690",
+      "window": {
+        "y": 120,
+        "height": 460,
+        "isOffscreen": false,
+        "isMinimized": false,
+        "width": 720,
+        "screenIndex": 0,
+        "id": 33969,
+        "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000",
+        "platform": {
+          "layer": 5
+        },
+        "x": 120
+      },
+      "focusedElementId": null
+    },
+    "screenshot": {
+      "format": "png",
+      "scale": 2,
+      "width": 1440,
+      "height": 920,
+      "path": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/8c3fd196-6fea-430c-a2ae-d0cea8ee06b8-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-05T23:10:47.314Z"
+    },
+    "screenshotStatus": {
+      "metadata": {
+        "engine": "screenCaptureKit",
+        "windowId": 33969
+      },
+      "state": "captured"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854657183806125,
+    "end_ns": 854657715995791,
+    "seconds": 0.532189666
+  }
+}

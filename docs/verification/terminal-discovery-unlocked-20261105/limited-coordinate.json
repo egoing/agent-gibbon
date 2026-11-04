@@ -1,0 +1,70 @@
+{
+  "id": "a7e69b7c-1aef-48d4-82bf-b7938aa1ac85",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "app": {
+        "bundleId": null,
+        "name": "agent-gibbon",
+        "pid": 62412
+      },
+      "truncation": {
+        "truncated": false,
+        "maxDepthReached": false,
+        "maxNodes": 1200,
+        "maxDepth": 64
+      },
+      "coordinateSpace": "window",
+      "window": {
+        "screenIndex": 0,
+        "platform": {
+          "layer": 5
+        },
+        "height": 460,
+        "id": 33969,
+        "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000",
+        "x": 120,
+        "y": 120,
+        "width": 720,
+        "isMinimized": false,
+        "isOffscreen": false
+      },
+      "elementCount": 13,
+      "focusedElementId": null,
+      "id": "CC3B5ADD-7A6E-4593-9D1A-0BF2A78DA972",
+      "treeText": "App=agent-gibbon (pid 62412)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000\", App: agent-gibbon.\n\nNo change in the accessibility tree since the previous snapshot.\n\nNo UI element is currently focused.",
+      "treeDiff": {
+        "baseSnapshotId": "63BBFD86-F20D-4F21-B8BC-BFF14A33F652",
+        "changed": 0,
+        "added": 0,
+        "removed": 0
+      }
+    },
+    "screenshotStatus": {
+      "reason": "no_screenshot_flag",
+      "state": "skipped"
+    },
+    "screenshot": null,
+    "action": {
+      "targetWindowId": 33969,
+      "verification": {
+        "state": "unverified",
+        "reason": "synthetic_input",
+        "expected": null,
+        "actualPreview": null
+      },
+      "delivery": "background",
+      "actionName": null,
+      "path": "synthetic",
+      "fallbackReason": null
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854667985035500,
+    "end_ns": 854668407866791,
+    "seconds": 0.422831291
+  }
+}

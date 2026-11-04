@@ -1,0 +1,62 @@
+{
+  "id": "318364c5-9b58-401d-b251-f0fc5948352f",
+  "ok": true,
+  "result": {
+    "screenshot": null,
+    "action": {
+      "path": "accessibility",
+      "fallbackReason": null,
+      "delivery": "background",
+      "targetWindowId": 33931,
+      "actionName": "AXPress",
+      "verification": {
+        "state": "unverified",
+        "reason": "accessibility_action_unasserted"
+      }
+    },
+    "screenshotStatus": {
+      "reason": "no_screenshot_flag",
+      "state": "skipped"
+    },
+    "snapshot": {
+      "window": {
+        "height": 550,
+        "isMinimized": false,
+        "isOffscreen": false,
+        "screenIndex": 0,
+        "platform": {
+          "layer": 5
+        },
+        "x": 120,
+        "y": 120,
+        "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-unlocked-progress",
+        "width": 860,
+        "id": 33931
+      },
+      "truncation": {
+        "maxDepthReached": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "truncated": false
+      },
+      "app": {
+        "bundleId": null,
+        "name": "agent-gibbon",
+        "pid": 50183
+      },
+      "coordinateSpace": "window",
+      "elementCount": 20,
+      "focusedElementId": 16,
+      "treeText": "App=agent-gibbon (pid 50183)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-unlocked-progress\", App: agent-gibbon.\n\n14 standard window Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — issue17-unlocked-progress\n\t15 scroll area\n\t\t16 HTML content Agent Gibbon\n\t\t\t17 container #17 최종 앱 검증\n\t\t\t\t18 toolbar Toolbar\n\t\t\t\t\t19 button (disabled) 이전 도구\n\t\t\t\t\t20 container DEV egoing/issue-17-terminal-discovery · 40ca7f18\n\t\t\t\t\t\t21 text DEV\n\t\t\t\t\t22 button (expanded) 메모 접기\n\t\t\t\t\t23 button 글자 크기 12px, 클릭하여 변경\n\t\t\t\t\t24 button 메모 편집\n\t\t\t\t\t25 button 파일로 저장\n\t\t\t\t\t26 button 본문 복사\n\t\t\t\t\t27 button 반대편으로 워프\n\t\t\t\t\t28 toggle button 상단 고정, Value: 1\n\t\t\t\t\t29 button 메모 숨기기\n\t\t\t\t\t30 button (disabled) 다음 도구\n\t\t\t\t31 container\n\t\t\t\t\t32 heading 터미널 탐색 개선 #17\n\t\t\t\t\t33 container, Text: ☑ HEAD·CI·제품 코드·빌드 출처 확인 ☐ 최종 앱 표시·네이티브 입력·resize·숨김 복원 ☐ 느린 탐색 중 기존 입력·resize·조회 ☐ 캐시·제한 PATH 검증 ☐ 문서·커밋·감독 보고\n\nThe focused UI element is 16 HTML content Agent Gibbon.",
+      "id": "AF0A20BA-6A58-4FE8-B237-B12A7F1269DD"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854500354780958,
+    "end_ns": 854500640501500,
+    "seconds": 0.285720542
+  }
+}

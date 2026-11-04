@@ -1,0 +1,22 @@
+--- a/ui/terminal.js
++++ b/ui/terminal.js
+@@ -56,3 +56,19 @@
+ document.getElementById('copy').onclick=()=>{
+   const text=terminal.getSelection();if(text)window.__TAURI__.clipboardManager.writeText(text).catch(report);
+ };
++
++// Temporary local verification observer; removed from the delivered source.
++(async()=>{
++  for(let i=0;!started&&i<200;i++)await new Promise(r=>setTimeout(r,50));
++  if(!started)return;
++  const info=await invoke('terminal_info');
++  if(!info.cwd.includes('dev-40ca7f182ba9bf0b29e94b20'))return;
++  let duplicate;try{await invoke('terminal_start',{cols:80,rows:24,output:new Channel()});duplicate='unexpected success';}catch(e){duplicate=String(e)}
++  await invoke('terminal_write',{data:'GIBBON17_PROBE\n'});
++  const before=await invoke('terminal_info');
++  await invoke('terminal_resize',{cols:97,rows:31});
++  const after=await invoke('terminal_info');
++  const dom={height:document.getElementById('terminal').getBoundingClientRect().height,rows:terminal.rows,cols:terminal.cols,text:[0,1,2].map(i=>terminal.buffer.active.getLine(i)?.translateToString()).join('|')};
++  await invoke('terminal_write',{data:'GIBBON17_OBSERVER '+JSON.stringify({id:info.id,instance:info.instance,duplicate,before:before.pty_size,after:after.pty_size,dom})+'\n'});
++  for(let i=0;i<30;i++){const t=performance.now();const v=await invoke('terminal_info');const infoMs=performance.now()-t;const r=performance.now();await invoke('terminal_resize',{cols:97,rows:31});const resizeMs=performance.now()-r;await invoke('terminal_write',{data:'GIBBON17_TIMING '+JSON.stringify({id:info.id,time:Date.now(),infoMs,resizeMs,running:v.running})+'\n'});await new Promise(r=>setTimeout(r,200));}
++})().catch(console.error);

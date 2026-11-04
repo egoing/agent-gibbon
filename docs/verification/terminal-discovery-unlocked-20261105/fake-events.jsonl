@@ -1,0 +1,41 @@
+{"kind": "start", "at": 1793833640.095493, "mono_ns": 43315333, "pid": 50334, "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833639537185000"}
+{"kind": "size", "at": 1793833640.096106, "mono_ns": 43927833, "pid": 50334, "rows": 28, "cols": 89}
+{"kind": "start", "at": 1793833640.3916428, "mono_ns": 19979750, "pid": 50493, "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833640066801000"}
+{"kind": "size", "at": 1793833640.391793, "mono_ns": 20128875, "pid": 50493, "rows": 28, "cols": 89}
+{"kind": "input", "at": 1793833676.806188, "mono_ns": 36754234583, "pid": 50334, "hex": "4e"}
+{"kind": "input", "at": 1793833676.8065999, "mono_ns": 36754646708, "pid": 50334, "hex": "41"}
+{"kind": "input", "at": 1793833676.806697, "mono_ns": 36754742875, "pid": 50334, "hex": "54"}
+{"kind": "input", "at": 1793833676.8068109, "mono_ns": 36754856958, "pid": 50334, "hex": "49"}
+{"kind": "input", "at": 1793833676.806873, "mono_ns": 36754918833, "pid": 50334, "hex": "56"}
+{"kind": "input", "at": 1793833676.8069289, "mono_ns": 36754974708, "pid": 50334, "hex": "45"}
+{"kind": "input", "at": 1793833676.806978, "mono_ns": 36755024625, "pid": 50334, "hex": "31"}
+{"kind": "input", "at": 1793833676.8070269, "mono_ns": 36755073125, "pid": 50334, "hex": "37"}
+{"kind": "input", "at": 1793833676.8070982, "mono_ns": 36755144208, "pid": 50334, "hex": "5f"}
+{"kind": "input", "at": 1793833676.807188, "mono_ns": 36755234625, "pid": 50334, "hex": "41"}
+{"kind": "input", "at": 1793833677.117474, "mono_ns": 37065523166, "pid": 50334, "hex": "0d"}
+{"kind": "echo", "at": 1793833677.117621, "mono_ns": 37065669333, "pid": 50334, "text": "NATIVE17_A"}
+{"kind": "input", "at": 1793833677.40463, "mono_ns": 37352680875, "pid": 50334, "hex": "31"}
+{"kind": "input", "at": 1793833677.6561, "mono_ns": 37604151916, "pid": 50334, "hex": "37"}
+{"kind": "input", "at": 1793833677.898477, "mono_ns": 37846530875, "pid": 50334, "hex": "0d"}
+{"kind": "echo", "at": 1793833677.89875, "mono_ns": 37846803125, "pid": 50334, "text": "17"}
+{"kind": "size", "at": 1793833689.5226061, "mono_ns": 49470730791, "pid": 50334, "rows": 34, "cols": 107}
+{"kind": "start", "at": 1793833768.6473658, "mono_ns": 21336375, "pid": 60923, "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833765984961000"}
+{"kind": "size", "at": 1793833768.6476958, "mono_ns": 21665708, "pid": 60923, "rows": 28, "cols": 89}
+{"kind": "input", "at": 1793833819.5487459, "mono_ns": 179497647166, "pid": 50334, "hex": "37"}
+{"kind": "start", "at": 1793833833.4238532, "mono_ns": 16054041, "pid": 62893, "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000"}
+{"kind": "size", "at": 1793833833.424161, "mono_ns": 16361833, "pid": 62893, "rows": 28, "cols": 89}
+{"kind": "start", "at": 1793833833.815108, "mono_ns": 15308000, "pid": 63034, "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833833622089000"}
+{"kind": "size", "at": 1793833833.8152242, "mono_ns": 15423625, "pid": 63034, "rows": 28, "cols": 89}
+{"kind": "input", "at": 1793833854.165629, "mono_ns": 20757953041, "pid": 62893, "hex": "53"}
+{"kind": "input", "at": 1793833854.1674821, "mono_ns": 20759806000, "pid": 62893, "hex": "4c"}
+{"kind": "input", "at": 1793833854.170471, "mono_ns": 20762794916, "pid": 62893, "hex": "4f"}
+{"kind": "input", "at": 1793833854.171885, "mono_ns": 20764208750, "pid": 62893, "hex": "57"}
+{"kind": "input", "at": 1793833854.1751292, "mono_ns": 20767453541, "pid": 62893, "hex": "31"}
+{"kind": "input", "at": 1793833854.180119, "mono_ns": 20772442833, "pid": 62893, "hex": "37"}
+{"kind": "input", "at": 1793833854.18098, "mono_ns": 20773303833, "pid": 62893, "hex": "5f"}
+{"kind": "input", "at": 1793833883.201508, "mono_ns": 49794008041, "pid": 62893, "hex": "31"}
+{"kind": "input", "at": 1793833883.4049652, "mono_ns": 49997467541, "pid": 62893, "hex": "0d"}
+{"kind": "echo", "at": 1793833883.405416, "mono_ns": 49997916541, "pid": 62893, "text": "SLOW17_1"}
+{"kind": "size", "at": 1793833883.830629, "mono_ns": 50423133083, "pid": 62893, "rows": 34, "cols": 107}
+{"kind": "start", "at": 1793833885.371829, "mono_ns": 17493916, "pid": 65253, "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833882704752000"}
+{"kind": "size", "at": 1793833885.3720288, "mono_ns": 17693125, "pid": 65253, "rows": 28, "cols": 89}

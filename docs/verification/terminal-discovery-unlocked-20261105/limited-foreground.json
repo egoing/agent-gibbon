@@ -1,0 +1,70 @@
+{
+  "id": "3f8fae48-8651-4357-808a-f1c22883336d",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "focusedElementId": 12,
+      "app": {
+        "bundleId": null,
+        "pid": 62412,
+        "name": "agent-gibbon"
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 62412)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000\", App: agent-gibbon.\n\nNo change in the accessibility tree since the previous snapshot.\n\nThe focused UI element is 12 text entry area (settable) Terminal input.",
+      "id": "E3BA3DA3-7DAC-4C45-9228-4B53AB343BD0",
+      "window": {
+        "width": 720,
+        "x": 120,
+        "height": 460,
+        "isOffscreen": false,
+        "platform": {
+          "layer": 5
+        },
+        "id": 33969,
+        "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000",
+        "y": 120,
+        "screenIndex": 0,
+        "isMinimized": false
+      },
+      "elementCount": 13,
+      "truncation": {
+        "maxDepthReached": false,
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64
+      },
+      "treeDiff": {
+        "baseSnapshotId": "CC3B5ADD-7A6E-4593-9D1A-0BF2A78DA972",
+        "changed": 0,
+        "added": 0,
+        "removed": 0
+      }
+    },
+    "action": {
+      "delivery": "foreground",
+      "path": "synthetic",
+      "actionName": null,
+      "fallbackReason": null,
+      "verification": {
+        "expected": null,
+        "state": "unverified",
+        "reason": "synthetic_input",
+        "actualPreview": null
+      },
+      "targetWindowId": 33969
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854672692676791,
+    "end_ns": 854674409438708,
+    "seconds": 1.716761917
+  }
+}

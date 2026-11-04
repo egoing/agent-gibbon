@@ -1,0 +1,68 @@
+{
+  "id": "0aebd480-a4b2-49d8-94b6-b55f144c63a4",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "app": {
+        "pid": 50183,
+        "name": "agent-gibbon",
+        "bundleId": null
+      },
+      "elementCount": 13,
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 50183)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000\", App: agent-gibbon.\n\nNo change in the accessibility tree since the previous snapshot.\n\nThe focused UI element is 12 text entry area (settable) Terminal input.",
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepthReached": false,
+        "maxDepth": 64
+      },
+      "id": "BDFD88C5-D4EA-41A6-BB35-C76ADD60DA22",
+      "window": {
+        "width": 720,
+        "isMinimized": false,
+        "screenIndex": 0,
+        "y": 120,
+        "isOffscreen": false,
+        "height": 460,
+        "platform": {
+          "layer": 5
+        },
+        "id": 33931,
+        "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000",
+        "x": 120
+      },
+      "focusedElementId": 12,
+      "treeDiff": {
+        "baseSnapshotId": "862E4A13-6B32-48B0-9DC1-71B758BB339F",
+        "changed": 0,
+        "added": 0,
+        "removed": 0
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "reason": "no_screenshot_flag",
+      "state": "skipped"
+    },
+    "action": {
+      "actionName": "AXPress",
+      "path": "accessibility",
+      "targetWindowId": 33931,
+      "fallbackReason": null,
+      "delivery": "background",
+      "verification": {
+        "state": "unverified",
+        "reason": "accessibility_action_unasserted"
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854474943145875,
+    "end_ns": 854475192070083,
+    "seconds": 0.248924208
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "args": [
+    "orca",
+    "computer",
+    "press-key",
+    "--app",
+    "pid:62412",
+    "--window-id",
+    "33969",
+    "--key",
+    "Return",
+    "--no-screenshot",
+    "--json"
+  ],
+  "start_at": 1793833883.218507,
+  "end_at": 1793833883.422282,
+  "seconds": 0.20377566700335592,
+  "exit": 0,
+  "response": {
+    "id": "e533a0c2-f74c-4b7b-a555-92740f750d7e",
+    "ok": true,
+    "result": {
+      "screenshot": null,
+      "snapshot": {
+        "focusedElementId": 12,
+        "truncation": {
+          "maxDepthReached": false,
+          "truncated": false,
+          "maxNodes": 1200,
+          "maxDepth": 64
+        },
+        "id": "30A796D2-CDF2-41DB-A528-1F78D9F812A4",
+        "window": {
+          "y": 120,
+          "x": 120,
+          "width": 720,
+          "isOffscreen": false,
+          "id": 33969,
+          "height": 460,
+          "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000",
+          "platform": {
+            "layer": 5
+          },
+          "isMinimized": false,
+          "screenIndex": 0
+        },
+        "app": {
+          "pid": 62412,
+          "bundleId": null,
+          "name": "agent-gibbon"
+        },
+        "treeText": "App=agent-gibbon (pid 62412)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000\", App: agent-gibbon.\n\nNo change in the accessibility tree since the previous snapshot.\n\nThe focused UI element is 12 text entry area (settable) Terminal input.",
+        "coordinateSpace": "window",
+        "elementCount": 13,
+        "treeDiff": {
+          "baseSnapshotId": "E607DD4D-46AC-4F30-B3D9-E0B9F63F662C",
+          "changed": 0,
+          "added": 0,
+          "removed": 0
+        }
+      },
+      "action": {
+        "fallbackReason": null,
+        "verification": {
+          "actualPreview": null,
+          "state": "unverified",
+          "reason": "synthetic_input",
+          "expected": null
+        },
+        "delivery": "background",
+        "targetWindowId": 33969,
+        "path": "synthetic",
+        "actionName": "pressKey"
+      },
+      "screenshotStatus": {
+        "reason": "no_screenshot_flag",
+        "state": "skipped"
+      }
+    },
+    "_meta": {
+      "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "args": [
+    "orca",
+    "computer",
+    "press-key",
+    "--app",
+    "pid:62412",
+    "--window-id",
+    "33969",
+    "--key",
+    "1",
+    "--no-screenshot",
+    "--json"
+  ],
+  "start_at": 1793833882.967547,
+  "end_at": 1793833883.217676,
+  "seconds": 0.250130416941829,
+  "exit": 0,
+  "response": {
+    "id": "e17b1711-18e5-4e99-adf2-f19de277d7d5",
+    "ok": true,
+    "result": {
+      "screenshot": null,
+      "snapshot": {
+        "id": "E607DD4D-46AC-4F30-B3D9-E0B9F63F662C",
+        "treeText": "App=agent-gibbon (pid 62412)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000\", App: agent-gibbon.\n\nNo change in the accessibility tree since the previous snapshot.\n\nThe focused UI element is 12 text entry area (settable) Terminal input.",
+        "app": {
+          "name": "agent-gibbon",
+          "bundleId": null,
+          "pid": 62412
+        },
+        "focusedElementId": 12,
+        "elementCount": 13,
+        "truncation": {
+          "truncated": false,
+          "maxDepth": 64,
+          "maxNodes": 1200,
+          "maxDepthReached": false
+        },
+        "coordinateSpace": "window",
+        "window": {
+          "x": 120,
+          "width": 720,
+          "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000",
+          "isMinimized": false,
+          "id": 33969,
+          "y": 120,
+          "isOffscreen": false,
+          "screenIndex": 0,
+          "height": 460,
+          "platform": {
+            "layer": 5
+          }
+        },
+        "treeDiff": {
+          "baseSnapshotId": "E3BA3DA3-7DAC-4C45-9228-4B53AB343BD0",
+          "changed": 0,
+          "added": 0,
+          "removed": 0
+        }
+      },
+      "screenshotStatus": {
+        "state": "skipped",
+        "reason": "no_screenshot_flag"
+      },
+      "action": {
+        "targetWindowId": 33969,
+        "actionName": "pressKey",
+        "verification": {
+          "actualPreview": null,
+          "state": "unverified",
+          "expected": null,
+          "reason": "synthetic_input"
+        },
+        "delivery": "background",
+        "fallbackReason": null,
+        "path": "synthetic"
+      }
+    },
+    "_meta": {
+      "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+    }
+  }
+}

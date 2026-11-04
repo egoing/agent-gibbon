@@ -1,0 +1,88 @@
+{
+  "args": [
+    "orca",
+    "computer",
+    "drag",
+    "--app",
+    "pid:62412",
+    "--window-id",
+    "33969",
+    "--from-x",
+    "717",
+    "--from-y",
+    "457",
+    "--to-x",
+    "857",
+    "--to-y",
+    "547",
+    "--no-screenshot",
+    "--json"
+  ],
+  "start_at": 1793833883.4227672,
+  "end_at": 1793833883.8077419,
+  "seconds": 0.3849774160189554,
+  "exit": 0,
+  "response": {
+    "id": "d6f28683-e62b-4ba9-8c48-965526e47494",
+    "ok": true,
+    "result": {
+      "snapshot": {
+        "app": {
+          "name": "agent-gibbon",
+          "pid": 62412,
+          "bundleId": null
+        },
+        "elementCount": 13,
+        "coordinateSpace": "window",
+        "treeText": "App=agent-gibbon (pid 62412)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000\", App: agent-gibbon.\n\nNo change in the accessibility tree since the previous snapshot.\n\nThe focused UI element is 12 text entry area (settable) Terminal input.",
+        "truncation": {
+          "maxNodes": 1200,
+          "maxDepth": 64,
+          "maxDepthReached": false,
+          "truncated": false
+        },
+        "id": "AC9450A9-2CE1-41DF-8E31-45BAC203CEFD",
+        "window": {
+          "y": 120,
+          "height": 550,
+          "isOffscreen": false,
+          "isMinimized": false,
+          "width": 860,
+          "screenIndex": 0,
+          "id": 33969,
+          "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000",
+          "platform": {
+            "layer": 5
+          },
+          "x": 120
+        },
+        "focusedElementId": 12,
+        "treeDiff": {
+          "baseSnapshotId": "30A796D2-CDF2-41DB-A528-1F78D9F812A4",
+          "changed": 0,
+          "added": 0,
+          "removed": 0
+        }
+      },
+      "screenshotStatus": {
+        "state": "skipped",
+        "reason": "no_screenshot_flag"
+      },
+      "action": {
+        "path": "synthetic",
+        "actionName": null,
+        "delivery": "background",
+        "targetWindowId": 33969,
+        "fallbackReason": null,
+        "verification": {
+          "state": "unverified",
+          "reason": "synthetic_input"
+        }
+      },
+      "screenshot": null
+    },
+    "_meta": {
+      "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+    }
+  }
+}

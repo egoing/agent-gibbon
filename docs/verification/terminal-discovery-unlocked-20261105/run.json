@@ -1,0 +1,1196 @@
+{
+  "dev": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery",
+    "id": "dev-40ca7f182ba9bf0b29e94b20",
+    "name": "egoing/issue-17-terminal-discovery",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon"
+  },
+  "head": "1b0a31ae7a72bac5fd9f601efe5edd4443ef0ff9",
+  "sha256": "c8af22a15063f6b9e86ba5348ff54ad53496c13b79cf53a8ce00fa7b136a7ad6",
+  "actions": [
+    {
+      "args": [
+        "open",
+        "--id",
+        "issue17-unlocked-progress",
+        "--title",
+        "#17 최종 앱 검증",
+        "--markdown",
+        "# 터미널 탐색 개선 #17\n- [x] HEAD·CI·제품 코드·빌드 출처 확인\n- [ ] 최종 앱 표시·네이티브 입력·resize·숨김 복원\n- [ ] 느린 탐색 중 기존 입력·resize·조회\n- [ ] 캐시·제한 PATH 검증\n- [ ] 문서·커밋·감독 보고"
+      ],
+      "start_ns": 854447753780958,
+      "end_ns": 854449519561166,
+      "seconds": 1.765780208,
+      "response": {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 117.0,
+        "dev_label": "DEV egoing/issue-17-terminal-discovery · 40ca7f18",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "issue17-unlocked-progress",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "layout_destination": {
+          "height": 234,
+          "width": 600,
+          "x": 3496,
+          "y": 50
+        },
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ HEAD·CI·제품 코드·빌드 출처 확인</li><li class=\"task-item\">☐ 최종 앱 표시·네이티브 입력·resize·숨김 복원</li><li class=\"task-item\">☐ 느린 탐색 중 기존 입력·resize·조회</li><li class=\"task-item\">☐ 캐시·제한 PATH 검증</li><li class=\"task-item\">☐ 문서·커밋·감독 보고</li></ul>",
+          "color": "#89f0ff",
+          "edit_on_open": false,
+          "html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ HEAD·CI·제품 코드·빌드 출처 확인</li><li class=\"task-item\">☐ 최종 앱 표시·네이티브 입력·resize·숨김 복원</li><li class=\"task-item\">☐ 느린 탐색 중 기존 입력·resize·조회</li><li class=\"task-item\">☐ 캐시·제한 PATH 검증</li><li class=\"task-item\">☐ 문서·커밋·감독 보고</li></ul>",
+          "markdown": "# 터미널 탐색 개선 #17\n- [x] HEAD·CI·제품 코드·빌드 출처 확인\n- [ ] 최종 앱 표시·네이티브 입력·resize·숨김 복원\n- [ ] 느린 탐색 중 기존 입력·resize·조회\n- [ ] 캐시·제한 PATH 검증\n- [ ] 문서·커밋·감독 보고",
+          "removed": false,
+          "revision": 1,
+          "source_path": null,
+          "status": "대기",
+          "title": "#17 최종 앱 검증",
+          "updated_at": 1793833638612
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 950,
+          "y": 698
+        },
+        "size": {
+          "height": 234,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/issue17-unlocked-progress/index.md",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "agent"
+      ],
+      "start_ns": 854449850318583,
+      "end_ns": 854449949306000,
+      "seconds": 0.098987417,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833639537185000",
+        "id": "agent-1793833639537185000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833639537185000"
+      ],
+      "start_ns": 854449950337958,
+      "end_ns": 854450167703250,
+      "seconds": 0.217365292,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833639537185000",
+        "id": "agent-1793833639537185000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833639537185000"
+      ],
+      "start_ns": 854450200000625,
+      "end_ns": 854450291215708,
+      "seconds": 0.091215083,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833639537185000",
+        "id": "agent-1793833639537185000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": 50334,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": "codex",
+        "pty_size": {
+          "cols": 89,
+          "rows": 28
+        },
+        "running": true,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "agent"
+      ],
+      "start_ns": 854450382566708,
+      "end_ns": 854450482949291,
+      "seconds": 0.100382583,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833640066801000",
+        "id": "agent-1793833640066801000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833640066801000"
+      ],
+      "start_ns": 854450483960958,
+      "end_ns": 854450582660416,
+      "seconds": 0.098699458,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833640066801000",
+        "id": "agent-1793833640066801000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833640066801000"
+      ],
+      "start_ns": 854450618497416,
+      "end_ns": 854450708190958,
+      "seconds": 0.089693542,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833640066801000",
+        "id": "agent-1793833640066801000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833640066801000"
+      ],
+      "start_ns": 854450739631500,
+      "end_ns": 854450818659666,
+      "seconds": 0.079028166,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833640066801000",
+        "id": "agent-1793833640066801000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": 50493,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": "codex",
+        "pty_size": {
+          "cols": 89,
+          "rows": 28
+        },
+        "running": true,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "open",
+        "--id",
+        "issue17-unlocked-progress",
+        "--title",
+        "#17 최종 앱 검증",
+        "--markdown",
+        "# 터미널 탐색 개선 #17\n- [x] HEAD·CI·제품 코드·빌드 출처 확인\n- [ ] 최종 앱 표시·네이티브 입력·resize·숨김 복원\n- [ ] 느린 탐색 중 기존 입력·resize·조회\n- [ ] 캐시·제한 PATH 검증\n- [ ] 문서·커밋·감독 보고"
+      ],
+      "start_ns": 854641360229375,
+      "end_ns": 854642046172583,
+      "seconds": 0.685943208,
+      "response": {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 117.0,
+        "dev_label": "DEV egoing/issue-17-terminal-discovery · 40ca7f18",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "issue17-unlocked-progress",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "layout_destination": {
+          "height": 234,
+          "width": 600,
+          "x": 3496,
+          "y": 50
+        },
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ HEAD·CI·제품 코드·빌드 출처 확인</li><li class=\"task-item\">☐ 최종 앱 표시·네이티브 입력·resize·숨김 복원</li><li class=\"task-item\">☐ 느린 탐색 중 기존 입력·resize·조회</li><li class=\"task-item\">☐ 캐시·제한 PATH 검증</li><li class=\"task-item\">☐ 문서·커밋·감독 보고</li></ul>",
+          "color": "#89f0ff",
+          "edit_on_open": false,
+          "html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ HEAD·CI·제품 코드·빌드 출처 확인</li><li class=\"task-item\">☐ 최종 앱 표시·네이티브 입력·resize·숨김 복원</li><li class=\"task-item\">☐ 느린 탐색 중 기존 입력·resize·조회</li><li class=\"task-item\">☐ 캐시·제한 PATH 검증</li><li class=\"task-item\">☐ 문서·커밋·감독 보고</li></ul>",
+          "markdown": "# 터미널 탐색 개선 #17\n- [x] HEAD·CI·제품 코드·빌드 출처 확인\n- [ ] 최종 앱 표시·네이티브 입력·resize·숨김 복원\n- [ ] 느린 탐색 중 기존 입력·resize·조회\n- [ ] 캐시·제한 PATH 검증\n- [ ] 문서·커밋·감독 보고",
+          "removed": false,
+          "revision": 2,
+          "source_path": null,
+          "status": "대기",
+          "title": "#17 최종 앱 검증",
+          "updated_at": 1793833831367
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 2058,
+          "y": 1056
+        },
+        "size": {
+          "height": 234,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/issue17-unlocked-progress/index.md",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "agent"
+      ],
+      "start_ns": 854642276115750,
+      "end_ns": 854642367323875,
+      "seconds": 0.091208125,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854642368431875,
+      "end_ns": 854642461916083,
+      "seconds": 0.093484208,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854642494134208,
+      "end_ns": 854642574100000,
+      "seconds": 0.079965792,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854642610138000,
+      "end_ns": 854642684251333,
+      "seconds": 0.074113333,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854642718644083,
+      "end_ns": 854642792750958,
+      "seconds": 0.074106875,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854642828056875,
+      "end_ns": 854642898043333,
+      "seconds": 0.069986458,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854642929602916,
+      "end_ns": 854643000999541,
+      "seconds": 0.071396625,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854643032408875,
+      "end_ns": 854643109055000,
+      "seconds": 0.076646125,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854643141346416,
+      "end_ns": 854643211812708,
+      "seconds": 0.070466292,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854643245754041,
+      "end_ns": 854643324413916,
+      "seconds": 0.078659875,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854643355704041,
+      "end_ns": 854643427525250,
+      "seconds": 0.071821209,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854643463751500,
+      "end_ns": 854643544776083,
+      "seconds": 0.081024583,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854643578319875,
+      "end_ns": 854643652178333,
+      "seconds": 0.073858458,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854643684073833,
+      "end_ns": 854643757805708,
+      "seconds": 0.073731875,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833831951440000"
+      ],
+      "start_ns": 854643789793791,
+      "end_ns": 854643861171041,
+      "seconds": 0.07137725,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+        "id": "agent-1793833831951440000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": 62893,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": "codex",
+        "pty_size": {
+          "cols": 89,
+          "rows": 28
+        },
+        "running": true,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "agent"
+      ],
+      "start_ns": 854643943852000,
+      "end_ns": 854644039036125,
+      "seconds": 0.095184125,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833833622089000",
+        "id": "agent-1793833833622089000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833833622089000"
+      ],
+      "start_ns": 854644040393875,
+      "end_ns": 854644122929541,
+      "seconds": 0.082535666,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833833622089000",
+        "id": "agent-1793833833622089000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": null,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": null,
+        "pty_size": null,
+        "running": false,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    },
+    {
+      "args": [
+        "inspect",
+        "--id",
+        "agent-1793833833622089000"
+      ],
+      "start_ns": 854644159396541,
+      "end_ns": 854644233402416,
+      "seconds": 0.074005875,
+      "response": {
+        "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833833622089000",
+        "id": "agent-1793833833622089000",
+        "instance": "dev-40ca7f182ba9bf0b29e94b20",
+        "kind": "agent",
+        "ok": true,
+        "pid": 63034,
+        "position": {
+          "x": 240,
+          "y": 240
+        },
+        "program": "codex",
+        "pty_size": {
+          "cols": 89,
+          "rows": 28
+        },
+        "running": true,
+        "size": {
+          "height": 920,
+          "width": 1440
+        },
+        "title": "에이전트 터미널",
+        "visible": true
+      }
+    }
+  ],
+  "current": {
+    "pid": 50183,
+    "env_path": "/tmp/gibbon17-40ca7f-unlocked/bin:/tmp/gibbon17-40ca7f-unlocked/tools:/usr/bin:/bin",
+    "shell": "/tmp/gibbon17-40ca7f-unlocked/discovery-shell",
+    "command": "  PID  PPID COMM\n50183     1 /Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon\n",
+    "marker": {
+      "always_on_top": true,
+      "animating": true,
+      "auto_layout_excluded": false,
+      "content_height_cap": 117.0,
+      "dev_label": "DEV egoing/issue-17-terminal-discovery · 40ca7f18",
+      "feedback_active": false,
+      "feedback_surface": null,
+      "focused": false,
+      "folded": false,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "issue17-unlocked-progress",
+      "instance": "dev-40ca7f182ba9bf0b29e94b20",
+      "layout_destination": {
+        "height": 234,
+        "width": 600,
+        "x": 3496,
+        "y": 50
+      },
+      "layout_pending": false,
+      "note": {
+        "capture": null,
+        "change_html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ HEAD·CI·제품 코드·빌드 출처 확인</li><li class=\"task-item\">☐ 최종 앱 표시·네이티브 입력·resize·숨김 복원</li><li class=\"task-item\">☐ 느린 탐색 중 기존 입력·resize·조회</li><li class=\"task-item\">☐ 캐시·제한 PATH 검증</li><li class=\"task-item\">☐ 문서·커밋·감독 보고</li></ul>",
+        "color": "#89f0ff",
+        "edit_on_open": false,
+        "html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ HEAD·CI·제품 코드·빌드 출처 확인</li><li class=\"task-item\">☐ 최종 앱 표시·네이티브 입력·resize·숨김 복원</li><li class=\"task-item\">☐ 느린 탐색 중 기존 입력·resize·조회</li><li class=\"task-item\">☐ 캐시·제한 PATH 검증</li><li class=\"task-item\">☐ 문서·커밋·감독 보고</li></ul>",
+        "markdown": "# 터미널 탐색 개선 #17\n- [x] HEAD·CI·제품 코드·빌드 출처 확인\n- [ ] 최종 앱 표시·네이티브 입력·resize·숨김 복원\n- [ ] 느린 탐색 중 기존 입력·resize·조회\n- [ ] 캐시·제한 PATH 검증\n- [ ] 문서·커밋·감독 보고",
+        "removed": false,
+        "revision": 1,
+        "source_path": null,
+        "status": "대기",
+        "title": "#17 최종 앱 검증",
+        "updated_at": 1793833638612
+      },
+      "ok": true,
+      "opacity": 1.0,
+      "position": {
+        "x": 950,
+        "y": 698
+      },
+      "size": {
+        "height": 234,
+        "width": 600
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/issue17-unlocked-progress/index.md",
+      "visible": true
+    }
+  },
+  "current_first": {
+    "id": "agent-1793833639537185000",
+    "until_running_seconds": 0.44197558297310024,
+    "inspect": {
+      "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833639537185000",
+      "id": "agent-1793833639537185000",
+      "instance": "dev-40ca7f182ba9bf0b29e94b20",
+      "kind": "agent",
+      "ok": true,
+      "pid": 50334,
+      "position": {
+        "x": 240,
+        "y": 240
+      },
+      "program": "codex",
+      "pty_size": {
+        "cols": 89,
+        "rows": 28
+      },
+      "running": true,
+      "size": {
+        "height": 920,
+        "width": 1440
+      },
+      "title": "에이전트 터미널",
+      "visible": true
+    }
+  },
+  "current_cached": {
+    "id": "agent-1793833640066801000",
+    "until_running_seconds": 0.4371145829791203,
+    "inspect": {
+      "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833640066801000",
+      "id": "agent-1793833640066801000",
+      "instance": "dev-40ca7f182ba9bf0b29e94b20",
+      "kind": "agent",
+      "ok": true,
+      "pid": 50493,
+      "position": {
+        "x": 240,
+        "y": 240
+      },
+      "program": "codex",
+      "pty_size": {
+        "cols": 89,
+        "rows": 28
+      },
+      "running": true,
+      "size": {
+        "height": 920,
+        "width": 1440
+      },
+      "title": "에이전트 터미널",
+      "visible": true
+    }
+  },
+  "limited": {
+    "pid": 62412,
+    "env_path": "/tmp/gibbon17-40ca7f-unlocked/tools:/usr/bin:/bin",
+    "shell": "/tmp/gibbon17-40ca7f-unlocked/discovery-shell",
+    "command": "  PID  PPID COMM\n62412     1 /Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-17-terminal-discovery/src-tauri/target/debug/agent-gibbon\n",
+    "marker": {
+      "always_on_top": true,
+      "animating": true,
+      "auto_layout_excluded": false,
+      "content_height_cap": 117.0,
+      "dev_label": "DEV egoing/issue-17-terminal-discovery · 40ca7f18",
+      "feedback_active": false,
+      "feedback_surface": null,
+      "focused": false,
+      "folded": false,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "issue17-unlocked-progress",
+      "instance": "dev-40ca7f182ba9bf0b29e94b20",
+      "layout_destination": {
+        "height": 234,
+        "width": 600,
+        "x": 3496,
+        "y": 50
+      },
+      "layout_pending": false,
+      "note": {
+        "capture": null,
+        "change_html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ HEAD·CI·제품 코드·빌드 출처 확인</li><li class=\"task-item\">☐ 최종 앱 표시·네이티브 입력·resize·숨김 복원</li><li class=\"task-item\">☐ 느린 탐색 중 기존 입력·resize·조회</li><li class=\"task-item\">☐ 캐시·제한 PATH 검증</li><li class=\"task-item\">☐ 문서·커밋·감독 보고</li></ul>",
+        "color": "#89f0ff",
+        "edit_on_open": false,
+        "html": "<h1>터미널 탐색 개선 #17</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ HEAD·CI·제품 코드·빌드 출처 확인</li><li class=\"task-item\">☐ 최종 앱 표시·네이티브 입력·resize·숨김 복원</li><li class=\"task-item\">☐ 느린 탐색 중 기존 입력·resize·조회</li><li class=\"task-item\">☐ 캐시·제한 PATH 검증</li><li class=\"task-item\">☐ 문서·커밋·감독 보고</li></ul>",
+        "markdown": "# 터미널 탐색 개선 #17\n- [x] HEAD·CI·제품 코드·빌드 출처 확인\n- [ ] 최종 앱 표시·네이티브 입력·resize·숨김 복원\n- [ ] 느린 탐색 중 기존 입력·resize·조회\n- [ ] 캐시·제한 PATH 검증\n- [ ] 문서·커밋·감독 보고",
+        "removed": false,
+        "revision": 2,
+        "source_path": null,
+        "status": "대기",
+        "title": "#17 최종 앱 검증",
+        "updated_at": 1793833831367
+      },
+      "ok": true,
+      "opacity": 1.0,
+      "position": {
+        "x": 2058,
+        "y": 1056
+      },
+      "size": {
+        "height": 234,
+        "width": 600
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/issue17-unlocked-progress/index.md",
+      "visible": true
+    }
+  },
+  "limited_first": {
+    "id": "agent-1793833831951440000",
+    "until_running_seconds": 1.5868644169531763,
+    "inspect": {
+      "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833831951440000",
+      "id": "agent-1793833831951440000",
+      "instance": "dev-40ca7f182ba9bf0b29e94b20",
+      "kind": "agent",
+      "ok": true,
+      "pid": 62893,
+      "position": {
+        "x": 240,
+        "y": 240
+      },
+      "program": "codex",
+      "pty_size": {
+        "cols": 89,
+        "rows": 28
+      },
+      "running": true,
+      "size": {
+        "height": 920,
+        "width": 1440
+      },
+      "title": "에이전트 터미널",
+      "visible": true
+    }
+  },
+  "limited_cached": {
+    "id": "agent-1793833833622089000",
+    "until_running_seconds": 0.2910808330634609,
+    "inspect": {
+      "cwd": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793833833622089000",
+      "id": "agent-1793833833622089000",
+      "instance": "dev-40ca7f182ba9bf0b29e94b20",
+      "kind": "agent",
+      "ok": true,
+      "pid": 63034,
+      "position": {
+        "x": 240,
+        "y": 240
+      },
+      "program": "codex",
+      "pty_size": {
+        "cols": 89,
+        "rows": 28
+      },
+      "running": true,
+      "size": {
+        "height": 920,
+        "width": 1440
+      },
+      "title": "에이전트 터미널",
+      "visible": true
+    }
+  }
+}
