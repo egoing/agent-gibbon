@@ -202,6 +202,9 @@ pub fn cancel(window: &WebviewWindow) -> Result<(), String> {
 }
 #[tauri::command]
 pub fn drag_note(window: WebviewWindow) -> Result<(), String> {
+    if crate::stash::owns(&window) {
+        return Ok(());
+    }
     cancel(&window)?;
     crate::layout::mark(&window, true);
     window.start_dragging().map_err(|e| e.to_string())
@@ -215,6 +218,9 @@ pub fn show(
     destination: Option<Destination>,
     presentation: Presentation,
 ) -> Result<(), String> {
+    if crate::stash::active(window.app_handle()) {
+        return crate::show_without_focus(window);
+    }
     if window.is_visible().map_err(|e| e.to_string())? {
         return crate::show_without_focus(window);
     }

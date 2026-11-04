@@ -185,7 +185,8 @@ pub fn layout_feedback(
             (!v.message.is_empty() || !v.buttons.is_empty())
                 && (!crate::sizing::folded(&parent) || v.folded_tip)
         });
-    if !active
+    if crate::stash::owns(&parent)
+        || !active
         || !parent.is_visible().map_err(|e| e.to_string())?
         || parent.is_minimized().map_err(|e| e.to_string())?
     {

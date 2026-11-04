@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="650" viewBox="0 0 1040 650">
+<style>text{font-family:'Apple SD Gothic Neo',Arial,sans-serif;fill:#27313c;font-size:15px}.title{font-size:25px;font-weight:600}.label{font-size:18px;font-weight:600}.screen{fill:#e3e6ea;stroke:#a2a9b3}.memo{fill:#fff5cf;stroke:#aaa084}.tip{fill:#fff5cf;fill-opacity:.95;stroke:#706d5a;stroke-opacity:.4} .icon{fill:#fff5cf;fill-opacity:.7;stroke:#706d5a;stroke-opacity:.4}</style>
+<rect width="1040" height="650" fill="#f3f4f6"/><text x="30" y="40" class="title">전체 창 접어두기 / 복원</text>
+<text x="30" y="70">설명용 시안 · 세 보조키만 누르고 모두 놓기 · 다른 키/클릭을 섞으면 취소</text>
+<text x="30" y="112" class="label">01 · 실행 당시 보이는 창만</text><text x="550" y="112" class="label">02 · 커서 화면의 오른쪽 하단</text>
+<rect class="screen" x="30" y="130" width="460" height="180" rx="4"/><rect class="screen" x="550" y="130" width="460" height="180" rx="4"/>
+<rect class="memo" x="55" y="157" width="175" height="90" rx="4"/><text x="67" y="181">편집 중인 메모</text><text x="67" y="209">미저장 초안을 유지합니다</text><rect class="memo" x="270" y="155" width="150" height="12" rx="4"/>
+<rect x="285" y="205" width="110" height="75" rx="4" fill="#c9eff7" stroke="#7c9fa8"/><text x="300" y="245">캡처 메모</text>
+<path d="M725 180Q875 170 958 273" stroke="#929cab" stroke-width="2" stroke-dasharray="6 5" fill="none"/>
+<rect x="875" y="245" width="70" height="34" rx="3" fill="#fff5cf" opacity=".3"/>
+<g transform="translate(958 258)" fill="none" stroke="#514b40" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M10 29Q7 35 12 38H28Q33 35 30 29" fill="#786e59"/>
+ <ellipse cx="7" cy="18" rx="4" ry="5" fill="#a99875"/><ellipse cx="33" cy="18" rx="4" ry="5" fill="#a99875"/>
+ <path d="M9 17C9 6 14 3 20 4C26 3 31 6 31 17V24C31 32 25 35 20 35C15 35 9 32 9 24Z" fill="#c4b48f"/>
+ <path d="M11 18C11 11 15 10 20 13C25 10 29 11 29 18V24C29 30 25 32 20 32C15 32 11 30 11 24Z" fill="#fff0cf"/>
+ <path d="M18 26Q20 28 22 26M19 23H21"/>
+ <!-- Long arms curl upward; broad palms cover both eyes. -->
+ <path d="M11 35C2 34 1 25 5 21L12 15Q15 13 18 16L18 21Q15 24 12 21L9 24Q6 28 12 29" fill="#a99875"/>
+ <path d="M29 35C38 34 39 25 35 21L28 15Q25 13 22 16L22 21Q25 24 28 21L31 24Q34 28 28 29" fill="#a99875"/>
+ <path d="M12 17L16 18M11 19L15 20M28 17L24 18M29 19L25 20" stroke-width="1"/>
+</g>
+<path class="tip" d="M702 252H936V264L944 270L936 276V287H702Z"/><text x="714" y="274" style="font-size:12px">Ctrl+Alt+Cmd · 다시 누르면 창 복원</text><text x="568" y="155">420ms ease-out · 이동 / 축소 / 흐려짐 → 숨김</text>
+<text x="30" y="354" class="label">03 · 420ms 이징 이동 → 정지 후 말풍선</text><text x="550" y="354" class="label">04 · 같은 420ms 애니메이션으로 복원</text>
+<rect class="screen" x="30" y="373" width="460" height="180" rx="4"/><rect class="screen" x="550" y="373" width="460" height="180" rx="4"/>
+<path class="tip" d="M185 388H427V398L435 404L427 410V422H185Z"/><text x="195" y="409" style="font-size:12px">Ctrl+Alt+Cmd · 다시 누르면 창 복원</text>
+<g transform="translate(438 384)" fill="none" stroke="#514b40" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M10 29Q7 35 12 38H28Q33 35 30 29" fill="#786e59"/>
+ <ellipse cx="7" cy="18" rx="4" ry="5" fill="#a99875"/><ellipse cx="33" cy="18" rx="4" ry="5" fill="#a99875"/>
+ <path d="M9 17C9 6 14 3 20 4C26 3 31 6 31 17V24C31 32 25 35 20 35C15 35 9 32 9 24Z" fill="#c4b48f"/>
+ <path d="M11 18C11 11 15 10 20 13C25 10 29 11 29 18V24C29 30 25 32 20 32C15 32 11 30 11 24Z" fill="#fff0cf"/>
+ <path d="M18 26Q20 28 22 26M19 23H21"/>
+ <!-- Long arms curl upward; broad palms cover both eyes. -->
+ <path d="M11 35C2 34 1 25 5 21L12 15Q15 13 18 16L18 21Q15 24 12 21L9 24Q6 28 12 29" fill="#a99875"/>
+ <path d="M29 35C38 34 39 25 35 21L28 15Q25 13 22 16L22 21Q25 24 28 21L31 24Q34 28 28 29" fill="#a99875"/>
+ <path d="M12 17L16 18M11 19L15 20M28 17L24 18M29 19L25 20" stroke-width="1"/>
+</g>
+<path d="M458 516V439m-6 8 6-8 6 8" fill="none" stroke="#929cab" stroke-width="2" stroke-dasharray="6 5"/>
+<path d="m448 525 1-21 15 15-8 0-2 8z" fill="#fff" stroke="#263238"/>
+<text x="48" y="469">56px 접근 / 96px 바깥으로 나가 재진입</text><text x="48" y="497">2초 쿨다운 + 안내 6초 동안 회피 보류</text><text x="48" y="525">이동 중 말풍선 숨김 · 정지 후 6초 안내</text>
+<rect class="memo" x="575" y="400" width="175" height="90" rx="4"/><text x="587" y="424">편집 중인 메모</text><text x="587" y="452">커지고 선명해지며 복원</text><rect class="memo" x="790" y="398" width="150" height="12" rx="4"/>
+<rect x="805" y="448" width="110" height="75" rx="4" fill="#c9eff7" stroke="#7c9fa8"/><text x="820" y="488">캡처 메모</text>
+<text x="30" y="594">원래 숨겨진 창은 열지 않음 · 개별 열기/숨기기 우선 · 새 열기는 기존 창을 재배치하지 않음</text><text x="30" y="622">현재 프레임에서 방향 반전 · 원래 위치로 복원 · 모니터 해제 시 화면 안 보정</text>
+</svg>

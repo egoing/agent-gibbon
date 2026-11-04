@@ -7,6 +7,7 @@ pub const LABEL: &str = "manager";
 
 pub fn open(app: &tauri::AppHandle) -> Result<(), String> {
     if let Some(window) = app.get_webview_window(LABEL) {
+        crate::stash::release(&window)?;
         window.unminimize().map_err(|e| e.to_string())?;
         window.show().map_err(|e| e.to_string())?;
         return window.set_focus().map_err(|e| e.to_string());

@@ -6,7 +6,6 @@ use tauri::{Manager, State};
 pub struct Warp {
     initial_y: f64,
     contact: Contact,
-    close_contact: Contact,
 }
 pub type Warps = Mutex<BTreeMap<String, Warp>>;
 
@@ -115,6 +114,9 @@ fn move_note(window: &tauri::WebviewWindow, warp: &mut Warp) -> Result<(), Strin
 
 #[tauri::command]
 pub fn warp_note(window: tauri::WebviewWindow, state: State<Warps>) -> Result<(), String> {
+    if crate::stash::owns(&window) {
+        return Ok(());
+    }
     let mut warps = state.lock().map_err(|e| e.to_string())?;
     let warp = warps
         .get_mut(window.label())
@@ -136,6 +138,12 @@ pub(crate) fn close_shortcut_pressed() -> bool {
 
 #[tauri::command]
 pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bool, String> {
+    if crate::stash::owns(&window)
+        || crate::stash::chord_busy(window.app_handle())
+        || close_shortcut_pressed()
+    {
+        return Ok(false);
+    }
     #[cfg(target_os = "macos")]
     let alt = objc2_app_kit::NSEvent::modifierFlags_class()
         .contains(objc2_app_kit::NSEventModifierFlags::Option);
@@ -147,7 +155,6 @@ pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bo
     };
     if !window.is_visible().map_err(|e| e.to_string())? {
         warp.contact = Contact::default();
-        warp.close_contact = Contact::default();
         return Ok(false);
     }
     let cursor = window.cursor_position().map_err(|e| e.to_string())?;
@@ -158,18 +165,9 @@ pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bo
         && cursor.x < p.x as f64 + s.width as f64
         && cursor.y < p.y as f64 + s.height as f64;
     let focused = window.is_focused().map_err(|e| e.to_string())?;
-    let closing = close_shortcut_pressed();
-    let close = warp
-        .close_contact
-        .trigger(closing, inside, focused, (cursor.x, cursor.y));
     let moving = warp
         .contact
-        .trigger(alt && !closing, inside, focused, (cursor.x, cursor.y));
-    // Observe all contacts even when closing takes priority.
-    if close {
-        crate::hide_note(window)?;
-        return Ok(false);
-    }
+        .trigger(alt, inside, focused, (cursor.x, cursor.y));
     if moving {
         move_note(&window, warp)?;
         return Ok(true);

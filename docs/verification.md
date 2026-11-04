@@ -980,3 +980,95 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 ### 최종 병합 검증 — 2026-11-04
 
 원격 main의 메모 관리 창 변경(93c66da)을 MVP에 통합했다. 명령 등록과 네이티브 이벤트/접촉 제외 조건의 충돌을 두 기능 모두 유지하도록 해결했다. agent-terminal-mvp 루트에서 npm test(Rust 72개·UI 53개), npm run check, npm run dev:build 통과. 실제 입력기 한글 조합과 신규 공통 패널 전체 조작의 최종 실환경 검증은 남아 있다. 성능 후속 작업은 GitHub #18과 하위 #17, #19~#25에서 관리한다.
+
+## 전체 창 접어두기/복원 (2026-11-04)
+
+### 환경과 출처
+
+- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle`
+- `npm run dev:info`: ID `dev-c0cc1b2099c4aae773649d36`, binary `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon`.
+- macOS 15.6.1, Apple Silicon `arm64`; Node v24.21.0, npm 11.19.0, rustc/cargo 1.91.1, Tauri CLI 2.12.1 / Rust Tauri 2.12.2. 실제 화면 3개, 모두 배율 2.
+- 최종 회귀 PID **13437**의 실행 명령을 위 binary의 `--serve`와 정확히 비교했다. 검증 메모 `stash-smoke-f3b54121-{edit,fold,hidden,new}`의 `inspect.ok`, `instance`, ID·고유 본문을 확인했다. GUI는 해당 PID의 `Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — <ID>` 네이티브 제목과 창 번호로 연결했다.
+- [일반 메모 최종 실행 기록](verification/stash-smoke-f3b54121/report.json), [캡처·트레이 최종 기록](verification/stash-capture-c816783b/report.json), [종료·재실행 기록](verification/stash-exit-20261104.json). 재실행 후 PID는 종료 기록에 별도로 남겼으며 이전 PID의 GUI 근거를 새 프로세스의 근거로 사용하지 않는다.
+
+### 실행과 결과
+
+| 검사 | 결과 |
+|---|---|
+| `cargo fmt --manifest-path src-tauri/Cargo.toml -- --check` | 통과 |
+| `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings` | 통과 |
+| `npm test` | Rust 71개, UI 52개 통과 |
+| `npm run dev:build` | 현재 워크트리 debug 빌드 통과, 해당 binary로 재시작 후 실검증 |
+| `node --check ui/stash.js`, Python 검증 스크립트 구문 검사, `git diff --check` | 통과 |
+| `python3 scripts/stash-smoke.py` | 전역 단축키·이동·축소·네이티브 알파·숨김·복원, 아이콘 회피/안내, 경합 회귀 통과 |
+| `python3 scripts/stash-capture-smoke.py image-1793792069082211000` | PID를 지정한 실제 트레이, 캡처 선택 화면 3개, 이 작업에서 실제 생성한 캡처 이미지 메모의 숨김/복원 통과 |
+| `rsvg-convert docs/design/window-stash.svg -o docs/design/window-stash.png` | 렌더링 후 시각 확인 |
+
+- 실제 등록 키는 **Ctrl+Shift+3**이었다. 네이티브 키 입력으로 실행했고 중간 프레임에서 위치·크기 감소와 알파 감소를 확인했다. [프레임 기록](verification/stash-smoke-f3b54121/animation.json). 숨긴 뒤에도 같은 PID가 살아 있고 CLI 갱신이 성공했다.
+- 기존 숨김 메모를 열지 않았다. 펼친 편집 메모와 다른 화면에 배치한 접힌 메모가 원래 위치·크기·접힘으로 복원됐다. Editor 초안은 숨긴 동안 CLI 본문이 바뀌어도 유지됐다. 원래 화면이 다른 메모도 보관된 좌표로 복원됐다.
+- 아이콘은 실행 당시 커서가 있는 화면 작업 영역 안에 표시됐다. 세 화면 각각에서 검사했다. 접근 시 반대쪽 가장자리로 이동, 안내의 실제 키·복원 문구, 6초 유지 후 제거, 안내 중 추가 회피 억제와 바깥 이동 후 재진입을 확인했다. 창은 클릭 통과·비활성화로 생성하며 표시 시 개발 앱이 전면 앱을 가져오지 않았다. 사용자의 외부 앱 간 전환은 테스트 실패로 간주하지 않는다.
+- 빠른 토글 3회에서 오래된 프레임이 창을 다시 숨기거나 움직이지 않았다. 전환 중 개별 숨김은 복원 예약에서 제외했고, 명시적 열기는 해당 메모만 복원했다. 새 메모를 열어도 보관 중인 창을 재배치하지 않았다.
+- 실제 트레이 항목으로 같은 전환을 실행했다. 캡처 선택 화면은 원래 네이티브 창 번호·전체 화면 크기로 복원됐고 선택 종료가 가능했다. 캡처 이미지 메모는 원래 기하와 capture 메타데이터를 유지했다. 일반 메모·Feedback 뒤에 캡처 선택 화면을 표시하도록 복원 순서를 보정했고, 캡처 화면에 메모의 유휴 알파를 적용하지 않도록 분리했다.
+- 접어둔 상태에서 **해당 PID의 트레이 종료**를 실행하고 새 PID로 재실행했다. 임시 복원 예약이 남지 않았다. 종료 명령은 실행 파일과 일치하는 검증 PID에만 한정했다. 이 종료 로그의 `--serve` 탐색에서는 비교할 다른 프로세스가 열거되지 않아 다른 인스턴스 전체의 전후 비교를 통과했다고 주장하지 않는다. 설치 앱과 다른 워크트리는 종료·교체하지 않았다.
+
+![실제 아이콘과 복원 단축키 안내](verification/stash-smoke-f3b54121/indicator-tip.png)
+
+캡처 출처: [아이콘 창 번호·PID·제목·좌표](verification/stash-smoke-f3b54121/indicator-tip-source.json). 위 이미지는 그 창만 `screencapture -l`로 캡처했다. [편집 초안 검증 화면](verification/stash-smoke-f3b54121/editor-before.png)에도 별도의 [창 출처](verification/stash-smoke-f3b54121/editor-before-source.json)가 있다.
+
+### 보정과 한계
+
+- 캡처 복원 후 자동 드래그로 **새 이미지까지 생성하는 일괄 검증은 여러 번 실패**했다. 도구의 실제 포인터 시작점과 전경 입력 조건을 점검했으며, 한 번의 실제 입력에서는 이미지 생성에 성공했다. 최종 반복 검증은 캡처 선택 화면의 복원/종료와 그 실제 생성 이미지의 복원을 나눠 수행했다. 자동 드래그 생성의 반복 안정성까지 통과한 것으로 보고하지 않는다.
+- 물리적인 모니터 분리·서로 다른 DPI·Windows·Intel 실행은 미검증이다. 화면 이탈/과대 크기 보정과 회피 재진입·쿨다운은 Rust 테스트를 통과했다. 단축키 대체 등록 경로와 전부 선점된 상황은 코드 검토만 수행했다. OS 파일 대화상자는 지원 대상이 아니다.
+- 기능은 실행 중 가시성 전환이다. 앱 종료 후 미저장 초안의 영속 보존을 추가하지 않았다. 공개 배포·설치 앱 교체·커밋·병합은 수행하지 않았다.
+- **Conf 5**: 위 macOS 실검증 범위. **Risk Medium**: 여러 창의 가시성·기하·동시 이벤트 상태에 영향. 환경별 미검증 범위는 위와 같다.
+
+설계와 시안은 [디자인 시스템](design-system.md#전체-창-접어두기--복원--2026-11-04)에 연결한다. 구현 전 확인한 공식 근거: [Tauri 전역 단축키](https://v2.tauri.app/plugin/global-shortcut/), [Tauri WebviewWindow](https://docs.rs/tauri/latest/tauri/webview/struct.WebviewWindow.html). 새 archive 아이콘은 기존 Tabler v3.35.0 MIT 라이선스 아래 원본을 보관했다.
+
+
+## 복원 애니메이션과 보조키 단독 충돌 방지 (2026-11-04)
+
+- 요청 반영: Ctrl+Alt+Cmd(macOS)/Ctrl+Alt+Win(Windows)를 함께 눌렀다가 **모두 놓으면** 한 번 토글한다. 다른 키(Shift 포함), 클릭, 휠이 섞이면 해당 입력 주기를 취소한다. 입력 이벤트를 가로막거나 키 내용을 저장하지 않는다. 기존 세 보조키 접촉 숨김을 제거하고 전체 토글 중 포인터 배치 동작을 억제했다.
+- 복원도 현재 아이콘 위치에서 420ms 이동·확대·페이드로 진행한다. 중간 토글은 현재 프레임에서 반전하고, 최종 프레임에는 저장한 위치·크기를 직접 적용하여 보간 반올림 오차를 없앴다.
+- 출처: root `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle`, instance `dev-c0cc1b2099c4aae773649d36`, binary `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon`, 최종 GUI PID **12503**. `npm run dev:info`, 개발 CLI `inspect`의 instance/고유 본문, 정확한 실행 파일 경로와 PID별 네이티브 창 제목을 대조했다. 설치 앱·다른 워크트리 프로세스는 종료하지 않았다.
+- 환경: macOS 15.6.1 ARM64, 실제 화면 3개(모두 2x), Node 24.21.0/npm 11.19.0/Rust·Cargo 1.91.1/Tauri CLI 2.12.1·Rust 2.12.2. 공식 [Tauri 전역 단축키](https://v2.tauri.app/plugin/global-shortcut/), [WebviewWindow](https://docs.rs/tauri/2.12.2/tauri/webview/struct.WebviewWindow.html), [Apple 이벤트 관찰](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/EventOverview/MonitoringEvents/MonitoringEvents.html)을 기준으로 보조키 단독 입력 관찰을 분리했다.
+- `cargo fmt --manifest-path src-tauri/Cargo.toml -- --check`, `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings`, `npm test`(Rust **74**, UI **52**), `npm run dev:build` 통과. Windows 전용 Shift 취소 분기는 Mac 빌드에서 컴파일·실행 검증하지 않았다.
+- `python3 scripts/stash-smoke.py`: [최종 보고서](verification/stash-smoke-15f6c92f/report.json). 메모 `stash-smoke-15f6c92f-{edit,fold,hidden,new}`. 실제 전역 키 입력, 이동·축소·투명도·숨김, 반대 방향 복원 프레임, 정확한 원래 위치·크기·접힘·편집 초안, CLI 갱신/새 창, 개별 open/close, 3회 빠른 반전, 혼합 키 취소, 길게 누르기/해제, 화면 3개, 아이콘 회피·쿨다운·6초 안내·포커스 보존 통과. [복원 프레임](verification/stash-smoke-15f6c92f/restore-animation.json), [실제 안내 캡처](verification/stash-smoke-15f6c92f/indicator-tip.png)와 같은 폴더의 PID별 출처 기록을 남겼다.
+- `python3 scripts/stash-capture-smoke.py image-1793792069082211000`: [최종 보고서](verification/stash-capture-5878c5b9/report.json). PID를 지정한 실제 트레이 메뉴, 화면 3개의 캡처 선택 창 네이티브 ID/전체 화면 크기 보존, 이전에 이 작업에서 만든 캡처 이미지의 크기·비율·내용 복원 통과. 선택 화면은 명시적 Escape로 끝내고 검증 메모만 숨겼다.
+- [인스턴스 잠금 검증](verification/stash-modifier-lease-20261104.json): 실행 중인 앱이 점유한 파일의 경쟁 독점 잠금이 거부됨을 확인했다. 동일 기능을 지원하는 Agent Gibbon 인스턴스끼리만 조정하며, 다른 앱의 동일한 보조키 단독 해제 감지까지 독점 차단할 수는 없다. 안전한 전역 입력 관찰 권한/훅이 없으면 단축키를 끄고 트레이를 제공한다.
+- 중간 검증에서는 합성 보조키 이벤트의 전달 간격, 트레이 클릭 전 포인터 위치, 네이티브 창 변경 완료 대기의 영향을 확인해 테스트 입력과 완료 관찰을 보완했다. 빠른 반복에서 발생한 위치 오차는 최종 프레임 직접 적용 후 전체 회귀에서 재현되지 않았다. 중간 실패를 통과로 집계하지 않았다.
+- [SVG](design/window-stash.svg)/[PNG](design/window-stash.png)를 새 단축키·양방향 애니메이션에 맞춰 갱신하고 렌더 및 실제 안내 캡처를 시각 확인했다. 기준은 [디자인 시스템](design-system.md#단축키-충돌-방지와-양방향-전환--후속-적용)에 있다.
+- 미검증: Windows 실행/빌드·훅, Intel, 혼합 DPI, 물리 모니터 분리, 타사 앱의 동일 보조키 전용 바인딩, 권한 거부 실환경, 복수 Gibbon 실제 동시 입력(경쟁 파일 잠금은 검증). 이전 종료 검증은 이전 빌드의 기록이며 이번 후속 변경의 종료 재검증으로 간주하지 않는다. **Conf 5(macOS 확인 범위) / Risk Medium(창 상태·전역 입력)**. 커밋·병합·배포하지 않았다.
+
+
+## 긴팔원숭이 말풍선과 회피 이동 (2026-11-04)
+
+- 변경: archive를 눈을 두 손으로 가린 긴팔원숭이 SVG로 교체했다. 아이콘은 40px 고정 영역, 말풍선은 별도 좌측 영역과 꼬리로 구성해 텍스트 길이가 아이콘의 배치에 영향을 주지 않도록 했다. 최초 접어두기 완료와 도망 이동 완료 때 각각 6초 표시한다. 이동 중에는 안내를 숨기고 420ms smoothstep ease-in-out으로 이동하며, 최종 네이티브 이동 다음 틱에 안내를 표시한다. 전환 방향 변경은 진행 중인 아이콘 이동을 취소한다.
+- 원인 조사 한계: 사용자가 보고한 ‘툴팁 표시 시 아이콘 누락’은 기존 성공 캡처와 이번 재현에서 확인하지 못했다. 이전 CSS는 flex 한 줄에 아이콘과 안내를 함께 배치했다. 이번 변경에서는 그 배치 의존성을 제거했지만, 이것을 확정 원인이라고 주장하지 않는다. 네이티브 창 경계·표시 타이밍 문제 여부도 최초 현상 재현 없이 확정할 수 없다.
+- 최종 개발 실행 출처: root `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle`, instance `dev-c0cc1b2099c4aae773649d36`, binary `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon`, PID **50159**, 메모 `stash-indicator-0bbcb75d`. 개발 CLI inspect의 instance와 고유 본문, PID별 네이티브 제목·실행 파일 경로를 대조했다. 해당 워크트리 앱만 재시작했다.
+- `python3 scripts/stash-indicator-smoke.py` 최종 성공: [보고서](verification/stash-indicator-0bbcb75d/report.json). [최초 말풍선](verification/stash-indicator-0bbcb75d/initial.png), [도착 후 말풍선](verification/stash-indicator-0bbcb75d/arrived.png)을 직접 시각 확인했다. 각 이미지의 `*-source.json`에 PID·창 제목·네이티브 창 ID를 기록했다. [이동 프레임](verification/stash-indicator-0bbcb75d/flight.json)으로 중간 위치와 이동 중 안내 비표시를 확인했고, 도착 후 표시·쿨다운·앞 앱 포커스 보존·같은 키 복원을 확인했다.
+- `cargo fmt --manifest-path src-tauri/Cargo.toml -- --check`, Clippy `--all-targets -- -D warnings`, `npm test`(Rust 74/UI 52), `npm run dev:build` 통과. 시안 SVG를 rsvg-convert로 PNG 렌더하고 시각 확인했다.
+- 전체 네이티브 회귀 재실행 `stash-smoke-c72d2c61`은 새 아이콘·이징·말풍선·초안·빠른 반전까지 통과했으나 마지막 화면별 배치 검사에서 이전 화면 위치를 읽어 실패했다. 후속 `stash-smoke-29119f9a`는 숨김 중간 프레임 샘플에 크기 변화가 포착되지 않아 실패했다. 이 두 실행은 전체 통과로 보고하지 않는다. 최종 빌드의 이번 UI 요청 범위는 위 별도 실제 창 검사로 검증했으며, 전체 다중 화면·캡처 회귀 완료를 뜻하지 않는다.
+- 미검증: 이번 변경의 Windows/Intel 실행, 혼합 DPI, 물리 화면 해제, 아이콘 누락 원현상의 확정 원인. **Conf 5(이번 macOS 아이콘·말풍선·회피 동작) / Risk Medium(창 전환 상태)**. 커밋·병합·배포 없음.
+- [디자인 시스템](design-system.md#긴팔원숭이-말풍선과-회피-이동--후속-적용) · [시안 SVG](design/window-stash.svg) · [시안 PNG](design/window-stash.png).
+
+
+### 후속 작업 이슈화 (2026-11-04)
+
+사용자 요청으로 [메인 #35](https://github.com/egoing/agent-gibbon/issues/35) 아래 실제 서브 이슈를 생성하고 부모/자식 API로 관계를 확인했다.
+
+- [#36 원숭이 접근·접촉 시 한 번에 이동하지 않음](https://github.com/egoing/agent-gibbon/issues/36): 새 사용자 제보. 말풍선 동안 회피 보류·쿨다운·재진입 조건은 조사 가설이며 확정 원인이 아니다.
+- [#37 말풍선 표시 시 아이콘 누락 원인](https://github.com/egoing/agent-gibbon/issues/37)
+- [#38 전체 회귀 실패·캡처 생성·최신 종료 검증](https://github.com/egoing/agent-gibbon/issues/38)
+- [#39 혼합 DPI·물리 모니터 분리](https://github.com/egoing/agent-gibbon/issues/39)
+- [#40 Windows·Intel 빌드와 실행](https://github.com/egoing/agent-gibbon/issues/40)
+- [#41 권한·복수 인스턴스·단축키 충돌 경계](https://github.com/egoing/agent-gibbon/issues/41)
+
+이번 단계는 추적 이슈 생성이며 후속 결함 수정·추가 GUI 검증을 수행한 것이 아니다. 구현과 증거가 아직 미커밋인 작업 사본에 있다는 점을 각 이슈에 명시했다.
+
+
+### 최신 main 통합 검증 (2026-11-04)
+
+- 사용자 병합·푸시 승인에 따라 `f9fb944`(관리 창·터미널 통합)와 `29752e2`(전체 창 접어두기)를 임시 복제본에서 병합했다. 원래 두 작업 폴더의 미커밋 `package-lock.json`은 보존했다.
+- 관리 창·터미널 트레이 항목과 stash 항목을 모두 유지했다. 전환 중 알파 소유권을 우선하고, 터미널의 중간 애니메이션 좌표 저장을 억제했다. 관리 창·터미널의 명시적 열기/숨김/닫기는 stash 복원 예약을 해제하도록 통합했다.
+- 병합본에서 `cargo fmt --manifest-path src-tauri/Cargo.toml -- --check`, Clippy `--all-targets -- -D warnings`, `npm test`(Rust **77** / UI **53**), `npm run dev:build` 통과. `npm ci`로 main 의존성을 설치했다.
+- 병합본 네이티브 GUI·Windows·Intel 재검증은 수행하지 않았다. 이전 Mac 증거를 병합본 GUI 통과로 재사용하지 않는다. 사용자 제보와 남은 실환경 검증은 #35~#41에서 계속 추적한다. 병합 통합 변경 기준 **Conf 3 / Risk Medium**.
