@@ -1030,7 +1030,2043 @@
     "npm run version:check": "0.2.7",
     "git diff --check": "passed"
   },
-  "integration": "pending: origin/main 661d834",
+  "integration": {
+    "main": "661d834a9f09d8d3f5800474d12ab4f48ebeee0e",
+    "change_commit": "00a0db6",
+    "pid": 77460,
+    "origin": {
+      "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order",
+      "id": "dev-5a3840c5cf7b0e9d4b92dbc0",
+      "name": "egoing/issue-34-open-order",
+      "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order/src-tauri/target",
+      "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order/src-tauri/target/debug/agent-gibbon"
+    },
+    "process_command": "77460 /Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order/src-tauri/target/debug/agent-gibbon",
+    "outcome": "passed",
+    "checks": [
+      "reverse IDs: sequential open order, left-column wrap, no overlap, focus preserved",
+      "visible reopen/content update preserve order and geometry",
+      "hidden update stays hidden; restore joins tail and preserves other relative order",
+      "rapid opens retarget transitions without reordering; focus preserved",
+      "native manual drag excluded; new open preserves obstacle geometry and current user focus",
+      "content action re-includes at original relative order without immediate geometry change",
+      "unrelated hidden note remains hidden and keeps geometry across later opens"
+    ],
+    "states": {
+      "sequential": {
+        "open34-07e400-z": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-z",
+          "position": {
+            "x": 4520,
+            "y": 284
+          },
+          "size": {
+            "height": 650,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 z"
+        },
+        "open34-07e400-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-y",
+          "position": {
+            "x": 4520,
+            "y": 934
+          },
+          "size": {
+            "height": 650,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 y"
+        },
+        "open34-07e400-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-x",
+          "position": {
+            "x": 4520,
+            "y": 1584
+          },
+          "size": {
+            "height": 648,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 x"
+        },
+        "open34-07e400-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-w",
+          "position": {
+            "x": 4520,
+            "y": 2232
+          },
+          "size": {
+            "height": 648,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 w"
+        },
+        "open34-07e400-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-v",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 v"
+        },
+        "open34-07e400-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-u",
+          "position": {
+            "x": 3920,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 u"
+        }
+      },
+      "restored-tail": {
+        "open34-07e400-z": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-z",
+          "position": {
+            "x": 4520,
+            "y": 284
+          },
+          "size": {
+            "height": 650,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 visible update"
+        },
+        "open34-07e400-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-x",
+          "position": {
+            "x": 4520,
+            "y": 934
+          },
+          "size": {
+            "height": 650,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 x"
+        },
+        "open34-07e400-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-w",
+          "position": {
+            "x": 4520,
+            "y": 1584
+          },
+          "size": {
+            "height": 648,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 w"
+        },
+        "open34-07e400-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-v",
+          "position": {
+            "x": 4520,
+            "y": 2232
+          },
+          "size": {
+            "height": 648,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 v"
+        },
+        "open34-07e400-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-u",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 u"
+        },
+        "open34-07e400-t": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-t",
+          "position": {
+            "x": 3920,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 t"
+        },
+        "open34-07e400-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-y",
+          "position": {
+            "x": 3920,
+            "y": 1730
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 hidden update"
+        }
+      },
+      "rapid": {
+        "open34-07e400-z": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-z",
+          "position": {
+            "x": 4520,
+            "y": 284
+          },
+          "size": {
+            "height": 650,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 visible update"
+        },
+        "open34-07e400-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-x",
+          "position": {
+            "x": 4520,
+            "y": 934
+          },
+          "size": {
+            "height": 650,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 x"
+        },
+        "open34-07e400-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-w",
+          "position": {
+            "x": 4520,
+            "y": 1584
+          },
+          "size": {
+            "height": 648,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 w"
+        },
+        "open34-07e400-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-v",
+          "position": {
+            "x": 4520,
+            "y": 2232
+          },
+          "size": {
+            "height": 648,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 v"
+        },
+        "open34-07e400-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-u",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 u"
+        },
+        "open34-07e400-t": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-t",
+          "position": {
+            "x": 3920,
+            "y": 758
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 t"
+        },
+        "open34-07e400-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-y",
+          "position": {
+            "x": 3920,
+            "y": 1466
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 hidden update"
+        },
+        "open34-07e400-s": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-s",
+          "position": {
+            "x": 3920,
+            "y": 2174
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 s"
+        },
+        "open34-07e400-r": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-r",
+          "position": {
+            "x": 3320,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 r"
+        },
+        "open34-07e400-q": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-q",
+          "position": {
+            "x": 3320,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 q"
+        }
+      },
+      "manual-excluded": {
+        "open34-07e400-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-x",
+          "position": {
+            "x": 4520,
+            "y": 284
+          },
+          "size": {
+            "height": 650,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 x"
+        },
+        "open34-07e400-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-w",
+          "position": {
+            "x": 4520,
+            "y": 934
+          },
+          "size": {
+            "height": 650,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 w"
+        },
+        "open34-07e400-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-v",
+          "position": {
+            "x": 4520,
+            "y": 1584
+          },
+          "size": {
+            "height": 648,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 v"
+        },
+        "open34-07e400-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-u",
+          "position": {
+            "x": 4520,
+            "y": 2232
+          },
+          "size": {
+            "height": 648,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 u"
+        },
+        "open34-07e400-t": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-t",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 t"
+        },
+        "open34-07e400-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-y",
+          "position": {
+            "x": 3920,
+            "y": 758
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 hidden update"
+        },
+        "open34-07e400-s": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-s",
+          "position": {
+            "x": 3920,
+            "y": 1466
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 s"
+        },
+        "open34-07e400-r": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-r",
+          "position": {
+            "x": 3920,
+            "y": 2174
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 r"
+        },
+        "open34-07e400-q": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-q",
+          "position": {
+            "x": 3320,
+            "y": 50
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 q"
+        },
+        "open34-07e400-p": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-p",
+          "position": {
+            "x": 3320,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 p"
+        }
+      },
+      "re-included": {
+        "open34-07e400-z": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-z",
+          "position": {
+            "x": 4520,
+            "y": 284
+          },
+          "size": {
+            "height": 650,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 re-included"
+        },
+        "open34-07e400-x": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-x",
+          "position": {
+            "x": 4520,
+            "y": 934
+          },
+          "size": {
+            "height": 650,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 x"
+        },
+        "open34-07e400-w": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-w",
+          "position": {
+            "x": 4520,
+            "y": 1584
+          },
+          "size": {
+            "height": 648,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 w"
+        },
+        "open34-07e400-v": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-v",
+          "position": {
+            "x": 4520,
+            "y": 2232
+          },
+          "size": {
+            "height": 648,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 v"
+        },
+        "open34-07e400-u": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-u",
+          "position": {
+            "x": 3920,
+            "y": 50
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 u"
+        },
+        "open34-07e400-t": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-t",
+          "position": {
+            "x": 3920,
+            "y": 758
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 t"
+        },
+        "open34-07e400-y": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-y",
+          "position": {
+            "x": 3920,
+            "y": 1466
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 hidden update"
+        },
+        "open34-07e400-s": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-s",
+          "position": {
+            "x": 3920,
+            "y": 2174
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 s"
+        },
+        "open34-07e400-r": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-r",
+          "position": {
+            "x": 3320,
+            "y": 50
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 r"
+        },
+        "open34-07e400-q": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-q",
+          "position": {
+            "x": 3320,
+            "y": 758
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 q"
+        },
+        "open34-07e400-p": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-p",
+          "position": {
+            "x": 3320,
+            "y": 1466
+          },
+          "size": {
+            "height": 708,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 p"
+        },
+        "open34-07e400-o": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-o",
+          "position": {
+            "x": 3320,
+            "y": 2174
+          },
+          "size": {
+            "height": 706,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 o"
+        }
+      }
+    },
+    "captures": {
+      "opened-z": {
+        "window": {
+          "isOffscreen": false,
+          "width": 300,
+          "x": 2260,
+          "height": 420,
+          "isMinimized": false,
+          "y": 142,
+          "platform": {
+            "layer": 5
+          },
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-07e400-z",
+          "screenIndex": 0,
+          "id": 32596
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-z",
+          "position": {
+            "x": 4520,
+            "y": 284
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 z"
+        }
+      },
+      "after-last": {
+        "window": {
+          "width": 300,
+          "id": 32623,
+          "isMinimized": false,
+          "isOffscreen": false,
+          "y": 445,
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-07e400-q",
+          "x": 1660,
+          "height": 420,
+          "screenIndex": 0,
+          "platform": {
+            "layer": 5
+          }
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-q",
+          "position": {
+            "x": 3320,
+            "y": 890
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 q"
+        }
+      },
+      "restored-tail": {
+        "window": {
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-07e400-y",
+          "width": 300,
+          "id": 32599,
+          "isOffscreen": false,
+          "isMinimized": false,
+          "platform": {
+            "layer": 5
+          },
+          "height": 420,
+          "screenIndex": 0,
+          "y": 865,
+          "x": 1960
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-y",
+          "position": {
+            "x": 3920,
+            "y": 1730
+          },
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "auto_layout_excluded": false,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 hidden update"
+        }
+      },
+      "manual-preserved": {
+        "window": {
+          "height": 325,
+          "id": 32596,
+          "isOffscreen": false,
+          "screenIndex": 0,
+          "platform": {
+            "layer": 5
+          },
+          "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-07e400-z",
+          "x": 1160,
+          "y": 430,
+          "width": 300,
+          "isMinimized": false
+        },
+        "inspect": {
+          "ok": true,
+          "instance": "dev-5a3840c5cf7b0e9d4b92dbc0",
+          "id": "open34-07e400-z",
+          "position": {
+            "x": 2320,
+            "y": 860
+          },
+          "size": {
+            "height": 650,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "auto_layout_excluded": true,
+          "animating": false,
+          "layout_pending": false,
+          "layout_destination": null,
+          "content_height_cap": 420.0,
+          "always_on_top": true,
+          "stash": {
+            "active": false,
+            "animating": false,
+            "indicator": {
+              "height": 48.0,
+              "width": 320.0,
+              "x": 1120.0,
+              "y": 367.0
+            },
+            "indicator_moving": false,
+            "restoring": false,
+            "shortcut": "Ctrl+Alt+Cmd",
+            "tip_visible": false,
+            "windows": null
+          },
+          "body_marker": "# open34-07e400 visible update"
+        }
+      }
+    },
+    "opens": [
+      {
+        "id": "open34-07e400-z",
+        "rapid": false,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-y",
+        "rapid": false,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-x",
+        "rapid": false,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-w",
+        "rapid": false,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-v",
+        "rapid": false,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-u",
+        "rapid": false,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-t",
+        "rapid": false,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-s",
+        "rapid": true,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-r",
+        "rapid": true,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-q",
+        "rapid": true,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-p",
+        "rapid": false,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-o",
+        "rapid": false,
+        "animating": true,
+        "pending": false
+      },
+      {
+        "id": "open34-07e400-n",
+        "rapid": false,
+        "animating": true,
+        "pending": false
+      }
+    ],
+    "front_before": "16242",
+    "front_after_cleanup": "16242",
+    "screens": [
+      {
+        "visible": [
+          0,
+          0,
+          2560,
+          1415
+        ],
+        "scale": 2,
+        "frame": [
+          0,
+          0,
+          2560,
+          1440
+        ]
+      },
+      {
+        "visible": [
+          344,
+          1440,
+          1920,
+          1080
+        ],
+        "frame": [
+          344,
+          1440,
+          1920,
+          1080
+        ],
+        "scale": 2
+      }
+    ],
+    "commands": {
+      "npm run test": "80 Rust / 53 UI passed",
+      "npm run dev:build": "passed",
+      "npm run check": "passed",
+      "cargo fmt --manifest-path src-tauri/Cargo.toml --check": "passed",
+      "npm run version:check": "0.2.7",
+      "python3 scripts/open-order-smoke.py --pid 77460 --report-dir /tmp/gibbon-issue34/integrated": "passed (7 checks)",
+      "git diff --check": "passed"
+    }
+  },
   "additional_stress_failure": {
     "pid": 31059,
     "checks_before_failure": [
@@ -1158,6 +3194,44 @@
       }
     },
     "raw_local": "/tmp/gibbon-issue34/after-final/live.json",
-    "note": "12 visible notes with re-inclusion: a transition stopped at an intermediate location; cause not established. Isolated 5-note re-inclusion succeeded, see /tmp/gibbon-issue34/debug-reinclude.json."
+    "note": "12 visible notes with re-inclusion: a transition stopped at an intermediate location; cause not established. Isolated 5-note re-inclusion succeeded, see /tmp/gibbon-issue34/debug-reinclude.json.",
+    "integrated_retry": "Full same 12-note/re-inclusion sequence passed on integrated PID 77460 after archiving 43 worker-created old test notes and restarting; original failure cause remains unconfirmed.",
+    "follow_up_issue": "https://github.com/egoing/agent-gibbon/issues/43"
+  },
+  "cleanup": {
+    "stopped_owned_pid": 77460,
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order/src-tauri/target/debug/agent-gibbon",
+    "process_exit_verified": true,
+    "archived_test_ids": [
+      "open34-07e400-n",
+      "open34-07e400-o",
+      "open34-07e400-p",
+      "open34-07e400-q",
+      "open34-07e400-r",
+      "open34-07e400-s",
+      "open34-07e400-t",
+      "open34-07e400-u",
+      "open34-07e400-v",
+      "open34-07e400-w",
+      "open34-07e400-x",
+      "open34-07e400-y",
+      "open34-07e400-z"
+    ],
+    "archive_path": "/tmp/gibbon-issue34/test-storage-after-integration",
+    "progress_storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-5a3840c5cf7b0e9d4b92dbc0/docs/issue34-progress/index.md",
+    "original_front_pid": "16242",
+    "matching_owned_binary_processes_at_end": [],
+    "stopped_owned_pids": [
+      23841,
+      31059,
+      77460
+    ]
+  },
+  "supervisor_decision": {
+    "merge": "held",
+    "reason": "Intermittent #43 cause remains unconfirmed despite integrated live pass",
+    "remote_push": false,
+    "pull_request_created": false,
+    "next_task": "#43 in a fresh dispatch"
   }
 }

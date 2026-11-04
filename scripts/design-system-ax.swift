@@ -37,6 +37,10 @@ case "draft":
     guard let node = nodes.first(where: { text($0, kAXRoleAttribute) == "AXTextArea" }) else { exit(1) }
     guard AXUIElementSetAttributeValue(node, kAXValueAttribute as CFString, args[4] as CFString) == .success else { exit(1) }
     print(text(node, kAXValueAttribute))
+case "position":
+    var point = CGPoint(x: Double(args[4])!, y: Double(args[5])!)
+    let value = AXValueCreate(.cgPoint, &point)!
+    guard AXUIElementSetAttributeValue(window, kAXPositionAttribute as CFString, value) == .success else { exit(1) }
 case "resize":
     var size = CGSize(width: Int(args[4])!, height: Int(args[5])!)
     let value = AXValueCreate(.cgSize, &size)!

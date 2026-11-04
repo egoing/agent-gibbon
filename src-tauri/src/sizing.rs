@@ -58,6 +58,10 @@ pub fn prepare(
     window: &WebviewWindow,
     presentation: crate::entrance::Presentation,
 ) -> Result<(), String> {
+    if crate::stash::active(window.app_handle()) {
+        crate::stash::release(window)?;
+        return crate::show_without_focus(window);
+    }
     let visible = window.is_visible().map_err(|e| e.to_string())?;
     crate::layout::register(window, visible || pending(window));
     if visible || image_size(window).is_some() || folded(window) {
@@ -217,6 +221,9 @@ fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
 
 #[tauri::command]
 pub fn toggle_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, String> {
+    if crate::stash::owns(&window) {
+        return Ok(folded(&window));
+    }
     let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
     let state = states.entry(window.label().into()).or_default();
     let (cursor, _) = contact_geometry(&window)?;
@@ -227,7 +234,10 @@ pub fn toggle_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, S
 
 #[tauri::command]
 pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, String> {
-    if crate::capture::active(window.app_handle()) {
+    if crate::capture::active(window.app_handle())
+        || crate::stash::owns(&window)
+        || crate::stash::chord_busy(window.app_handle())
+    {
         return Ok(folded(&window));
     }
     #[cfg(target_os = "macos")]

@@ -1,0 +1,128 @@
+[
+  {
+    "active": true,
+    "animating": false,
+    "indicator": {
+      "height": 48.0,
+      "width": 320.0,
+      "x": -332.0,
+      "y": 587.0
+    },
+    "indicator_moving": true,
+    "restoring": false,
+    "shortcut": "Ctrl+Alt+Cmd",
+    "tip_visible": false,
+    "windows": [
+      "note-stash-indicator-0bbcb75d",
+      "note-stash-work-c0cc1b"
+    ]
+  },
+  {
+    "active": true,
+    "animating": false,
+    "indicator": {
+      "height": 48.0,
+      "width": 320.0,
+      "x": -332.0,
+      "y": 356.0
+    },
+    "indicator_moving": true,
+    "restoring": false,
+    "shortcut": "Ctrl+Alt+Cmd",
+    "tip_visible": false,
+    "windows": [
+      "note-stash-indicator-0bbcb75d",
+      "note-stash-work-c0cc1b"
+    ]
+  },
+  {
+    "active": true,
+    "animating": false,
+    "indicator": {
+      "height": 48.0,
+      "width": 320.0,
+      "x": -332.0,
+      "y": 44.0
+    },
+    "indicator_moving": false,
+    "restoring": false,
+    "shortcut": "Ctrl+Alt+Cmd",
+    "tip_visible": true,
+    "windows": [
+      "note-stash-indicator-0bbcb75d",
+      "note-stash-work-c0cc1b"
+    ]
+  },
+  {
+    "active": true,
+    "animating": false,
+    "indicator": {
+      "height": 48.0,
+      "width": 320.0,
+      "x": -332.0,
+      "y": 44.0
+    },
+    "indicator_moving": false,
+    "restoring": false,
+    "shortcut": "Ctrl+Alt+Cmd",
+    "tip_visible": true,
+    "windows": [
+      "note-stash-indicator-0bbcb75d",
+      "note-stash-work-c0cc1b"
+    ]
+  },
+  {
+    "active": true,
+    "animating": false,
+    "indicator": {
+      "height": 48.0,
+      "width": 320.0,
+      "x": -332.0,
+      "y": 44.0
+    },
+    "indicator_moving": false,
+    "restoring": false,
+    "shortcut": "Ctrl+Alt+Cmd",
+    "tip_visible": true,
+    "windows": [
+      "note-stash-indicator-0bbcb75d",
+      "note-stash-work-c0cc1b"
+    ]
+  },
+  {
+    "active": true,
+    "animating": false,
+    "indicator": {
+      "height": 48.0,
+      "width": 320.0,
+      "x": -332.0,
+      "y": 44.0
+    },
+    "indicator_moving": false,
+    "restoring": false,
+    "shortcut": "Ctrl+Alt+Cmd",
+    "tip_visible": true,
+    "windows": [
+      "note-stash-indicator-0bbcb75d",
+      "note-stash-work-c0cc1b"
+    ]
+  },
+  {
+    "active": true,
+    "animating": false,
+    "indicator": {
+      "height": 48.0,
+      "width": 320.0,
+      "x": -332.0,
+      "y": 44.0
+    },
+    "indicator_moving": false,
+    "restoring": false,
+    "shortcut": "Ctrl+Alt+Cmd",
+    "tip_visible": true,
+    "windows": [
+      "note-stash-indicator-0bbcb75d",
+      "note-stash-work-c0cc1b"
+    ]
+  }
+]

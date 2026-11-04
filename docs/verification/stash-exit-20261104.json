@@ -1,0 +1,13 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle",
+  "instance": "dev-c0cc1b2099c4aae773649d36",
+  "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon --serve",
+  "quit_pid": 13437,
+  "restart_pid": 24099,
+  "other_instances_preserved": {},
+  "checks": [
+    "actual tray quit while stashed exits only this PID",
+    "restart clears temporary stash state; no stale restore or icon"
+  ],
+  "scope": "Quit menu targeted verified PID only; no other process was targeted. No other --serve process was enumerated by this probe."
+}

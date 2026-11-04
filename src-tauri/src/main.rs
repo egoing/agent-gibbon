@@ -15,6 +15,8 @@ mod opacity;
 mod placement;
 mod sizing;
 mod source;
+mod stash;
+mod stash_input;
 mod storage;
 mod telemetry;
 mod terminal;
@@ -65,6 +67,9 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
 // Called only on Tauri's main thread. macOS `show()` makes the window key;
 // ordering it front directly preserves the user's active application.
 fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
+    if stash::owns(win) {
+        return Ok(());
+    }
     #[cfg(target_os = "macos")]
     {
         let ptr = win.ns_window().map_err(|e| e.to_string())?;
@@ -117,6 +122,19 @@ fn sync_pointer(window: &tauri::WebviewWindow) -> Result<bool, String> {
 // Called by synchronous commands and the IPC main-thread handler only.
 #[tauri::command]
 fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
+    if stash::owns(&window)
+        || window.label() == "stash-indicator"
+        || window.label().starts_with("capture-")
+    {
+        #[cfg(target_os = "macos")]
+        unsafe {
+            return Ok((&*(window.ns_window().map_err(|e| e.to_string())?
+                as *const objc2_app_kit::NSWindow))
+                .alphaValue());
+        }
+        #[cfg(not(target_os = "macos"))]
+        return Ok(1.0);
+    }
     if window.label() == manager::LABEL {
         #[cfg(target_os = "macos")]
         {
@@ -177,7 +195,7 @@ fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<V
     let position = win.outer_position().map_err(|e| e.to_string())?;
     let size = win.outer_size().map_err(|e| e.to_string())?;
     Ok(
-        json!({"ok":true,"feedback_surface":feedback_window::inspect(win)?,"hovered":pointer_over(win)?,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"auto_layout_excluded":layout::excluded(win),"layout_pending":sizing::pending(win),"content_height_cap":sizing::content_height(win),"layout_destination":entrance::destination(win).map(|d|json!({"x":d.position.x,"y":d.position.y,"width":d.size.width,"height":d.size.height})),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"folded": sizing::folded(win), "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        json!({"ok":true,"stash":stash::inspect(win.app_handle()),"feedback_surface":feedback_window::inspect(win)?,"hovered":pointer_over(win)?,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"auto_layout_excluded":layout::excluded(win),"layout_pending":sizing::pending(win),"content_height_cap":sizing::content_height(win),"layout_destination":entrance::destination(win).map(|d|json!({"x":d.position.x,"y":d.position.y,"width":d.size.width,"height":d.size.height})),"visible":win.is_visible().map_err(|e| e.to_string())?,"focused":win.is_focused().map_err(|e| e.to_string())?,"folded": sizing::folded(win), "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     )
 }
 #[tauri::command]
@@ -209,6 +227,7 @@ fn save_note(
 }
 #[tauri::command]
 fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
+    stash::release(&window)?;
     layout::mark(&window, false);
     sizing::cancel(&window);
     feedback::clear(&window);
@@ -317,6 +336,7 @@ fn apply_with_presentation(
             sizing::prepare(&win, presentation)?;
         }
         Action::Close => {
+            stash::release(&win)?;
             sizing::cancel(&win);
             feedback::clear(&win);
             feedback_window::hide(&win);
@@ -362,6 +382,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(layout::Exclusions::default())
         .manage(layout::OpenOrder::default())
         .manage(sizing::Sizes::default())
+        .manage(stash::Stash::default())
         .manage(Mutex::new(BTreeMap::from([(
             "main".to_string(),
             Note::default(),
@@ -414,11 +435,17 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 }
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                     api.prevent_close();
+                    if let Some(w) = win.app_handle().get_webview_window(win.label()) {
+                        let _ = stash::release(&w);
+                    }
                     let _ = win.hide();
                 }
                 return;
             }
-            if win.label().starts_with("capture-") || feedback_window::is_surface(win.label()) {
+            if win.label() == "stash-indicator"
+                || win.label().starts_with("capture-")
+                || feedback_window::is_surface(win.label())
+            {
                 return;
             }
             if matches!(
@@ -440,6 +467,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 api.prevent_close();
                 if let Some(webview) = win.app_handle().get_webview_window(win.label()) {
+                    let _ = stash::release(&webview);
                     layout::mark(&webview, false);
                     sizing::cancel(&webview);
                     feedback::clear(&webview);
@@ -497,6 +525,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             }
             tray::install(app.handle())?;
             capture::install(app.handle())?;
+            stash::install(app.handle())?;
+            tray::refresh(app.handle())?;
             #[cfg(target_os = "macos")]
             sizing::install_contact_monitor(app.handle());
             if initial_open {

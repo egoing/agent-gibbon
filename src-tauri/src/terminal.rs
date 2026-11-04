@@ -191,6 +191,7 @@ pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
             .orderFrontRegardless();
     }
     #[cfg(not(target_os = "macos"))]
+    crate::stash::release(&win)?;
     win.show().map_err(err)?;
     Ok(())
 }
@@ -227,6 +228,7 @@ pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value,
         crate::Action::Open => open(app, id)?,
         crate::Action::Close => {
             if let Some(win) = app.get_webview_window(id) {
+                crate::stash::release(&win)?;
                 win.hide().map_err(err)?;
             }
         }
@@ -391,6 +393,7 @@ pub fn terminal_resize(window: WebviewWindow, cols: u16, rows: u16) -> Result<()
 #[tauri::command]
 pub fn terminal_hide(window: WebviewWindow) -> Result<(), String> {
     caller(&window)?;
+    crate::stash::release(&window)?;
     window.hide().map_err(err)
 }
 #[tauri::command]
@@ -400,6 +403,12 @@ pub fn terminal_info(window: WebviewWindow) -> Result<Value, String> {
 }
 pub fn geometry(window: &tauri::Window) {
     let app = window.app_handle();
+    if app
+        .get_webview_window(window.label())
+        .is_some_and(|w| crate::stash::owns(&w))
+    {
+        return;
+    }
     let state = app.state::<Terminals>();
     let Ok(mut agents) = state.agents.lock() else {
         return;

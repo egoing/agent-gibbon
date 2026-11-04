@@ -1,0 +1,18 @@
+{
+  "kCGWindowNumber": 31491,
+  "kCGWindowOwnerName": "agent-gibbon",
+  "kCGWindowBounds": {
+    "X": -332,
+    "Height": 48,
+    "Y": 44,
+    "Width": 320
+  },
+  "kCGWindowAlpha": 1,
+  "kCGWindowOwnerPID": 50159,
+  "kCGWindowIsOnscreen": true,
+  "kCGWindowLayer": 5,
+  "kCGWindowStoreType": 1,
+  "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-indicator",
+  "kCGWindowMemoryUsage": 2288,
+  "kCGWindowSharingState": 1
+}

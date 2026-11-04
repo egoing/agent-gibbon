@@ -121,7 +121,8 @@ pub fn reflow(app: &tauri::AppHandle, opened: &WebviewWindow) -> Result<Destinat
         .webview_windows()
         .into_values()
         .filter(|w| {
-            (w.label() == "main" || w.label().starts_with("note-"))
+            !crate::stash::owns(w)
+                && (w.label() == "main" || w.label().starts_with("note-"))
                 && (w.label() == opened.label() || w.is_visible().unwrap_or(false))
         })
         .collect();

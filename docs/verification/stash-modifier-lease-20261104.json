@@ -1,0 +1,8 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle",
+  "instance": "dev-c0cc1b2099c4aae773649d36",
+  "shortcut": "Ctrl+Alt+Cmd",
+  "lease_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/modifier-stash.lock",
+  "competing_lock_rejected": true,
+  "pid": 12503
+}
