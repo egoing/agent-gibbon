@@ -84,6 +84,7 @@ fn destination(area: Rect, current: Rect, initial_y: i64, gap: i64) -> Result<(i
 
 fn move_note(window: &tauri::WebviewWindow, warp: &mut Warp) -> Result<(), String> {
     crate::entrance::finish(window)?;
+    crate::layout::mark(window, true);
     let monitor = window
         .current_monitor()
         .map_err(|e| e.to_string())?
@@ -105,7 +106,7 @@ fn move_note(window: &tauri::WebviewWindow, warp: &mut Warp) -> Result<(), Strin
             height: s.height.into(),
         },
         (warp.initial_y * monitor.scale_factor()).round() as i64,
-        (8.0 * monitor.scale_factor()).round() as i64,
+        0,
     )?;
     window
         .set_position(tauri::PhysicalPosition::new(x, y))

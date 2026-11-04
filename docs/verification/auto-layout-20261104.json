@@ -1,0 +1,2107 @@
+{
+  "ordinary": {
+    "origin": {
+      "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/memo-auto-layout",
+      "id": "dev-3a00beb5ec408d9ff88dc157",
+      "name": "egoing/memo-auto-layout",
+      "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/memo-auto-layout/src-tauri/target",
+      "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/memo-auto-layout/src-tauri/target/debug/agent-gibbon"
+    },
+    "checks": [
+      "CLI instance, binary PID, native window title and unique body marker",
+      "ordinary sequential opens: 300px, bounded heights, gapless rows/columns, transition intermediate frames, focus preserved",
+      "visible content update does not reflow or resize",
+      "native drag excludes only its note; new open avoids and preserves obstacle",
+      "editor action/save re-includes without immediate layout; next open reflows it",
+      "native resize excludes; polling preserves flag/size; explicit content update re-includes",
+      "hidden update preserves visibility/geometry; ordinary reopen reflows all eligible notes",
+      "rapid opens replace active animation destinations without final overlap"
+    ],
+    "states": [
+      {
+        "ordinary": [
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 125.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-01",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 3512,
+              "y": 88
+            },
+            "size": {
+              "height": 250,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 201.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-02",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-2\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 3512,
+              "y": 338
+            },
+            "size": {
+              "height": 402,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 277.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-03",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-3\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 3512,
+              "y": 740
+            },
+            "size": {
+              "height": 554,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 353.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-04",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-4\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 3512,
+              "y": 1294
+            },
+            "size": {
+              "height": 682,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 420.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-05",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-5\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 3512,
+              "y": 1976
+            },
+            "size": {
+              "height": 682,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 420.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-06",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-6\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 2912,
+              "y": 88
+            },
+            "size": {
+              "height": 840,
+              "width": 600
+            },
+            "visible": true
+          }
+        ]
+      },
+      {
+        "final": [
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 48.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": 4,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-01",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# CLI 내용 갱신으로 복귀",
+              "revision": 4,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 3512,
+              "y": 88
+            },
+            "size": {
+              "height": 96,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 201.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-02",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-2\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 3512,
+              "y": 184
+            },
+            "size": {
+              "height": 402,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 277.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-03",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-3\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 3512,
+              "y": 586
+            },
+            "size": {
+              "height": 554,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 353.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-04",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-4\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 3512,
+              "y": 1140
+            },
+            "size": {
+              "height": 706,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 420.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-05",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-5\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 3512,
+              "y": 1846
+            },
+            "size": {
+              "height": 812,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 420.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-06",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-6\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 2912,
+              "y": 88
+            },
+            "size": {
+              "height": 826,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 420.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-07",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-7\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 2912,
+              "y": 914
+            },
+            "size": {
+              "height": 824,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 48.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": 2,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-08",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "숨김 갱신",
+              "revision": 3,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 2912,
+              "y": 1738
+            },
+            "size": {
+              "height": 96,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 420.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-09",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-9\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 2912,
+              "y": 1834
+            },
+            "size": {
+              "height": 824,
+              "width": 600
+            },
+            "visible": true
+          },
+          {
+            "always_on_top": true,
+            "animating": false,
+            "auto_layout_excluded": false,
+            "content_height_cap": 420.0,
+            "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+            "feedback_active": false,
+            "focused": false,
+            "folded": false,
+            "highlight_revision": null,
+            "hovered": false,
+            "id": "auto-proof-d9b6bd-10",
+            "instance": "dev-3a00beb5ec408d9ff88dc157",
+            "layout_destination": null,
+            "layout_pending": false,
+            "note": {
+              "markdown": "# auto-proof-d9b6bd-10\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+              "revision": 1,
+              "capture": null
+            },
+            "ok": true,
+            "opacity": 1.0,
+            "position": {
+              "x": 2312,
+              "y": 88
+            },
+            "size": {
+              "height": 840,
+              "width": 600
+            },
+            "visible": true
+          }
+        ]
+      }
+    ],
+    "pid": 97243,
+    "samples": [
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 125.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 250,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# auto-proof-d9b6bd-1\n본문\n\n본문\n\n본문\n\n본문\n\n본문\n\n",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 250,
+          "width": 600
+        },
+        "visible": true
+      }
+    ],
+    "movement": [
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 49.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": true,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 98,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 편집으로 자동배치 복귀\nauto-proof-d9b6bd",
+          "revision": 3,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 2958,
+          "y": 184
+        },
+        "size": {
+          "height": 146,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 49.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": true,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 98,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 편집으로 자동배치 복귀\nauto-proof-d9b6bd",
+          "revision": 3,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3330,
+          "y": 120
+        },
+        "size": {
+          "height": 114,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 49.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": true,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 98,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 편집으로 자동배치 복귀\nauto-proof-d9b6bd",
+          "revision": 3,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3482,
+          "y": 94
+        },
+        "size": {
+          "height": 102,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 49.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": true,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "auto-proof-d9b6bd-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": {
+          "height": 98,
+          "width": 600,
+          "x": 3512,
+          "y": 88
+        },
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 편집으로 자동배치 복귀\nauto-proof-d9b6bd",
+          "revision": 3,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 100,
+          "width": 600
+        },
+        "visible": true
+      }
+    ]
+  },
+  "regions": {
+    "origin": {
+      "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/memo-auto-layout",
+      "id": "dev-3a00beb5ec408d9ff88dc157",
+      "name": "egoing/memo-auto-layout",
+      "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/memo-auto-layout/src-tauri/target",
+      "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/memo-auto-layout/src-tauri/target/debug/agent-gibbon"
+    },
+    "checks": [
+      "short content stays at 48px; long content never exceeds 420px",
+      "actual region text selection keeps exact bounds, starts excluded despite automatic editor, does not reflow",
+      "actual image selection keeps bounds and aspect ratio, starts excluded, does not reflow",
+      "new normal open avoids both region obstacles without changing their frames",
+      "region edit/pin action re-includes; next normal open reflows text and preserves image ratio without enlarging original",
+      "native tray hidden-note restore uses direct layout and preserves focus"
+    ],
+    "pid": 11188,
+    "overlays": [
+      {
+        "screens": [
+          {
+            "frame": [
+              0,
+              0,
+              2056,
+              1329
+            ],
+            "visible": [
+              0,
+              0,
+              2056,
+              1285
+            ],
+            "scale": 2
+          }
+        ],
+        "windows": [
+          {
+            "kCGWindowOwnerPID": 11188,
+            "kCGWindowAlpha": 1,
+            "kCGWindowBounds": {
+              "X": 1285,
+              "Height": 43,
+              "Y": 0,
+              "Width": 34
+            },
+            "kCGWindowNumber": 29433,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowStoreType": 1,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowSharingState": 1,
+            "kCGWindowName": "Item-0",
+            "kCGWindowLayer": 25,
+            "kCGWindowMemoryUsage": 2288
+          },
+          {
+            "kCGWindowNumber": 29439,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerPID": 11188,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowSharingState": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowLayer": 5,
+            "kCGWindowName": "빈 메모 영역 선택 — Escape로 취소",
+            "kCGWindowBounds": {
+              "X": 0,
+              "Height": 1329,
+              "Y": 0,
+              "Width": 2056
+            },
+            "kCGWindowStoreType": 1
+          },
+          {
+            "kCGWindowLayer": 5,
+            "kCGWindowNumber": 29437,
+            "kCGWindowAlpha": 0.5,
+            "kCGWindowBounds": {
+              "X": 1756,
+              "Height": 420,
+              "Y": 92,
+              "Width": 300
+            },
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowSharingState": 1,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerPID": 11188,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — region-proof-22700d-02-long",
+            "kCGWindowStoreType": 1,
+            "kCGWindowOwnerName": "agent-gibbon"
+          },
+          {
+            "kCGWindowBounds": {
+              "X": 1756,
+              "Height": 48,
+              "Y": 44,
+              "Width": 300
+            },
+            "kCGWindowSharingState": 1,
+            "kCGWindowNumber": 29436,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — region-proof-22700d-01-short",
+            "kCGWindowStoreType": 1,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowOwnerPID": 11188,
+            "kCGWindowLayer": 5,
+            "kCGWindowAlpha": 0.5
+          }
+        ]
+      },
+      {
+        "windows": [
+          {
+            "kCGWindowSharingState": 1,
+            "kCGWindowAlpha": 1,
+            "kCGWindowLayer": 25,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowOwnerPID": 11188,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowStoreType": 1,
+            "kCGWindowName": "Item-0",
+            "kCGWindowNumber": 29433,
+            "kCGWindowBounds": {
+              "X": 1285,
+              "Height": 43,
+              "Y": 0,
+              "Width": 34
+            }
+          },
+          {
+            "kCGWindowBounds": {
+              "X": 0,
+              "Height": 1329,
+              "Y": 0,
+              "Width": 2056
+            },
+            "kCGWindowNumber": 29450,
+            "kCGWindowSharingState": 1,
+            "kCGWindowOwnerPID": 11188,
+            "kCGWindowAlpha": 1,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowName": "영역 캡처 — Escape로 취소",
+            "kCGWindowLayer": 5,
+            "kCGWindowStoreType": 1
+          },
+          {
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowAlpha": 1,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowSharingState": 1,
+            "kCGWindowNumber": 29446,
+            "kCGWindowStoreType": 1,
+            "kCGWindowBounds": {
+              "X": 1149,
+              "Height": 36,
+              "Y": 320,
+              "Width": 91
+            },
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowOwnerPID": 11188,
+            "kCGWindowLayer": 5,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — text-1793776343884666000 · Feedback"
+          },
+          {
+            "kCGWindowSharingState": 1,
+            "kCGWindowOwnerPID": 11188,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowStoreType": 1,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — text-1793776343884666000",
+            "kCGWindowAlpha": 1,
+            "kCGWindowBounds": {
+              "X": 1000,
+              "Height": 120,
+              "Y": 200,
+              "Width": 240
+            },
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowLayer": 5,
+            "kCGWindowNumber": 29445
+          },
+          {
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowLayer": 5,
+            "kCGWindowAlpha": 0.5,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowSharingState": 1,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — region-proof-22700d-02-long",
+            "kCGWindowNumber": 29437,
+            "kCGWindowStoreType": 1,
+            "kCGWindowBounds": {
+              "X": 1756,
+              "Height": 420,
+              "Y": 92,
+              "Width": 300
+            },
+            "kCGWindowOwnerPID": 11188
+          },
+          {
+            "kCGWindowAlpha": 0.5,
+            "kCGWindowOwnerPID": 11188,
+            "kCGWindowStoreType": 1,
+            "kCGWindowBounds": {
+              "X": 1756,
+              "Height": 48,
+              "Y": 44,
+              "Width": 300
+            },
+            "kCGWindowNumber": 29436,
+            "kCGWindowOwnerName": "agent-gibbon",
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowSharingState": 1,
+            "kCGWindowLayer": 5,
+            "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — region-proof-22700d-01-short"
+          }
+        ],
+        "screens": [
+          {
+            "scale": 2,
+            "visible": [
+              0,
+              0,
+              2056,
+              1285
+            ],
+            "frame": [
+              0,
+              0,
+              2056,
+              1329
+            ]
+          }
+        ]
+      }
+    ],
+    "text_initial": {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": true,
+      "content_height_cap": 48.0,
+      "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+      "feedback_active": false,
+      "focused": true,
+      "folded": false,
+      "highlight_revision": null,
+      "hovered": true,
+      "id": "text-1793776343884666000",
+      "instance": "dev-3a00beb5ec408d9ff88dc157",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "markdown": "",
+        "revision": 1,
+        "capture": null
+      },
+      "ok": true,
+      "opacity": 1.0,
+      "position": {
+        "x": 2000,
+        "y": 400
+      },
+      "size": {
+        "height": 240,
+        "width": 480
+      },
+      "visible": true
+    },
+    "image_initial": {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": true,
+      "content_height_cap": 48.0,
+      "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+      "feedback_active": false,
+      "focused": true,
+      "folded": false,
+      "highlight_revision": null,
+      "hovered": true,
+      "id": "image-1793776347596671000",
+      "instance": "dev-3a00beb5ec408d9ff88dc157",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "markdown": "",
+        "revision": 1,
+        "capture": {
+          "height": 100.0,
+          "width": 160.0,
+          "x": 1800.0,
+          "y": 150.0
+        }
+      },
+      "ok": true,
+      "opacity": 1.0,
+      "position": {
+        "x": 3600,
+        "y": 300
+      },
+      "size": {
+        "height": 200,
+        "width": 320
+      },
+      "visible": true
+    },
+    "image_after": {
+      "always_on_top": false,
+      "animating": false,
+      "auto_layout_excluded": false,
+      "content_height_cap": 48.0,
+      "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+      "feedback_active": false,
+      "focused": true,
+      "folded": false,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "image-1793776347596671000",
+      "instance": "dev-3a00beb5ec408d9ff88dc157",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "markdown": "",
+        "revision": 1,
+        "capture": {
+          "height": 100.0,
+          "width": 160.0,
+          "x": 1800.0,
+          "y": 150.0
+        }
+      },
+      "ok": true,
+      "opacity": 1.0,
+      "position": {
+        "x": 3792,
+        "y": 88
+      },
+      "size": {
+        "height": 200,
+        "width": 320
+      },
+      "visible": true
+    },
+    "text_after": {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": false,
+      "content_height_cap": 49.0,
+      "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+      "feedback_active": false,
+      "focused": false,
+      "folded": false,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "text-1793776343884666000",
+      "instance": "dev-3a00beb5ec408d9ff88dc157",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "markdown": "# 영역 편집 후 복귀\nregion-proof-22700d",
+        "revision": 2,
+        "capture": null
+      },
+      "ok": true,
+      "opacity": 1.0,
+      "position": {
+        "x": 3512,
+        "y": 1416
+      },
+      "size": {
+        "height": 98,
+        "width": 600
+      },
+      "visible": true
+    }
+  },
+  "capture": {
+    "pid": 11188,
+    "states": [
+      {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 420.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "layout-live-view-01",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 자동 배치 01\n\n01 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n02 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n03 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n04 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n05 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n06 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n07 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n08 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n09 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n10 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n11 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n12 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n13 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n14 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n15 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n16 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n17 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n18 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n19 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n20 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n21 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n22 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n23 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n24 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n25 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n26 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n27 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n28 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n29 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n30 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n31 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n32 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n33 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n34 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 88
+        },
+        "size": {
+          "height": 644,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 420.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "layout-live-view-02",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 자동 배치 02\n\n01 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n02 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n03 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n04 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n05 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n06 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n07 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n08 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n09 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n10 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n11 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n12 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n13 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n14 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n15 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n16 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n17 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n18 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n19 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n20 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n21 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n22 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n23 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n24 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n25 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n26 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n27 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n28 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n29 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n30 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n31 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n32 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n33 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n34 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 732
+        },
+        "size": {
+          "height": 642,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 420.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "layout-live-view-03",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 자동 배치 03\n\n01 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n02 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n03 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n04 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n05 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n06 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n07 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n08 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n09 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n10 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n11 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n12 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n13 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n14 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n15 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n16 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n17 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n18 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n19 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n20 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n21 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n22 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n23 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n24 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n25 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n26 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n27 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n28 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n29 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n30 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n31 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n32 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n33 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n34 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 1374
+        },
+        "size": {
+          "height": 642,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 420.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "layout-live-view-04",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 자동 배치 04\n\n01 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n02 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n03 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n04 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n05 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n06 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n07 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n08 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n09 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n10 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n11 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n12 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n13 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n14 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n15 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n16 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n17 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n18 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n19 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n20 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n21 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n22 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n23 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n24 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n25 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n26 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n27 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n28 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n29 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n30 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n31 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n32 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n33 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n34 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3512,
+          "y": 2016
+        },
+        "size": {
+          "height": 642,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 420.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "layout-live-view-05",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 자동 배치 05\n\n01 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n02 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n03 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n04 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n05 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n06 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n07 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n08 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n09 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n10 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n11 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n12 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n13 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n14 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n15 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n16 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n17 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n18 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n19 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n20 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n21 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n22 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n23 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n24 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n25 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n26 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n27 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n28 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n29 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n30 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n31 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n32 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n33 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n34 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 2912,
+          "y": 88
+        },
+        "size": {
+          "height": 644,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 420.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "layout-live-view-06",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 자동 배치 06\n\n01 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n02 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n03 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n04 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n05 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n06 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n07 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n08 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n09 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n10 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n11 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n12 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n13 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n14 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n15 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n16 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n17 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n18 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n19 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n20 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n21 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n22 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n23 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n24 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n25 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n26 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n27 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n28 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n29 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n30 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n31 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n32 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n33 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n34 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 2912,
+          "y": 732
+        },
+        "size": {
+          "height": 642,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 420.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "layout-live-view-07",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 자동 배치 07\n\n01 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n02 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n03 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n04 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n05 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n06 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n07 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n08 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n09 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n10 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n11 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n12 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n13 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n14 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n15 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n16 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n17 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n18 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n19 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n20 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n21 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n22 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n23 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n24 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n25 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n26 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n27 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n28 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n29 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n30 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n31 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n32 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n33 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n34 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 2912,
+          "y": 1374
+        },
+        "size": {
+          "height": 642,
+          "width": 600
+        },
+        "visible": true
+      },
+      {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 420.0,
+        "dev_label": "DEV egoing/memo-auto-layout · 3a00beb5",
+        "feedback_active": false,
+        "focused": false,
+        "folded": false,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "layout-live-view-08",
+        "instance": "dev-3a00beb5ec408d9ff88dc157",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "markdown": "# 자동 배치 08\n\n01 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n02 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n03 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n04 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n05 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n06 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n07 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n08 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n09 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n10 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n11 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n12 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n13 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n14 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n15 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n16 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n17 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n18 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n19 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n20 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n21 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n22 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n23 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n24 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n25 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n26 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n27 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n28 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n29 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n30 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n31 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n32 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n33 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.\n\n34 · 실제 일반 메모의 콘텐츠 높이를 측정합니다.",
+          "revision": 1,
+          "capture": null
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 2912,
+          "y": 2016
+        },
+        "size": {
+          "height": 642,
+          "width": 600
+        },
+        "visible": true
+      }
+    ],
+    "native": {
+      "windows": [
+        {
+          "kCGWindowName": "Item-0",
+          "kCGWindowStoreType": 1,
+          "kCGWindowLayer": 25,
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowAlpha": 1,
+          "kCGWindowOwnerName": "agent-gibbon",
+          "kCGWindowNumber": 29433,
+          "kCGWindowBounds": {
+            "X": 1285,
+            "Height": 43,
+            "Y": 0,
+            "Width": 34
+          },
+          "kCGWindowOwnerPID": 11188,
+          "kCGWindowSharingState": 1,
+          "kCGWindowIsOnscreen": true
+        },
+        {
+          "kCGWindowBounds": {
+            "X": 1456,
+            "Height": 321,
+            "Y": 1008,
+            "Width": 300
+          },
+          "kCGWindowNumber": 29476,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowLayer": 5,
+          "kCGWindowStoreType": 1,
+          "kCGWindowSharingState": 1,
+          "kCGWindowOwnerName": "agent-gibbon",
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowOwnerPID": 11188,
+          "kCGWindowAlpha": 1,
+          "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — layout-live-view-08"
+        },
+        {
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowOwnerPID": 11188,
+          "kCGWindowNumber": 29475,
+          "kCGWindowLayer": 5,
+          "kCGWindowSharingState": 1,
+          "kCGWindowOwnerName": "agent-gibbon",
+          "kCGWindowBounds": {
+            "X": 1456,
+            "Height": 321,
+            "Y": 687,
+            "Width": 300
+          },
+          "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — layout-live-view-07",
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowAlpha": 1,
+          "kCGWindowStoreType": 1
+        },
+        {
+          "kCGWindowLayer": 5,
+          "kCGWindowNumber": 29474,
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowBounds": {
+            "X": 1456,
+            "Height": 321,
+            "Y": 366,
+            "Width": 300
+          },
+          "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — layout-live-view-06",
+          "kCGWindowOwnerName": "agent-gibbon",
+          "kCGWindowSharingState": 1,
+          "kCGWindowAlpha": 1,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowOwnerPID": 11188,
+          "kCGWindowStoreType": 1
+        },
+        {
+          "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — layout-live-view-05",
+          "kCGWindowOwnerName": "agent-gibbon",
+          "kCGWindowLayer": 5,
+          "kCGWindowNumber": 29473,
+          "kCGWindowStoreType": 1,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowBounds": {
+            "X": 1456,
+            "Height": 322,
+            "Y": 44,
+            "Width": 300
+          },
+          "kCGWindowAlpha": 1,
+          "kCGWindowOwnerPID": 11188,
+          "kCGWindowSharingState": 1,
+          "kCGWindowMemoryUsage": 2288
+        },
+        {
+          "kCGWindowLayer": 5,
+          "kCGWindowAlpha": 1,
+          "kCGWindowNumber": 29472,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowOwnerName": "agent-gibbon",
+          "kCGWindowStoreType": 1,
+          "kCGWindowOwnerPID": 11188,
+          "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — layout-live-view-04",
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowBounds": {
+            "X": 1756,
+            "Height": 321,
+            "Y": 1008,
+            "Width": 300
+          },
+          "kCGWindowSharingState": 1
+        },
+        {
+          "kCGWindowSharingState": 1,
+          "kCGWindowOwnerPID": 11188,
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowOwnerName": "agent-gibbon",
+          "kCGWindowAlpha": 1,
+          "kCGWindowLayer": 5,
+          "kCGWindowStoreType": 1,
+          "kCGWindowBounds": {
+            "X": 1756,
+            "Height": 321,
+            "Y": 687,
+            "Width": 300
+          },
+          "kCGWindowNumber": 29471,
+          "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — layout-live-view-03",
+          "kCGWindowIsOnscreen": true
+        },
+        {
+          "kCGWindowSharingState": 1,
+          "kCGWindowBounds": {
+            "X": 1756,
+            "Height": 321,
+            "Y": 366,
+            "Width": 300
+          },
+          "kCGWindowAlpha": 1,
+          "kCGWindowOwnerName": "agent-gibbon",
+          "kCGWindowOwnerPID": 11188,
+          "kCGWindowStoreType": 1,
+          "kCGWindowLayer": 5,
+          "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — layout-live-view-02",
+          "kCGWindowNumber": 29470,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowMemoryUsage": 2288
+        },
+        {
+          "kCGWindowLayer": 5,
+          "kCGWindowNumber": 29469,
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowBounds": {
+            "X": 1756,
+            "Height": 322,
+            "Y": 44,
+            "Width": 300
+          },
+          "kCGWindowSharingState": 1,
+          "kCGWindowStoreType": 1,
+          "kCGWindowOwnerName": "agent-gibbon",
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowOwnerPID": 11188,
+          "kCGWindowName": "Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — layout-live-view-01",
+          "kCGWindowAlpha": 1
+        }
+      ],
+      "screens": [
+        {
+          "visible": [
+            0,
+            0,
+            2056,
+            1285
+          ],
+          "scale": 2,
+          "frame": [
+            0,
+            0,
+            2056,
+            1329
+          ]
+        }
+      ]
+    },
+    "capture": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/memo-auto-layout/docs/design/auto-layout-live-macos.png",
+    "region": [
+      1456,
+      44,
+      600,
+      1285
+    ]
+  },
+  "commands": [
+    "npm test",
+    "npm run check",
+    "npm run dev:build",
+    "cargo fmt --manifest-path src-tauri/Cargo.toml -- --check",
+    "node --check ui/app.js",
+    "python3 scripts/auto-layout-smoke.py",
+    "python3 scripts/auto-layout-region-smoke.py",
+    "python3 scripts/entrance-direction-smoke.py"
+  ],
+  "results": {
+    "rust": 69,
+    "ui": 52,
+    "rustfmt": "pass",
+    "clippy": "pass",
+    "dev_build": "pass",
+    "entrance": [
+      "PASS: right hold/reversal/action/reopen/jitter/one-shot",
+      "PASS: left hold/reversal/action/reopen/jitter/one-shot",
+      "PASS: up hold/reversal/action/reopen/jitter/one-shot",
+      "PASS: down hold/reversal/action/reopen/jitter/one-shot",
+      "PASS: native drag cancellation; explicit hidden reopen returns to content-bounded layout",
+      "PASS: concurrent entrances reserve non-overlapping destinations"
+    ]
+  }
+}
