@@ -1,0 +1,18 @@
+{
+  "kCGWindowNumber": 33236,
+  "kCGWindowIsOnscreen": true,
+  "kCGWindowBounds": {
+    "X": 668,
+    "Height": 48,
+    "Y": 952,
+    "Width": 300
+  },
+  "kCGWindowStoreType": 1,
+  "kCGWindowSharingState": 1,
+  "kCGWindowOwnerPID": 21283,
+  "kCGWindowOwnerName": "agent-gibbon",
+  "kCGWindowMemoryUsage": 2288,
+  "kCGWindowLayer": 5,
+  "kCGWindowAlpha": 1,
+  "kCGWindowName": "Agent Gibbon [DEV egoing/issue-36-first-approach \u00b7 8fbfdca2] \u2014 issue49-verified-new"
+}

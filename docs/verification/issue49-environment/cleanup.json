@@ -1,0 +1,13 @@
+{
+  "stopped_own_app_pids": [
+    15904,
+    17029,
+    18037,
+    21283
+  ],
+  "final_binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri/target/debug/agent-gibbon",
+  "caffeinate_pid": 24889,
+  "product_code_changed": false,
+  "push_or_merge": false,
+  "other_apps_or_user_notes_changed": false
+}

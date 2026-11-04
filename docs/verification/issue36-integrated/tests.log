@@ -1,0 +1,158 @@
+
+> agent-gibbon@0.2.7 test
+> cargo test --manifest-path src-tauri/Cargo.toml && node scripts/test-ui.mjs
+
+    Blocking waiting for file lock on build directory
+   Compiling agent-gibbon v0.2.7 (/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 12.57s
+     Running unittests src/main.rs (src-tauri/target/debug/deps/agent_gibbon-9489e5f87df4a6e6)
+
+running 84 tests
+test entrance::tests::destination_reservation_retains_size_in_both_mixed_dpi_directions ... ok
+test capture::tests::text_selection_creates_empty_editable_note_without_image ... ok
+test entrance::tests::every_direction_and_diagonal_starts_the_same_flight_after_hold ... ok
+test capture::tests::retina_crop_and_invalid_selection ... ok
+test entrance::tests::corners_and_negative_monitor_origin_keep_clearance ... ok
+test entrance::tests::early_pointer_movement_waits_until_one_second_even_if_pointer_returns ... ok
+test capture::tests::preview_preserves_dimensions_and_rgba_bytes ... ok
+test entrance::tests::clamping_never_covers_pointer_and_large_windows_fall_back ... ok
+test entrance::tests::mixed_dpi_positions_share_desktop_coordinates ... ok
+test entrance::tests::native_frame_conversion_handles_negative_desktop_positions ... ok
+test entrance::tests::completed_or_disconnected_frame_stops_the_worker ... ok
+test entrance::tests::late_frame_response_keeps_worker_alive_without_queuing_another_frame ... ok
+test entrance::tests::native_frame_conversion_preserves_top_left_while_resizing ... ok
+test entrance::tests::only_pointer_movement_starts_one_flight ... ok
+test feedback::tests::deadlines_restart_and_are_isolated_without_stale_callbacks ... ok
+test feedback_window::tests::placement_below_above_narrow_and_negative_monitor ... ok
+test capture::tests::clipboard_png_decode_preserves_rgba_and_dimensions ... ok
+test feedback::tests::acknowledgement_is_revision_guarded_and_does_not_touch_opacity ... ok
+test feedback_window::tests::stale_confirmation_is_blocked_but_edit_actions_reach_conflict_check ... ok
+test instance::tests::installed_path_is_unchanged ... ok
+test instance::tests::namespaces_are_short_and_distinct ... ok
+test feedback::tests::restored_pending_notes_have_highlights_without_attention_and_reverts_clear_them ... ok
+test instance::tests::rejects_empty_traversal_and_malformed_ids ... ok
+test layout::tests::reverse_ids_follow_requests_even_when_measurements_finish_in_reverse ... ok
+test layout::tests::hidden_restore_moves_only_that_note_to_the_tail ... ok
+test layout::tests::request_order_continues_into_left_column ... ok
+test manager::tests::first_text_ignores_markdown_and_blank_lines ... ok
+test export::tests::failed_export_preserves_destination_and_cleans_temp_file ... ok
+test model::tests::color_updates_are_normalized_preserved_and_atomic ... ok
+test model::tests::confirmation_advances_baseline_and_reverts_remove_only_net_changes ... ok
+test model::tests::cumulative_diff_keeps_unconfirmed_changes_and_omits_intermediate_versions ... ok
+test model::tests::feedback_distinguishes_additions_replacements_and_deletions ... ok
+test model::tests::feedback_html_is_sanitized_and_editor_uses_same_diff ... ok
+test model::tests::feedback_deletion_empty_initial_same_and_metadata ... ok
+test model::palette_tests::palette_cycles_and_explicit_color_survives_updates ... ok
+test model::tests::invalid_ids_and_read_only_options_are_rejected ... ok
+test model::tests::malformed_tasks_report_line_and_preserve_all_fields ... ok
+test model::tests::feedback_marks_changed_lines_without_polluting_source_or_plain_html ... ok
+test model::tests::markdown_validation_allows_code_links_and_real_tasks ... ok
+test model::tests::old_requests_keep_default_window_and_color ... ok
+test model::tests::inline_update_detaches_file_and_editor_preserves_metadata ... ok
+test model::tests::partial_updates_preserve_unspecified_fields ... ok
+test model::tests::feedback_deletion_keeps_remaining_line_unmarked_and_large_diff_is_bounded ... ok
+test model::tests::feedback_preserves_unchanged_middle_and_handles_tasks_tables_code ... ok
+test model::tests::rejected_update_does_not_change_note ... ok
+test ipc::tests::independent_locks_and_stale_socket_recovery ... ok
+test opacity::tests::waits_two_seconds_then_eases_and_interrupts_immediately ... ok
+test placement::tests::bounded_single_and_exact_remainders ... ok
+test placement::tests::fixed_ratio_images_and_folded_heights ... ok
+test model::tests::renders_korean_tasks_and_blocks_active_content ... ok
+test model::tests::pending_baselines_survive_metadata_same_body_and_remain_note_local ... ok
+test model::tests::tasks_use_unindented_rows_but_normal_lists_keep_markers ... ok
+test placement::tests::full_screen_and_short_slots ... ok
+test placement::tests::obstacles_and_negative_origins ... ok
+test placement::tests::ordinary_notes_fill_top_down_then_left ... ok
+test placement::tests::short_content_is_never_stretched_to_fill_the_screen ... ok
+test export::tests::exports_utf8_and_image_bytes_and_replaces_existing_file ... ok
+test placement::tests::zero_gap_fills_exact_horizontal_and_vertical_slots ... ok
+test sizing::contact_tests::folded_margin_handles_small_title_and_negative_coordinates ... ok
+test sizing::contact_tests::rapid_exit_and_reentry_rearms_without_bouncing_after_resize ... ok
+test stash::tests::bare_modifier_chord_commits_once_on_complete_release ... ok
+test stash::tests::escape_requires_exit_and_cooldown ... ok
+test stash::tests::other_shortcuts_clicks_shift_and_preheld_keys_cancel_until_release ... ok
+test stash::tests::reverse_animation_has_exact_endpoints_and_continuous_retarget ... ok
+test stash::tests::unplugged_and_oversized_rectangles_stay_in_work_area ... ok
+test telemetry::tests::development_and_tests_never_enable_collection ... ok
+test telemetry::tests::production_requires_a_valid_embedded_dsn ... ok
+test telemetry::tests::removes_private_error_payloads ... ok
+test tests::invalid_commands_and_duplicate_content_fail ... ok
+test tests::named_window_commands_and_list_parse ... ok
+test model::tests::editor_saves_source_and_rejects_stale_or_invalid_changes ... ok
+test tests::window_labels_do_not_collide ... ok
+test warp::tests::contact_requires_entry_and_does_not_retrigger_on_key_press_inside ... ok
+test warp::tests::entering_without_key_then_pressing_inside_does_not_trigger ... ok
+test warp::tests::focused_note_and_focus_loss_inside_do_not_trigger ... ok
+test warp::tests::movement_does_not_bounce_but_real_exit_rearms ... ok
+test warp::tests::sides_initial_height_and_monitor_bounds ... ok
+test terminal::tests::selection_priority_and_missing ... ok
+test storage::tests::direct_save_confirms_pending_diff_even_when_text_is_unchanged ... ok
+test terminal::tests::metadata_does_not_claim_project_index ... ok
+test storage::tests::cumulative_baseline_survives_restart_and_confirmation_is_transactional ... ok
+test storage::failure_tests::edit_persists_and_failed_store_rolls_back_source_and_memory ... ok
+test storage::tests::roundtrip_and_isolation ... ok
+test storage::tests::windows_reserved_ids_roundtrip_without_case_collisions ... ok
+
+test result: ok. 84 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+✔ reverse drag clamps to the display and submits one selection (9.708333ms)
+✔ click without drag creates no note; Escape cancels (0.631708ms)
+✔ original RGBA pixels are painted before showing, without a load or click event (0.566459ms)
+✔ unusable preview cancels without displaying a black overlay: {"malformed":true} (1.751041ms)
+✔ unusable preview cancels without displaying a black overlay: {"noCanvas":true} (0.728333ms)
+✔ the first pointer press after paint immediately starts selection (0.628541ms)
+✔ canonical paths, not cwd or basename, determine stable instance IDs (89.611458ms)
+✔ development CLI rejects missing, old and foreign binaries without release fallback (612.111875ms)
+✔ font sizes cycle four steps and remain selected across note updates (14.525416ms)
+✔ editing preserves drafts on polling and failed saves; cancel reveals latest note (5.416667ms)
+✔ save returns to rendered content; editor input never drags the window; Escape cancels (1.380584ms)
+✔ failed warp reports error without showing success help or losing draft (1.742708ms)
+✔ feedback persists after opacity expiry and pointer contact until button click, preserving drafts (6.441042ms)
+✔ feedback never reappears when an expired change is saved without editing (3.761917ms)
+✔ next body persists through rollover until explicit button click and affects only that note (2.955416ms)
+✔ fold contact preserves editor drafts and restores through the unfold button (1.4475ms)
+✔ explicit button folds and unfolds without Control and updates its label (1.252583ms)
+✔ native rollover updates chrome without a DOM click or pointer event (1.153792ms)
+✔ clear diff button stays hidden without changes and stale clicks preserve newer revisions (1.468458ms)
+✔ external action never consumes memo height (1.288083ms)
+✔ failed confirmation keeps cumulative changes and allows retry (1.504333ms)
+✔ folded note opens from title, blank space, border and icon without starting a drag (1.860209ms)
+✔ folded click ignores secondary buttons and coalesces pending clicks (1.180708ms)
+✔ region text note opens a blank editor once, preserves drafts and saves normally (1.195667ms)
+✔ canceling the initial region editor does not reopen it on polling (1.520166ms)
+✔ direct save immediately clears existing diff controls (0.94875ms)
+✔ temporary copy notice restores acknowledgement; editing owns the action slot (2.575667ms)
+✔ save success becomes Toast; save error retains actions and outranks tips (1.233917ms)
+✔ development labels remain distinct from installed memo content (0.72125ms)
+✔ delayed surface acknowledgement cannot acknowledge a newer rendered revision (0.8915ms)
+✔ hidden memo defers companion creation until its native window is visible (1.455125ms)
+✔ foreign Feedback actions cannot save another memo draft (0.803125ms)
+✔ connected outline follows its own companion and restores after hiding (0.801542ms)
+✔ copy uses the latest rendered note without confirming or copying deleted diff text (0.923875ms)
+✔ capture copy invokes native image writing without fetching a data URL (0.908291ms)
+✔ failed clipboard write reports the error without showing success feedback (0.942875ms)
+✔ Cmd+S and Ctrl+S export viewing notes and toolbar exports the current draft (0.953875ms)
+✔ cancel and export failure preserve draft and allow retry (0.899708ms)
+✔ repeated shortcuts open only one export dialog (0.840583ms)
+✔ Feedback export shortcut targets its own memo draft (0.986208ms)
+✔ toolbar shortcuts follow platform and gesture help is shown on button use (1.472541ms)
+✔ polling and hover never reset placement intent, explicit editing does (1.044958ms)
+✔ content measurement carries the current revision and pending reopen can measure in editor (1.011833ms)
+✔ content drag delegates to the backend command that cancels entrance before native dragging (7.419959ms)
+✔ editor and non-primary clicks never start entrance-cancelling drag (2.09225ms)
+✔ read-only selection, settings navigation and empty result (8.295417ms)
+✔ version bump updates all manifests and both lockfiles without changing dependencies (18.932125ms)
+✔ version drift blocks release and bump without writing files (10.87775ms)
+✔ release assets require all three platforms and contain independently checkable hashes (3.618375ms)
+✔ frontend reports only fixed error kinds and handles IPC failure (2.676ms)
+✔ light and dark backgrounds have readable foregrounds (0.715041ms)
+✔ sampled RGB space has at least 4.5:1 text contrast (32.604666ms)
+✔ error text retains contrast on saturated memo colors (0.193417ms)
+ℹ tests 53
+ℹ suites 0
+ℹ pass 53
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 779.178917

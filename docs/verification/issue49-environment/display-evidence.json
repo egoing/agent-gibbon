@@ -1,0 +1,15 @@
+{
+  "active_before": "status1=0 status2=0 count=0 displays=[] screens=2",
+  "online_before": "online_status=0 count=2\nid=2 active=0 online=1 asleep=1\nid=3 active=0 online=1 asleep=1",
+  "active_after_wake": "status1=0 status2=0 count=2 displays=[2, 3] screens=2",
+  "online_after_wake": "online_status=0 count=2\nid=2 active=1 online=1 asleep=0\nid=3 active=1 online=1 asleep=0",
+  "active_during_verified_smoke": "status1=0 status2=0 count=1 displays=[2] screens=1",
+  "diagnostic_log": [
+    "ISSUE49 monitors: []",
+    "ISSUE49 fit_note show: 배치할 화면이 너무 작습니다",
+    "ISSUE49 monitors: []",
+    "ISSUE49 fit_note show: 배치할 화면이 너무 작습니다"
+  ],
+  "source": "tao 0.37.1 macos/monitor.rs:146 calls CGDisplay::active_displays; core-graphics active_displays calls CGGetActiveDisplayList",
+  "original_code_restored": true
+}

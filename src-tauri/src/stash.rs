@@ -191,17 +191,26 @@ fn show_frame(w: &WebviewWindow) -> Result<(), String> {
 }
 struct EscapeGate {
     armed: bool,
-    last: Instant,
+    last: Option<Instant>,
 }
 impl EscapeGate {
-    fn step(&mut self, distance: f64, now: Instant) -> bool {
+    fn step(&mut self, distance: f64, now: Instant, tip_visible: bool) -> bool {
+        // The initial hint must not swallow the first approach. Only a hint
+        // after an escape protects reading time; do not queue reentry in it.
+        if self.last.is_some() && tip_visible {
+            return false;
+        }
         if distance > 96.0 {
             self.armed = true;
         }
-        if self.armed && distance < 56.0 && now.duration_since(self.last) >= Duration::from_secs(2)
+        if self.armed
+            && distance < 56.0
+            && self
+                .last
+                .is_none_or(|last| now.duration_since(last) >= Duration::from_secs(2))
         {
             self.armed = false;
-            self.last = now;
+            self.last = Some(now);
             true
         } else {
             false
@@ -538,7 +547,7 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
         top: false,
         gate: EscapeGate {
             armed: true,
-            last: now - Duration::from_secs(2),
+            last: None,
         },
         tip_until: now,
         displayed: None,
@@ -664,7 +673,7 @@ fn tick(app: &tauri::AppHandle) -> Result<(), String> {
         geometry(&w, next, w.scale_factor().map_err(err)?)?;
         return Ok(());
     }
-    if s.displayed.is_some() && now >= s.tip_until && s.gate.step(distance, now) {
+    if s.displayed.is_some() && s.gate.step(distance, now, now < s.tip_until) {
         s.top = !s.top;
         s.flight = Some((r, now));
         s.displayed = Some((s.top, false));
@@ -815,14 +824,25 @@ mod tests {
         let now = Instant::now();
         let mut g = EscapeGate {
             armed: true,
-            last: now - Duration::from_secs(3),
+            last: None,
         };
-        assert!(g.step(20., now));
-        assert!(!g.step(20., now + Duration::from_secs(3)));
-        assert!(!g.step(100., now + Duration::from_secs(3)));
-        assert!(g.step(20., now + Duration::from_secs(3)));
-        g.step(100., now + Duration::from_secs(3));
-        assert!(!g.step(20., now + Duration::from_millis(3500)));
+        assert!(
+            g.step(20., now, true),
+            "initial hint permits first approach"
+        );
+        assert!(!g.step(20., now + Duration::from_secs(3), true));
+        assert!(!g.step(100., now + Duration::from_secs(3), true));
+        assert!(
+            !g.step(20., now + Duration::from_secs(7), false),
+            "protected exit is not queued"
+        );
+        assert!(!g.step(96., now + Duration::from_secs(7), false));
+        assert!(!g.step(100., now + Duration::from_secs(7), false));
+        assert!(!g.step(56., now + Duration::from_secs(7), false));
+        assert!(g.step(20., now + Duration::from_secs(7), false));
+        g.step(100., now + Duration::from_secs(7), false);
+        assert!(!g.step(20., now + Duration::from_millis(7500), false));
+        assert!(g.step(20., now + Duration::from_secs(9), false));
     }
     #[test]
     fn unplugged_and_oversized_rectangles_stay_in_work_area() {

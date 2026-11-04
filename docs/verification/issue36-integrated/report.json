@@ -1,0 +1,2095 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach",
+  "info": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach",
+    "id": "dev-8fbfdca2d77ba80c9f021e8f",
+    "name": "egoing/issue-36-first-approach",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri/target/debug/agent-gibbon"
+  },
+  "id": "issue36-first-approach-571216f1",
+  "phase": "after",
+  "events": [
+    {
+      "at": 8.393,
+      "pointer": [
+        600,
+        500
+      ],
+      "label": "away"
+    },
+    {
+      "at": 10.16,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 10.252,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 10.346,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 10.447,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 10.539,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 10.643,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 10.742,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 10.832,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 10.929,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 11.024,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 11.121,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 11.225,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 11.324,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 11.424,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 11.513,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 11.605,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 11.699,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 11.794,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 11.903,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 12.005,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 12.119,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 12.217,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 12.313,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 12.408,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 12.509,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 12.606,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 12.704,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 12.805,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 12.894,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 12.99,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 13.093,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 13.199,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 13.298,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 13.392,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 13.491,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 13.59,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 13.693,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 13.794,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 13.895,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 13.994,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 14.095,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 14.191,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 14.288,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 14.39,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 14.483,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 14.575,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 14.671,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 14.761,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 14.856,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 14.963,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 15.078,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 15.178,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 15.267,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 15.367,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 15.468,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 15.569,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 15.665,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 15.765,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 15.864,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 15.963,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 16.066,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 16.166,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 16.261,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 16.354,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 16.454,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 16.554,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 16.651,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 16.747,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 16.836,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 16.934,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 17.032,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 17.126,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 17.23,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 17.326,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 17.426,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 17.525,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 17.643,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 17.737,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 17.83,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 17.924,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 18.022,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 18.12,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 18.213,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 18.313,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 18.412,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 18.509,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 18.614,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 18.709,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 18.803,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 18.903,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 18.999,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 19.101,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 19.193,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 19.291,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 19.389,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 19.485,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 19.585,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 19.682,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 19.773,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 19.866,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 19.964,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 20.053,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 20.153,
+      "label": "initial hidden",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1120.0,
+          "y": 367.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 20.318,
+      "pointer": [
+        655.5,
+        1012.48046875
+      ],
+      "label": "restore original pointer"
+    }
+  ],
+  "focus_before": "427\n",
+  "pid": 4623,
+  "executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri/target/debug/agent-gibbon",
+  "result": "failed",
+  "failure": "initial hidden timeout: stash.active=false; first approach not reached"
+}

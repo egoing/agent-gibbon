@@ -1,0 +1,58 @@
+{
+  "always_on_top": true,
+  "animating": false,
+  "auto_layout_excluded": false,
+  "content_height_cap": 48.0,
+  "dev_label": "DEV egoing/issue-36-first-approach · 8fbfdca2",
+  "feedback_active": false,
+  "feedback_surface": null,
+  "focused": false,
+  "folded": false,
+  "highlight_revision": null,
+  "hovered": false,
+  "id": "issue36-first-approach-571216f1",
+  "instance": "dev-8fbfdca2d77ba80c9f021e8f",
+  "layout_destination": null,
+  "layout_pending": false,
+  "note": {
+    "capture": null,
+    "change_html": "<p>issue36-first-approach-571216f1</p>\n",
+    "color": "#ffb2b1",
+    "edit_on_open": false,
+    "html": "<p>issue36-first-approach-571216f1</p>\n",
+    "markdown": "issue36-first-approach-571216f1",
+    "removed": false,
+    "revision": 1,
+    "source_path": null,
+    "status": "대기",
+    "title": "Agent Gibbon",
+    "updated_at": 1793817363645
+  },
+  "ok": true,
+  "opacity": 0.5,
+  "position": {
+    "x": 2260,
+    "y": 638
+  },
+  "size": {
+    "height": 480,
+    "width": 600
+  },
+  "stash": {
+    "active": false,
+    "animating": false,
+    "indicator": {
+      "height": 48.0,
+      "width": 320.0,
+      "x": 1120.0,
+      "y": 367.0
+    },
+    "indicator_moving": false,
+    "restoring": false,
+    "shortcut": "Ctrl+Alt+Cmd",
+    "tip_visible": false,
+    "windows": null
+  },
+  "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-8fbfdca2d77ba80c9f021e8f/docs/issue36-first-approach-571216f1/index.md",
+  "visible": false
+}

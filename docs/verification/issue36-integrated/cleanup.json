@@ -1,0 +1,9 @@
+{
+  "stopped_own_pids": [
+    4623,
+    10994
+  ],
+  "executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri/target/debug/agent-gibbon",
+  "other_instances_touched": false,
+  "pointer_restored_by_smoke": true
+}

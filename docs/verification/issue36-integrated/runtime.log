@@ -1,0 +1,7 @@
+
+> agent-gibbon@0.2.7 dev
+> node scripts/dev.mjs dev --no-watch
+
+     Running DevCommand (`cargo  run --target-dir /Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri/target --no-default-features --color always --`)
+[1m[92m    Finished[0m ]8;;https://doc.rust-lang.org/cargo/reference/profiles.html#default-profiles\`dev` profile [unoptimized + debuginfo]]8;;\ target(s) in 0.79s
+[1m[92m     Running[0m `target/debug/agent-gibbon`

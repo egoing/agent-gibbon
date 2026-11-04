@@ -1,0 +1,2854 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach",
+  "info": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach",
+    "id": "dev-8fbfdca2d77ba80c9f021e8f",
+    "name": "egoing/issue-36-first-approach",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri/target/debug/agent-gibbon"
+  },
+  "id": "issue36-first-approach",
+  "phase": "before",
+  "events": [
+    {
+      "at": 0.222,
+      "pointer": [
+        600,
+        500
+      ],
+      "label": "away"
+    },
+    {
+      "at": 1.866,
+      "label": "initial hidden",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 1.967,
+      "label": "initial hidden",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 2.064,
+      "label": "initial hidden",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 2.161,
+      "label": "initial hidden",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 2.354,
+      "label": "initial native placement settled",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 2.354,
+      "pointer": [
+        2524.0,
+        1404.0
+      ],
+      "label": "first approach during initial bubble"
+    },
+    {
+      "at": 2.639,
+      "label": "first response",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 2.886,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 2.987,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 3.09,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 3.193,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 3.291,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 3.396,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 3.497,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 3.599,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 3.708,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 3.807,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 3.913,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 4.016,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 4.116,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 4.217,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 4.319,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 4.416,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 4.519,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 4.618,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 4.716,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 4.819,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 4.914,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 5.012,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 5.11,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 5.206,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 5.307,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 5.407,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 5.513,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 5.615,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 5.72,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 5.822,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 5.919,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 6.027,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 6.123,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 6.222,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 6.325,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 6.427,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 6.532,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 6.638,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 6.741,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 6.845,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 6.951,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 7.049,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 7.148,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 7.239,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 7.332,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 7.429,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 7.528,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 7.631,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 7.725,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 7.827,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 7.922,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 8.032,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 8.133,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 8.232,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1252.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 8.343,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 797.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 8.448,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 291.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 8.556,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 38.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 8.67,
+      "label": "held pointer delayed flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 8.851,
+      "pointer": [
+        2524.0,
+        61.0
+      ],
+      "label": "arrival approach during bubble"
+    },
+    {
+      "at": 9.273,
+      "label": "arrival protected",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 9.273,
+      "pointer": [
+        600,
+        500
+      ],
+      "label": "96px exit during bubble"
+    },
+    {
+      "at": 9.317,
+      "pointer": [
+        2524.0,
+        61.0
+      ],
+      "label": "reentry during bubble"
+    },
+    {
+      "at": 9.748,
+      "label": "bubble reentry protected",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 9.816,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 9.916,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 10.014,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 10.116,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 10.213,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 10.32,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 10.425,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 10.52,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 10.616,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 10.715,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 10.814,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 10.918,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 11.016,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 11.115,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 11.207,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 11.305,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 11.405,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 11.5,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 11.598,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 11.688,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 11.796,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 11.891,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 11.99,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 12.088,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 12.183,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 12.275,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 12.366,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 12.46,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 12.555,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 12.649,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 12.743,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 12.839,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 12.943,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 13.039,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 13.136,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 13.236,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 13.331,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 13.424,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 13.518,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 13.623,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 13.724,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 13.822,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 13.923,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 14.032,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 14.13,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 14.229,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 14.324,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 14.423,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 14.515,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 14.614,
+      "label": "bubble expired",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 14.836,
+      "label": "held at destination no chase",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 14.836,
+      "pointer": [
+        600,
+        500
+      ],
+      "label": "96px exit after bubble"
+    },
+    {
+      "at": 14.997,
+      "pointer": [
+        2524.0,
+        61.0
+      ],
+      "label": "reentry after bubble"
+    },
+    {
+      "at": 15.115,
+      "label": "second flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 106.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 15.191,
+      "label": "second arrival",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 366.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 15.332,
+      "label": "second arrival",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1007.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 15.424,
+      "label": "second arrival",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1337.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 15.523,
+      "label": "second arrival",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": true,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 15.831,
+      "label": "restored",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": true,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 15.945,
+      "label": "restored",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": true,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 16.057,
+      "label": "restored",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": true,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": [
+          "note-issue36-first-approach"
+        ]
+      },
+      "focused": false
+    },
+    {
+      "at": 16.162,
+      "label": "restored",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 2228.0,
+          "y": 1380.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      },
+      "focused": false
+    },
+    {
+      "at": 16.307,
+      "pointer": [
+        655.5,
+        1012.48046875
+      ],
+      "label": "restore original pointer"
+    }
+  ],
+  "focus_before": "16242\n",
+  "pid": 31113,
+  "executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri/target/debug/agent-gibbon",
+  "reproduced": "first approach blocked during initial bubble",
+  "focus_after": "16242\n",
+  "result": "passed"
+}
