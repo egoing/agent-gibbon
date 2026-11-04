@@ -924,3 +924,34 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - Windows·Intel Mac·실제 복수 모니터/혼합 DPI는 미실행이다. 다른 워크트리를 다시 빌드·종료하는 격리 smoke는 실행하지 않았다. 설치본 교체·공개 릴리스·커밋은 하지 않았다.
 
 Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치·크기 상태에 영향, 앱/데이터 저장 형식은 유지).
+
+## 영역 에이전트 터미널 MVP — 2026-11-04
+
+- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/agent-terminal-mvp`
+- `npm run dev:info`: id `dev-fdef84af36acd888fa9b71b0`, binary `<작업 루트>/src-tauri/target/debug/agent-gibbon`, root는 위 절대 경로와 일치.
+- 호스트 arm64, Node v24.21.0, npm 11.19.0, rustc/cargo 1.91.1. xterm 6.0.0, addon-fit 0.11.0, portable-pty 0.9.0.
+- `npm run dev:build` 성공. `npm test`: Rust 71개, UI 52개 통과. `npm run check` Clippy 통과. `cargo fmt --manifest-path src-tauri/Cargo.toml --check` 통과.
+- 개발 CLI `agent`로 생성한 ID `agent-1793789403647383000`. `inspect`의 ok=true, instance 일치, program=codex, PID=12565, PTY=89×28, running=true 확인. cwd는 저장 루트 바로 아래 해당 agent-ID 폴더.
+- 앱 PID 11986의 실제 실행 경로가 위 binary와 일치. CoreGraphics로 창 30148의 네이티브 제목에 해당 agent-ID를 확인하고 Orca computer로 그 창만 조회·캡처. Codex v0.166.0 화면과 전용 cwd를 확인. [캡처](design/agent-terminal-macos.png).
+- 개발 CLI `close` 후 visible=false, `open` 후 visible=true이며 PID=12565 유지. 유료 모델 작업은 제출하지 않았다.
+- 미검증: 실제 영역 드래그 생성, 단축키 충돌, 한글 IME 조합, 입력·Ctrl+C·복사/붙여넣기, GUI 리사이즈, 앱 종료 자식 프로세스 정리 및 재시작 복원. 백그라운드 GUI 입력은 computer-use 도구가 background_unavailable로 거부했으며 사용자 포커스를 가져오는 재시도는 하지 않았다. Windows 터미널 미지원, Intel 미검증.
+- 저장 설계: agent-ID 폴더는 프로젝트 전용, `.agent-gibbon-terminals/ID.json`은 앱 메타데이터. 메모 로더는 등록된 에이전트 폴더를 건너뛰므로 사용자 index.md를 읽거나 덮어쓰지 않는다.
+- 공식 근거: https://docs.rs/portable-pty/0.9.0/portable_pty/ , https://v2.tauri.app/develop/calling-rust/ , https://xtermjs.org/docs/api/terminal/classes/terminal/
+
+### 한글 입력 보고 후 보완
+
+사용자가 한글 입력 실패를 보고했다. 프로세스의 LANG/LC_ALL/LC_CTYPE는 UTF-8이며 macOS setlocale도 해당 locale을 수락했다. 따라서 locale 오류로 단정하지 않았다. xterm 동적 CSS가 현재 CSP에서 차단됨을 독립 WKWebView 실험으로 확인했다(현재 정책: 기본 글꼴/검정, 허용 정책: Menlo/빨강). 터미널에만 style-src 예외를 적용하고 본문 클릭 포커스 및 composition 단축키 제외를 추가했다. NO_COLOR=1 상속도 제거했다. 개발 빌드와 Clippy 및 JS 구문 검사 통과. 실행 중 사용자 세션을 종료하지 않아 변경 바이너리의 네이티브 IME·실화면 검증은 남아 있다.
+
+### 수정본 재시작 확인
+
+사용자 승인으로 해당 워크스페이스 PID 11986만 정상 종료했다. 종료 후 기존 자식 PID 19142·35643이 사라진 것을 확인했다. 개발 CLI로 직전 표시 창 `agent-1793790346064928000`을 복원했다. 위치 (1072,646), 물리 크기 1020×852, cwd 유지. 새 앱 PID 36837의 실행 경로와 inspect.instance=`dev-fdef84af36acd888fa9b71b0`를 확인했다. 새 Codex PID 37378, running=true. 네이티브 창 30277 제목의 해당 ID를 대조하고 캡처해 고정폭 글꼴·색상·입력 영역 강조가 정상 적용됨을 확인했다. 숨겨져 있던 다른 창은 열지 않았다. 네이티브 한글 IME 조합은 아직 미검증이다.
+
+### 트레이 통합 및 한글 입력 추가 조사
+
+터미널 항목을 일반 메모 목록과 동일한 구분선 안으로 이동했다. 개발 빌드·Clippy·JS 구문 검사 통과, 트레이 SVG/PNG 렌더 확인. xterm 6.0.0 소스의 _inputEvent는 screenReaderMode=true일 때 insertText 전달을 건너뛴다. 독립 WKWebView에서 번들 xterm을 로드하고 같은 합성 InputEvent(data='한', inputType='insertText', composed=false)를 전달한 결과 true에서는 output=[], false에서는 output=['한']이었다. 강제 스크린리더 모드를 해제했다. 이 결과는 실제 키보드 IME 조합 검증이 아니며, 현재 사용자 프로세스를 종료하지 않아 새 수정본은 아직 실행 앱에 미적용이다. 참고한 xterm 이슈 #6084는 작성자가 진단을 철회했으므로 해당 이슈의 사용자 정의 IME bridge는 적용하지 않았다.
+
+### 한글 조합 보정 및 공통 패널
+
+사용자 보고로 기본 모드에서도 자모 분리 현상이 남음을 확인했다. WebKit fallback을 추가해 input/insertReplacementText의 임시 textarea 내용을 PTY로 보내지 않고 조합 표시로 유지한다. 독립 WKWebView에 실제 번들 xterm과 adapter를 로드한 합성 이벤트 시험: ㅎ→하→한→한ㄱ→한그→한글 중 output=[], 공백 확정 후 output=['한글 '], 새 ㅎ 후 Ctrl+C 취소 시 추가 한글 전송 없음. 이는 실제 IME/키보드 검증을 대체하지 않는다. 입력 내용은 로깅하지 않는다.
+
+터미널 HTML에 공통 memo-surface/style.css/toolbar.js와 메모의 아이콘·페이지 이동·8방향 크기 핸들을 적용했다. 글자 크기/선택 복사/상단 고정/숨기기 지원. 개발 빌드와 UI 테스트 및 JS 구문 검사를 수행했다. 사용자 세션을 보존하기 위해 재시작하지 않아 새 패널·IME는 아직 실행 앱 미적용이다.

@@ -8,6 +8,7 @@ pub const MAX_REQUEST: u64 = 1024 * 1024;
 #[serde(rename_all = "lowercase")]
 pub enum Action {
     Open,
+    Agent,
     Update,
     Close,
     Inspect,
@@ -33,6 +34,16 @@ impl Request {
     }
 
     pub fn validate(&self) -> Result<(), String> {
+        if matches!(self.action, Action::Agent)
+            && (self.id.is_some()
+                || self.title.is_some()
+                || self.markdown.is_some()
+                || self.source_path.is_some()
+                || self.status.is_some()
+                || self.color.is_some())
+        {
+            return Err("agent 명령에는 옵션을 지정할 수 없습니다".into());
+        }
         let id = self.id();
         if id.is_empty()
             || id.len() > 64

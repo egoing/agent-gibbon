@@ -43,6 +43,17 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         .map_err(|e| e.to_string())?,
     )
     .map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(
+            app,
+            "capture-agent",
+            "영역 에이전트 터미널 · Ctrl+Shift+3",
+            cfg!(target_os = "macos"),
+            None::<&str>,
+        )
+        .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
     let front = MenuItem::with_id(app, "bring-visible", "열린 메모 앞으로", true, None::<&str>)
         .map_err(|e| e.to_string())?;
     menu.append(&front).map_err(|e| e.to_string())?;
@@ -77,6 +88,19 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         )
         .map_err(|e| e.to_string())?;
         menu.append(&item).map_err(|e| e.to_string())?;
+    }
+    for agent in crate::terminal::entries(app) {
+        menu.append(
+            &MenuItem::with_id(
+                app,
+                format!("agent:{}", agent.id),
+                format!("에이전트 터미널 ({})", agent.id),
+                true,
+                None::<&str>,
+            )
+            .map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())?;
     }
     menu.append(&PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?)
         .map_err(|e| e.to_string())?;
@@ -242,6 +266,11 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             } else if event.id.as_ref() == "capture-text" {
                 crate::capture::trigger(app, crate::capture::SelectionMode::Text);
                 Ok(())
+            } else if event.id.as_ref() == "capture-agent" {
+                crate::capture::trigger(app, crate::capture::SelectionMode::Agent);
+                Ok(())
+            } else if let Some(id) = event.id.as_ref().strip_prefix("agent:") {
+                crate::terminal::open(app, id)
             } else if event.id.as_ref() == "bring-visible" {
                 app.webview_windows().values().try_for_each(|win| {
                     if !crate::feedback_window::is_surface(win.label())

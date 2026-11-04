@@ -351,3 +351,33 @@ Toast 한 줄 높이는 위 제안값에서 약 25px, Action Bar는 약 32px가 
 구현·검증 범위는 [검증 기록](verification.md#메모-자동-배치와-전환-2026-11-04)에 기록한다.
 
 - 적용·검증: Rust 69개·UI 52개, Clippy·Rustfmt·개발 빌드 통과. macOS Retina에서 일반 열기·실제 드래그/리사이즈/편집·영역 지정·트레이 복원·전환 중간 프레임을 검증했다. [실제 일반 메모 8개 배치 화면](design/auto-layout-live-macos.png). Windows·Intel·복수 모니터 실환경은 미검증이다.
+
+## 영역 에이전트 터미널 MVP — 2026-11-04
+
+- macOS에서 Ctrl+Shift+3 또는 Tray Menu의 ‘영역 에이전트 터미널’로 기존 Capture Overlay를 사용한다. 선택한 위치와 크기에 Terminal Window를 만든다.
+- Toolbar는 별도 이동 영역이며 본문 드래그는 터미널 텍스트 선택이다. 오른쪽 아래 핸들로 크기를 조절한다. 닫기 버튼은 숨기기이며 PTY와 스크롤백을 유지한다. Escape와 Ctrl+C는 CLI로 전달한다.
+- 설치된 Codex를 우선 실행하고 없으면 Claude Code를 실행한다. 에이전트·모델·폴더 설정 화면은 없다. 설치 누락·시작 오류는 창 안에 표시한다. 로그인·신뢰·권한 확인은 CLI가 담당한다.
+- Terminal Window는 기본 어두운 표면, 28px 이동 막대, 13px 고정폭 본문, 기존 24px 버튼·4px 모서리를 사용한다. 영역이 작으면 내용이 잘릴 수 있으며 사용자가 크기를 늘릴 수 있다.
+- 재시작 후 폴더와 창 위치·크기는 남고 창은 숨김 상태로 복원된다. 열 때 새 CLI 세션을 시작한다. 과거 프로세스·대화 세션 복원은 제외한다.
+- 구현 및 실환경 검증 범위는 [검증 기록](verification.md)의 에이전트 터미널 절을 따른다. Windows 터미널은 지원하지 않는다.
+
+[터미널 SVG 시안](design/agent-terminal.svg) · [렌더링 PNG](design/agent-terminal.png) · [macOS 실제 실행](design/agent-terminal-macos.png). 시안은 배치 설명용이며 실제 CLI 화면은 설치 버전에 따라 다르다.
+
+### 터미널 스타일·IME 보완
+
+- 터미널 WebView에만 동적 CSS를 허용하여 xterm의 고정폭 글꼴·셀 배치·조합 표시 스타일이 적용되도록 한다. 스크립트 정책과 메모 WebView 정책은 유지한다.
+- 본문 클릭으로 xterm 입력란에 포커스를 주며 IME 조합 중에는 커스텀 단축키 처리를 건너뛴다. 시작·숨김 복원만으로 사용자 포커스를 가져오지 않는다.
+- 개발 빌드·Clippy·JS 구문 검사 통과. 현재 실행 세션 보존을 위해 재시작하지 않았으므로 네이티브 한글 IME 해결 여부와 변경된 실제 외형은 미검증이다. 시안은 의도한 고정폭 터미널 기준을 유지한다.
+
+수정본 재시작 후 실제 창에서 고정폭 글꼴·색상·입력 영역 강조를 확인하고 [실행 화면](design/agent-terminal-macos.png)을 갱신했다. 한글 IME 조합 검증은 남아 있다.
+
+### 통합 트레이 목록 및 입력 모드 보정
+
+- 에이전트 터미널 항목을 생성 명령 영역에서 제거하고 일반 메모·캡처와 같은 Memo List 구분선 안에 배치한다. 개별 선택은 기존 세션 복원 동작을 유지한다. [트레이 시안](design/tray-memo-list.svg)과 PNG를 갱신·렌더 확인했다.
+- xterm의 강제 screenReaderMode=true를 기본값 false로 변경했다. WebView 합성 insertText 입력은 기존 설정에서 누락, 기본 모드에서 전달됨을 확인했다. 네이티브 IME와 스크린리더 접근성 검증은 별도 필요하다.
+
+### 공통 패널·Toolbar 적용
+
+사용자 합의에 따라 Terminal Window도 텍스트·이미지 Memo의 `memo-surface`, 공통 style.css, Toolbar 아이콘·24px 버튼·넘침 페이지 이동(toolbar.js), 사방 크기 조절 핸들을 공유한다. 글자 크기, 선택 텍스트 복사, 상단 고정, 숨기기를 제공한다. Markdown 편집·파일 내보내기·접기·워프는 이번 터미널 Toolbar에서 생략했다. 터미널 본문은 텍스트 선택을 유지하며 상단 제목 영역으로 이동한다. Escape는 CLI로 전달하므로 숨기기 단축키로 안내하지 않는다. 시안 SVG/PNG를 갱신했다. 실제 앱 적용 및 네이티브 IME 검증은 재시작 후 필요하다.
+
+한글 fallback은 네이티브 composition 이벤트가 없는 WebKit 입력 경로에서 provisional textarea 값을 로컬 조합 표시로 유지한다. 공백·구두점·제어키·포커스 이탈로 확정하며 Escape/Ctrl+C는 임시 조합을 취소한다. 정상 composition 이벤트는 xterm에 맡긴다. 실제 입력기 검증 전까지 해결 완료로 기록하지 않는다.

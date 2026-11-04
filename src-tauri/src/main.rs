@@ -15,6 +15,7 @@ mod sizing;
 mod source;
 mod storage;
 mod telemetry;
+mod terminal;
 mod tray;
 mod warp;
 #[cfg(windows)]
@@ -214,6 +215,20 @@ fn apply_with_presentation(
     presentation: entrance::Presentation,
 ) -> Result<Value, String> {
     request.validate()?;
+    if matches!(request.action, Action::Agent) {
+        return terminal::create(
+            app,
+            capture::ImageNote {
+                x: 120.,
+                y: 120.,
+                width: 720.,
+                height: 460.,
+            },
+        );
+    }
+    if terminal::contains(app, request.id()) {
+        return terminal::handle(app, &request);
+    }
     let state = app.state::<AppNotes>();
     if matches!(request.action, Action::List) {
         let notes = state.lock().map_err(|e| e.to_string())?;
@@ -225,6 +240,9 @@ fn apply_with_presentation(
                 "visible":win.is_visible().map_err(|e| e.to_string())?,
                 "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?}),
             );
+        }
+        for agent in terminal::entries(app) {
+            windows.push(terminal::inspect(app, &agent.id)?);
         }
         return Ok(json!({"ok":true,"windows":windows}));
     }
@@ -285,7 +303,7 @@ fn apply_with_presentation(
             win.hide().map_err(|e| e.to_string())?;
             tray::sync_visibility(app)?;
         }
-        Action::Update | Action::Inspect | Action::List => (),
+        Action::Update | Action::Inspect | Action::List | Action::Agent => (),
     }
     let menu_changed = existing
         .as_ref()
@@ -313,6 +331,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .manage(capture::Captures::default())
+        .manage(terminal::Terminals::default())
         .manage(PointerStates::default())
         .manage(initial_focus)
         .manage(warp::Warps::default())
@@ -327,6 +346,11 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         )])))
         .invoke_handler(tauri::generate_handler![
             snapshot,
+            terminal::terminal_start,
+            terminal::terminal_write,
+            terminal::terminal_resize,
+            terminal::terminal_hide,
+            terminal::terminal_info,
             layout::content_action,
             feedback_window::present_feedback,
             feedback_window::feedback_snapshot,
@@ -355,6 +379,19 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::manual_resize
         ])
         .on_window_event(|win, event| {
+            if win.label().starts_with("agent-") {
+                if matches!(
+                    event,
+                    tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)
+                ) {
+                    terminal::geometry(win);
+                }
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    let _ = win.hide();
+                }
+                return;
+            }
             if win.label().starts_with("capture-") || feedback_window::is_surface(win.label()) {
                 return;
             }
@@ -419,6 +456,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 .map_err(|e| e.to_string())?
                 .extend(restored);
             app.manage(store);
+            terminal::restore(app.handle())?;
             for id in ids {
                 let win = create_window(app.handle(), &id)?;
                 let capture = app
@@ -486,6 +524,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .build(tauri::generate_context!())
         .map_err(|e| e.to_string())?;
     app.run(|_app, _event| {
+        if matches!(_event, tauri::RunEvent::Exit) {
+            terminal::shutdown(_app);
+        }
         #[cfg(target_os = "macos")]
         if let tauri::RunEvent::Reopen { .. } = _event {
             if let Err(error) = reopen_from_icon(_app) {
@@ -532,7 +573,7 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
 }
 
 fn parse(args: &[String]) -> Result<Request, String> {
-    let action = match args.first().map(String::as_str) { Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
+    let action = match args.first().map(String::as_str) { Some("agent") => Action::Agent, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
         action,
         source_path: None,
@@ -592,7 +633,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
     let request = parse(args)?;
     let stream = match ipc::connect() {
         Ok(stream) => stream,
-        Err(_) if matches!(request.action, Action::Open) => {
+        Err(_) if matches!(request.action, Action::Open | Action::Agent) => {
             let mut child = Command::new(std::env::current_exe().map_err(|e| e.to_string())?);
             child
                 .arg("--serve")

@@ -1,1 +1,16 @@
-{"identifier":"main","windows":["main","note-*"],"permissions":["core:window:allow-start-dragging","core:window:allow-start-resize-dragging","clipboard-manager:allow-write-text","core:event:allow-listen","core:event:allow-unlisten"]}
+{
+  "identifier": "main",
+  "windows": [
+    "main",
+    "note-*",
+    "agent-*"
+  ],
+  "permissions": [
+    "core:window:allow-start-dragging",
+    "core:window:allow-start-resize-dragging",
+    "clipboard-manager:allow-write-text",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "clipboard-manager:allow-read-text"
+  ]
+}

@@ -162,6 +162,16 @@ impl Store {
             if !entry_type_is_directory(&path)? {
                 continue;
             }
+            // Agent project files are not application-owned Markdown records.
+            if path.file_name().is_some_and(|name| {
+                self.0
+                    .join(".agent-gibbon-terminals")
+                    .join(name)
+                    .with_extension("json")
+                    .is_file()
+            }) {
+                continue;
+            }
             let path = path.join("index.md");
             if !path.exists() {
                 continue;

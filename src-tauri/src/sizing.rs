@@ -317,7 +317,9 @@ pub fn install_contact_monitor(app: &tauri::AppHandle) {
             return;
         }
         for window in app.webview_windows().into_values() {
-            if crate::feedback_window::is_surface(window.label()) {
+            if crate::feedback_window::is_surface(window.label())
+                || window.label().starts_with("agent-")
+            {
                 continue;
             }
             if let Err(error) = poll_fold(window.clone(), window.state::<Sizes>()) {

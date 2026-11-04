@@ -23,6 +23,7 @@ xcap = "0.7"
 base64 = "0.22"
 tauri-plugin-dialog = "2"
 tempfile = "3"
+portable-pty = "0.9"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]

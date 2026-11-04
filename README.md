@@ -309,3 +309,11 @@ Agent Gibbon의 소스 코드는 [MIT 라이선스](LICENSE)로 공개합니다.
 ## 홈페이지 운영
 
 [공식 홈페이지](https://agentgibbon.com/)는 Vercel에서 `website/dist/`의 정적 파일을 배포합니다. Cloudflare는 DNS를 관리합니다. 배포 설정·검색 등록 상태·검증 기록은 [홈페이지 운영 문서](website/README.md)를 참고하세요. 데스크톱 앱 빌드와 홈페이지 배포는 별개입니다.
+
+## 영역 에이전트 터미널 (macOS MVP)
+
+Ctrl+Shift+3 또는 트레이의 **영역 에이전트 터미널**에서 영역을 드래그하면 실제 PTY 터미널이 열린다. 설치된 Codex CLI를 우선 실행하고 없으면 Claude Code를 실행한다. 둘 다 없으면 창에서 설치 필요를 안내한다. 로그인·신뢰·권한 확인은 각 CLI 안내를 따른다.
+
+메모 저장 루트의 `agent-<고유 숫자 ID>` 폴더 자체가 작업 디렉터리다. 앱 메타데이터는 별도 `.agent-gibbon-terminals` 폴더에 저장하므로 프로젝트의 `index.md`를 덮어쓰지 않는다. 숨기기와 트레이 복원은 같은 세션을 유지한다. 앱 종료 시 자식 프로세스를 정리하며 재시작 후 폴더는 보존하되 새 세션을 시작한다.
+
+본문 드래그는 텍스트 선택, 상단은 창 이동, 우하단은 크기 조절이다. ⌘C/⌘V는 복사/붙여넣기, Ctrl+C는 CLI 인터럽트다. 개발 CLI의 `agent` 명령은 기본 크기 터미널을 생성하며 기존 ID의 `open`, `close`, `inspect`를 지원한다. Windows 터미널은 미지원이며 검증 범위는 [검증 기록](docs/verification.md), 상호작용 기준은 [디자인 시스템](docs/design-system.md)을 참고한다.

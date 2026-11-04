@@ -23,6 +23,7 @@ pub struct ImageNote {
 pub enum SelectionMode {
     Image,
     Text,
+    Agent,
 }
 struct Screen {
     mode: SelectionMode,
@@ -87,6 +88,17 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
         })
     {
         eprintln!("영역 메모 단축키 등록 실패 (메뉴에서 실행 가능): {error}");
+    }
+    #[cfg(target_os = "macos")]
+    if let Err(error) = app
+        .global_shortcut()
+        .on_shortcut("Ctrl+Shift+3", |app, _, event| {
+            if event.state() == ShortcutState::Pressed {
+                trigger(app, SelectionMode::Agent);
+            }
+        })
+    {
+        eprintln!("에이전트 단축키 등록 실패 (메뉴에서 실행 가능): {error}");
     }
     Ok(())
 }
@@ -187,6 +199,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
         .title(match mode {
             SelectionMode::Image => "영역 캡처 — Escape로 취소",
             SelectionMode::Text => "빈 메모 영역 선택 — Escape로 취소",
+            SelectionMode::Agent => "에이전트 터미널 영역 선택 — Escape로 취소",
         })
         .decorations(false)
         .resizable(false)
@@ -349,7 +362,7 @@ pub fn finish_capture(
     height: f64,
 ) -> Result<(), String> {
     let app = window.app_handle();
-    let (bytes, bounds) = {
+    let (bytes, bounds, mode) = {
         let state = app.state::<Captures>();
         let screens = state.0.lock().map_err(err)?;
         let s = screens.get(window.label()).ok_or("캡처가 종료되었습니다")?;
@@ -374,10 +387,14 @@ pub fn finish_capture(
                 width,
                 height,
             },
+            s.mode,
         )
     };
     // Restore the previous app before the new editor deliberately takes focus.
     cleanup(app);
+    if mode == SelectionMode::Agent {
+        return crate::terminal::create(app, bounds).map(|_| ());
+    }
     match bytes {
         Some(bytes) => create_note(app, bytes, bounds),
         None => create_text_note(app, bounds),
