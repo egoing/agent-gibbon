@@ -1,0 +1,62 @@
+{
+  "id": "2d2ef6d6-5c6a-41cc-b372-7f0c28eb1c65",
+  "ok": true,
+  "result": {
+    "screenshotStatus": {
+      "metadata": {
+        "engine": "screenCaptureKit",
+        "windowId": 33931
+      },
+      "state": "captured"
+    },
+    "snapshot": {
+      "id": "C9A83960-D3C6-4737-9F88-D725D59C76B1",
+      "truncation": {
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "truncated": false,
+        "maxDepthReached": false
+      },
+      "coordinateSpace": "window",
+      "app": {
+        "bundleId": null,
+        "pid": 50183,
+        "name": "agent-gibbon"
+      },
+      "window": {
+        "screenIndex": 0,
+        "x": 120,
+        "height": 550,
+        "isMinimized": false,
+        "id": 33931,
+        "width": 860,
+        "platform": {
+          "layer": 5
+        },
+        "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000",
+        "y": 120,
+        "isOffscreen": false
+      },
+      "elementCount": 13,
+      "focusedElementId": 46,
+      "treeText": "App=agent-gibbon (pid 50183)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000\", App: agent-gibbon.\n\n34 standard window Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000\n\t35 scroll area\n\t\t36 HTML content 에이전트 터미널\n\t\t\t37 text codex · agent-1793833639537185000\n\t\t\t38 toolbar Toolbar\n\t\t\t\t39 button (disabled) 이전 도구\n\t\t\t\t40 button 글자 크기 13px, 클릭하여 변경\n\t\t\t\t41 button 선택한 텍스트 복사\n\t\t\t\t42 toggle button 상단 고정, Value: 1\n\t\t\t\t43 button 터미널 숨기기\n\t\t\t\t44 button (disabled) 다음 도구\n\t\t\t45 container 에이전트 터미널\n\t\t\t\t46 text entry area (settable) Terminal input\n\nThe focused UI element is 46 text entry area (settable) Terminal input."
+    },
+    "screenshot": {
+      "width": 1720,
+      "scale": 2,
+      "format": "png",
+      "height": 1100,
+      "path": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/2d2ef6d6-5c6a-41cc-b372-7f0c28eb1c65-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-05T23:08:10.855Z"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854500836535583,
+    "end_ns": 854501256624833,
+    "seconds": 0.42008925
+  }
+}

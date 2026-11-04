@@ -1,6 +1,6 @@
 # 터미널 CLI 탐색 개선 #17 — 2026-11-05
 
-탐색 지연과 세션 목록 잠금은 변경 전 실제 개발 앱에서 재현했고, 성공 캐시·단계별 fallback·창별 시작 예약을 구현했다. **최종 앱의 본문 표시와 네이티브 입력은 확인하지 못해 병합 보류**다. 관련 후속은 [#50](https://github.com/egoing/agent-gibbon/issues/50)(잘못된 interpreter의 PTY spawn)과 [#51](https://github.com/egoing/agent-gibbon/issues/51)(빈 본문/접근성 창 목록)이다.
+탐색 지연과 세션 목록 잠금은 변경 전 실제 개발 앱에서 재현했고, 성공 캐시·단계별 fallback·창별 시작 예약을 구현했다. **잠금 해제 후 계측 없는 최종 앱의 실제 표시·네이티브 키·resize·숨김 복원과 느린 탐색 중 기존 터미널 응답 검증을 완료했다.** [08시 재검증의 출처·외부 로그·실제 화면](terminal-discovery-unlocked-20261105/README.md)을 현재 판정의 근거로 삼으며, 아래 최초 실행의 미검증·Conf 3 표기는 당시 기록으로 보존한다. Draft PR #52의 병합은 감독 판단을 기다린다. [#50](https://github.com/egoing/agent-gibbon/issues/50)(잘못된 interpreter의 PTY spawn)은 별도 미해결이며, [#51](https://github.com/egoing/agent-gibbon/issues/51)은 잠금 해제 후 원본 앱에서도 표시 문제가 재현되지 않았다.
 
 ## 출처와 재현 범위
 

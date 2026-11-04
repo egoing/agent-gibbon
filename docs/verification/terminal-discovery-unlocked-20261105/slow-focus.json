@@ -1,0 +1,22 @@
+{
+  "id": "7187c3e4-f248-4483-9774-c723a942cb75",
+  "ok": false,
+  "error": {
+    "code": "background_unavailable",
+    "message": "the background click target does not identify the requested window; run get-app-state again or retry with --restore-window",
+    "data": {
+      "nextSteps": [
+        "If the message names a popup menu or `<select>`, set its option with `orca computer set-value` on that element instead of clicking.",
+        "Otherwise retry once with `--restore-window`; that brings the app forward and uses foreground input, so tell the user it will take over their screen."
+      ]
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854575930614750,
+    "end_ns": 854576247473916,
+    "seconds": 0.316859166
+  }
+}

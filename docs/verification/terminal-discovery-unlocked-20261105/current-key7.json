@@ -1,0 +1,70 @@
+{
+  "id": "55f9e8dc-eaa1-43e9-9dfa-df53e97fbdbb",
+  "ok": true,
+  "result": {
+    "screenshot": null,
+    "action": {
+      "actionName": "pressKey",
+      "verification": {
+        "actualPreview": null,
+        "state": "unverified",
+        "reason": "synthetic_input",
+        "expected": null
+      },
+      "path": "synthetic",
+      "fallbackReason": null,
+      "delivery": "background",
+      "targetWindowId": 33931
+    },
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "snapshot": {
+      "id": "4F9F7A86-4E4B-44E9-90FD-83E11A6B3B28",
+      "focusedElementId": 12,
+      "coordinateSpace": "window",
+      "window": {
+        "x": 120,
+        "isMinimized": false,
+        "platform": {
+          "layer": 5
+        },
+        "height": 460,
+        "id": 33931,
+        "width": 720,
+        "isOffscreen": false,
+        "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000",
+        "y": 120,
+        "screenIndex": 0
+      },
+      "elementCount": 13,
+      "truncation": {
+        "truncated": false,
+        "maxDepthReached": false,
+        "maxDepth": 64,
+        "maxNodes": 1200
+      },
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": null,
+        "pid": 50183
+      },
+      "treeText": "App=agent-gibbon (pid 50183)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000\", App: agent-gibbon.\n\nNo change in the accessibility tree since the previous snapshot.\n\nThe focused UI element is 12 text entry area (settable) Terminal input.",
+      "treeDiff": {
+        "baseSnapshotId": "39A11085-CD3F-46D4-90AA-EFD3425F3F0A",
+        "changed": 0,
+        "added": 0,
+        "removed": 0
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854487851316000,
+    "end_ns": 854488067737333,
+    "seconds": 0.216421333
+  }
+}

@@ -475,7 +475,7 @@ SVG 3개와 PNG 3개를 함께 갱신했다. PNG 렌더링과 배치 육안 확�
 
 - 기존 ‘설치된 에이전트를 찾고 있습니다…’ 상태와 설치 누락·오류의 창 안 안내를 유지한다. 현재 PATH의 Codex를 먼저 선택하고, 없으면 로그인 셸 → 대화형 로그인 셸을 필요한 만큼만 실행한다. Claude fallback은 Codex 탐색을 마친 뒤 선택한다.
 - 성공 결과는 앱 수명 동안 공유하고 실행 파일 변경·삭제·실패 시 무효화한다. 같은 창의 시작 중/시작됨 요청은 중복으로 거부한다. 셸 단계 3초·전체 탐색 4초 제한과 한 번의 spawn 실패 재탐색을 적용하며, 비정상 종료된 CLI를 자동 재시작하지 않는다.
-- 레이아웃·색·아이콘·포커스 동작은 변경하지 않아 SVG/PNG 시안을 변경하지 않았다. fixture와 실제 앱 IPC의 입력·resize·조회는 확인했으나 계측 없는 최종 앱의 본문 표시·네이티브 입력은 완료로 판정하지 않는다. [#17 검증 기록](verification/terminal-discovery-20261105.md), 독립 후속 [#50](https://github.com/egoing/agent-gibbon/issues/50)·[#51](https://github.com/egoing/agent-gibbon/issues/51)을 따른다.
+- 레이아웃·색·아이콘·포커스 기준은 변경하지 않아 SVG/PNG 시안을 변경하지 않았다. 잠금 해제된 macOS ARM64에서 계측 없는 최종 앱의 READY/ECHO 표시·네이티브 키·resize·동일 PTY의 숨김 복원을 확인했다. 2.2초 탐색 중에도 기존 터미널의 입력·resize와 조회가 완료됐다. [최종 앱 출처·화면·겹친 시간 구간과 한계](verification/terminal-discovery-unlocked-20261105/README.md)를 따르며, Windows·Intel·실제 모델 CLI 인증·전체 한글 IME는 미검증이다. [#51](https://github.com/egoing/agent-gibbon/issues/51)은 원본 앱에서도 표시 문제가 재현되지 않은 환경 검증이며, 잘못된 interpreter의 PTY 오류 [#50](https://github.com/egoing/agent-gibbon/issues/50)은 별도 미해결 범위로 유지한다.
 
 ### 터미널 스타일·IME 보완
 

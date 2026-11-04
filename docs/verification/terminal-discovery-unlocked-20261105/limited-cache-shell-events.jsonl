@@ -1,0 +1,2 @@
+{"kind": "begin", "at": 1793833832.174967, "mono_ns": 22672583, "pid": 62548, "args": ["-lc", "printf '\\nAGENT_GIBBON_PATH=%s\\n' \"$PATH\""]}
+{"kind": "end", "at": 1793833833.376234, "mono_ns": 1223946916, "pid": 62548, "args": ["-lc", "printf '\\nAGENT_GIBBON_PATH=%s\\n' \"$PATH\""]}

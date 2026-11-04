@@ -1,0 +1,51 @@
+{
+  "id": "fd79cec3-c632-4f5c-a366-fc55e799d324",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "treeText": "App=agent-gibbon (pid 50183)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000\", App: agent-gibbon.\n\n34 standard window Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000\n\t35 scroll area\n\t\t36 HTML content 에이전트 터미널\n\t\t\t37 text codex · agent-1793833639537185000\n\t\t\t38 toolbar Toolbar\n\t\t\t\t39 button (disabled) 이전 도구\n\t\t\t\t40 button 글자 크기 13px, 클릭하여 변경\n\t\t\t\t41 button 선택한 텍스트 복사\n\t\t\t\t42 toggle button 상단 고정, Value: 1\n\t\t\t\t43 button 터미널 숨기기\n\t\t\t\t44 button (disabled) 다음 도구\n\t\t\t45 container 에이전트 터미널\n\t\t\t\t46 text entry area (settable) Terminal input\n\nNo UI element is currently focused.",
+      "elementCount": 13,
+      "focusedElementId": null,
+      "id": "38F76426-BEBF-4BD8-80AA-B5020E7F0A49",
+      "window": {
+        "width": 860,
+        "height": 550,
+        "x": 120,
+        "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000",
+        "platform": {
+          "layer": 5
+        },
+        "isOffscreen": false,
+        "screenIndex": 0,
+        "id": 33931,
+        "y": 120,
+        "isMinimized": false
+      },
+      "truncation": {
+        "maxNodes": 1200,
+        "truncated": false,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      },
+      "app": {
+        "bundleId": null,
+        "pid": 50183,
+        "name": "agent-gibbon"
+      },
+      "coordinateSpace": "window"
+    },
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "screenshot": null
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854605666150625,
+    "end_ns": 854605942525791,
+    "seconds": 0.276375166
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "id": "84ecd6c2-28c6-4352-869d-6fd4d2af9f02",
+  "ok": true,
+  "result": {
+    "action": {
+      "delivery": "background",
+      "verification": {
+        "actualPreview": null,
+        "state": "unverified",
+        "reason": "synthetic_input",
+        "expected": null
+      },
+      "targetWindowId": 33931,
+      "path": "synthetic",
+      "actionName": "pressKey",
+      "fallbackReason": null
+    },
+    "snapshot": {
+      "elementCount": 13,
+      "window": {
+        "screenIndex": 0,
+        "isMinimized": false,
+        "y": 120,
+        "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000",
+        "width": 720,
+        "x": 120,
+        "height": 460,
+        "platform": {
+          "layer": 5
+        },
+        "id": 33931,
+        "isOffscreen": false
+      },
+      "id": "9CBA95C4-6E5F-4BD0-9C00-7F5F6BF9D590",
+      "treeText": "App=agent-gibbon (pid 50183)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833639537185000\", App: agent-gibbon.\n\nNo change in the accessibility tree since the previous snapshot.\n\nThe focused UI element is 12 text entry area (settable) Terminal input.",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": null,
+        "pid": 50183
+      },
+      "focusedElementId": 12,
+      "truncation": {
+        "maxDepth": 64,
+        "maxDepthReached": false,
+        "maxNodes": 1200,
+        "truncated": false
+      },
+      "coordinateSpace": "window",
+      "treeDiff": {
+        "baseSnapshotId": "4F9F7A86-4E4B-44E9-90FD-83E11A6B3B28",
+        "changed": 0,
+        "added": 0,
+        "removed": 0
+      }
+    },
+    "screenshot": {
+      "format": "png",
+      "height": 920,
+      "width": 1440,
+      "scale": 2,
+      "path": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/84ecd6c2-28c6-4352-869d-6fd4d2af9f02-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-05T23:07:58.113Z"
+    },
+    "screenshotStatus": {
+      "metadata": {
+        "engine": "screenCaptureKit",
+        "windowId": 33931
+      },
+      "state": "captured"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854488101593541,
+    "end_ns": 854488513915333,
+    "seconds": 0.412321792
+  }
+}

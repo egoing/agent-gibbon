@@ -1,0 +1,5 @@
+
+> agent-gibbon@0.2.7 dev:build
+> node scripts/dev.mjs build
+
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.87s

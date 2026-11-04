@@ -1,0 +1,70 @@
+{
+  "id": "290f0b5e-a29c-40a6-966a-ae09aabc851f",
+  "ok": true,
+  "result": {
+    "action": {
+      "fallbackReason": null,
+      "path": "synthetic",
+      "actionName": "typeText",
+      "verification": {
+        "reason": "synthetic_input",
+        "actualPreview": null,
+        "expected": null,
+        "state": "unverified"
+      },
+      "delivery": "background",
+      "targetWindowId": 33969
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "snapshot": {
+      "treeText": "App=agent-gibbon (pid 62412)\nWindow: \"Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000\", App: agent-gibbon.\n\nNo change in the accessibility tree since the previous snapshot.\n\nNo UI element is currently focused.",
+      "truncation": {
+        "maxDepthReached": false,
+        "maxDepth": 64,
+        "truncated": false,
+        "maxNodes": 1200
+      },
+      "window": {
+        "height": 460,
+        "isOffscreen": false,
+        "title": "Agent Gibbon [DEV egoing/issue-17-terminal-discovery · 40ca7f18] — agent-1793833831951440000",
+        "id": 33969,
+        "y": 120,
+        "screenIndex": 0,
+        "platform": {
+          "layer": 5
+        },
+        "x": 120,
+        "isMinimized": false,
+        "width": 720
+      },
+      "elementCount": 13,
+      "focusedElementId": null,
+      "id": "63BBFD86-F20D-4F21-B8BC-BFF14A33F652",
+      "coordinateSpace": "window",
+      "app": {
+        "name": "agent-gibbon",
+        "pid": 62412,
+        "bundleId": null
+      },
+      "treeDiff": {
+        "baseSnapshotId": "8E8DDAF6-4B52-42B4-9DD2-001CD6C7849F",
+        "changed": 0,
+        "added": 0,
+        "removed": 0
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  },
+  "fixture_timing": {
+    "start_ns": 854664287456208,
+    "end_ns": 854664639388833,
+    "seconds": 0.351932625
+  }
+}
