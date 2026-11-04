@@ -1,0 +1,217 @@
+{
+  "instance": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle",
+    "id": "dev-c0cc1b2099c4aae773649d36",
+    "name": "egoing/window-stash-toggle",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon"
+  },
+  "ids": [
+    "stash-smoke-f3b54121-edit",
+    "stash-smoke-f3b54121-fold",
+    "stash-smoke-f3b54121-hidden",
+    "stash-smoke-f3b54121-new"
+  ],
+  "checks": [
+    "root/id/binary + inspect instance + PID/native title proven",
+    "real hotkey: native movement/shrink/alpha/hide; original hidden stays hidden; focus preserved",
+    "cursor-monitor icon, escape, 6s readable actual-key tip, cooldown/reentry, no focus steal",
+    "exact geometry/fold restoration, draft retained through CLI update, new open bypasses reflow",
+    "three rapid animation reversals: no stale hide/move frame",
+    "individual close/open overrides the stash snapshot safely during animation",
+    "3 actual screens: cursor screen selection and original position restore"
+  ],
+  "pid": 13437,
+  "executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon --serve",
+  "native_before": {
+    "windows": [
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowName": "Item-0",
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowNumber": 30691,
+        "kCGWindowLayer": 25,
+        "kCGWindowOwnerPID": 13437,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowBounds": {
+          "X": 1309,
+          "Height": 24,
+          "Y": 0,
+          "Width": 34
+        },
+        "kCGWindowAlpha": 1,
+        "kCGWindowSharingState": 1
+      },
+      {
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowSharingState": 1,
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-smoke-f3b54121-fold · Feedback",
+        "kCGWindowAlpha": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowBounds": {
+          "X": -1628,
+          "Height": 44,
+          "Y": 112,
+          "Width": 300
+        },
+        "kCGWindowNumber": 30736,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerPID": 13437,
+        "kCGWindowMemoryUsage": 2288
+      },
+      {
+        "kCGWindowBounds": {
+          "X": -1628,
+          "Height": 12,
+          "Y": 100,
+          "Width": 300
+        },
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-smoke-f3b54121-fold",
+        "kCGWindowStoreType": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerPID": 13437,
+        "kCGWindowAlpha": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowNumber": 30733,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowIsOnscreen": true
+      },
+      {
+        "kCGWindowBounds": {
+          "X": 1957,
+          "Height": 36,
+          "Y": 74,
+          "Width": 91
+        },
+        "kCGWindowOwnerPID": 13437,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowNumber": 30735,
+        "kCGWindowSharingState": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-smoke-f3b54121-edit · Feedback",
+        "kCGWindowAlpha": 1
+      },
+      {
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowOwnerPID": 13437,
+        "kCGWindowStoreType": 1,
+        "kCGWindowBounds": {
+          "X": 1748,
+          "Height": 49,
+          "Y": 25,
+          "Width": 300
+        },
+        "kCGWindowNumber": 30732,
+        "kCGWindowSharingState": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-smoke-f3b54121-edit",
+        "kCGWindowAlpha": 1
+      },
+      {
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowNumber": 30694,
+        "kCGWindowBounds": {
+          "X": 1944,
+          "Height": 36,
+          "Y": 355,
+          "Width": 104
+        },
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowSharingState": 1,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowStoreType": 1,
+        "kCGWindowAlpha": 0.8995682597160339,
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-work-c0cc1b · Feedback",
+        "kCGWindowOwnerPID": 13437,
+        "kCGWindowLayer": 5
+      },
+      {
+        "kCGWindowBounds": {
+          "X": 1748,
+          "Height": 184,
+          "Y": 171,
+          "Width": 300
+        },
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowLayer": 5,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowNumber": 30690,
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-work-c0cc1b",
+        "kCGWindowSharingState": 1,
+        "kCGWindowAlpha": 0.8995682597160339,
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerPID": 13437
+      }
+    ],
+    "screens": [
+      {
+        "visible": [
+          0,
+          0,
+          2048,
+          1127
+        ],
+        "scale": 2,
+        "frame": [
+          0,
+          0,
+          2048,
+          1152
+        ]
+      },
+      {
+        "frame": [
+          -1728,
+          35,
+          1728,
+          1117
+        ],
+        "scale": 2,
+        "visible": [
+          -1728,
+          35,
+          1728,
+          1085
+        ]
+      },
+      {
+        "frame": [
+          0,
+          1152,
+          1920,
+          1080
+        ],
+        "scale": 2,
+        "visible": [
+          0,
+          1152,
+          1920,
+          1080
+        ]
+      }
+    ]
+  },
+  "focus_before": 53662,
+  "indicator_initial": {
+    "height": 48.0,
+    "width": 320.0,
+    "x": -332.0,
+    "y": 1057.0
+  },
+  "indicator_escaped": {
+    "height": 48.0,
+    "width": 320.0,
+    "x": -332.0,
+    "y": 44.0
+  },
+  "result": "passed"
+}

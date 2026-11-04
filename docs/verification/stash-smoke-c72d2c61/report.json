@@ -1,0 +1,217 @@
+{
+  "instance": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle",
+    "id": "dev-c0cc1b2099c4aae773649d36",
+    "name": "egoing/window-stash-toggle",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon"
+  },
+  "ids": [
+    "stash-smoke-c72d2c61-edit",
+    "stash-smoke-c72d2c61-fold",
+    "stash-smoke-c72d2c61-hidden",
+    "stash-smoke-c72d2c61-new"
+  ],
+  "checks": [
+    "root/id/binary + inspect instance + PID/native title proven",
+    "real hotkey: native movement/shrink/alpha/hide; original hidden stays hidden; focus preserved",
+    "cursor-monitor icon, escape, 6s readable actual-key tip, cooldown/reentry, no focus steal",
+    "restoration animates position, size and alpha from the current indicator edge",
+    "exact geometry/fold restoration, draft retained through CLI update, new open bypasses reflow",
+    "other-key chord cancelled; holding alone does not fire; complete release toggles once",
+    "three rapid animation reversals: no stale hide/move frame",
+    "individual close/open overrides the stash snapshot safely during animation"
+  ],
+  "pid": 41210,
+  "executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon --serve",
+  "native_before": {
+    "screens": [
+      {
+        "frame": [
+          0,
+          0,
+          2048,
+          1152
+        ],
+        "visible": [
+          0,
+          0,
+          2048,
+          1127
+        ],
+        "scale": 2
+      },
+      {
+        "scale": 2,
+        "frame": [
+          -1728,
+          35,
+          1728,
+          1117
+        ],
+        "visible": [
+          -1728,
+          35,
+          1728,
+          1085
+        ]
+      },
+      {
+        "frame": [
+          0,
+          1152,
+          1920,
+          1080
+        ],
+        "visible": [
+          0,
+          1152,
+          1920,
+          1080
+        ],
+        "scale": 2
+      }
+    ],
+    "windows": [
+      {
+        "kCGWindowBounds": {
+          "X": 1309,
+          "Height": 24,
+          "Y": 0,
+          "Width": 34
+        },
+        "kCGWindowNumber": 31405,
+        "kCGWindowLayer": 25,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Item-0",
+        "kCGWindowOwnerPID": 41210,
+        "kCGWindowStoreType": 1,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowSharingState": 1,
+        "kCGWindowAlpha": 1
+      },
+      {
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowStoreType": 1,
+        "kCGWindowAlpha": 0.800000011920929,
+        "kCGWindowOwnerPID": 41210,
+        "kCGWindowLayer": 5,
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": -1628,
+          "Height": 44,
+          "Y": 112,
+          "Width": 300
+        },
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowNumber": 31414,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-smoke-c72d2c61-fold · Feedback"
+      },
+      {
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowSharingState": 1,
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-smoke-c72d2c61-fold",
+        "kCGWindowNumber": 31411,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowBounds": {
+          "X": -1628,
+          "Height": 12,
+          "Y": 100,
+          "Width": 300
+        },
+        "kCGWindowOwnerPID": 41210,
+        "kCGWindowAlpha": 0.800000011920929,
+        "kCGWindowLayer": 5,
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerName": "agent-gibbon"
+      },
+      {
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowSharingState": 1,
+        "kCGWindowAlpha": 0.5,
+        "kCGWindowLayer": 5,
+        "kCGWindowNumber": 31413,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowOwnerPID": 41210,
+        "kCGWindowStoreType": 1,
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-smoke-c72d2c61-edit · Feedback",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowBounds": {
+          "X": 1956,
+          "Height": 36,
+          "Y": 76,
+          "Width": 91
+        }
+      },
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowBounds": {
+          "X": 1747,
+          "Height": 49,
+          "Y": 27,
+          "Width": 300
+        },
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerPID": 41210,
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-smoke-c72d2c61-edit",
+        "kCGWindowAlpha": 0.5,
+        "kCGWindowSharingState": 1,
+        "kCGWindowNumber": 31410,
+        "kCGWindowIsOnscreen": true
+      },
+      {
+        "kCGWindowLayer": 5,
+        "kCGWindowAlpha": 0.5,
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 1944,
+          "Height": 36,
+          "Y": 270,
+          "Width": 104
+        },
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-work-c0cc1b · Feedback",
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowOwnerPID": 41210,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowStoreType": 1,
+        "kCGWindowNumber": 31408
+      },
+      {
+        "kCGWindowName": "Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — stash-work-c0cc1b",
+        "kCGWindowLayer": 5,
+        "kCGWindowBounds": {
+          "X": 1748,
+          "Height": 100,
+          "Y": 170,
+          "Width": 300
+        },
+        "kCGWindowOwnerPID": 41210,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowNumber": 31404,
+        "kCGWindowAlpha": 0.5,
+        "kCGWindowStoreType": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowMemoryUsage": 2288
+      }
+    ]
+  },
+  "focus_before": 15027,
+  "indicator_initial": {
+    "height": 48.0,
+    "width": 320.0,
+    "x": -332.0,
+    "y": 1057.0
+  },
+  "indicator_escaped": {
+    "height": 48.0,
+    "width": 320.0,
+    "x": -332.0,
+    "y": 44.0
+  }
+}

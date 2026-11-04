@@ -222,6 +222,7 @@ fn cleanup(app: &tauri::AppHandle) {
         .values()
         .filter(|w| w.label().starts_with("capture-"))
     {
+        let _ = crate::stash::release(win);
         crate::focus::restore(win);
         let _ = win.destroy();
     }

@@ -1,0 +1,18 @@
+{
+  "instance": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle",
+    "id": "dev-c0cc1b2099c4aae773649d36",
+    "name": "egoing/window-stash-toggle",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon"
+  },
+  "id": "stash-indicator-0bbcb75d",
+  "checks": [
+    "initial settled bubble + mascot, actual key, unchanged frontmost PID",
+    "intermediate eased flight positions, no bubble during flight, bubble after arrival, cooldown",
+    "same shortcut restores note"
+  ],
+  "pid": 50159,
+  "executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon --serve",
+  "result": "passed"
+}

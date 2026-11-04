@@ -43,6 +43,17 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         .map_err(|e| e.to_string())?,
     )
     .map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(
+            app,
+            "stash-toggle",
+            format!("전체 창 접어두기 / 복원 · {}", crate::stash::shortcut(app)),
+            true,
+            None::<&str>,
+        )
+        .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
     let front = MenuItem::with_id(app, "bring-visible", "열린 메모 앞으로", true, None::<&str>)
         .map_err(|e| e.to_string())?;
     menu.append(&front).map_err(|e| e.to_string())?;
@@ -236,7 +247,10 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 app.exit(0);
                 return;
             }
-            let result = if event.id.as_ref() == "capture-image" {
+            let result = if event.id.as_ref() == "stash-toggle" {
+                crate::stash::trigger(app);
+                Ok(())
+            } else if event.id.as_ref() == "capture-image" {
                 crate::capture::trigger(app, crate::capture::SelectionMode::Image);
                 Ok(())
             } else if event.id.as_ref() == "capture-text" {
@@ -244,7 +258,9 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 Ok(())
             } else if event.id.as_ref() == "bring-visible" {
                 app.webview_windows().values().try_for_each(|win| {
-                    if !crate::feedback_window::is_surface(win.label())
+                    if win.label() != "stash-indicator"
+                        && !crate::stash::owns(win)
+                        && !crate::feedback_window::is_surface(win.label())
                         && win.is_visible().map_err(|e| e.to_string())?
                     {
                         crate::layout::mark(win, false);
