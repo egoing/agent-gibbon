@@ -56,3 +56,14 @@
 Conf **5**, Risk **Low**: 실제 macOS ARM64 개발 앱에서 해당 증상을 전후 비교했고 국소 접근 게이트만 바꿨다. Windows·Intel·모니터 해제·다른 DPI 조합은 이번에 실행하지 않았다. 전체 창 접어두기 기능의 다른 독립 시나리오는 범위를 확대해 반복하지 않았다. 새 독립 문제는 발견하지 않았다. 설치 앱·다른 워크트리 앱은 시작·종료하지 않았다. 검증을 위해 직접 시작한 PID 31113과 40620만 종료했으며 [최종 종료 확인](issue36-after/cleanup.json)을 남겼다. 감독자가 검증 후 이번 변경의 커밋·push·PR 생성을 승인했으며 병합 판단은 감독자에게 남긴다.
 
 [디자인 시스템](../design-system.md#최초-접근-즉시-회피--이슈-36-2026-11-05) · [시안 SVG](../design/window-stash.svg) · [시안 PNG](../design/window-stash.png)
+
+## main b931ac2 통합 확인 (2026-11-05)
+
+clean 상태의 `ac32ad6`에 origin/main `b931ac2`를 병합했다. 검증 문서 충돌은 #36·#34·#43 양쪽 기록을 보존했다. 디자인 시스템의 열기 순서·전환 보정과 최초 접근 기준을 함께 유지했다.
+
+- 통합 개발 빌드, Rust **84**·UI **53**, Clippy all-targets 경고 오류 처리, Rustfmt, 버전 0.2.7 검사, diff 검사 통과. 원본 [테스트 로그](issue36-integrated/tests.log)·[Clippy 로그](issue36-integrated/clippy.log).
+- `python3 /tmp/gibbon-issue36-integrated-smoke.py after` 1회 실행. 저장 경로만 `issue36-integrated`로 격리한 기존 하네스이며 최초 접근까지 **도달하지 못해 실패**했다. 세 보조키 입력 뒤 `stash.active=false`가 10초 유지됐다. [시간·상태 보고](issue36-integrated/report.json).
+- root는 위 출처 절과 같고 instance는 `dev-8fbfdca2d77ba80c9f021e8f`, 최초 PID **4623**, 고유 메모 `issue36-first-approach-571216f1`이다. [inspect](issue36-integrated/inspect.json)의 ok/instance/본문과 [절대 실행 경로](issue36-integrated/process.json)를 확인했다. [PID별 창 목록](issue36-integrated/windows.json)은 비어 있어 네이티브 창·표식/캡처 대조는 완료하지 못했다.
+- 후속 원인 확인에서 CLI `open`은 ok:true이나 5초 뒤 visible:false/layout_pending:false였다. `npm ci` 후 `npm run dev -- --no-watch`로 자체 앱만 재시작한 PID **10994**에서도 새 메모 `issue36-runtime-check`·본문 `ISSUE36-RUNTIME-CHECK`가 같은 상태였다. [재시작 inspect](issue36-integrated/restarted-inspect.json)·[창 목록](issue36-integrated/restarted-windows.json)·[런타임 로그](issue36-integrated/runtime.log). lsof txt로 같은 절대 실행 파일을 확인했다. 단축키 표시는 권한/잠금 경고 없는 Ctrl+Alt+Cmd이며 권한 설정은 바꾸지 않았다. 비가시의 제품/환경 원인은 미확정이고 새 이슈를 생성하지 않은 채 감독자에게 근거를 보고했다.
+- 감독자는 실패 원인 확인에 필요한 추가 재검증을 허용했으나 제품 최초 접근에 진입할 전제가 충족되지 않아 두 번째 스모크는 실행하지 않았다. 이전 전후 성공 기록을 통합 GUI 통과로 재사용하지 않는다. 통합의 정적/테스트 검증은 Conf 3, 해당 GUI는 미검증이며 Risk Medium으로 유지한다.
+- [정리](issue36-integrated/cleanup.json): 자체 시작 PID 4623·10994만 종료했다. 하네스가 원래 포인터를 복원했고 검증 메모를 숨겼다. 다른 앱·워크트리 및 사용자 권한은 변경하지 않았다. 통합 커밋·push 후 최종 head CI는 별도 확인하며 GUI 차단이 남아 있는 동안 병합과 #36 닫기는 보류한다. #35·#44는 유지한다.

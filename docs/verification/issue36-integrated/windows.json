@@ -1,0 +1,18 @@
+{
+  "id": "115b742b-09e5-49c4-9d55-86b2e0ffc627",
+  "ok": true,
+  "result": {
+    "windows": [],
+    "app": {
+      "isRunning": true,
+      "useCount": null,
+      "pid": 4623,
+      "name": "agent-gibbon",
+      "bundleId": null,
+      "lastUsedAt": null
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  }
+}

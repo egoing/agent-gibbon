@@ -6,6 +6,37 @@ use std::{
 };
 use tauri::{Manager, PhysicalPosition, WebviewWindow};
 
+// Opt-in local diagnostics only: no note contents, default logging or history.
+fn trace(window: &WebviewWindow, event: &str, data: impl FnOnce() -> serde_json::Value) {
+    use std::{io::Write, sync::OnceLock};
+    static PATH: OnceLock<Option<std::path::PathBuf>> = OnceLock::new();
+    static WRITER: Mutex<()> = Mutex::new(());
+    let Some(path) =
+        PATH.get_or_init(|| std::env::var_os("AGENT_GIBBON_ENTRANCE_TRACE").map(Into::into))
+    else {
+        return;
+    };
+    let row = serde_json::json!({
+        "event":event,"window":window.label(),"pid":std::process::id(),
+        "instance":crate::instance::current().id,
+        "time_us":std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_micros(),
+        "data":data()
+    });
+    let line = format!("{row}\n");
+    let _writer = WRITER.lock().unwrap();
+    if let Ok(mut file) = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(path)
+    {
+        let _ = file.write_all(line.as_bytes());
+    }
+}
+fn flight_trace(flight: &Flight) -> serde_json::Value {
+    serde_json::json!({"generation":format!("{:?}",flight.started),"expected":flight.expected,
+        "destination":{"position":flight.destination.position,"size":flight.destination.size,"scale":flight.destination.scale}})
+}
+
 type Point = PhysicalPosition<f64>;
 
 #[derive(Clone, Copy, Default)]
@@ -63,14 +94,72 @@ fn position(window: &WebviewWindow) -> Result<Point, String> {
     ))
 }
 fn move_to(window: &WebviewWindow, p: Point) -> Result<(), String> {
+    geometry(window, p, None)
+}
+
+// Recover the native bottom-left origin from the current frame/top-left pair.
+// This avoids assuming a primary display's origin, height or backing scale.
+#[cfg(any(target_os = "macos", test))]
+fn native_y(origin: f64, height: f64, top: f64, next_top: f64, next_height: f64) -> f64 {
+    origin + height + top - next_top - next_height
+}
+
+// All entrance writes run on the main thread. Tao's macOS position/size setters
+// enqueue GCD work even there: a later tick can read the previous native frame
+// and mistake the unacknowledged write for manual movement. Apply the whole
+// native frame synchronously, before advancing our expected position.
+fn geometry(
+    window: &WebviewWindow,
+    p: Point,
+    size: Option<tauri::LogicalSize<f64>>,
+) -> Result<(), String> {
     #[cfg(target_os = "macos")]
-    let position = tauri::Position::Logical(tauri::LogicalPosition::new(p.x, p.y));
+    {
+        let _main =
+            objc2::MainThreadMarker::new().ok_or("창 전환은 메인 스레드에서 실행해야 합니다")?;
+        let top = position(window)?;
+        let ptr = window.ns_window().map_err(|e| e.to_string())?;
+        // SAFETY: checked main thread, live window borrowed only for this call.
+        let native = unsafe { &*(ptr as *const objc2_app_kit::NSWindow) };
+        let mut frame = native.frame();
+        let (width, height) = size
+            .map(|s| (s.width.round(), s.height.round()))
+            .unwrap_or((frame.size.width, frame.size.height));
+        frame.origin.y = native_y(
+            frame.origin.y,
+            frame.size.height,
+            top.y,
+            p.y.round(),
+            height,
+        );
+        frame.origin.x = p.x.round();
+        frame.size.width = width;
+        frame.size.height = height;
+        // Mark for normal AppKit display rather than synchronously forcing
+        // every WebView to draw while applying a batch of window frames.
+        native.setFrame_display(frame, false);
+        Ok(())
+    }
     #[cfg(not(target_os = "macos"))]
-    let position = tauri::Position::Physical(PhysicalPosition::new(
-        p.x.round() as i32,
-        p.y.round() as i32,
-    ));
-    window.set_position(position).map_err(|e| e.to_string())
+    {
+        if let Some(size) = size {
+            window.set_size(size).map_err(|e| e.to_string())?;
+        }
+        window
+            .set_position(PhysicalPosition::new(
+                p.x.round() as i32,
+                p.y.round() as i32,
+            ))
+            .map_err(|e| e.to_string())
+    }
+}
+
+pub fn place(window: &WebviewWindow, destination: Destination) -> Result<(), String> {
+    geometry(
+        window,
+        point(destination.position, destination.scale),
+        Some(destination.size.to_logical::<f64>(destination.scale)),
+    )
 }
 
 // Latch the first deliberate movement, even during the minimum one-second hold.
@@ -142,19 +231,9 @@ pub fn finish(window: &WebviewWindow) -> Result<(), String> {
         .map_err(|e| e.to_string())?
         .remove(window.label());
     if let Some(flight) = flight {
+        trace(window, "finish", || flight_trace(&flight));
         if near(position(window)?, flight.expected) {
-            window
-                .set_size(
-                    flight
-                        .destination
-                        .size
-                        .to_logical::<f64>(flight.destination.scale),
-                )
-                .map_err(|e| e.to_string())?;
-            move_to(
-                window,
-                point(flight.destination.position, flight.destination.scale),
-            )?;
+            place(window, flight.destination)?;
         }
     }
     Ok(())
@@ -191,13 +270,22 @@ impl Destination {
 }
 // Direct manipulation owns the current position, unlike hiding/warping which
 // completes the entrance at its destination.
+#[track_caller]
 pub fn cancel(window: &WebviewWindow) -> Result<(), String> {
-    window
+    let flight = window
         .state::<Entrances>()
         .0
         .lock()
         .map_err(|e| e.to_string())?
         .remove(window.label());
+    if let Some(flight) = flight {
+        let caller = std::panic::Location::caller();
+        trace(
+            window,
+            "cancel",
+            || serde_json::json!({"flight":flight_trace(&flight),"caller":caller.to_string()}),
+        );
+    }
     Ok(())
 }
 #[tauri::command]
@@ -279,6 +367,11 @@ pub fn show(
     };
     move_to(window, start)?;
     let started = Instant::now();
+    trace(
+        window,
+        "show",
+        || serde_json::json!({"generation":format!("{started:?}"),"start":start,"destination":destination.position,"size":destination.size,"anchor":anchor}),
+    );
     window
         .state::<Entrances>()
         .0
@@ -329,6 +422,11 @@ pub fn transition(window: &WebviewWindow, destination: Destination) -> Result<()
         .map_err(|e| e.to_string())?
         .to_logical::<f64>(scale);
     let started = Instant::now();
+    trace(
+        window,
+        "transition",
+        || serde_json::json!({"generation":format!("{started:?}"),"start":start,"destination":destination.position,"size":destination.size}),
+    );
     window
         .state::<Entrances>()
         .0
@@ -359,21 +457,46 @@ fn run_frames(window: &WebviewWindow, start: Point, started: Instant) {
         std::thread::sleep(Duration::from_millis(16));
         let frame = window.clone();
         let (tx, rx) = mpsc::sync_channel(1);
-        if window
-            .run_on_main_thread(move || {
-                let result = tick(&frame, start, started);
-                if let Err(error) = &result {
-                    eprintln!("패널 등장 이동 실패: {error}");
-                    let _ = finish(&frame);
-                }
-                let _ = tx.send(result.unwrap_or(false));
-            })
-            .is_err()
-            || rx.recv_timeout(Duration::from_secs(1)) != Ok(true)
-        {
+        let queued = window.run_on_main_thread(move || {
+            let result = tick(&frame, start, started);
+            if let Err(error) = &result {
+                eprintln!("패널 등장 이동 실패: {error}");
+                let _ = finish(&frame);
+            }
+            let _ = tx.send(result.unwrap_or(false));
+        });
+        if queued.is_err() {
+            trace(
+                &window,
+                "queue-error",
+                || serde_json::json!({"generation":format!("{started:?}")}),
+            );
+            break;
+        }
+        if !await_frame(&rx, Duration::from_secs(1), || {
+            trace(
+                &window,
+                "frame-wait-late",
+                || serde_json::json!({"generation":format!("{started:?}")}),
+            );
+        }) {
             break;
         }
     });
+}
+
+// Only one frame is queued per worker. A busy main thread is not cancellation:
+// keep its receiver alive so a late callback can continue this generation.
+// Channel disconnection/app teardown still ends the worker.
+fn await_frame(rx: &mpsc::Receiver<bool>, timeout: Duration, late: impl FnOnce()) -> bool {
+    match rx.recv_timeout(timeout) {
+        Ok(next) => next,
+        Err(mpsc::RecvTimeoutError::Timeout) => {
+            late();
+            rx.recv().unwrap_or(false)
+        }
+        Err(mpsc::RecvTimeoutError::Disconnected) => false,
+    }
 }
 fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, String> {
     let state = window.state::<Entrances>();
@@ -387,7 +510,13 @@ fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, 
     // Own this generation outside the lock while updating the native window.
     let mut flight = flights.remove(window.label()).unwrap();
     drop(flights);
-    if !near(position(window)?, flight.expected) {
+    let actual = position(window)?;
+    if !near(actual, flight.expected) {
+        trace(
+            window,
+            "position-mismatch",
+            || serde_json::json!({"flight":flight_trace(&flight),"actual":actual}),
+        );
         return Ok(false);
     }
     let hidden = !window.is_visible().map_err(|e| e.to_string())?;
@@ -410,19 +539,22 @@ fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, 
         start.x + (destination.x - start.x) * ease,
         start.y + (destination.y - start.y) * ease,
     );
-    if let Some(size) = flight.from_size {
+    let size = flight.from_size.map(|size| {
         let target = flight
             .destination
             .size
             .to_logical::<f64>(flight.destination.scale);
-        window
-            .set_size(tauri::LogicalSize::new(
-                size.width + (target.width - size.width) * ease,
-                size.height + (target.height - size.height) * ease,
-            ))
-            .map_err(|e| e.to_string())?;
-    }
-    move_to(window, next)?;
+        tauri::LogicalSize::new(
+            size.width + (target.width - size.width) * ease,
+            size.height + (target.height - size.height) * ease,
+        )
+    });
+    geometry(window, next, size)?;
+    trace(
+        window,
+        "frame",
+        || serde_json::json!({"flight":flight_trace(&flight),"t":t,"next":next,"actual_after":position(window).ok(),"size_after":window.outer_size().ok()}),
+    );
     flight.expected = next;
     if t >= 1.0 {
         return Ok(false);
@@ -438,6 +570,39 @@ fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn late_frame_response_keeps_worker_alive_without_queuing_another_frame() {
+        let (tx, rx) = mpsc::sync_channel(1);
+        let mut observed_late = false;
+        assert!(await_frame(&rx, Duration::ZERO, || {
+            observed_late = true;
+            tx.send(true).unwrap();
+        }));
+        assert!(observed_late);
+    }
+    #[test]
+    fn completed_or_disconnected_frame_stops_the_worker() {
+        let (tx, rx) = mpsc::sync_channel(1);
+        tx.send(false).unwrap();
+        assert!(!await_frame(&rx, Duration::ZERO, || panic!(
+            "unexpected timeout"
+        )));
+        drop(tx);
+        assert!(!await_frame(&rx, Duration::ZERO, || panic!(
+            "unexpected timeout"
+        )));
+    }
+    #[test]
+    fn native_frame_conversion_preserves_top_left_while_resizing() {
+        // Native bottom-left (40), height (500), top-left (900): desktop 1440.
+        assert_eq!(native_y(40., 500., 900., 25., 420.), 995.);
+        assert_eq!(native_y(40., 500., 900., 900., 100.), 440.);
+    }
+    #[test]
+    fn native_frame_conversion_handles_negative_desktop_positions() {
+        assert_eq!(native_y(-100., 200., 1340., -300., 100.), 1640.);
+        assert_eq!(native_y(1640., 100., -300., 1800., 420.), -780.);
+    }
     #[test]
     fn every_direction_and_diagonal_starts_the_same_flight_after_hold() {
         for (dx, dy) in [

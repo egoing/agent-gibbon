@@ -1,0 +1,57 @@
+{
+  "id": "daf2cec1-da81-4daa-95f8-b3a14bb0ad29",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "window": {
+        "isOffscreen": false,
+        "height": 329,
+        "isMinimized": false,
+        "platform": {
+          "layer": 5
+        },
+        "screenIndex": 0,
+        "title": "Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-z",
+        "x": 1160,
+        "y": 430,
+        "width": 300,
+        "id": 33063
+      },
+      "app": {
+        "name": "agent-gibbon",
+        "pid": 73759,
+        "bundleId": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 73759)\nWindow: \"Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-z\", App: agent-gibbon.\n\nShowing the first 45 of 66 elements.\n0 standard window Agent Gibbon [DEV egoing/issue-34-open-order · 5a3840c5] — open34-3832b6-z\n\t1 scroll area\n\t\t2 HTML content Agent Gibbon\n\t\t\t3 container Agent Gibbon\n\t\t\t\t4 toolbar Toolbar\n\t\t\t\t\t5 button (disabled) 이전 도구\n\t\t\t\t\t6 container DEV egoing/issue-34-open-order · 5a3840c5\n\t\t\t\t\t\t114 text DEV\n\t\t\t\t\t8 button (expanded) 메모 접기\n\t\t\t\t\t9 button 글자 크기 12px, 클릭하여 변경\n\t\t\t\t\t10 button 메모 편집\n\t\t\t\t\t11 button 파일로 저장\n\t\t\t\t\t12 button 본문 복사\n\t\t\t\t\t13 button 반대편으로 워프\n\t\t\t\t\t14 toggle button 상단 고정, Value: 1\n\t\t\t\t\t15 button 메모 숨기기\n\t\t\t\t\t16 button (disabled) 다음 도구\n\t\t\t\t17 container\n\t\t\t\t\t65 heading open34-3832b6 z\n\t\t\t\t\t66 text 본문 순서 검증\n\t\t\t\t\t67 heading open34-3832b6 visible update\n\t\t\t\t\t68 text 본문\n\t\t\t\t\t69 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t70 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t71 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t72 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t73 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t74 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t75 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t76 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t77 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t78 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t79 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t80 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t81 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t82 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t83 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t84 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t85 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t86 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t87 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t88 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t89 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t90 container, Text: 본문 순서 검증 본문\n\t\t\t\t\t91 container, Text: 본문 순서 검증 본문\n\nThe focused UI element is 2 HTML content Agent Gibbon.",
+      "focusedElementId": 2,
+      "truncation": {
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false,
+        "truncated": false
+      },
+      "elementCount": 66,
+      "id": "ADE5BAE9-021A-4564-8324-2006E37A0D21"
+    },
+    "screenshotStatus": {
+      "state": "captured",
+      "metadata": {
+        "engine": "screenCaptureKit",
+        "windowId": 33063
+      }
+    },
+    "screenshot": {
+      "format": "png",
+      "width": 600,
+      "height": 658,
+      "scale": 2,
+      "path": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/daf2cec1-da81-4daa-95f8-b3a14bb0ad29-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-05T17:26:39.900Z"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  }
+}
