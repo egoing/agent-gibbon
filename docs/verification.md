@@ -817,3 +817,28 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - 실행 출처: 작업 루트 `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/issue-14`, `npm run dev:info`의 ID `dev-891816675f30ffa97abd5f0b`, 바이너리 `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/issue-14/src-tauri/target/debug/agent-gibbon`. 해당 개발 CLI의 `inspect --id issue14-check`가 `ok: true`, 같은 `instance`, 본문 `작은 창 Toolbar 검증`을 반환했다. 최종 GUI 검증은 정확한 바이너리 경로의 서버 PID `44416`과 그 PID에 속한 창 제목 `Agent Gibbon [DEV egoing/oystercatcher · 89181667] — issue14-check`를 함께 특정했다. 실제 크기별 포인터 검증은 `/tmp/gibbon-toolbar-native.py`로 수행했고 144×32 캡처는 `/tmp/gibbon-toolbar-native.png`에서 확인했다. 이 임시 파일은 저장소에 포함하지 않는다.
 
 - 병합 검증: 기본 브랜치의 기존 출처 정책·스킬 변경을 보존해 통합한 후 `/Users/egoinglee/dev/project/agent-gibbon`에서 UI 테스트 50개와 Chromium 6개 조합을 다시 통과했다. 이 실행은 브라우저 배치 검증이며 위 워크트리의 실제 개발 앱 검증과 구분한다.
+
+## 트레이 메모 유형 실행 확인 (2026-10-30)
+
+- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/classify-text-image`.
+- `npm run dev:info`: instance `dev-2aefd51f2a4b38e297900e00`, binary는 위 루트의 `src-tauri/target/debug/agent-gibbon`.
+- 기존 실행 PID 24163은 다른 워크트리(display-feedback-bar)의 앱이었다. 종료하거나 변경하지 않았다.
+- 개발 CLI `open` 및 `inspect --id tray-type-check-1030`: ok true, instance 일치, 검증 본문 일치. 실행 PID 34236의 절대 경로 확인.
+- `orca computer get-app-state --app pid:34236`: 네이티브 창 제목에 해당 메모 ID와 DEV 식별자가 일치함을 확인.
+- System Events에서 unix id 34236의 menu bar 2 접근성 트리를 조회해 `[텍스트] 유형 표시 확인 (tray-type-check-1030)`을 확인했다. 이미지 항목 실환경 검증과 메뉴 픽셀 캡처는 미실행.
+
+### Tabler 아이콘 적용
+
+- 위 작업 루트·instance 그대로 개발 빌드 및 Rust 테스트 69개 통과. Tabler v3.35.0 file-text/photo SVG를 18px PNG로 렌더링하고 시안 확인.
+- 이번 작업에서 시작한 PID 34236만 종료 후 개발 CLI `--serve`로 재시작. PID 25114의 실행 파일이 위 작업 루트의 debug 바이너리임을 확인.
+- `inspect --id tray-type-check-1030`의 ok true, instance 일치, visible false 확인. 다른 워크트리 프로세스는 유지.
+- 네이티브 메뉴 아이콘의 실제 픽셀·다크 모드 대비·Windows 실행은 미검증.
+
+### 2026-11-04 메뉴 상태 표시 후속 변경
+
+- 동일 작업 루트·instance에서 개발 빌드 및 Rust 테스트 69개 통과. 최신 빌드 실행 PID 55518의 절대 경로 확인.
+- `inspect --id main`: ok true, instance `dev-2aefd51f2a4b38e297900e00`, visible true 확인. 기존 열린 main·진행 메모를 다시 열고 AX로 이전 위치·크기를 복원했다. 다른 메모의 숨김 상태 유지.
+- macOS 템플릿 이미지와 NSColor.labelColor 기반 attributed title 적용. 열림 100%·닫힘 45%로 동기화. 유형 접두사·체크·도움말 제거.
+- 시안 SVG→PNG 렌더링 확인. 최신 실행의 실제 메뉴 픽셀 및 선택 강조·다크 모드 시각 검증은 미완료. Windows 자동 색상 연동은 미구현.
+- 제목 흐림 후속 보정: 열린 항목의 attributed title을 nil로 초기화하고 적용 시점의 가시성을 조회한다. 빌드·Rust 69개 통과. 동일 작업 루트의 PID 71421로 재시작하고 기존 열린 메모 3개의 위치·크기를 AX로 복원했다. inspect main의 instance를 재확인했다. 실제 메뉴 색상 육안 검증은 미완료다.
+- 커밋 전 최종 검증: Rust 69개·UI 50개 테스트, Clippy 전체 대상 경고 없음, Rustfmt 및 git diff 검사 통과. 실제 메뉴 육안 검증의 기존 한계는 유지한다.
