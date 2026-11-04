@@ -1,0 +1,8 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.80s
+     Running unittests src/main.rs (src-tauri/target/debug/deps/agent_gibbon-9489e5f87df4a6e6)
+
+running 1 test
+discovery-only cold=389.053917ms cache=620.666µs; CLI never spawned
+test terminal::discovery::tests::discovery_and_cache_times_are_separate_from_cli_startup ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 93 filtered out; finished in 0.40s

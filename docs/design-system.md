@@ -471,6 +471,12 @@ SVG 3개와 PNG 3개를 함께 갱신했다. PNG 렌더링과 배치 육안 확�
 
 [터미널 SVG 시안](design/agent-terminal.svg) · [렌더링 PNG](design/agent-terminal.png) · [macOS 실제 실행](design/agent-terminal-macos.png). 시안은 배치 설명용이며 실제 CLI 화면은 설치 버전에 따라 다르다.
 
+### CLI 탐색과 시작 실패 — #17, 2026-11-05
+
+- 기존 ‘설치된 에이전트를 찾고 있습니다…’ 상태와 설치 누락·오류의 창 안 안내를 유지한다. 현재 PATH의 Codex를 먼저 선택하고, 없으면 로그인 셸 → 대화형 로그인 셸을 필요한 만큼만 실행한다. Claude fallback은 Codex 탐색을 마친 뒤 선택한다.
+- 성공 결과는 앱 수명 동안 공유하고 실행 파일 변경·삭제·실패 시 무효화한다. 같은 창의 시작 중/시작됨 요청은 중복으로 거부한다. 셸 단계 3초·전체 탐색 4초 제한과 한 번의 spawn 실패 재탐색을 적용하며, 비정상 종료된 CLI를 자동 재시작하지 않는다.
+- 레이아웃·색·아이콘·포커스 동작은 변경하지 않아 SVG/PNG 시안을 변경하지 않았다. fixture와 실제 앱 IPC의 입력·resize·조회는 확인했으나 계측 없는 최종 앱의 본문 표시·네이티브 입력은 완료로 판정하지 않는다. [#17 검증 기록](verification/terminal-discovery-20261105.md), 독립 후속 [#50](https://github.com/egoing/agent-gibbon/issues/50)·[#51](https://github.com/egoing/agent-gibbon/issues/51)을 따른다.
+
 ### 터미널 스타일·IME 보완
 
 - 터미널 WebView에만 동적 CSS를 허용하여 xterm의 고정폭 글꼴·셀 배치·조합 표시 스타일이 적용되도록 한다. 스크립트 정책과 메모 WebView 정책은 유지한다.

@@ -7,9 +7,11 @@ use std::{
     io::{Read, Write},
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
-    time::{Duration, Instant},
+    time::Instant,
 };
 use tauri::{ipc::Channel, Manager, WebviewWindow};
+
+mod discovery;
 
 fn err(e: impl std::fmt::Display) -> String {
     e.to_string()
@@ -24,6 +26,7 @@ struct Session {
     writer: Box<dyn Write + Send>,
     child: Box<dyn Child + Send + Sync>,
     program: String,
+    found: discovery::Found,
 }
 impl Drop for Session {
     fn drop(&mut self) {
@@ -40,10 +43,57 @@ impl Drop for Session {
         let _ = self.child.wait();
     }
 }
+enum Slot {
+    Starting,
+    Running(Arc<Mutex<Session>>),
+}
 #[derive(Default)]
 pub struct Terminals {
     agents: Mutex<BTreeMap<String, Agent>>,
-    sessions: Mutex<BTreeMap<String, Arc<Mutex<Session>>>>,
+    sessions: Mutex<BTreeMap<String, Slot>>,
+    discovery: discovery::Discovery,
+}
+struct Start<'a> {
+    state: &'a Terminals,
+    id: String,
+}
+impl<'a> Start<'a> {
+    fn reserve(state: &'a Terminals, id: &str) -> Result<Self, String> {
+        let mut sessions = state.sessions.lock().map_err(err)?;
+        if sessions.contains_key(id) {
+            return Err("이미 시작 중이거나 시작된 세션입니다. 창을 숨겼다가 복원하세요".into());
+        }
+        sessions.insert(id.into(), Slot::Starting);
+        Ok(Self {
+            state,
+            id: id.into(),
+        })
+    }
+    fn finish(self, session: Session) -> Result<(), String> {
+        let mut sessions = self.state.sessions.lock().map_err(err)?;
+        if !matches!(sessions.get(&self.id), Some(Slot::Starting)) {
+            return Err("터미널 시작이 취소되었습니다".into());
+        }
+        sessions.insert(
+            self.id.clone(),
+            Slot::Running(Arc::new(Mutex::new(session))),
+        );
+        Ok(())
+    }
+}
+impl Drop for Start<'_> {
+    fn drop(&mut self) {
+        let mut sessions = self.state.sessions.lock().unwrap();
+        if matches!(sessions.get(&self.id), Some(Slot::Starting)) {
+            sessions.remove(&self.id);
+        }
+    }
+}
+fn running(slot: &Slot) -> Option<Arc<Mutex<Session>>> {
+    match slot {
+        Slot::Starting => None,
+        Slot::Running(s) => Some(s.clone()),
+    }
 }
 fn root(app: &tauri::AppHandle) -> PathBuf {
     app.state::<crate::storage::Store>().0.clone()
@@ -208,14 +258,15 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         .lock()
         .map_err(err)?
         .get(id)
-        .cloned();
+        .and_then(running);
     let (pid, program, size, running) = if let Some(session) = session {
         let mut s = session.lock().map_err(err)?;
+        let running = observe_exit(&mut s, &app.state::<Terminals>().discovery)?;
         (
             s.child.process_id(),
             Some(s.program.clone()),
             Some(s.master.get_size().map_err(err)?),
-            s.child.try_wait().map_err(err)?.is_none(),
+            running,
         )
     } else {
         (None, None, None, false)
@@ -246,73 +297,6 @@ fn caller(window: &WebviewWindow) -> Result<String, String> {
     }
     Ok(id.into())
 }
-// Bound login-shell PATH discovery. Redirect output to a file so large startup
-// output cannot deadlock a pipe; only accept a marked, bounded PATH line.
-fn shell_path() -> Result<String, String> {
-    let fallback = std::env::var("PATH").unwrap_or_default();
-    let shell = std::env::var("SHELL").unwrap_or_else(|_| "/bin/zsh".into());
-    let file = tempfile::tempfile().map_err(err)?;
-    let output = file.try_clone().map_err(err)?;
-    let mut cmd = std::process::Command::new(shell);
-    cmd.args(["-ilc", "printf '\\nAGENT_GIBBON_PATH=%s\\n' \"$PATH\""])
-        .stdin(std::process::Stdio::null())
-        .stdout(output)
-        .stderr(std::process::Stdio::null());
-    #[cfg(unix)]
-    {
-        use std::os::unix::process::CommandExt;
-        cmd.process_group(0);
-    }
-    let mut child = cmd.spawn().map_err(err)?;
-    let deadline = Instant::now() + Duration::from_secs(3);
-    loop {
-        if child.try_wait().map_err(err)?.is_some() {
-            break;
-        }
-        if Instant::now() >= deadline {
-            #[cfg(unix)]
-            unsafe {
-                libc::kill(-(child.id() as i32), libc::SIGKILL);
-            }
-            let _ = child.kill();
-            let _ = child.wait();
-            return Ok(fallback);
-        }
-        std::thread::sleep(Duration::from_millis(20));
-    }
-    let mut text = String::new();
-    use std::io::{Seek, SeekFrom};
-    let mut file = file;
-    file.seek(SeekFrom::Start(0)).map_err(err)?;
-    file.take(65536).read_to_string(&mut text).map_err(err)?;
-    Ok(text
-        .lines()
-        .rev()
-        .find_map(|l| l.strip_prefix("AGENT_GIBBON_PATH="))
-        .filter(|p| !p.is_empty())
-        .unwrap_or(&fallback)
-        .into())
-}
-fn resolve(path: &str) -> Option<(String, PathBuf)> {
-    for name in ["codex", "claude"] {
-        for dir in std::env::split_paths(path).filter(|p| p.is_absolute()) {
-            let candidate = dir.join(name);
-            #[cfg(not(unix))]
-            let _ = candidate;
-            #[cfg(unix)]
-            {
-                use std::os::unix::fs::PermissionsExt;
-                if candidate
-                    .metadata()
-                    .is_ok_and(|m| m.is_file() && m.permissions().mode() & 0o111 != 0)
-                {
-                    return Some((name.into(), candidate));
-                }
-            }
-        }
-    }
-    None
-}
 fn size(cols: u16, rows: u16) -> Result<PtySize, String> {
     if !(2..=1000).contains(&cols) || !(1..=1000).contains(&rows) {
         return Err("터미널 크기 범위를 벗어났습니다".into());
@@ -324,6 +308,49 @@ fn size(cols: u16, rows: u16) -> Result<PtySize, String> {
         pixel_height: 0,
     })
 }
+// Exits can be authentication/trust failures. Invalidate on a confirmed
+// abnormal exit, but never automatically restart an already-spawned CLI.
+fn observe_exit(session: &mut Session, discovery: &discovery::Discovery) -> Result<bool, String> {
+    match session.child.try_wait().map_err(err)? {
+        Some(status) => {
+            if !status.success() {
+                discovery.invalidate(&session.found);
+            }
+            Ok(false)
+        }
+        None => Ok(true),
+    }
+}
+fn start_session(
+    discovery: &discovery::Discovery,
+    cwd: &Path,
+    dimensions: PtySize,
+) -> Result<(Session, Box<dyn Read + Send>), String> {
+    // One shared budget also bounds rediscovery after a spawn failure.
+    let deadline = Instant::now() + discovery::TOTAL_TIMEOUT;
+    let pair = native_pty_system().openpty(dimensions).map_err(err)?;
+    let (found, child) = discovery.spawn(deadline, |found| {
+        let mut command = CommandBuilder::new(&found.executable);
+        command.cwd(cwd);
+        command.env("PATH", &found.path);
+        command.env("TERM", "xterm-256color");
+        command.env_remove("NO_COLOR");
+        pair.slave.spawn_command(command).map_err(err)
+    })?;
+    drop(pair.slave);
+    // Session owns the child before fallible reader/writer acquisition.
+    let mut session = Session {
+        master: pair.master,
+        writer: Box::new(std::io::sink()),
+        child,
+        program: found.program.clone(),
+        found,
+    };
+    let reader = session.master.try_clone_reader().map_err(err)?;
+    session.writer = session.master.take_writer().map_err(err)?;
+    Ok((session, reader))
+}
+
 #[tauri::command]
 pub async fn terminal_start(
     window: WebviewWindow,
@@ -336,33 +363,41 @@ pub async fn terminal_start(
     tauri::async_runtime::spawn_blocking(move || {
         let dimensions = size(cols, rows)?;
         let state = app.state::<Terminals>();
-        // Serialize creation, including duplicate frontend requests.
-        let mut sessions = state.sessions.lock().map_err(err)?;
-        if sessions.contains_key(&id) { return Err("이미 시작된 세션입니다. 창을 숨겼다가 복원하세요".into()); }
-        let path = shell_path()?;
-        let (program, executable) = resolve(&path).ok_or("Codex CLI 또는 Claude Code를 설치한 뒤 새 에이전트 창을 여세요. 로그인과 권한 확인은 CLI 안내를 따르세요.")?;
-        let pair = native_pty_system().openpty(dimensions).map_err(err)?;
-        let mut command = CommandBuilder::new(executable);
-        command.cwd(root(&app).join(&id));
-        command.env("PATH",path); command.env("TERM","xterm-256color");
-        command.env_remove("NO_COLOR");
-        let child = pair.slave.spawn_command(command).map_err(err)?;
-        drop(pair.slave);
-        let mut reader = pair.master.try_clone_reader().map_err(err)?;
-        let writer = pair.master.take_writer().map_err(err)?;
-        sessions.insert(id.clone(),Arc::new(Mutex::new(Session { master:pair.master, writer, child, program })));
+        let reservation = Start::reserve(&state, &id)?;
+        let (session, mut reader) =
+            start_session(&state.discovery, &root(&app).join(&id), dimensions)?;
+        reservation.finish(session)?;
+        let watched_app = app.clone();
+        let watched_id = id.clone();
         // Raw bytes preserve UTF-8 across arbitrary PTY read boundaries.
         std::thread::spawn(move || {
-            let mut bytes = [0u8;8192];
-            loop { match reader.read(&mut bytes) {
-                Ok(0) | Err(_) => break,
-                Ok(n) => { if output.send(bytes[..n].to_vec()).is_err() { break; } }
-            }}
-            let _ = output.send(b"\r\n[PTY \xec\x84\xb8\xec\x85\x98 \xec\xa2\x85\xeb\xa3\x8c]\r\n".to_vec());
+            let mut bytes = [0u8; 8192];
+            loop {
+                match reader.read(&mut bytes) {
+                    Ok(0) | Err(_) => break,
+                    Ok(n) => {
+                        if output.send(bytes[..n].to_vec()).is_err() {
+                            break;
+                        }
+                    }
+                }
+            }
+            let state = watched_app.state::<Terminals>();
+            let session = state
+                .sessions
+                .lock()
+                .ok()
+                .and_then(|s| s.get(&watched_id).and_then(running));
+            if let Some(session) = session {
+                let _ = observe_exit(&mut session.lock().unwrap(), &state.discovery);
+            }
+            let _ = output
+                .send(b"\r\n[PTY \xec\x84\xb8\xec\x85\x98 \xec\xa2\x85\xeb\xa3\x8c]\r\n".to_vec());
         });
-        drop(sessions);
-        inspect(&app,&id)
-    }).await.map_err(err)?
+        inspect(&app, &id)
+    })
+    .await
+    .map_err(err)?
 }
 fn session(window: &WebviewWindow) -> Result<Arc<Mutex<Session>>, String> {
     let id = caller(window)?;
@@ -372,7 +407,7 @@ fn session(window: &WebviewWindow) -> Result<Arc<Mutex<Session>>, String> {
         .lock()
         .map_err(err)?
         .get(&id)
-        .cloned()
+        .and_then(running)
         .ok_or("실행 중인 세션이 없습니다".into())
 }
 #[tauri::command]
@@ -441,25 +476,158 @@ pub fn shutdown(app: &tauri::AppHandle) {
 mod tests {
     use super::*;
     #[test]
-    fn selection_priority_and_missing() {
-        let dir = tempfile::tempdir().unwrap();
-        assert!(resolve(dir.path().to_str().unwrap()).is_none());
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            for name in ["claude", "codex"] {
-                let p = dir.path().join(name);
-                std::fs::write(&p, "#!/bin/sh\n").unwrap();
-                std::fs::set_permissions(p, std::fs::Permissions::from_mode(0o700)).unwrap();
-            }
-            assert_eq!(resolve(dir.path().to_str().unwrap()).unwrap().0, "codex");
-            std::fs::remove_file(dir.path().join("codex")).unwrap();
-            assert_eq!(resolve(dir.path().to_str().unwrap()).unwrap().0, "claude");
-        }
-        assert!(resolve(".").is_none());
+    fn reservation_is_per_window_and_released_on_failure() {
+        let state = Terminals::default();
+        let first = Start::reserve(&state, "agent-1").unwrap();
+        assert!(Start::reserve(&state, "agent-1").is_err());
+        let other = Start::reserve(&state, "agent-2").unwrap();
+        assert!(state.sessions.try_lock().is_ok());
+        drop(first);
+        assert!(Start::reserve(&state, "agent-1").is_ok());
+        drop(other);
+        assert!(state.sessions.lock().unwrap().is_empty());
         assert!(!valid_id("agent-../x"));
         assert!(valid_id("agent-123"));
         assert!(size(0, 24).is_err());
+    }
+    #[cfg(unix)]
+    #[test]
+    fn pty_fixture_invalidates_failed_cli_and_keeps_existing_session_responsive() {
+        use std::os::unix::fs::PermissionsExt;
+        use std::time::Duration;
+        // Environment changes belong to an isolated test process, never the
+        // parallel cargo test runner or a real installed model CLI.
+        if let Some(folder) = std::env::var_os("GIBBON_PTY_FIXTURE") {
+            let folder = PathBuf::from(folder);
+            let state = Arc::new(Terminals::default());
+            let reservation = Start::reserve(&state, "agent-1").unwrap();
+            let (session, mut reader) =
+                start_session(&state.discovery, &folder, size(80, 24).unwrap()).unwrap();
+            let pid = session.child.process_id().unwrap();
+            reservation.finish(session).unwrap();
+            let existing = running(state.sessions.lock().unwrap().get("agent-1").unwrap()).unwrap();
+            let (tx, rx) = std::sync::mpsc::channel();
+            std::thread::spawn(move || {
+                let mut buf = [0; 4096];
+                while let Ok(n) = reader.read(&mut buf) {
+                    if n == 0 {
+                        break;
+                    }
+                    if tx
+                        .send(String::from_utf8_lossy(&buf[..n]).into_owned())
+                        .is_err()
+                    {
+                        break;
+                    }
+                }
+            });
+            let ready = rx.recv_timeout(Duration::from_secs(3)).unwrap();
+            assert!(ready.contains("FIXTURE_READY"));
+            // Keep the old PTY alive while invalidating discovery and forcing
+            // a slow shell for a different window.
+            std::fs::remove_file(folder.join("bin/codex")).unwrap();
+            let next = state.clone();
+            let cwd = folder.clone();
+            let worker = std::thread::spawn(move || {
+                let reserved = Start::reserve(&next, "agent-2").unwrap();
+                let result = start_session(&next.discovery, &cwd, size(90, 30).unwrap());
+                drop(reserved);
+                result
+            });
+            let until = Instant::now() + Duration::from_secs(3);
+            while !folder.join("shell-started").exists() {
+                assert!(Instant::now() < until);
+                std::thread::sleep(Duration::from_millis(10));
+            }
+            let t = Instant::now();
+            assert!(state.sessions.try_lock().is_ok());
+            {
+                let mut s = existing.lock().unwrap();
+                s.writer.write_all(b"fixture-input\n").unwrap();
+                s.writer.flush().unwrap();
+                s.master.resize(size(97, 31).unwrap()).unwrap();
+                assert_eq!(s.master.get_size().unwrap().cols, 97);
+                assert!(s.child.try_wait().unwrap().is_none());
+            }
+            assert!(t.elapsed() < Duration::from_millis(200));
+            let mut output = String::new();
+            let until = Instant::now() + Duration::from_secs(3);
+            while !output.contains("ECHO:fixture-input") {
+                output.push_str(
+                    &rx.recv_timeout(until.saturating_duration_since(Instant::now()))
+                        .unwrap(),
+                );
+            }
+            let (second, _reader) = worker.join().unwrap().unwrap();
+            assert_eq!(second.program, "codex");
+            drop(second);
+            // A CLI may reject authentication/trust and exit immediately.
+            // Observe and invalidate it without an automatic restart.
+            let failed = folder.join("failed");
+            std::fs::write(&failed, "#!/bin/sh\nexit 23\n").unwrap();
+            std::fs::set_permissions(&failed, std::fs::Permissions::from_mode(0o700)).unwrap();
+            std::fs::rename(failed, folder.join("fallback/codex")).unwrap();
+            let reserved = Start::reserve(&state, "agent-3").unwrap();
+            let (mut exited, _) =
+                start_session(&state.discovery, &folder, size(80, 24).unwrap()).unwrap();
+            let calls = std::fs::read_to_string(folder.join("shell-started")).unwrap();
+            let until = Instant::now() + Duration::from_secs(3);
+            while observe_exit(&mut exited, &state.discovery).unwrap() {
+                assert!(Instant::now() < until);
+                std::thread::sleep(Duration::from_millis(10));
+            }
+            assert_eq!(
+                calls,
+                std::fs::read_to_string(folder.join("shell-started")).unwrap()
+            );
+            drop(exited);
+            drop(reserved);
+            assert!(Start::reserve(&state, "agent-3").is_ok());
+            // The next explicit request rediscovers the unchanged failed CLI.
+            let (mut retried, _) =
+                start_session(&state.discovery, &folder, size(80, 24).unwrap()).unwrap();
+            assert!(
+                std::fs::read_to_string(folder.join("shell-started"))
+                    .unwrap()
+                    .len()
+                    > calls.len()
+            );
+            retried.child.kill().unwrap();
+            drop(retried);
+            let fixed = folder.join("fixed");
+            std::fs::write(&fixed, "#!/bin/sh\nprintf 'RECOVERED\\n'\nsleep 60\n").unwrap();
+            std::fs::set_permissions(&fixed, std::fs::Permissions::from_mode(0o700)).unwrap();
+            std::fs::rename(fixed, folder.join("fallback/codex")).unwrap();
+            assert!(start_session(&state.discovery, &folder, size(80, 24).unwrap()).is_ok());
+            drop(existing);
+            state.sessions.lock().unwrap().clear();
+            let status = std::process::Command::new("/bin/ps")
+                .args(["-o", "stat=", "-p", &pid.to_string()])
+                .output()
+                .unwrap();
+            assert!(status.stdout.is_empty());
+            return;
+        }
+        let dir = tempfile::tempdir().unwrap();
+        for name in ["bin", "fallback"] {
+            std::fs::create_dir(dir.path().join(name)).unwrap();
+        }
+        let body="#!/bin/sh\nprintf 'FIXTURE_READY\\n'\nwhile IFS= read -r line; do printf 'ECHO:%s\\n' \"$line\"; done\n";
+        for name in ["bin/codex", "fallback/codex"] {
+            let p = dir.path().join(name);
+            std::fs::write(&p, body).unwrap();
+            std::fs::set_permissions(p, std::fs::Permissions::from_mode(0o700)).unwrap();
+        }
+        let shell = dir.path().join("shell");
+        std::fs::write(&shell,format!("#!/bin/sh\necho call >> '{}/shell-started'\n/bin/sleep .8\nprintf '\\nAGENT_GIBBON_PATH={}/fallback:/usr/bin:/bin\\n'\n",dir.path().display(),dir.path().display())).unwrap();
+        std::fs::set_permissions(&shell, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let result=std::process::Command::new(std::env::current_exe().unwrap()).args(["--exact","terminal::tests::pty_fixture_invalidates_failed_cli_and_keeps_existing_session_responsive","--nocapture"]).env("GIBBON_PTY_FIXTURE",dir.path()).env("PATH",format!("{}:/usr/bin:/bin",dir.path().join("bin").display())).env("SHELL",shell).output().unwrap();
+        assert!(
+            result.status.success(),
+            "{}\n{}",
+            String::from_utf8_lossy(&result.stdout),
+            String::from_utf8_lossy(&result.stderr)
+        );
     }
     #[test]
     fn metadata_does_not_claim_project_index() {
