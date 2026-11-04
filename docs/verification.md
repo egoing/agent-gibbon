@@ -1072,3 +1072,7 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 - 관리 창·터미널 트레이 항목과 stash 항목을 모두 유지했다. 전환 중 알파 소유권을 우선하고, 터미널의 중간 애니메이션 좌표 저장을 억제했다. 관리 창·터미널의 명시적 열기/숨김/닫기는 stash 복원 예약을 해제하도록 통합했다.
 - 병합본에서 `cargo fmt --manifest-path src-tauri/Cargo.toml -- --check`, Clippy `--all-targets -- -D warnings`, `npm test`(Rust **77** / UI **53**), `npm run dev:build` 통과. `npm ci`로 main 의존성을 설치했다.
 - 병합본 네이티브 GUI·Windows·Intel 재검증은 수행하지 않았다. 이전 Mac 증거를 병합본 GUI 통과로 재사용하지 않는다. 사용자 제보와 남은 실환경 검증은 #35~#41에서 계속 추적한다. 병합 통합 변경 기준 **Conf 3 / Risk Medium**.
+
+## 최초 접근 즉시 회피 — 이슈 #36 (2026-11-05)
+
+초기 안내 6초가 첫 접근을 막는 현상을 실제 포인터로 재현하고 최초 회피만 초기 안내를 중단하도록 국소 수정했다. 수정 후 최초 접근·도착 안내·안내 중/종료 후 이탈과 재진입·추격 방지·포커스 보존을 같은 개발 instance의 새 PID로 재검증했다. Rust 77개·UI 53개, Clippy·Rustfmt·개발 빌드 통과, 시안 SVG/PNG 렌더와 실제 캡처를 확인했다. Conf 5 / Risk Low. Windows·Intel 등 미실행 범위와 PID·좌표·시간·캡처 출처는 [전후 검증 보고서](verification/issue36-first-approach.md)에 기록한다.
