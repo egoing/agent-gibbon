@@ -114,7 +114,9 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
     };
     let cwd = root(app).join(&agent.id);
     // Refuse existing paths; never adopt someone else's project directory.
-    let mut builder = std::fs::DirBuilder::new();
+    let builder = std::fs::DirBuilder::new();
+    #[cfg(unix)]
+    let mut builder = builder;
     #[cfg(unix)]
     {
         use std::os::unix::fs::DirBuilderExt;
@@ -295,6 +297,8 @@ fn resolve(path: &str) -> Option<(String, PathBuf)> {
     for name in ["codex", "claude"] {
         for dir in std::env::split_paths(path).filter(|p| p.is_absolute()) {
             let candidate = dir.join(name);
+            #[cfg(not(unix))]
+            let _ = candidate;
             #[cfg(unix)]
             {
                 use std::os::unix::fs::PermissionsExt;
