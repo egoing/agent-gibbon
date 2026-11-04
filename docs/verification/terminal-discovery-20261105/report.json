@@ -2048,5 +2048,171 @@
     "binary_sha256": "c8af22a15063f6b9e86ba5348ff54ad53496c13b79cf53a8ce00fa7b136a7ad6",
     "terminal_rs_sha256": "c0c8b1012e117e64106e562ed27d9db3101bc3a11acf9e756fa41bfe534d37d5",
     "discovery_rs_sha256": "01d7d968187b7a4c0fbb77af111129d865d08344ee0150eb635868c60ab1a7f9"
-  }
+  },
+  "cleanup": {
+    "app_pid": 2915,
+    "app_processes_remaining": [],
+    "caffeinate_pid": 86875,
+    "caffeinate_stopped": true,
+    "checked_child_pids": [
+      835,
+      1006,
+      1133,
+      2915,
+      3348,
+      3436,
+      5310,
+      76642,
+      77403,
+      88543,
+      92004,
+      96323,
+      96439,
+      96573,
+      97501,
+      97911,
+      98323
+    ],
+    "remaining_child_commands": {},
+    "additional_group_kills": {},
+    "archive": "/tmp/gibbon-issue17/test-storage",
+    "moved": [
+      {
+        "id": "agent-1793819421326872000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793819421326872000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793819421326872000"
+      },
+      {
+        "id": "agent-1793819421326872000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793819421326872000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793819421326872000.json"
+      },
+      {
+        "id": "agent-1793819436725835000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793819436725835000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793819436725835000"
+      },
+      {
+        "id": "agent-1793819436725835000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793819436725835000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793819436725835000.json"
+      },
+      {
+        "id": "agent-1793819964183523000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793819964183523000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793819964183523000"
+      },
+      {
+        "id": "agent-1793819964183523000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793819964183523000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793819964183523000.json"
+      },
+      {
+        "id": "agent-1793820040937769000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820040937769000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820040937769000"
+      },
+      {
+        "id": "agent-1793820040937769000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820040937769000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820040937769000.json"
+      },
+      {
+        "id": "agent-1793820191829029000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820191829029000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820191829029000"
+      },
+      {
+        "id": "agent-1793820191829029000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820191829029000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820191829029000.json"
+      },
+      {
+        "id": "agent-1793820192424182000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820192424182000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820192424182000"
+      },
+      {
+        "id": "agent-1793820192424182000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820192424182000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820192424182000.json"
+      },
+      {
+        "id": "agent-1793820212528911000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820212528911000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820212528911000"
+      },
+      {
+        "id": "agent-1793820212528911000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820212528911000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820212528911000.json"
+      },
+      {
+        "id": "agent-1793820214320905000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820214320905000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820214320905000"
+      },
+      {
+        "id": "agent-1793820214320905000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820214320905000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820214320905000.json"
+      },
+      {
+        "id": "agent-1793820297151132000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820297151132000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820297151132000"
+      },
+      {
+        "id": "agent-1793820297151132000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820297151132000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820297151132000.json"
+      },
+      {
+        "id": "agent-1793820298916594000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820298916594000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820298916594000"
+      },
+      {
+        "id": "agent-1793820298916594000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820298916594000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820298916594000.json"
+      },
+      {
+        "id": "agent-1793820369572072000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820369572072000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820369572072000"
+      },
+      {
+        "id": "agent-1793820369572072000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820369572072000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820369572072000.json"
+      },
+      {
+        "id": "agent-1793820371426656000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820371426656000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820371426656000"
+      },
+      {
+        "id": "agent-1793820371426656000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820371426656000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820371426656000.json"
+      },
+      {
+        "id": "agent-1793820392725209000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/agent-1793820392725209000",
+        "to": "/tmp/gibbon-issue17/test-storage/projects/agent-1793820392725209000"
+      },
+      {
+        "id": "agent-1793820392725209000",
+        "from": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/.agent-gibbon-terminals/agent-1793820392725209000.json",
+        "to": "/tmp/gibbon-issue17/test-storage/metadata/agent-1793820392725209000.json"
+      }
+    ],
+    "progress_preserved": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-40ca7f182ba9bf0b29e94b20/docs/issue17-progress",
+    "frontmost_pid": 427,
+    "pointer_restored_by_native_helper": true,
+    "other_apps_or_power_settings_changed": false
+  },
+  "pr": "https://github.com/egoing/agent-gibbon/pull/52",
+  "supervisor_decision": "Draft PR, no merge; next #51 then #50"
 }

@@ -57,3 +57,9 @@
 - [변경 전 캡처](terminal-discovery-20261105/before-observer-short.png), [수정본 observer 캡처](terminal-discovery-20261105/after-observer.png), [최종 pristine 캡처](terminal-discovery-20261105/final-pristine.png)는 제목 아래가 비어 보인다. observer의 xterm buffer에는 READY/PROBE/ECHO가 있고 요소 높이는 428px였다. 네이티브 전면 입력도 fake CLI 로그로 성공을 확인하지 못했으며 전면 앱 PID **427**과 포인터는 복원했다. granted 권한 응답에도 AX 창 목록이 비어 있으며, 환경/표시/캡처 중 원인은 미확정이다. [#51](https://github.com/egoing/agent-gibbon/issues/51)에 분리했다.
 
 **Conf 3 / Risk Medium**. 탐색 개선의 실제 일부 경로와 단위·PTY 통합 검사는 확인했지만 최종 사용자 화면·네이티브 입력 E2E를 완료하지 못했다. Intel Mac·Windows·Finder의 실제 축소 환경·실제 설치 CLI 인증/신뢰·한글 IME·교차 워크트리 격리 재검증·공개 릴리스는 미실행이다. 형상·색·아이콘을 바꾸지 않았으며 [디자인 시스템](../design-system.md#cli-탐색과-시작-실패--17-2026-11-05)에 안내 기준과 적용 상태를 갱신했다.
+
+## 감독 판정과 종료 정리
+
+감독자는 **Draft PR 보존·병합 금지**, 이후 **#51 → #50** 순차 처리를 지시했다. 구현은 한국어 커밋 `ea5782f`로 보존했고 [Draft PR #52](https://github.com/egoing/agent-gibbon/pull/52)를 생성했다. CI 완료를 기다려 병합하거나 #17을 닫지 않았다.
+
+자체 최종 앱 PID **2915**의 정확한 binary를 다시 확인한 뒤 종료했다. 이 워크트리 앱 프로세스는 **0개**, 기록한 fake CLI 자식은 **0개**, 자체 caffeinate PID **86875**도 종료됨을 확인했다. 추가 자식 그룹 강제 종료는 필요하지 않았다. 생성한 검증 프로젝트 13개와 대응 metadata 13개만 `/tmp/gibbon-issue17/test-storage/`로 보관했고 진행 메모는 유지했다. 설치 앱·다른 워크트리·다른 caffeinate는 종료하지 않았다. 네이티브 입력 helper는 포인터를 복원했고 전면 앱 PID **427**이 초기와 같음을 확인했다. 이동한 ID/경로·검사한 PID와 최종 상태는 [JSON의 cleanup](terminal-discovery-20261105/report.json)에 있다.
