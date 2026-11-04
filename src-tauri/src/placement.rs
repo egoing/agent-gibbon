@@ -1,4 +1,4 @@
-// 신규 창을 오른쪽부터 배치하며 겹치지 않는 세로 좌표를 무작위 선택한다.
+// Deterministic bounded column layout in physical pixels.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Rect {
     pub x: i64,
@@ -13,12 +13,14 @@ impl Rect {
     fn bottom(self) -> i64 {
         self.y + self.height
     }
+    #[cfg(test)]
     fn fits(self, area: Self) -> bool {
         self.x >= area.x
             && self.y >= area.y
             && self.right() <= area.right()
             && self.bottom() <= area.bottom()
     }
+    #[cfg(test)]
     fn conflicts(self, other: Self, gap: i64) -> bool {
         self.x < other.right() + gap
             && self.right() + gap > other.x
@@ -27,43 +29,94 @@ impl Rect {
     }
 }
 
-pub fn find_space(
-    area: Rect,
-    size: (i64, i64),
-    random: u64,
-    occupied: &[Rect],
-    gap: i64,
-) -> Option<Rect> {
-    if size.0 <= 0 || size.1 <= 0 || size.0 > area.width || size.1 > area.height {
-        return None;
+#[derive(Clone, Copy, Debug)]
+pub struct Item {
+    pub width: i64,
+    pub min: i64,
+    pub max: i64,
+}
+
+/// Right-to-left columns, top-to-bottom free spans. Allocate bounded heights
+/// across each span; integer remainders belong to the first items (no gaps).
+pub fn stack(area: Rect, width: i64, items: &[Item], obstacles: &[Rect]) -> Vec<Rect> {
+    if width <= 0 || area.height <= 0 {
+        return Vec::new();
     }
-    // Prefer the rightmost available column; choose among every legal y pixel.
-    let mut xs = vec![area.x, area.right() - size.0];
-    for other in occupied {
-        xs.push(other.x - size.0 - gap);
+    let mut slots = Vec::new();
+    let mut right = area.right();
+    while right - width >= area.x {
+        let x = right - width;
+        let mut spans = vec![(area.y, area.bottom())];
+        for o in obstacles.iter().filter(|o| o.x < right && o.right() > x) {
+            spans = spans
+                .into_iter()
+                .flat_map(|(a, b)| {
+                    if o.y >= b || o.bottom() <= a {
+                        vec![(a, b)]
+                    } else {
+                        [(a, o.y.min(b)), (o.bottom().max(a), b)]
+                            .into_iter()
+                            .filter(|(a, b)| a < b)
+                            .collect()
+                    }
+                })
+                .collect();
+        }
+        spans.sort_unstable();
+        slots.extend(spans.into_iter().map(|(top, bottom)| (right, top, bottom)));
+        right -= width;
     }
-    xs.sort_unstable();
-    xs.dedup();
-    for x in xs.into_iter().rev() {
-        let candidates: Vec<_> = (area.y..=area.bottom() - size.1)
-            .map(|y| Rect {
-                x,
+    let mut result = Vec::new();
+    for (index, &(right, top, bottom)) in slots.iter().enumerate() {
+        let later_capacity: i64 = slots[index + 1..].iter().map(|(_, a, b)| b - a).sum();
+        let remaining = &items[result.len()..];
+        let capacity = bottom - top;
+        let (mut count, mut minimum, mut maximum) = (0, 0, 0);
+        for (i, item) in remaining.iter().enumerate() {
+            let suffix_min: i64 = remaining[i..].iter().map(|item| item.min).sum();
+            if minimum + item.min > capacity
+                || (maximum >= capacity && suffix_min <= later_capacity)
+            {
+                break;
+            }
+            minimum += item.min;
+            maximum += item.max;
+            count += 1;
+        }
+        if count == 0 {
+            continue;
+        }
+        let chosen = &remaining[..count];
+        let mut heights: Vec<_> = chosen.iter().map(|i| i.min).collect();
+        let mut extra = capacity.min(maximum) - minimum;
+        while extra > 0 {
+            let active = heights
+                .iter()
+                .zip(chosen)
+                .filter(|(h, i)| **h < i.max)
+                .count() as i64;
+            if active == 0 {
+                break;
+            }
+            let share = (extra / active).max(1);
+            for (h, item) in heights.iter_mut().zip(chosen) {
+                let add = share.min(item.max - *h).min(extra);
+                *h += add;
+                extra -= add;
+            }
+        }
+        let mut y = top;
+        for (h, item) in heights.into_iter().zip(chosen) {
+            result.push(Rect {
+                x: right - item.width,
                 y,
-                width: size.0,
-                height: size.1,
-            })
-            .filter(|candidate| {
-                candidate.fits(area)
-                    && occupied
-                        .iter()
-                        .all(|&other| !candidate.conflicts(other, gap))
-            })
-            .collect();
-        if !candidates.is_empty() {
-            return Some(candidates[(random % candidates.len() as u64) as usize]);
+                width: item.width,
+                height: h,
+            });
+            y += h;
         }
     }
-    None
+    result
 }
 
 // When every monitor is occupied, keep the panel on screen with minimal overlap.
@@ -104,73 +157,148 @@ pub fn least_overlap(area: Rect, size: (i64, i64), occupied: &[Rect]) -> Option<
 #[cfg(test)]
 mod tests {
     use super::*;
-    fn rect(x: i64, y: i64, width: i64, height: i64) -> Rect {
+    fn area() -> Rect {
         Rect {
+            x: 0,
+            y: 30,
+            width: 900,
+            height: 1000,
+        }
+    }
+    fn text() -> Item {
+        Item {
+            width: 300,
+            min: 48,
+            max: 420,
+        }
+    }
+    #[test]
+    fn short_content_is_never_stretched_to_fill_the_screen() {
+        let short = Item {
+            width: 300,
+            min: 48,
+            max: 48,
+        };
+        let medium = Item {
+            width: 300,
+            min: 48,
+            max: 123,
+        };
+        let r = stack(area(), 300, &[short, medium, short], &[]);
+        assert_eq!(
+            r.iter().map(|r| r.height).collect::<Vec<_>>(),
+            vec![48, 123, 48]
+        );
+        assert_eq!(r[1].y, r[0].bottom());
+        assert_eq!(r[2].y, r[1].bottom());
+    }
+    #[test]
+    fn zero_gap_fills_exact_horizontal_and_vertical_slots() {
+        let rect = |x, y, width, height| Rect {
             x,
             y,
             width,
             height,
-        }
-    }
-    #[test]
-    fn right_edge_and_random_vertical_position() {
+        };
+        let area = rect(-600, 30, 600, 480);
+        let item = Item {
+            width: 300,
+            min: 240,
+            max: 240,
+        };
         assert_eq!(
-            find_space(rect(0, 30, 1000, 700), (300, 240), 70, &[], 8),
-            Some(rect(700, 100, 300, 240))
+            stack(area, 300, &[item; 4], &[]),
+            vec![
+                rect(-300, 30, 300, 240),
+                rect(-300, 270, 300, 240),
+                rect(-600, 30, 300, 240),
+                rect(-600, 270, 300, 240),
+            ]
         );
+        assert_eq!(stack(area, 300, &[item; 5], &[]).len(), 4);
     }
     #[test]
-    fn samples_distinct_legal_heights_and_skips_blocked_ranges() {
-        let area = rect(0, 0, 1000, 1000);
-        let occupied = [rect(700, 300, 300, 240)];
-        let mut heights = std::collections::BTreeSet::new();
-        for random in 0..=1000 {
-            let placed = find_space(area, (300, 240), random, &occupied, 8).unwrap();
-            assert_eq!(placed.x, 700);
-            assert!(!placed.conflicts(occupied[0], 8));
-            assert!(placed.fits(area));
-            heights.insert(placed.y);
+    fn ordinary_notes_fill_top_down_then_left() {
+        let r = stack(area(), 300, &[text(); 5], &[]);
+        assert_eq!(r.len(), 5);
+        assert_eq!((r[0].x, r[0].y), (600, 30));
+        assert_eq!(r[0].height + r[1].height + r[2].height, 1000);
+        assert_eq!(r[1].y, r[0].bottom());
+        assert_eq!(r[2].y, r[1].bottom());
+        assert_eq!((r[3].x, r[3].y), (300, 30));
+        assert_eq!(r[4].y, r[3].bottom());
+        assert!(r
+            .iter()
+            .all(|r| r.fits(area()) && r.height >= 48 && r.height <= 420));
+    }
+    #[test]
+    fn obstacles_and_negative_origins() {
+        let a = Rect {
+            x: -900,
+            y: -30,
+            ..area()
+        };
+        let obstacle = Rect {
+            x: -300,
+            y: 200,
+            width: 300,
+            height: 200,
+        };
+        let r = stack(a, 300, &[text(); 7], &[obstacle]);
+        assert_eq!(r[0].y, -30);
+        assert_eq!(r[0].bottom(), 200);
+        assert_eq!(r[1].y, 400);
+        for (i, rect) in r.iter().enumerate() {
+            assert!(rect.fits(a));
+            assert!(!rect.conflicts(obstacle, 0));
+            assert!(rect.height <= 420);
+            for other in &r[..i] {
+                assert!(!rect.conflicts(*other, 0));
+            }
         }
-        assert!(heights.len() > 200);
     }
     #[test]
-    fn avoids_existing_window_with_gap() {
-        let occupied = [rect(200, 100, 300, 240)];
-        let placed = find_space(rect(0, 30, 1000, 700), (300, 240), 70, &occupied, 8).unwrap();
-        assert!(!placed.conflicts(occupied[0], 8));
-        assert_eq!(occupied[0], rect(200, 100, 300, 240));
+    fn bounded_single_and_exact_remainders() {
+        assert_eq!(stack(area(), 300, &[text()], &[])[0].height, 420);
+        let a = Rect {
+            height: 1001,
+            ..area()
+        };
+        let r = stack(a, 300, &[text(); 3], &[]);
+        assert_eq!(r.iter().map(|r| r.height).sum::<i64>(), 1001);
+        assert_eq!(r.last().unwrap().bottom(), a.bottom());
     }
     #[test]
-    fn fills_remaining_hole_between_windows() {
-        let occupied = [rect(0, 0, 308, 480), rect(616, 0, 308, 480)];
-        assert_eq!(
-            find_space(rect(0, 0, 924, 480), (292, 240), 0, &occupied, 8),
-            Some(rect(316, 0, 292, 240))
-        );
+    fn full_screen_and_short_slots() {
+        assert!(stack(area(), 300, &[text()], &[area()]).is_empty());
+        let a = Rect {
+            height: 47,
+            ..area()
+        };
+        assert!(stack(a, 300, &[text()], &[]).is_empty());
+        let r = stack(area(), 300, &[text(); 100], &[]);
+        assert_eq!(r.len(), 60);
+        assert_eq!(stack(area(), 300, &[text(); 10], &[]).len(), 10);
     }
     #[test]
-    fn supports_negative_monitor_origins_and_large_scale() {
-        let area = rect(-2560, -300, 2560, 1440);
-        let occupied = [rect(-1800, 0, 600, 480)];
-        let placed = find_space(area, (600, 480), 42, &occupied, 16).unwrap();
-        assert!(placed.fits(area));
-        assert!(!placed.conflicts(occupied[0], 16));
-    }
-    #[test]
-    fn full_or_undersized_screen_has_no_position() {
-        let area = rect(0, 0, 300, 240);
-        assert_eq!(find_space(area, (300, 240), 0, &[area], 8), None);
-        assert_eq!(find_space(area, (301, 240), 0, &[], 8), None);
-    }
-    #[test]
-    fn repeated_creation_never_overlaps_until_full() {
-        let area = rect(0, 0, 1000, 750);
-        let mut occupied = Vec::new();
-        while let Some(next) = find_space(area, (300, 240), 0, &occupied, 8) {
-            assert!(occupied.iter().all(|&other| !next.conflicts(other, 8)));
-            occupied.push(next);
-            assert!(occupied.len() <= 9);
-        }
-        assert!(occupied.len() >= 4);
+    fn fixed_ratio_images_and_folded_heights() {
+        let items = [
+            Item {
+                width: 210,
+                min: 420,
+                max: 420,
+            },
+            Item {
+                width: 300,
+                min: 12,
+                max: 12,
+            },
+            text(),
+            text(),
+        ];
+        let r = stack(area(), 300, &items, &[]);
+        assert_eq!((r[0].width, r[0].height), (210, 420));
+        assert_eq!(r[1].height, 12);
+        assert_eq!(r.last().unwrap().bottom(), area().bottom());
     }
 }

@@ -856,3 +856,71 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - 시안 SVG→PNG 렌더링 확인. 최신 실행의 실제 메뉴 픽셀 및 선택 강조·다크 모드 시각 검증은 미완료. Windows 자동 색상 연동은 미구현.
 - 제목 흐림 후속 보정: 열린 항목의 attributed title을 nil로 초기화하고 적용 시점의 가시성을 조회한다. 빌드·Rust 69개 통과. 동일 작업 루트의 PID 71421로 재시작하고 기존 열린 메모 3개의 위치·크기를 AX로 복원했다. inspect main의 instance를 재확인했다. 실제 메뉴 색상 육안 검증은 미완료다.
 - 커밋 전 최종 검증: Rust 69개·UI 50개 테스트, Clippy 전체 대상 경고 없음, Rustfmt 및 git diff 검사 통과. 실제 메뉴 육안 검증의 기존 한계는 유지한다.
+
+## 화면 가장자리·메모 간격 0px (2026-11-04)
+
+- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/position`
+- `npm run dev:info`: instance `dev-f2b87d7d25433895e0fea8ff`, binary `<작업 루트>/src-tauri/target/debug/agent-gibbon`. macOS ARM64, Rust 1.91.1, Node v24.21.0.
+- `npm run dev:build` 성공, `cargo test --manifest-path src-tauri/Cargo.toml` 70개, `npm run test:ui` 50개 통과. Rustfmt·`git diff --check` 통과. 0px 가로·세로 슬롯을 빈틈없이 채우는 회귀 테스트 포함.
+- 사용자의 기존 앱 종료 요청에 따라 `classify-text-image` 워크트리 바이너리 경로를 재확인한 PID 71421만 SIGTERM으로 종료. 현재 워크트리 개발 CLI로 새 앱 실행(PID 21410).
+- `position-zero-1`~`position-zero-6`을 개발 CLI로 생성하고 각각 inspect의 `ok`, instance, 본문 고유 표식 `POSITION-ZERO-N`, visible, animating=false 확인. 마우스 이동 후 원래 위치 복원.
+- Retina 물리 좌표: 각 창 600×630, 위치 (3512,444), (3512,1246), (3512,1944), (2912,1584), (2912,518), (2312,286). 6개 창 쌍별 겹침 없음. 작업 영역 오른쪽 경계 x=4112와 창 오른쪽이 일치하며 인접 열 간격 0.
+- GUI 출처: `ps`의 정확한 바이너리 경로/PID 및 CGWindowList의 owner PID 21410·창 제목 `Agent Gibbon [DEV egoing/position · f2b87d7d] — position-zero-N`을 대조. Orca list-windows는 빈 목록을 반환해 macOS System Events와 CGWindowList로 확인했다.
+- 실제 Toolbar의 ‘반대편으로 워프’를 AX로 실행한 `position-zero-6`의 inspect 위치 (0,286), 크기 600×630 확인. 왼쪽 여백 0px.
+- 캡처 `/tmp/position-live.png`, `/tmp/position-warp.png` 육안 확인. CLI 원본 `/tmp/position-live.json`, `/tmp/position-warp.json`. 캡처에는 사용자 배경 화면이 포함되어 저장소에 넣지 않는다.
+- 세로 최소 간격 0px은 Rust 회귀 테스트로 확인. 실제 무작위 세로 배치는 빈 공간을 남기므로 세로 밀착 자체는 실화면에서 재현하지 않았다. Windows·Intel·다중 모니터 실환경 검증은 미실행. 개발 앱과 확인용 메모는 실행 상태로 유지.
+
+### 수직 0px 실환경 추가 검증 (2026-11-04)
+
+- 같은 작업 루트와 instance `dev-f2b87d7d25433895e0fea8ff`, 정확한 debug 바이너리/PID 21410을 재확인했다. 기존 사용자 메모의 위치·내용·숨김은 변경하지 않았다.
+- `/tmp/position-vertical.py`로 전용 메모 `vertical-gap-top`, `vertical-gap-bottom`의 크기·위치를 AX로 설정해 오른쪽 열에 정확히 48 논리 px 공간을 만들었다. `vertical-gap-probe`는 위치를 직접 설정하지 않고 개발 CLI로 다시 열어 정상 자동 배치를 실행했다.
+- inspect 물리 좌표: 위 창 y=88, 높이=1012 → 하단=1100; 새 창 y=1100, 높이=96 → 하단=1196; 아래 창 y=1196. 세 창 x=3512, 너비=600. 두 접합부 모두 간격 **0 물리 px**, 겹침 없음. Retina 논리 좌표로 각각 y=44/550/598이다.
+- 세 inspect 응답의 ok·instance·visible 및 고유 본문을 확인했다. CGWindowList의 PID 21410·각 네이티브 창 제목·좌표를 대조했다. 원본 `/tmp/position-vertical.json`, 창 출처 `/tmp/position-vertical-windows.txt`.
+- 접합부 캡처 `/tmp/position-vertical.png`를 육안 확인했다. 모서리 둥글기와 테두리는 유지하며 창 사이 추가 수직 여백은 없다. 위의 ‘세로 밀착 실화면 미재현’ 한계를 이번 검증으로 해소했다.
+- 검증용 세 창만 숨겼고 마우스는 원래 위치로 복원했다. 앱은 계속 실행한다. Windows·Intel·다중 모니터는 여전히 미검증이다.
+
+## 메모 자동 배치와 전환 (2026-11-04)
+
+이 절은 `memo-auto-layout`의 새 구현 검증이다. 위 `position`의 0px 슬롯 실험과 별개이며, 좁은 슬롯만 만든 결과를 일반 자동 배치의 증거로 쓰지 않았다. 이후 사용자 합의인 **콘텐츠보다 높게 늘리지 않기**와 **420ms 재배치 전환**까지 반영했다.
+
+### 출처와 실행 환경
+
+- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/memo-auto-layout`
+- `npm run dev:info`: instance `dev-3a00beb5ec408d9ff88dc157`, binary `src-tauri/target/debug/agent-gibbon`(위 루트 기준 절대 경로 확인).
+- macOS Apple Silicon, Rust 1.91.1, Node v24.21.0, Tauri 2.12.2. 실제 Retina 단일 화면 2056×1329 논리 px, 작업 영역 `(0,44)–(2056,1329)`, 배율 2.
+- 일반 조작 회귀 PID **97243**, 최종 영역·이미지 및 화면 캡처 PID **11188**. 각 실행에서 `ps`의 실행 파일 절대 경로를 대조하고 CLI `inspect.ok`·instance·메모 ID·본문 표식을 확인했다. GUI는 해당 PID의 `Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — <ID>` 제목으로 접근했다.
+- 재시작은 이 작업에서 실행한 해당 PID만 종료했다. 기존 설치 앱과 다른 워크트리 프로세스는 종료하거나 조작하지 않았다. 사용자 승인에 따라 개발 메모 백업·복원 절차는 추가하지 않았다.
+- [정량 검증 JSON](verification/auto-layout-20261104.json): 일반 메모·전환 중간 프레임·영역 메모·캡처의 좌표, 크기, 콘텐츠 상한, 제외 플래그, native window ID 및 화면 범위.
+
+### 수행 결과
+
+| 검증 | 결과 |
+|---|---|
+| Rust 단위 테스트 | 69개 통과. 0px 정확 슬롯, 음수 원점·장애물, 최소/최대, 부족한 공간, 이미지/접힘, 짧은 콘텐츠 확대 금지 포함 |
+| UI 테스트 | 52개 통과. 폴링·hover는 제외 플래그 갱신 명령을 보내지 않음, 실제 편집은 보냄, 초기 영역 편집은 제외 유지, 측정 revision 전달 포함 |
+| 정적 검사/빌드 | Clippy 경고 0, Rustfmt, JS 구문, `git diff --check`, 버전 일치 및 `npm run dev:build` 통과 |
+| `scripts/auto-layout-smoke.py` | 일반 메모 6개 순차 열기의 가로·세로 0px, 콘텐츠 상한, 내용 갱신 시 현재 배치 유지, 실제 드래그·리사이즈→제외, 편집/CLI 갱신→복귀, 장애물 보존, 숨김 갱신·복원, 빠른 연속 열기의 최종 겹침 없음 통과 |
+| 재배치 전환 | 실제 메모를 직접 옮긴 뒤 편집→일반 열기를 수행해, `animating=true` 동안 서로 다른 중간 좌표를 관측하고 최종 도착·겹침 없음을 확인 |
+| `scripts/auto-layout-region-smoke.py` | 실제 메뉴·포인터 영역 지정으로 텍스트 240×120px, 이미지 160×100px 생성. 선택 좌표·크기 및 제외 플래그 확인, 기존 일반 창의 배치 불변. 다음 일반 열기가 두 장애물을 보존함을 확인 |
+| 영역 작업 후 복귀 | 텍스트 편집 저장 및 이미지 핀 클릭으로 포함 복귀. 다음 일반 열기에서 텍스트 300px, 이미지 160×100px/비율 1.6 유지(원본보다 확대하지 않음) 확인 |
+| 콘텐츠 높이 | 한 줄 메모 48px 유지, 충분히 긴 본문 상한 420px. 매 검증 창의 실제 높이 ≤ 측정된 콘텐츠 상한 |
+| 실제 메뉴 복원 | 해당 PID의 트레이에서 숨긴 일반 메모 복원. 커서 대기 없이 재배치, 새 창에 포커스 강탈 없음 |
+| `scripts/entrance-direction-smoke.py` | 네 방향·반전·1초 대기·jitter·one-shot, 실제 드래그 취소, 숨김 복원 시 새 높이 규칙, 동시 등장 목적지 겹침 없음 통과 |
+| SVG/PNG | 갱신된 [시안 SVG](design/placement-zero-gap.svg)를 `rsvg-convert`로 PNG 렌더링하고 육안 확인 |
+
+### 일반 열기 실제 화면
+
+`layout-live-view-01`~`08`을 일반 CLI `open`으로 순서대로 생성했다. 미리 슬롯을 만들거나 창 위치·크기를 강제로 설정하지 않았다. 모두 본문이 충분히 긴 메모이며, 각 열의 높이는 **322+321+321+321=1285px**이다. 오른쪽 열 x=1756, 왼쪽 열 x=1456, y=44·366·687·1008 논리 px이며 너비 300px, 오른쪽 경계 2056px·아래 경계 1329px에 정확히 맞는다. 가로·세로 간격은 0px이다.
+
+캡처 전 `inspect`와 PID 11188의 native 제목/창 ID를 대조했다. 실제 화면의 `(1456,44,600,1285)` 영역을 `screencapture -x -R`로 저장했다. 포인터를 각 검증 메모에 올려 원래 불투명 표시 상태를 확인했으며 이미지 합성이 아니다. 캡처 후 이번 검증 메모만 숨겼다.
+
+![일반 메모 8개의 실제 0px 자동 열 배치](design/auto-layout-live-macos.png)
+
+### 발견·보정 및 한계
+
+- 첫 실환경 검증에서 물리 픽셀로 나눈 홀수 높이가 macOS의 정수 논리 크기로 반올림되어 접합부에 2 물리 px 겹침이 생겼다. macOS를 정수 논리 좌표로 계산하도록 보정한 뒤 일반 열기·실제 조작 회귀와 위 8개 메모 캡처를 통과했다. 최초 실패를 통과로 집계하지 않았다.
+- 짧은 콘텐츠는 화면을 채우려고 늘리지 않는다. 열 아래 잔여 공간과 장애물 주변 최소 높이 미만 공간은 허용한다. 전환 경로에서 잠시 겹칠 수 있지만 위 테스트의 최종 배치는 겹치지 않았다.
+- 모든 화면이 최소 크기에서도 가득 차면 기존 창을 유지하고 새 창에 최소 겹침 대안을 적용한다. 이 극한 경우와 작은/음수 화면·고정 비율의 조합은 단위 검증 범위이며 실제 화면을 가득 채운 대량 창 실험은 하지 않았다.
+- Windows·Intel Mac·실제 복수 모니터/혼합 DPI는 미실행이다. 다른 워크트리를 다시 빌드·종료하는 격리 smoke는 실행하지 않았다. 설치본 교체·공개 릴리스·커밋은 하지 않았다.
+
+Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치·크기 상태에 영향, 앱/데이터 저장 형식은 유지).

@@ -27,6 +27,7 @@ struct Flight {
     expected: Point,
     started: Instant,
     motion: Motion,
+    from_size: Option<tauri::LogicalSize<f64>>,
 }
 #[derive(Default)]
 pub struct Entrances(Mutex<BTreeMap<String, Flight>>);
@@ -142,6 +143,14 @@ pub fn finish(window: &WebviewWindow) -> Result<(), String> {
         .remove(window.label());
     if let Some(flight) = flight {
         if near(position(window)?, flight.expected) {
+            window
+                .set_size(
+                    flight
+                        .destination
+                        .size
+                        .to_logical::<f64>(flight.destination.scale),
+                )
+                .map_err(|e| e.to_string())?;
             move_to(
                 window,
                 point(flight.destination.position, flight.destination.scale),
@@ -169,6 +178,7 @@ pub fn destination(window: &WebviewWindow) -> Option<Destination> {
         .get(window.label())
         .map(|f| f.destination)
 }
+#[cfg(test)]
 impl Destination {
     pub fn rect(self) -> crate::placement::Rect {
         crate::placement::Rect {
@@ -193,6 +203,7 @@ pub fn cancel(window: &WebviewWindow) -> Result<(), String> {
 #[tauri::command]
 pub fn drag_note(window: WebviewWindow) -> Result<(), String> {
     cancel(&window)?;
+    crate::layout::mark(&window, true);
     window.start_dragging().map_err(|e| e.to_string())
 }
 fn near(a: Point, b: Point) -> bool {
@@ -210,8 +221,11 @@ pub fn show(
     finish(window)?;
     let destination = match destination {
         Some(p) => p,
-        None => crate::place_new_window(window.app_handle(), window, None)?,
+        None => crate::layout::reflow(window.app_handle(), window)?,
     };
+    if crate::layout::excluded(window) {
+        return crate::show_without_focus(window);
+    }
     // Placement is complete while hidden. Direct user opens need no cursor wait.
     if matches!(presentation, Presentation::Direct) {
         return crate::show_without_focus(window);
@@ -270,6 +284,7 @@ pub fn show(
                 destination,
                 expected: start,
                 started,
+                from_size: None,
                 motion: Motion {
                     shown_at: started,
                     moved: false,
@@ -293,6 +308,46 @@ pub fn show(
     {
         flight.motion.shown_at = Instant::now();
     }
+    run_frames(window, start, started);
+    Ok(())
+}
+
+/// Re-target an active flight from its current rendered frame. Transient
+/// interpolation state is discarded when complete; it is not user history.
+pub fn transition(window: &WebviewWindow, destination: Destination) -> Result<(), String> {
+    cancel(window)?;
+    let start = position(window)?;
+    let scale = window.scale_factor().map_err(|e| e.to_string())?;
+    let size = window
+        .outer_size()
+        .map_err(|e| e.to_string())?
+        .to_logical::<f64>(scale);
+    let started = Instant::now();
+    window
+        .state::<Entrances>()
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .insert(
+            window.label().into(),
+            Flight {
+                destination,
+                expected: start,
+                started,
+                from_size: Some(size),
+                motion: Motion {
+                    shown_at: started,
+                    moved: true,
+                    threshold: 0.0,
+                    anchor: start,
+                    moving_since: Some(started),
+                },
+            },
+        );
+    run_frames(window, start, started);
+    Ok(())
+}
+fn run_frames(window: &WebviewWindow, start: Point, started: Instant) {
     let window = window.clone();
     std::thread::spawn(move || loop {
         std::thread::sleep(Duration::from_millis(16));
@@ -313,7 +368,6 @@ pub fn show(
             break;
         }
     });
-    Ok(())
 }
 fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, String> {
     let state = window.state::<Entrances>();
@@ -350,6 +404,18 @@ fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, 
         start.x + (destination.x - start.x) * ease,
         start.y + (destination.y - start.y) * ease,
     );
+    if let Some(size) = flight.from_size {
+        let target = flight
+            .destination
+            .size
+            .to_logical::<f64>(flight.destination.scale);
+        window
+            .set_size(tauri::LogicalSize::new(
+                size.width + (target.width - size.width) * ease,
+                size.height + (target.height - size.height) * ease,
+            ))
+            .map_err(|e| e.to_string())?;
+    }
     move_to(window, next)?;
     flight.expected = next;
     if t >= 1.0 {

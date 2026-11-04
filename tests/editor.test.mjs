@@ -14,7 +14,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
       setAttribute(key, value) { this.attributes[key] = value; }, removeAttribute(key) { delete this.attributes[key]; }, focus() {},
       setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; },
       getBoundingClientRect() { return { width: 298, height: this.hidden ? 0 : 42 }; },
-      cloneNode() { return { style: {}, getBoundingClientRect: () => ({ width: 298, height: 120 }), remove() {} }; },
+      cloneNode() { return { style: {}, querySelector: () => ({ hidden: false, innerHTML: '', remove() {} }), getBoundingClientRect: () => ({ width: 298, height: 120 }), remove() {} }; },
     });
     return elements.get(id);
   };
@@ -578,4 +578,24 @@ test('toolbar shortcuts follow platform and gesture help is shown on button use'
     if (platform === 'MacIntel') assert.match(app.view().message, /Option.*포인터/);
     else assert.equal(app.view().message, '');
   }
+});
+
+
+test('polling and hover never reset placement intent, explicit editing does', async () => {
+  const app = await setup();
+  await app.refresh(); await app.pollFold(); await app.pollWarp();
+  await app.pointers.pointerenter(); await app.pointers.pointerleave();
+  assert.equal(app.calls.filter(([name]) => name === 'content_action').length, 0);
+  app.element('edit').listeners.click();
+  assert.equal(app.calls.filter(([name]) => name === 'content_action').length, 1);
+  app.element('markdown').listeners.input();
+  assert.equal(app.calls.filter(([name]) => name === 'content_action').length, 2);
+});
+
+test('content measurement carries the current revision and pending reopen can measure in editor', async () => {
+  const app = await setup(new Map(), { layout_pending: true }, { edit_on_open: true, revision: 9 });
+  const fit = app.calls.find(([name]) => name === 'fit_note');
+  assert.equal(fit[1].revision, 9);
+  assert.equal(app.element('editor').hidden, false);
+  assert.equal(app.calls.filter(([name]) => name === 'content_action').length, 0);
 });

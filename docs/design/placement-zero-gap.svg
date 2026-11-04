@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="680" viewBox="0 0 1000 680">
+<style>text{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#27313c}.small{font-size:14px}.label{font-size:16px;font-weight:bold}.note{stroke:#8f968c;stroke-width:1;rx:3}</style>
+<rect width="1000" height="680" fill="#f3f4f6"/>
+<text x="30" y="40" font-size="25" font-weight="bold">메모 자동 배치 · 콘텐츠를 넘겨 늘리지 않기</text>
+<text x="30" y="67" class="small">설명용 시안 · 논리 300px 열 / 48~420px 높이 · 메뉴·Dock을 제외한 작업 영역</text>
+<rect x="40" y="100" width="720" height="360" fill="#dce0e5" stroke="#657080"/>
+<text x="57" y="128" class="small">화면 작업 영역</text>
+<rect class="note" x="580" y="100" width="180" height="29" fill="#fff5cf"/>
+<text x="590" y="120" class="small">① 짧은 본문 · 최소 48px</text>
+<rect class="note" x="580" y="129" width="180" height="96" fill="#c9eff7"/>
+<text x="590" y="156" class="label">② 콘텐츠 160px</text><text x="590" y="181" class="small">콘텐츠만큼만 사용</text>
+<rect class="note" x="580" y="225" width="180" height="235" fill="#d7edcb"/>
+<text x="590" y="253" class="label">③ 긴 본문 · 392px</text><text x="590" y="281" class="small">남은 높이에 맞춤</text><text x="590" y="306" class="small">초과 내용은 스크롤</text>
+<path d="M748 333v105" stroke="#568548" stroke-width="3"/><path d="m742 430 6 8 6-8" fill="none" stroke="#568548" stroke-width="3"/>
+<rect class="note" x="400" y="100" width="180" height="252" fill="#f4d8e6"/>
+<text x="410" y="130" class="label">④ 다음 왼쪽 열</text><text x="410" y="159" class="small">최대 420px</text><text x="410" y="187" class="small">글자 크기 유지</text>
+<text x="410" y="385" class="small">남는 공간 허용</text><text x="410" y="410" class="small">내용을 늘리지 않음</text>
+<rect class="note" x="185" y="275" width="185" height="110" fill="#e4d4ff" stroke-dasharray="5 3"/>
+<text x="199" y="305" class="label">사용자가 직접 배치</text><text x="199" y="332" class="small">제외 · 위치/크기 유지</text><text x="199" y="359" class="small">편집하면 다음 정렬에 포함</text>
+<path d="M770 100h20v360h-20" fill="none" stroke="#568548" stroke-width="2"/>
+<text x="805" y="145" class="label">간격 0px</text><text x="805" y="175" class="small">오른쪽·위·아래 경계</text><text x="805" y="202" class="small">인접 메모 경계</text>
+<text x="805" y="275" class="label">전환 420ms</text><text x="805" y="305" class="small">현재 위치 → 새 목적지</text><text x="805" y="332" class="small">직접 조작 시 취소</text>
+<text x="40" y="505" class="label">새 일반 메모 / 숨김 복원 → 대상 전체 계산 → 부드러운 위치·크기 전환</text>
+<text x="40" y="537" class="small">내용만 갱신 → 제외 플래그·콘텐츠 상한 갱신 / 현재 배치 유지</text>
+<text x="40" y="567" class="small">영역 지정 생성 → 선택한 위치·크기 유지 / 전체 재배치 없음</text>
+<text x="40" y="609" class="small">높이 상한 = max(48, min(콘텐츠 높이, 420)) · 공간 부족 시 상한 안에서 줄이고 스크롤</text>
+<text x="40" y="639" class="small">장애물·이미지 비율·최소 높이 때문에 생기는 잔여 공간은 허용 · 실제 검증은 별도 실행 기록 참고</text>
+</svg>

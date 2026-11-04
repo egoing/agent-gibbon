@@ -20,13 +20,19 @@ let exporting = false;
 let editRevision;
 let needsFit = true;
 let fitting = false;
+let layoutPending = false;
 let folded = false;
 async function fitContent() {
-  if (latestNote?.capture || !needsFit || fitting || editing || folded) return;
+  if (latestNote?.capture || !needsFit || fitting || (editing && !layoutPending) || folded) return;
   fitting = true;
   // Measure natural flow independently of the current window height.
   const measure = $('viewport').cloneNode(true);
   measure.id = 'measure-viewport';
+  measure.querySelector('#editor')?.remove();
+  measure.querySelector('#controls')?.remove();
+  const measuredContent = measure.querySelector('#content');
+  measuredContent.hidden = false;
+  measuredContent.innerHTML = latestNote.html;
   Object.assign(measure.style, {
     position: 'fixed', left: '-10000px', top: '0', visibility: 'hidden',
     display: 'flow-root', flex: 'none', width: '298px', minWidth: '298px',
@@ -38,13 +44,18 @@ async function fitContent() {
   const width = Math.ceil(rect.width + 2);
   const height = Math.ceil(rect.height + 2);
   measure.remove();
-  try { needsFit = !await invoke('fit_note', { width, height }); }
+  try { needsFit = !await invoke('fit_note', { width, height, revision: latestNote.revision }); }
   catch (error) { failure(error); }
   finally { fitting = false; }
 }
+function contentAction() { return invoke('content_action').catch(failure); }
+$('markdown').addEventListener('input', contentAction);
+for (const id of ['toolbar-previous', 'toolbar-next']) $(id).addEventListener('click', contentAction);
+document.addEventListener('wheel', contentAction, { passive: true });
 const fontSizes = [12, 14, 16, 18];
 let fontIndex = 0;
 $('font-size').addEventListener('click', () => {
+  contentAction();
   fontIndex = (fontIndex + 1) % fontSizes.length;
   const size = fontSizes[fontIndex];
   document.documentElement.style.setProperty('--font-size', `${size}px`);
@@ -55,6 +66,7 @@ $('font-size').addEventListener('click', () => {
 });
 let restoringEditorFocus = false;
 function endEditing() {
+  contentAction();
   editing = false;
   document.body.classList.toggle('editing', false);
   $('editor').hidden = true;
@@ -83,7 +95,7 @@ function beginEditing() {
   $('markdown').setSelectionRange(0, 0);
   $('markdown').scrollTop = 0;
 }
-$('edit').addEventListener('click', beginEditing);
+$('edit').addEventListener('click', () => { contentAction(); beginEditing(); });
 
 async function save() {
   if (!editing || saving) return;
@@ -138,6 +150,7 @@ async function publishFeedback() {
 }
 async function exportNote() {
   if (!latestNote || exporting || saving) return;
+  contentAction();
   exporting = true;
   $('export').disabled = true;
   try {
@@ -149,10 +162,12 @@ async function exportNote() {
   finally { exporting = false; $('export').disabled = false; }
 }
 $('export').addEventListener('click', exportNote);
-async function refresh() {
+async function refresh(schedule = true) {
   try {
     const state = await invoke('snapshot');
     latestNote = state.note;
+    layoutPending = !!state.layout_pending;
+    if (layoutPending) needsFit = true;
     memoVisible = state.visible !== false;
     if (!memoVisible) feedbackSignature = undefined;
     document.body.classList.toggle('pointer-over', !!state.hovered);
@@ -202,7 +217,7 @@ async function refresh() {
     }
     await fitContent();
   } catch (error) { failure(error); }
-  setTimeout(refresh, 350);
+  if (schedule) setTimeout(refresh, 350);
 }
 document.addEventListener('mousedown', (event) => {
   if (folded || event.button !== 0 || event.target.closest('button, #editor, #tooltip, .resize')) return;
@@ -251,6 +266,7 @@ function currentPlainText() {
 }
 async function copyNote() {
   if (!latestNote || editing) return;
+  contentAction();
   try {
     if (latestNote.capture) {
       await invoke('copy_note_image');
@@ -266,10 +282,12 @@ $('content').addEventListener('click', (event) => { if (event.target.closest('a'
 window.__TAURI__.event.listen('note-pointer-over', ({ payload }) => {
   document.body.classList.toggle('pointer-over', payload);
 }).catch(failure);
+window.__TAURI__.event.listen('layout-measure', () => { needsFit = true; refresh(false); }).catch(failure);
 refresh();
 
 async function acknowledge() {
   if (highlightRevision === null || acknowledging) return;
+  contentAction();
   const observed = highlightRevision;
   acknowledging = true;
   publishFeedback();
