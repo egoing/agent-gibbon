@@ -6,6 +6,8 @@ mod feedback_window;
 mod focus;
 mod instance;
 mod ipc;
+mod manager;
+
 mod layout;
 mod model;
 #[cfg(target_os = "macos")]
@@ -111,6 +113,22 @@ fn sync_pointer(window: &tauri::WebviewWindow) -> Result<bool, String> {
 // Called by synchronous commands and the IPC main-thread handler only.
 #[tauri::command]
 fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
+    if window.label() == manager::LABEL {
+        #[cfg(target_os = "macos")]
+        {
+            window
+                .state::<opacity::Fades>()
+                .lock()
+                .map_err(|e| e.to_string())?
+                .remove(manager::LABEL);
+            let ptr = window.ns_window().map_err(|e| e.to_string())?;
+            // SAFETY: Tauri owns this live NSWindow; called on the main thread.
+            unsafe {
+                (&*(ptr as *const objc2_app_kit::NSWindow)).setAlphaValue(1.0);
+            }
+        }
+        return Ok(1.0);
+    }
     let hovered = sync_pointer(&window)?;
     #[cfg(target_os = "macos")]
     {
@@ -327,6 +345,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         )])))
         .invoke_handler(tauri::generate_handler![
             snapshot,
+            manager::manager_notes,
+            manager::manager_image,
             layout::content_action,
             feedback_window::present_feedback,
             feedback_window::feedback_snapshot,
@@ -355,6 +375,13 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::manual_resize
         ])
         .on_window_event(|win, event| {
+            if win.label() == manager::LABEL {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    let _ = win.hide();
+                }
+                return;
+            }
             if win.label().starts_with("capture-") || feedback_window::is_surface(win.label()) {
                 return;
             }

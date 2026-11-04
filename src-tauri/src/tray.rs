@@ -14,6 +14,11 @@ type TrayMenu = std::sync::Mutex<Option<Menu<tauri::Wry>>>;
 
 fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     let menu = Menu::new(app).map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(app, "open-manager", "메모 관리", true, None::<&str>)
+            .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
     if let Some(label) = &crate::instance::current().label {
         menu.append(
             &MenuItem::with_id(app, "dev-instance", label, false, None::<&str>)
@@ -138,7 +143,7 @@ fn memo_icon(bytes: &[u8], visible: bool) -> Result<tauri::image::Image<'static>
     let image = tauri::image::Image::from_bytes(bytes).map_err(|e| e.to_string())?;
     let mut rgba = image.rgba().to_vec();
     if !visible {
-        for pixel in rgba.chunks_exact_mut(4) {
+        for pixel in rgba.as_chunks_mut::<4>().0 {
             pixel[3] = (pixel[3] as f32 * 0.45) as u8;
         }
     }
@@ -236,7 +241,9 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 app.exit(0);
                 return;
             }
-            let result = if event.id.as_ref() == "capture-image" {
+            let result = if event.id.as_ref() == "open-manager" {
+                crate::manager::open(app)
+            } else if event.id.as_ref() == "capture-image" {
                 crate::capture::trigger(app, crate::capture::SelectionMode::Image);
                 Ok(())
             } else if event.id.as_ref() == "capture-text" {
@@ -244,7 +251,8 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 Ok(())
             } else if event.id.as_ref() == "bring-visible" {
                 app.webview_windows().values().try_for_each(|win| {
-                    if !crate::feedback_window::is_surface(win.label())
+                    if win.label() != crate::manager::LABEL
+                        && !crate::feedback_window::is_surface(win.label())
                         && win.is_visible().map_err(|e| e.to_string())?
                     {
                         crate::layout::mark(win, false);

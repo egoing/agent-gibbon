@@ -857,6 +857,27 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - 제목 흐림 후속 보정: 열린 항목의 attributed title을 nil로 초기화하고 적용 시점의 가시성을 조회한다. 빌드·Rust 69개 통과. 동일 작업 루트의 PID 71421로 재시작하고 기존 열린 메모 3개의 위치·크기를 AX로 복원했다. inspect main의 instance를 재확인했다. 실제 메뉴 색상 육안 검증은 미완료다.
 - 커밋 전 최종 검증: Rust 69개·UI 50개 테스트, Clippy 전체 대상 경고 없음, Rustfmt 및 git diff 검사 통과. 실제 메뉴 육안 검증의 기존 한계는 유지한다.
 
+
+## 관리 창 최소 구현 (2026-11-04)
+
+- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/manager`
+- `npm run dev:info` instance: `dev-982ea77b921faa21fd43bf4d`
+- binary: 위 루트의 `src-tauri/target/debug/agent-gibbon`
+- `npm test`: Rust 69개, UI 51개 통과. `npm run dev:build`, `node --check ui/manager.js`, Rustfmt 통과.
+- 개발 CLI의 `open / close / inspect / update / inspect`로 `manager-smoke-1104` 검증. 응답 `ok: true`와 instance 일치, 본문 갱신, 숨김과 위치 보존 확인. 검증 메모는 숨김 상태로 남김.
+- GUI 조작과 캡처는 미실행. 관리 창 선택·설정 복귀는 mock DOM 검사이며 실제 WebView 실행 검증으로 간주하지 않는다. Windows·Intel 미검증.
+
+- 후속 정적 검사: `npm run check`(Clippy, 경고 오류 처리) 통과.
+
+
+### 관리 창 제목·불투명 보정
+
+- 같은 루트·instance에서 Rust 70개, UI 51개, 개발 빌드, Clippy 통과.
+- `orca computer list-windows --app pid:52970 --json`에서 window 29645, 제목 `Agent Gibbon [DEV egoing/manager · 982ea77b] — 메모 관리`, native alpha 0.5로 수정 전 문제 확인.
+- 현재 프로세스는 수정 전 빌드다. 사용자 메모가 표시 중이므로 자동 종료하지 않았다. 수정 후 실제 alpha·GUI는 미검증.
+
+- 재실행 검증: 사용자 요청으로 기존 개발 PID 52970만 종료하고 같은 워크트리 개발 CLI로 재실행했다. inspect instance `dev-982ea77b921faa21fd43bf4d` 확인. 새 PID 62385, 관리 창 ID 29698의 native alpha 1 확인. 접근성 트리에서 본문 첫 텍스트 기반 목록 제목과 선택한 상세 헤더, 새로고침 버튼을 확인했다. 이미지·Windows 검증은 미실행이다.
+
 ## 화면 가장자리·메모 간격 0px (2026-11-04)
 
 - 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/position`
