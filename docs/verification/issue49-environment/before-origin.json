@@ -1,0 +1,69 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach",
+  "info": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach",
+    "id": "dev-8fbfdca2d77ba80c9f021e8f",
+    "name": "egoing/issue-36-first-approach",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-36-first-approach/src-tauri/target/debug/agent-gibbon"
+  },
+  "pid": 18037,
+  "inspect": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": false,
+    "content_height_cap": 48.0,
+    "dev_label": "DEV egoing/issue-36-first-approach · 8fbfdca2",
+    "feedback_active": false,
+    "feedback_surface": null,
+    "focused": false,
+    "folded": false,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "issue49-monitor-check",
+    "instance": "dev-8fbfdca2d77ba80c9f021e8f",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<p>ISSUE49-MONITOR</p>\n",
+      "color": "#89f0ff",
+      "edit_on_open": false,
+      "html": "<p>ISSUE49-MONITOR</p>\n",
+      "markdown": "ISSUE49-MONITOR",
+      "removed": false,
+      "revision": 1,
+      "source_path": null,
+      "status": "대기",
+      "title": "Agent Gibbon",
+      "updated_at": 1793817778368
+    },
+    "ok": true,
+    "opacity": 0.5,
+    "position": {
+      "x": 2260,
+      "y": 638
+    },
+    "size": {
+      "height": 480,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 1120.0,
+        "y": 367.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-8fbfdca2d77ba80c9f021e8f/docs/issue49-monitor-check/index.md",
+    "visible": false
+  }
+}
