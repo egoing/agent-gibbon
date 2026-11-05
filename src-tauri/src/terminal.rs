@@ -476,6 +476,26 @@ pub fn shutdown(app: &tauri::AppHandle) {
 mod tests {
     use super::*;
     #[test]
+    fn welcome_metadata_preserves_only_last_path_title_and_geometry() {
+        let original = json!({"id":"terminal-123","bounds":{"x":11.,"y":22.,"width":720.,"height":460.},"kind":"terminal","last_path":"/tmp/project","path_updated":42,"title":"내 작업"});
+        let agent: Agent = serde_json::from_value(original.clone()).unwrap();
+        let restored = serde_json::to_value(agent).unwrap();
+        for key in ["kind", "last_path", "path_updated", "title", "bounds"] {
+            assert_eq!(restored.get(key), original.get(key), "lost {key}");
+        }
+        assert!(restored.get("history").is_none());
+        assert!(restored.get("commands").is_none());
+        assert!(valid_id("terminal-123"));
+        assert!(!valid_id("terminal-../x"));
+    }
+    #[test]
+    fn existing_agent_metadata_stays_an_agent_without_path_history() {
+        let agent: Agent = serde_json::from_value(json!({"id":"agent-123","bounds":{"x":1.,"y":2.,"width":640.,"height":400.}})).unwrap();
+        let restored = serde_json::to_value(agent).unwrap();
+        assert_eq!(restored.get("kind"), Some(&json!("agent")));
+        assert!(restored.get("last_path").is_none_or(Value::is_null));
+    }
+    #[test]
     fn reservation_is_per_window_and_released_on_failure() {
         let state = Terminals::default();
         let first = Start::reserve(&state, "agent-1").unwrap();
