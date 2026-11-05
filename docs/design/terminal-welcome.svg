@@ -1,12 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600">
-<rect width="1000" height="600" fill="#e6e8eb"/>
-<g font-family="sans-serif" fill="#f0f0f0">
-<rect x="20" y="20" width="620" height="430" rx="4" fill="#20252e" stroke="#667080"/>
-<text x="32" y="42" font-size="11">project · 터미널</text><text x="526" y="42" font-size="12">aA　▣　♟　×</text>
-<text x="44" y="92" font-size="24" font-weight="600">Welcome</text><text x="44" y="122" font-size="13">이 폴더에서 시작할 작업을 선택하세요.</text>
-<text x="44" y="170" font-size="13">~/work/project</text><rect x="220" y="148" width="92" height="32" rx="3" fill="#303844" stroke="#667080"/><text x="238" y="169" font-size="12">폴더 선택</text>
-<g fill="#303844" stroke="#667080"><rect x="44" y="202" width="80" height="34" rx="3"/><rect x="134" y="202" width="110" height="34" rx="3"/><rect x="254" y="202" width="90" height="34" rx="3"/><rect x="44" y="250" width="86" height="34" rx="3"/></g>
-<g font-size="12"><text x="64" y="224">Codex</text><text x="150" y="224">Claude Code</text><text x="272" y="224">Git 로그</text><text x="62" y="272">셸 열기</text><text x="44" y="318">▸ 실행 명령 확인</text><text x="44" y="366">창 제목</text><text x="118" y="366">폴더명 사용　　[제목 변경]</text></g>
-<rect x="670" y="20" width="310" height="240" rx="4" fill="#20252e" stroke="#667080"/>
-<text x="686" y="44" font-size="11">경로 기록이 없는 첫 시작</text><text x="690" y="90" font-size="22">Welcome</text><rect x="690" y="114" width="90" height="32" rx="3" fill="#303844" stroke="#667080"/><text x="708" y="135" font-size="12">폴더 선택</text><text x="690" y="182" font-size="13">셸 열기</text><text x="690" y="220" font-size="11">경로 숨김 · 홈 폴더에서 실행</text>
-</g><g font-family="sans-serif" fill="#20252e" font-size="14"><text x="24" y="492">명령 종료 → 같은 셸 유지　|　핀 해제 후 포커스 이동 / 세 보조키 → 숨김</text><text x="24" y="524">창 닫기 → 작업 중이면 확인 후 종료　|　목록에서 재열기 → 마지막 위치·크기의 Welcome</text><text x="24" y="558">배치 시안 · 설치가 확인된 앱만 표시 · 실제 앱 화면과 구분</text></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620">
+<rect width="1100" height="620" fill="#e6e8eb"/>
+<g font-family="Arial, Apple SD Gothic Neo, sans-serif">
+<rect x="24" y="44" width="630" height="360" rx="3" fill="#20252e" stroke="#667080"/>
+<text x="36" y="65" font-size="11" fill="#f0f0f0" font-weight="400">project · 터미널</text>
+<text x="564" y="65" font-size="11" fill="#f0f0f0" font-weight="400">aA　▣　♟　×</text>
+<text x="40" y="101" font-size="17" fill="#f0f0f0" font-weight="600">작업 시작</text>
+<rect x="562" y="80" width="76" height="32" rx="3" fill="#303844" stroke="#667080"/>
+<text x="572" y="101" font-size="12" fill="#f0f0f0" font-weight="400">셸 열기</text>
+<text x="40" y="143" font-size="11" fill="#bac3cf" font-weight="400">~/work/project</text>
+<rect x="556" y="122" width="82" height="32" rx="3" fill="#303844" stroke="#667080"/>
+<text x="566" y="143" font-size="12" fill="#f0f0f0" font-weight="400">폴더 선택</text>
+<text x="40" y="180" font-size="11" fill="#bac3cf" font-weight="400">설치된 앱</text>
+<rect x="40.0" y="188" width="295.0" height="50" rx="3" fill="#303844" stroke="#667080"/>
+<text x="48.0" y="205" font-size="12" fill="#f0f0f0" font-weight="600">Codex</text>
+<text x="48.0" y="220" font-size="11" fill="#bac3cf" font-weight="400">코딩 에이전트</text>
+<rect x="343.0" y="188" width="295.0" height="50" rx="3" fill="#303844" stroke="#667080"/>
+<text x="351.0" y="205" font-size="12" fill="#f0f0f0" font-weight="600">Claude Code</text>
+<text x="351.0" y="220" font-size="11" fill="#bac3cf" font-weight="400">코딩 에이전트</text>
+<rect x="40.0" y="246" width="295.0" height="50" rx="3" fill="#303844" stroke="#667080"/>
+<text x="48.0" y="263" font-size="12" fill="#f0f0f0" font-weight="600">Git 로그</text>
+<text x="48.0" y="278" font-size="11" fill="#bac3cf" font-weight="400">최근 커밋 보기</text>
+<rect x="343.0" y="246" width="295.0" height="50" rx="3" fill="#303844" stroke="#667080"/>
+<text x="351.0" y="263" font-size="12" fill="#f0f0f0" font-weight="600">htop</text>
+<text x="351.0" y="278" font-size="11" fill="#bac3cf" font-weight="400">프로세스 확인</text>
+<text x="40" y="320" font-size="12" fill="#f0f0f0" font-weight="400">▸ 실행 명령 확인</text>
+<text x="40" y="350" font-size="12" fill="#f0f0f0" font-weight="400">▸ 창 제목 변경</text>
+<rect x="680" y="44" width="396" height="300" rx="3" fill="#20252e" stroke="#667080"/>
+<text x="692" y="65" font-size="11" fill="#f0f0f0" font-weight="400">터미널</text>
+<text x="986" y="65" font-size="11" fill="#f0f0f0" font-weight="400">aA　▣　♟　×</text>
+<text x="692" y="101" font-size="17" fill="#f0f0f0" font-weight="600">작업 시작</text>
+<rect x="988" y="80" width="76" height="32" rx="3" fill="#303844" stroke="#667080"/>
+<text x="998" y="101" font-size="12" fill="#f0f0f0" font-weight="400">셸 열기</text>
+<text x="692" y="143" font-size="11" fill="#bac3cf" font-weight="400">홈 폴더에서 시작합니다.</text>
+<rect x="982" y="122" width="82" height="32" rx="3" fill="#303844" stroke="#667080"/>
+<text x="992" y="143" font-size="12" fill="#f0f0f0" font-weight="400">폴더 선택</text>
+<text x="692" y="180" font-size="11" fill="#bac3cf" font-weight="400">설치된 앱</text>
+<rect x="692.0" y="188" width="183.0" height="42" rx="3" fill="#303844" stroke="#667080"/>
+<text x="700.0" y="205" font-size="12" fill="#f0f0f0" font-weight="600">Codex</text>
+<text x="700.0" y="220" font-size="11" fill="#bac3cf" font-weight="400">코딩 에이전트</text>
+<rect x="881.0" y="188" width="183.0" height="42" rx="3" fill="#303844" stroke="#667080"/>
+<text x="889.0" y="205" font-size="12" fill="#f0f0f0" font-weight="600">Claude Code</text>
+<text x="889.0" y="220" font-size="11" fill="#bac3cf" font-weight="400">코딩 에이전트</text>
+<rect x="692.0" y="236" width="183.0" height="42" rx="3" fill="#303844" stroke="#667080"/>
+<text x="700.0" y="253" font-size="12" fill="#f0f0f0" font-weight="600">Git 로그</text>
+<text x="700.0" y="268" font-size="11" fill="#bac3cf" font-weight="400">최근 커밋 보기</text>
+<rect x="881.0" y="236" width="183.0" height="42" rx="3" fill="#303844" stroke="#667080"/>
+<text x="889.0" y="253" font-size="12" fill="#f0f0f0" font-weight="600">htop</text>
+<text x="889.0" y="268" font-size="11" fill="#bac3cf" font-weight="400">프로세스 확인</text>
+<text x="692" y="300" font-size="12" fill="#f0f0f0" font-weight="400">▸ 실행 명령 확인</text>
+<text x="692" y="330" font-size="12" fill="#f0f0f0" font-weight="400">▸ 창 제목 변경</text>
+<rect x="680" y="370" width="396" height="240" rx="3" fill="#20252e" stroke="#667080"/>
+<text x="692" y="391" font-size="11" fill="#f0f0f0" font-weight="400">터미널</text>
+<text x="986" y="391" font-size="11" fill="#f0f0f0" font-weight="400">aA　▣　♟　×</text>
+<text x="692" y="427" font-size="17" fill="#f0f0f0" font-weight="600">작업 시작</text>
+<rect x="988" y="406" width="76" height="32" rx="3" fill="#303844" stroke="#667080"/>
+<text x="998" y="427" font-size="12" fill="#f0f0f0" font-weight="400">셸 열기</text>
+<text x="692" y="469" font-size="11" fill="#bac3cf" font-weight="400">홈 폴더에서 시작합니다.</text>
+<rect x="982" y="448" width="82" height="32" rx="3" fill="#303844" stroke="#667080"/>
+<text x="992" y="469" font-size="12" fill="#f0f0f0" font-weight="400">폴더 선택</text>
+<text x="692" y="506" font-size="11" fill="#bac3cf" font-weight="400">설치된 앱</text>
+<text x="692" y="530" font-size="11" fill="#bac3cf" font-weight="400">설치된 추천 앱이 없습니다.</text>
+<text x="692" y="547" font-size="11" fill="#bac3cf" font-weight="400">셸에서 시작할 수 있습니다.</text>
+<text x="692" y="583" font-size="12" fill="#f0f0f0" font-weight="400">▸ 창 제목 변경</text>
+<text x="24" y="27" font-size="14" fill="#20252e" font-weight="600">기록된 작업 폴더 · 설치 앱 있음</text>
+<text x="680" y="27" font-size="14" fill="#20252e" font-weight="600">경로 기록 없음 · 홈에서 시작</text>
+<text x="680" y="360" font-size="14" fill="#20252e" font-weight="600">설치 앱 없음 · 셸/폴더 선택 유지</text>
+<text x="24" y="445" font-size="13" fill="#20252e" font-weight="400">한 번 클릭하여 실행 · 실제 명령과 제목 설정은 접어서 제공</text>
+<text x="24" y="478" font-size="13" fill="#20252e" font-weight="400">긴 전체 경로는 두 줄 높이 안에서 스크롤·선택 가능</text>
+<text x="24" y="511" font-size="13" fill="#20252e" font-weight="400">작은 창은 여백을 줄이고 필요하면 시작 화면을 스크롤</text>
+<text x="24" y="553" font-size="13" fill="#20252e" font-weight="400">앱 종료 → 같은 셸 유지 · 창 숨김 → 실행 유지</text>
+<text x="24" y="586" font-size="13" fill="#20252e" font-weight="400">설명용 배치 시안 · 실제 앱 캡처 및 네이티브 검증과 구분</text>
+</g></svg>

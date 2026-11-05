@@ -38,28 +38,44 @@ document.getElementById('close').onclick=()=>invoke(generic?'terminal_close':'te
 function setInfo(info){
   document.getElementById('title').textContent=info.title;
   const path=document.getElementById('work-path');path.hidden=!info.last_path;path.textContent=info.last_path||'';
+  document.getElementById('home-hint').hidden=Boolean(info.last_path);
 }
-async function start(choice){
+async function start(choice, trigger){
   if(started||starting)return;
   starting=true;
+  status.textContent=`${trigger?.dataset?.label||'터미널'} 시작 중…`;
+  document.getElementById('welcome').setAttribute('aria-busy','true');
   document.getElementById('welcome').hidden=true;
   document.getElementById('terminal').hidden=false;measure();
   const output=new Channel();output.onmessage=bytes=>terminal.write(new Uint8Array(bytes));
   try{
     await invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output,choice});
     started=true;status.textContent='';measure();
-  }catch(e){report(e);if(generic){document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;}}
-  finally{starting=false;}
+    if(trigger && document.hasFocus() && (document.activeElement===trigger || document.activeElement===document.body))terminal.focus();
+  }catch(e){
+    const restoreFocus=trigger && document.hasFocus() && (document.activeElement===trigger || document.activeElement===document.body);
+    report(e);if(generic){document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;if(restoreFocus)trigger.focus({preventScroll:true});}
+  }
+  finally{starting=false;document.getElementById('welcome').setAttribute('aria-busy','false');}
 }
 async function welcome(){
   const {info,choices}=await invoke('terminal_welcome');setInfo(info);
   const list=document.getElementById('recommendations');list.replaceChildren();
-  for(const item of choices){const button=document.createElement('button');button.textContent=item.label;button.title=item.command;button.onclick=()=>start(item.id);list.append(button);}
+  const descriptions={codex:'코딩 에이전트',claude:'코딩 에이전트',git:'최근 커밋 보기',htop:'프로세스 확인'};
+  for(const item of choices){
+    const button=document.createElement('button');button.className='launch-app';button.dataset.label=item.label;button.setAttribute('aria-label',item.label);
+    const name=document.createElement('span');name.className='launch-name';name.textContent=item.label;
+    const description=document.createElement('span');description.className='launch-description';description.id=`description-${item.id}`;button.setAttribute('aria-describedby',description.id);description.textContent=descriptions[item.id]||'';
+    button.append(name,description);button.title=item.command;button.onclick=()=>start(item.id,button);list.append(button);
+  }
+  document.getElementById('no-apps').hidden=choices.length>0;
+  document.getElementById('command-details').hidden=choices.length===0;
   document.getElementById('commands').textContent=choices.map(item=>`${item.label}: ${item.command}`).join('\n');
 }
-document.getElementById('open-shell').onclick=()=>start('shell');
+document.getElementById('open-shell').dataset.label='셸';
+document.getElementById('open-shell').onclick=()=>start('shell',document.getElementById('open-shell'));
 document.getElementById('choose-folder').onclick=async()=>{try{setInfo(await invoke('terminal_folder'));}catch(e){report(e);}};
-document.getElementById('rename-form').onsubmit=async event=>{event.preventDefault();try{setInfo(await invoke('terminal_rename',{title:document.getElementById('rename-title').value}));}catch(e){report(e);}};
+document.getElementById('rename-form').onsubmit=async event=>{event.preventDefault();try{setInfo(await invoke('terminal_rename',{title:document.getElementById('rename-title').value}));status.textContent='창 제목을 변경했습니다.';}catch(e){report(e);}};
 (async()=>{
   const info=await invoke('terminal_info');generic=info.kind==='terminal';setInfo(info);
   if(generic){
