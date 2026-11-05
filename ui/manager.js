@@ -1,5 +1,5 @@
 'use strict';
-const invoke = window.__TAURI__.core.invoke;
+const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const el = id => document.getElementById(id);
 let notes = [], selected = null, busy = false, detailVersion = 0, signature = '';
 function page(settings) {

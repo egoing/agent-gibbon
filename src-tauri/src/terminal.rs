@@ -474,6 +474,7 @@ pub async fn terminal_start(
     let id = caller(&window)?;
     let app = window.app_handle().clone();
     tauri::async_runtime::spawn_blocking(move || {
+        let _timing = crate::telemetry::Timing::new("terminal.start");
         let dimensions = size(cols, rows)?;
         let state = app.state::<Terminals>();
         let reservation = Start::reserve(&state, &id)?;
@@ -501,6 +502,7 @@ pub async fn terminal_start(
                 match reader.read(&mut bytes) {
                     Ok(0) | Err(_) => break,
                     Ok(n) => {
+                        let _timing = crate::telemetry::Timing::new("terminal.output");
                         let paths = directory_report.feed(&bytes[..n]);
                         let state = watched_app.state::<Terminals>();
                         let sessions = state.sessions.lock().unwrap();
@@ -554,6 +556,7 @@ fn session(window: &WebviewWindow) -> Result<Arc<Mutex<Session>>, String> {
 }
 #[tauri::command]
 pub fn terminal_write(window: WebviewWindow, data: String) -> Result<(), String> {
+    let _timing = crate::telemetry::Timing::new("terminal.write");
     if data.len() > 65536 {
         return Err("입력은 64KiB 이하여야 합니다".into());
     }
@@ -567,6 +570,7 @@ pub fn terminal_write(window: WebviewWindow, data: String) -> Result<(), String>
 }
 #[tauri::command]
 pub fn terminal_resize(window: WebviewWindow, cols: u16, rows: u16) -> Result<(), String> {
+    let _timing = crate::telemetry::Timing::new("terminal.resize");
     session(&window)?
         .lock()
         .map_err(err)?

@@ -32,6 +32,8 @@ git push origin v0.2.8
 
 저장소 Actions secret 또는 variable `AGENT_GIBBON_SENTRY_DSN`에 공식 배포용 공개 수신 DSN을 설정하면 빌드 단계에만 주입합니다(secret 우선). 관리 API 토큰을 넣지 않습니다. 값이 없으면 경고를 표시하고 오류 수집이 꺼진 설치 파일을 만듭니다. 소스에는 개인 계정·서버 정보나 DSN을 넣지 않습니다.
 
+상세 성능·로그·릴리스 상태·응답 감시는 기본 release에서 켜지지 않는다. 명시적 진단 모드와 수집 끄기, 공헌자 빌드 경계는 [Sentry 진단 안내](diagnostics.md)를 따른다. 관리 토큰·진단 원문은 빌드 캐시나 릴리스 자산에 포함하지 않는다.
+
 macOS는 기존 애드혹 서명을 유지하며 Developer ID 서명·공증과 Windows 코드 서명은 구성하지 않았습니다. 사용자 설치 경고가 발생할 수 있습니다. 이 워크플로는 GitHub Releases 배포를 자동화하며 설치된 앱의 자동 업데이트 기능을 추가하지 않습니다.
 
 공식 참고: [Tauri GitHub 배포](https://v2.tauri.app/distribute/pipelines/github/), [GitHub 호스팅 runner](https://docs.github.com/en/actions/reference/runners/github-hosted-runners), [GitHub CLI 릴리스 생성](https://cli.github.com/manual/gh_release_create).

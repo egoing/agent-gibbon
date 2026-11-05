@@ -13,7 +13,11 @@
     "build:windows": "tauri build --bundles nsis",
     "test:ui": "node scripts/test-ui.mjs",
     "version:check": "node scripts/release-version.mjs check",
-    "version:set": "node scripts/release-version.mjs set"
+    "version:set": "node scripts/release-version.mjs set",
+    "diagnostics:build": "node scripts/diagnostics.mjs build",
+    "diagnostics:open": "node scripts/diagnostics.mjs open",
+    "diagnostics:status": "node scripts/diagnostics.mjs status",
+    "diagnostics:probe": "node scripts/diagnostics.mjs probe"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.0.0"

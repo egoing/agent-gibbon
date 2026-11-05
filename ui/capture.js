@@ -1,5 +1,5 @@
 'use strict';
-const { invoke } = window.__TAURI__.core;
+const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const selection = document.getElementById('selection');
 const hint = document.getElementById('hint');
 let start, rect, ready = false, busy = false;

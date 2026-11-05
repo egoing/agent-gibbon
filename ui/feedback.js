@@ -1,5 +1,5 @@
 import { themeFor } from './theme.mjs';
-const { invoke } = window.__TAURI__.core;
+const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const surface = document.getElementById('feedback');
 const message = document.getElementById('message');
 const actions = document.getElementById('actions');

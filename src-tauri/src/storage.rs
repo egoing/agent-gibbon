@@ -80,6 +80,7 @@ impl Store {
         self.0.join(name).join("index.md")
     }
     pub fn save(&self, id: &str, note: &Note) -> Result<(), String> {
+        let _timing = crate::telemetry::Timing::new("storage.save");
         let result = (|| -> Result<(), Box<dyn std::error::Error>> {
             let path = self.path(id);
             let mut builder = fs::DirBuilder::new();
@@ -153,6 +154,7 @@ impl Store {
         Ok(())
     }
     pub fn load(&self) -> Result<BTreeMap<String, Note>, String> {
+        let _timing = crate::telemetry::Timing::new("storage.load");
         let mut notes = BTreeMap::new();
         if !self.0.exists() {
             return Ok(notes);

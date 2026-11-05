@@ -1,7 +1,7 @@
 'use strict';
 import { themeFor } from './theme.mjs';
 import { feedbackView, durations } from './feedback-state.mjs';
-const { invoke } = window.__TAURI__.core;
+const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const win = window.__TAURI__.window.getCurrentWindow();
 const $ = (id) => document.getElementById(id);
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform);

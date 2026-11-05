@@ -1,5 +1,6 @@
 'use strict';
-const { invoke, Channel } = window.__TAURI__.core;
+const { Channel } = window.__TAURI__.core;
+const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const win = window.__TAURI__.window.getCurrentWindow();
 const status = document.getElementById('status');
 const terminal = new Terminal({fontSize:13,fontFamily:'Menlo, Monaco, monospace',cursorBlink:true,scrollback:3000,allowProposedApi:false,theme:{background:'#20252e',foreground:'#f0f0f0'},screenReaderMode:false});

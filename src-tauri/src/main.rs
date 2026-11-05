@@ -47,6 +47,7 @@ fn label(id: &str) -> String {
     }
 }
 fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindow, String> {
+    let _timing = telemetry::Timing::new("window.create");
     let mut config = app.config().app.windows[0].clone();
     config.label = label(id);
     config.title = format!("{} — {id}", instance::current().title());
@@ -281,6 +282,21 @@ fn apply_with_presentation(
     presentation: entrance::Presentation,
 ) -> Result<Value, String> {
     request.validate()?;
+    if matches!(request.action, Action::Diagnostics) {
+        return Ok(json!({"ok":true,"diagnostics":telemetry::status()}));
+    }
+    if matches!(request.action, Action::Probe) {
+        return Ok(telemetry::probe());
+    }
+    let _timing = telemetry::Timing::new(match request.action {
+        Action::Open => "ipc.open",
+        Action::Update => "ipc.update",
+        Action::Close => "ipc.close",
+        Action::Inspect => "ipc.inspect",
+        Action::List => "ipc.list",
+        Action::Agent => "ipc.agent",
+        _ => unreachable!(),
+    });
     if matches!(request.action, Action::Agent) {
         return terminal::create(
             app,
@@ -383,7 +399,12 @@ fn apply_with_presentation(
             win.hide().map_err(|e| e.to_string())?;
             tray::sync_visibility(app)?;
         }
-        Action::Update | Action::Inspect | Action::List | Action::Agent => (),
+        Action::Update
+        | Action::Inspect
+        | Action::List
+        | Action::Agent
+        | Action::Diagnostics
+        | Action::Probe => (),
     }
     let menu_changed = existing
         .as_ref()
@@ -399,6 +420,7 @@ fn apply_with_presentation(
 }
 fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     let _sentry = telemetry::init();
+    let startup = telemetry::Timing::new("app.startup");
     let initial_focus = if initial_open {
         focus::Targets::initial()
     } else {
@@ -454,6 +476,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             capture::note_image,
             capture::copy_note_image,
             telemetry::report_frontend_error,
+            telemetry::telemetry_status,
+            telemetry::telemetry_heartbeat,
             entrance::drag_note,
             hide_note,
             close_note,
@@ -605,6 +629,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     },
                 )?;
             }
+            telemetry::install(app.handle());
             let handle = app.handle().clone();
             std::thread::spawn(move || {
                 for connection in endpoint.listener.incoming() {
@@ -613,6 +638,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                         Err(e) => ipc::error(e),
                         Ok(request) => {
                             let (tx, rx) = mpsc::sync_channel(1);
+                            let _wait = telemetry::Timing::new("ipc.wait");
                             let target = handle.clone();
                             let deadline = Instant::now() + Duration::from_secs(5);
                             match handle.run_on_main_thread(move || {
@@ -641,8 +667,10 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         })
         .build(tauri::generate_context!())
         .map_err(|e| e.to_string())?;
+    drop(startup);
     app.run(|_app, _event| {
         if matches!(_event, tauri::RunEvent::Exit) {
+            telemetry::shutdown(_app);
             terminal::shutdown(_app);
         }
         #[cfg(target_os = "macos")]
@@ -693,7 +721,7 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
 }
 
 fn parse(args: &[String]) -> Result<Request, String> {
-    let action = match args.first().map(String::as_str) { Some("agent") => Action::Agent, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
+    let action = match args.first().map(String::as_str) { Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("agent") => Action::Agent, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
         action,
         source_path: None,
@@ -842,7 +870,7 @@ fn main() {
         )
     } else if args == ["--help"] || args == ["-h"] {
         Ok(
-            json!({"ok":true,"usage":"agent-gibbon open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open만 앱을 시작하거나 창을 생성·복원합니다. ID 생략 시 main, close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
+            json!({"ok":true,"usage":"agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open만 앱을 시작하거나 창을 생성·복원합니다. ID 생략 시 main, close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
         )
     } else {
         cli(&args)

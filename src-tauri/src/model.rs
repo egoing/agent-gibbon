@@ -13,6 +13,8 @@ pub enum Action {
     Close,
     Inspect,
     List,
+    Diagnostics,
+    Probe,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -34,15 +36,19 @@ impl Request {
     }
 
     pub fn validate(&self) -> Result<(), String> {
-        if matches!(self.action, Action::Agent)
-            && (self.id.is_some()
-                || self.title.is_some()
-                || self.markdown.is_some()
-                || self.source_path.is_some()
-                || self.status.is_some()
-                || self.color.is_some())
+        if matches!(
+            self.action,
+            Action::Agent | Action::Diagnostics | Action::Probe
+        ) && (self.id.is_some()
+            || self.title.is_some()
+            || self.markdown.is_some()
+            || self.source_path.is_some()
+            || self.status.is_some()
+            || self.color.is_some())
         {
-            return Err("agent 명령에는 옵션을 지정할 수 없습니다".into());
+            return Err(
+                "agent/diagnostics/diagnostics-probe 명령에는 옵션을 지정할 수 없습니다".into(),
+            );
         }
         let id = self.id();
         if id.is_empty()
@@ -442,6 +448,7 @@ fn render_changes(markdown: &str, changes: &[std::ops::Range<usize>]) -> String 
 }
 
 fn render_styled(markdown: &str, changes: &[std::ops::Range<usize>], kinds: &[&str]) -> String {
+    let _timing = crate::telemetry::Timing::new("markdown.render");
     let mark = |range: &std::ops::Range<usize>| {
         let index = changes.partition_point(|c| c.end <= range.start);
         format!("<mark class=\"change-{}\">", kinds[index])
