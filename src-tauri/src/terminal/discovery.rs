@@ -85,6 +85,7 @@ pub(super) struct Discovery {
 }
 impl Discovery {
     pub fn get(&self, deadline: Instant) -> Result<Found, String> {
+        let _discovery = crate::telemetry::Timing::new("terminal.discovery");
         self.get_with(deadline, || {
             discover(
                 &std::env::var("PATH").unwrap_or_default(),
@@ -128,7 +129,10 @@ impl Discovery {
         }
         state.busy = true;
         drop(state);
-        let result = run();
+        let result = {
+            let _resolve = crate::telemetry::Timing::new("terminal.discovery.resolve");
+            run()
+        };
         let mut state = self.state.lock().map_err(|e| e.to_string())?;
         state.cached = result.as_ref().ok().cloned();
         state.last = Some(result.clone());

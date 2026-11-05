@@ -48,6 +48,7 @@ fn label(id: &str) -> String {
 }
 fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindow, String> {
     let _timing = telemetry::Timing::new("window.create");
+    telemetry::checkpoint("window.create");
     let mut config = app.config().app.windows[0].clone();
     config.label = label(id);
     config.title = format!("{} — {id}", instance::current().title());

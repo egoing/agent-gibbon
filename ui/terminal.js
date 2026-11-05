@@ -3,6 +3,7 @@ const { Channel } = window.__TAURI__.core;
 const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const win = window.__TAURI__.window.getCurrentWindow();
 const status = document.getElementById('status');
+const clock = () => window.performance?.now?.() || 0;
 const terminal = new Terminal({fontSize:13,fontFamily:'Menlo, Monaco, monospace',cursorBlink:true,scrollback:3000,allowProposedApi:false,theme:{background:'#20252e',foreground:'#f0f0f0'},screenReaderMode:false});
 const fit = new FitAddon.FitAddon();
 terminal.loadAddon(fit);
@@ -48,7 +49,15 @@ async function start(choice, trigger){
   document.getElementById('welcome').setAttribute('aria-busy','true');
   document.getElementById('welcome').hidden=true;
   document.getElementById('terminal').hidden=false;measure();
-  const output=new Channel();output.onmessage=bytes=>terminal.write(new Uint8Array(bytes));
+  const startedAt=clock(); let firstOutput=true;
+  const output=new Channel();output.onmessage=bytes=>{
+    const measure=window.gibbonMeasure;
+    if(firstOutput){firstOutput=false;measure?.('terminal.first_output',clock()-startedAt);}
+    if(measure){
+      const receivedAt=clock();
+      terminal.write(new Uint8Array(bytes),()=>measure('terminal.output.parse',clock()-receivedAt));
+    }else terminal.write(new Uint8Array(bytes));
+  };
   try{
     if(generic && selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
     await invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output,choice});
@@ -107,6 +116,7 @@ document.getElementById('rename-form').onsubmit=async event=>{event.preventDefau
     document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;
     await welcome();
   }else{await start(null);}
+  window.gibbonMeasure?.('terminal.ui.ready',clock());
 })().catch(report);
 // Refresh only the current directory; never collect input, output or history.
 setInterval(()=>{if(generic&&started)invoke('terminal_info').then(setInfo).catch(report);},2000);

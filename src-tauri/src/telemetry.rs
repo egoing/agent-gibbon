@@ -70,10 +70,42 @@ pub const OPERATIONS_ALLOWED: &[&str] = &[
     "ipc.agent",
     "ipc.wait",
     "window.create",
+    "capture.prepare",
+    "capture.finish",
+    "capture.cancel",
+    "capture.failed",
+    "capture.lifecycle.wait",
+    "capture.screen.enumerate",
+    "capture.screen.capture",
+    "capture.overlay.create",
+    "capture.preview.copy",
+    "capture.selection.validate",
+    "capture.image.encode",
+    "capture.cleanup.request",
+    "capture.cleanup.wait",
     "storage.save",
     "storage.load",
     "markdown.render",
     "terminal.start",
+    "terminal.window.open",
+    "terminal.window.create",
+    "terminal.window.position",
+    "terminal.window.show",
+    "terminal.command.prepare",
+    "terminal.discovery",
+    "terminal.discovery.resolve",
+    "terminal.pty.create",
+    "terminal.process.spawn",
+    "terminal.io.attach",
+    "terminal.output.filter",
+    "terminal.output.dispatch",
+    "terminal.session.lock",
+    "terminal.input.write",
+    "terminal.ui.ready",
+    "terminal.first_output",
+    "terminal.output.parse",
+    "manager.terminal.open",
+    "manager.terminal.delete",
     "terminal.write",
     "terminal.resize",
     "terminal.output",
@@ -168,6 +200,7 @@ fn options(dsn: sentry::types::Dsn, detailed: bool) -> sentry::ClientOptions {
                     | "ipc.inspect"
                     | "ipc.list"
                     | "terminal.info"
+                    | "terminal.output.parse"
             ) {
                 rate.min(0.01)
             } else {
@@ -275,7 +308,12 @@ fn log(op: &str, ms: f64) {
     sentry::Hub::current().capture_log(p::Log {
         level: p::LogLevel::Info,
         body: "Agent Gibbon operation".into(),
-        trace_id: None,
+        trace_id: PARENTS.with(|parents| {
+            parents
+                .borrow()
+                .last()
+                .map(|s| s.get_trace_context().trace_id)
+        }),
         timestamp: SystemTime::now(),
         severity_number: None,
         attributes: p::Map::from_iter([
@@ -289,6 +327,11 @@ fn log(op: &str, ms: f64) {
         data: p::Map::from_iter([("duration_ms".into(), json!(ms))]),
         ..Default::default()
     });
+}
+/// Static stage marker: makes a stage that never finishes visible in bounded
+/// structured logs without including any window identifier or operation input.
+pub fn checkpoint(op: &'static str) {
+    log(op, 0.0);
 }
 pub fn diagnostic(message: &'static str, kind: &'static str, elapsed_ms: f64) {
     if !detailed() || !MESSAGES.contains(&message) {

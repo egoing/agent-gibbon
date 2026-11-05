@@ -298,6 +298,7 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
     inspect(app, &agent.id)
 }
 pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+    let _root = crate::telemetry::Timing::new("terminal.window.open");
     let agent = app
         .state::<Terminals>()
         .agents
@@ -310,63 +311,71 @@ pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     let win = if let Some(win) = app.get_webview_window(id) {
         win
     } else {
-        let window = tauri::WebviewWindowBuilder::new(
-            app,
-            id,
-            tauri::WebviewUrl::App("terminal.html".into()),
-        )
-        .on_web_resource_request(|_, response| {
-            // xterm generates cell/theme CSS at runtime. Scope this exception
-            // to terminal WebViews; script policy and memo windows stay strict.
-            if let Some(header) = response.headers_mut().get_mut("Content-Security-Policy") {
-                if let Ok(policy) = header.to_str() {
-                    let mut directives: std::collections::HashMap<
-                        String,
-                        tauri::utils::config::CspDirectiveSources,
-                    > = tauri::utils::config::Csp::Policy(policy.into()).into();
-                    directives.insert(
-                        "style-src".into(),
-                        tauri::utils::config::CspDirectiveSources::List(vec![
-                            "'self'".into(),
-                            "'unsafe-inline'".into(),
-                        ]),
-                    );
-                    if let Ok(value) = tauri::utils::config::Csp::from(directives)
-                        .to_string()
-                        .parse()
-                    {
-                        *header = value;
+        let window = {
+            let _creation = crate::telemetry::Timing::new("terminal.window.create");
+            crate::telemetry::checkpoint("terminal.window.create");
+            tauri::WebviewWindowBuilder::new(
+                app,
+                id,
+                tauri::WebviewUrl::App("terminal.html".into()),
+            )
+            .on_web_resource_request(|_, response| {
+                // xterm generates cell/theme CSS at runtime. Scope this exception
+                // to terminal WebViews; script policy and memo windows stay strict.
+                if let Some(header) = response.headers_mut().get_mut("Content-Security-Policy") {
+                    if let Ok(policy) = header.to_str() {
+                        let mut directives: std::collections::HashMap<
+                            String,
+                            tauri::utils::config::CspDirectiveSources,
+                        > = tauri::utils::config::Csp::Policy(policy.into()).into();
+                        directives.insert(
+                            "style-src".into(),
+                            tauri::utils::config::CspDirectiveSources::List(vec![
+                                "'self'".into(),
+                                "'unsafe-inline'".into(),
+                            ]),
+                        );
+                        if let Ok(value) = tauri::utils::config::Csp::from(directives)
+                            .to_string()
+                            .parse()
+                        {
+                            *header = value;
+                        }
                     }
                 }
-            }
-        })
-        .title(format!("{} — {id}", crate::instance::current().title()))
-        .decorations(false)
-        .resizable(true)
-        .min_inner_size(2.0, 2.0)
-        .inner_size(agent.bounds.width, agent.bounds.height)
-        .always_on_top(true)
-        .skip_taskbar(true)
-        .visible(false)
-        .focused(false)
-        .background_throttling(tauri::utils::config::BackgroundThrottlingPolicy::Disabled)
-        .build()
-        .map_err(err)?;
-        // Position before showing. Legacy logical origins remain compatible;
-        // captured Windows origins are already physical desktop coordinates.
-        window.set_position(agent.position()).map_err(err)?;
-        #[cfg(windows)]
+            })
+            .title(format!("{} — {id}", crate::instance::current().title()))
+            .decorations(false)
+            .resizable(true)
+            .min_inner_size(2.0, 2.0)
+            .inner_size(agent.bounds.width, agent.bounds.height)
+            .always_on_top(true)
+            .skip_taskbar(true)
+            .visible(false)
+            .focused(false)
+            .background_throttling(tauri::utils::config::BackgroundThrottlingPolicy::Disabled)
+            .build()
+            .map_err(err)?
+        };
         {
-            // Size using the target monitor's DPI after positioning.
-            window
-                .set_size(tauri::LogicalSize::new(
-                    agent.bounds.width,
-                    agent.bounds.height,
-                ))
-                .map_err(err)?;
+            let _position = crate::telemetry::Timing::new("terminal.window.position");
+            // Position before showing. Legacy logical origins remain compatible;
+            // captured Windows origins are already physical desktop coordinates.
+            window.set_position(agent.position()).map_err(err)?;
+            #[cfg(windows)]
+            {
+                // Size using the target monitor's DPI after positioning.
+                window
+                    .set_size(tauri::LogicalSize::new(
+                        agent.bounds.width,
+                        agent.bounds.height,
+                    ))
+                    .map_err(err)?;
+            }
         }
         window
     };
+    let _show = crate::telemetry::Timing::new("terminal.window.show");
     // User explicitly opens a terminal, but background CLI/tray restore preserves focus.
     #[cfg(target_os = "macos")]
     unsafe {
@@ -472,13 +481,18 @@ fn start_session(
 ) -> Result<(Session, Box<dyn Read + Send>), String> {
     // One shared budget also bounds rediscovery after a spawn failure.
     let deadline = Instant::now() + discovery::TOTAL_TIMEOUT;
-    let pair = native_pty_system().openpty(dimensions).map_err(err)?;
+    let pair = {
+        let _timing = crate::telemetry::Timing::new("terminal.pty.create");
+        native_pty_system().openpty(dimensions).map_err(err)?
+    };
     let (found, child) = discovery.spawn(deadline, |found| {
         let mut command = CommandBuilder::new(&found.executable);
         command.cwd(cwd);
         command.env("PATH", &found.path);
         command.env("TERM", "xterm-256color");
         command.env_remove("NO_COLOR");
+        let _timing = crate::telemetry::Timing::new("terminal.process.spawn");
+        crate::telemetry::checkpoint("terminal.process.spawn");
         pair.slave.spawn_command(command).map_err(err)
     })?;
     drop(pair.slave);
@@ -491,6 +505,7 @@ fn start_session(
         found: Some(found),
         prompt: welcome::PromptState::default(),
     };
+    let _attach = crate::telemetry::Timing::new("terminal.io.attach");
     let reader = session.master.try_clone_reader().map_err(err)?;
     session.writer = session.master.take_writer().map_err(err)?;
     Ok((session, reader))
@@ -536,7 +551,10 @@ pub async fn terminal_start(
                     Ok(0) | Err(_) => break,
                     Ok(n) => {
                         let _timing = crate::telemetry::Timing::new("terminal.output");
-                        let paths = directory_report.feed(&bytes[..n]);
+                        let paths = {
+                            let _filter = crate::telemetry::Timing::new("terminal.output.filter");
+                            directory_report.feed(&bytes[..n])
+                        };
                         let state = watched_app.state::<Terminals>();
                         let sessions = state.sessions.lock().unwrap();
                         if sessions
@@ -560,6 +578,7 @@ pub async fn terminal_start(
                         }
                         drop(sessions);
                         // Keep draining after the webview closes: a full PTY can block shell exit.
+                        let _dispatch = crate::telemetry::Timing::new("terminal.output.dispatch");
                         let _ = output.send(bytes[..n].to_vec());
                     }
                 }
@@ -594,10 +613,15 @@ pub fn terminal_write(window: WebviewWindow, data: String) -> Result<(), String>
         return Err("입력은 64KiB 이하여야 합니다".into());
     }
     let session = session(&window)?;
-    let mut session = session.lock().map_err(err)?;
+    let mut session = {
+        let _lock = crate::telemetry::Timing::new("terminal.session.lock");
+        session.lock().map_err(err)?
+    };
     session.prompt.input(data.as_bytes());
+    let write = crate::telemetry::Timing::new("terminal.input.write");
     session.writer.write_all(data.as_bytes()).map_err(err)?;
     session.writer.flush().map_err(err)?;
+    drop(write);
     drop(session);
     welcome::touch_path(window.app_handle(), &caller(&window)?)
 }

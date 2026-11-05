@@ -138,11 +138,18 @@ fn basic_release_and_opted_in_diagnostics_have_separate_features() {
     );
     let detailed = options("https://public@example.invalid/42".parse().unwrap(), true);
     assert!(detailed.enable_logs && detailed.auto_session_tracking);
+    let sampler = detailed.traces_sampler.unwrap();
     assert_eq!(
-        detailed.traces_sampler.unwrap()(&sentry::TransactionContext::new(
+        sampler(&sentry::TransactionContext::new(
             "diagnostic.probe",
             "diagnostic.probe"
         )),
         1.0
+    );
+    assert!(
+        sampler(&sentry::TransactionContext::new(
+            "terminal.output.parse",
+            "terminal.output.parse"
+        )) <= 0.01
     );
 }

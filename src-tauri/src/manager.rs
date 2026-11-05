@@ -130,8 +130,14 @@ pub fn manager_terminal(
         return Err("터미널이 없습니다".into());
     }
     match action.as_str() {
-        "open" => crate::terminal::open(app, &id),
-        "delete" => crate::terminal::welcome::delete(app, &id),
+        "open" => {
+            let _timing = crate::telemetry::Timing::new("manager.terminal.open");
+            crate::terminal::open(app, &id)
+        }
+        "delete" => {
+            let _timing = crate::telemetry::Timing::new("manager.terminal.delete");
+            crate::terminal::welcome::delete(app, &id)
+        }
         _ => Err("지원하지 않는 동작입니다".into()),
     }
 }

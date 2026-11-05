@@ -53,6 +53,12 @@
   raw('telemetry_status').then(config => {
     if (!config.detailed) return;
     active = true;
+    const stages = new Set(['terminal.ui.ready', 'terminal.first_output', 'terminal.output.parse']);
+    // This API accepts fixed English stage names and numeric durations only.
+    // It does not exist in the ordinary, non-diagnostic mode.
+    window.gibbonMeasure = (op, duration) => {
+      if (stages.has(op) && window.document.visibilityState === 'visible') record(op, duration);
+    };
     let inFlight = false;
     function beat() {
       if (inFlight) return;

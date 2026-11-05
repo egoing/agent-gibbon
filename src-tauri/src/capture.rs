@@ -110,10 +110,15 @@ static NEXT_SELECTION: AtomicU64 = AtomicU64::new(1);
 static LIFECYCLE: Mutex<()> = Mutex::new(());
 #[cfg(windows)]
 async fn lifecycle(
+    operation: &'static str,
     work: impl FnOnce() -> Result<(), String> + Send + 'static,
 ) -> Result<(), String> {
     tauri::async_runtime::spawn_blocking(move || {
-        let _operation = LIFECYCLE.lock().map_err(err)?;
+        let _root = crate::telemetry::Timing::new(operation);
+        let _operation = {
+            let _wait = crate::telemetry::Timing::new("capture.lifecycle.wait");
+            LIFECYCLE.lock().map_err(err)?
+        };
         work()
     })
     .await
@@ -131,7 +136,12 @@ pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
     std::thread::spawn(move || {
         #[cfg(windows)]
         {
-            if let Ok(_operation) = LIFECYCLE.lock() {
+            let _root = crate::telemetry::Timing::new("capture.prepare");
+            let operation = {
+                let _wait = crate::telemetry::Timing::new("capture.lifecycle.wait");
+                LIFECYCLE.lock()
+            };
+            if let Ok(_operation) = operation {
                 launch(&app, mode);
             }
             LAUNCH_QUEUED.store(false, Ordering::Release);
@@ -176,6 +186,8 @@ extern "C" {
     fn CGRequestScreenCaptureAccess() -> bool;
 }
 fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
+    #[cfg(not(windows))]
+    let _root = crate::telemetry::Timing::new("capture.prepare");
     trace("begin");
     #[cfg(target_os = "macos")]
     // Called only by an explicit capture action. Never capture a wallpaper-only
@@ -189,7 +201,11 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
     // Capture every display before creating any overlays, so dimming never enters the PNG.
     let mut screens = BTreeMap::new();
     let generation = NEXT_SELECTION.fetch_add(1, Ordering::Relaxed);
-    for (index, monitor) in xcap::Monitor::all().map_err(err)?.into_iter().enumerate() {
+    let monitors = {
+        let _timing = crate::telemetry::Timing::new("capture.screen.enumerate");
+        xcap::Monitor::all().map_err(err)?
+    };
+    for (index, monitor) in monitors.into_iter().enumerate() {
         let scale = if cfg!(target_os = "macos") {
             1.0
         } else {
@@ -200,7 +216,10 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
             Screen {
                 mode,
                 ready: false,
-                image: monitor.capture_image().map_err(err)?,
+                image: {
+                    let _timing = crate::telemetry::Timing::new("capture.screen.capture");
+                    monitor.capture_image().map_err(err)?
+                },
                 bounds: ImageNote {
                     x: f64::from(monitor.x().map_err(err)?),
                     y: f64::from(monitor.y().map_err(err)?),
@@ -217,6 +236,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
         .collect();
     *app.state::<Captures>().0.lock().map_err(err)? = screens;
     for (label, b) in bounds {
+        let _timing = crate::telemetry::Timing::new("capture.overlay.create");
         crate::focus::remember(app, &label);
         let win = tauri::WebviewWindowBuilder::new(
             app,
@@ -261,6 +281,8 @@ fn set_position(win: &WebviewWindow, x: f64, y: f64) -> Result<(), String> {
     win.set_position(selection_position(x, y)).map_err(err)
 }
 fn cleanup(app: &tauri::AppHandle) {
+    let _timing = crate::telemetry::Timing::new("capture.cleanup.request");
+    crate::telemetry::checkpoint("capture.cleanup.request");
     for win in app
         .webview_windows()
         .values()
@@ -303,6 +325,8 @@ fn wait_for_cleanup(
     pending: Vec<std::sync::mpsc::Receiver<()>>,
     timeout: std::time::Duration,
 ) -> Result<(), String> {
+    let _timing = crate::telemetry::Timing::new("capture.cleanup.wait");
+    crate::telemetry::checkpoint("capture.cleanup.wait");
     let deadline = std::time::Instant::now() + timeout;
     for rx in pending {
         rx.recv_timeout(deadline.saturating_duration_since(std::time::Instant::now()))
@@ -335,11 +359,12 @@ fn cancel_selection(window: WebviewWindow) -> Result<(), String> {
 #[cfg(windows)]
 #[tauri::command]
 pub async fn cancel_capture(window: WebviewWindow) -> Result<(), String> {
-    lifecycle(move || cancel_selection(window)).await
+    lifecycle("capture.cancel", move || cancel_selection(window)).await
 }
 #[cfg(not(windows))]
 #[tauri::command]
 pub fn cancel_capture(window: WebviewWindow) -> Result<(), String> {
+    let _root = crate::telemetry::Timing::new("capture.cancel");
     cancel_selection(window)
 }
 #[tauri::command]
@@ -403,15 +428,17 @@ fn failed_selection(window: WebviewWindow) -> Result<(), String> {
 #[cfg(windows)]
 #[tauri::command]
 pub async fn capture_failed(window: WebviewWindow) -> Result<(), String> {
-    lifecycle(move || failed_selection(window)).await
+    lifecycle("capture.failed", move || failed_selection(window)).await
 }
 #[cfg(not(windows))]
 #[tauri::command]
 pub fn capture_failed(window: WebviewWindow) -> Result<(), String> {
+    let _root = crate::telemetry::Timing::new("capture.failed");
     failed_selection(window)
 }
 #[tauri::command]
 pub fn capture_screen(window: WebviewWindow) -> Result<tauri::ipc::Response, String> {
+    let _timing = crate::telemetry::Timing::new("capture.preview.copy");
     trace("preview requested");
     let state = window.state::<Captures>();
     let screens = state.0.lock().map_err(err)?;
@@ -463,7 +490,10 @@ pub async fn finish_capture(
     width: f64,
     height: f64,
 ) -> Result<(), String> {
-    lifecycle(move || finish_selection(window, x, y, width, height)).await
+    lifecycle("capture.finish", move || {
+        finish_selection(window, x, y, width, height)
+    })
+    .await
 }
 #[cfg(not(windows))]
 #[tauri::command]
@@ -474,6 +504,7 @@ pub fn finish_capture(
     width: f64,
     height: f64,
 ) -> Result<(), String> {
+    let _root = crate::telemetry::Timing::new("capture.finish");
     finish_selection(window, x, y, width, height)
 }
 fn finish_selection(
@@ -491,7 +522,10 @@ fn finish_selection(
         let state = app.state::<Captures>();
         let screens = state.0.lock().map_err(err)?;
         let s = screens.get(window.label()).ok_or("캡처가 종료되었습니다")?;
-        let (px, py, pw, ph) = crop_rect(&s.bounds, s.image.dimensions(), [x, y, width, height])?;
+        let (px, py, pw, ph) = {
+            let _timing = crate::telemetry::Timing::new("capture.selection.validate");
+            crop_rect(&s.bounds, s.image.dimensions(), [x, y, width, height])?
+        };
         let offset = if cfg!(target_os = "macos") {
             1.0
         } else {
@@ -499,6 +533,7 @@ fn finish_selection(
         };
         (
             if s.mode == SelectionMode::Image {
+                let _timing = crate::telemetry::Timing::new("capture.image.encode");
                 Some(png(
                     &image::imageops::crop_imm(&s.image, px, py, pw, ph).to_image()
                 )?)
@@ -671,14 +706,14 @@ mod tests {
     #[test]
     fn lifecycle_errors_release_the_gate_without_dropping_next_cleanup() {
         let caller = std::thread::current().id();
-        let failed = tauri::async_runtime::block_on(lifecycle(move || {
+        let failed = tauri::async_runtime::block_on(lifecycle("capture.failed", move || {
             assert_ne!(std::thread::current().id(), caller);
             Err("synthetic initialization failure".into())
         }));
         assert!(failed.is_err());
         let cleaned = std::sync::Arc::new(AtomicBool::new(false));
         let result = cleaned.clone();
-        tauri::async_runtime::block_on(lifecycle(move || {
+        tauri::async_runtime::block_on(lifecycle("capture.cancel", move || {
             result.store(true, Ordering::Relaxed);
             Ok(())
         }))

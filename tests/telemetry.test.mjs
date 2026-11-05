@@ -34,3 +34,15 @@ test('captured invoke works with frozen Tauri API and source metadata is allowli
  await captured('snapshot',{note:'PRIVATE'});s.listeners.error({filename:'/Users/PRIVATE/app.js',lineno:12,colno:3,message:'PRIVATE'});await tick();
  const e=s.calls.find(c=>c.command==='report_frontend_error');assert.equal(e.args.source,'app.js');assert.equal(e.args.line,12);assert(!JSON.stringify(e).includes('PRIVATE'));
 });
+test('explicit terminal stages accept only fixed names and finite visible durations',async()=>{
+ const off=setup(false);await tick();assert.equal(off.window.gibbonMeasure,undefined);
+ const s=setup();await tick();s.calls.length=0;
+ s.window.gibbonMeasure('terminal.ui.ready',40);
+ s.window.gibbonMeasure('PRIVATE_NOTE_PATH',12);
+ s.window.gibbonMeasure('terminal.output.parse',Infinity);
+ s.window.document.visibilityState='hidden';s.window.gibbonMeasure('terminal.first_output',10000);
+ s.timers.find(t=>t.ms===2000).fn();await tick();
+ const report=s.calls.find(c=>c.command==='telemetry_heartbeat');
+ assert.equal(report.args.measurements.length,1);assert.equal(report.args.measurements[0].op,'terminal.ui.ready');
+ assert(!JSON.stringify(report).includes('PRIVATE'));
+});

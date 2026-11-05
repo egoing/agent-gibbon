@@ -395,12 +395,14 @@ pub(super) fn start(
     choice: &str,
     dimensions: PtySize,
 ) -> Result<(Session, Box<dyn Read + Send>), String> {
+    let prepare = crate::telemetry::Timing::new("terminal.command.prepare");
     let cwd = agent.last_path.clone().map(Ok).unwrap_or_else(home)?;
     if !cwd.is_dir() {
         return Err("마지막 폴더가 없습니다. 다른 폴더를 선택하세요".into());
     }
     let line = command(&search_path(), choice)?;
     let shell = default_shell()?;
+    drop(prepare);
     start_shell(&cwd, line, dimensions, &shell)
 }
 fn start_shell(
@@ -410,7 +412,10 @@ fn start_shell(
     shell: &Path,
 ) -> Result<(Session, Box<dyn Read + Send>), String> {
     let prompt = PromptState::new();
-    let pair = native_pty_system().openpty(dimensions).map_err(err)?;
+    let pair = {
+        let _timing = crate::telemetry::Timing::new("terminal.pty.create");
+        native_pty_system().openpty(dimensions).map_err(err)?
+    };
     let mut cmd = CommandBuilder::new(shell);
     cmd.cwd(cwd);
     cmd.env("TERM", "xterm-256color");
@@ -434,7 +439,11 @@ fn start_shell(
             line.as_deref().unwrap_or("")
         ));
     }
-    let child = pair.slave.spawn_command(cmd).map_err(err)?;
+    let child = {
+        let _spawn = crate::telemetry::Timing::new("terminal.process.spawn");
+        crate::telemetry::checkpoint("terminal.process.spawn");
+        pair.slave.spawn_command(cmd).map_err(err)?
+    };
     drop(pair.slave);
     let mut session = Session {
         master: pair.master,
@@ -444,6 +453,7 @@ fn start_shell(
         found: None,
         prompt,
     };
+    let _attach = crate::telemetry::Timing::new("terminal.io.attach");
     let reader = session.master.try_clone_reader().map_err(err)?;
     session.writer = session.master.take_writer().map_err(err)?;
     #[cfg(unix)]
