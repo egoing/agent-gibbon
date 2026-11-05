@@ -23,3 +23,5 @@ test('failed app launch restores triggering button and clears busy state',async(
 test('long path is preserved completely and home hint is hidden',async()=>{const path='/project/'+('긴 경로/'.repeat(80));const {elements}=ui({path});await flush();assert.equal(elements['work-path'].textContent,path);assert.equal(elements['home-hint'].hidden,true);});
 
 test('failed launch does not move focus when window is inactive',async()=>{const {elements}=ui({fail:true,focused:false});await flush();const trigger=elements.recommendations.children[0];await trigger.onclick();assert.notEqual(trigger.focused,true);});
+
+test('approved wireframe selects a task without starting until Run',async()=>{const {elements,calls}=ui();await flush();await elements.recommendations.children[0].onclick();assert.equal(calls.filter(([n])=>n==='terminal_start').length,0);assert.equal(typeof elements['run-task'].onclick,'function');await elements['run-task'].onclick();assert.equal(calls.filter(([n])=>n==='terminal_start').length,1);});

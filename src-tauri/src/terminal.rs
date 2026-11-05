@@ -616,6 +616,12 @@ pub fn shutdown(app: &tauri::AppHandle) {
 mod tests {
     use super::*;
     #[test]
+    fn approved_recent_folders_survive_metadata_roundtrip() {
+        let value = json!({"id":"terminal-123","bounds":{"x":0.,"y":0.,"width":720.,"height":460.},"kind":"terminal","recent_paths":[{"path":"/tmp/project","updated":42}]});
+        let restored = serde_json::to_value(serde_json::from_value::<Agent>(value.clone()).unwrap()).unwrap();
+        assert_eq!(restored["recent_paths"], value["recent_paths"]);
+    }
+    #[test]
     fn welcome_metadata_preserves_only_last_path_title_and_geometry() {
         let original = json!({"id":"terminal-123","bounds":{"x":11.,"y":22.,"width":720.,"height":460.},"kind":"terminal","last_path":"/tmp/project","path_updated":42,"title":"내 작업"});
         let agent: Agent = serde_json::from_value(original.clone()).unwrap();
