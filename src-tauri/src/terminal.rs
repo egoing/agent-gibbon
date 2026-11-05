@@ -1,4 +1,4 @@
-//! Local PTYs, scoped to the calling agent window. No shell command or cwd from JS.
+//! Local PTYs, scoped to the calling agent window. Shell commands stay backend-owned; selected directories are validated.
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -27,9 +27,16 @@ pub struct Agent {
     #[serde(default)]
     pub last_path: Option<PathBuf>,
     #[serde(default)]
+    pub recent_paths: Vec<RecentPath>,
+    #[serde(default)]
     pub path_updated: u64,
     #[serde(default)]
     pub title: String,
+}
+#[derive(Clone, Serialize, Deserialize)]
+pub struct RecentPath {
+    pub path: PathBuf,
+    pub updated: u64,
 }
 #[derive(Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -248,6 +255,7 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
         bounds,
         kind: Kind::Agent,
         last_path: None,
+        recent_paths: Vec::new(),
         path_updated: 0,
         title: String::new(),
     };
@@ -618,7 +626,8 @@ mod tests {
     #[test]
     fn approved_recent_folders_survive_metadata_roundtrip() {
         let value = json!({"id":"terminal-123","bounds":{"x":0.,"y":0.,"width":720.,"height":460.},"kind":"terminal","recent_paths":[{"path":"/tmp/project","updated":42}]});
-        let restored = serde_json::to_value(serde_json::from_value::<Agent>(value.clone()).unwrap()).unwrap();
+        let restored =
+            serde_json::to_value(serde_json::from_value::<Agent>(value.clone()).unwrap()).unwrap();
         assert_eq!(restored["recent_paths"], value["recent_paths"]);
     }
     #[test]
@@ -804,6 +813,7 @@ mod tests {
         let a = Agent {
             kind: Kind::Agent,
             last_path: None,
+            recent_paths: Vec::new(),
             path_updated: 0,
             title: String::new(),
             id: "agent-123".into(),
