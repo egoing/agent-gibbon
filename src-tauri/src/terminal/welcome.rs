@@ -290,34 +290,54 @@ pub(super) fn start(
     #[cfg(windows)]
     let shell = PathBuf::from(std::env::var_os("SystemRoot").ok_or("SystemRoot가 없습니다")?)
         .join("System32/WindowsPowerShell/v1.0/powershell.exe");
+    start_shell(&cwd, line, dimensions, &shell)
+}
+fn start_shell(
+    cwd: &Path,
+    line: Option<String>,
+    dimensions: PtySize,
+    shell: &Path,
+) -> Result<(Session, Box<dyn Read + Send>), String> {
+    let prompt = PromptState::new();
     let pair = native_pty_system().openpty(dimensions).map_err(err)?;
-    let mut cmd = CommandBuilder::new(&shell);
-    cmd.cwd(&cwd);
+    let mut cmd = CommandBuilder::new(shell);
+    cmd.cwd(cwd);
     cmd.env("TERM", "xterm-256color");
     cmd.env_remove("NO_COLOR");
     #[cfg(unix)]
     {
         cmd.arg("-i");
+        // A shell which replaces PS1 remains unknown and asks before closing.
+        cmd.env(
+            "PS1",
+            format!("\x1b]777;gibbon-ready;{}\x07$ ", prompt.token),
+        );
     }
     #[cfg(windows)]
     {
         cmd.args(["-NoLogo", "-NoExit", "-Command"]);
-        let prompt = "function global:prompt { [Console]::Write(([char]27 + ']777;gibbon-cwd;' + (Get-Location).Path + [char]7)); 'PS> ' }; ";
-        cmd.arg(format!("{prompt}{}", line.as_deref().unwrap_or("")));
+        let prompt_script = "function global:prompt { [Console]::Write(([char]27 + ']777;gibbon-cwd;' + (Get-Location).Path + [char]7)); [Console]::Write(([char]27 + ']777;gibbon-ready;TOKEN' + [char]7)); 'PS> ' }; ";
+        cmd.arg(format!(
+            "{}{}",
+            prompt_script.replace("TOKEN", &prompt.token),
+            line.as_deref().unwrap_or("")
+        ));
     }
     let child = pair.slave.spawn_command(cmd).map_err(err)?;
     drop(pair.slave);
     let mut session = Session {
         master: pair.master,
         writer: Box::new(std::io::sink()),
-        child,
+        child: OwnedChild(Some(child)),
         program: "shell".into(),
         found: None,
+        prompt,
     };
     let reader = session.master.try_clone_reader().map_err(err)?;
     session.writer = session.master.take_writer().map_err(err)?;
     #[cfg(unix)]
     if let Some(line) = line {
+        session.prompt.input(format!("{line}\r").as_bytes());
         session
             .writer
             .write_all(format!("{line}\r").as_bytes())
@@ -329,6 +349,9 @@ pub(super) fn start(
 fn busy(session: &mut Session) -> bool {
     if session.child.try_wait().ok().flatten().is_some() {
         return false;
+    }
+    if !session.prompt.ready {
+        return true;
     }
     #[cfg(unix)]
     {
@@ -358,13 +381,11 @@ pub fn request_close(window: &WebviewWindow) -> Result<(), String> {
     let app = window.app_handle();
     let id = window.label().to_string();
     refresh_path(app, &id)?;
-    let session = app
-        .state::<Terminals>()
-        .sessions
-        .lock()
-        .map_err(err)?
-        .get(&id)
-        .and_then(running);
+    let state = app.state::<Terminals>();
+    let sessions = state.sessions.lock().map_err(err)?;
+    let expected = close_identity(sessions.get(&id));
+    let session = sessions.get(&id).and_then(running);
+    drop(sessions);
     let needs_confirm = session
         .as_ref()
         .is_some_and(|s| busy(&mut s.lock().unwrap()));
@@ -382,26 +403,38 @@ pub fn request_close(window: &WebviewWindow) -> Result<(), String> {
                 if yes {
                     let app2 = app.clone();
                     let _ = app.run_on_main_thread(move || {
-                        let _ = finish_close(&app2, &id);
+                        let _ = finish_close(&app2, &id, expected);
                     });
                 }
             });
         Ok(())
     } else {
-        finish_close(app, &id)
+        finish_close(app, &id, expected)
     }
 }
-fn finish_close(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+fn close_identity(slot: Option<&Slot>) -> Option<(bool, usize)> {
+    slot.map(|slot| match slot {
+        Slot::Starting(token) => (false, *token as usize),
+        Slot::Running(session) => (true, Arc::as_ptr(session) as usize),
+    })
+}
+fn finish_close(
+    app: &tauri::AppHandle,
+    id: &str,
+    expected: Option<(bool, usize)>,
+) -> Result<(), String> {
+    let state = app.state::<Terminals>();
     refresh_path(app, id)?;
+    let mut sessions = state.sessions.lock().map_err(err)?;
+    if close_identity(sessions.get(id)) != expected {
+        return Ok(());
+    }
     if let Some(window) = app.get_webview_window(id) {
         crate::stash::release(&window)?;
         window.destroy().map_err(err)?;
     }
-    app.state::<Terminals>()
-        .sessions
-        .lock()
-        .map_err(err)?
-        .remove(id);
+    sessions.remove(id);
+    drop(sessions);
     crate::tray::refresh(app)
 }
 
@@ -459,10 +492,17 @@ mod tests {
         std::fs::create_dir(&bin).unwrap();
         for name in ["codex", "claude", "git", "htop"] {
             let p = bin.join(name);
-            std::fs::write(&p, "#!/bin/sh\ntouch SHOULD_NOT_EXIST\n").unwrap();
+            std::fs::write(
+                &p,
+                format!(
+                    "#!/bin/sh\ntouch {}\n",
+                    quote(&dir.path().join("SHOULD_NOT_EXIST").to_string_lossy())
+                ),
+            )
+            .unwrap();
             std::fs::set_permissions(p, std::fs::Permissions::from_mode(0o700)).unwrap();
         }
-        let list = choices(&[bin.clone()]);
+        let list = choices(std::slice::from_ref(&bin));
         assert_eq!(list.len(), 4);
         assert!(list[0]["command"].as_str().unwrap().contains("'\\''"));
         assert!(list[2]["command"]
@@ -480,8 +520,13 @@ mod tests {
     #[test]
     fn shell_command_exit_returns_to_same_pty_and_cwd_is_observed() {
         let dir = tempfile::tempdir().unwrap();
-        let a = agent(Some(dir.path().into()), 1);
-        let (mut session, mut reader) = start(&a, "shell", size(80, 24).unwrap()).unwrap();
+        let (mut session, mut reader) = start_shell(
+            dir.path(),
+            None,
+            size(80, 24).unwrap(),
+            Path::new("/bin/sh"),
+        )
+        .unwrap();
         let pid = session.child.process_id().unwrap();
         let (tx, rx) = std::sync::mpsc::channel();
         std::thread::spawn(move || {
@@ -522,14 +567,18 @@ mod tests {
 }
 
 // Only the bounded directory control sequence is retained, never PTY transcript.
-#[cfg(any(windows, test))]
 #[derive(Default)]
 pub(super) struct DirectoryReport {
     frame: Vec<u8>,
     escape: bool,
+    prompt: Option<String>,
 }
-#[cfg(any(windows, test))]
 impl DirectoryReport {
+    pub(super) fn take_prompt(&mut self, token: &str) -> bool {
+        self.prompt
+            .take()
+            .is_some_and(|value| !token.is_empty() && value == token)
+    }
     pub fn feed(&mut self, bytes: &[u8]) -> Vec<PathBuf> {
         let mut paths = Vec::new();
         for &byte in bytes {
@@ -547,10 +596,21 @@ impl DirectoryReport {
                         paths.push(PathBuf::from(path));
                     }
                 }
+                if let Some(raw) = self.frame.strip_prefix(b"]777;gibbon-ready;") {
+                    self.prompt = std::str::from_utf8(raw).ok().map(str::to_owned);
+                }
                 self.frame.clear();
                 self.escape = false;
             } else if self.frame.len() < 32768 {
                 self.frame.push(byte);
+                let prefixes: [&[u8]; 2] = [b"]777;gibbon-cwd;", b"]777;gibbon-ready;"];
+                if !prefixes
+                    .iter()
+                    .any(|prefix| prefix.starts_with(&self.frame) || self.frame.starts_with(prefix))
+                {
+                    self.frame.clear();
+                    self.escape = false;
+                }
             } else {
                 self.frame.clear();
                 self.escape = false;
@@ -572,6 +632,8 @@ mod report_tests {
             parser.feed(b"\\project\x07other text"),
             vec![PathBuf::from("C:\\work\\project")]
         );
+        assert!(parser.frame.is_empty());
+        parser.feed(b"\x1b[31mprivate output");
         assert!(parser.frame.is_empty());
         parser.feed(b"\x1b]");
         parser.feed(&vec![b'x'; 40000]);
@@ -634,4 +696,167 @@ pub(super) fn descendants(pid: u32) -> Option<Vec<i32>> {
     }
     found.remove(0);
     Some(found)
+}
+
+#[derive(Default)]
+pub(super) struct PromptState {
+    pub token: String,
+    pub ready: bool,
+    due: usize,
+    editing: bool,
+}
+impl PromptState {
+    pub fn input(&mut self, data: &[u8]) {
+        if data.is_empty() {
+            return;
+        }
+        self.ready = false;
+        self.editing = true;
+        for byte in data {
+            if matches!(byte, b'\r' | b'\n') {
+                self.due = self.due.saturating_add(1);
+                self.editing = false;
+            }
+        }
+    }
+    pub fn report(&mut self) {
+        self.due = self.due.saturating_sub(1);
+        self.ready = self.due == 0 && !self.editing;
+    }
+    fn new() -> Self {
+        static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
+        Self {
+            token: format!(
+                "{}-{}",
+                now(),
+                NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+            ),
+            ready: false,
+            due: 1,
+            editing: false,
+        }
+    }
+}
+pub(super) fn touch_path(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+    let state = app.state::<Terminals>();
+    let mut agents = state.agents.lock().map_err(err)?;
+    if let Some(agent) = agents
+        .get_mut(id)
+        .filter(|a| a.kind == Kind::Terminal && a.last_path.is_some())
+    {
+        agent.path_updated = now();
+        save(&root(app), agent)?;
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod lifecycle_tests {
+    use super::*;
+    #[test]
+    fn queued_startup_prompt_cannot_mark_submitted_builtin_idle() {
+        let mut prompt = PromptState::new();
+        prompt.input(b"while :; do :; done\r");
+        prompt.report();
+        assert!(!prompt.ready);
+        prompt.report();
+        assert!(prompt.ready);
+        prompt.input(b"partial input");
+        assert!(!prompt.ready);
+    }
+    #[test]
+    fn old_reservation_does_not_match_reopened_window() {
+        assert_ne!(
+            close_identity(Some(&Slot::Starting(1))),
+            close_identity(Some(&Slot::Starting(2)))
+        );
+        assert_ne!(
+            close_identity(None),
+            close_identity(Some(&Slot::Starting(1)))
+        );
+    }
+    #[cfg(unix)]
+    #[test]
+    fn real_shell_prompt_builtin_busy_and_child_cleanup() {
+        let dir = tempfile::tempdir().unwrap();
+        let (mut session, mut reader) = start_shell(
+            dir.path(),
+            None,
+            size(80, 24).unwrap(),
+            Path::new("/bin/sh"),
+        )
+        .unwrap();
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let mut buf = [0; 4096];
+            while let Ok(n) = reader.read(&mut buf) {
+                if n == 0 || tx.send(buf[..n].to_vec()).is_err() {
+                    break;
+                }
+            }
+        });
+        let mut parser = DirectoryReport::default();
+        let deadline = Instant::now() + std::time::Duration::from_secs(5);
+        while !session.prompt.ready {
+            parser.feed(
+                &rx.recv_timeout(deadline.saturating_duration_since(Instant::now()))
+                    .unwrap(),
+            );
+            if parser.take_prompt(&session.prompt.token) {
+                session.prompt.report();
+            }
+        }
+        assert!(!busy(&mut session));
+        let pid = session.child.process_id().unwrap();
+        let input = b"while :; do :; done\r";
+        session.prompt.input(input);
+        session.writer.write_all(input).unwrap();
+        session.writer.flush().unwrap();
+        std::thread::sleep(std::time::Duration::from_millis(50));
+        assert!(descendants(pid).unwrap().is_empty());
+        assert!(busy(&mut session));
+        drop(session);
+        let deadline = Instant::now() + std::time::Duration::from_secs(5);
+        while unsafe { libc::kill(pid as i32, 0) } == 0 {
+            assert!(Instant::now() < deadline, "shell was not reaped");
+            std::thread::sleep(std::time::Duration::from_millis(10));
+        }
+
+        let (mut session, mut reader) = start_shell(
+            dir.path(),
+            None,
+            size(80, 24).unwrap(),
+            Path::new("/bin/sh"),
+        )
+        .unwrap();
+        std::thread::spawn(move || {
+            let _ = std::io::copy(&mut reader, &mut std::io::sink());
+        });
+        let pid = session.child.process_id().unwrap();
+        session.writer.write_all(b"sleep 60 & wait\r").unwrap();
+        session.writer.flush().unwrap();
+        let deadline = Instant::now() + std::time::Duration::from_secs(5);
+        let children = loop {
+            let children = descendants(pid).unwrap();
+            if !children.is_empty() {
+                break children;
+            }
+            assert!(Instant::now() < deadline, "background child did not start");
+            std::thread::sleep(std::time::Duration::from_millis(10));
+        };
+        assert!(busy(&mut session));
+        drop(session);
+        for child in children {
+            // A reparented zombie may remain until launchd/init reaps it; it must not run.
+            let status = std::process::Command::new("/bin/ps")
+                .args(["-o", "stat=", "-p", &child.to_string()])
+                .output()
+                .unwrap();
+            let status = String::from_utf8_lossy(&status.stdout);
+            assert!(
+                status.trim().is_empty() || status.trim().starts_with('Z'),
+                "child remains alive: {status}"
+            );
+        }
+    }
 }

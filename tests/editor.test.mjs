@@ -599,3 +599,12 @@ test('content measurement carries the current revision and pending reopen can me
   assert.equal(app.element('editor').hidden, false);
   assert.equal(app.calls.filter(([name]) => name === 'content_action').length, 0);
 });
+
+
+test('window close terminates while Escape remains a hide action', async () => {
+  const app = await setup();
+  app.element('close').listeners.click();
+  assert.equal(app.calls.at(-1)[0], 'close_note');
+  app.events.keydown({key:'Escape',preventDefault(){},target:{closest(){return null;}}});
+  assert.equal(app.calls.at(-1)[0], 'hide_note');
+});

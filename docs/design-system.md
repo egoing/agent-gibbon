@@ -559,3 +559,5 @@ SVG 3개와 PNG 3개를 함께 갱신했다. PNG 렌더링과 배치 육안 확�
 [SVG 시안](design/terminal-welcome.svg) · [PNG 렌더링](design/terminal-welcome.png). 시안은 설명용이며 실앱 캡처가 아니다.
 
 구현·검증 범위와 macOS/Windows 차이는 [#57 검증 기록](verification/issue57-terminal-welcome.md)을 따른다. 이전 검증 기록을 이번 변경의 실행 증거로 사용하지 않는다.
+
+- #57 검증 상태: SVG→PNG 렌더·실제 UI 자산의 Chromium 720×460/320×240 검증 통과. 텍스트 버튼은 최소 64×32px로 보완했다. 실제 셸 수명 자동 테스트는 통과했으나 부분 범위의 기존 탐색 테스트 실패가 남아 있고 최종 native GUI/Windows 실행은 미검증이다. 사용자 PS1 재정의·복잡한 여러 줄 입력 시 idle에서도 종료 확인이 나올 수 있는 구현 제한이 있다. 이는 확정 요구사항의 변경이 아니며 위 검증 기록의 리뷰 항목으로 남긴다.

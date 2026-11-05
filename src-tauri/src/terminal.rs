@@ -13,6 +13,7 @@ use tauri::{ipc::Channel, Manager, WebviewWindow};
 
 mod discovery;
 pub mod welcome;
+pub use welcome::{create as create_terminal, request_close};
 
 fn err(e: impl std::fmt::Display) -> String {
     e.to_string()
@@ -52,12 +53,36 @@ impl Agent {
             .unwrap_or_else(|| "터미널".into())
     }
 }
+// Reap after Session's PTY handles are dropped; waiting before closing those handles
+// can deadlock shell exit on macOS if no reader was successfully attached.
+struct OwnedChild(Option<Box<dyn Child + Send + Sync>>);
+impl std::ops::Deref for OwnedChild {
+    type Target = dyn Child + Send + Sync;
+    fn deref(&self) -> &Self::Target {
+        self.0.as_deref().unwrap()
+    }
+}
+impl std::ops::DerefMut for OwnedChild {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        self.0.as_deref_mut().unwrap()
+    }
+}
+impl Drop for OwnedChild {
+    fn drop(&mut self) {
+        if let Some(mut child) = self.0.take() {
+            std::thread::spawn(move || {
+                let _ = child.wait();
+            });
+        }
+    }
+}
 struct Session {
     master: Box<dyn MasterPty + Send>,
     writer: Box<dyn Write + Send>,
-    child: Box<dyn Child + Send + Sync>,
+    child: OwnedChild,
     program: String,
     found: Option<discovery::Found>,
+    prompt: welcome::PromptState,
 }
 impl Drop for Session {
     fn drop(&mut self) {
@@ -98,7 +123,6 @@ impl Drop for Session {
             }
         }
         let _ = self.child.kill();
-        let _ = self.child.wait();
     }
 }
 enum Slot {
@@ -131,16 +155,14 @@ impl<'a> Start<'a> {
             token,
         })
     }
-    fn finish(self, session: Session) -> Result<(), String> {
+    fn finish(self, session: Session) -> Result<Arc<Mutex<Session>>, String> {
         let mut sessions = self.state.sessions.lock().map_err(err)?;
         if !matches!(sessions.get(&self.id), Some(Slot::Starting(token)) if *token == self.token) {
             return Err("터미널 시작이 취소되었습니다".into());
         }
-        sessions.insert(
-            self.id.clone(),
-            Slot::Running(Arc::new(Mutex::new(session))),
-        );
-        Ok(())
+        let session = Arc::new(Mutex::new(session));
+        sessions.insert(self.id.clone(), Slot::Running(session.clone()));
+        Ok(session)
     }
 }
 impl Drop for Start<'_> {
@@ -423,9 +445,10 @@ fn start_session(
     let mut session = Session {
         master: pair.master,
         writer: Box::new(std::io::sink()),
-        child,
+        child: OwnedChild(Some(child)),
         program: found.program.clone(),
         found: Some(found),
+        prompt: welcome::PromptState::default(),
     };
     let reader = session.master.try_clone_reader().map_err(err)?;
     session.writer = session.master.take_writer().map_err(err)?;
@@ -458,35 +481,48 @@ pub async fn terminal_start(
         } else {
             start_session(&state.discovery, &root(&app).join(&id), dimensions)?
         };
-        reservation.finish(session)?;
+        let watched_session = Arc::downgrade(&reservation.finish(session)?);
+        welcome::touch_path(&app, &id)?;
         let watched_app = app.clone();
         let watched_id = id.clone();
         // Raw bytes preserve UTF-8 across arbitrary PTY read boundaries.
         std::thread::spawn(move || {
-            #[cfg(windows)]
             let mut directory_report = welcome::DirectoryReport::default();
             let mut bytes = [0u8; 8192];
             loop {
                 match reader.read(&mut bytes) {
                     Ok(0) | Err(_) => break,
                     Ok(n) => {
-                        #[cfg(windows)]
-                        for path in directory_report.feed(&bytes[..n]) {
-                            let _ = welcome::set_path(&watched_app, &watched_id, path);
+                        let paths = directory_report.feed(&bytes[..n]);
+                        let state = watched_app.state::<Terminals>();
+                        let sessions = state.sessions.lock().unwrap();
+                        if sessions
+                            .get(&watched_id)
+                            .and_then(running)
+                            .is_some_and(|s| {
+                                std::ptr::eq(Arc::as_ptr(&s), watched_session.as_ptr())
+                            })
+                        {
+                            let Some(watched_session) = watched_session.upgrade() else {
+                                break;
+                            };
+                            let mut s = watched_session.lock().unwrap();
+                            if directory_report.take_prompt(&s.prompt.token) {
+                                s.prompt.report();
+                            }
+                            drop(s);
+                            for path in paths {
+                                let _ = welcome::set_path(&watched_app, &watched_id, path);
+                            }
                         }
-                        if output.send(bytes[..n].to_vec()).is_err() {
-                            break;
-                        }
+                        drop(sessions);
+                        // Keep draining after the webview closes: a full PTY can block shell exit.
+                        let _ = output.send(bytes[..n].to_vec());
                     }
                 }
             }
             let state = watched_app.state::<Terminals>();
-            let session = state
-                .sessions
-                .lock()
-                .ok()
-                .and_then(|s| s.get(&watched_id).and_then(running));
-            if let Some(session) = session {
+            if let Some(session) = watched_session.upgrade() {
                 let _ = observe_exit(&mut session.lock().unwrap(), &state.discovery);
             }
             let _ = output
@@ -515,8 +551,11 @@ pub fn terminal_write(window: WebviewWindow, data: String) -> Result<(), String>
     }
     let session = session(&window)?;
     let mut session = session.lock().map_err(err)?;
+    session.prompt.input(data.as_bytes());
     session.writer.write_all(data.as_bytes()).map_err(err)?;
-    session.writer.flush().map_err(err)
+    session.writer.flush().map_err(err)?;
+    drop(session);
+    welcome::touch_path(window.app_handle(), &caller(&window)?)
 }
 #[tauri::command]
 pub fn terminal_resize(window: WebviewWindow, cols: u16, rows: u16) -> Result<(), String> {
@@ -776,5 +815,3 @@ mod tests {
         assert_eq!(std::fs::read_to_string(index).unwrap(), "user project");
     }
 }
-
-pub use welcome::{create as create_terminal, request_close};
