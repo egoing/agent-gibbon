@@ -21,6 +21,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
   const styles = {};
   const events = {};
   const nativeEvents = {};
+  const nativeTargets = {};
   const timers = [];
   const pointers = {};
   const calls = [];
@@ -51,7 +52,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
     },
     window: { __TAURI__: {
       clipboardManager: { async writeText(text) { if (copyError) throw copyError; calls.push(['clipboard-text', text]); } },
-      event: { async listen(name, handler) { nativeEvents[name] = handler; return () => {}; } },
+      event: { async listen(name, handler, options) { nativeEvents[name] = handler; nativeTargets[name] = options?.target; return () => {}; } },
       core: { async invoke(command, args) {
         calls.push([command, args]);
         if (command === 'poll_fold') return folded;
@@ -79,7 +80,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
   await new Promise(setImmediate);
   const action = async payload => { await nativeEvents['feedback-action']({ payload: { owner: 'memo-test', action: payload, revision: view().revision } }); await new Promise(setImmediate); };
   const view = () => calls.filter(([name]) => name === 'present_feedback').at(-1)?.[1].view;
-  return { exportResult: value => { exportResult = value; }, failExport: error => { exportError = error; }, failCopy: error => { copyError = error; }, element, styles, events, calls, pointers, classes, nativeEvents, action, view,
+  return { exportResult: value => { exportResult = value; }, failExport: error => { exportError = error; }, failCopy: error => { copyError = error; }, element, styles, events, calls, pointers, classes, nativeEvents, nativeTargets, action, view,
     expireNotice: async () => { timers.filter(fn => fn.name === 'clearNotice').at(-1)?.(); await new Promise(setImmediate); },
     fold: value => { folded = value; },
     pollFold: () => timers.find(fn => fn.name === 'pollFold')(), highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
@@ -258,6 +259,8 @@ test('explicit button folds and unfolds without Control and updates its label', 
 
 test('native rollover updates chrome without a DOM click or pointer event', async () => {
   const app = await setup();
+  assert.equal(app.nativeTargets['note-pointer-over']?.kind, 'Window');
+  assert.equal(app.nativeTargets['note-pointer-over']?.label, 'memo-test');
   const html = app.element('content').innerHTML;
   app.nativeEvents['note-pointer-over']({ payload: true });
   assert.equal(app.classes.has('pointer-over'), true);
@@ -265,6 +268,15 @@ test('native rollover updates chrome without a DOM click or pointer event', asyn
   assert.equal(app.classes.has('pointer-over'), false);
   assert.equal(app.element('content').innerHTML, html);
   assert.equal(app.calls.some(([name]) => name === 'drag_note'), false);
+});
+
+test('native pointer notifications are addressed to the originating memo', () => {
+  // The JS handler cannot distinguish a broadcast boolean from its own hover.
+  // Guard the Rust/JS wiring as well as the handler behavior tested above.
+  const backend = readFileSync(new URL('../src-tauri/src/main.rs', import.meta.url), 'utf8');
+  const syncPointer = backend.slice(backend.indexOf('fn sync_pointer('), backend.indexOf('// Native alpha'));
+  assert.match(syncPointer, /\.emit_to\(window\.label\(\), "note-pointer-over", hovered\)/);
+  assert.doesNotMatch(syncPointer, /\.emit\("note-pointer-over"/);
 });
 
 test('clear diff button stays hidden without changes and stale clicks preserve newer revisions', async () => {

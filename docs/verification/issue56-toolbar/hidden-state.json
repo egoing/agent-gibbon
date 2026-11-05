@@ -1,0 +1,162 @@
+{
+  "before": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": false,
+    "content_height_cap": 48.0,
+    "dev_label": "DEV egoing/issue-56 · ae152059",
+    "feedback_active": false,
+    "feedback_surface": {
+      "always_on_top": true,
+      "focused": false,
+      "opacity": 0.8,
+      "position": {
+        "x": 2000,
+        "y": 1124
+      },
+      "size": {
+        "height": 88,
+        "width": 600
+      },
+      "view": {
+        "buttons": [],
+        "color": "#84fe83",
+        "error": false,
+        "folded_tip": false,
+        "message": "",
+        "revision": null
+      },
+      "visible": false,
+      "window_id": 36071
+    },
+    "focused": false,
+    "folded": true,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "issue56-b",
+    "instance": "dev-ae1520595bc95087ada44ff1",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<p>ISSUE56-B 관계없는 메모</p>\n",
+      "color": "#84fe83",
+      "edit_on_open": false,
+      "html": "<p>ISSUE56-B 관계없는 메모</p>\n",
+      "markdown": "ISSUE56-B 관계없는 메모",
+      "removed": false,
+      "revision": 5,
+      "source_path": null,
+      "status": "대기",
+      "title": "Agent Gibbon",
+      "updated_at": 1793867510711
+    },
+    "ok": true,
+    "opacity": 0.8,
+    "position": {
+      "x": 2000,
+      "y": 1100
+    },
+    "size": {
+      "height": 24,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 868.0,
+        "y": 354.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-ae1520595bc95087ada44ff1/docs/issue56-b/index.md",
+    "visible": false
+  },
+  "after": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": false,
+    "content_height_cap": 48.0,
+    "dev_label": "DEV egoing/issue-56 · ae152059",
+    "feedback_active": false,
+    "feedback_surface": {
+      "always_on_top": true,
+      "focused": false,
+      "opacity": 0.8,
+      "position": {
+        "x": 2000,
+        "y": 1124
+      },
+      "size": {
+        "height": 88,
+        "width": 600
+      },
+      "view": {
+        "buttons": [],
+        "color": "#84fe83",
+        "error": false,
+        "folded_tip": false,
+        "message": "",
+        "revision": null
+      },
+      "visible": false,
+      "window_id": 36071
+    },
+    "focused": false,
+    "folded": true,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "issue56-b",
+    "instance": "dev-ae1520595bc95087ada44ff1",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<p>ISSUE56-B 관계없는 메모</p>\n",
+      "color": "#84fe83",
+      "edit_on_open": false,
+      "html": "<p>ISSUE56-B 관계없는 메모</p>\n",
+      "markdown": "ISSUE56-B 관계없는 메모",
+      "removed": false,
+      "revision": 5,
+      "source_path": null,
+      "status": "대기",
+      "title": "Agent Gibbon",
+      "updated_at": 1793867510711
+    },
+    "ok": true,
+    "opacity": 0.8,
+    "position": {
+      "x": 2000,
+      "y": 1100
+    },
+    "size": {
+      "height": 24,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 868.0,
+        "y": 354.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-ae1520595bc95087ada44ff1/docs/issue56-b/index.md",
+    "visible": false
+  }
+}

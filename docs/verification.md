@@ -1200,3 +1200,7 @@ Rust 84개·UI 53개 및 필수 검사는 통과했으나 실제 스모크는 op
 ## 터미널 CLI 탐색 개선 #17 — 2026-11-05
 
 변경 전 실제 앱에서 반복 셸 실행과 기존 터미널 조회 1.12초 대기를 재현했다. 성공 캐시·Codex 우선 단계별 fallback·창별 시작 예약·시간 제한과 복구를 구현했다. 잠금 해제 후 계측 없는 최종 앱의 실제 표시·네이티브 키·resize·숨김 복원과 느린 탐색 중 기존 입력·크기 변경·조회 응답을 확인했고, 제한 PATH 첫 창 1.587초 / 캐시 창 0.291초에서 로그인 셸은 총 1회였다. [전후 측정·검사 결과와 독립 미해결 범위](verification/terminal-discovery-20261105.md), [최종 앱 출처·화면·겹친 시간 구간](verification/terminal-discovery-unlocked-20261105/README.md)을 따른다. Draft PR #52는 감독의 병합 판단을 기다리며 이번 작업에서 병합하지 않는다.
+
+## 다중 메모 Toolbar 깜빡임 #56 — 2026-11-05
+
+창별 포인터 상태를 Rust 송신과 JavaScript 수신 양쪽에서 해당 창으로 제한했다. macOS ARM64에서 수정 전 421프레임 중 42개의 동시 표시를 재현했고, 수정 후 같은 조건의 421프레임에서 동시 표시 0개를 확인했다. Rust 94개·UI 54개, Rustfmt·Clippy·개발 빌드와 Chromium Toolbar 6조합 검사를 통과했다. 실제 편집·접힘·숨김·위치·포커스 보존 범위와 이미지·키보드·플랫폼별 한계는 [검증 출처와 영상](verification/issue56-toolbar/README.md)을 따른다. 기존 [Toolbar 기준](design-system.md#toolbar-롤오버--확정-2026-10-28)과 시안은 유지한다.

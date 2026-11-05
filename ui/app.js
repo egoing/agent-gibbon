@@ -281,7 +281,7 @@ $('content').addEventListener('click', (event) => { if (event.target.closest('a'
 // Native movement arrives even when WKWebView belongs to a background app.
 window.__TAURI__.event.listen('note-pointer-over', ({ payload }) => {
   document.body.classList.toggle('pointer-over', payload);
-}).catch(failure);
+}, { target: { kind: 'Window', label: win.label } }).catch(failure);
 window.__TAURI__.event.listen('layout-measure', () => { needsFit = true; refresh(false); }).catch(failure);
 refresh();
 

@@ -1,0 +1,337 @@
+{
+  "pid": 70404,
+  "frames": 421,
+  "a_visible_frames": 77,
+  "b_visible_frames": 174,
+  "both_visible_frames": [],
+  "front_pid": "16242",
+  "windows": {
+    "screens": [
+      {
+        "visible": [
+          0,
+          0,
+          2056,
+          1285
+        ],
+        "frame": [
+          0,
+          0,
+          2056,
+          1329
+        ],
+        "scale": 2
+      }
+    ],
+    "windows": [
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowNumber": 36063,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowOwnerPID": 70404,
+        "kCGWindowSharingState": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowBounds": {
+          "X": 1000,
+          "Height": 48,
+          "Y": 550,
+          "Width": 300
+        },
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowAlpha": 0.5,
+        "kCGWindowName": "Agent Gibbon [DEV egoing/issue-56 · ae152059] — issue56-b"
+      },
+      {
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowAlpha": 0.5,
+        "kCGWindowBounds": {
+          "X": 1000,
+          "Height": 48,
+          "Y": 500,
+          "Width": 300
+        },
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowName": "Agent Gibbon [DEV egoing/issue-56 · ae152059] — issue56-a",
+        "kCGWindowSharingState": 1,
+        "kCGWindowOwnerPID": 70404,
+        "kCGWindowNumber": 36062,
+        "kCGWindowStoreType": 1,
+        "kCGWindowIsOnscreen": true
+      },
+      {
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 1952,
+          "Height": 36,
+          "Y": 144,
+          "Width": 104
+        },
+        "kCGWindowAlpha": 0.5,
+        "kCGWindowOwnerPID": 70404,
+        "kCGWindowLayer": 5,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowNumber": 36068,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowStoreType": 1,
+        "kCGWindowName": "Agent Gibbon [DEV egoing/issue-56 · ae152059] — issue56-progress · Feedback"
+      },
+      {
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowName": "Agent Gibbon [DEV egoing/issue-56 · ae152059] — issue56-progress",
+        "kCGWindowSharingState": 1,
+        "kCGWindowAlpha": 0.5,
+        "kCGWindowOwnerPID": 70404,
+        "kCGWindowStoreType": 1,
+        "kCGWindowBounds": {
+          "X": 1756,
+          "Height": 100,
+          "Y": 44,
+          "Width": 300
+        },
+        "kCGWindowNumber": 36064
+      }
+    ]
+  },
+  "before": [
+    {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": false,
+      "content_height_cap": 48.0,
+      "dev_label": "DEV egoing/issue-56 · ae152059",
+      "feedback_active": false,
+      "feedback_surface": null,
+      "focused": false,
+      "folded": false,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "issue56-a",
+      "instance": "dev-ae1520595bc95087ada44ff1",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "capture": null,
+        "change_html": "<p>ISSUE56-A 포인터 검증용 메모</p>\n",
+        "color": "#89f0ff",
+        "edit_on_open": false,
+        "html": "<p>ISSUE56-A 포인터 검증용 메모</p>\n",
+        "markdown": "ISSUE56-A 포인터 검증용 메모",
+        "removed": false,
+        "revision": 5,
+        "source_path": null,
+        "status": "대기",
+        "title": "Agent Gibbon",
+        "updated_at": 1793867510594
+      },
+      "ok": true,
+      "opacity": 0.5,
+      "position": {
+        "x": 2000,
+        "y": 1000
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 868.0,
+          "y": 354.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-ae1520595bc95087ada44ff1/docs/issue56-a/index.md",
+      "visible": true
+    },
+    {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": false,
+      "content_height_cap": 48.0,
+      "dev_label": "DEV egoing/issue-56 · ae152059",
+      "feedback_active": false,
+      "feedback_surface": null,
+      "focused": false,
+      "folded": false,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "issue56-b",
+      "instance": "dev-ae1520595bc95087ada44ff1",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "capture": null,
+        "change_html": "<p>ISSUE56-B 관계없는 메모</p>\n",
+        "color": "#84fe83",
+        "edit_on_open": false,
+        "html": "<p>ISSUE56-B 관계없는 메모</p>\n",
+        "markdown": "ISSUE56-B 관계없는 메모",
+        "removed": false,
+        "revision": 5,
+        "source_path": null,
+        "status": "대기",
+        "title": "Agent Gibbon",
+        "updated_at": 1793867510711
+      },
+      "ok": true,
+      "opacity": 0.5,
+      "position": {
+        "x": 2000,
+        "y": 1100
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 868.0,
+          "y": 354.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-ae1520595bc95087ada44ff1/docs/issue56-b/index.md",
+      "visible": true
+    }
+  ],
+  "after": [
+    {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": false,
+      "content_height_cap": 48.0,
+      "dev_label": "DEV egoing/issue-56 · ae152059",
+      "feedback_active": false,
+      "feedback_surface": null,
+      "focused": false,
+      "folded": false,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "issue56-a",
+      "instance": "dev-ae1520595bc95087ada44ff1",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "capture": null,
+        "change_html": "<p>ISSUE56-A 포인터 검증용 메모</p>\n",
+        "color": "#89f0ff",
+        "edit_on_open": false,
+        "html": "<p>ISSUE56-A 포인터 검증용 메모</p>\n",
+        "markdown": "ISSUE56-A 포인터 검증용 메모",
+        "removed": false,
+        "revision": 5,
+        "source_path": null,
+        "status": "대기",
+        "title": "Agent Gibbon",
+        "updated_at": 1793867510594
+      },
+      "ok": true,
+      "opacity": 0.5,
+      "position": {
+        "x": 2000,
+        "y": 1000
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 868.0,
+          "y": 354.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-ae1520595bc95087ada44ff1/docs/issue56-a/index.md",
+      "visible": true
+    },
+    {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": false,
+      "content_height_cap": 48.0,
+      "dev_label": "DEV egoing/issue-56 · ae152059",
+      "feedback_active": false,
+      "feedback_surface": null,
+      "focused": false,
+      "folded": false,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "issue56-b",
+      "instance": "dev-ae1520595bc95087ada44ff1",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "capture": null,
+        "change_html": "<p>ISSUE56-B 관계없는 메모</p>\n",
+        "color": "#84fe83",
+        "edit_on_open": false,
+        "html": "<p>ISSUE56-B 관계없는 메모</p>\n",
+        "markdown": "ISSUE56-B 관계없는 메모",
+        "removed": false,
+        "revision": 5,
+        "source_path": null,
+        "status": "대기",
+        "title": "Agent Gibbon",
+        "updated_at": 1793867510711
+      },
+      "ok": true,
+      "opacity": 1.0,
+      "position": {
+        "x": 2000,
+        "y": 1100
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 868.0,
+          "y": 354.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-ae1520595bc95087ada44ff1/docs/issue56-b/index.md",
+      "visible": true
+    }
+  ]
+}
