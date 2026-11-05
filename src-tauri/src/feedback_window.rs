@@ -320,6 +320,23 @@ pub fn hide(parent: &WebviewWindow) {
     }
 }
 
+// A closed memo must not leave a companion attached to a destroyed native parent.
+pub fn destroy(parent: &WebviewWindow) -> Result<(), String> {
+    parent
+        .state::<Surfaces>()
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .remove(parent.label());
+    if let Some(child) = parent
+        .app_handle()
+        .get_webview_window(&label(parent.label()))
+    {
+        child.destroy().map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
 // Treat the visible companion as part of the memo's hover surface.
 #[cfg(target_os = "macos")]
 pub fn pointer_over(parent: &WebviewWindow) -> bool {

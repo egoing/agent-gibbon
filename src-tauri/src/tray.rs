@@ -232,7 +232,7 @@ fn template_icons(app: &tauri::AppHandle, menu: &Menu<tauri::Wry>) -> Result<(),
                 for index in 0..count {
                     let item: *mut AnyObject = msg_send![raw, itemAtIndex: index];
                     if let Some(Some(id)) = ids.get(index as usize) {
-                        let Ok(visible) = crate::window(&app_handle, id).and_then(|win| win.is_visible().map_err(|e| e.to_string())) else { continue; };
+                        let visible = app_handle.get_webview_window(&crate::label(id)).is_some_and(|win| win.is_visible().unwrap_or(false));
                         if visible {
                             // Remove the faded attributed title entirely so AppKit restores
                             // its normal text color, including selection highlighting.

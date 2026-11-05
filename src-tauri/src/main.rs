@@ -46,11 +46,6 @@ fn label(id: &str) -> String {
         format!("note-{id}")
     }
 }
-fn window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindow, String> {
-    app.get_webview_window(&label(id)).ok_or_else(|| {
-        format!("메모 창을 찾을 수 없습니다: {id}. 먼저 open --id {id}를 실행하세요")
-    })
-}
 fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindow, String> {
     let mut config = app.config().app.windows[0].clone();
     config.label = label(id);
@@ -258,6 +253,8 @@ fn close_note(window: tauri::WebviewWindow) -> Result<(), String> {
     let mut state = inspect_window(&window, &id, &note)?;
     state["visible"] = json!(false);
     state["closed"] = json!(true);
+    state["feedback_surface"] = Value::Null;
+    feedback_window::destroy(&window)?;
     app.state::<ClosedNotes>()
         .lock()
         .map_err(|e| e.to_string())?
