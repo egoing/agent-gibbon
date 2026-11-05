@@ -31,3 +31,51 @@ pub fn spawn(command: &mut Command) -> std::io::Result<Child> {
     }
     command.spawn()
 }
+
+// Inspect process identity only, never command lines or shell history.
+pub fn has_children(pid: u32) -> Option<bool> {
+    #[repr(C)]
+    struct Entry {
+        size: u32,
+        usage: u32,
+        pid: u32,
+        heap: usize,
+        module: u32,
+        threads: u32,
+        parent: u32,
+        priority: i32,
+        flags: u32,
+        exe: [u16; 260],
+    }
+    #[link(name = "kernel32")]
+    extern "system" {
+        fn CreateToolhelp32Snapshot(flags: u32, pid: u32) -> isize;
+        fn Process32FirstW(snapshot: isize, entry: *mut Entry) -> i32;
+        fn Process32NextW(snapshot: isize, entry: *mut Entry) -> i32;
+        fn CloseHandle(handle: isize) -> i32;
+    }
+    unsafe {
+        let snapshot = CreateToolhelp32Snapshot(2, 0);
+        if snapshot == -1 {
+            return None;
+        }
+        let mut entry: Entry = std::mem::zeroed();
+        entry.size = std::mem::size_of::<Entry>() as u32;
+        if Process32FirstW(snapshot, &mut entry) == 0 {
+            CloseHandle(snapshot);
+            return None;
+        }
+        let mut found = false;
+        loop {
+            if entry.parent == pid {
+                found = true;
+                break;
+            }
+            if Process32NextW(snapshot, &mut entry) == 0 {
+                break;
+            }
+        }
+        CloseHandle(snapshot);
+        Some(found)
+    }
+}

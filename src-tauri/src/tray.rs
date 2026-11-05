@@ -51,8 +51,19 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     menu.append(
         &MenuItem::with_id(
             app,
+            "capture-terminal",
+            "영역 터미널 · Ctrl+Shift+3",
+            true,
+            None::<&str>,
+        )
+        .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(
+            app,
             "capture-agent",
-            "영역 에이전트 터미널 · Ctrl+Shift+3",
+            "영역 에이전트 터미널",
             cfg!(target_os = "macos"),
             None::<&str>,
         )
@@ -84,9 +95,9 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         } else {
             format!("{title} ({id})")
         };
-        let visible = crate::window(app, id)?
-            .is_visible()
-            .map_err(|e| e.to_string())?;
+        let visible = app
+            .get_webview_window(&crate::label(id))
+            .is_some_and(|w| w.is_visible().unwrap_or(false));
 
         let bytes: &[u8] = if note.capture.is_some() {
             include_bytes!("../icons/tabler/photo.png")
@@ -110,7 +121,16 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
             &MenuItem::with_id(
                 app,
                 format!("agent:{}", agent.id),
-                format!("에이전트 터미널 ({})", agent.id),
+                format!(
+                    "[{}] {} ({})",
+                    if agent.kind == crate::terminal::Kind::Terminal {
+                        "터미널"
+                    } else {
+                        "에이전트"
+                    },
+                    agent.display_title(),
+                    agent.id
+                ),
                 true,
                 None::<&str>,
             )
@@ -149,9 +169,9 @@ pub fn sync_visibility(app: &tauri::AppHandle) -> Result<(), String> {
         for item in menu.items().map_err(|e| e.to_string())? {
             if let Some(check) = item.as_icon_menuitem() {
                 if let Some(id) = check.id().as_ref().strip_prefix("note:") {
-                    let visible = crate::window(app, id)?
-                        .is_visible()
-                        .map_err(|e| e.to_string())?;
+                    let visible = app
+                        .get_webview_window(&crate::label(id))
+                        .is_some_and(|w| w.is_visible().unwrap_or(false));
                     let notes = app.state::<AppNotes>();
                     let notes = notes.lock().map_err(|e| e.to_string())?;
                     if let Some(note) = notes.get(id) {
@@ -286,6 +306,9 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 Ok(())
             } else if event.id.as_ref() == "capture-text" {
                 crate::capture::trigger(app, crate::capture::SelectionMode::Text);
+                Ok(())
+            } else if event.id.as_ref() == "capture-terminal" {
+                crate::capture::trigger(app, crate::capture::SelectionMode::Terminal);
                 Ok(())
             } else if event.id.as_ref() == "capture-agent" {
                 crate::capture::trigger(app, crate::capture::SelectionMode::Agent);

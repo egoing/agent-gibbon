@@ -34,16 +34,12 @@ pub fn manager_notes(
         return Err("관리 창에서만 조회할 수 있습니다".into());
     }
     let notes = state.lock().map_err(|e| e.to_string())?;
-    Ok(Value::Array(
-        notes
-            .iter()
-            .map(|(id, note)| {
-                json!({
-                    "id": id, "title": display_title(note, id), "html": note.html, "capture": note.capture
-                })
-            })
-            .collect(),
-    ))
+    let mut rows: Vec<Value> = notes.iter().map(|(id,note)|json!({"id":id,"title":display_title(note,id),"html":note.html,"capture":note.capture})).collect();
+    drop(notes);
+    for agent in crate::terminal::entries(window.app_handle()) {
+        rows.push(json!({"id":agent.id,"title":agent.display_title(),"kind":agent.kind}));
+    }
+    Ok(Value::Array(rows))
 }
 
 #[tauri::command]
@@ -114,5 +110,25 @@ mod tests {
         assert_eq!(display_title(&note, "id"), "메타 제목");
         note.title.clear();
         assert_eq!(display_title(&note, "id"), "id");
+    }
+}
+
+#[tauri::command]
+pub fn manager_terminal(
+    window: tauri::WebviewWindow,
+    id: String,
+    action: String,
+) -> Result<(), String> {
+    if window.label() != LABEL {
+        return Err("관리 창에서만 사용할 수 있습니다".into());
+    }
+    let app = window.app_handle();
+    if !crate::terminal::contains(app, &id) {
+        return Err("터미널이 없습니다".into());
+    }
+    match action.as_str() {
+        "open" => crate::terminal::open(app, &id),
+        "delete" => crate::terminal::welcome::delete(app, &id),
+        _ => Err("지원하지 않는 동작입니다".into()),
     }
 }

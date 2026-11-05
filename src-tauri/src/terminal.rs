@@ -12,6 +12,7 @@ use std::{
 use tauri::{ipc::Channel, Manager, WebviewWindow};
 
 mod discovery;
+pub mod welcome;
 
 fn err(e: impl std::fmt::Display) -> String {
     e.to_string()
@@ -20,21 +21,78 @@ fn err(e: impl std::fmt::Display) -> String {
 pub struct Agent {
     pub id: String,
     pub bounds: crate::capture::ImageNote,
+    #[serde(default)]
+    pub kind: Kind,
+    #[serde(default)]
+    pub last_path: Option<PathBuf>,
+    #[serde(default)]
+    pub path_updated: u64,
+    #[serde(default)]
+    pub title: String,
+}
+#[derive(Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Kind {
+    #[default]
+    Agent,
+    Terminal,
+}
+impl Agent {
+    pub fn display_title(&self) -> String {
+        if !self.title.trim().is_empty() {
+            return self.title.clone();
+        }
+        if self.kind == Kind::Agent {
+            return "에이전트 터미널".into();
+        }
+        self.last_path
+            .as_ref()
+            .and_then(|p| p.file_name())
+            .map(|p| p.to_string_lossy().into_owned())
+            .unwrap_or_else(|| "터미널".into())
+    }
 }
 struct Session {
     master: Box<dyn MasterPty + Send>,
     writer: Box<dyn Write + Send>,
     child: Box<dyn Child + Send + Sync>,
     program: String,
-    found: discovery::Found,
+    found: Option<discovery::Found>,
 }
 impl Drop for Session {
     fn drop(&mut self) {
+        #[cfg(windows)]
+        if let Some(pid) = self
+            .child
+            .process_id()
+            .filter(|_| self.child.try_wait().ok().flatten().is_none())
+        {
+            let _ = std::process::Command::new("taskkill.exe")
+                .args(["/PID", &pid.to_string(), "/T", "/F"])
+                .output();
+        }
         #[cfg(unix)]
         if self.child.try_wait().ok().flatten().is_none() {
             if let Some(pid) = self.child.process_id() {
+                // Include background jobs: job-control shells give them separate groups.
+                if self.found.is_none() {
+                    if let Some(children) = welcome::descendants(pid) {
+                        for child in children.into_iter().rev() {
+                            unsafe {
+                                libc::kill(child, libc::SIGKILL);
+                            }
+                        }
+                    }
+                }
                 // portable-pty creates a new session; signal only our child group.
                 unsafe {
+                    if let Some(fg) = self
+                        .master
+                        .process_group_leader()
+                        .filter(|fg| *fg > 0 && *fg != pid as i32)
+                    {
+                        libc::kill(-fg, libc::SIGKILL);
+                    }
                     libc::kill(-(pid as i32), libc::SIGKILL);
                 }
             }
@@ -44,7 +102,7 @@ impl Drop for Session {
     }
 }
 enum Slot {
-    Starting,
+    Starting(u64),
     Running(Arc<Mutex<Session>>),
 }
 #[derive(Default)]
@@ -56,6 +114,7 @@ pub struct Terminals {
 struct Start<'a> {
     state: &'a Terminals,
     id: String,
+    token: u64,
 }
 impl<'a> Start<'a> {
     fn reserve(state: &'a Terminals, id: &str) -> Result<Self, String> {
@@ -63,15 +122,18 @@ impl<'a> Start<'a> {
         if sessions.contains_key(id) {
             return Err("이미 시작 중이거나 시작된 세션입니다. 창을 숨겼다가 복원하세요".into());
         }
-        sessions.insert(id.into(), Slot::Starting);
+        static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
+        let token = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        sessions.insert(id.into(), Slot::Starting(token));
         Ok(Self {
             state,
             id: id.into(),
+            token,
         })
     }
     fn finish(self, session: Session) -> Result<(), String> {
         let mut sessions = self.state.sessions.lock().map_err(err)?;
-        if !matches!(sessions.get(&self.id), Some(Slot::Starting)) {
+        if !matches!(sessions.get(&self.id), Some(Slot::Starting(token)) if *token == self.token) {
             return Err("터미널 시작이 취소되었습니다".into());
         }
         sessions.insert(
@@ -84,14 +146,14 @@ impl<'a> Start<'a> {
 impl Drop for Start<'_> {
     fn drop(&mut self) {
         let mut sessions = self.state.sessions.lock().unwrap();
-        if matches!(sessions.get(&self.id), Some(Slot::Starting)) {
+        if matches!(sessions.get(&self.id), Some(Slot::Starting(token)) if *token == self.token) {
             sessions.remove(&self.id);
         }
     }
 }
 fn running(slot: &Slot) -> Option<Arc<Mutex<Session>>> {
     match slot {
-        Slot::Starting => None,
+        Slot::Starting(_) => None,
         Slot::Running(s) => Some(s.clone()),
     }
 }
@@ -103,6 +165,7 @@ fn metadata(root: &Path) -> PathBuf {
 }
 fn valid_id(id: &str) -> bool {
     id.strip_prefix("agent-")
+        .or_else(|| id.strip_prefix("terminal-"))
         .is_some_and(|s| !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit()))
         && id.len() <= 64
 }
@@ -161,6 +224,10 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
     let agent = Agent {
         id: format!("agent-{stamp}"),
         bounds,
+        kind: Kind::Agent,
+        last_path: None,
+        path_updated: 0,
+        title: String::new(),
     };
     let cwd = root(app).join(&agent.id);
     // Refuse existing paths; never adopt someone else's project directory.
@@ -193,6 +260,7 @@ pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
         .get(id)
         .cloned()
         .ok_or("에이전트 창이 없습니다")?;
+    crate::focus::remember(app, id);
     let win = if let Some(win) = app.get_webview_window(id) {
         win
     } else {
@@ -245,9 +313,20 @@ pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     #[cfg(not(target_os = "macos"))]
     crate::stash::release(&win)?;
     win.show().map_err(err)?;
+    #[cfg(any(target_os = "macos", windows))]
+    crate::focus::restore(&win);
     Ok(())
 }
 pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
+    welcome::refresh_path(app, id)?;
+    let agent = app
+        .state::<Terminals>()
+        .agents
+        .lock()
+        .map_err(err)?
+        .get(id)
+        .cloned()
+        .ok_or("터미널 창이 없습니다")?;
     if !contains(app, id) {
         return Err("에이전트 창이 없습니다".into());
     }
@@ -272,7 +351,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         (None, None, None, false)
     };
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":"agent","title":"에이전트 터미널","cwd":root(app).join(id),"pid":pid,"program":program,"running":running,"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"title":agent.display_title(),"cwd":if agent.kind == Kind::Agent {Some(root(app).join(id))} else {agent.last_path.clone()},"last_path":agent.last_path,"bounds":agent.bounds,"pid":pid,"program":program,"running":running,"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
     )
 }
 pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value, String> {
@@ -314,7 +393,9 @@ fn observe_exit(session: &mut Session, discovery: &discovery::Discovery) -> Resu
     match session.child.try_wait().map_err(err)? {
         Some(status) => {
             if !status.success() {
-                discovery.invalidate(&session.found);
+                if let Some(found) = &session.found {
+                    discovery.invalidate(found);
+                }
             }
             Ok(false)
         }
@@ -344,7 +425,7 @@ fn start_session(
         writer: Box::new(std::io::sink()),
         child,
         program: found.program.clone(),
-        found,
+        found: Some(found),
     };
     let reader = session.master.try_clone_reader().map_err(err)?;
     session.writer = session.master.take_writer().map_err(err)?;
@@ -357,6 +438,7 @@ pub async fn terminal_start(
     cols: u16,
     rows: u16,
     output: Channel<Vec<u8>>,
+    choice: Option<String>,
 ) -> Result<Value, String> {
     let id = caller(&window)?;
     let app = window.app_handle().clone();
@@ -364,18 +446,34 @@ pub async fn terminal_start(
         let dimensions = size(cols, rows)?;
         let state = app.state::<Terminals>();
         let reservation = Start::reserve(&state, &id)?;
-        let (session, mut reader) =
-            start_session(&state.discovery, &root(&app).join(&id), dimensions)?;
+        let agent = state
+            .agents
+            .lock()
+            .map_err(err)?
+            .get(&id)
+            .cloned()
+            .ok_or("터미널 창이 없습니다")?;
+        let (session, mut reader) = if agent.kind == Kind::Terminal {
+            welcome::start(&agent, choice.as_deref().unwrap_or("shell"), dimensions)?
+        } else {
+            start_session(&state.discovery, &root(&app).join(&id), dimensions)?
+        };
         reservation.finish(session)?;
         let watched_app = app.clone();
         let watched_id = id.clone();
         // Raw bytes preserve UTF-8 across arbitrary PTY read boundaries.
         std::thread::spawn(move || {
+            #[cfg(windows)]
+            let mut directory_report = welcome::DirectoryReport::default();
             let mut bytes = [0u8; 8192];
             loop {
                 match reader.read(&mut bytes) {
                     Ok(0) | Err(_) => break,
                     Ok(n) => {
+                        #[cfg(windows)]
+                        for path in directory_report.feed(&bytes[..n]) {
+                            let _ = welcome::set_path(&watched_app, &watched_id, path);
+                        }
                         if output.send(bytes[..n].to_vec()).is_err() {
                             break;
                         }
@@ -469,6 +567,9 @@ pub fn geometry(window: &tauri::Window) {
     }
 }
 pub fn shutdown(app: &tauri::AppHandle) {
+    for agent in entries(app) {
+        let _ = welcome::refresh_path(app, &agent.id);
+    }
     app.state::<Terminals>().sessions.lock().unwrap().clear();
 }
 
@@ -490,7 +591,10 @@ mod tests {
     }
     #[test]
     fn existing_agent_metadata_stays_an_agent_without_path_history() {
-        let agent: Agent = serde_json::from_value(json!({"id":"agent-123","bounds":{"x":1.,"y":2.,"width":640.,"height":400.}})).unwrap();
+        let agent: Agent = serde_json::from_value(
+            json!({"id":"agent-123","bounds":{"x":1.,"y":2.,"width":640.,"height":400.}}),
+        )
+        .unwrap();
         let restored = serde_json::to_value(agent).unwrap();
         assert_eq!(restored.get("kind"), Some(&json!("agent")));
         assert!(restored.get("last_path").is_none_or(Value::is_null));
@@ -653,6 +757,10 @@ mod tests {
     fn metadata_does_not_claim_project_index() {
         let dir = tempfile::tempdir().unwrap();
         let a = Agent {
+            kind: Kind::Agent,
+            last_path: None,
+            path_updated: 0,
+            title: String::new(),
             id: "agent-123".into(),
             bounds: crate::capture::ImageNote {
                 x: 1.,
@@ -668,3 +776,5 @@ mod tests {
         assert_eq!(std::fs::read_to_string(index).unwrap(), "user project");
     }
 }
+
+pub use welcome::{create as create_terminal, request_close};

@@ -1,0 +1,637 @@
+//! Generic shell windows. Only a single last directory and presentation metadata persist.
+use super::*;
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
+
+fn now() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis() as u64
+}
+fn home() -> Result<PathBuf, String> {
+    std::env::var_os(if cfg!(windows) { "USERPROFILE" } else { "HOME" })
+        .map(PathBuf::from)
+        .filter(|p| p.is_dir())
+        .ok_or("홈 폴더를 찾을 수 없습니다".into())
+}
+fn latest(agents: impl Iterator<Item = Agent>) -> Option<PathBuf> {
+    agents
+        .filter(|a| a.kind == Kind::Terminal && a.last_path.as_ref().is_some_and(|p| p.is_dir()))
+        .max_by_key(|a| a.path_updated)
+        .and_then(|a| a.last_path)
+}
+pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Result<Value, String> {
+    let state = app.state::<Terminals>();
+    let last_path = latest(entries(app).into_iter());
+    let id = format!(
+        "terminal-{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map_err(err)?
+            .as_nanos()
+    );
+    let agent = Agent {
+        id: id.clone(),
+        bounds,
+        kind: Kind::Terminal,
+        last_path,
+        path_updated: 0,
+        title: String::new(),
+    };
+    save(&root(app), &agent)?;
+    state.agents.lock().map_err(err)?.insert(id.clone(), agent);
+    open(app, &id)?;
+    crate::tray::refresh(app)?;
+    inspect(app, &id)
+}
+fn executable(path: &Path) -> bool {
+    let Ok(meta) = path.metadata() else {
+        return false;
+    };
+    if !meta.is_file() {
+        return false;
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        meta.permissions().mode() & 0o111 != 0
+    }
+    #[cfg(not(unix))]
+    {
+        true
+    }
+}
+fn search_path() -> Vec<PathBuf> {
+    let mut paths: Vec<_> = std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
+        .filter(|p| p.is_absolute())
+        .collect();
+    if let Ok(home) = home() {
+        for suffix in [
+            ".local/bin",
+            ".cargo/bin",
+            ".npm-global/bin",
+            "AppData/Roaming/npm",
+        ] {
+            paths.push(home.join(suffix));
+        }
+    }
+    for path in ["/opt/homebrew/bin", "/usr/local/bin", "/usr/bin", "/bin"] {
+        paths.push(PathBuf::from(path));
+    }
+    paths
+}
+fn resolve(paths: &[PathBuf], name: &str) -> Option<PathBuf> {
+    let names = if cfg!(windows) {
+        vec![
+            format!("{name}.exe"),
+            format!("{name}.cmd"),
+            format!("{name}.bat"),
+        ]
+    } else {
+        vec![name.into()]
+    };
+    paths
+        .iter()
+        .flat_map(|p| names.iter().map(move |n| p.join(n)))
+        .find(|p| executable(p))
+}
+fn quote(value: &str) -> String {
+    format!(
+        "'{}'",
+        value.replace('\'', if cfg!(windows) { "''" } else { "'\\''" })
+    )
+}
+fn command(paths: &[PathBuf], choice: &str) -> Result<Option<String>, String> {
+    let (name, args) = match choice {
+        "shell" => return Ok(None),
+        "codex" => ("codex", ""),
+        "claude" => ("claude", ""),
+        "git" => ("git", " log --oneline --decorate -20"),
+        "htop" => ("htop", ""),
+        _ => return Err("지원하지 않는 실행 항목입니다".into()),
+    };
+    let path =
+        resolve(paths, name).ok_or("실행 파일을 찾을 수 없습니다. 설치 상태를 확인하세요")?;
+    Ok(Some(format!(
+        "{}{}{args}",
+        if cfg!(windows) { "& " } else { "" },
+        quote(&path.to_string_lossy())
+    )))
+}
+fn choices(paths: &[PathBuf]) -> Vec<Value> {
+    [
+        ("codex", "Codex"),
+        ("claude", "Claude Code"),
+        ("git", "Git 로그"),
+        ("htop", "htop"),
+    ]
+    .into_iter()
+    .filter_map(|(id, label)| {
+        command(paths, id)
+            .ok()
+            .flatten()
+            .map(|cmd| json!({"id":id,"label":label,"command":cmd}))
+    })
+    .collect()
+}
+fn generic(window: &WebviewWindow) -> Result<String, String> {
+    let id = caller(window)?;
+    if window
+        .state::<Terminals>()
+        .agents
+        .lock()
+        .map_err(err)?
+        .get(&id)
+        .is_none_or(|a| a.kind != Kind::Terminal)
+    {
+        return Err("범용 터미널에서만 사용할 수 있습니다".into());
+    }
+    Ok(id)
+}
+#[tauri::command]
+pub fn terminal_welcome(window: WebviewWindow) -> Result<Value, String> {
+    let id = generic(&window)?;
+    let info = inspect(window.app_handle(), &id)?;
+    Ok(json!({"info":info,"choices":choices(&search_path())}))
+}
+#[tauri::command]
+pub async fn terminal_folder(window: WebviewWindow) -> Result<Value, String> {
+    let id = generic(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        if app
+            .state::<Terminals>()
+            .sessions
+            .lock()
+            .map_err(err)?
+            .contains_key(&id)
+        {
+            return Err("실행 중에는 셸에서 폴더를 변경하세요".into());
+        }
+        if let Some(path) = app
+            .dialog()
+            .file()
+            .set_title("작업 폴더 선택")
+            .blocking_pick_folder()
+        {
+            let path = path.into_path().map_err(err)?;
+            set_path(&app, &id, path)?;
+        }
+        inspect(&app, &id)
+    })
+    .await
+    .map_err(err)?
+}
+pub(super) fn set_path(app: &tauri::AppHandle, id: &str, path: PathBuf) -> Result<(), String> {
+    if !path.is_absolute() || !path.is_dir() {
+        return Err("사용 가능한 폴더가 아닙니다".into());
+    }
+    let state = app.state::<Terminals>();
+    let mut agents = state.agents.lock().map_err(err)?;
+    let agent = agents.get_mut(id).ok_or("터미널 창이 없습니다")?;
+    if agent.kind != Kind::Terminal {
+        return Ok(());
+    }
+    if agent.last_path.as_ref() != Some(&path) {
+        agent.last_path = Some(path);
+        agent.path_updated = now();
+        save(&root(app), agent)?;
+    }
+    Ok(())
+}
+#[tauri::command]
+pub fn terminal_rename(window: WebviewWindow, title: String) -> Result<Value, String> {
+    let id = generic(&window)?;
+    if title.chars().count() > 120 || title.contains(['\n', '\r']) {
+        return Err("제목은 한 줄, 120자 이하여야 합니다".into());
+    }
+    {
+        let state = window.state::<Terminals>();
+        let mut agents = state.agents.lock().map_err(err)?;
+        let a = agents.get_mut(&id).ok_or("터미널 창이 없습니다")?;
+        a.title = title.trim().into();
+        save(&root(window.app_handle()), a)?;
+    }
+    crate::tray::refresh(window.app_handle())?;
+    inspect(window.app_handle(), &id)
+}
+#[cfg(target_os = "macos")]
+fn process_cwd(pid: u32) -> Option<PathBuf> {
+    use std::os::unix::ffi::OsStrExt;
+    let mut info: libc::proc_vnodepathinfo = unsafe { std::mem::zeroed() };
+    let size = std::mem::size_of_val(&info) as i32;
+    let count = unsafe {
+        libc::proc_pidinfo(
+            pid as i32,
+            libc::PROC_PIDVNODEPATHINFO,
+            0,
+            &mut info as *mut _ as *mut _,
+            size,
+        )
+    };
+    if count != size {
+        return None;
+    }
+    let bytes =
+        unsafe { std::ffi::CStr::from_ptr(info.pvi_cdir.vip_path.as_ptr().cast()) }.to_bytes();
+    Some(PathBuf::from(std::ffi::OsStr::from_bytes(bytes)))
+}
+#[cfg(target_os = "linux")]
+fn process_cwd(pid: u32) -> Option<PathBuf> {
+    std::fs::read_link(format!("/proc/{pid}/cwd")).ok()
+}
+#[cfg(not(any(target_os = "macos", target_os = "linux")))]
+fn process_cwd(_pid: u32) -> Option<PathBuf> {
+    None
+}
+pub(super) fn refresh_path(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+    let state = app.state::<Terminals>();
+    if state
+        .agents
+        .lock()
+        .map_err(err)?
+        .get(id)
+        .is_none_or(|a| a.kind != Kind::Terminal)
+    {
+        return Ok(());
+    }
+    let session = state
+        .sessions
+        .lock()
+        .map_err(err)?
+        .get(id)
+        .and_then(running);
+    if let Some(session) = session {
+        let mut s = session.lock().map_err(err)?;
+        if s.child.try_wait().map_err(err)?.is_none() {
+            if let Some(path) = s.child.process_id().and_then(process_cwd) {
+                drop(s);
+                set_path(app, id, path)?;
+            }
+        }
+    }
+    Ok(())
+}
+pub(super) fn start(
+    agent: &Agent,
+    choice: &str,
+    dimensions: PtySize,
+) -> Result<(Session, Box<dyn Read + Send>), String> {
+    let cwd = agent.last_path.clone().map(Ok).unwrap_or_else(home)?;
+    if !cwd.is_dir() {
+        return Err("마지막 폴더가 없습니다. 다른 폴더를 선택하세요".into());
+    }
+    let line = command(&search_path(), choice)?;
+    #[cfg(unix)]
+    let shell = std::env::var_os("SHELL")
+        .map(PathBuf::from)
+        .filter(|p| p.is_absolute() && executable(p))
+        .unwrap_or_else(|| PathBuf::from("/bin/sh"));
+    #[cfg(windows)]
+    let shell = PathBuf::from(std::env::var_os("SystemRoot").ok_or("SystemRoot가 없습니다")?)
+        .join("System32/WindowsPowerShell/v1.0/powershell.exe");
+    let pair = native_pty_system().openpty(dimensions).map_err(err)?;
+    let mut cmd = CommandBuilder::new(&shell);
+    cmd.cwd(&cwd);
+    cmd.env("TERM", "xterm-256color");
+    cmd.env_remove("NO_COLOR");
+    #[cfg(unix)]
+    {
+        cmd.arg("-i");
+    }
+    #[cfg(windows)]
+    {
+        cmd.args(["-NoLogo", "-NoExit", "-Command"]);
+        let prompt = "function global:prompt { [Console]::Write(([char]27 + ']777;gibbon-cwd;' + (Get-Location).Path + [char]7)); 'PS> ' }; ";
+        cmd.arg(format!("{prompt}{}", line.as_deref().unwrap_or("")));
+    }
+    let child = pair.slave.spawn_command(cmd).map_err(err)?;
+    drop(pair.slave);
+    let mut session = Session {
+        master: pair.master,
+        writer: Box::new(std::io::sink()),
+        child,
+        program: "shell".into(),
+        found: None,
+    };
+    let reader = session.master.try_clone_reader().map_err(err)?;
+    session.writer = session.master.take_writer().map_err(err)?;
+    #[cfg(unix)]
+    if let Some(line) = line {
+        session
+            .writer
+            .write_all(format!("{line}\r").as_bytes())
+            .map_err(err)?;
+        session.writer.flush().map_err(err)?;
+    }
+    Ok((session, reader))
+}
+fn busy(session: &mut Session) -> bool {
+    if session.child.try_wait().ok().flatten().is_some() {
+        return false;
+    }
+    #[cfg(unix)]
+    {
+        session
+            .child
+            .process_id()
+            .zip(session.master.process_group_leader())
+            .is_none_or(|(pid, fg)| {
+                pid as i32 != fg || descendants(pid).is_none_or(|children| !children.is_empty())
+            })
+    }
+    #[cfg(windows)]
+    {
+        session
+            .child
+            .process_id()
+            .and_then(crate::windows_process::has_children)
+            .unwrap_or(true)
+    }
+}
+#[tauri::command]
+pub fn terminal_close(window: WebviewWindow) -> Result<(), String> {
+    caller(&window)?;
+    request_close(&window)
+}
+pub fn request_close(window: &WebviewWindow) -> Result<(), String> {
+    let app = window.app_handle();
+    let id = window.label().to_string();
+    refresh_path(app, &id)?;
+    let session = app
+        .state::<Terminals>()
+        .sessions
+        .lock()
+        .map_err(err)?
+        .get(&id)
+        .and_then(running);
+    let needs_confirm = session
+        .as_ref()
+        .is_some_and(|s| busy(&mut s.lock().unwrap()));
+    if needs_confirm {
+        let app = app.clone();
+        app.clone()
+            .dialog()
+            .message("실행 중인 작업을 종료하고 창을 닫을까요?")
+            .title("터미널 종료")
+            .buttons(MessageDialogButtons::OkCancelCustom(
+                "종료".into(),
+                "취소".into(),
+            ))
+            .show(move |yes| {
+                if yes {
+                    let app2 = app.clone();
+                    let _ = app.run_on_main_thread(move || {
+                        let _ = finish_close(&app2, &id);
+                    });
+                }
+            });
+        Ok(())
+    } else {
+        finish_close(app, &id)
+    }
+}
+fn finish_close(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+    refresh_path(app, id)?;
+    if let Some(window) = app.get_webview_window(id) {
+        crate::stash::release(&window)?;
+        window.destroy().map_err(err)?;
+    }
+    app.state::<Terminals>()
+        .sessions
+        .lock()
+        .map_err(err)?
+        .remove(id);
+    crate::tray::refresh(app)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn agent(path: Option<PathBuf>, updated: u64) -> Agent {
+        Agent {
+            id: "terminal-1".into(),
+            bounds: crate::capture::ImageNote {
+                x: 1.,
+                y: 2.,
+                width: 720.,
+                height: 460.,
+            },
+            kind: Kind::Terminal,
+            last_path: path,
+            path_updated: updated,
+            title: String::new(),
+        }
+    }
+    #[test]
+    fn no_history_has_no_display_path_and_home_is_execution_fallback() {
+        let a = agent(None, 0);
+        assert!(a.last_path.is_none());
+        assert_eq!(a.display_title(), "터미널");
+        assert!(home().unwrap().is_dir());
+        assert!(latest([a].into_iter()).is_none());
+    }
+    #[test]
+    fn latest_valid_path_and_custom_title_are_independent() {
+        let a = tempfile::tempdir().unwrap();
+        let b = tempfile::tempdir().unwrap();
+        assert_eq!(
+            latest(
+                [
+                    agent(Some(a.path().into()), 1),
+                    agent(Some(b.path().into()), 2),
+                    agent(Some(a.path().join("missing")), 3)
+                ]
+                .into_iter()
+            ),
+            Some(b.path().into())
+        );
+        let mut a = agent(Some(a.path().into()), 1);
+        a.title = "내 제목".into();
+        assert_eq!(a.display_title(), "내 제목");
+    }
+    #[cfg(unix)]
+    #[test]
+    fn recommendations_do_not_execute_candidates_and_show_exact_quoted_command() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let bin = dir.path().join("path with ' quote");
+        std::fs::create_dir(&bin).unwrap();
+        for name in ["codex", "claude", "git", "htop"] {
+            let p = bin.join(name);
+            std::fs::write(&p, "#!/bin/sh\ntouch SHOULD_NOT_EXIST\n").unwrap();
+            std::fs::set_permissions(p, std::fs::Permissions::from_mode(0o700)).unwrap();
+        }
+        let list = choices(&[bin.clone()]);
+        assert_eq!(list.len(), 4);
+        assert!(list[0]["command"].as_str().unwrap().contains("'\\''"));
+        assert!(list[2]["command"]
+            .as_str()
+            .unwrap()
+            .ends_with(" log --oneline --decorate -20"));
+        assert!(!dir.path().join("SHOULD_NOT_EXIST").exists());
+        std::fs::set_permissions(bin.join("codex"), std::fs::Permissions::from_mode(0o600))
+            .unwrap();
+        assert_eq!(choices(&[bin]).len(), 3);
+        assert_eq!(command(&[], "shell").unwrap(), None);
+        assert!(command(&[], "resume").is_err());
+    }
+    #[cfg(unix)]
+    #[test]
+    fn shell_command_exit_returns_to_same_pty_and_cwd_is_observed() {
+        let dir = tempfile::tempdir().unwrap();
+        let a = agent(Some(dir.path().into()), 1);
+        let (mut session, mut reader) = start(&a, "shell", size(80, 24).unwrap()).unwrap();
+        let pid = session.child.process_id().unwrap();
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let mut bytes = [0; 4096];
+            while let Ok(n) = reader.read(&mut bytes) {
+                if n == 0 {
+                    break;
+                }
+                if tx
+                    .send(String::from_utf8_lossy(&bytes[..n]).into_owned())
+                    .is_err()
+                {
+                    break;
+                }
+            }
+        });
+        session.writer.write_all(b"/bin/sh -c 'exit 7'; printf '\\123\\110\\105\\114\\114\\137\\101\\114\\111\\126\\105\\n'\r").unwrap();
+        session.writer.flush().unwrap();
+        let deadline = Instant::now() + std::time::Duration::from_secs(5);
+        let mut output = String::new();
+        while !output.contains("SHELL_ALIVE") {
+            output.push_str(
+                &rx.recv_timeout(deadline.saturating_duration_since(Instant::now()))
+                    .unwrap(),
+            );
+        }
+        assert!(session.child.try_wait().unwrap().is_none());
+        assert_eq!(session.child.process_id(), Some(pid));
+        #[cfg(any(target_os = "macos", target_os = "linux"))]
+        assert_eq!(
+            process_cwd(pid).unwrap().canonicalize().unwrap(),
+            dir.path().canonicalize().unwrap()
+        );
+        session.master.resize(size(100, 30).unwrap()).unwrap();
+        assert_eq!(session.master.get_size().unwrap().cols, 100);
+        drop(session);
+    }
+}
+
+// Only the bounded directory control sequence is retained, never PTY transcript.
+#[cfg(any(windows, test))]
+#[derive(Default)]
+pub(super) struct DirectoryReport {
+    frame: Vec<u8>,
+    escape: bool,
+}
+#[cfg(any(windows, test))]
+impl DirectoryReport {
+    pub fn feed(&mut self, bytes: &[u8]) -> Vec<PathBuf> {
+        let mut paths = Vec::new();
+        for &byte in bytes {
+            if byte == 27 {
+                self.frame.clear();
+                self.escape = true;
+                continue;
+            }
+            if !self.escape {
+                continue;
+            }
+            if byte == 7 {
+                if let Some(raw) = self.frame.strip_prefix(b"]777;gibbon-cwd;") {
+                    if let Ok(path) = std::str::from_utf8(raw) {
+                        paths.push(PathBuf::from(path));
+                    }
+                }
+                self.frame.clear();
+                self.escape = false;
+            } else if self.frame.len() < 32768 {
+                self.frame.push(byte);
+            } else {
+                self.frame.clear();
+                self.escape = false;
+            }
+        }
+        paths
+    }
+}
+#[cfg(test)]
+mod report_tests {
+    use super::*;
+    #[test]
+    fn directory_control_sequence_survives_chunks_without_retaining_transcript() {
+        let mut parser = DirectoryReport::default();
+        assert!(parser.feed(b"private output and commands").is_empty());
+        assert!(parser.frame.is_empty());
+        assert!(parser.feed(b"\x1b]777;gibbon-cwd;C:\\work").is_empty());
+        assert_eq!(
+            parser.feed(b"\\project\x07other text"),
+            vec![PathBuf::from("C:\\work\\project")]
+        );
+        assert!(parser.frame.is_empty());
+        parser.feed(b"\x1b]");
+        parser.feed(&vec![b'x'; 40000]);
+        assert!(parser.frame.is_empty());
+    }
+}
+
+// List deletion is deliberately distinct from closing a window or hiding a session.
+pub fn delete(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+    let state = app.state::<Terminals>();
+    if state.sessions.lock().map_err(err)?.contains_key(id) {
+        return Err("먼저 터미널 창을 종료하세요".into());
+    }
+    let a = state
+        .agents
+        .lock()
+        .map_err(err)?
+        .get(id)
+        .cloned()
+        .ok_or("터미널이 없습니다")?;
+    if a.kind != Kind::Terminal {
+        return Err("기존 에이전트는 여기서 삭제하지 않습니다".into());
+    }
+    if let Some(w) = app.get_webview_window(id) {
+        crate::stash::release(&w)?;
+        w.destroy().map_err(err)?;
+    }
+    std::fs::remove_file(metadata(&root(app)).join(format!("{id}.json"))).map_err(err)?;
+    state.agents.lock().map_err(err)?.remove(id);
+    crate::tray::refresh(app)
+}
+
+#[cfg(unix)]
+pub(super) fn descendants(pid: u32) -> Option<Vec<i32>> {
+    let output = std::process::Command::new("/bin/ps")
+        .args(["-axo", "pid=,ppid="])
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let pairs: Vec<(i32, i32)> = String::from_utf8(output.stdout)
+        .ok()?
+        .lines()
+        .filter_map(|line| {
+            let mut parts = line.split_whitespace();
+            Some((parts.next()?.parse().ok()?, parts.next()?.parse().ok()?))
+        })
+        .collect();
+    let mut found = vec![pid as i32];
+    let mut index = 0;
+    while index < found.len() {
+        let parent = found[index];
+        for &(child, ppid) in &pairs {
+            if ppid == parent && !found.contains(&child) {
+                found.push(child)
+            }
+        }
+        index += 1;
+    }
+    found.remove(0);
+    Some(found)
+}
