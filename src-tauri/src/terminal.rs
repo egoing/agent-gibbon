@@ -22,6 +22,10 @@ fn err(e: impl std::fmt::Display) -> String {
 pub struct Agent {
     pub id: String,
     pub bounds: crate::capture::ImageNote,
+    // Older terminal metadata stores logical origins. New Windows selections
+    // and geometry use physical desktop origins; keep the distinction on disk.
+    #[serde(default)]
+    pub physical_position: bool,
     #[serde(default)]
     pub kind: Kind,
     #[serde(default)]
@@ -46,6 +50,17 @@ pub enum Kind {
     Terminal,
 }
 impl Agent {
+    fn position(&self) -> tauri::Position {
+        #[cfg(windows)]
+        if self.physical_position {
+            return tauri::PhysicalPosition::new(
+                self.bounds.x.round() as i32,
+                self.bounds.y.round() as i32,
+            )
+            .into();
+        }
+        tauri::LogicalPosition::new(self.bounds.x, self.bounds.y).into()
+    }
     pub fn display_title(&self) -> String {
         if !self.title.trim().is_empty() {
             return self.title.clone();
@@ -253,6 +268,7 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
     let agent = Agent {
         id: format!("agent-{stamp}"),
         bounds,
+        physical_position: cfg!(windows),
         kind: Kind::Agent,
         last_path: None,
         recent_paths: Vec::new(),
@@ -294,45 +310,62 @@ pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     let win = if let Some(win) = app.get_webview_window(id) {
         win
     } else {
-        tauri::WebviewWindowBuilder::new(app, id, tauri::WebviewUrl::App("terminal.html".into()))
-            .on_web_resource_request(|_, response| {
-                // xterm generates cell/theme CSS at runtime. Scope this exception
-                // to terminal WebViews; script policy and memo windows stay strict.
-                if let Some(header) = response.headers_mut().get_mut("Content-Security-Policy") {
-                    if let Ok(policy) = header.to_str() {
-                        let mut directives: std::collections::HashMap<
-                            String,
-                            tauri::utils::config::CspDirectiveSources,
-                        > = tauri::utils::config::Csp::Policy(policy.into()).into();
-                        directives.insert(
-                            "style-src".into(),
-                            tauri::utils::config::CspDirectiveSources::List(vec![
-                                "'self'".into(),
-                                "'unsafe-inline'".into(),
-                            ]),
-                        );
-                        if let Ok(value) = tauri::utils::config::Csp::from(directives)
-                            .to_string()
-                            .parse()
-                        {
-                            *header = value;
-                        }
+        let window = tauri::WebviewWindowBuilder::new(
+            app,
+            id,
+            tauri::WebviewUrl::App("terminal.html".into()),
+        )
+        .on_web_resource_request(|_, response| {
+            // xterm generates cell/theme CSS at runtime. Scope this exception
+            // to terminal WebViews; script policy and memo windows stay strict.
+            if let Some(header) = response.headers_mut().get_mut("Content-Security-Policy") {
+                if let Ok(policy) = header.to_str() {
+                    let mut directives: std::collections::HashMap<
+                        String,
+                        tauri::utils::config::CspDirectiveSources,
+                    > = tauri::utils::config::Csp::Policy(policy.into()).into();
+                    directives.insert(
+                        "style-src".into(),
+                        tauri::utils::config::CspDirectiveSources::List(vec![
+                            "'self'".into(),
+                            "'unsafe-inline'".into(),
+                        ]),
+                    );
+                    if let Ok(value) = tauri::utils::config::Csp::from(directives)
+                        .to_string()
+                        .parse()
+                    {
+                        *header = value;
                     }
                 }
-            })
-            .title(format!("{} — {id}", crate::instance::current().title()))
-            .decorations(false)
-            .resizable(true)
-            .min_inner_size(2.0, 2.0)
-            .inner_size(agent.bounds.width, agent.bounds.height)
-            .position(agent.bounds.x, agent.bounds.y)
-            .always_on_top(true)
-            .skip_taskbar(true)
-            .visible(false)
-            .focused(false)
-            .background_throttling(tauri::utils::config::BackgroundThrottlingPolicy::Disabled)
-            .build()
-            .map_err(err)?
+            }
+        })
+        .title(format!("{} — {id}", crate::instance::current().title()))
+        .decorations(false)
+        .resizable(true)
+        .min_inner_size(2.0, 2.0)
+        .inner_size(agent.bounds.width, agent.bounds.height)
+        .always_on_top(true)
+        .skip_taskbar(true)
+        .visible(false)
+        .focused(false)
+        .background_throttling(tauri::utils::config::BackgroundThrottlingPolicy::Disabled)
+        .build()
+        .map_err(err)?;
+        // Position before showing. Legacy logical origins remain compatible;
+        // captured Windows origins are already physical desktop coordinates.
+        window.set_position(agent.position()).map_err(err)?;
+        #[cfg(windows)]
+        {
+            // Size using the target monitor's DPI after positioning.
+            window
+                .set_size(tauri::LogicalSize::new(
+                    agent.bounds.width,
+                    agent.bounds.height,
+                ))
+                .map_err(err)?;
+        }
+        window
     };
     // User explicitly opens a terminal, but background CLI/tray restore preserves focus.
     #[cfg(target_os = "macos")]
@@ -608,11 +641,12 @@ pub fn geometry(window: &tauri::Window) {
             window.scale_factor(),
         ) {
             agent.bounds = crate::capture::ImageNote {
-                x: f64::from(p.x) / scale,
-                y: f64::from(p.y) / scale,
+                x: f64::from(p.x) / if cfg!(windows) { 1.0 } else { scale },
+                y: f64::from(p.y) / if cfg!(windows) { 1.0 } else { scale },
                 width: f64::from(s.width) / scale,
                 height: f64::from(s.height) / scale,
             };
+            agent.physical_position = cfg!(windows);
             let _ = save(&root(app), agent);
         }
     }
@@ -627,6 +661,23 @@ pub fn shutdown(app: &tauri::AppHandle) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn legacy_logical_and_windows_physical_origins_survive_restore() {
+        let legacy = json!({"id":"terminal-123","bounds":{"x":-1600.,"y":240.,"width":720.,"height":460.},"kind":"terminal"});
+        let mut agent: Agent = serde_json::from_value(legacy).unwrap();
+        assert!(!agent.physical_position);
+        let old: tauri::PhysicalPosition<i32> = agent.position().to_physical(1.25);
+        assert_eq!((old.x, old.y), (-2000, 300));
+        agent.physical_position = true;
+        let restored: Agent = serde_json::from_value(serde_json::to_value(agent).unwrap()).unwrap();
+        assert!(restored.physical_position);
+        assert_eq!((restored.bounds.x, restored.bounds.y), (-1600., 240.));
+        #[cfg(windows)]
+        for scale in [1.0, 1.25, 1.5, 2.0] {
+            let position: tauri::PhysicalPosition<i32> = restored.position().to_physical(scale);
+            assert_eq!((position.x, position.y), (-1600, 240));
+        }
+    }
     #[test]
     fn approved_recent_folders_survive_metadata_roundtrip() {
         let value = json!({"id":"terminal-123","bounds":{"x":0.,"y":0.,"width":720.,"height":460.},"kind":"terminal","recent_paths":[{"path":"/tmp/project","updated":42}]});
@@ -815,6 +866,7 @@ mod tests {
     fn metadata_does_not_claim_project_index() {
         let dir = tempfile::tempdir().unwrap();
         let a = Agent {
+            physical_position: false,
             kind: Kind::Agent,
             last_path: None,
             recent_paths: Vec::new(),

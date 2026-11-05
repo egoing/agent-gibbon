@@ -33,6 +33,7 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
     let agent = Agent {
         id: id.clone(),
         bounds,
+        physical_position: cfg!(windows),
         kind: Kind::Terminal,
         last_path,
         recent_paths: Vec::new(),
@@ -553,6 +554,7 @@ mod tests {
     use super::*;
     fn agent(path: Option<PathBuf>, updated: u64) -> Agent {
         Agent {
+            physical_position: false,
             id: "terminal-1".into(),
             bounds: crate::capture::ImageNote {
                 x: 1.,

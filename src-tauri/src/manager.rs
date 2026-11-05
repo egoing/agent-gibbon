@@ -113,7 +113,10 @@ mod tests {
     }
 }
 
-#[tauri::command]
+// A closed terminal needs a new WebView; never build it from WebView2's
+// synchronous IPC callback on Windows.
+#[cfg_attr(windows, tauri::command(async))]
+#[cfg_attr(not(windows), tauri::command)]
 pub fn manager_terminal(
     window: tauri::WebviewWindow,
     id: String,

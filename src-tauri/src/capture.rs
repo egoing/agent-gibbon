@@ -5,7 +5,7 @@ use std::{
     collections::BTreeMap,
     io::Cursor,
     sync::{
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicU64, Ordering},
         Mutex,
     },
 };
@@ -103,6 +103,22 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
     Ok(())
 }
 static LAUNCH_QUEUED: AtomicBool = AtomicBool::new(false);
+static NEXT_SELECTION: AtomicU64 = AtomicU64::new(1);
+// Windows lifecycle work runs on blocking workers only. Never acquire this
+// mutex from capture_ready, a native event, or another UI-thread callback.
+#[cfg(windows)]
+static LIFECYCLE: Mutex<()> = Mutex::new(());
+#[cfg(windows)]
+async fn lifecycle(
+    work: impl FnOnce() -> Result<(), String> + Send + 'static,
+) -> Result<(), String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        let _operation = LIFECYCLE.lock().map_err(err)?;
+        work()
+    })
+    .await
+    .map_err(err)?
+}
 
 pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
     trace("trigger");
@@ -113,21 +129,31 @@ pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
     // from another thread wakes the event loop even when the mouse stays still.
     let app = app.clone();
     std::thread::spawn(move || {
-        let handle = app.clone();
-        if app
-            .run_on_main_thread(move || {
-                launch(&handle, mode);
-                LAUNCH_QUEUED.store(false, Ordering::Release);
-            })
-            .is_err()
+        #[cfg(windows)]
         {
+            if let Ok(_operation) = LIFECYCLE.lock() {
+                launch(&app, mode);
+            }
             LAUNCH_QUEUED.store(false, Ordering::Release);
+        }
+        #[cfg(not(windows))]
+        {
+            let handle = app.clone();
+            if app
+                .run_on_main_thread(move || {
+                    launch(&handle, mode);
+                    LAUNCH_QUEUED.store(false, Ordering::Release);
+                })
+                .is_err()
+            {
+                LAUNCH_QUEUED.store(false, Ordering::Release);
+            }
         }
     });
 }
 fn launch(app: &tauri::AppHandle, mode: SelectionMode) {
     if let Err(error) = begin(app, mode) {
-        cleanup(app);
+        let _ = cleanup_before_create(app);
         if let Some(tray) = app.tray_by_id("agent-gibbon") {
             let _ = tray.set_tooltip(Some(format!(
                 "화면 캡처 실패: {error}. 화면 기록 권한을 확인하세요."
@@ -162,6 +188,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
     }
     // Capture every display before creating any overlays, so dimming never enters the PNG.
     let mut screens = BTreeMap::new();
+    let generation = NEXT_SELECTION.fetch_add(1, Ordering::Relaxed);
     for (index, monitor) in xcap::Monitor::all().map_err(err)?.into_iter().enumerate() {
         let scale = if cfg!(target_os = "macos") {
             1.0
@@ -169,7 +196,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
             f64::from(monitor.scale_factor().map_err(err)?)
         };
         screens.insert(
-            format!("capture-{index}"),
+            format!("capture-{generation}-{index}"),
             Screen {
                 mode,
                 ready: false,
@@ -220,7 +247,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
     }
     Ok(())
 }
-fn set_position(win: &WebviewWindow, x: f64, y: f64) -> Result<(), String> {
+fn selection_position(x: f64, y: f64) -> tauri::Position {
     #[cfg(target_os = "macos")]
     let position = tauri::Position::Logical(tauri::LogicalPosition::new(x, y));
     #[cfg(not(target_os = "macos"))]
@@ -228,7 +255,10 @@ fn set_position(win: &WebviewWindow, x: f64, y: f64) -> Result<(), String> {
         x.round() as i32,
         y.round() as i32,
     ));
-    win.set_position(position).map_err(err)
+    position
+}
+fn set_position(win: &WebviewWindow, x: f64, y: f64) -> Result<(), String> {
+    win.set_position(selection_position(x, y)).map_err(err)
 }
 fn cleanup(app: &tauri::AppHandle) {
     for win in app
@@ -244,13 +274,73 @@ fn cleanup(app: &tauri::AppHandle) {
         screens.clear();
     }
 }
-#[tauri::command]
-pub fn cancel_capture(window: WebviewWindow) -> Result<(), String> {
+// destroy() only queues native destruction. WebView2 creation pumps window
+// messages. A stall recurred after the first async change, so also order old
+// overlay destruction before the next build. Destroyed listeners run before
+// WebviewWrapper::drop; the worker queues the next creation event, which Tao
+// handles after completing destruction. No UI callback waits on this barrier.
+#[cfg(windows)]
+fn cleanup_before_create(app: &tauri::AppHandle) -> Result<(), String> {
+    let mut pending = Vec::new();
+    for window in app
+        .webview_windows()
+        .into_values()
+        .filter(|w| w.label().starts_with("capture-"))
+    {
+        let (tx, rx) = std::sync::mpsc::channel();
+        window.on_window_event(move |event| {
+            if matches!(event, tauri::WindowEvent::Destroyed) {
+                let _ = tx.send(());
+            }
+        });
+        pending.push(rx);
+    }
+    cleanup(app);
+    wait_for_cleanup(pending, std::time::Duration::from_secs(5))
+}
+#[cfg(any(windows, test))]
+fn wait_for_cleanup(
+    pending: Vec<std::sync::mpsc::Receiver<()>>,
+    timeout: std::time::Duration,
+) -> Result<(), String> {
+    let deadline = std::time::Instant::now() + timeout;
+    for rx in pending {
+        rx.recv_timeout(deadline.saturating_duration_since(std::time::Instant::now()))
+            .map_err(|_| "영역 선택 창 종료를 확인하지 못했습니다. 다시 시도하세요".to_string())?;
+    }
+    Ok(())
+}
+#[cfg(not(windows))]
+fn cleanup_before_create(app: &tauri::AppHandle) -> Result<(), String> {
+    cleanup(app);
+    Ok(())
+}
+fn cancel_selection(window: WebviewWindow) -> Result<(), String> {
     if !window.label().starts_with("capture-") {
         return Err("캡처 창이 아닙니다".into());
     }
-    cleanup(window.app_handle());
-    Ok(())
+    // Delayed cancel/failure from a prior generation must not erase a newer
+    // selection. Every overlay label includes its generation.
+    if !window
+        .state::<Captures>()
+        .0
+        .lock()
+        .map_err(err)?
+        .contains_key(window.label())
+    {
+        return Ok(());
+    }
+    cleanup_before_create(window.app_handle())
+}
+#[cfg(windows)]
+#[tauri::command]
+pub async fn cancel_capture(window: WebviewWindow) -> Result<(), String> {
+    lifecycle(move || cancel_selection(window)).await
+}
+#[cfg(not(windows))]
+#[tauri::command]
+pub fn cancel_capture(window: WebviewWindow) -> Result<(), String> {
+    cancel_selection(window)
 }
 #[tauri::command]
 pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
@@ -303,13 +393,22 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
     }
     Ok(())
 }
-#[tauri::command]
-pub fn capture_failed(window: WebviewWindow) -> Result<(), String> {
-    cancel_capture(window.clone())?;
+fn failed_selection(window: WebviewWindow) -> Result<(), String> {
+    cancel_selection(window.clone())?;
     if let Some(tray) = window.app_handle().tray_by_id("agent-gibbon") {
         let _ = tray.set_tooltip(Some("화면 이미지 로딩 실패. 캡처를 다시 실행하세요."));
     }
     Ok(())
+}
+#[cfg(windows)]
+#[tauri::command]
+pub async fn capture_failed(window: WebviewWindow) -> Result<(), String> {
+    lifecycle(move || failed_selection(window)).await
+}
+#[cfg(not(windows))]
+#[tauri::command]
+pub fn capture_failed(window: WebviewWindow) -> Result<(), String> {
+    failed_selection(window)
 }
 #[tauri::command]
 pub fn capture_screen(window: WebviewWindow) -> Result<tauri::ipc::Response, String> {
@@ -355,6 +454,18 @@ fn crop_rect(
     let bottom = ((y + h) * sy).ceil().min(f64::from(pixels.1)) as u32;
     Ok((left, top, right - left, bottom - top))
 }
+#[cfg(windows)]
+#[tauri::command]
+pub async fn finish_capture(
+    window: WebviewWindow,
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+) -> Result<(), String> {
+    lifecycle(move || finish_selection(window, x, y, width, height)).await
+}
+#[cfg(not(windows))]
 #[tauri::command]
 pub fn finish_capture(
     window: WebviewWindow,
@@ -363,13 +474,24 @@ pub fn finish_capture(
     width: f64,
     height: f64,
 ) -> Result<(), String> {
+    finish_selection(window, x, y, width, height)
+}
+fn finish_selection(
+    window: WebviewWindow,
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+) -> Result<(), String> {
     let app = window.app_handle();
+    // Window getters can wait for the UI thread on Windows. Do not hold the
+    // capture state while waiting: capture_ready/cancel use it on that thread.
+    let scale = window.scale_factor().map_err(err)?;
     let (bytes, bounds, mode) = {
         let state = app.state::<Captures>();
         let screens = state.0.lock().map_err(err)?;
         let s = screens.get(window.label()).ok_or("캡처가 종료되었습니다")?;
         let (px, py, pw, ph) = crop_rect(&s.bounds, s.image.dimensions(), [x, y, width, height])?;
-        let scale = window.scale_factor().map_err(err)?;
         let offset = if cfg!(target_os = "macos") {
             1.0
         } else {
@@ -393,7 +515,7 @@ pub fn finish_capture(
         )
     };
     // Restore the previous app before the new editor deliberately takes focus.
-    cleanup(app);
+    cleanup_before_create(app)?;
     if mode == SelectionMode::Terminal {
         return crate::terminal::create_terminal(app, bounds).map(|_| ());
     }
@@ -545,6 +667,61 @@ pub fn copy_note_image(window: WebviewWindow) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(windows)]
+    #[test]
+    fn lifecycle_errors_release_the_gate_without_dropping_next_cleanup() {
+        let caller = std::thread::current().id();
+        let failed = tauri::async_runtime::block_on(lifecycle(move || {
+            assert_ne!(std::thread::current().id(), caller);
+            Err("synthetic initialization failure".into())
+        }));
+        assert!(failed.is_err());
+        let cleaned = std::sync::Arc::new(AtomicBool::new(false));
+        let result = cleaned.clone();
+        tauri::async_runtime::block_on(lifecycle(move || {
+            result.store(true, Ordering::Relaxed);
+            Ok(())
+        }))
+        .unwrap();
+        assert!(cleaned.load(Ordering::Relaxed));
+    }
+    #[test]
+    fn transition_waits_for_every_destroyed_window() {
+        use std::{sync::mpsc, time::Duration};
+        let (first, first_done) = mpsc::sync_channel(0);
+        let (second, second_done) = mpsc::sync_channel(0);
+        let (created, result) = mpsc::channel();
+        let worker = std::thread::spawn(move || {
+            let completed = wait_for_cleanup(vec![first_done, second_done], Duration::from_secs(2));
+            created.send(completed).unwrap();
+        });
+        first.send(()).unwrap();
+        assert!(matches!(result.try_recv(), Err(mpsc::TryRecvError::Empty)));
+        second.send(()).unwrap();
+        result
+            .recv_timeout(Duration::from_secs(2))
+            .unwrap()
+            .unwrap();
+        worker.join().unwrap();
+    }
+    #[test]
+    fn transition_does_not_continue_after_missing_destroy_acknowledgment() {
+        use std::{sync::mpsc, time::Duration};
+        let (tx, rx) = mpsc::channel();
+        assert!(wait_for_cleanup(vec![rx], Duration::ZERO).is_err());
+        drop(tx);
+        let (tx, rx) = mpsc::channel();
+        drop(tx);
+        assert!(wait_for_cleanup(vec![rx], Duration::from_secs(2)).is_err());
+    }
+    #[test]
+    fn selected_origin_keeps_desktop_coordinate_units() {
+        let position = selection_position(-1599.6, 240.4);
+        #[cfg(target_os = "macos")]
+        assert!(matches!(position, tauri::Position::Logical(p) if p.x == -1599.6 && p.y == 240.4));
+        #[cfg(not(target_os = "macos"))]
+        assert!(matches!(position, tauri::Position::Physical(p) if p.x == -1600 && p.y == 240));
+    }
     #[test]
     fn clipboard_png_decode_preserves_rgba_and_dimensions() {
         let pixels = vec![255, 0, 40, 255, 0, 200, 70, 128];
