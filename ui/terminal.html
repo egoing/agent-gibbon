@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>에이전트 터미널</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="vendor/xterm.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="terminal.css"></head><body><div id="memo-surface"><header><span id="title">에이전트 터미널</span></header><div id="controls" role="toolbar" aria-label="Toolbar">
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>터미널</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="vendor/xterm.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="terminal.css"></head><body><div id="memo-surface"><header><span id="title">터미널</span></header><div id="controls" role="toolbar" aria-label="Toolbar">
 <button id="toolbar-previous" aria-label="이전 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
 <div id="toolbar-items">
 <span id="dev-instance" hidden></span>
@@ -12,5 +12,12 @@
 </div>
 <button id="toolbar-next" aria-label="다음 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
 </div>
-<div id="status" role="status">설치된 에이전트를 찾고 있습니다…</div><main id="terminal" aria-label="에이전트 터미널"></main></div><div class="resize" data-direction="North" id="n"></div><div class="resize" data-direction="South" id="s"></div><div class="resize" data-direction="East" id="e"></div><div class="resize" data-direction="West" id="w"></div><div class="resize corner" data-direction="NorthWest" id="nw"></div><div class="resize corner" data-direction="NorthEast" id="ne"></div><div class="resize corner" data-direction="SouthWest" id="sw"></div><div class="resize corner" data-direction="SouthEast" id="se"></div>
+<section id="welcome" hidden aria-label="Welcome">
+<h1>Welcome</h1><p>이 폴더에서 시작할 작업을 선택하세요.</p>
+<div class="folder-row"><span id="work-path" hidden></span><button id="choose-folder">폴더 선택</button></div>
+<div id="recommendations" aria-label="설치된 앱"></div>
+<button id="open-shell">셸 열기</button>
+<details><summary>실행 명령 확인</summary><pre id="commands"></pre></details>
+<form id="rename-form"><label for="rename-title">창 제목</label><input id="rename-title" maxlength="120" placeholder="폴더명 사용"><button type="submit">제목 변경</button></form>
+</section><div id="status" role="status"></div><main id="terminal" aria-label="에이전트 터미널"></main></div><div class="resize" data-direction="North" id="n"></div><div class="resize" data-direction="South" id="s"></div><div class="resize" data-direction="East" id="e"></div><div class="resize" data-direction="West" id="w"></div><div class="resize corner" data-direction="NorthWest" id="nw"></div><div class="resize corner" data-direction="NorthEast" id="ne"></div><div class="resize corner" data-direction="SouthWest" id="sw"></div><div class="resize corner" data-direction="SouthEast" id="se"></div>
 <script src="vendor/xterm.js"></script><script src="vendor/addon-fit.js"></script><script src="terminal-ime.js"></script><script src="terminal.js"></script><script type="module" src="toolbar.js"></script></body></html>

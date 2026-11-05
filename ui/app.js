@@ -234,7 +234,7 @@ for (const grip of document.querySelectorAll('.resize')) {
   });
 }
 $('pin').addEventListener('click', () => invoke('toggle_pin').catch(failure));
-$('close').addEventListener('click', () => invoke('hide_note').catch(failure));
+$('close').addEventListener('click', () => invoke('close_note').catch(failure));
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     event.preventDefault();

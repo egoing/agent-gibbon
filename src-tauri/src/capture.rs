@@ -24,6 +24,7 @@ pub enum SelectionMode {
     Image,
     Text,
     Agent,
+    Terminal,
 }
 struct Screen {
     mode: SelectionMode,
@@ -89,12 +90,11 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
     {
         eprintln!("영역 메모 단축키 등록 실패 (메뉴에서 실행 가능): {error}");
     }
-    #[cfg(target_os = "macos")]
     if let Err(error) = app
         .global_shortcut()
         .on_shortcut("Ctrl+Shift+3", |app, _, event| {
             if event.state() == ShortcutState::Pressed {
-                trigger(app, SelectionMode::Agent);
+                trigger(app, SelectionMode::Terminal);
             }
         })
     {
@@ -200,6 +200,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
             SelectionMode::Image => "영역 캡처 — Escape로 취소",
             SelectionMode::Text => "빈 메모 영역 선택 — Escape로 취소",
             SelectionMode::Agent => "에이전트 터미널 영역 선택 — Escape로 취소",
+            SelectionMode::Terminal => "터미널 영역 선택 — Escape로 취소",
         })
         .decorations(false)
         .resizable(false)
@@ -393,6 +394,9 @@ pub fn finish_capture(
     };
     // Restore the previous app before the new editor deliberately takes focus.
     cleanup(app);
+    if mode == SelectionMode::Terminal {
+        return crate::terminal::create_terminal(app, bounds).map(|_| ());
+    }
     if mode == SelectionMode::Agent {
         return crate::terminal::create(app, bounds).map(|_| ());
     }

@@ -3,7 +3,8 @@
   "windows": [
     "main",
     "note-*",
-    "agent-*"
+    "agent-*",
+    "terminal-*"
   ],
   "permissions": [
     "core:window:allow-start-dragging",

@@ -6,7 +6,7 @@ const terminal = new Terminal({fontSize:13,fontFamily:'Menlo, Monaco, monospace'
 const fit = new FitAddon.FitAddon();
 terminal.loadAddon(fit);
 terminal.open(document.getElementById('terminal'));
-let started=false, input=Promise.resolve(), resizeTimer;
+let started=false, starting=false, generic=false, input=Promise.resolve(), resizeTimer;
 function report(e){status.textContent=String(e);}
 function measure(){if(innerWidth<20||innerHeight<60)return;fit.fit();if(started)invoke('terminal_resize',{cols:terminal.cols,rows:terminal.rows}).catch(report);}
 new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(measure,60);}).observe(document.getElementById('terminal'));
@@ -34,17 +34,42 @@ document.getElementById('terminal').addEventListener('pointerdown', e => {
 });
 document.querySelector('header').addEventListener('pointerdown',e=>{if(e.button===0&&!e.target.closest('button'))win.startDragging().catch(report);});
 document.querySelectorAll('.resize').forEach(handle=>handle.addEventListener('pointerdown',e=>{if(e.button===0)win.startResizeDragging(handle.dataset.direction).catch(report);}));
-document.getElementById('close').onclick=()=>invoke('terminal_hide').catch(report);
+document.getElementById('close').onclick=()=>invoke(generic?'terminal_close':'terminal_hide').catch(report);
+function setInfo(info){
+  document.getElementById('title').textContent=info.title;
+  const path=document.getElementById('work-path');path.hidden=!info.last_path;path.textContent=info.last_path||'';
+}
+async function start(choice){
+  if(started||starting)return;
+  starting=true;
+  document.getElementById('welcome').hidden=true;
+  document.getElementById('terminal').hidden=false;measure();
+  const output=new Channel();output.onmessage=bytes=>terminal.write(new Uint8Array(bytes));
+  try{
+    await invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output,choice});
+    started=true;status.textContent='';measure();
+  }catch(e){report(e);if(generic){document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;}}
+  finally{starting=false;}
+}
+async function welcome(){
+  const {info,choices}=await invoke('terminal_welcome');setInfo(info);
+  const list=document.getElementById('recommendations');list.replaceChildren();
+  for(const item of choices){const button=document.createElement('button');button.textContent=item.label;button.title=item.command;button.onclick=()=>start(item.id);list.append(button);}
+  document.getElementById('commands').textContent=choices.map(item=>`${item.label}: ${item.command}`).join('\n');
+}
+document.getElementById('open-shell').onclick=()=>start('shell');
+document.getElementById('choose-folder').onclick=async()=>{try{setInfo(await invoke('terminal_folder'));}catch(e){report(e);}};
+document.getElementById('rename-form').onsubmit=async event=>{event.preventDefault();try{setInfo(await invoke('terminal_rename',{title:document.getElementById('rename-title').value}));}catch(e){report(e);}};
 (async()=>{
-  const info=await invoke('terminal_info');
-  document.getElementById('title').textContent=`에이전트 터미널 · ${info.id}`;
-  measure();
-  const output=new Channel();
-  output.onmessage=bytes=>terminal.write(new Uint8Array(bytes));
-  const session=await invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output});
-  started=true;status.textContent='';measure();
-  document.getElementById('title').textContent=`${session.program} · ${session.id}`;
+  const info=await invoke('terminal_info');generic=info.kind==='terminal';setInfo(info);
+  if(generic){
+    const close=document.getElementById('close');close.title='터미널 종료';close.setAttribute('aria-label','터미널 종료');
+    document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;
+    await welcome();
+  }else{await start(null);}
 })().catch(report);
+// Refresh only the current directory; never collect input, output or history.
+setInterval(()=>{if(generic&&started)invoke('terminal_info').then(setInfo).catch(report);},2000);
 
 document.getElementById('pin').onclick=async()=>{
   try { await invoke('toggle_pin'); const button=document.getElementById('pin'); button.setAttribute('aria-pressed',String(button.getAttribute('aria-pressed')!=='true')); } catch(e){report(e);}

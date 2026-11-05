@@ -18,7 +18,11 @@ async function detail() {
   const target = el('detail'); target.replaceChildren();
   if (!note) { target.textContent = notes.length ? '메모를 선택하세요.' : '아직 메모가 없습니다.'; return; }
   const title = document.createElement('h1'); title.textContent = note.title || note.id; target.append(title);
-  if (note.capture) {
+  if (note.kind) {
+    const kind=document.createElement('p');kind.textContent=note.kind==='terminal'?'터미널':'에이전트';target.append(kind);
+    const open=document.createElement('button');open.textContent='화면에 띄우기';open.onclick=()=>invoke('manager_terminal',{id:note.id,action:'open'}).catch(()=>{el('error').hidden=false;});target.append(open);
+    if(note.kind==='terminal'){const remove=document.createElement('button');remove.textContent='목록에서 삭제';remove.onclick=async()=>{try{await invoke('manager_terminal',{id:note.id,action:'delete'});await refresh(true);}catch(e){el('error').hidden=false;remove.title=String(e);}};target.append(remove);}
+  } else if (note.capture) {
     try {
       const src = await invoke('manager_image', { id: note.id });
       if (version !== detailVersion) return;
@@ -35,7 +39,7 @@ function render() {
   list.replaceChildren();
   if (!notes.length) list.textContent = '아직 메모가 없습니다.';
   for (const note of notes) {
-    const button = document.createElement('button'); button.textContent = note.title || note.id;
+    const button = document.createElement('button'); button.textContent = (note.kind ? `[${note.kind==='terminal'?'터미널':'에이전트'}] ` : '') + (note.title || note.id);
     button.title = note.title || note.id;
     button.dataset.id = note.id; button.setAttribute('aria-current', String(note.id === selected));
     button.onclick = () => { selected = note.id; render(); detail(); };
@@ -58,7 +62,7 @@ async function refresh(force = false) {
   } catch { el('error').hidden = false; }
   finally { busy = false; }
 }
-// No writes or floating-window actions are exposed by this UI.
+// Content links remain inert; terminal actions require explicit buttons.
 el('detail').addEventListener('click', event => { if (event.target.closest('a')) event.preventDefault(); });
 window.addEventListener('focus', () => refresh());
 setInterval(() => { if (!document.hidden && !el('notes-page').hidden) refresh(); }, 2000);

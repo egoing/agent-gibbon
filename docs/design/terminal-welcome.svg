@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600">
+<rect width="1000" height="600" fill="#e6e8eb"/>
+<g font-family="sans-serif" fill="#f0f0f0">
+<rect x="20" y="20" width="620" height="430" rx="4" fill="#20252e" stroke="#667080"/>
+<text x="32" y="42" font-size="11">project · 터미널</text><text x="526" y="42" font-size="12">aA　▣　♟　×</text>
+<text x="44" y="92" font-size="24" font-weight="600">Welcome</text><text x="44" y="122" font-size="13">이 폴더에서 시작할 작업을 선택하세요.</text>
+<text x="44" y="170" font-size="13">~/work/project</text><rect x="220" y="148" width="92" height="32" rx="3" fill="#303844" stroke="#667080"/><text x="238" y="169" font-size="12">폴더 선택</text>
+<g fill="#303844" stroke="#667080"><rect x="44" y="202" width="80" height="34" rx="3"/><rect x="134" y="202" width="110" height="34" rx="3"/><rect x="254" y="202" width="90" height="34" rx="3"/><rect x="44" y="250" width="86" height="34" rx="3"/></g>
+<g font-size="12"><text x="64" y="224">Codex</text><text x="150" y="224">Claude Code</text><text x="272" y="224">Git 로그</text><text x="62" y="272">셸 열기</text><text x="44" y="318">▸ 실행 명령 확인</text><text x="44" y="366">창 제목</text><text x="118" y="366">폴더명 사용　　[제목 변경]</text></g>
+<rect x="670" y="20" width="310" height="240" rx="4" fill="#20252e" stroke="#667080"/>
+<text x="686" y="44" font-size="11">경로 기록이 없는 첫 시작</text><text x="690" y="90" font-size="22">Welcome</text><rect x="690" y="114" width="90" height="32" rx="3" fill="#303844" stroke="#667080"/><text x="708" y="135" font-size="12">폴더 선택</text><text x="690" y="182" font-size="13">셸 열기</text><text x="690" y="220" font-size="11">경로 숨김 · 홈 폴더에서 실행</text>
+</g><g font-family="sans-serif" fill="#20252e" font-size="14"><text x="24" y="492">명령 종료 → 같은 셸 유지　|　핀 해제 후 포커스 이동 / 세 보조키 → 숨김</text><text x="24" y="524">창 닫기 → 작업 중이면 확인 후 종료　|　목록에서 재열기 → 마지막 위치·크기의 Welcome</text><text x="24" y="558">배치 시안 · 설치가 확인된 앱만 표시 · 실제 앱 화면과 구분</text></g></svg>

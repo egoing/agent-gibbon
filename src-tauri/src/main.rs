@@ -236,6 +236,33 @@ fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
     window.hide().map_err(|e| e.to_string())?;
     tray::sync_visibility(window.app_handle())
 }
+type ClosedNotes = std::sync::Mutex<std::collections::BTreeMap<String, Value>>;
+#[tauri::command]
+fn close_note(window: tauri::WebviewWindow) -> Result<(), String> {
+    let app = window.app_handle();
+    let id = window
+        .label()
+        .strip_prefix("note-")
+        .unwrap_or("main")
+        .to_string();
+    hide_note(window.clone())?;
+    let note = app
+        .state::<AppNotes>()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .get(&id)
+        .cloned()
+        .ok_or("메모가 없습니다")?;
+    let mut state = inspect_window(&window, &id, &note)?;
+    state["visible"] = json!(false);
+    state["closed"] = json!(true);
+    app.state::<ClosedNotes>()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .insert(id, state);
+    window.destroy().map_err(|e| e.to_string())?;
+    tray::sync_visibility(app)
+}
 #[tauri::command]
 fn toggle_pin(window: tauri::WebviewWindow) -> Result<(), String> {
     layout::mark(&window, false);
@@ -274,11 +301,11 @@ fn apply_with_presentation(
         let notes = state.lock().map_err(|e| e.to_string())?;
         let mut windows = Vec::new();
         for (id, note) in notes.iter() {
-            let win = window(app, id)?;
+            let win = app.get_webview_window(&label(id));
             windows.push(
                 json!({"id":id,"title":note.title,"status":note.status,"color":note.color,
-                "visible":win.is_visible().map_err(|e| e.to_string())?,
-                "always_on_top":win.is_always_on_top().map_err(|e| e.to_string())?}),
+                "visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),
+                "always_on_top":win.as_ref().is_none_or(|w|w.is_always_on_top().unwrap_or(true))}),
             );
         }
         for agent in terminal::entries(app) {
@@ -316,8 +343,21 @@ fn apply_with_presentation(
     if matches!(request.action, Action::Open | Action::Update) {
         app.state::<storage::Store>().save(&id, &next)?;
     }
-    let win = if existing.is_some() {
-        window(app, &id)?
+    if !matches!(request.action, Action::Open) {
+        let closed_state = app.state::<ClosedNotes>();
+        let mut closed = closed_state.lock().map_err(|e| e.to_string())?;
+        if let Some(response) = closed.get_mut(&id) {
+            response["note"] = serde_json::to_value(&next).map_err(|e| e.to_string())?;
+            state.lock().map_err(|e| e.to_string())?.insert(id, next);
+            return Ok(response.clone());
+        }
+    }
+    app.state::<ClosedNotes>()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .remove(&id);
+    let win = if let Some(win) = app.get_webview_window(&label(&id)) {
+        win
     } else {
         create_window(app, &id)?
     };
@@ -373,6 +413,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .plugin(tauri_plugin_dialog::init())
         .manage(capture::Captures::default())
         .manage(terminal::Terminals::default())
+        .manage(ClosedNotes::default())
         .manage(PointerStates::default())
         .manage(initial_focus)
         .manage(warp::Warps::default())
@@ -394,7 +435,12 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             terminal::terminal_resize,
             terminal::terminal_hide,
             terminal::terminal_info,
+            terminal::welcome::terminal_welcome,
+            terminal::welcome::terminal_folder,
+            terminal::welcome::terminal_rename,
+            terminal::welcome::terminal_close,
             manager::manager_notes,
+            manager::manager_terminal,
             manager::manager_image,
             layout::content_action,
             feedback_window::present_feedback,
@@ -411,6 +457,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             telemetry::report_frontend_error,
             entrance::drag_note,
             hide_note,
+            close_note,
             toggle_pin,
             sync_opacity,
             feedback::acknowledge_feedback,
@@ -424,6 +471,29 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::manual_resize
         ])
         .on_window_event(|win, event| {
+            if win.label().starts_with("terminal-") {
+                if matches!(
+                    event,
+                    tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)
+                ) {
+                    terminal::geometry(win);
+                }
+                if let Some(w) = win.app_handle().get_webview_window(win.label()) {
+                    match event {
+                        tauri::WindowEvent::CloseRequested { api, .. } => {
+                            api.prevent_close();
+                            let _ = terminal::request_close(&w);
+                        }
+                        tauri::WindowEvent::Focused(false)
+                            if !w.is_always_on_top().unwrap_or(true) =>
+                        {
+                            let _ = terminal::terminal_hide(w);
+                        }
+                        _ => (),
+                    }
+                }
+                return;
+            }
             if win.label().starts_with("agent-") || win.label() == manager::LABEL {
                 if win.label().starts_with("agent-")
                     && matches!(
@@ -467,15 +537,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 api.prevent_close();
                 if let Some(webview) = win.app_handle().get_webview_window(win.label()) {
-                    let _ = stash::release(&webview);
-                    layout::mark(&webview, false);
-                    sizing::cancel(&webview);
-                    feedback::clear(&webview);
-                    feedback_window::hide(&webview);
-                    let _ = entrance::finish(&webview);
+                    let _ = close_note(webview);
                 }
-                let _ = win.hide();
-                let _ = tray::sync_visibility(win.app_handle());
             }
         })
         .setup(move |app| {
@@ -605,7 +668,9 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
         .cloned()
         .collect();
     for id in ids {
-        let win = window(app, &id)?;
+        let Some(win) = app.get_webview_window(&label(&id)) else {
+            continue;
+        };
         if win.is_visible().map_err(|e| e.to_string())? {
             show_without_focus(&win)?;
             visible = true;
