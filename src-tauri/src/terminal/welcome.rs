@@ -1,4 +1,4 @@
-//! Generic shell windows. Only a single last directory and presentation metadata persist.
+//! Generic shell windows. Bounded recent directories and presentation metadata persist.
 use super::*;
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 
@@ -35,6 +35,7 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
         bounds,
         kind: Kind::Terminal,
         last_path,
+        recent_paths: Vec::new(),
         path_updated: 0,
         title: String::new(),
     };
@@ -43,6 +44,91 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
     open(app, &id)?;
     crate::tray::refresh(app)?;
     inspect(app, &id)
+}
+
+fn default_shell() -> Result<PathBuf, String> {
+    #[cfg(unix)]
+    {
+        Ok(std::env::var_os("SHELL")
+            .map(PathBuf::from)
+            .filter(|p| p.is_absolute() && executable(p))
+            .unwrap_or_else(|| PathBuf::from("/bin/sh")))
+    }
+    #[cfg(windows)]
+    {
+        Ok(
+            PathBuf::from(std::env::var_os("SystemRoot").ok_or("SystemRoot가 없습니다")?)
+                .join("System32/WindowsPowerShell/v1.0/powershell.exe"),
+        )
+    }
+}
+fn remember_path(agent: &mut Agent, path: PathBuf, updated: u64) {
+    // Migrate the former single-path record on the first directory change.
+    if let Some(old) = agent.last_path.as_ref() {
+        if old != &path {
+            if let Some(record) = agent.recent_paths.iter_mut().find(|r| &r.path == old) {
+                record.updated = record.updated.max(agent.path_updated);
+            } else {
+                agent.recent_paths.push(RecentPath {
+                    path: old.clone(),
+                    updated: agent.path_updated,
+                });
+            }
+        }
+    }
+    agent.recent_paths.retain(|r| r.path != path);
+    agent.recent_paths.push(RecentPath {
+        path: path.clone(),
+        updated,
+    });
+    agent
+        .recent_paths
+        .sort_by_key(|r| std::cmp::Reverse(r.updated));
+    agent.recent_paths.truncate(20);
+    agent.last_path = Some(path);
+    agent.path_updated = updated;
+}
+fn recent_directories(agents: impl Iterator<Item = Agent>) -> Vec<RecentPath> {
+    let mut paths = BTreeMap::<PathBuf, u64>::new();
+    for a in agents.filter(|a| a.kind == Kind::Terminal) {
+        let mut recent = a.recent_paths;
+        if let Some(path) = a.last_path {
+            recent.push(RecentPath {
+                path,
+                updated: a.path_updated,
+            });
+        }
+        for r in recent
+            .into_iter()
+            .filter(|r| r.path.is_absolute() && r.path.is_dir())
+        {
+            paths
+                .entry(r.path)
+                .and_modify(|t| *t = (*t).max(r.updated))
+                .or_insert(r.updated);
+        }
+    }
+    let mut recent: Vec<_> = paths
+        .into_iter()
+        .map(|(path, updated)| RecentPath { path, updated })
+        .collect();
+    recent.sort_by_key(|r| std::cmp::Reverse(r.updated));
+    recent.truncate(20);
+    recent
+}
+fn folder_value(path: &Path, home: &Path) -> Value {
+    let parent = path.parent().unwrap_or(path);
+    let display_parent = parent
+        .strip_prefix(home)
+        .map(|suffix| {
+            if suffix.as_os_str().is_empty() {
+                "~".into()
+            } else {
+                format!("~/{}", suffix.to_string_lossy())
+            }
+        })
+        .unwrap_or_else(|_| parent.to_string_lossy().into_owned());
+    json!({"path":path,"name":path.file_name().unwrap_or(path.as_os_str()).to_string_lossy(),"parent":display_parent,"command":format!("{}{}",if cfg!(windows){"Set-Location -LiteralPath "}else{"cd -- "},quote(&path.to_string_lossy()))})
 }
 fn executable(path: &Path) -> bool {
     let Ok(meta) = path.metadata() else {
@@ -120,9 +206,9 @@ fn command(paths: &[PathBuf], choice: &str) -> Result<Option<String>, String> {
 }
 fn choices(paths: &[PathBuf]) -> Vec<Value> {
     [
-        ("codex", "Codex"),
         ("claude", "Claude Code"),
-        ("git", "Git 로그"),
+        ("codex", "Codex"),
+        ("git", "git log"),
         ("htop", "htop"),
     ]
     .into_iter()
@@ -152,10 +238,35 @@ fn generic(window: &WebviewWindow) -> Result<String, String> {
 pub fn terminal_welcome(window: WebviewWindow) -> Result<Value, String> {
     let id = generic(&window)?;
     let info = inspect(window.app_handle(), &id)?;
-    Ok(json!({"info":info,"choices":choices(&search_path())}))
+    let home = home()?;
+    let recent = recent_directories(entries(window.app_handle()).into_iter());
+    let folders: Vec<_> = recent
+        .iter()
+        .map(|r| folder_value(&r.path, &home))
+        .collect();
+    let mut options = choices(&search_path());
+    let shell = default_shell()?;
+    let shell_command = format!(
+        "{}{}{}",
+        if cfg!(windows) { "& " } else { "" },
+        quote(&shell.to_string_lossy()),
+        if cfg!(windows) {
+            " -NoLogo -NoExit"
+        } else {
+            " -i"
+        }
+    );
+    options.push(json!({"id":"shell","label":"셸","command":shell_command}));
+    let selected = info["last_path"]
+        .as_str()
+        .map(PathBuf::from)
+        .unwrap_or_else(|| home.clone());
+    Ok(
+        json!({"info":info,"choices":options,"folders":folders,"location":folder_value(&selected,&home),"home":home}),
+    )
 }
 #[tauri::command]
-pub async fn terminal_folder(window: WebviewWindow) -> Result<Value, String> {
+pub async fn terminal_folder(window: WebviewWindow, path: Option<String>) -> Result<Value, String> {
     let id = generic(&window)?;
     let app = window.app_handle().clone();
     tauri::async_runtime::spawn_blocking(move || {
@@ -168,16 +279,23 @@ pub async fn terminal_folder(window: WebviewWindow) -> Result<Value, String> {
         {
             return Err("실행 중에는 셸에서 폴더를 변경하세요".into());
         }
-        if let Some(path) = app
+        let mut selected = false;
+        if let Some(path) = path {
+            selected = true;
+            set_path(&app, &id, PathBuf::from(path))?;
+        } else if let Some(path) = app
             .dialog()
             .file()
             .set_title("작업 폴더 선택")
             .blocking_pick_folder()
         {
+            selected = true;
             let path = path.into_path().map_err(err)?;
             set_path(&app, &id, path)?;
         }
-        inspect(&app, &id)
+        let mut info = inspect(&app, &id)?;
+        info["folder_selected"] = json!(selected);
+        Ok(info)
     })
     .await
     .map_err(err)?
@@ -193,8 +311,7 @@ pub(super) fn set_path(app: &tauri::AppHandle, id: &str, path: PathBuf) -> Resul
         return Ok(());
     }
     if agent.last_path.as_ref() != Some(&path) {
-        agent.last_path = Some(path);
-        agent.path_updated = now();
+        remember_path(agent, path, now());
         save(&root(app), agent)?;
     }
     Ok(())
@@ -282,14 +399,7 @@ pub(super) fn start(
         return Err("마지막 폴더가 없습니다. 다른 폴더를 선택하세요".into());
     }
     let line = command(&search_path(), choice)?;
-    #[cfg(unix)]
-    let shell = std::env::var_os("SHELL")
-        .map(PathBuf::from)
-        .filter(|p| p.is_absolute() && executable(p))
-        .unwrap_or_else(|| PathBuf::from("/bin/sh"));
-    #[cfg(windows)]
-    let shell = PathBuf::from(std::env::var_os("SystemRoot").ok_or("SystemRoot가 없습니다")?)
-        .join("System32/WindowsPowerShell/v1.0/powershell.exe");
+    let shell = default_shell()?;
     start_shell(&cwd, line, dimensions, &shell)
 }
 fn start_shell(
@@ -452,9 +562,57 @@ mod tests {
             },
             kind: Kind::Terminal,
             last_path: path,
+            recent_paths: Vec::new(),
             path_updated: updated,
             title: String::new(),
         }
+    }
+    #[test]
+    fn recent_folders_migrate_deduplicate_bound_and_filter_missing() {
+        let root = tempfile::tempdir().unwrap();
+        let old = root.path().join("old");
+        std::fs::create_dir(&old).unwrap();
+        let mut a = agent(Some(old.clone()), 1);
+        for i in 0..25 {
+            let path = root.path().join(format!("p{i}"));
+            std::fs::create_dir(&path).unwrap();
+            remember_path(&mut a, path, i + 2);
+        }
+        assert_eq!(a.recent_paths.len(), 20);
+        let chosen = root.path().join("p10");
+        remember_path(&mut a, chosen.clone(), 100);
+        assert_eq!(a.recent_paths.len(), 20);
+        assert_eq!(a.recent_paths[0].path, chosen);
+        let restored: Agent = serde_json::from_value(serde_json::to_value(&a).unwrap()).unwrap();
+        let duplicate = agent(Some(chosen.clone()), 99);
+        std::fs::remove_dir(root.path().join("p24")).unwrap();
+        let recent = recent_directories([restored, duplicate].into_iter());
+        assert_eq!(recent[0].path, chosen);
+        assert_eq!(recent.iter().filter(|r| r.path == chosen).count(), 1);
+        assert!(recent.iter().all(|r| r.path.is_dir()));
+        let mut legacy = agent(Some(old.clone()), 42);
+        remember_path(&mut legacy, chosen, 43);
+        assert!(legacy
+            .recent_paths
+            .iter()
+            .any(|r| r.path == old && r.updated == 42));
+    }
+    #[test]
+    fn preview_directory_quotes_spaces_and_metacharacters() {
+        let folder = folder_value(Path::new("/tmp/a ' $(cmd)"), Path::new("/home/user"));
+        assert_eq!(folder["path"], "/tmp/a ' $(cmd)");
+        assert_eq!(
+            folder["command"],
+            format!(
+                "{}{}",
+                if cfg!(windows) {
+                    "Set-Location -LiteralPath "
+                } else {
+                    "cd -- "
+                },
+                quote("/tmp/a ' $(cmd)")
+            )
+        );
     }
     #[test]
     fn no_history_has_no_display_path_and_home_is_execution_fallback() {

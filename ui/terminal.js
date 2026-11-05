@@ -6,6 +6,7 @@ const terminal = new Terminal({fontSize:13,fontFamily:'Menlo, Monaco, monospace'
 const fit = new FitAddon.FitAddon();
 terminal.loadAddon(fit);
 terminal.open(document.getElementById('terminal'));
+let homePath=null, selectedFolder=null, selectedChoice=null, availableChoices=[], folders=[], expandedFolders=false, selectingFolder=false;
 let started=false, starting=false, generic=false, input=Promise.resolve(), resizeTimer;
 function report(e){status.textContent=String(e);}
 function measure(){if(innerWidth<20||innerHeight<60)return;fit.fit();if(started)invoke('terminal_resize',{cols:terminal.cols,rows:terminal.rows}).catch(report);}
@@ -37,8 +38,7 @@ document.querySelectorAll('.resize').forEach(handle=>handle.addEventListener('po
 document.getElementById('close').onclick=()=>invoke(generic?'terminal_close':'terminal_hide').catch(report);
 function setInfo(info){
   document.getElementById('title').textContent=info.title;
-  const path=document.getElementById('work-path');path.hidden=!info.last_path;path.textContent=info.last_path||'';
-  document.getElementById('home-hint').hidden=Boolean(info.last_path);
+
 }
 async function start(choice, trigger){
   if(started||starting)return;
@@ -49,6 +49,7 @@ async function start(choice, trigger){
   document.getElementById('terminal').hidden=false;measure();
   const output=new Channel();output.onmessage=bytes=>terminal.write(new Uint8Array(bytes));
   try{
+    if(generic && selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
     await invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output,choice});
     started=true;status.textContent='';measure();
     if(trigger && document.hasFocus() && (document.activeElement===trigger || document.activeElement===document.body))terminal.focus();
@@ -58,23 +59,45 @@ async function start(choice, trigger){
   }
   finally{starting=false;document.getElementById('welcome').setAttribute('aria-busy','false');}
 }
-async function welcome(){
-  const {info,choices}=await invoke('terminal_welcome');setInfo(info);
-  const list=document.getElementById('recommendations');list.replaceChildren();
-  const descriptions={codex:'코딩 에이전트',claude:'코딩 에이전트',git:'최근 커밋 보기',htop:'프로세스 확인'};
-  for(const item of choices){
-    const button=document.createElement('button');button.className='launch-app';button.dataset.label=item.label;button.setAttribute('aria-label',item.label);
-    const name=document.createElement('span');name.className='launch-name';name.textContent=item.label;
-    const description=document.createElement('span');description.className='launch-description';description.id=`description-${item.id}`;button.setAttribute('aria-describedby',description.id);description.textContent=descriptions[item.id]||'';
-    button.append(name,description);button.title=item.command;button.onclick=()=>start(item.id,button);list.append(button);
-  }
-  document.getElementById('no-apps').hidden=choices.length>0;
-  document.getElementById('command-details').hidden=choices.length===0;
-  document.getElementById('commands').textContent=choices.map(item=>`${item.label}: ${item.command}`).join('\n');
+function selectionChanged(){
+  document.getElementById('home-hint').hidden=selectedFolder?.path!==homePath;
+  for(const button of document.getElementById('recommendations').children)button.setAttribute('aria-pressed',String(button.dataset.choice===selectedChoice));
+  for(const button of document.getElementById('recent-folders').children)button.setAttribute('aria-pressed',String(button.dataset.path===selectedFolder?.path));
+  const choice=availableChoices.find(item=>item.id===selectedChoice);
+  document.getElementById('command-preview').textContent=selectedFolder && choice ? `${selectedFolder.command}${navigator.platform.includes('Win')?' -ErrorAction Stop':' &&'}\n${choice.command}` : '';
+  document.getElementById('run-task').disabled=selectingFolder || !choice;
 }
-document.getElementById('open-shell').dataset.label='셸';
-document.getElementById('open-shell').onclick=()=>start('shell',document.getElementById('open-shell'));
-document.getElementById('choose-folder').onclick=async()=>{try{setInfo(await invoke('terminal_folder'));}catch(e){report(e);}};
+function renderFolders(){
+  const list=document.getElementById('recent-folders');list.replaceChildren();
+  for(const folder of folders.slice(0,expandedFolders?folders.length:3)){
+    const button=document.createElement('button');button.className='select-row';button.dataset.path=folder.path;button.title=folder.path;
+    button.setAttribute('aria-label',folder.path);
+    const name=document.createElement('span');name.className='folder-name';name.textContent=folder.name;
+    const parent=document.createElement('span');parent.className='folder-parent';parent.textContent=folder.parent;
+    button.append(name,parent);button.onclick=()=>{selectedFolder=folder;selectionChanged();};list.append(button);
+  }
+  const more=document.getElementById('more-folders');more.hidden=folders.length<=3;more.textContent=expandedFolders?'접기':'더 보기…';more.setAttribute('aria-expanded',String(expandedFolders));
+  selectionChanged();
+}
+async function welcome(){
+  const data=await invoke('terminal_welcome');setInfo(data.info);
+  availableChoices=data.choices;folders=data.folders||[];selectedFolder=data.location;homePath=data.home;
+  if(data.info.last_path && selectedFolder){folders=[selectedFolder,...folders.filter(f=>f.path!==selectedFolder.path)].slice(0,20);}
+  document.getElementById('home-hint').hidden=Boolean(data.info.last_path);
+  if(!availableChoices.some(item=>item.id===selectedChoice))selectedChoice=availableChoices[0]?.id;
+  const list=document.getElementById('recommendations');list.replaceChildren();
+  for(const item of availableChoices){
+    const button=document.createElement('button');button.className='select-row';button.dataset.choice=item.id;button.textContent=item.label;
+    button.onclick=()=>{selectedChoice=item.id;selectionChanged();};list.append(button);
+  }
+  renderFolders();
+}
+document.getElementById('more-folders').onclick=()=>{expandedFolders=!expandedFolders;renderFolders();};
+document.getElementById('run-task').onclick=()=>{if(!selectingFolder) return start(selectedChoice,document.getElementById('run-task'));};
+document.getElementById('choose-folder').onclick=async()=>{
+  if(selectingFolder)return;selectingFolder=true;selectionChanged();
+  try{const result=await invoke('terminal_folder',{path:null});if(result.folder_selected!==false)await welcome();status.textContent='';}catch(e){report(e);}finally{selectingFolder=false;selectionChanged();}
+};
 document.getElementById('rename-form').onsubmit=async event=>{event.preventDefault();try{setInfo(await invoke('terminal_rename',{title:document.getElementById('rename-title').value}));status.textContent='창 제목을 변경했습니다.';}catch(e){report(e);}};
 (async()=>{
   const info=await invoke('terminal_info');generic=info.kind==='terminal';setInfo(info);
