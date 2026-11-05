@@ -1,5 +1,30 @@
 html,body{width:100%;height:100%;overflow:hidden}body{cursor:default}header{height:30px;min-height:30px;display:flex;align-items:center;padding:0 8px;cursor:move;user-select:none}#title{font:var(--font-ui)/var(--line-ui) -apple-system,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:calc(100% - 110px)}#status{padding:4px 8px;white-space:pre-wrap;overflow:auto;flex-shrink:0;max-height:50%}#status:empty{display:none}#terminal{flex:1;min-height:0;padding:3px 5px 5px;overflow:hidden;letter-spacing:0;cursor:text}.xterm{height:100%}.xterm-viewport{border-radius:0}#controls{opacity:1;pointer-events:auto}
 
-[hidden]{display:none!important}#welcome{flex:1;overflow:auto;padding:20px;min-height:0}#welcome h1{font-size:22px;margin:0 0 8px}#welcome p{opacity:.8}#welcome button,#welcome input{font:inherit;color:inherit;border:1px solid #667080;border-radius:3px;background:#303844;padding:7px 10px}#welcome button{cursor:pointer}#welcome button:hover{background:#414c5c}#welcome button:focus-visible,#welcome input:focus-visible{outline:2px solid #a8c5ff;outline-offset:2px}.folder-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:20px 0}#work-path{overflow-wrap:anywhere;min-width:0}#recommendations{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}#welcome details{margin:18px 0}#commands{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px}#rename-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}#rename-title{min-width:80px;max-width:100%;box-sizing:border-box}
-#welcome button{width:auto;height:auto;min-height:32px;white-space:nowrap}#welcome input{user-select:text;-webkit-user-select:text}#work-path,#commands{user-select:text;-webkit-user-select:text}
-#welcome button{min-width:64px}
+[hidden]{display:none!important}
+#welcome{flex:1;overflow:auto;padding:16px;min-height:0}
+.welcome-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+#welcome h1{font-size:17px;line-height:24px;margin:0;font-weight:600}
+#welcome h2{font-size:11px;line-height:16px;margin:0 0 6px;color:#bac3cf;font-weight:500}
+#welcome button,#welcome input{font:inherit;color:inherit;border:1px solid #667080;border-radius:3px;background:#303844;padding:6px 10px}
+#welcome button{width:auto;height:auto;min-width:64px;min-height:32px;cursor:pointer;white-space:normal}
+#welcome button:hover{background:#414c5c}
+#welcome button:focus-visible,#welcome input:focus-visible,#welcome summary:focus-visible,#work-path:focus-visible{outline:2px solid #a8c5ff;outline-offset:2px}
+.folder-row{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+.folder-location{flex:1;min-width:0}
+#work-path{display:block;overflow-wrap:anywhere;max-height:3.2em;overflow:auto;line-height:1.6;user-select:text;-webkit-user-select:text}
+#home-hint{color:#bac3cf;font-size:11px}
+#choose-folder{flex-shrink:0}
+#recommendations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#welcome .launch-app{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-width:0;padding:8px 10px}
+.launch-name{font-weight:600}.launch-description{font-size:11px;line-height:14px;color:#bac3cf}
+#no-apps{margin:0;font-size:11px;color:#bac3cf}
+#welcome details{margin-top:12px}#welcome summary{cursor:pointer;width:fit-content;padding:2px 0}
+#commands{white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;user-select:text;-webkit-user-select:text;margin:8px 0}
+#rename-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+#rename-title{flex:1;min-width:80px;max-width:100%;box-sizing:border-box;user-select:text;-webkit-user-select:text}
+#welcome .setting-hint{font-size:11px;color:#bac3cf;margin:6px 0 0}
+@media(max-width:420px),(max-height:300px){
+ #welcome{padding:10px 12px}.welcome-heading{margin-bottom:8px;gap:8px}
+ .folder-row{margin-bottom:8px;gap:8px}#recommendations{gap:6px}
+ #welcome .launch-app{padding:4px 8px;gap:0}#welcome details{margin-top:8px}
+}
