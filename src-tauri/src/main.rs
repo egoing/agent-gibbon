@@ -112,8 +112,10 @@ fn sync_pointer(window: &tauri::WebviewWindow) -> Result<bool, String> {
         .insert(window.label().into(), hovered)
         != Some(hovered);
     if changed {
+        // Emitter::emit broadcasts even when called on a window. Hover belongs
+        // only to this memo; other WebViews must never receive its boolean.
         window
-            .emit("note-pointer-over", hovered)
+            .emit_to(window.label(), "note-pointer-over", hovered)
             .map_err(|e| e.to_string())?;
     }
     Ok(hovered)
