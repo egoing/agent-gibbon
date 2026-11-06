@@ -50,6 +50,30 @@ Windows는 `npm.cmd`를 사용한다. `gh api`를 지원하는 인증된 GitHub 
 
 ## 부하·개인정보 경계
 
+### Windows 행 조사용 로컬 단계 기록 — #66
+
+`AGENT_GIBBON_LOCAL_TRACE=1`을 **앱 시작 전** 설정하면 Sentry와 독립적인 로컬 단계 기록을 켠다. 기본은 꺼짐이며 외부 전송 동의·SDK·watchdog를 활성화하지 않는다. `AGENT_GIBBON_TELEMETRY=off`와 함께 사용할 수 있다. 이는 원인 확정이나 행 해결 표시가 아니다.
+
+```powershell
+$env:AGENT_GIBBON_LOCAL_TRACE = '1'
+$env:AGENT_GIBBON_TELEMETRY = 'off'
+.\scripts\agent-gibbon-dev.cmd open --id issue66-test --markdown 'LOCAL-TRACE-TEST'
+.\scripts\agent-gibbon-dev.cmd diagnostics
+powershell -NoProfile -File scripts/windows-hang-evidence.ps1
+```
+
+이미 실행 중인 앱에는 환경변수가 소급 적용되지 않는다. 기존 사용자 프로세스는 임의 종료하지 않는다. 첫 실행 약관은 사용자가 검토하며 점검 도구가 대신 동의하거나 우회하지 않는다.
+
+- 파일: Tauri 앱 데이터의 `diagnostics/<instance>/local-stages.json`. Windows에서는 `%APPDATA%\org.egoing.floatnote\diagnostics\<instance>\local-stages.json`이다. 재시작 시 이전 실행 파일을 덮어쓰므로 멈춘 앱을 재시작하기 **전에** 사본을 남긴다.
+- 내용: 실행 PID·시작 시각·빌드 표식, 실행 내 숫자 호출 번호, 고정 작업/단계 이름, 프로세스 시작 후 단조 증가 마이크로초만 기록한다. 창 ID·메모·제목·경로·명령·출력·화면·장치 식별자를 입력받지 않으며 Sentry 경로와 연결하지 않는다.
+- 메모 `snapshot`: Rust command 진입(`dispatch`), `notes_wait`, `notes_copy`, 잠금 해제 후 `opacity`·`feedback`·`position`·`size`·`visibility`·`focus`·`pin`, `response`, `complete`/`aborted`를 기록한다. `opacity`와 `feedback`은 여러 하위 조회를 포함하며 단일 Win32 함수 이름을 뜻하지 않는다. `response`도 다른 상태 잠금과 JSON 값 생성을 포함한다. Tauri가 반환값을 직렬화·전달하는 시간은 포함하지 않는다.
+- CLI: 고정 작업명 `ipc`로 UI 실행 큐 진입(`ui_queue`)·실행(`ui_execute`)·종료를 기록한다. 메모 `inspect`의 내부 조회는 별도 호출 번호로 기록한다. WebView가 Rust command에 도달하기 전 대기와 IPC 내부의 부모/자식 연결은 아직 계측하지 않는다.
+- 완료되지 않은 호출은 최근 이력과 별도로 최대 64개 유지하고, 단계 이력은 최대 256개 유지한다. 기록은 `try_lock`으로 UI를 기다리게 하지 않으며 경합·용량 초과 횟수를 `lost`로 표시한다. `lost > 0`이면 시작·진행·완료가 누락되어 `active`가 불완전하거나 이미 끝난 호출이 남을 수 있다. 이 상태만으로 교착을 확정하지 않는다.
+- 별도 worker가 최대 약 500ms 주기로 작은 스냅샷을 원자 교체한다. 애플리케이션 잠금이나 네이티브 창 API를 호출하지 않는다. 파일 I/O 지연·실패·프로세스 정지·강제 종료 때 마지막 단계 보존을 보장하지 않는다. 파일 부재·수정 시각·PID·시작 시각을 반드시 확인한다. 실제 CPU/디스크 부하의 p50/p95 검증은 아직 없다.
+- `scripts/windows-hang-evidence.ps1`은 현재 워크트리 binary와 일치하는 단일 PID만 선택한다. 로컬 임시 폴더에 CPU 변화, 스레드 상태/대기 이유, HWND/TID/가시성·WM_NULL 응답을 저장한다. 창 제목·본문을 읽거나 포커스·배치를 바꾸지 않는다. 호출 스택·WebView2 자식 상태·메모리 덤프를 얻는 도구는 아니며, `Responding`/WM_NULL 성공만으로 WebView 렌더링 성공을 보장하지 않는다. 대상이 없거나 여러 개면 다른 앱으로 대체하지 않고 실패한다.
+
+[현재 출처·검증·미해결 범위](verification/issue66-windows-hang.md)를 따른다.
+
 ### 단계별 trace/span 이름
 
 운영 이름과 레이블은 국제화와 쿼리 재사용을 위해 고정된 영어 이름을 사용한다. 동적 메모 제목·ID·경로·실행 명령을 이름에 붙이지 않는다. 같은 Rust 동기 호출 흐름의 하위 구간은 부모 trace의 자식 span이며, 서로 다른 UI callback·thread·WebView 집계 사이에 자동으로 trace가 이어진다고 가정하지 않는다.

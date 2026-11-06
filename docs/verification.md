@@ -1,5 +1,9 @@
 # Floatnote 검증 기록
 
+## Windows 반복 행 조사 — #66 (2026-11-06)
+
+[출처·실행 기록·미해결 범위](verification/issue66-windows-hang.md). snapshot 잠금 범위 축소와 로컬 계측 이후 실제 캡처 드래그 정지의 UI/작업자 스택을 확보했다. 트레이 갱신의 Notes 잠금과 UI snapshot 사이의 교착을 수정하고, Windows computer-use 드래그 5회·최대 표시 6창·pin/닫기·CLI 응답을 확인했다. Rust 114개·Clippy·개발 빌드 통과. 장시간과 다른 플랫폼·캡처 유형의 회귀는 별도다.
+
 검증일: 2026-10-10 (Asia/Seoul)
 
 ## 둥근 Surface 외부 배경 보정 (2026-10-27)

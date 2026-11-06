@@ -12,6 +12,26 @@ use tauri::{
 
 type TrayMenu = std::sync::Mutex<Option<Menu<tauri::Wry>>>;
 
+struct MemoMenuEntry {
+    id: String,
+    title: String,
+    capture: bool,
+}
+
+// Only owned menu metadata crosses into native menu/window calls. Those calls
+// may synchronously wait for the UI thread, which can be handling snapshot.
+fn memo_entries(notes: &AppNotes) -> Result<Vec<MemoMenuEntry>, String> {
+    let notes = notes.lock().map_err(|e| e.to_string())?;
+    Ok(notes
+        .iter()
+        .map(|(id, note)| MemoMenuEntry {
+            id: id.clone(),
+            title: note.title.chars().take(30).collect(),
+            capture: note.capture.is_some(),
+        })
+        .collect())
+}
+
 fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     let menu = Menu::new(app).map_err(|e| e.to_string())?;
     menu.append(
@@ -87,9 +107,10 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     menu.append(&PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?)
         .map_err(|e| e.to_string())?;
     let state = app.state::<AppNotes>();
-    let notes = state.lock().map_err(|e| e.to_string())?;
-    for (id, note) in notes.iter() {
-        let title: String = note.title.chars().take(30).collect();
+    let notes = memo_entries(&state)?;
+    for note in notes {
+        let id = &note.id;
+        let title = &note.title;
         let text = if title.is_empty() {
             id.clone()
         } else {
@@ -99,7 +120,7 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
             .get_webview_window(&crate::label(id))
             .is_some_and(|w| w.is_visible().unwrap_or(false));
 
-        let bytes: &[u8] = if note.capture.is_some() {
+        let bytes: &[u8] = if note.capture {
             include_bytes!("../icons/tabler/photo.png")
         } else {
             include_bytes!("../icons/tabler/file-text.png")
@@ -154,7 +175,13 @@ pub fn refresh(app: &tauri::AppHandle) -> Result<(), String> {
         let menu = menu(app)?;
         tray.set_menu(Some(menu.clone()))
             .map_err(|e| e.to_string())?;
-        *app.state::<TrayMenu>().lock().map_err(|e| e.to_string())? = Some(menu);
+        // Drop the old native menu only after releasing TrayMenu as well.
+        let previous = app
+            .state::<TrayMenu>()
+            .lock()
+            .map_err(|e| e.to_string())?
+            .replace(menu);
+        drop(previous);
     }
     Ok(())
 }
@@ -164,18 +191,17 @@ pub fn sync_visibility(app: &tauri::AppHandle) -> Result<(), String> {
     let Some(state) = app.try_state::<TrayMenu>() else {
         return Ok(());
     };
-    let guard = state.lock().map_err(|e| e.to_string())?;
-    if let Some(menu) = guard.as_ref() {
+    let menu = state.lock().map_err(|e| e.to_string())?.clone();
+    let notes = memo_entries(&app.state::<AppNotes>())?;
+    if let Some(menu) = menu.as_ref() {
         for item in menu.items().map_err(|e| e.to_string())? {
             if let Some(check) = item.as_icon_menuitem() {
                 if let Some(id) = check.id().as_ref().strip_prefix("note:") {
                     let visible = app
                         .get_webview_window(&crate::label(id))
                         .is_some_and(|w| w.is_visible().unwrap_or(false));
-                    let notes = app.state::<AppNotes>();
-                    let notes = notes.lock().map_err(|e| e.to_string())?;
-                    if let Some(note) = notes.get(id) {
-                        let bytes: &[u8] = if note.capture.is_some() {
+                    if let Some(note) = notes.iter().find(|note| note.id == id) {
+                        let bytes: &[u8] = if note.capture {
                             include_bytes!("../icons/tabler/photo.png")
                         } else {
                             include_bytes!("../icons/tabler/file-text.png")
@@ -188,7 +214,7 @@ pub fn sync_visibility(app: &tauri::AppHandle) -> Result<(), String> {
             }
         }
     }
-    if let Some(menu) = guard.as_ref() {
+    if let Some(menu) = menu.as_ref() {
         template_icons(app, menu)?;
     }
     Ok(())
@@ -356,4 +382,56 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
         .build(app)
         .map_err(|e| e.to_string())?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn native_menu_wait_allows_ui_snapshot_to_acquire_notes() {
+        use std::{
+            collections::BTreeMap,
+            sync::{mpsc, Arc},
+            time::Duration,
+        };
+        let notes = Arc::new(AppNotes::new(BTreeMap::from([(
+            "capture".into(),
+            crate::Note::default(),
+        )])));
+        let worker_notes = notes.clone();
+        let (queued, ui_request) = mpsc::channel();
+        let (ack, ui_reply) = mpsc::channel();
+        let worker = std::thread::spawn(move || {
+            let entries = memo_entries(&worker_notes).unwrap();
+            // Model the blocking set_icon call: its worker waits for the UI,
+            // while the UI must first process an incoming snapshot.
+            queued.send(()).unwrap();
+            let serviced = ui_reply.recv_timeout(Duration::from_secs(2)).unwrap();
+            assert_eq!(entries[0].id, "capture");
+            serviced
+        });
+        ui_request.recv_timeout(Duration::from_secs(2)).unwrap();
+        let snapshot_available = notes.try_lock().is_ok();
+        ack.send(snapshot_available).unwrap();
+        assert!(
+            worker.join().unwrap(),
+            "native menu update held AppNotes while waiting for UI snapshot"
+        );
+    }
+
+    #[test]
+    fn menu_metadata_is_owned_and_does_not_copy_memo_content() {
+        use std::collections::BTreeMap;
+        let note = crate::Note {
+            title: "가".repeat(40),
+            markdown: "private body".into(),
+            ..crate::Note::default()
+        };
+        let notes = AppNotes::new(BTreeMap::from([("a".into(), note)]));
+        let entries = memo_entries(&notes).unwrap();
+        notes.lock().unwrap().clear();
+        assert_eq!(entries.len(), 1);
+        assert_eq!(entries[0].title, "가".repeat(30));
+        assert!(!entries[0].capture);
+    }
 }
