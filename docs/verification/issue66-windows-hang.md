@@ -115,3 +115,9 @@ worker TID 33420 (tokio-rt-worker):
 로컬 `%TEMP%\gibbon-issue66-live-26516\`에 `main-stack.jsonl`, `worker-stacks.jsonl`, `local-stages-before-restart.json`, `local-stages-after-fix.json`, `binary-before.json`, `fixed-source-binary-hashes.json`을 보관했다. 위 root의 실제 main/tray/capture/local_trace 소스와 수정 binary의 SHA-256을 기록했으며, 동일한 기반 revision만으로 소스 일치를 주장하지 않는다. 네이티브 상태는 `%TEMP%\gibbon-hang-20261106-104003\process.json`(전), `...-104331`, `...-104515`, `...-104613`, `...-104713`(후)의 `process.json`에 남았다.
 
 이번 **이미지 캡처 생성 경로의 교착은 확인·수정·짧은 실제 반복 검증을 완료**했다. 수정 전 자동화 반복으로 재현 빈도를 측정하지 않았고, 수정 후 사용자의 물리 입력 재확인, 수시간 실행, 잠금/해제·절전, 텍스트/터미널 선택 반복, 다중 모니터·다른 DPI, macOS ARM/Intel 회귀 및 설치 파일 빌드는 미검증이다. #66에 열거된 과거 모든 정지의 해결이나 장시간 안정성을 보장하지 않는다.
+
+## main 통합 검사와 작업 종료
+
+- 수정 커밋 `f0a0874`를 작성하고 원격 main `2f7ee58`의 개인정보 동의·관리 창 변경을 `65326d6`에서 충돌 없이 통합했다. 이 통합은 앞선 PID 12644의 실행 뒤에 수행했으므로 과거 드래그 화면을 통합본의 새로운 GUI 실행 근거로 사용하지 않는다.
+- 같은 작업 root에서 통합본 Rust **115개**, UI **80개 통과/1개 POSIX 전용 제외**, Rustfmt·Clippy·버전 일관성 검사(`0.2.7`)·Windows 개발 빌드와 diff 검사를 통과했다. 이 단계에서는 앱을 다시 실행하거나 새 개인정보 정책에 대신 동의하지 않았으며, 통합본 native GUI 반복·다른 플랫폼·설치 빌드는 미검증이다.
+- 사용자의 커밋·병합·푸시·워크스페이스 종료 요청에 따라, 직접 시작했던 PID 12644의 binary 절대 경로를 재대조해 종료했다. 원래 캡처의 저장 파일과 로컬 조사 증거는 워크스페이스 밖의 앱 데이터·TEMP에 유지한다. 종료를 기능상 `close`와 혼동하지 않는다.
