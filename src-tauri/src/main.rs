@@ -75,6 +75,7 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
 // Called only on Tauri's main thread. macOS `show()` makes the window key;
 // ordering it front directly preserves the user's active application.
 fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
+    opacity::reset_for_reveal(win)?;
     sync_opacity(win.clone())?;
     if stash::owns(win) {
         return Ok(());
@@ -179,7 +180,8 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
         let alpha = opacity::target(
             manual,
             hovered || feedback_hovered,
-            entrance::active(&window) || feedback::active(&window),
+            entrance::presenting(&window),
+            feedback::active(&window),
             sizing::folded(&window),
         );
         let alpha = window

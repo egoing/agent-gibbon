@@ -1,0 +1,133 @@
+{
+  "origin": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement",
+    "id": "dev-dab6365756cd9981d7d0ff67",
+    "name": "egoing/bottom-right-memo-placement",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target/debug/agent-gibbon"
+  },
+  "pid": 73070,
+  "result": {
+    "always_on_top": true,
+    "animating": true,
+    "auto_layout_excluded": false,
+    "content_height_cap": 122.0,
+    "dev_label": "DEV egoing/bottom-right-memo-placement · dab63657",
+    "feedback_active": false,
+    "feedback_surface": null,
+    "focused": false,
+    "folded": false,
+    "global_opacity": null,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "new-memo-spotlight-result-20261106",
+    "instance": "dev-dab6365756cd9981d7d0ff67",
+    "layout_destination": {
+      "height": 244,
+      "width": 600,
+      "x": 3496,
+      "y": 2060
+    },
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<h1>새 메모가 스포트라이트를 받습니다</h1>\n<p>새로 열린 이 메모는 선명하게 표시됩니다.\n기존 메모는 원래 반투명도를 유지합니다.</p>\n<ul>\n<li>수동 투명도를 설정해도 등장 중에는 100%</li>\n<li>도착 후 2초 대기하고 600ms 동안 원래 값으로 복귀</li>\n</ul>\n<p>실제 창 검사: 자동 50%·수동 35% 모두 통과</p>\n",
+      "color": "#dadada",
+      "edit_on_open": false,
+      "html": "<h1>새 메모가 스포트라이트를 받습니다</h1>\n<p>새로 열린 이 메모는 선명하게 표시됩니다.\n기존 메모는 원래 반투명도를 유지합니다.</p>\n<ul>\n<li>수동 투명도를 설정해도 등장 중에는 100%</li>\n<li>도착 후 2초 대기하고 600ms 동안 원래 값으로 복귀</li>\n</ul>\n<p>실제 창 검사: 자동 50%·수동 35% 모두 통과</p>\n",
+      "markdown": "# 새 메모가 스포트라이트를 받습니다\n\n새로 열린 이 메모는 선명하게 표시됩니다.\n기존 메모는 원래 반투명도를 유지합니다.\n\n- 수동 투명도를 설정해도 등장 중에는 100%\n- 도착 후 2초 대기하고 600ms 동안 원래 값으로 복귀\n\n실제 창 검사: 자동 50%·수동 35% 모두 통과",
+      "removed": false,
+      "revision": 1,
+      "source_path": null,
+      "status": "대기",
+      "title": "새 메모 스포트라이트 확인",
+      "updated_at": 1793972657675
+    },
+    "ok": true,
+    "opacity": 1.0,
+    "position": {
+      "x": 2502,
+      "y": 50
+    },
+    "size": {
+      "height": 244,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 864.0,
+        "y": 295.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-dab6365756cd9981d7d0ff67/docs/new-memo-spotlight-result-20261106/index.md",
+    "visible": true
+  },
+  "progress": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": false,
+    "content_height_cap": 135.0,
+    "dev_label": "DEV egoing/bottom-right-memo-placement · dab63657",
+    "feedback_active": false,
+    "feedback_surface": null,
+    "focused": false,
+    "folded": false,
+    "global_opacity": null,
+    "highlight_revision": 3,
+    "hovered": false,
+    "id": "new-memo-spotlight-plan-20261106",
+    "instance": "dev-dab6365756cd9981d7d0ff67",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<h1>새 메모 스포트라이트 보정</h1>\n<ul class=\"task-list\"><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">투명도 역전 원인 확인</mark></li><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">새 메모 강조와 기존 메모 감쇠 구현</mark></li><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">회귀 검사·빌드·실제 창 검증</mark></li><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">디자인 기준·검증 기록 정리</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">투명도 역전 원인 확인</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">새 메모 강조와 기존 메모 감쇠 구현</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">회귀 검사·빌드·실제 창 검증</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">디자인 기준·시안·검증 기록 정리</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☐ </mark><mark class=\"change-modified\">커밋 승인 후 세 플랫폼 CI</mark></li></ul>\n<p><mark class=\"change-modified\">Rust 157개·UI 95개, Clippy·빌드 통과.</mark>\n<mark class=\"change-modified\">실제 macOS 창에서 자동 50%·수동 35% 각각 8단계 통과.</mark>\n<mark class=\"change-modified\">새 메모만 100%로 강조하고 기존 재배치는 선명해지지 않습니다.</mark>\n<mark class=\"change-modified\">Windows·Intel 실제 GUI와 원격 CI는 미검증입니다.</mark></p>\n",
+      "color": "#ffb2b1",
+      "edit_on_open": false,
+      "html": "<h1>새 메모 스포트라이트 보정</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ 투명도 역전 원인 확인</li><li class=\"task-item\">☑ 새 메모 강조와 기존 메모 감쇠 구현</li><li class=\"task-item\">☑ 회귀 검사·빌드·실제 창 검증</li><li class=\"task-item\">☑ 디자인 기준·시안·검증 기록 정리</li><li class=\"task-item\">☐ 커밋 승인 후 세 플랫폼 CI</li></ul>\n<p>Rust 157개·UI 95개, Clippy·빌드 통과.\n실제 macOS 창에서 자동 50%·수동 35% 각각 8단계 통과.\n새 메모만 100%로 강조하고 기존 재배치는 선명해지지 않습니다.\nWindows·Intel 실제 GUI와 원격 CI는 미검증입니다.</p>\n",
+      "markdown": "# 새 메모 스포트라이트 보정\n- [x] 투명도 역전 원인 확인\n- [x] 새 메모 강조와 기존 메모 감쇠 구현\n- [x] 회귀 검사·빌드·실제 창 검증\n- [x] 디자인 기준·시안·검증 기록 정리\n- [ ] 커밋 승인 후 세 플랫폼 CI\n\nRust 157개·UI 95개, Clippy·빌드 통과.\n실제 macOS 창에서 자동 50%·수동 35% 각각 8단계 통과.\n새 메모만 100%로 강조하고 기존 재배치는 선명해지지 않습니다.\nWindows·Intel 실제 GUI와 원격 CI는 미검증입니다.",
+      "removed": true,
+      "revision": 3,
+      "source_path": null,
+      "status": "대기",
+      "title": "새 메모 스포트라이트 보정",
+      "updated_at": 1793972660064
+    },
+    "ok": true,
+    "opacity": 0.7499348437506554,
+    "position": {
+      "x": 1748,
+      "y": 494
+    },
+    "size": {
+      "height": 480,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 864.0,
+        "y": 295.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-dab6365756cd9981d7d0ff67/docs/new-memo-spotlight-plan-20261106/index.md",
+    "visible": false
+  }
+}

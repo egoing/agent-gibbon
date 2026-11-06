@@ -65,8 +65,14 @@ impl Fade {
 }
 
 #[cfg(any(target_os = "macos", windows, test))]
-pub fn target(manual: Option<f64>, hovered: bool, attention: bool, folded: bool) -> f64 {
-    if hovered {
+pub fn target(
+    manual: Option<f64>,
+    hovered: bool,
+    presenting: bool,
+    attention: bool,
+    folded: bool,
+) -> f64 {
+    if hovered || presenting {
         1.0
     } else if let Some(alpha) = manual {
         alpha
@@ -77,6 +83,23 @@ pub fn target(manual: Option<f64>, hovered: bool, attention: bool, folded: bool)
     } else {
         0.5
     }
+}
+
+// A hidden memo may already have faded while its WebView was measuring content.
+// Restart at full opacity before showing it, including direct/menu restores.
+pub fn reset_for_reveal(window: &tauri::WebviewWindow) -> Result<(), String> {
+    if !is_memo(window.label()) || window.is_visible().map_err(|e| e.to_string())? {
+        return Ok(());
+    }
+    #[cfg(any(target_os = "macos", windows))]
+    window
+        .state::<Fades>()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .insert(window.label().into(), Fade::default());
+    #[cfg(not(any(target_os = "macos", windows)))]
+    let _ = window;
+    Ok(())
 }
 // Only pending fades schedule main-thread work; idle windows do not animate.
 #[cfg(any(target_os = "macos", windows))]
@@ -124,20 +147,55 @@ pub fn start(app: tauri::AppHandle) {
 mod tests {
     use super::*;
     #[test]
+    fn newly_presented_memo_stays_opaque_while_idle_peers_keep_their_alpha() {
+        let now = Instant::now();
+        for manual in [None, Some(0.1), Some(0.35), Some(0.8), Some(1.0)] {
+            for folded in [false, true] {
+                let idle = target(manual, false, false, false, folded);
+                let mut opened = Fade::at(idle);
+                let mut peer = Fade::at(idle);
+                for elapsed in [0, 1000, 3000, 10000] {
+                    let at = now + Duration::from_millis(elapsed);
+                    assert_eq!(
+                        opened.sample(target(manual, false, true, false, folded), at),
+                        1.0,
+                        "cursor wait and entrance must override the saved idle alpha"
+                    );
+                    assert_eq!(
+                        peer.sample(idle, at),
+                        idle,
+                        "reflow must not brighten peers"
+                    );
+                }
+                let arrived = now + Duration::from_secs(11);
+                assert_eq!(opened.sample(idle, arrived), 1.0);
+                assert_eq!(
+                    opened.sample(idle, arrived + Duration::from_millis(1999)),
+                    1.0
+                );
+                assert!(
+                    (opened.sample(idle, arrived + Duration::from_millis(2600)) - idle).abs()
+                        < 0.0001
+                );
+            }
+        }
+    }
+
+    #[test]
     fn hover_temporarily_overrides_manual_choice_and_restores_with_existing_delay() {
         let now = Instant::now();
         for manual in [0.1, 0.35, 0.8, 1.0] {
             for folded in [false, true] {
                 let mut fade = Fade::at(manual);
                 assert_eq!(
-                    fade.sample(target(Some(manual), false, false, folded), now),
+                    fade.sample(target(Some(manual), false, false, false, folded), now),
                     manual
                 );
                 assert_eq!(
-                    fade.sample(target(Some(manual), true, false, folded), now),
+                    fade.sample(target(Some(manual), true, false, false, folded), now),
                     1.0
                 );
-                let outside = target(Some(manual), false, true, folded);
+                let outside = target(Some(manual), false, false, true, folded);
                 assert_eq!(
                     outside, manual,
                     "attention must not overwrite the saved choice"
@@ -150,10 +208,10 @@ mod tests {
                 );
             }
         }
-        assert_eq!(target(None, false, false, false), 0.5);
-        assert_eq!(target(None, false, false, true), 0.8);
-        assert_eq!(target(None, false, true, false), 1.0);
-        assert_eq!(target(None, true, false, false), 1.0);
+        assert_eq!(target(None, false, false, false, false), 0.5);
+        assert_eq!(target(None, false, false, false, true), 0.8);
+        assert_eq!(target(None, false, false, true, false), 1.0);
+        assert_eq!(target(None, true, false, false, false), 1.0);
     }
 
     #[test]
@@ -162,24 +220,24 @@ mod tests {
         let mut hovered = Fade::at(0.35);
         let mut peer = Fade::at(0.35);
         assert_eq!(
-            hovered.sample(target(Some(0.35), true, false, false), now),
+            hovered.sample(target(Some(0.35), true, false, false, false), now),
             1.0
         );
         assert_eq!(
-            peer.sample(target(Some(0.35), false, false, false), now),
+            peer.sample(target(Some(0.35), false, false, false, false), now),
             0.35
         );
         // Wheel refresh discards old transitions and starts from the new choice.
         let mut updated = Fade::at(0.1);
         assert_eq!(
-            updated.sample(target(Some(0.1), false, false, false), now),
+            updated.sample(target(Some(0.1), false, false, false, false), now),
             0.1
         );
         assert_eq!(
-            updated.sample(target(Some(0.1), true, false, false), now),
+            updated.sample(target(Some(0.1), true, false, false, false), now),
             1.0
         );
-        assert_eq!(target(Some(0.1), false, false, false), 0.1);
+        assert_eq!(target(Some(0.1), false, false, false, false), 0.1);
     }
 
     #[test]
