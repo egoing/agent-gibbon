@@ -1,6 +1,30 @@
 # 자동 릴리스
 
-`.github/workflows/release.yml`은 `vX.Y.Z` 태그 push로 시작합니다. 소스의 버전만 변경하거나 일반 브랜치를 push하면 공개하지 않습니다. 브랜치 push와 `workflow_dispatch` 수동 실행은 검증·빌드 결과를 Actions artifact로 보관하며 릴리스를 만들지 않습니다. 수동 실행 버튼은 이 워크플로가 기본 브랜치에 병합된 뒤 사용할 수 있습니다.
+`.github/workflows/release.yml`은 `v*` 태그 push 또는 `workflow_dispatch` 수동 요청으로 실행합니다. 일반 브랜치 push는 이 워크플로를 실행하지 않습니다. 수동 실행은 전체 플랫폼 검증·빌드 결과를 Actions artifact로 보관하며 릴리스를 만들지 않습니다. 버전이 일치하는 `vX.Y.Z` 태그 push만 검증·빌드 성공 후 공개로 이어집니다. 수동 실행을 요청하려면 이 워크플로가 기본 브랜치에 있어야 합니다.
+
+## 필요할 때 전체 검사 요청
+
+모든 변경에서 관련 로컬 검사를 수행합니다. 에이전트의 전체 검사 요청 기준은 [프로젝트 지침](../AGENTS.md#버전과-릴리스)에 따릅니다. OS별 코드·전역 입력·창 제어·의존성·빌드 및 배포 설정 변경 등에 전체 검사가 필요하며, 문서·단순 문구 변경은 관련 로컬 검사로 마칠 수 있습니다.
+
+검토할 커밋을 작업 브랜치에 push한 뒤 요청합니다. 아래 `ci-on-demand`는 실제 작업 브랜치로 바꿉니다.
+
+```sh
+git rev-parse HEAD
+git push -u origin ci-on-demand
+gh workflow run release.yml --ref ci-on-demand
+gh run list --workflow release.yml --branch ci-on-demand --event workflow_dispatch --limit 10 --json databaseId,url,headSha,status,conclusion
+```
+
+요청 이유·브랜치·커밋 SHA를 남기고, 목록에서 해당 요청의 실행 URL과 `headSha`가 대상 커밋과 일치하는지 확인합니다. 요청 수락만으로 검증 통과로 보고하지 않습니다. 확인한 실행 ID로 완료와 플랫폼별 결과를 조회합니다.
+
+```sh
+gh run watch <실행-ID> --exit-status
+gh run view <실행-ID> --json url,headSha,status,conclusion,jobs
+```
+
+실행 중 새 커밋을 push했다면 기존 결과는 이전 SHA에만 유효합니다. 여전히 전체 검사가 필요한 변경이면 다시 요청합니다. 수동 검사는 세 플랫폼 테스트·검사·설치 파일 빌드를 모두 수행하고 artifact를 보관하지만, 공개용 체크섬 생성과 릴리스 게시 작업은 건너뜁니다. 검사용 태그를 만들지 않으며 `vX.Y.Z` 태그는 승인된 실제 배포에만 사용합니다.
+
+참고: [GitHub 수동 실행 안내](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow).
 
 ## 버전 올리기
 
