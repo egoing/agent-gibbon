@@ -117,6 +117,17 @@ pub const OPERATIONS_ALLOWED: &[&str] = &[
     "terminal.rename",
     "terminal.close",
     "snapshot",
+    "snapshot.request",
+    "note.state.notes_wait",
+    "note.state.notes_copy",
+    "note.state.opacity",
+    "note.state.feedback",
+    "note.state.position",
+    "note.state.size",
+    "note.state.visibility",
+    "note.state.focus",
+    "note.state.pin",
+    "note.state.response",
     "save_note",
     "export_note",
     "toggle_pin",
@@ -199,6 +210,7 @@ fn options(dsn: sentry::types::Dsn, detailed: bool) -> sentry::ClientOptions {
                 "terminal.write"
                     | "terminal.output"
                     | "snapshot"
+                    | "snapshot.request"
                     | "ipc.inspect"
                     | "ipc.list"
                     | "terminal.info"
@@ -293,30 +305,35 @@ pub fn detailed() -> bool {
 thread_local! { static PARENTS: RefCell<Vec<TransactionOrSpan>> = const {RefCell::new(Vec::new())}; }
 /// Nested Rust timings are child spans, never named with note IDs, paths or commands.
 pub struct Timing {
+    local: crate::local_trace::Call,
+    _scope: crate::local_trace::Scope,
     span: Option<TransactionOrSpan>,
     op: &'static str,
     start: Instant,
 }
+fn timing_span(parent: Option<&TransactionOrSpan>, op: &'static str) -> TransactionOrSpan {
+    parent
+        .map(|parent| TransactionOrSpan::Span(parent.start_child(op, op)))
+        .unwrap_or_else(|| {
+            TransactionOrSpan::Transaction(sentry::start_transaction(
+                sentry::TransactionContext::new(op, op),
+            ))
+        })
+}
 impl Timing {
     pub fn new(op: &'static str) -> Self {
+        let local = crate::local_trace::Call::begin(op, crate::local_trace::Stage::Dispatch);
+        let scope = local.scope();
         let span = (detailed() && allowed(op)).then(|| {
             bind_client();
-            let span = PARENTS
-                .with(|p| {
-                    p.borrow()
-                        .last()
-                        .map(|parent| TransactionOrSpan::Span(parent.start_child(op, op)))
-                })
-                .unwrap_or_else(|| {
-                    TransactionOrSpan::Transaction(sentry::start_transaction(
-                        sentry::TransactionContext::new(op, op),
-                    ))
-                });
+            let span = PARENTS.with(|p| timing_span(p.borrow().last(), op));
             span.set_tag("measurement.origin", "rust");
             PARENTS.with(|p| p.borrow_mut().push(span.clone()));
             span
         });
         Self {
+            local,
+            _scope: scope,
             span,
             op,
             start: Instant::now(),
@@ -325,6 +342,9 @@ impl Timing {
 }
 impl Drop for Timing {
     fn drop(&mut self) {
+        if !std::thread::panicking() {
+            self.local.complete();
+        }
         if let Some(span) = self.span.take() {
             PARENTS.with(|p| {
                 p.borrow_mut().pop();
@@ -446,7 +466,7 @@ pub fn telemetry_heartbeat(
             started,
         );
         t.set_tag("window.kind", kind);
-        t.set_tag("measurement.origin", "webview");
+        t.set_tag("measurement.origin", "webview.aggregate");
         t.set_data("duration_ms", json!(m.duration_ms));
         t.set_data("count", json!(m.count));
         t.set_data("failure_count", json!(m.failure_count));
