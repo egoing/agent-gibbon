@@ -1,0 +1,1017 @@
+{
+  "origin": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement",
+    "id": "dev-dab6365756cd9981d7d0ff67",
+    "name": "egoing/bottom-right-memo-placement",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target/debug/agent-gibbon"
+  },
+  "cases": [
+    {
+      "manual_percent": null,
+      "samples": [
+        {
+          "stage": "new-at-cursor",
+          "windows": [
+            {
+              "title": "Item-0",
+              "alpha": 1,
+              "id": 41214,
+              "bounds": {
+                "X": 1122,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              }
+            },
+            {
+              "bounds": {
+                "X": 662,
+                "Height": 420,
+                "Y": 512,
+                "Width": 300
+              },
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-a",
+              "alpha": 1,
+              "id": 41218
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-01498541-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 1.0,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 1324,
+                "y": 1024
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": true,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "650.0 500.0",
+          "front_pid": "74919"
+        },
+        {
+          "stage": "stationary-hold-over-two-seconds",
+          "windows": [
+            {
+              "alpha": 1,
+              "id": 41214,
+              "bounds": {
+                "X": 1122,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "title": "Item-0"
+            },
+            {
+              "alpha": 1,
+              "id": 41218,
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-a",
+              "bounds": {
+                "X": 1740,
+                "Height": 420,
+                "Y": 730,
+                "Width": 300
+              }
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-01498541-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 1.0,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 1464
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "584.0 512.0",
+          "front_pid": "74919"
+        },
+        {
+          "stage": "arrived-fades-without-more-input",
+          "windows": [
+            {
+              "id": 41214,
+              "alpha": 1,
+              "bounds": {
+                "X": 1122,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "title": "Item-0"
+            },
+            {
+              "bounds": {
+                "X": 1748,
+                "Height": 420,
+                "Y": 732,
+                "Width": 300
+              },
+              "id": 41218,
+              "alpha": 0.5,
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-a"
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-01498541-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.5,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 1464
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "1307.0 -133.0",
+          "front_pid": "74919"
+        },
+        {
+          "stage": "new-opaque-existing-reflow-dim",
+          "windows": [
+            {
+              "id": 41214,
+              "bounds": {
+                "X": 1122,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "title": "Item-0",
+              "alpha": 1
+            },
+            {
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-b",
+              "bounds": {
+                "X": 995,
+                "Height": 420,
+                "Y": -565,
+                "Width": 300
+              },
+              "alpha": 1,
+              "id": 41219
+            },
+            {
+              "bounds": {
+                "X": 1748,
+                "Height": 420,
+                "Y": 732,
+                "Width": 300
+              },
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-a",
+              "alpha": 0.5,
+              "id": 41218
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-01498541-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.5,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 1464
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": true,
+              "layout_pending": false
+            },
+            {
+              "id": "spotlight-01498541-b",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 1.0,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 1990,
+                "y": -1130
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": true,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "1307.0 -133.0",
+          "front_pid": "74919"
+        },
+        {
+          "stage": "only-new-memo-holds-attention",
+          "windows": [
+            {
+              "id": 41214,
+              "alpha": 1,
+              "bounds": {
+                "X": 1122,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "title": "Item-0"
+            },
+            {
+              "bounds": {
+                "X": 1486,
+                "Height": 420,
+                "Y": 25,
+                "Width": 300
+              },
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-b",
+              "alpha": 1,
+              "id": 41219
+            },
+            {
+              "id": 41218,
+              "bounds": {
+                "X": 1748,
+                "Height": 420,
+                "Y": 732,
+                "Width": 300
+              },
+              "alpha": 0.5,
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-a"
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-01498541-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.5,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 1464
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            },
+            {
+              "id": "spotlight-01498541-b",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 1.0,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 2972,
+                "y": 50
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "1092.5 -278.5",
+          "front_pid": "74919"
+        },
+        {
+          "stage": "both-return-to-idle",
+          "windows": [
+            {
+              "title": "Item-0",
+              "bounds": {
+                "X": 1156,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "id": 41214,
+              "alpha": 1
+            },
+            {
+              "alpha": 0.5,
+              "id": 41219,
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-b",
+              "bounds": {
+                "X": 1486,
+                "Height": 420,
+                "Y": 25,
+                "Width": 300
+              }
+            },
+            {
+              "alpha": 0.5,
+              "id": 41218,
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-a",
+              "bounds": {
+                "X": 1748,
+                "Height": 420,
+                "Y": 732,
+                "Width": 300
+              }
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-01498541-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.5,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 1464
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            },
+            {
+              "id": "spotlight-01498541-b",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.5,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 2972,
+                "y": 50
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "983.0 918.5",
+          "front_pid": "74919"
+        },
+        {
+          "stage": "hidden-restore-starts-opaque",
+          "windows": [
+            {
+              "id": 41214,
+              "bounds": {
+                "X": 1156,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "alpha": 1,
+              "title": "Item-0"
+            },
+            {
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-b",
+              "alpha": 1,
+              "bounds": {
+                "X": 995,
+                "Height": 48,
+                "Y": 859,
+                "Width": 300
+              },
+              "id": 41219
+            },
+            {
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-a",
+              "id": 41218,
+              "alpha": 0.5,
+              "bounds": {
+                "X": 1748,
+                "Height": 420,
+                "Y": 732,
+                "Width": 300
+              }
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-01498541-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.5,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 1464
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": true,
+              "layout_pending": false
+            },
+            {
+              "id": "spotlight-01498541-b",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 1.0,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 1990,
+                "y": 1718
+              },
+              "size": {
+                "height": 96,
+                "width": 600
+              },
+              "animating": true,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "983.0 918.5",
+          "front_pid": "74919"
+        },
+        {
+          "stage": "rapid-open-latest-spotlight",
+          "windows": [
+            {
+              "alpha": 1,
+              "bounds": {
+                "X": 1156,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "id": 41214,
+              "title": "Item-0"
+            },
+            {
+              "id": 41230,
+              "alpha": 1,
+              "bounds": {
+                "X": 809,
+                "Height": 359,
+                "Y": 290,
+                "Width": 300
+              },
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-d"
+            },
+            {
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-c",
+              "bounds": {
+                "X": 1748,
+                "Height": 360,
+                "Y": 384,
+                "Width": 300
+              },
+              "alpha": 0.5,
+              "id": 41229
+            },
+            {
+              "alpha": 0.5,
+              "id": 41228,
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-b · Feedback",
+              "bounds": {
+                "X": 1944,
+                "Height": 36,
+                "Y": 792,
+                "Width": 104
+              }
+            },
+            {
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-b",
+              "id": 41219,
+              "alpha": 0.5,
+              "bounds": {
+                "X": 1748,
+                "Height": 48,
+                "Y": 744,
+                "Width": 300
+              }
+            },
+            {
+              "bounds": {
+                "X": 1748,
+                "Height": 360,
+                "Y": 792,
+                "Width": 300
+              },
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-a",
+              "alpha": 0.5,
+              "id": 41218
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-01498541-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.5,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 1584
+              },
+              "size": {
+                "height": 720,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            },
+            {
+              "id": "spotlight-01498541-b",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.5,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 1488
+              },
+              "size": {
+                "height": 96,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            },
+            {
+              "id": "spotlight-01498541-c",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.5,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 768
+              },
+              "size": {
+                "height": 720,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            },
+            {
+              "id": "spotlight-01498541-d",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 1.0,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3426,
+                "y": 70
+              },
+              "size": {
+                "height": 718,
+                "width": 600
+              },
+              "animating": true,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "1121.0 660.5",
+          "front_pid": "74919"
+        }
+      ],
+      "pid": 58687,
+      "executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target/debug/agent-gibbon",
+      "lsof": "p58687\nftxt\nn/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target/debug/agent-gibbon\nftxt\nn/Library/Preferences/Logging/.plist-cache.DeLYj5iT\nftxt\nn/private/var/db/analyticsd/events.allowlist\nftxt\nn/usr/lib/dyld\nftxt\nn/private/var/db/timezone/tz/2026e.1.0/icutz/icutz44l.dat\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/SystemAppearance.car\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/FauxVibrantLight.car\nftxt\nn/usr/share/icu/icudt76l.dat\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/Aqua.car\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/VibrantLight.car\nftxt\nn/System/Library/PrivateFrameworks/SFSymbols.framework/Versions/A/Resources/CoreGlyphs.bundle/Contents/Resources/Assets.car\nftxt\nn/usr/lib/libobjc-trampolines.dylib\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/InputManager.loctable\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/DictationManager.loctable\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/WritingTools.loctable\nftxt\nn/System/Library/Caches/com.apple.IntlDataCache.le.kbdx\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/MenuCommands.loctable\nftxt\nn/System/Library/Keyboard Layouts/AppleKeyboardLayouts.bundle/Contents/Resources/AppleKeyboardLayouts-L.dat\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/0/com.apple.LaunchServices.dv/com.apple.LaunchServices-6291460-v2.csstore\nftxt\nn/System/Library/Input Methods/KoreanIM.app/Contents/PlugIns/KIM_Extension.appex/Contents/Resources/InfoPlist.loctable\nftxt\nn/System/Library/Keyboard Layouts/AppleKeyboardLayouts.bundle/Contents/Resources/InfoPlist.loctable\nftxt\nn/System/Library/CoreServices/SystemVersion.bundle/English.lproj/SystemVersion.strings\nftxt\nn/System/Library/Extensions/AGXMetalG13X.bundle/Contents/Resources/ds.g13s\nftxt\nn/System/Library/Fonts/SFNS.ttf\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/STORAGE_ACCESS_PROMPT_QUIRKS.wplist\nftxt\nn/System/Library/PrivateFrameworks/MarkupUI.framework/PlugIns/Markup.appex/Contents/Resources/InfoPlist.loctable\nftxt\nn/System/Library/PrivateFrameworks/ShareKit.framework/Versions/A/PlugIns/ShareSheetUI.appex/Contents/Resources/InfoPlist.loctable\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/STORAGE_ACCESS_USER_AGENT_STRING_QUIRKS.wplist\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/RESTRICTED_OPENER_DOMAINS.wplist\nftxt\nn/System/Library/PrivateFrameworks/CoreUI.framework/Versions/A/Resources/DesignLibrary-macOS.bundle/Contents/Resources/macOSRepositories/LightStandard.car\nftxt\nn/System/Library/Extensions/AppleMetalOpenGLRenderer.bundle/Contents/MacOS/AppleMetalOpenGLRenderer\nftxt\nn/System/Library/PrivateFrameworks/ShareKit.framework/Versions/A/Resources/ShareKit.loctable\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Google/unwanted_software,osx,url_expression\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/ALLOWED_QUERY_PARAM.wplist\nftxt\nn/System/Library/Extensions/AGXMetalG13X.bundle/Contents/MacOS/AGXMetalG13X\nftxt\nn/System/Library/Frameworks/CoreImage.framework/Versions/A/Resources/Keys.loctable\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/QUERY_PARAM.wplist\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/FauxVibrantDark.car\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/Common.loctable\nftxt\nn/System/Library/Fonts/Helvetica.ttc\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/DarkAqua.car\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/VibrantDark.car\nftxt\nn/System/Library/Frameworks/CoreImage.framework/Versions/A/Resources/Filters.loctable\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Google/malware,osx,url_expression\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Apple/social_engineering,any_platform,url_expression\nftxt\nn/private/var/db/nsurlstoraged/dafsaData.bin\nftxt\nn/System/Library/Frameworks/CoreImage.framework/Versions/A/Resources/Descriptions.loctable\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Google/social_engineering,osx,url_expression",
+      "front_before_startup": "74919",
+      "front_pid": "74919",
+      "capture": {
+        "path": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/docs/verification/new-memo-spotlight/worktree/auto-new.png",
+        "pid": 58687,
+        "window": {
+          "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-01498541-b",
+          "bounds": {
+            "X": 995,
+            "Height": 420,
+            "Y": -565,
+            "Width": 300
+          },
+          "alpha": 1,
+          "id": 41219
+        },
+        "note": "spotlight-01498541-b"
+      }
+    },
+    {
+      "manual_percent": 35,
+      "samples": [
+        {
+          "stage": "new-at-cursor",
+          "windows": [
+            {
+              "id": 41271,
+              "alpha": 1,
+              "bounds": {
+                "X": 1122,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "title": "Item-0"
+            },
+            {
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-4e768357-a",
+              "alpha": 1,
+              "id": 41275,
+              "bounds": {
+                "X": 662,
+                "Height": 420,
+                "Y": 512,
+                "Width": 300
+              }
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-4e768357-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 1.0,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 1324,
+                "y": 1024
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": true,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "650.0 500.0",
+          "front_pid": "74919"
+        },
+        {
+          "stage": "stationary-hold-over-two-seconds",
+          "windows": [
+            {
+              "id": 41271,
+              "bounds": {
+                "X": 1122,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "title": "Item-0",
+              "alpha": 1
+            },
+            {
+              "bounds": {
+                "X": 662,
+                "Height": 420,
+                "Y": 512,
+                "Width": 300
+              },
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-4e768357-a",
+              "id": 41275,
+              "alpha": 1
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-4e768357-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 1.0,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 2040,
+                "y": 1168
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": true,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "650.0 500.0",
+          "front_pid": "74919"
+        },
+        {
+          "stage": "arrived-fades-without-more-input",
+          "windows": [
+            {
+              "title": "Item-0",
+              "alpha": 1,
+              "id": 41271,
+              "bounds": {
+                "X": 1122,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              }
+            },
+            {
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-4e768357-a",
+              "bounds": {
+                "X": 1748,
+                "Height": 420,
+                "Y": 732,
+                "Width": 300
+              },
+              "id": 41275,
+              "alpha": 0.3499999940395355
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-4e768357-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.35,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 1464
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "620.0 504.5",
+          "front_pid": "74919"
+        },
+        {
+          "stage": "new-opaque-existing-reflow-dim",
+          "windows": [
+            {
+              "bounds": {
+                "X": 1122,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "id": 41271,
+              "alpha": 1,
+              "title": "Item-0"
+            },
+            {
+              "id": 41276,
+              "bounds": {
+                "X": 632,
+                "Height": 420,
+                "Y": 517,
+                "Width": 300
+              },
+              "alpha": 1,
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-4e768357-b"
+            },
+            {
+              "id": 41275,
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-4e768357-a",
+              "alpha": 0.3499999940395355,
+              "bounds": {
+                "X": 1748,
+                "Height": 420,
+                "Y": 732,
+                "Width": 300
+              }
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-4e768357-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.35,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 1464
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": true,
+              "layout_pending": false
+            },
+            {
+              "id": "spotlight-4e768357-b",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 1.0,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 1264,
+                "y": 1034
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": true,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "620.0 504.5",
+          "front_pid": "74919"
+        },
+        {
+          "stage": "only-new-memo-holds-attention",
+          "windows": [
+            {
+              "bounds": {
+                "X": 1122,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "title": "Item-0",
+              "alpha": 1,
+              "id": 41271
+            },
+            {
+              "alpha": 0.8500279188156128,
+              "id": 41276,
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-4e768357-b",
+              "bounds": {
+                "X": 1748,
+                "Height": 420,
+                "Y": 312,
+                "Width": 300
+              }
+            },
+            {
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-4e768357-a",
+              "id": 41275,
+              "alpha": 0.3499999940395355,
+              "bounds": {
+                "X": 1748,
+                "Height": 420,
+                "Y": 732,
+                "Width": 300
+              }
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-4e768357-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.35,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 1464
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            },
+            {
+              "id": "spotlight-4e768357-b",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 0.5435062269148926,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 3496,
+                "y": 624
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": false,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "677.0 558.5",
+          "front_pid": "74919"
+        }
+      ],
+      "pid": 60310,
+      "executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target/debug/agent-gibbon",
+      "lsof": "p60310\nftxt\nn/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target/debug/agent-gibbon\nftxt\nn/Library/Preferences/Logging/.plist-cache.DeLYj5iT\nftxt\nn/private/var/db/timezone/tz/2026e.1.0/icutz/icutz44l.dat\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/SystemAppearance.car\nftxt\nn/usr/lib/dyld\nftxt\nn/usr/share/icu/icudt76l.dat\nftxt\nn/usr/lib/libobjc-trampolines.dylib\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/InputManager.loctable\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/DictationManager.loctable\nftxt\nn/private/var/db/analyticsd/events.allowlist\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/WritingTools.loctable\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/MenuCommands.loctable\nftxt\nn/System/Library/Input Methods/KoreanIM.app/Contents/PlugIns/KIM_Extension.appex/Contents/Resources/InfoPlist.loctable\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/FauxVibrantLight.car\nftxt\nn/System/Library/Caches/com.apple.IntlDataCache.le.kbdx\nftxt\nn/System/Library/Keyboard Layouts/AppleKeyboardLayouts.bundle/Contents/Resources/AppleKeyboardLayouts-L.dat\nftxt\nn/System/Library/Keyboard Layouts/AppleKeyboardLayouts.bundle/Contents/Resources/InfoPlist.loctable\nftxt\nn/System/Library/CoreServices/SystemVersion.bundle/English.lproj/SystemVersion.strings\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/STORAGE_ACCESS_USER_AGENT_STRING_QUIRKS.wplist\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/VibrantLight.car\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/Aqua.car\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/RESTRICTED_OPENER_DOMAINS.wplist\nftxt\nn/System/Library/PrivateFrameworks/MarkupUI.framework/PlugIns/Markup.appex/Contents/Resources/InfoPlist.loctable\nftxt\nn/System/Library/PrivateFrameworks/ShareKit.framework/Versions/A/PlugIns/ShareSheetUI.appex/Contents/Resources/InfoPlist.loctable\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/0/com.apple.LaunchServices.dv/com.apple.LaunchServices-6291460-v2.csstore\nftxt\nn/System/Library/Extensions/AppleMetalOpenGLRenderer.bundle/Contents/MacOS/AppleMetalOpenGLRenderer\nftxt\nn/System/Library/Extensions/AGXMetalG13X.bundle/Contents/Resources/ds.g13s\nftxt\nn/System/Library/PrivateFrameworks/ShareKit.framework/Versions/A/Resources/ShareKit.loctable\nftxt\nn/System/Library/Fonts/SFNS.ttf\nftxt\nn/System/Library/PrivateFrameworks/CoreUI.framework/Versions/A/Resources/DesignLibrary-macOS.bundle/Contents/Resources/macOSRepositories/LightStandard.car\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/STORAGE_ACCESS_PROMPT_QUIRKS.wplist\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Google/unwanted_software,osx,url_expression\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/ALLOWED_QUERY_PARAM.wplist\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/QUERY_PARAM.wplist\nftxt\nn/System/Library/Extensions/AGXMetalG13X.bundle/Contents/MacOS/AGXMetalG13X\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/FauxVibrantDark.car\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/Common.loctable\nftxt\nn/System/Library/Frameworks/CoreImage.framework/Versions/A/Resources/Filters.loctable\nftxt\nn/System/Library/Frameworks/CoreImage.framework/Versions/A/Resources/Keys.loctable\nftxt\nn/System/Library/Fonts/Helvetica.ttc\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Google/malware,osx,url_expression\nftxt\nn/System/Library/PrivateFrameworks/SFSymbols.framework/Versions/A/Resources/CoreGlyphs.bundle/Contents/Resources/Assets.car\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/DarkAqua.car\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/VibrantDark.car\nftxt\nn/System/Library/Frameworks/CoreImage.framework/Versions/A/Resources/Descriptions.loctable\nftxt\nn/private/var/db/nsurlstoraged/dafsaData.bin\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Google/social_engineering,osx,url_expression\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Apple/social_engineering,any_platform,url_expression",
+      "front_before_startup": "74919",
+      "front_pid": "74919",
+      "capture": {
+        "path": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/docs/verification/new-memo-spotlight/worktree/manual-new.png",
+        "pid": 60310,
+        "window": {
+          "id": 41276,
+          "bounds": {
+            "X": 632,
+            "Height": 420,
+            "Y": 517,
+            "Width": 300
+          },
+          "alpha": 1,
+          "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-4e768357-b"
+        },
+        "note": "spotlight-4e768357-b"
+      }
+    }
+  ],
+  "passed": false,
+  "alpha_mismatches": [
+    {
+      "stage": "only-new-memo-holds-attention",
+      "note": "spotlight-4e768357-b",
+      "expected": 1.0,
+      "actual": {
+        "alpha": 0.8500279188156128,
+        "id": 41276,
+        "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-4e768357-b",
+        "bounds": {
+          "X": 1748,
+          "Height": 420,
+          "Y": 312,
+          "Width": 300
+        }
+      },
+      "manual_percent": 35
+    }
+  ],
+  "error": "AssertionError({'stage': 'only-new-memo-holds-attention', 'note': 'spotlight-4e768357-b', 'expected': 1.0, 'actual': {'alpha': 0.8500279188156128, 'id': 41276, 'title': 'Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-4e768357-b', 'bounds': {'X': 1748, 'Height': 420, 'Y': 312, 'Width': 300}}, 'manual_percent': 35})",
+  "server_stopped": true,
+  "setting_restored": true
+}

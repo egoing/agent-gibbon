@@ -75,6 +75,7 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
 // Called only on Tauri's main thread. macOS `show()` makes the window key;
 // ordering it front directly preserves the user's active application.
 fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
+    opacity::reset_for_reveal(win)?;
     sync_opacity(win.clone())?;
     if stash::owns(win) {
         return Ok(());
@@ -179,7 +180,8 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
         let alpha = opacity::target(
             manual,
             hovered || feedback_hovered,
-            entrance::active(&window) || feedback::active(&window),
+            entrance::presenting(&window),
+            feedback::active(&window),
             sizing::folded(&window),
         );
         let alpha = window
@@ -208,6 +210,16 @@ fn inspect_window(win: &tauri::WebviewWindow, id: &str, note: &Note) -> Result<V
     let mut trace = local_trace::Call::new(false);
     inspect_window_traced(win, id, note, &mut trace)
 }
+fn state_stage<T>(
+    trace: &local_trace::Call,
+    stage: local_trace::Stage,
+    operation: &'static str,
+    work: impl FnOnce() -> T,
+) -> T {
+    trace.stage(stage);
+    let _timing = telemetry::Timing::new(operation);
+    work()
+}
 fn inspect_window_traced(
     win: &tauri::WebviewWindow,
     id: &str,
@@ -215,40 +227,64 @@ fn inspect_window_traced(
     trace: &mut local_trace::Call,
 ) -> Result<Value, String> {
     use local_trace::Stage;
-    trace.stage(Stage::Opacity);
-    let opacity = sync_opacity(win.clone())?;
-    trace.stage(Stage::Feedback);
-    let feedback_active = feedback::active(win);
-    trace.stage(Stage::Position);
-    let position = win.outer_position().map_err(|e| e.to_string())?;
-    trace.stage(Stage::Size);
-    let size = win.outer_size().map_err(|e| e.to_string())?;
-    trace.stage(Stage::Visibility);
-    let visible = win.is_visible().map_err(|e| e.to_string())?;
-    trace.stage(Stage::Focus);
-    let focused = win.is_focused().map_err(|e| e.to_string())?;
-    trace.stage(Stage::Pin);
-    let pinned = win.is_always_on_top().map_err(|e| e.to_string())?;
-    trace.stage(Stage::Feedback);
-    let surface = feedback_window::inspect(win)?;
-    trace.stage(Stage::Opacity);
-    let hovered = pointer_over(win)?;
-    trace.stage(Stage::Response);
-    let result = json!({"ok":true,"stash":stash::inspect(win.app_handle()),"feedback_surface":surface,"hovered":hovered,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"global_opacity":opacity::configured(win.app_handle()),"animating":entrance::active(win),"auto_layout_excluded":layout::excluded(win),"layout_pending":sizing::pending(win),"content_height_cap":sizing::content_height(win),"layout_destination":entrance::destination(win).map(|d|json!({"x":d.position.x,"y":d.position.y,"width":d.size.width,"height":d.size.height})),"visible":visible,"focused":focused,"folded": sizing::folded(win), "always_on_top":pinned,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}});
+    let opacity = state_stage(trace, Stage::Opacity, "note.state.opacity", || {
+        sync_opacity(win.clone())
+    })?;
+    let feedback_active = state_stage(trace, Stage::Feedback, "note.state.feedback", || {
+        feedback::active(win)
+    });
+    let position = state_stage(trace, Stage::Position, "note.state.position", || {
+        win.outer_position().map_err(|e| e.to_string())
+    })?;
+    let size = state_stage(trace, Stage::Size, "note.state.size", || {
+        win.outer_size().map_err(|e| e.to_string())
+    })?;
+    let visible = state_stage(trace, Stage::Visibility, "note.state.visibility", || {
+        win.is_visible().map_err(|e| e.to_string())
+    })?;
+    let focused = state_stage(trace, Stage::Focus, "note.state.focus", || {
+        win.is_focused().map_err(|e| e.to_string())
+    })?;
+    let pinned = state_stage(trace, Stage::Pin, "note.state.pin", || {
+        win.is_always_on_top().map_err(|e| e.to_string())
+    })?;
+    let surface = state_stage(trace, Stage::Feedback, "note.state.feedback", || {
+        feedback_window::inspect(win)
+    })?;
+    let hovered = state_stage(trace, Stage::Opacity, "note.state.opacity", || {
+        pointer_over(win)
+    })?;
+    let result = state_stage(
+        trace,
+        Stage::Response,
+        "note.state.response",
+        || json!({"ok":true,"stash":stash::inspect(win.app_handle()),"feedback_surface":surface,"hovered":hovered,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"global_opacity":opacity::configured(win.app_handle()),"animating":entrance::active(win),"auto_layout_excluded":layout::excluded(win),"layout_pending":sizing::pending(win),"content_height_cap":sizing::content_height(win),"layout_destination":entrance::destination(win).map(|d|json!({"x":d.position.x,"y":d.position.y,"width":d.size.width,"height":d.size.height})),"visible":visible,"focused":focused,"folded": sizing::folded(win), "always_on_top":pinned,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+    );
     trace.complete();
     Ok(result)
 }
 #[tauri::command]
-fn snapshot(window: tauri::WebviewWindow, notes: State<AppNotes>) -> Result<Value, String> {
+fn snapshot(
+    window: tauri::WebviewWindow,
+    notes: State<AppNotes>,
+    local_flow: Option<u64>,
+) -> Result<Value, String> {
+    let _scope = local_trace::webview_scope(&window, local_flow);
+    let _timing = telemetry::Timing::new("snapshot.request");
     // Tauri injects the calling window; the frontend cannot select another note.
     let mut trace = local_trace::Call::new(true);
     let id = window.label().strip_prefix("note-").unwrap_or("main");
     trace.stage(local_trace::Stage::NotesWait);
     let note = {
-        let notes = notes.lock().map_err(|e| e.to_string())?;
+        let notes = {
+            let _wait = telemetry::Timing::new("note.state.notes_wait");
+            notes.lock().map_err(|e| e.to_string())?
+        };
         trace.stage(local_trace::Stage::NotesCopy);
+        let _copy = telemetry::Timing::new("note.state.notes_copy");
         notes.get(id).cloned().ok_or("메모를 찾을 수 없습니다")?
     };
+    trace.cause(note.local_mutation);
     // Native getters and feedback inspection must not hold AppNotes.
     inspect_window_traced(&window, id, &note, &mut trace)
 }
@@ -258,7 +294,10 @@ fn save_note(
     notes: State<AppNotes>,
     markdown: String,
     expected_revision: u64,
+    local_flow: Option<u64>,
 ) -> Result<Note, String> {
+    let _scope = local_trace::webview_scope(&window, local_flow);
+    let _timing = telemetry::Timing::new("save_note");
     let id = window.label().strip_prefix("note-").unwrap_or("main");
     let mut notes = notes.lock().map_err(|e| e.to_string())?;
     let note = notes.get_mut(id).ok_or("메모를 찾을 수 없습니다")?;
@@ -268,6 +307,7 @@ fn save_note(
         markdown,
         expected_revision,
     )?;
+    note.local_mutation = local_trace::current();
     layout::mark(&window, false);
     feedback::edited(&window)?;
     Ok(note.clone())
@@ -411,6 +451,9 @@ fn apply_with_presentation(
         existing.clone().unwrap_or_default()
     };
     next.apply(&request)?;
+    if matches!(request.action, Action::Open | Action::Update) {
+        next.local_mutation = local_trace::current();
+    }
     if matches!(request.action, Action::Open) {
         focus::remember(app, &label(&id));
     }
@@ -516,6 +559,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     privacy::privacy_status,
                     privacy::privacy_save,
                     privacy::privacy_quit,
+                    local_trace::local_flow_status,
+                    local_trace::local_flow_begin,
+                    local_trace::local_flow_stage,
                     snapshot,
                     terminal::terminal_start,
                     terminal::terminal_write,
@@ -752,13 +798,14 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                             let deadline = Instant::now() + Duration::from_secs(5);
                             let mut local_call = local_trace::Call::ipc();
                             match handle.run_on_main_thread(move || {
+                                let _scope = local_call.scope();
                                 local_call.stage(local_trace::Stage::UiExecute);
                                 let result = if Instant::now() > deadline {
                                     ipc::error("요청 처리 기한이 만료되었습니다")
                                 } else {
                                     apply(&target, request).unwrap_or_else(ipc::error)
                                 };
-                                local_call.complete();
+                                local_call.finish(result["ok"] == true);
                                 let _ = tx.send(result);
                             }) {
                                 Err(e) => ipc::error(e),

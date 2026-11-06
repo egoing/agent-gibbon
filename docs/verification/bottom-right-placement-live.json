@@ -1,0 +1,518 @@
+{
+  "pid": 58138,
+  "checks": [
+    "instance/PID/title/body matched; native right and bottom work-area edges; short content height retained",
+    "six sequential opens: bottom-to-top then left-column order, zero gaps, no overlaps, bounded heights, no memo focus",
+    "visible reopen/content update preserve all current positions and sizes",
+    "hidden update preserves geometry and visibility; explicit restore joins the end of open order",
+    "rapid opens preserve order and finish without overlap"
+  ],
+  "outcome": "passed",
+  "cleanup_errors": [],
+  "front_before": "54349",
+  "front_after": "54349",
+  "pointer_restored": {
+    "scale": 2,
+    "width": 2048,
+    "x": 1215,
+    "y": 12,
+    "height": 1152
+  },
+  "origin": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement",
+    "id": "dev-dab6365756cd9981d7d0ff67",
+    "name": "egoing/bottom-right-memo-placement",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target/debug/agent-gibbon"
+  },
+  "states": {
+    "sequential": {
+      "right-bottom-9a1f79-z": {
+        "id": "right-bottom-9a1f79-z",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 3496,
+          "y": 1552
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-y": {
+        "id": "right-bottom-9a1f79-y",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 3496,
+          "y": 800
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-x": {
+        "id": "right-bottom-9a1f79-x",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 3496,
+          "y": 50
+        },
+        "size": {
+          "height": 750,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-w": {
+        "id": "right-bottom-9a1f79-w",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 2896,
+          "y": 1552
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-v": {
+        "id": "right-bottom-9a1f79-v",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 2896,
+          "y": 800
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-u": {
+        "id": "right-bottom-9a1f79-u",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 2896,
+          "y": 50
+        },
+        "size": {
+          "height": 750,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      }
+    },
+    "restored-tail": {
+      "right-bottom-9a1f79-z": {
+        "id": "right-bottom-9a1f79-z",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 3496,
+          "y": 1552
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-x": {
+        "id": "right-bottom-9a1f79-x",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 3496,
+          "y": 800
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-w": {
+        "id": "right-bottom-9a1f79-w",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 3496,
+          "y": 50
+        },
+        "size": {
+          "height": 750,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-v": {
+        "id": "right-bottom-9a1f79-v",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 2896,
+          "y": 1552
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-u": {
+        "id": "right-bottom-9a1f79-u",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 2896,
+          "y": 800
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-y": {
+        "id": "right-bottom-9a1f79-y",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 2896,
+          "y": 50
+        },
+        "size": {
+          "height": 750,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      }
+    },
+    "rapid": {
+      "right-bottom-9a1f79-z": {
+        "id": "right-bottom-9a1f79-z",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 3496,
+          "y": 1552
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-x": {
+        "id": "right-bottom-9a1f79-x",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 3496,
+          "y": 800
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-w": {
+        "id": "right-bottom-9a1f79-w",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 3496,
+          "y": 50
+        },
+        "size": {
+          "height": 750,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-v": {
+        "id": "right-bottom-9a1f79-v",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 2896,
+          "y": 1552
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-u": {
+        "id": "right-bottom-9a1f79-u",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 2896,
+          "y": 800
+        },
+        "size": {
+          "height": 752,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-y": {
+        "id": "right-bottom-9a1f79-y",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 2896,
+          "y": 50
+        },
+        "size": {
+          "height": 750,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-t": {
+        "id": "right-bottom-9a1f79-t",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 2296,
+          "y": 1464
+        },
+        "size": {
+          "height": 840,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      },
+      "right-bottom-9a1f79-s": {
+        "id": "right-bottom-9a1f79-s",
+        "instance": "dev-dab6365756cd9981d7d0ff67",
+        "position": {
+          "x": 2296,
+          "y": 624
+        },
+        "size": {
+          "height": 840,
+          "width": 600
+        },
+        "content_height_cap": 420.0,
+        "visible": true,
+        "focused": false,
+        "animating": false,
+        "auto_layout_excluded": false
+      }
+    }
+  },
+  "captures": {
+    "origin": {
+      "id": "right-bottom-9a1f79-origin",
+      "instance": "dev-dab6365756cd9981d7d0ff67",
+      "window": {
+        "isMinimized": false,
+        "width": 300,
+        "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — right-bottom-9a1f79-origin",
+        "x": 1748,
+        "y": 1103,
+        "isOffscreen": false,
+        "screenIndex": 0,
+        "id": 40638,
+        "platform": {
+          "layer": 5
+        },
+        "height": 49
+      },
+      "app": {
+        "pid": 58138,
+        "name": "agent-gibbon",
+        "bundleId": null
+      },
+      "position": {
+        "x": 3496,
+        "y": 2206
+      },
+      "size": {
+        "height": 98,
+        "width": 600
+      }
+    },
+    "six-notes-first": {
+      "id": "right-bottom-9a1f79-z",
+      "instance": "dev-dab6365756cd9981d7d0ff67",
+      "window": {
+        "screenIndex": 0,
+        "x": 1748,
+        "isOffscreen": false,
+        "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — right-bottom-9a1f79-z",
+        "id": 40642,
+        "isMinimized": false,
+        "platform": {
+          "layer": 5
+        },
+        "height": 376,
+        "width": 300,
+        "y": 776
+      },
+      "app": {
+        "name": "agent-gibbon",
+        "pid": 58138,
+        "bundleId": null
+      },
+      "position": {
+        "x": 3496,
+        "y": 1552
+      },
+      "size": {
+        "height": 752,
+        "width": 600
+      }
+    },
+    "rapid-last": {
+      "id": "right-bottom-9a1f79-s",
+      "instance": "dev-dab6365756cd9981d7d0ff67",
+      "window": {
+        "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — right-bottom-9a1f79-s",
+        "height": 420,
+        "isMinimized": false,
+        "isOffscreen": false,
+        "x": 1148,
+        "platform": {
+          "layer": 5
+        },
+        "y": 312,
+        "width": 300,
+        "id": 40655,
+        "screenIndex": 0
+      },
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": null,
+        "pid": 58138
+      },
+      "position": {
+        "x": 2296,
+        "y": 624
+      },
+      "size": {
+        "height": 840,
+        "width": 600
+      }
+    }
+  },
+  "screens": [
+    {
+      "visible": [
+        0,
+        0,
+        2048,
+        1127
+      ],
+      "frame": [
+        0,
+        0,
+        2048,
+        1152
+      ],
+      "scale": 2
+    },
+    {
+      "scale": 2,
+      "visible": [
+        -1728,
+        35,
+        1728,
+        1085
+      ],
+      "frame": [
+        -1728,
+        35,
+        1728,
+        1117
+      ]
+    },
+    {
+      "visible": [
+        0,
+        1152,
+        1920,
+        1080
+      ],
+      "frame": [
+        0,
+        1152,
+        1920,
+        1080
+      ],
+      "scale": 2
+    }
+  ]
+}

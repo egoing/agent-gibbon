@@ -123,6 +123,8 @@ impl Request {
 
 #[derive(Clone, Serialize)]
 pub struct Note {
+    #[serde(skip)]
+    pub local_mutation: Option<u64>,
     // Session-only intent; Store deliberately does not persist this flag.
     pub edit_on_open: bool,
     pub capture: Option<crate::capture::ImageNote>,
@@ -144,6 +146,7 @@ pub struct Note {
 impl Default for Note {
     fn default() -> Self {
         Self {
+            local_mutation: None,
             edit_on_open: false,
             capture: None,
             title: "Agent Gibbon".into(),

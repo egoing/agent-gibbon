@@ -24,29 +24,33 @@ let needsFit = true;
 let fitting = false;
 let layoutPending = false;
 let folded = false;
-async function fitContent() {
+async function fitContent(flow) {
   if (latestNote?.capture || !needsFit || fitting || (editing && !layoutPending) || folded) return;
   fitting = true;
-  // Measure natural flow independently of the current window height.
-  const measure = $('viewport').cloneNode(true);
-  measure.id = 'measure-viewport';
-  measure.querySelector('#editor')?.remove();
-  measure.querySelector('#controls')?.remove();
-  const measuredContent = measure.querySelector('#content');
-  measuredContent.hidden = false;
-  measuredContent.innerHTML = latestNote.html;
-  Object.assign(measure.style, {
-    position: 'fixed', left: '-10000px', top: '0', visibility: 'hidden',
-    display: 'flow-root', flex: 'none', width: '298px', minWidth: '298px',
-    maxWidth: '298px', height: 'auto', minHeight: '0', maxHeight: 'none',
-    overflow: 'visible', padding: '3px', overflowWrap: 'anywhere', pointerEvents: 'none',
+  const {width, height} = (flow?.measure || ((_stage, work) => work()))('measure', () => {
+    // Measure natural flow independently of the current window height.
+    const measure = $('viewport').cloneNode(true);
+    measure.id = 'measure-viewport';
+    measure.querySelector('#editor')?.remove();
+    measure.querySelector('#controls')?.remove();
+    const measuredContent = measure.querySelector('#content');
+    measuredContent.hidden = false;
+    measuredContent.innerHTML = latestNote.html;
+    Object.assign(measure.style, {
+      position: 'fixed', left: '-10000px', top: '0', visibility: 'hidden',
+      display: 'flow-root', flex: 'none', width: '298px', minWidth: '298px',
+      maxWidth: '298px', height: 'auto', minHeight: '0', maxHeight: 'none',
+      overflow: 'visible', padding: '3px', overflowWrap: 'anywhere', pointerEvents: 'none',
+    });
+    document.body.appendChild(measure);
+    const rect = measure.getBoundingClientRect();
+    const width = Math.ceil(rect.width + 2);
+    const height = Math.ceil(rect.height + 2);
+    measure.remove();
+    return {width, height};
   });
-  document.body.appendChild(measure);
-  const rect = measure.getBoundingClientRect();
-  const width = Math.ceil(rect.width + 2);
-  const height = Math.ceil(rect.height + 2);
-  measure.remove();
-  try { needsFit = !await invoke('fit_note', { width, height, revision: latestNote.revision }); }
+  flow?.stage('fit');
+  try { needsFit = !await (flow?.invoke || invoke)('fit_note', { width, height, revision: latestNote.revision }); }
   catch (error) { failure(error); }
   finally { fitting = false; }
 }
@@ -67,7 +71,7 @@ $('font-size').addEventListener('click', () => {
   $('font-size').setAttribute('aria-label', `글자 크기 ${size}px, 클릭하여 변경`);
 });
 let restoringEditorFocus = false;
-function endEditing() {
+function endEditing(flow) {
   contentAction();
   editing = false;
   document.body.classList.toggle('editing', false);
@@ -77,10 +81,12 @@ function endEditing() {
   $('edit').disabled = false;
   clearNotice();
   needsFit = true;
-  fitContent();
+  const fitted = fitContent(flow);
+  flow?.follow?.(fitted);
   restoringEditorFocus = true;
   $('edit').focus();
   restoringEditorFocus = false;
+  return fitted;
 }
 function beginEditing() {
   if (!latestNote || editing) return;
@@ -105,16 +111,20 @@ async function save() {
   publishFeedback();
   $('markdown').readOnly = true;
   try {
-    latestNote = await invoke('save_note', { markdown: $('markdown').value, expectedRevision: editRevision });
-    highlightRevision = null;
-    acknowledgedRevision = latestNote.revision;
+    await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('note.save', async flow => {
+      latestNote = await flow.invoke('save_note', { markdown: $('markdown').value, expectedRevision: editRevision });
+      highlightRevision = null;
+      acknowledgedRevision = latestNote.revision;
 
-    // Direct saves confirm the content; subsequent external revisions can highlight again.
-    $('content').innerHTML = latestNote.html;
-    displayedHtml = $('content').innerHTML;
-    revision = latestNote.revision;
-    endEditing();
-    notify('저장했습니다');
+      flow.stage('response');
+      // Direct saves confirm the content; subsequent external revisions can highlight again.
+      (flow.measure || ((_stage, work) => work()))('dom', () => { $('content').innerHTML = latestNote.html; });
+      displayedHtml = $('content').innerHTML;
+      revision = latestNote.revision;
+      endEditing(flow);
+      notify('저장했습니다');
+      flow.frame?.();
+    });
   } catch (error) { failure(error); }
   finally {
     saving = false;
@@ -166,66 +176,75 @@ async function exportNote() {
 $('export').addEventListener('click', exportNote);
 async function refresh(schedule = true) {
   try {
-    const state = await invoke('snapshot');
-    latestNote = state.note;
-    layoutPending = !!state.layout_pending;
-    if (layoutPending) needsFit = true;
-    memoVisible = state.visible !== false;
-    if (!memoVisible) feedbackSignature = undefined;
-    document.body.classList.toggle('pointer-over', !!state.hovered);
-    $('dev-instance').hidden = !state.dev_label;
-    $('dev-instance').textContent = state.dev_label ? 'DEV' : '';
-    $('dev-instance').title = state.dev_label || '';
-    $('dev-instance').setAttribute('aria-label', state.dev_label || '');
-    $('fold-title').textContent = state.dev_label ? `[${state.dev_label}] ${state.note.title}` : state.note.title;
-    $('fold-title').title = state.note.title;
-    $('edit').disabled = editing || !!state.note.capture;
-    $('font-size').disabled = !!state.note.capture;
-    $('copy').disabled = editing;
-    const copyLabel = state.note.capture ? '이미지 복사' : '본문 복사';
-    $('copy').title = `${copyLabel} · ${shortcut('C')}`;
-    $('copy').setAttribute('aria-label', copyLabel);
-    document.body.classList.toggle('image-note', !!state.note.capture);
-    if (revision !== state.note.revision) {
-      const theme = themeFor(state.note.color);
-      document.documentElement.style.setProperty('--background', state.note.color);
-      document.documentElement.style.setProperty('--foreground', theme.foreground);
-      document.documentElement.style.colorScheme = theme.scheme;
-      document.documentElement.style.setProperty('--border', theme.border);
-      document.documentElement.style.setProperty('--panel', theme.panel);
-      $('viewport').setAttribute('aria-label', state.note.title || '메모 내용');
-      // HTML is generated and sanitized in Rust; no user HTML reaches this sink.
-      // Feedback rendering is synchronized below even when revision is unchanged.
-      revision = state.note.revision;
-      needsFit = true;
-    }
-    highlightRevision = (state.highlight_revision ?? -1) > acknowledgedRevision ? state.highlight_revision : null;
-    publishFeedback();
-    const html = highlightRevision !== null ? state.note.change_html : (state.note.completion_html ?? state.note.html);
-    if (displayedHtml !== html) {
-      $('content').innerHTML = html;
-      if (state.note.capture) {
-        const img = document.createElement('img');
-        img.alt = '화면 캡처'; img.draggable = false;
-        img.src = await invoke('note_image');
-        $('content').replaceChildren(img);
+    await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('note.refresh', async flow => {
+      const state = await flow.invoke('snapshot');
+      flow.stage('response');
+      latestNote = state.note;
+      layoutPending = !!state.layout_pending;
+      if (layoutPending) needsFit = true;
+      memoVisible = state.visible !== false;
+      if (!memoVisible) feedbackSignature = undefined;
+      document.body.classList.toggle('pointer-over', !!state.hovered);
+      $('dev-instance').hidden = !state.dev_label;
+      $('dev-instance').textContent = state.dev_label ? 'DEV' : '';
+      $('dev-instance').title = state.dev_label || '';
+      $('dev-instance').setAttribute('aria-label', state.dev_label || '');
+      $('fold-title').textContent = state.dev_label ? `[${state.dev_label}] ${state.note.title}` : state.note.title;
+      $('fold-title').title = state.note.title;
+      $('edit').disabled = editing || !!state.note.capture;
+      $('font-size').disabled = !!state.note.capture;
+      $('copy').disabled = editing;
+      const copyLabel = state.note.capture ? '이미지 복사' : '본문 복사';
+      $('copy').title = `${copyLabel} · ${shortcut('C')}`;
+      $('copy').setAttribute('aria-label', copyLabel);
+      document.body.classList.toggle('image-note', !!state.note.capture);
+      if (revision !== state.note.revision) {
+        const theme = themeFor(state.note.color);
+        document.documentElement.style.setProperty('--background', state.note.color);
+        document.documentElement.style.setProperty('--foreground', theme.foreground);
+        document.documentElement.style.colorScheme = theme.scheme;
+        document.documentElement.style.setProperty('--border', theme.border);
+        document.documentElement.style.setProperty('--panel', theme.panel);
+        $('viewport').setAttribute('aria-label', state.note.title || '메모 내용');
+        // HTML is generated and sanitized in Rust; no user HTML reaches this sink.
+        // Feedback rendering is synchronized below even when revision is unchanged.
+        revision = state.note.revision;
+        needsFit = true;
       }
-      displayedHtml = html;
-    }
-    $('pin').setAttribute('aria-pressed', String(state.always_on_top));
-    if (!initialEditHandled) {
-      initialEditHandled = true;
-      if (state.note.edit_on_open && !state.note.capture) beginEditing();
-    }
-    await fitContent();
-    const reading = memoVisible && (state.focused || state.feedback_surface?.focused);
-    if (reading && !editing) readRevision = state.note.revision;
-    if (wasReading && !reading) {
-      const observed = readRevision;
-      readRevision = null;
-      if (observed !== null) await acknowledge(observed);
-    }
-    wasReading = !!reading;
+      highlightRevision = (state.highlight_revision ?? -1) > acknowledgedRevision ? state.highlight_revision : null;
+      publishFeedback();
+      const html = highlightRevision !== null ? state.note.change_html : (state.note.completion_html ?? state.note.html);
+      const changed = displayedHtml !== html;
+      if (changed) {
+        (flow.measure || ((_stage, work) => work()))('dom', () => { $('content').innerHTML = html; });
+        if (state.note.capture) {
+          const img = document.createElement('img');
+          img.alt = '화면 캡처'; img.draggable = false;
+          img.src = await invoke('note_image');
+          $('content').replaceChildren(img);
+        }
+        displayedHtml = html;
+      }
+      $('pin').setAttribute('aria-pressed', String(state.always_on_top));
+      if (!initialEditHandled) {
+        initialEditHandled = true;
+        if (state.note.edit_on_open && !state.note.capture) beginEditing();
+      }
+      await fitContent(flow);
+      const reading = memoVisible && (state.focused || state.feedback_surface?.focused);
+      if (reading && !editing) readRevision = state.note.revision;
+      if (wasReading && !reading) {
+        const observed = readRevision;
+        readRevision = null;
+        if (observed !== null) await acknowledge(observed);
+      }
+      wasReading = !!reading;
+
+      if (changed && document.visibilityState === 'visible') {
+        // Observation only: do not delay refresh/fit waiting for a hidden WebView.
+        flow.frame?.();
+      }
+    });
   } catch (error) { failure(error); }
   if (schedule) setTimeout(refresh, 350);
 }

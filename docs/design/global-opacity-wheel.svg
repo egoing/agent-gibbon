@@ -5,8 +5,10 @@
 <text x="32" y="43" font-size="24" font-weight="600">전체 메모 투명도 · 보조키 + 휠</text>
 <text x="32" y="75" font-size="15">Ctrl + Alt + Cmd(macOS) / Win(Windows) · 위로: 선명하게 · 아래로: 흐리게</text>
 <rect x="32" y="106" width="1016" height="258" rx="4" fill="url(#desk)"/>
-<g opacity=".35"><rect x="65" y="141" width="275" height="165" rx="4" fill="#20252e" stroke="#656d79"/><rect x="739" y="141" width="275" height="165" rx="4" fill="#20252e" stroke="#656d79"/>
-<g fill="#f3f4f6" font-size="16"><text x="80" y="168">메모 A · 포인터 밖</text><text x="754" y="168">메모 C · 새로 열기</text><text x="80" y="207">저장된 불투명도 35%</text><text x="754" y="207">저장된 값 적용</text></g></g>
+<g opacity=".35"><rect x="65" y="141" width="275" height="165" rx="4" fill="#20252e" stroke="#656d79"/>
+<g fill="#f3f4f6" font-size="16"><text x="80" y="168">메모 A · 기존 메모</text><text x="80" y="207">재배치 중에도 저장값 35%</text></g></g>
+<rect x="739" y="141" width="275" height="165" rx="4" fill="#20252e" stroke="#656d79"/>
+<g fill="#f3f4f6" font-size="16"><text x="754" y="168">메모 C · 새로 열기</text><text x="754" y="207">등장 중 100%로 표시</text><text x="754" y="246" font-size="13">도착 후 2초 대기 + 600ms 복귀</text><text x="754" y="273" font-size="13">저장값 35%는 유지</text></g>
 <rect x="402" y="141" width="275" height="165" rx="4" fill="#20252e" stroke="#656d79"/>
 <g fill="#f3f4f6" font-size="16"><text x="417" y="168">메모 B · 포인터 접촉 중</text><text x="417" y="207">즉시 100%로 표시</text><text x="417" y="246" font-size="13">이탈 후 2초 대기 + 600ms 복귀</text><text x="417" y="273" font-size="13">저장값 35%는 유지</text></g>
 <text x="64" y="340" font-size="14">체크 무늬는 뒤의 화면을 나타내는 설명용 배경입니다.</text>

@@ -264,6 +264,19 @@ pub fn active(window: &WebviewWindow) -> bool {
         .map(|flights| flights.contains_key(window.label()))
         .unwrap_or(false)
 }
+// Reflow moves existing memos too, but only a newly revealed memo gets attention.
+pub fn presenting(window: &WebviewWindow) -> bool {
+    window
+        .state::<Entrances>()
+        .0
+        .lock()
+        .map(|flights| {
+            flights
+                .get(window.label())
+                .is_some_and(|flight| flight.from_size.is_none())
+        })
+        .unwrap_or(false)
+}
 // Keep the destination rectangle in its own monitor's physical coordinate space.
 // The live window may temporarily reside on a monitor with another scale.
 pub fn destination(window: &WebviewWindow) -> Option<Destination> {
@@ -466,6 +479,7 @@ pub fn transition(window: &WebviewWindow, destination: Destination) -> Result<()
                 },
             },
         );
+    crate::sync_opacity(window.clone())?;
     run_frames(window, start, started);
     Ok(())
 }
@@ -537,6 +551,7 @@ fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, 
             "position-mismatch",
             || serde_json::json!({"flight":flight_trace(&flight),"actual":actual}),
         );
+        crate::sync_opacity(window.clone())?;
         return Ok(false);
     }
     let hidden = !window.is_visible().map_err(|e| e.to_string())?;
@@ -577,6 +592,8 @@ fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, 
     );
     flight.expected = next;
     if t >= 1.0 {
+        // Start the normal fade even if the pointer stops moving at arrival.
+        crate::sync_opacity(window.clone())?;
         return Ok(false);
     }
     state
