@@ -62,3 +62,33 @@ actionlint는 공식 `rhysd/actionlint`의 v1.7.12 macOS ARM64 배포 파일을 
 ## 커밋·원격 검사 착수
 
 사용자가 커밋·병합·push·워크스페이스 삭제를 지시하여 승인 대기를 해제했다. 배포 설정 변경이므로 작업 브랜치 `ci-on-demand`에 검토할 커밋을 push한 뒤 `gh workflow run release.yml --ref ci-on-demand`로 전체 검사를 요청한다. 이 시점에는 원격 검사 결과를 아직 통과로 판단하지 않는다. 실제 대상 SHA·실행 URL·플랫폼별 결과는 완료 후 아래에 추가한다.
+
+## 실제 GitHub 실행 결과
+
+- 요청 이유: Release 워크플로 실행 조건 변경에 대한 세 플랫폼 전체 검사와 수동 실행의 공개 차단 확인.
+- 대상 브랜치: `ci-on-demand`.
+- 검사한 커밋: `1ec41768c6164d3975bc7ec570bf0069980732f4`.
+- 실행: [42198469319](https://github.com/egoing/agent-gibbon/actions/runs/42198469319), 이벤트 `workflow_dispatch`, `headSha`가 대상 커밋과 일치.
+- 명령: `git push -u origin ci-on-demand`, `gh workflow run release.yml --ref ci-on-demand`, `gh run view 42198469319 --json url,headSha,event,status,conclusion,jobs`.
+- 작업 브랜치 push 후 및 수동 검사 완료 후 `gh run list --workflow release.yml --branch ci-on-demand --event push --limit 10 --json databaseId,headSha,status`가 모두 `[]`를 반환했다. 관측 구간에서 브랜치 push 자동 실행이 없었다.
+
+| 작업 | 결과 |
+|---|---|
+| `validate` | 성공, 버전 일치 |
+| macOS ARM64 (`macos-15`) | Rustfmt·Rust 테스트·Node 테스트·Clippy·앱/DMG 빌드·artifact 업로드 성공 |
+| macOS Intel (`macos-15-intel`) | Rustfmt·Rust 테스트·Node 테스트·Clippy·앱/DMG 빌드·artifact 업로드 성공 |
+| Windows x64 (`windows-2022`) | Rustfmt·Rust 테스트·Node 테스트·Clippy·NSIS 빌드·artifact 업로드 성공 |
+| `publish` | `skipped`, 수동 실행의 게시 차단 확인 |
+| 워크플로 전체 | `completed` / `success` |
+
+`gh run download 42198469319 --dir <임시 디렉터리>`로 artifact 세 개를 내려받아 각 폴더에 아래 설치 파일이 하나씩 존재하고 크기가 0보다 큰지 확인했다. 확인 후 임시 디렉터리를 제거했다.
+
+| Artifact | 설치 파일 | 크기 (bytes) |
+|---|---|---:|
+| `installer-macos-arm64` | `Agent Gibbon_0.2.7_aarch64.dmg` | 7467205 |
+| `installer-macos-x64` | `Agent Gibbon_0.2.7_x64.dmg` | 7910907 |
+| `installer-windows-x64` | `Agent Gibbon_0.2.7_x64-setup.exe` | 4979666 |
+
+설치 파일 실행·설치·GUI 및 태그 push에 의한 공개 배포는 검증하지 않았다. 실제 태그를 발행하지 않았으며 태그 배포 경계는 앞의 정적 비교 범위다. 수동 실행에서는 설계대로 공개용 체크섬을 생성하지 않았다.
+
+이 결과를 추가하는 후속 커밋은 이 검증 문서만 변경하며 관련 로컬 검사로 확인한다. 위 CI 성공은 명시한 `1ec4176` 커밋의 결과이고, 후속 문서 커밋을 대상으로 전체 CI를 실행한 것으로 보고하지 않는다. 이번 실행 조건 변경의 확신도 **5** (실제 GitHub 환경에서 브랜치 push 미실행·수동 검사 성공·게시 생략 확인), 위험도 **Low**.
