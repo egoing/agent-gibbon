@@ -21,3 +21,5 @@
 - 최종 서버 PID **36728**, instance `dev-b09222c3d68057de28b6eb9c`. [실행 근거](issue65-focus/evidence.json)의 `passed:true`, `test_server_stopped:true`를 확인했다. lsof 실행 경로·동일 PID의 정확한 창 제목과 CLI instance/고유 본문을 대조했다.
 - 롤오버로 diff가 유지되고, 포커스 진입에도 유지되며, 다른 테스트 메모로 포커스를 옮기면 정리됐다. 포커스 중 새 diff는 유지되고 다음 이탈에 정리됐다. 완료 강조의 hover 유지, 숨긴 peer 갱신, geometry·핀 보존을 확인했다. 변경 전용 Feedback도 보이지 않았다.
 - 이번 macOS native 범위 Conf 5, Risk Medium. Windows·Intel 실제 GUI 및 모든 편집 조합은 여전히 미검증이다.
+
+최신 main `ab14680` 통합 후 Rust 169개·UI 103개·Rustfmt·Clippy·개발 빌드와 native smoke 재검증을 통과했다. 최종 실행 근거 JSON/캡처는 이 통합 빌드에서 갱신했다. 변경 전용 Feedback도 숨김을 확인했다.
