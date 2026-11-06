@@ -1,0 +1,85 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-77-otu-themes",
+  "base_sha": "30a39e9354b0c7298048d7e9b98af65b29c92012",
+  "instance": "dev-f1d9811e5ba88a2ec84a8faa",
+  "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-77-otu-themes/src-tauri/target/debug/agent-gibbon",
+  "pid": 11157,
+  "note_id": "issue77-titlebar-probe",
+  "probe_marker": "TITLEBAR77-f1d9811e",
+  "cli_ok": true,
+  "manager_window_id": 41763,
+  "manager_native_title": "Agent Gibbon [DEV egoing/issue-77-otu-themes · f1d9811e] — 메모 관리",
+  "restored_frame": {
+    "x": -1329,
+    "y": 354,
+    "width": 944,
+    "height": 480
+  },
+  "privacy": {
+    "notice_ready": true,
+    "onboarding_required": false,
+    "sharing_allowed": false,
+    "terms_accepted": false,
+    "terms_skipped": true
+  },
+  "final_visibility": {
+    "issue77-theme-plan": false,
+    "issue77-titlebar-probe": false,
+    "main": false
+  },
+  "pixel_samples": {
+    "points_2x": [
+      [
+        700,
+        20
+      ],
+      [
+        700,
+        150
+      ]
+    ],
+    "white": [
+      [
+        248,
+        248,
+        248
+      ],
+      [
+        248,
+        248,
+        248
+      ]
+    ],
+    "gray": [
+      [
+        223,
+        226,
+        221
+      ],
+      [
+        223,
+        226,
+        221
+      ]
+    ],
+    "black": [
+      [
+        38,
+        38,
+        39
+      ],
+      [
+        38,
+        38,
+        39
+      ]
+    ]
+  },
+  "drag_result": "background input delivered but position unchanged; real drag unverified",
+  "asset_sha256": {
+    "ui/manager-theme.js": "93c2bc08bf81f4212d7ff927666a041418a1ed820bfa966ac0fd4b45646aa6cb",
+    "ui/manager.html": "6d36ba6d18c78219586e912877cb489541fec2f5c2ec442e733188dc6f423c91",
+    "src-tauri/src/manager.rs": "51428c208fe5623120f6f367e097600a569f7073d7f616759ebd3845b74f69ac",
+    "src-tauri/src/main.rs": "0db96ad2750d04722c26cc87ea33514db3b6a92794d6248469ef8f0dbf462f30"
+  }
+}

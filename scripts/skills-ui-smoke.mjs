@@ -8,7 +8,7 @@ const browser=await puppeteer.launch({executablePath:process.env.CHROME_BIN||'/A
 try {
  const page=await browser.newPage();const errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));
  await page.setRequestInterception(true);
- page.on('request',r=>{const url=new URL(r.url());if(url.hostname!=='gibbon.test'){external.push(r.url());return r.abort();}const file=root+'ui'+url.pathname;if(!fs.existsSync(file))return r.respond({status:404,body:''});return r.respond({status:200,contentType:file.endsWith('.css')?'text/css':file.endsWith('.js')?'text/javascript':'text/html',body:fs.readFileSync(file)});});
+ page.on('request',r=>{const url=new URL(r.url());if(url.hostname!=='gibbon.test'){external.push(r.url());return r.abort();}const file=root+'ui'+url.pathname;if(!fs.existsSync(file))return r.respond({status:404,body:''});return r.respond({status:200,contentType:file.endsWith('.css')?'text/css':/\.(m?js)$/.test(file)?'text/javascript':'text/html',body:fs.readFileSync(file)});});
  await page.evaluateOnNewDocument(()=>{
   let skills=[{id:'agent-gibbon',name:'메모 관리',description:'Agent Gibbon의 메모 생성·조회·갱신·숨기기를 사용합니다. 기존 창의 위치와 포커스, 숨김 상태를 유지합니다.',enabled:false},{id:'agent-gibbon-progress',name:'작업 진행 표시',description:'작업 계획과 진행상황을 플로팅 체크리스트 메모로 표시합니다. 실제로 끝난 단계와 미검증 범위를 구분하며 같은 메모를 갱신합니다.',enabled:false}];
   window.calls=[];window.__TAURI__={core:{invoke:async(name,args)=>{
@@ -43,7 +43,7 @@ try {
   await page.waitForFunction(()=>document.querySelector('.skill-switch').getAttribute('aria-checked')==='true');
   assert.equal(await page.$eval('.skill-item',e=>e.dataset.enabled),'true');
   assert.equal(await page.evaluate(()=>document.activeElement.getAttribute('role')),'switch');
-  assert.equal(await page.$eval('.skill-item',e=>getComputedStyle(e).backgroundColor),'rgb(238, 248, 239)');
+  assert.equal(await page.$eval('.skill-item',e=>getComputedStyle(e).backgroundColor),'rgb(228, 240, 229)');
   await summary.focus();await page.keyboard.press('Enter');assert.equal(await page.$eval('.skill-item',e=>e.open),false);
   assert.equal(await page.$eval('.skill-item',e=>e.dataset.enabled),'true');
   await summary.click();buttons=await toggle();await buttons[0].focus();await page.keyboard.press('Space');

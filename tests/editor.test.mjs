@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-import { themeFor } from '../ui/theme.mjs';
+import { memoThemeFor } from '../ui/theme.mjs';
+import { readMemoAppearance } from '../ui/appearance.mjs';
 import { feedbackView, durations } from '../ui/feedback-state.mjs';
 
 async function setup(storage = new Map(), instance = {}, initialNote = {}, platform = "MacIntel") {
@@ -40,7 +41,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
   const context = vm.createContext({
     navigator: { platform },
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
-    themeFor, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
+    memoThemeFor, readMemoAppearance, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
       createElement() { return { style: {}, setAttribute() {}, remove() {}, get innerText() { return this.innerHTML.replace(/<[^>]+>/g, '').trim(); } }; },
       createElement() { return { style: {}, setAttribute() {}, remove() {},
@@ -76,6 +77,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
       window: { getCurrentWindow: () => ({ label: 'memo-test', startDragging: async () => calls.push(['drag']) }) },
     } },
   });
+  context.window.localStorage = context.localStorage;
   vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace(/^import .*;$/gm, ''), context);
   await new Promise(setImmediate);
   const action = async payload => { await nativeEvents['feedback-action']({ payload: { owner: 'memo-test', action: payload, revision: view().revision } }); await new Promise(setImmediate); };
@@ -641,4 +643,15 @@ test('companion focus continues the same reading session', async () => {
   assert.equal(app.view().revision, 2);
   app.state({ feedback_surface: { focused: false } }); await app.refresh();
   assert.equal(app.view().revision, null);
+});
+
+test('independent memo designs preserve editor drafts and original colors without a note revision',async()=>{
+ const storage=new Map();const app=await setup(storage,{}, {color:'#ffeeaa'});
+ assert.equal(app.styles['--background'],'#dfe2dd');
+ app.element('edit').listeners.click();app.element('markdown').value='보존할 초안';
+ storage.set('agent-gibbon.manager-theme','black');await app.refresh();assert.equal(app.styles['--background'],'#dfe2dd');
+ for(const [design,bg] of [['white','#f8f8f8'],['black','#262627'],['color','#ffeeaa'],['system','#dfe2dd'],['gray','#dfe2dd']]){
+  storage.set('agent-gibbon.memo-design',design);await app.refresh();assert.equal(app.styles['--background'],bg);assert.equal(app.element('markdown').value,'보존할 초안');
+ }
+ assert(!app.calls.some(([name])=>name==='save_note'));
 });

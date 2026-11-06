@@ -12,7 +12,7 @@ function syncVisibility() {
   visibilityView.button.disabled = visibilityPending.has(note.id);
 }
 // Register settings destinations here; navigation preserves each panel's DOM.
-const settingsSections = ['privacy', 'skills'];
+const settingsSections = ['privacy', 'skills', 'appearance'];
 let selectedSettingsSection = 'privacy';
 function settingsSection(selectedSection) {
   selectedSettingsSection = selectedSection;

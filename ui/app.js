@@ -1,5 +1,6 @@
 'use strict';
-import { themeFor } from './theme.mjs';
+import { memoThemeFor } from './theme.mjs';
+import { readMemoAppearance } from './appearance.mjs';
 import { feedbackView, durations } from './feedback-state.mjs';
 const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const win = window.__TAURI__.window.getCurrentWindow();
@@ -8,6 +9,15 @@ const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
 const shortcut = key => isMac ? `⌘${key}` : `Ctrl+${key}`;
 $('export').title = `파일로 저장 · ${shortcut('S')}`;
 let revision = -1;
+let appearanceSignature;
+function applyMemoAppearance(color) {
+  const theme = memoThemeFor(color, readMemoAppearance(window));
+  const next = JSON.stringify(theme);
+  if (next === appearanceSignature) return;
+  for (const key of ['background', 'foreground', 'border', 'panel']) document.documentElement.style.setProperty(`--${key}`, theme[key]);
+  document.documentElement.style.colorScheme = theme.scheme;
+  appearanceSignature = next;
+}
 let latestNote;
 let displayedHtml;
 let highlightRevision = null;
@@ -198,13 +208,9 @@ async function refresh(schedule = true) {
       $('copy').title = `${copyLabel} · ${shortcut('C')}`;
       $('copy').setAttribute('aria-label', copyLabel);
       document.body.classList.toggle('image-note', !!state.note.capture);
+      // Refresh CSS independently of revisions; preserve drafts and local trace stages.
+      applyMemoAppearance(state.note.color);
       if (revision !== state.note.revision) {
-        const theme = themeFor(state.note.color);
-        document.documentElement.style.setProperty('--background', state.note.color);
-        document.documentElement.style.setProperty('--foreground', theme.foreground);
-        document.documentElement.style.colorScheme = theme.scheme;
-        document.documentElement.style.setProperty('--border', theme.border);
-        document.documentElement.style.setProperty('--panel', theme.panel);
         $('viewport').setAttribute('aria-label', state.note.title || '메모 내용');
         // HTML is generated and sanitized in Rust; no user HTML reaches this sink.
         // Feedback rendering is synchronized below even when revision is unchanged.

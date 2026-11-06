@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko"><head><script src="telemetry.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>메모 관리</title><link rel="stylesheet" href="manager.css"><script src="privacy.js" defer></script><script src="skills.js" defer></script><script src="manager.js" defer></script></head>
+<html lang="ko"><head><script src="telemetry.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>메모 관리</title><link rel="stylesheet" href="manager.css"><script src="manager-theme.js"></script><script type="module" src="memo-preview.js"></script><script src="privacy.js" defer></script><script src="skills.js" defer></script><script src="manager.js" defer></script></head>
 <body><header><strong>Agent Gibbon</strong><nav id="manager-navigation" aria-label="관리 탐색" hidden><button id="notes-nav" aria-pressed="true">모든 메모</button><button id="settings-nav" aria-pressed="false">설정</button></nav></header>
 <div id="error" role="alert" hidden>메모를 읽지 못했습니다. <button id="retry">다시 시도</button></div>
 <main id="notes-page" hidden><aside aria-label="메모 목록"><div class="list-heading"><h2>모든 메모</h2><button id="refresh" aria-label="메모 목록 새로고침">새로고침</button></div><div id="list"></div></aside><section id="detail" aria-label="메모 상세" tabindex="0"><p>메모를 선택하세요.</p></section></main>
@@ -7,8 +7,37 @@
 <aside class="settings-sidebar"><h1>설정</h1><nav aria-label="설정 항목">
 <button id="settings-privacy-nav" type="button" aria-current="page" aria-controls="settings-privacy">Privacy &amp; Diagnostics</button>
 <button id="settings-skills-nav" type="button" aria-controls="settings-skills">스킬</button>
+<button id="settings-appearance-nav" type="button" aria-controls="settings-appearance">테마</button>
 </nav></aside>
 <div class="settings-content">
+<section id="settings-appearance" aria-labelledby="settings-appearance-title" hidden>
+<h2 id="settings-appearance-title">테마</h2><p>관리 창 테마를 선택하세요. 선택은 이 기기에 자동 저장됩니다.</p>
+<fieldset class="theme-options"><legend>관리 창 테마</legend>
+<label><input type="radio" name="manager-theme" value="white">흰색</label>
+<label><input type="radio" name="manager-theme" value="gray">회색</label>
+<label><input type="radio" name="manager-theme" value="black">검정</label>
+<label class="theme-system-option"><input type="radio" name="manager-theme" value="system">시스템</label>
+</fieldset>
+<p id="theme-mode" class="theme-help"></p>
+<p id="theme-result" role="status" aria-live="polite"></p>
+<p id="theme-native-status" role="status" hidden>제목 표시줄 색상을 적용하지 못했습니다. 테마를 다시 선택해 재시도하세요.</p>
+
+<div class="memo-appearance-card">
+<fieldset class="theme-options"><legend>메모 창 디자인</legend>
+<label><input type="radio" name="memo-design" value="white">흰색</label>
+<label><input type="radio" name="memo-design" value="gray">회색</label>
+<label><input type="radio" name="memo-design" value="black">검정</label>
+<label><input type="radio" name="memo-design" value="color">컬러</label>
+<label class="theme-system-option"><input type="radio" name="memo-design" value="system">시스템</label>
+</fieldset>
+
+<section class="memo-preview" aria-labelledby="memo-preview-title"><h3 id="memo-preview-title">미리보기</h3>
+<div class="memo-preview-grid">
+<article id="memo-preview-first" class="memo-sample" aria-label="첫 번째 예시 메모"><h4>오늘 할 일</h4><p>☑ 자료 정리<br>☐ 다음 일정 확인</p></article>
+<article id="memo-preview-second" class="memo-sample" aria-label="두 번째 예시 메모"><h4>작업 메모</h4><p>작은 아이디어를 적어두세요.<br>필요할 때 곁에서 확인합니다.</p></article>
+</div></section>
+</div>
+</section>
 <section id="settings-privacy" aria-labelledby="settings-privacy-title"><div class="privacy-card privacy-settings"><h2 id="settings-privacy-title">Privacy &amp; Diagnostics</h2><p>Your choice is stored locally.</p>
 <div class="privacy-box"><label class="privacy-choice"><input id="privacy-setting-share" type="checkbox" disabled> I agree to diagnostic sharing (optional)</label><p id="privacy-sharing-status" role="status">Not sharing</p><p>Sanitized errors, app/OS versions, operation timings and freeze diagnostics.</p><p>No notes, terminal input/output, clipboard or screenshots.</p><p>Sent to Sentry in Iowa, United States. Originals: up to 30 days. Read the notice for backup and aggregate retention and overseas transfer details.</p></div>
 <p>Turning this off saves withdrawal immediately. Turning it on requires Save Changes. A request already started before withdrawal may finish. Previously uploaded information is handled separately.</p>
