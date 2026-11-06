@@ -198,7 +198,7 @@ unsafe extern "system" fn collect(hwnd: isize, data: isize) -> i32 {
 }
 fn windows() -> Result<Vec<Window>, String> {
     sync_events()?;
-    let mut rows = Vec::new();
+    let mut rows: Vec<Window> = Vec::new();
     if unsafe { EnumWindows(collect, &mut rows as *mut Vec<Window> as isize) } == 0 {
         return Err(native_error("창 목록 조회 실패"));
     }
