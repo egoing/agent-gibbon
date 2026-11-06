@@ -1040,6 +1040,9 @@ fn main() {
 }
 
 #[cfg(test)]
+mod external_app_cli_tests;
+
+#[cfg(test)]
 mod tests {
     use super::*;
     #[test]
