@@ -1,0 +1,1960 @@
+{
+  "red": {
+    "origin": {
+      "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click",
+      "id": "dev-93d04163fc73ff36c6926322",
+      "name": "84-tray-manager-first-click",
+      "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click/src-tauri/target",
+      "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click/src-tauri/target/debug/agent-gibbon"
+    },
+    "pid": 2759,
+    "proof": {
+      "instance": "dev-93d04163fc73ff36c6926322",
+      "id": "manager84-4c141640",
+      "visible": true,
+      "position": {
+        "x": 3496,
+        "y": 2112
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      }
+    },
+    "cases": [
+      {
+        "name": "first-create",
+        "passed": false,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.08213799993973225,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.3454187089810148,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 0.9598671249113977,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 2.0395293339388445,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "existing-background",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.09708004107233137,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 0.36243300000205636,
+            "frontmost": 2759,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 1.0268425829708576,
+            "frontmost": 2759,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 2.089086874970235,
+            "frontmost": 2759,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "hidden-restore",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.07929441693704575,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.3639705419773236,
+            "frontmost": 2759,
+            "manager": [],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 0.9668612090172246,
+            "frontmost": 2759,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 2.037121083936654,
+            "frontmost": 2759,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "minimized-restore",
+        "passed": false,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.07768025004770607,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": false,
+                "minimized": true,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.3349913751007989,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": false,
+                "minimized": true,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.9055990420747548,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 2.037344542099163,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43625,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 2759,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "failures": [
+      "first-create",
+      "minimized-restore"
+    ],
+    "memo_state_preserved": true
+  },
+  "green": {
+    "origin": {
+      "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click",
+      "id": "dev-93d04163fc73ff36c6926322",
+      "name": "84-tray-manager-first-click",
+      "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click/src-tauri/target",
+      "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click/src-tauri/target/debug/agent-gibbon"
+    },
+    "pid": 6476,
+    "proof": {
+      "instance": "dev-93d04163fc73ff36c6926322",
+      "id": "manager84-8073d16d",
+      "visible": true,
+      "position": {
+        "x": 3496,
+        "y": 2112
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      }
+    },
+    "cases": [
+      {
+        "name": "first-create",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.07690733298659325,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.42138895799871534,
+            "frontmost": 6476,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43648,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 6476,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 1.0272792499745265,
+            "frontmost": 6476,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43648,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 6476,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 2.0784279159270227,
+            "frontmost": 6476,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43648,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 6476,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "failures": [],
+    "memo_state_preserved": false
+  },
+  "retry1": {
+    "origin": {
+      "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click",
+      "id": "dev-93d04163fc73ff36c6926322",
+      "name": "84-tray-manager-first-click",
+      "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click/src-tauri/target",
+      "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click/src-tauri/target/debug/agent-gibbon"
+    },
+    "pid": 14389,
+    "proof": {
+      "instance": "dev-93d04163fc73ff36c6926322",
+      "id": "manager84-f5af13be",
+      "visible": true,
+      "position": {
+        "x": 3496,
+        "y": 2112
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      }
+    },
+    "cases": [
+      {
+        "name": "first-create",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.07895591598935425,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.3378119159024209,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.9080151249654591,
+            "frontmost": 14389,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43670,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 14389,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 1.9675775408977643,
+            "frontmost": 14389,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43670,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 14389,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "existing-background",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.08090179099235684,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43670,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 14389,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 0.3387410829309374,
+            "frontmost": 14389,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43670,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 14389,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 0.9187194159021601,
+            "frontmost": 14389,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43670,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 14389,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 1.9990920829586685,
+            "frontmost": 14389,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43670,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 14389,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "hidden-restore",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.0988552919588983,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.386714749969542,
+            "frontmost": 14389,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43670,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 14389,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 1.0728013329207897,
+            "frontmost": 14389,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43670,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 14389,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 2.163999042008072,
+            "frontmost": 14389,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43670,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 14389,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "minimized-restore",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.08199704205617309,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": false,
+                "minimized": true,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.34036308398935944,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": false,
+                "minimized": true,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.9014620420057327,
+            "frontmost": 14389,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43670,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 14389,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 2.111561208963394,
+            "frontmost": 14389,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43670,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 14389,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "failures": [],
+    "memo_state_preserved": true
+  },
+  "replay-red": {
+    "origin": {
+      "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click",
+      "id": "dev-93d04163fc73ff36c6926322",
+      "name": "84-tray-manager-first-click",
+      "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click/src-tauri/target",
+      "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click/src-tauri/target/debug/agent-gibbon"
+    },
+    "pid": 16617,
+    "proof": {
+      "instance": "dev-93d04163fc73ff36c6926322",
+      "id": "manager84-ad48dac8",
+      "visible": true,
+      "position": {
+        "x": 3496,
+        "y": 2112
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      }
+    },
+    "cases": [
+      {
+        "name": "first-create",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.07702616695314646,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.3472023329231888,
+            "frontmost": 16617,
+            "manager": [],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 1.0337999169714749,
+            "frontmost": 16617,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 2.0946335420012474,
+            "frontmost": 16617,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "existing-background",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.07670716603752226,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 0.3531590000493452,
+            "frontmost": 16617,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 0.9302912910934538,
+            "frontmost": 16617,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 1.9853704160777852,
+            "frontmost": 16617,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "hidden-restore",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.08126979100052267,
+            "frontmost": 16242,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.36143729102332145,
+            "frontmost": 16617,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 0.9645040830364451,
+            "frontmost": 16617,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 2.0254494580440223,
+            "frontmost": 16617,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "minimized-restore",
+        "passed": false,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.08114404196385294,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": false,
+                "minimized": true,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.33915612497366965,
+            "frontmost": 16242,
+            "manager": [
+              {
+                "main": false,
+                "minimized": true,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.9027830000268295,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 2.0335912079317495,
+            "frontmost": 16242,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43698,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 16617,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "failures": [
+      "minimized-restore"
+    ],
+    "memo_state_preserved": true
+  },
+  "replay-green": {
+    "origin": {
+      "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click",
+      "id": "dev-93d04163fc73ff36c6926322",
+      "name": "84-tray-manager-first-click",
+      "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click/src-tauri/target",
+      "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/84-tray-manager-first-click/src-tauri/target/debug/agent-gibbon"
+    },
+    "pid": 19674,
+    "proof": {
+      "instance": "dev-93d04163fc73ff36c6926322",
+      "id": "manager84-30837ea2",
+      "visible": true,
+      "position": {
+        "x": 3496,
+        "y": 2112
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      }
+    },
+    "cases": [
+      {
+        "name": "first-create",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.07444416603539139,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.3378820000216365,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.9086056250380352,
+            "frontmost": 19674,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43732,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 19674,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 1.9752110410481691,
+            "frontmost": 19674,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43732,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 19674,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "existing-background",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.08498441695701331,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43732,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 19674,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 0.3518992079189047,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43732,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 19674,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 0.9145858749980107,
+            "frontmost": 19674,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43732,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 19674,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 1.9797460830304772,
+            "frontmost": 19674,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43732,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 19674,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "hidden-restore",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.07873862492851913,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.3359742499887943,
+            "frontmost": 732,
+            "manager": [],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.8982256249291822,
+            "frontmost": 19674,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43732,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 19674,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 1.9565365829039365,
+            "frontmost": 19674,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43732,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 19674,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "minimized-restore",
+        "passed": true,
+        "before_frontmost": 732,
+        "samples": [
+          {
+            "elapsed": 0.0775862499140203,
+            "frontmost": 732,
+            "manager": [
+              {
+                "main": false,
+                "minimized": true,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": []
+          },
+          {
+            "elapsed": 0.344238540972583,
+            "frontmost": 19674,
+            "manager": [
+              {
+                "main": false,
+                "minimized": true,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43732,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 19674,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 0.9297680829185992,
+            "frontmost": 19674,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43732,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 19674,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          },
+          {
+            "elapsed": 2.0510625829920173,
+            "frontmost": 19674,
+            "manager": [
+              {
+                "main": true,
+                "minimized": false,
+                "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리"
+              }
+            ],
+            "onscreen_manager": [
+              {
+                "kCGWindowAlpha": 1,
+                "kCGWindowBounds": {
+                  "Height": 508,
+                  "Width": 944,
+                  "X": 552,
+                  "Y": 180
+                },
+                "kCGWindowIsOnscreen": true,
+                "kCGWindowLayer": 0,
+                "kCGWindowMemoryUsage": 2288,
+                "kCGWindowName": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+                "kCGWindowNumber": 43732,
+                "kCGWindowOwnerName": "agent-gibbon",
+                "kCGWindowOwnerPID": 19674,
+                "kCGWindowSharingState": 1,
+                "kCGWindowStoreType": 1
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "failures": [],
+    "memo_state_preserved": true
+  },
+  "baseline": {
+    "regression": {
+      "command": "npm test",
+      "exit": 0
+    },
+    "typecheck": {
+      "command": "cargo check --locked --manifest-path src-tauri/Cargo.toml --all-targets",
+      "exit": 0
+    },
+    "lint": {
+      "command": "cargo fmt --manifest-path src-tauri/Cargo.toml -- --check && cargo clippy --locked --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings",
+      "exit": 0
+    },
+    "build": {
+      "command": "npm run dev:build",
+      "exit": 0
+    }
+  },
+  "gates": {
+    "regression": {
+      "command": "npm test",
+      "exit": 0
+    },
+    "typecheck": {
+      "command": "cargo check --locked --manifest-path src-tauri/Cargo.toml --all-targets",
+      "exit": 0
+    },
+    "lint": {
+      "command": "cargo fmt --manifest-path src-tauri/Cargo.toml -- --check && cargo clippy --locked --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings",
+      "exit": 0
+    },
+    "build": {
+      "command": "npm run build",
+      "exit": 0
+    }
+  },
+  "capture": {
+    "pid": 19674,
+    "window_id": 43732,
+    "title": "Agent Gibbon [DEV 84-tray-manager-first-click · 93d04163] — 메모 관리",
+    "path": "manager.png"
+  }
+}
