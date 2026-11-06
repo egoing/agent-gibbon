@@ -8,7 +8,7 @@ const browser=await puppeteer.launch({executablePath:process.env.CHROME_BIN || '
 try {
 const page=await browser.newPage(); const errors=[];page.on('pageerror',e=>errors.push(e.message));
 await page.setRequestInterception(true);
-page.on('request',r=>{const url=new URL(r.url());if(url.hostname!=='gibbon.test')return r.abort();const file=root+'/ui'+url.pathname;if(!fs.existsSync(file))return r.respond({status:404,body:''});r.respond({status:200,contentType:file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':'text/html',body:fs.readFileSync(file)});});
+page.on('request',r=>{const url=new URL(r.url());if(url.hostname!=='gibbon.test')return r.abort();const file=root+'/ui'+url.pathname;if(!fs.existsSync(file))return r.respond({status:404,body:''});r.respond({status:200,contentType:/\.(m?js)$/.test(file)?'text/javascript':file.endsWith('.css')?'text/css':'text/html',body:fs.readFileSync(file)});});
 await page.evaluateOnNewDocument(()=>{
  let state={terms_accepted:true,allowed:false,sharing:false,notice_ready:true,terms_html:'<h1>Terms</h1>',notice_html:'<h1>Privacy</h1>'};
  window.calls=[];window.__TAURI__={core:{invoke:async(name,args)=>{window.calls.push({name,args});if(name==='privacy_status')return state;if(name==='privacy_save'){state={...state,allowed:args.shareDiagnostics,sharing:args.shareDiagnostics};return state;}if(name==='skills_list')return {skills:[{id:'agent-gibbon',name:'메모 관리',description:'메모 사용',enabled:false}],feedback:null};if(name==='manager_notes')return [{id:'sidebar-memo',title:'검증 메모',html:'<h1>Sidebar memo</h1>',capture:null}];}}};

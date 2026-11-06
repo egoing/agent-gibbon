@@ -6,7 +6,7 @@ const source = readFileSync(new URL('../ui/manager.js', import.meta.url), 'utf8'
 function setup() {
   const elements = new Map();
   const make = tagName => ({ tagName, hidden: false, children: [], dataset: {}, parentElement: { scrollTop: 0 }, setAttribute(k,v) { this[k] = v; }, append(x) { this.children.push(x); }, replaceChildren() { this.children = []; this.textContent = ''; }, addEventListener() {}, focus() {} });
-  for (const id of ['notes-page','settings-page','notes-nav','settings-nav','retry','refresh','detail','list','error','settings-privacy','settings-skills','settings-privacy-nav','settings-skills-nav']) elements.set(id, make());
+  for (const id of ['notes-page','settings-page','notes-nav','settings-nav','retry','refresh','detail','list','error','settings-privacy','settings-skills','settings-privacy-nav','settings-skills-nav','settings-appearance','settings-appearance-nav']) elements.set(id, make());
   let data = [{id:'hidden',title:'숨긴 메모',html:'<h1>숨긴 메모</h1><p>내용</p>',capture:null,visible:false}];
   const calls = [], requests = [];
   let show = async ({id,visible}) => { data = data.map(n => n.id === id ? {...n,visible} : n); return visible; };

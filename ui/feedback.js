@@ -1,20 +1,25 @@
-import { themeFor } from './theme.mjs';
+import { memoThemeFor } from './theme.mjs';
+import { readMemoAppearance } from './appearance.mjs';
 const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const surface = document.getElementById('feedback');
 const message = document.getElementById('message');
 const actions = document.getElementById('actions');
-let signature;
+let signature, appearanceSignature;
 let renderedRevision = null;
 async function refresh() {
   try {
     const state = await invoke('feedback_snapshot');
     const next = JSON.stringify(state.view);
+    const theme = memoThemeFor(state.view.color || '#20252e', readMemoAppearance(window));
+    const nextAppearance = JSON.stringify(theme);
+    if (appearanceSignature !== nextAppearance) {
+      for (const [key, value] of Object.entries({ background: theme.background, foreground: theme.foreground, border: theme.border, primary: theme.panel, error: theme.error })) document.documentElement.style.setProperty(`--${key}`, value);
+      document.documentElement.style.colorScheme = theme.scheme;
+      appearanceSignature = nextAppearance;
+    }
     if (signature !== next) {
       const view = state.view;
       renderedRevision = view.revision;
-      const theme = themeFor(view.color);
-      for (const [key, value] of Object.entries({ background: view.color, foreground: theme.foreground, border: theme.border, primary: theme.panel, error: theme.error })) document.documentElement.style.setProperty(`--${key}`, value);
-      document.documentElement.style.colorScheme = theme.scheme;
       surface.classList.toggle('error', view.error);
       message.setAttribute('role', view.error ? 'alert' : 'status');
       message.textContent = view.message;
