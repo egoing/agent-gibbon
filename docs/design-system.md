@@ -17,6 +17,8 @@
 - 화면 구성은 [와이어프레임 SVG](design/privacy-onboarding.svg)와 [PNG](design/privacy-onboarding.png)에 제시한다. 프레임 크기는 제안값이며 실제 앱은 기존 관리 창 크기에서 스크롤한다. 기존 메모의 외형·위치·숨김 기준은 바꾸지 않는다.
 - 필수 약관을 체크하기 전 Continue는 비활성화한다. 전송 선택과 묶어 체크하거나 전체 동의를 기본값으로 제공하지 않는다. 저장 실패는 성공으로 표시하지 않는다. 동의·철회·재시작·손상 파일 검증 결과는 [검증 기록](verification/privacy-consent-20261106.md)에 구분해 남긴다. macOS/Windows 개발 빌드와 자동 검사는 통과했으며 실제 네이티브 동의 조작·Windows 프리징 재현은 미검증이다.
 
+- 동의 기록과 설정 반영은 [실제 저장·재실행 검증](verification/privacy-persistence-20261106.md)에서 macOS 테스트 인스턴스의 native UI·파일·앱 상태를 대조했다. 테스트 약관·로컬 수신기를 사용했으며 실제 사용자 동의·공식 Sentry 수신·Windows 검증과 구분한다.
+
 ### Windows 영역 선택 완료 전환 보정 (2026-11-06)
 
 - Capture Overlay에서 선택을 마친 뒤 새 창으로 전환하는 기존 동작을적용하되, Windows의 WebView2 콜백에서 동기 창 생성으로 교착하지 않도록 실행 경로를 분리하고 기존 Overlay의 실제 종료를 기다린다. 터미널은 선택한 물리 desktop 원점을 논리 좌표로 재해석하지 않으며, 과거에 저장된 논리 좌표도 구분해 복원한다. 외형·배치·포커스 기준과 시안은 유지한다.
