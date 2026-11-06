@@ -7,7 +7,7 @@ fn safe_tags(tags: &mut p::Map<String, String>) {
         "app.arch" => matches!(v.as_str(), "aarch64" | "x86_64" | "x86"),
         "app.os" => matches!(v.as_str(), "macos" | "windows" | "linux"),
         "app.build" => v == env!("AGENT_GIBBON_BUILD_REVISION"),
-        "measurement.origin" => matches!(v.as_str(), "rust" | "webview"),
+        "measurement.origin" => matches!(v.as_str(), "rust" | "webview" | "webview.aggregate"),
         "window.kind" => matches!(
             v.as_str(),
             "memo" | "terminal" | "agent" | "manager" | "feedback" | "capture" | "stash" | "native"

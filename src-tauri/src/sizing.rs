@@ -169,7 +169,10 @@ pub fn fit_note(
     width: f64,
     height: f64,
     revision: u64,
+    local_flow: Option<u64>,
 ) -> Result<bool, String> {
+    let _scope = crate::local_trace::webview_scope(&window, local_flow);
+    let _timing = crate::telemetry::Timing::new("window.fit");
     #[cfg(windows)]
     native_resize(&window)?;
     if !width.is_finite() || !height.is_finite() {

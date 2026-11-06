@@ -155,3 +155,98 @@ fn basic_release_and_opted_in_diagnostics_have_separate_features() {
         )) <= 0.01
     );
 }
+
+#[test]
+fn aggregate_tag_survives_but_local_correlation_never_leaves_envelope() {
+    let mut input = sentry::Envelope::new();
+    let mut t = p::Transaction {
+        name: Some("snapshot".into()),
+        ..Default::default()
+    };
+    t.tags
+        .insert("measurement.origin".into(), "webview.aggregate".into());
+    for key in ["local_flow", "parent", "cause", "local_mutation"] {
+        t.extra.insert(key.into(), json!(123));
+    }
+    input.add_item(t);
+    let mut bytes = Vec::new();
+    privacy::envelope(input).to_writer(&mut bytes).unwrap();
+    let payload = String::from_utf8(bytes).unwrap();
+    assert!(payload.contains("webview.aggregate"));
+    for key in ["local_flow", "parent", "cause", "local_mutation"] {
+        assert!(!payload.contains(key));
+    }
+}
+
+#[test]
+fn snapshot_request_is_sampled_and_children_use_the_same_trace() {
+    let config = options("https://public@example.invalid/42".parse().unwrap(), true);
+    let sampler = config.traces_sampler.unwrap();
+    assert!(
+        sampler(&sentry::TransactionContext::new(
+            "snapshot.request",
+            "snapshot.request"
+        )) <= 0.01
+    );
+    #[derive(Default)]
+    struct Capture(std::sync::Mutex<Vec<sentry::Envelope>>);
+    impl sentry::Transport for Capture {
+        fn send_envelope(&self, envelope: sentry::Envelope) {
+            self.0.lock().unwrap().push(envelope);
+        }
+    }
+    let captured = Arc::new(Capture::default());
+    let client = Arc::new(sentry::Client::from_config(sentry::ClientOptions {
+        dsn: Some("https://public@example.invalid/42".parse().unwrap()),
+        traces_sample_rate: 1.0,
+        default_integrations: false,
+        transport: Some(Arc::new(captured.clone())),
+        ..Default::default()
+    }));
+    let hub = Arc::new(sentry::Hub::new(
+        Some(client),
+        Arc::new(sentry::Scope::default()),
+    ));
+    sentry::Hub::run(hub, || {
+        let root = timing_span(None, "snapshot.request");
+        for op in [
+            "note.state.notes_wait",
+            "note.state.notes_copy",
+            "note.state.opacity",
+            "note.state.feedback",
+            "note.state.position",
+            "note.state.size",
+            "note.state.visibility",
+            "note.state.focus",
+            "note.state.pin",
+            "note.state.response",
+        ] {
+            assert!(allowed(op));
+            let child = timing_span(Some(&root), op);
+            assert_eq!(
+                child.get_trace_context().trace_id,
+                root.get_trace_context().trace_id
+            );
+            child.finish();
+        }
+        root.finish();
+    });
+    let mut envelopes = captured.0.lock().unwrap();
+    assert_eq!(envelopes.len(), 1);
+    let filtered = privacy::envelope(envelopes.pop().unwrap());
+    let t = filtered
+        .items()
+        .find_map(|item| match item {
+            p::EnvelopeItem::Transaction(t) => Some(t),
+            _ => None,
+        })
+        .unwrap();
+    let p::Context::Trace(context) = &t.contexts["trace"] else {
+        panic!("missing trace");
+    };
+    assert_eq!(t.spans.len(), 10);
+    for span in &t.spans {
+        assert_eq!(span.parent_span_id, Some(context.span_id));
+        assert_eq!(span.trace_id, context.trace_id);
+    }
+}
