@@ -2,7 +2,7 @@
 use crate::{
     apply_direct,
     model::{Action, Request},
-    show_without_focus, AppNotes,
+    AppNotes,
 };
 use tauri::{
     menu::{IconMenuItem, Menu, MenuItem, PredefinedMenuItem},
@@ -12,45 +12,131 @@ use tauri::{
 
 type TrayMenu = std::sync::Mutex<Option<Menu<tauri::Wry>>>;
 
+const RECENT_LIMIT: usize = 30;
+
+#[derive(Clone, Debug, PartialEq, Eq)]
 struct MemoMenuEntry {
     id: String,
     title: String,
-    capture: bool,
+    kind: crate::presentation::Kind,
+    updated: u64,
+}
+impl MemoMenuEntry {
+    fn event_id(&self) -> String {
+        format!(
+            "{}:{}",
+            if self.kind.is_terminal() {
+                "agent"
+            } else {
+                "note"
+            },
+            self.id
+        )
+    }
+    fn window_label(&self) -> String {
+        if self.kind.is_terminal() {
+            self.id.clone()
+        } else {
+            crate::label(&self.id)
+        }
+    }
+    fn icon(&self) -> &'static [u8] {
+        use crate::presentation::Kind;
+        match self.kind {
+            Kind::Note => include_bytes!("../icons/tabler/file-text.png"),
+            Kind::Capture => include_bytes!("../icons/tabler/photo.png"),
+            Kind::Terminal => include_bytes!("../icons/tabler/terminal-2.png"),
+        }
+    }
 }
 
-// Only owned menu metadata crosses into native menu/window calls. Those calls
-// may synchronously wait for the UI thread, which can be handling snapshot.
+// Copy only owned metadata, then release all data locks before native calls.
 fn memo_entries(notes: &AppNotes) -> Result<Vec<MemoMenuEntry>, String> {
     let notes = notes.lock().map_err(|e| e.to_string())?;
     Ok(notes
         .iter()
-        .map(|(id, note)| MemoMenuEntry {
-            id: id.clone(),
-            title: note.title.chars().take(30).collect(),
-            capture: note.capture.is_some(),
+        .map(|(id, note)| {
+            let kind = if note.capture.is_some() {
+                crate::presentation::Kind::Capture
+            } else {
+                crate::presentation::Kind::Note
+            };
+            MemoMenuEntry {
+                id: id.clone(),
+                title: crate::presentation::list_title(&note.title, id, kind),
+                kind,
+                updated: note.updated_at.max(creation_ms(id)),
+            }
         })
         .collect())
+}
+fn entries(app: &tauri::AppHandle) -> Result<Vec<MemoMenuEntry>, String> {
+    let mut entries = memo_entries(&app.state::<AppNotes>())?;
+    // entries() releases Terminals before any menu/window API is used.
+    entries.extend(crate::terminal::entries(app).into_iter().map(|agent| {
+        let kind = crate::presentation::Kind::Terminal;
+        MemoMenuEntry {
+            title: crate::presentation::list_title(&agent.title, &agent.id, kind),
+            updated: agent
+                .updated_at
+                .max(agent.path_updated)
+                .max(creation_ms(&agent.id)),
+            id: agent.id,
+            kind,
+        }
+    }));
+    Ok(entries)
+}
+// Generated region/terminal IDs encode creation time in nanoseconds. This also
+// covers legacy captures whose persisted updated_at is zero; other IDs are opaque.
+fn creation_ms(id: &str) -> u64 {
+    id.strip_prefix("terminal-")
+        .or_else(|| id.strip_prefix("image-"))
+        .or_else(|| id.strip_prefix("text-"))
+        .and_then(|stamp| stamp.parse::<u128>().ok())
+        .and_then(|stamp| u64::try_from(stamp / 1_000_000).ok())
+        .unwrap_or(0)
+}
+fn recent(mut entries: Vec<MemoMenuEntry>) -> (Vec<MemoMenuEntry>, usize) {
+    entries.sort_by(|a, b| {
+        b.updated
+            .cmp(&a.updated)
+            .then_with(|| a.event_id().cmp(&b.event_id()))
+    });
+    let remaining = entries.len().saturating_sub(RECENT_LIMIT);
+    entries.truncate(RECENT_LIMIT);
+    (entries, remaining)
+}
+#[cfg(any(target_os = "macos", test))]
+fn event_window_label(event: &str) -> Option<String> {
+    event
+        .strip_prefix("note:")
+        .map(crate::label)
+        .or_else(|| event.strip_prefix("agent:").map(str::to_owned))
 }
 
 fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     let menu = Menu::new(app).map_err(|e| e.to_string())?;
-    menu.append(
-        &MenuItem::with_id(app, "open-manager", "메모 관리", true, None::<&str>)
-            .map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
-    if let Some(label) = &crate::instance::current().label {
+    if let Some(branch) = &crate::instance::current().branch {
         menu.append(
-            &MenuItem::with_id(app, "dev-instance", label, false, None::<&str>)
+            &MenuItem::with_id(app, "dev-instance", branch, false, None::<&str>)
                 .map_err(|e| e.to_string())?,
         )
         .map_err(|e| e.to_string())?;
     }
     menu.append(
+        &MenuItem::with_id(app, "open-manager", "메모 관리", true, None::<&str>)
+            .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
+    menu.append(
         &MenuItem::with_id(
             app,
             "capture-image",
-            "영역 캡처 · Ctrl+Shift+1",
+            format!(
+                "영역 캡처\t{}",
+                crate::presentation::tray_shortcut("Ctrl+Shift+1")
+            ),
             true,
             None::<&str>,
         )
@@ -61,7 +147,10 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         &MenuItem::with_id(
             app,
             "capture-text",
-            "영역 텍스트 메모 · Ctrl+Shift+2",
+            format!(
+                "영역 텍스트 메모\t{}",
+                crate::presentation::tray_shortcut("Ctrl+Shift+2")
+            ),
             true,
             None::<&str>,
         )
@@ -72,19 +161,11 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         &MenuItem::with_id(
             app,
             "capture-terminal",
-            "영역 터미널 · Ctrl+Shift+3",
+            format!(
+                "영역 터미널\t{}",
+                crate::presentation::tray_shortcut("Ctrl+Shift+3")
+            ),
             true,
-            None::<&str>,
-        )
-        .map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
-    menu.append(
-        &MenuItem::with_id(
-            app,
-            "capture-agent",
-            "영역 에이전트 터미널",
-            cfg!(target_os = "macos"),
             None::<&str>,
         )
         .map_err(|e| e.to_string())?,
@@ -94,64 +175,40 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         &MenuItem::with_id(
             app,
             "stash-toggle",
-            format!("전체 창 접어두기 / 복원 · {}", crate::stash::shortcut(app)),
+            format!(
+                "숨김\t{}",
+                crate::presentation::tray_shortcut(&crate::stash::shortcut(app))
+            ),
             true,
             None::<&str>,
         )
         .map_err(|e| e.to_string())?,
     )
     .map_err(|e| e.to_string())?;
-    let front = MenuItem::with_id(app, "bring-visible", "열린 메모 앞으로", true, None::<&str>)
-        .map_err(|e| e.to_string())?;
-    menu.append(&front).map_err(|e| e.to_string())?;
     menu.append(&PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?)
         .map_err(|e| e.to_string())?;
-    let state = app.state::<AppNotes>();
-    let notes = memo_entries(&state)?;
-    for note in notes {
-        let id = &note.id;
-        let title = &note.title;
-        let text = if title.is_empty() {
-            id.clone()
-        } else {
-            format!("{title} ({id})")
-        };
+    let (entries, remaining) = recent(entries(app)?);
+    for entry in entries {
         let visible = app
-            .get_webview_window(&crate::label(id))
+            .get_webview_window(&entry.window_label())
             .is_some_and(|w| w.is_visible().unwrap_or(false));
-
-        let bytes: &[u8] = if note.capture {
-            include_bytes!("../icons/tabler/photo.png")
-        } else {
-            include_bytes!("../icons/tabler/file-text.png")
-        };
-        let image = memo_icon(bytes, visible)?;
         let item = IconMenuItem::with_id(
             app,
-            format!("note:{id}"),
-            text,
+            entry.event_id(),
+            &entry.title,
             true,
-            Some(image),
+            Some(memo_icon(entry.icon(), visible)?),
             None::<&str>,
         )
         .map_err(|e| e.to_string())?;
         menu.append(&item).map_err(|e| e.to_string())?;
     }
-    for agent in crate::terminal::entries(app) {
+    if remaining > 0 {
         menu.append(
             &MenuItem::with_id(
                 app,
-                format!("agent:{}", agent.id),
-                format!(
-                    "[{}] {} ({})",
-                    if agent.kind == crate::terminal::Kind::Terminal {
-                        "터미널"
-                    } else {
-                        "에이전트"
-                    },
-                    agent.display_title(),
-                    agent.id
-                ),
+                "more-notes",
+                format!("더보기({remaining})"),
                 true,
                 None::<&str>,
             )
@@ -192,24 +249,20 @@ pub fn sync_visibility(app: &tauri::AppHandle) -> Result<(), String> {
         return Ok(());
     };
     let menu = state.lock().map_err(|e| e.to_string())?.clone();
-    let notes = memo_entries(&app.state::<AppNotes>())?;
+    let entries = entries(app)?;
     if let Some(menu) = menu.as_ref() {
         for item in menu.items().map_err(|e| e.to_string())? {
             if let Some(check) = item.as_icon_menuitem() {
-                if let Some(id) = check.id().as_ref().strip_prefix("note:") {
+                if let Some(entry) = entries
+                    .iter()
+                    .find(|entry| entry.event_id() == check.id().as_ref())
+                {
                     let visible = app
-                        .get_webview_window(&crate::label(id))
+                        .get_webview_window(&entry.window_label())
                         .is_some_and(|w| w.is_visible().unwrap_or(false));
-                    if let Some(note) = notes.iter().find(|note| note.id == id) {
-                        let bytes: &[u8] = if note.capture {
-                            include_bytes!("../icons/tabler/photo.png")
-                        } else {
-                            include_bytes!("../icons/tabler/file-text.png")
-                        };
-                        check
-                            .set_icon(Some(memo_icon(bytes, visible)?))
-                            .map_err(|e| e.to_string())?;
-                    }
+                    check
+                        .set_icon(Some(memo_icon(entry.icon(), visible)?))
+                        .map_err(|e| e.to_string())?;
                 }
             }
         }
@@ -242,13 +295,61 @@ fn template_icons(app: &tauri::AppHandle, menu: &Menu<tauri::Wry>) -> Result<(),
             .items()
             .map_err(|e| e.to_string())?
             .iter()
-            .map(|item| item.id().as_ref().strip_prefix("note:").map(str::to_owned))
+            .map(|item| event_window_label(item.id().as_ref()))
+            .collect::<Vec<_>>();
+        let shortcut_rows = menu
+            .items()
+            .map_err(|e| e.to_string())?
+            .iter()
+            .map(|item| {
+                matches!(
+                    item.id().as_ref(),
+                    "capture-image" | "capture-text" | "capture-terminal" | "stash-toggle"
+                )
+            })
             .collect::<Vec<_>>();
         let app_handle = app.clone();
         let menu = menu.clone();
         app.run_on_main_thread(move || {
             fn native<T: tauri::menu::ContextMenu>(menu: &T) -> *mut std::ffi::c_void {
                 menu.inner_context().ns_menu()
+            }
+            unsafe fn align_shortcut(item: *mut objc2::runtime::AnyObject) {
+                use objc2::{class, msg_send, runtime::AnyObject};
+                #[repr(C)] struct Range { location: usize, length: usize }
+                unsafe impl objc2::encode::Encode for Range {
+                    const ENCODING: objc2::encode::Encoding = objc2::encode::Encoding::Struct("_NSRange", &[<usize as objc2::encode::Encode>::ENCODING, <usize as objc2::encode::Encode>::ENCODING]);
+                }
+                let title: *mut AnyObject = msg_send![item, title];
+                let length: usize = msg_send![title, length];
+                let tab: *mut AnyObject = msg_send![class!(NSTextTab), alloc];
+                let options: *mut AnyObject = msg_send![class!(NSDictionary), dictionary];
+                let tab: *mut AnyObject = msg_send![tab, initWithTextAlignment: 2isize, location: 310f64, options: options];
+                let tabs: *mut AnyObject = msg_send![class!(NSArray), arrayWithObject: tab];
+                let paragraph: *mut AnyObject = msg_send![class!(NSMutableParagraphStyle), alloc];
+                let paragraph: *mut AnyObject = msg_send![paragraph, init];
+                let _: () = msg_send![paragraph, setTabStops: tabs];
+                let key: *mut AnyObject = msg_send![class!(NSString), stringWithUTF8String: c"NSParagraphStyle".as_ptr()];
+                let attributed: *mut AnyObject = msg_send![class!(NSMutableAttributedString), alloc];
+                let attributed: *mut AnyObject = msg_send![attributed, initWithString: title];
+                let _: () = msg_send![attributed, addAttribute: key, value: paragraph, range: Range { location: 0, length }];
+                // De-emphasize only the shortcut column; keep the action label
+                // and all input/accelerator contracts untouched.
+                let utf8: *const std::ffi::c_char = msg_send![title, UTF8String];
+                if !utf8.is_null() {
+                    let text = std::ffi::CStr::from_ptr(utf8).to_string_lossy();
+                    if let Some((prefix, _)) = text.split_once('\t') {
+                        let start = prefix.encode_utf16().count() + 1;
+                        let color: *mut AnyObject = msg_send![class!(NSColor), labelColor];
+                        let color: *mut AnyObject = msg_send![color, colorWithAlphaComponent: 0.55f64];
+                        let color_key: *mut AnyObject = msg_send![class!(NSString), stringWithUTF8String: c"NSColor".as_ptr()];
+                        let _: () = msg_send![attributed, addAttribute: color_key, value: color, range: Range { location: start, length: length - start }];
+                    }
+                }
+                let _: () = msg_send![item, setAttributedTitle: attributed];
+                let _: () = msg_send![attributed, release];
+                let _: () = msg_send![paragraph, release];
+                let _: () = msg_send![tab, release];
             }
             // The menu owns these objects and all AppKit calls run on the main thread.
             unsafe {
@@ -258,7 +359,7 @@ fn template_icons(app: &tauri::AppHandle, menu: &Menu<tauri::Wry>) -> Result<(),
                 for index in 0..count {
                     let item: *mut AnyObject = msg_send![raw, itemAtIndex: index];
                     if let Some(Some(id)) = ids.get(index as usize) {
-                        let visible = app_handle.get_webview_window(&crate::label(id)).is_some_and(|win| win.is_visible().unwrap_or(false));
+                        let visible = app_handle.get_webview_window(id).is_some_and(|win| win.is_visible().unwrap_or(false));
                         if visible {
                             // Remove the faded attributed title entirely so AppKit restores
                             // its normal text color, including selection highlighting.
@@ -275,6 +376,7 @@ fn template_icons(app: &tauri::AppHandle, menu: &Menu<tauri::Wry>) -> Result<(),
                         let _: () = msg_send![attributed, release];
                         }
                     }
+                    if shortcut_rows.get(index as usize) == Some(&true) { align_shortcut(item); }
                     let image: *mut AnyObject = msg_send![item, image];
                     if !image.is_null() {
                         let _: () = msg_send![image, setTemplate: true];
@@ -317,12 +419,21 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
         ))
         .menu(&initial_menu)
         .show_menu_on_left_click(true)
+        .on_tray_icon_event(|tray, event| {
+            if matches!(event, tauri::tray::TrayIconEvent::Enter { .. }) {
+                if let Err(error) = refresh(tray.app_handle()) {
+                    eprintln!("메뉴 열기 전 갱신 실패: {error}");
+                }
+            }
+        })
         .on_menu_event(|app, event| {
             if event.id.as_ref() == "quit-app" {
                 app.exit(0);
                 return;
             }
-            let result = if event.id.as_ref() == "open-manager" {
+            let result = if event.id.as_ref() == "more-notes" {
+                crate::manager::open_list(app)
+            } else if event.id.as_ref() == "open-manager" {
                 crate::manager::open(app)
             } else if event.id.as_ref() == "stash-toggle" {
                 crate::stash::trigger(app);
@@ -336,24 +447,8 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             } else if event.id.as_ref() == "capture-terminal" {
                 crate::capture::trigger(app, crate::capture::SelectionMode::Terminal);
                 Ok(())
-            } else if event.id.as_ref() == "capture-agent" {
-                crate::capture::trigger(app, crate::capture::SelectionMode::Agent);
-                Ok(())
             } else if let Some(id) = event.id.as_ref().strip_prefix("agent:") {
                 crate::terminal::open(app, id)
-            } else if event.id.as_ref() == "bring-visible" {
-                app.webview_windows().values().try_for_each(|win| {
-                    if win.label() != crate::manager::LABEL
-                        && win.label() != "stash-indicator"
-                        && !crate::stash::owns(win)
-                        && !crate::feedback_window::is_surface(win.label())
-                        && win.is_visible().map_err(|e| e.to_string())?
-                    {
-                        crate::layout::mark(win, false);
-                        show_without_focus(win)?;
-                    }
-                    Ok::<_, String>(())
-                })
             } else if let Some(id) = event.id.as_ref().strip_prefix("note:") {
                 apply_direct(
                     app,
@@ -434,6 +529,90 @@ mod tests {
         notes.lock().unwrap().clear();
         assert_eq!(entries.len(), 1);
         assert_eq!(entries[0].title, "가".repeat(30));
-        assert!(!entries[0].capture);
+        assert_eq!(entries[0].kind, crate::presentation::Kind::Note);
+    }
+    fn entry(id: &str, kind: crate::presentation::Kind, updated: u64) -> MemoMenuEntry {
+        MemoMenuEntry {
+            id: id.into(),
+            title: "제목".into(),
+            kind,
+            updated,
+        }
+    }
+    #[test]
+    fn recent_boundary_zero_thirty_thirty_one_and_mixed_ties() {
+        use crate::presentation::Kind::*;
+        assert_eq!(recent(vec![]), (vec![], 0));
+        let all = (0..31)
+            .map(|i| entry(&format!("{i:02}"), [Note, Capture, Terminal][i % 3], 100))
+            .collect::<Vec<_>>();
+        let (thirty, remaining) = recent(all[..30].to_vec());
+        assert_eq!(thirty.len(), 30);
+        assert_eq!(remaining, 0);
+        let (a, remaining) = recent(all.clone());
+        let (b, _) = recent(all.into_iter().rev().collect());
+        assert_eq!(a, b);
+        assert_eq!(a.len(), 30);
+        assert_eq!(remaining, 1);
+        assert!(a
+            .windows(2)
+            .all(|pair| pair[0].event_id() < pair[1].event_id()));
+        assert!(a.iter().any(|e| e.kind == Terminal));
+    }
+    #[test]
+    fn content_updates_reorder_and_legacy_time_is_compatible() {
+        use crate::presentation::Kind::*;
+        let a = entry("note", Note, 1);
+        let mut b = entry(
+            "terminal-2000000",
+            Terminal,
+            creation_ms("terminal-2000000"),
+        );
+        assert_eq!(recent(vec![a.clone(), b.clone()]).0[0].id, b.id);
+        b.updated = 0;
+        assert_eq!(recent(vec![b, a]).0[0].id, "note");
+        for id in ["legacy", "agent-invalid", "terminal-", "note-99999"] {
+            assert_eq!(creation_ms(id), 0);
+        }
+        assert_eq!(creation_ms("terminal-1793960823000000000"), 1793960823000);
+    }
+    #[test]
+    fn legacy_region_notes_with_zero_update_time_use_creation_fallback() {
+        use std::collections::BTreeMap;
+        let notes = AppNotes::new(BTreeMap::from([
+            ("image-1793960823000000000".into(), crate::Note::default()),
+            ("text-1793960824000000000".into(), crate::Note::default()),
+        ]));
+        let (entries, _) = recent(memo_entries(&notes).unwrap());
+        assert_eq!(entries[0].id, "text-1793960824000000000");
+        assert_eq!(entries[1].updated, 1793960823000);
+        assert!(notes
+            .lock()
+            .unwrap()
+            .values()
+            .all(|note| note.updated_at == 0));
+    }
+    #[test]
+    fn all_kinds_have_icons_event_routing_and_visibility_alpha() {
+        use crate::presentation::Kind::*;
+        for kind in [Note, Capture, Terminal] {
+            let entry = entry("internal", kind, 0);
+            assert_eq!(
+                event_window_label(&entry.event_id()),
+                Some(entry.window_label())
+            );
+            let shown = memo_icon(entry.icon(), true).unwrap();
+            let hidden = memo_icon(entry.icon(), false).unwrap();
+            assert!(shown.rgba().as_chunks::<4>().0.iter().any(|p| p[3] > 0));
+            for (a, b) in shown
+                .rgba()
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .zip(hidden.rgba().as_chunks::<4>().0.iter())
+            {
+                assert_eq!(b[3], (a[3] as f32 * 0.45) as u8);
+            }
+        }
     }
 }

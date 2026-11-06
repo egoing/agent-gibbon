@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 // Approved wireframe replaces immediate app launch/details with selection + Run
-// and a persistent selected-command preview. Legacy agent lifecycle stays covered.
+// and a persistent selected-command preview. Removed modes cannot auto launch.
 const flush=async()=>{for(let i=0;i<20;i++)await Promise.resolve();};
 const folder=path=>({path,name:path.split('/').at(-1),parent:path.slice(0,path.lastIndexOf('/')),command:`cd -- '${path}'`});
 const shell={id:'shell',label:'셸',command:"'/bin/zsh' -i"};
@@ -30,7 +30,7 @@ test('shell remains the only task when no recommended app is installed',async()=
 test('picker refreshes location and preview without starting',async()=>{const {elements,calls}=ui();await flush();await elements['choose-folder'].onclick();assert.equal(elements['home-hint'].hidden,true);assert.ok(elements['command-preview'].textContent.includes('/tmp/chosen'));assert.equal(calls.some(([n])=>n==='terminal_start'),false);});
 test('failed Run preserves Welcome, restores Run focus and permits retry',async()=>{const {elements,calls}=ui({fail:true});await flush();await elements['run-task'].onclick();assert.equal(elements.welcome.hidden,false);assert.equal(elements.terminal.hidden,true);assert.equal(elements['run-task'].focused,true);assert.equal(elements.welcome.attrs['aria-busy'],'false');assert.match(elements.status.textContent,/missing/);await elements['run-task'].onclick();assert.equal(calls.filter(([n])=>n==='terminal_start').length,2);});
 test('failed launch does not move focus when window is inactive',async()=>{const {elements}=ui({fail:true,focused:false});await flush();await elements['run-task'].onclick();assert.notEqual(elements['run-task'].focused,true);});
-test('existing agent still auto launches and hides through original command',async()=>{const {elements,calls}=ui({kind:'agent'});await flush();assert.equal(calls.filter(([n])=>n==='terminal_start').length,1);assert.equal(calls.some(([n])=>n==='terminal_folder'),false);await elements.close.onclick();assert.equal(calls.at(-1)[0],'terminal_hide');});
+test('removed agent mode cannot auto launch a PTY',async()=>{const {elements,calls}=ui({kind:'agent'});await flush();assert.equal(calls.some(([n])=>n==='terminal_start'||n==='terminal_welcome'),false);assert.match(elements.status.textContent,/지원하지 않습니다/);});
 test('rename remains explicit and polling only reads metadata',async()=>{const {elements,calls,intervals}=ui();await flush();elements['rename-title'].value='내 작업';await elements['rename-form'].onsubmit({preventDefault(){}});assert.equal(elements.title.textContent,'내 작업');await elements['run-task'].onclick();await intervals[0]();await flush();assert.equal(calls.at(-1)[0],'terminal_info');});
 test('long folder path and exact command remain available',async()=>{const path='/project/'+('긴 경로/'.repeat(80));const {elements}=ui({path});await flush();assert.equal(elements['recent-folders'].children[0].title,path);assert.ok(elements['command-preview'].textContent.includes(folder(path).command));});
 

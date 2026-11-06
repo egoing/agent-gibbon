@@ -1,0 +1,56 @@
+App=agent-gibbon (pid 63665)
+Window: "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — 메모 관리", App: agent-gibbon.
+
+0 standard window Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — 메모 관리
+	1 scroll area
+		2 HTML content 메모 관리
+			3 container
+				4 text Agent Gibbon
+				5 container 관리 탐색
+					6 toggle button 모든 메모, Value: 1
+					7 toggle button 설정, Value: 0
+			8 container
+				9 container 메모 목록
+					10 heading 모든 메모
+					11 button 메모 목록 새로고침
+					12 button 화면 캡처
+					13 button 작업 내용을 기다리고 있습니다.
+					14 button tray76-9e86b2
+					15 button tray76-9e86b2
+					16 button tray76-9e86b2
+					17 button tray76-9e86b2
+					18 button tray76-9e86b2
+					19 button tray76-9e86b2
+					20 button tray76-9e86b2
+					21 button tray76-9e86b2
+					22 button tray76-9e86b2
+					23 button tray76-9e86b2
+					24 button tray76-9e86b2
+					25 button tray76-9e86b2
+					26 button tray76-9e86b2
+					27 button tray76-9e86b2
+					28 button tray76-9e86b2
+					29 button tray76-9e86b2
+					30 button tray76-9e86b2
+					31 button tray76-9e86b2
+					32 button tray76-9e86b2
+					33 button tray76-9e86b2
+					34 button tray76-9e86b2
+					35 button tray76-9e86b2
+					36 button tray76-9e86b2
+					37 button tray76-9e86b2
+					38 button tray76-9e86b2
+					39 button tray76-9e86b2
+					40 button 전용 에이전트 제거
+					41 button 트레이 메뉴 #76 · 에이전트 기능 제거
+					42 button 검증 표식: tray76-removal-final-20
+					43 button 터미널
+				44 container 메모 상세
+					45 text 메모를 선택하세요.
+			46 container Welcome to Agent Gibbon
+	47 close button
+	48 full screen button, Secondary Actions: zoom the window
+	49 minimize button
+	50 text Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — 메모 관리
+
+No UI element is currently focused.

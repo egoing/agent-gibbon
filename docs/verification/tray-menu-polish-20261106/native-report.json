@@ -1,0 +1,877 @@
+{
+  "origin": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/tray-menu-polish",
+    "id": "dev-1fd207d59c82431a32969a4a",
+    "name": "tray-menu-polish",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/tray-menu-polish/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/tray-menu-polish/src-tauri/target/debug/agent-gibbon"
+  },
+  "prefix": "tray76-9e86b2",
+  "checks": [
+    "CLI instance, unique body, exact executable PID and native window title agree",
+    "hidden item is enabled and restores after inspect/update while menu stays open",
+    "30 has no More; 31 has exactly 30 entries plus More(1); body-only update reorders on next open",
+    "More opens the native manager belonging to the same PID"
+  ],
+  "pid": 70625,
+  "executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/tray-menu-polish/src-tauri/target/debug/agent-gibbon",
+  "proof": {
+    "always_on_top": true,
+    "animating": true,
+    "auto_layout_excluded": false,
+    "content_height_cap": 48.0,
+    "dev_label": "DEV tray-menu-polish · 1fd207d5",
+    "feedback_active": false,
+    "feedback_surface": null,
+    "focused": false,
+    "folded": false,
+    "global_opacity": null,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "tray76-9e86b2-proof",
+    "instance": "dev-1fd207d59c82431a32969a4a",
+    "layout_destination": {
+      "height": 96,
+      "width": 600,
+      "x": 3496,
+      "y": 356
+    },
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<h1>tray76-9e86b2</h1>\n",
+      "color": "#84fe83",
+      "edit_on_open": false,
+      "html": "<h1>tray76-9e86b2</h1>\n",
+      "markdown": "# tray76-9e86b2",
+      "removed": false,
+      "revision": 1,
+      "source_path": null,
+      "status": "대기",
+      "title": "최근검증 기준",
+      "updated_at": 1793961794877
+    },
+    "ok": true,
+    "opacity": 1.0,
+    "position": {
+      "x": 1806,
+      "y": 50
+    },
+    "size": {
+      "height": 96,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 864.0,
+        "y": 295.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-1fd207d59c82431a32969a4a/docs/tray76-9e86b2-proof/index.md",
+    "visible": true
+  },
+  "native_origin": {
+    "screens": [
+      {
+        "scale": 2,
+        "frame": [
+          0,
+          0,
+          2048,
+          1152
+        ],
+        "visible": [
+          0,
+          0,
+          2048,
+          1127
+        ]
+      },
+      {
+        "visible": [
+          -1728,
+          35,
+          1728,
+          1085
+        ],
+        "scale": 2,
+        "frame": [
+          -1728,
+          35,
+          1728,
+          1117
+        ]
+      },
+      {
+        "frame": [
+          0,
+          1152,
+          1920,
+          1080
+        ],
+        "visible": [
+          0,
+          1152,
+          1920,
+          1080
+        ],
+        "scale": 2
+      }
+    ],
+    "windows": [
+      {
+        "kCGWindowBounds": {
+          "X": 1164,
+          "Height": 24,
+          "Y": 0,
+          "Width": 34
+        },
+        "kCGWindowStoreType": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowLayer": 25,
+        "kCGWindowSharingState": 1,
+        "kCGWindowOwnerPID": 70625,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowAlpha": 1,
+        "kCGWindowName": "Item-0",
+        "kCGWindowNumber": 40664,
+        "kCGWindowIsOnscreen": true
+      },
+      {
+        "kCGWindowNumber": 40668,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowSharingState": 1,
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "X": 903,
+          "Height": 48,
+          "Y": 25,
+          "Width": 300
+        },
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerPID": 70625,
+        "kCGWindowStoreType": 1,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-proof",
+        "kCGWindowMemoryUsage": 2288
+      },
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-proof-1fd207",
+        "kCGWindowNumber": 40663,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowSharingState": 1,
+        "kCGWindowOwnerPID": 70625,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowAlpha": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowBounds": {
+          "X": 1748,
+          "Height": 153,
+          "Y": 25,
+          "Width": 300
+        }
+      }
+    ]
+  },
+  "captures": {
+    "menu-background-update": {
+      "X": 1160,
+      "Height": 374,
+      "Y": 25,
+      "Width": 313
+    },
+    "menu31": {
+      "X": 1160,
+      "Height": 972,
+      "Y": 25,
+      "Width": 313
+    }
+  },
+  "menu30": [
+    {
+      "enabled": false,
+      "title": "tray-menu-polish"
+    },
+    {
+      "enabled": true,
+      "title": "메모 관리"
+    },
+    {
+      "enabled": true,
+      "title": "영역 캡처 · Control ⇧ 1"
+    },
+    {
+      "enabled": true,
+      "title": "영역 텍스트 메모 · Control ⇧ 2"
+    },
+    {
+      "enabled": true,
+      "title": "영역 터미널 · Control ⇧ 3"
+    },
+    {
+      "enabled": true,
+      "title": "영역 에이전트 터미널"
+    },
+    {
+      "enabled": true,
+      "title": "전체 창 접어두기 / 복원 · Control Option Command"
+    },
+    {
+      "enabled": true,
+      "title": "열린 메모 앞으로"
+    },
+    {
+      "enabled": false,
+      "title": ""
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 23"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 22"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 21"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 20"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 19"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 18"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 17"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 16"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 15"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 14"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 13"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 12"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 11"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 10"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 09"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 08"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 07"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 06"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 05"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 04"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 03"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 02"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 01"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 00"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 기준"
+    },
+    {
+      "enabled": true,
+      "title": "트레이 검증"
+    },
+    {
+      "enabled": true,
+      "title": "화면 캡처"
+    },
+    {
+      "enabled": true,
+      "title": "egoinglee"
+    },
+    {
+      "enabled": true,
+      "title": "에이전트 터미널"
+    },
+    {
+      "enabled": true,
+      "title": "Agent Gibbon"
+    },
+    {
+      "enabled": false,
+      "title": ""
+    },
+    {
+      "enabled": true,
+      "title": "Agent Gibbon 종료"
+    }
+  ],
+  "menu31": [
+    {
+      "enabled": false,
+      "title": "tray-menu-polish"
+    },
+    {
+      "enabled": true,
+      "title": "메모 관리"
+    },
+    {
+      "enabled": true,
+      "title": "영역 캡처 · Control ⇧ 1"
+    },
+    {
+      "enabled": true,
+      "title": "영역 텍스트 메모 · Control ⇧ 2"
+    },
+    {
+      "enabled": true,
+      "title": "영역 터미널 · Control ⇧ 3"
+    },
+    {
+      "enabled": true,
+      "title": "영역 에이전트 터미널"
+    },
+    {
+      "enabled": true,
+      "title": "전체 창 접어두기 / 복원 · Control Option Command"
+    },
+    {
+      "enabled": true,
+      "title": "열린 메모 앞으로"
+    },
+    {
+      "enabled": false,
+      "title": ""
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 초과"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 23"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 22"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 21"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 20"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 19"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 18"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 17"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 16"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 15"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 14"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 13"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 12"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 11"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 10"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 09"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 08"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 07"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 06"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 05"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 04"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 03"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 02"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 01"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 00"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 기준"
+    },
+    {
+      "enabled": true,
+      "title": "트레이 검증"
+    },
+    {
+      "enabled": true,
+      "title": "화면 캡처"
+    },
+    {
+      "enabled": true,
+      "title": "egoinglee"
+    },
+    {
+      "enabled": true,
+      "title": "에이전트 터미널"
+    },
+    {
+      "enabled": true,
+      "title": "더보기(1)"
+    },
+    {
+      "enabled": false,
+      "title": ""
+    },
+    {
+      "enabled": true,
+      "title": "Agent Gibbon 종료"
+    }
+  ],
+  "menu_after_body_update": [
+    {
+      "enabled": false,
+      "title": "tray-menu-polish"
+    },
+    {
+      "enabled": true,
+      "title": "메모 관리"
+    },
+    {
+      "enabled": true,
+      "title": "영역 캡처 · Control ⇧ 1"
+    },
+    {
+      "enabled": true,
+      "title": "영역 텍스트 메모 · Control ⇧ 2"
+    },
+    {
+      "enabled": true,
+      "title": "영역 터미널 · Control ⇧ 3"
+    },
+    {
+      "enabled": true,
+      "title": "영역 에이전트 터미널"
+    },
+    {
+      "enabled": true,
+      "title": "전체 창 접어두기 / 복원 · Control Option Command"
+    },
+    {
+      "enabled": true,
+      "title": "열린 메모 앞으로"
+    },
+    {
+      "enabled": false,
+      "title": ""
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 기준"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 초과"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 23"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 22"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 21"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 20"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 19"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 18"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 17"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 16"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 15"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 14"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 13"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 12"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 11"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 10"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 09"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 08"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 07"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 06"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 05"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 04"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 03"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 02"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 01"
+    },
+    {
+      "enabled": true,
+      "title": "최근검증 00"
+    },
+    {
+      "enabled": true,
+      "title": "트레이 검증"
+    },
+    {
+      "enabled": true,
+      "title": "화면 캡처"
+    },
+    {
+      "enabled": true,
+      "title": "egoinglee"
+    },
+    {
+      "enabled": true,
+      "title": "에이전트 터미널"
+    },
+    {
+      "enabled": true,
+      "title": "더보기(1)"
+    },
+    {
+      "enabled": false,
+      "title": ""
+    },
+    {
+      "enabled": true,
+      "title": "Agent Gibbon 종료"
+    }
+  ],
+  "native_manager": {
+    "screens": [
+      {
+        "frame": [
+          0,
+          0,
+          2048,
+          1152
+        ],
+        "visible": [
+          0,
+          0,
+          2048,
+          1127
+        ],
+        "scale": 2
+      },
+      {
+        "scale": 2,
+        "visible": [
+          -1728,
+          35,
+          1728,
+          1085
+        ],
+        "frame": [
+          -1728,
+          35,
+          1728,
+          1117
+        ]
+      },
+      {
+        "frame": [
+          0,
+          1152,
+          1920,
+          1080
+        ],
+        "visible": [
+          0,
+          1152,
+          1920,
+          1080
+        ],
+        "scale": 2
+      }
+    ],
+    "windows": [
+      {
+        "kCGWindowLayer": 25,
+        "kCGWindowSharingState": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowName": "Item-0",
+        "kCGWindowBounds": {
+          "X": 1164,
+          "Height": 24,
+          "Y": 0,
+          "Width": 34
+        },
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerPID": 70625,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowStoreType": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowNumber": 40664
+      },
+      {
+        "kCGWindowNumber": 40732,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowSharingState": 1,
+        "kCGWindowAlpha": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowBounds": {
+          "X": 1944,
+          "Height": 36,
+          "Y": 226,
+          "Width": 104
+        },
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerPID": 70625,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-proof · Feedback"
+      },
+      {
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowNumber": 40668,
+        "kCGWindowStoreType": 1,
+        "kCGWindowAlpha": 1,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-proof",
+        "kCGWindowBounds": {
+          "X": 1748,
+          "Height": 48,
+          "Y": 178,
+          "Width": 300
+        },
+        "kCGWindowSharingState": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerPID": 70625
+      },
+      {
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowBounds": {
+          "X": 1748,
+          "Height": 153,
+          "Y": 25,
+          "Width": 300
+        },
+        "kCGWindowOwnerPID": 70625,
+        "kCGWindowAlpha": 0.9224314093589783,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowNumber": 40663,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowStoreType": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-proof-1fd207",
+        "kCGWindowLayer": 5
+      },
+      {
+        "kCGWindowNumber": 40734,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — 메모 관리",
+        "kCGWindowLayer": 0,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 552,
+          "Height": 480,
+          "Y": 187,
+          "Width": 944
+        },
+        "kCGWindowAlpha": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerPID": 70625
+      }
+    ]
+  },
+  "result": "passed",
+  "created": [
+    "tray76-9e86b2-proof",
+    "tray76-9e86b2-00",
+    "tray76-9e86b2-01",
+    "tray76-9e86b2-02",
+    "tray76-9e86b2-03",
+    "tray76-9e86b2-04",
+    "tray76-9e86b2-05",
+    "tray76-9e86b2-06",
+    "tray76-9e86b2-07",
+    "tray76-9e86b2-08",
+    "tray76-9e86b2-09",
+    "tray76-9e86b2-10",
+    "tray76-9e86b2-11",
+    "tray76-9e86b2-12",
+    "tray76-9e86b2-13",
+    "tray76-9e86b2-14",
+    "tray76-9e86b2-15",
+    "tray76-9e86b2-16",
+    "tray76-9e86b2-17",
+    "tray76-9e86b2-18",
+    "tray76-9e86b2-19",
+    "tray76-9e86b2-20",
+    "tray76-9e86b2-21",
+    "tray76-9e86b2-22",
+    "tray76-9e86b2-23",
+    "tray76-9e86b2-overflow"
+  ]
+}

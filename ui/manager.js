@@ -38,7 +38,8 @@ function page(settings) {
   else if (selectedSettingsSection === 'skills') window.gibbonSkills?.refresh();
   else window.gibbonPrivacy?.refresh().catch(()=>{});
 }
-el('notes-nav').onclick = () => page(false);
+window.gibbonShowNotes = () => page(false);
+el('notes-nav').onclick = window.gibbonShowNotes;
 el('settings-nav').onclick = () => page(true);
 el('retry').onclick = () => refresh(true);
 el('refresh').onclick = () => refresh(true);
@@ -69,7 +70,7 @@ async function detail() {
     const title = document.createElement('h1'); title.textContent = note.title || note.id; target.append(title);
   }
   if (note.kind) {
-    const kind=document.createElement('p');kind.textContent=note.kind==='terminal'?'터미널':'에이전트';target.append(kind);
+    const kind=document.createElement('p');kind.textContent='터미널';target.append(kind);
     if(note.kind==='terminal'){const remove=document.createElement('button');remove.textContent='목록에서 삭제';remove.onclick=async()=>{try{await invoke('manager_terminal',{id:note.id,action:'delete'});await refresh(true);}catch(e){el('error').hidden=false;remove.title=String(e);}};target.append(remove);}
   } else if (note.capture) {
     try {
@@ -88,7 +89,7 @@ function render() {
   list.replaceChildren();
   if (!notes.length) list.textContent = '아직 메모가 없습니다.';
   for (const note of notes) {
-    const button = document.createElement('button'); button.textContent = (note.kind ? `[${note.kind==='terminal'?'터미널':'에이전트'}] ` : '') + (note.title || note.id);
+    const button = document.createElement('button'); button.textContent = note.title;
     button.title = note.title || note.id;
     button.dataset.id = note.id; button.setAttribute('aria-current', String(note.id === selected));
     button.onclick = () => { selected = note.id; render(); detail(); };
@@ -103,7 +104,7 @@ async function refresh(force = false) {
   busy = true;
   const version = visibilityVersion;
   try {
-    const next = await invoke('manager_notes');
+    const next = (await invoke('manager_notes')).filter(note => !note.kind || note.kind === 'terminal');
     if (version !== visibilityVersion) return;
     const nextSignature = JSON.stringify(next.map(({ visible, ...note }) => note));
     el('error').hidden = true;

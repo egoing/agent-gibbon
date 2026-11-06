@@ -9,7 +9,7 @@ const fit = new FitAddon.FitAddon();
 terminal.loadAddon(fit);
 terminal.open(document.getElementById('terminal'));
 let homePath=null, selectedFolder=null, selectedChoice=null, availableChoices=[], folders=[], expandedFolders=false, selectingFolder=false;
-let started=false, starting=false, generic=false, input=Promise.resolve(), resizeTimer;
+let started=false, starting=false, input=Promise.resolve(), resizeTimer;
 function report(e){status.textContent=String(e);}
 function measure(){if(innerWidth<20||innerHeight<60)return;fit.fit();if(started)invoke('terminal_resize',{cols:terminal.cols,rows:terminal.rows}).catch(report);}
 new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(measure,60);}).observe(document.getElementById('terminal'));
@@ -37,7 +37,7 @@ document.getElementById('terminal').addEventListener('pointerdown', e => {
 });
 document.querySelector('header').addEventListener('pointerdown',e=>{if(e.button===0&&!e.target.closest('button'))win.startDragging().catch(report);});
 document.querySelectorAll('.resize').forEach(handle=>handle.addEventListener('pointerdown',e=>{if(e.button===0)win.startResizeDragging(handle.dataset.direction).catch(report);}));
-document.getElementById('close').onclick=()=>invoke(generic?'terminal_close':'terminal_hide').catch(report);
+document.getElementById('close').onclick=()=>invoke('terminal_close').catch(report);
 function setInfo(info){
   document.getElementById('title').textContent=info.title;
 
@@ -59,7 +59,7 @@ async function start(choice, trigger){
     }else terminal.write(new Uint8Array(bytes));
   };
   try{
-    if(generic && selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
+    if(selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
     await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('terminal.start', async flow => {
       await flow.invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output,choice});
       flow.stage('response');
@@ -69,7 +69,7 @@ async function start(choice, trigger){
     if(trigger && document.hasFocus() && (document.activeElement===trigger || document.activeElement===document.body))terminal.focus();
   }catch(e){
     const restoreFocus=trigger && document.hasFocus() && (document.activeElement===trigger || document.activeElement===document.body);
-    report(e);if(generic){document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;if(restoreFocus)trigger.focus({preventScroll:true});}
+    report(e);{document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;if(restoreFocus)trigger.focus({preventScroll:true});}
   }
   finally{starting=false;document.getElementById('welcome').setAttribute('aria-busy','false');}
 }
@@ -114,16 +114,18 @@ document.getElementById('choose-folder').onclick=async()=>{
 };
 document.getElementById('rename-form').onsubmit=async event=>{event.preventDefault();try{setInfo(await invoke('terminal_rename',{title:document.getElementById('rename-title').value}));status.textContent='창 제목을 변경했습니다.';}catch(e){report(e);}};
 (async()=>{
-  const info=await invoke('terminal_info');generic=info.kind==='terminal';setInfo(info);
-  if(generic){
+  const info=await invoke('terminal_info');
+  if(info.kind!=='terminal')throw Error('전용 에이전트 기능은 지원하지 않습니다.');
+  setInfo(info);
+  {
     const close=document.getElementById('close');close.title='터미널 종료';close.setAttribute('aria-label','터미널 종료');
     document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;
     await welcome();
-  }else{await start(null);}
+  }
   window.gibbonMeasure?.('terminal.ui.ready',clock());
 })().catch(report);
 // Refresh only the current directory; never collect input, output or history.
-setInterval(()=>{if(generic&&started)invoke('terminal_info').then(setInfo).catch(report);},2000);
+setInterval(()=>{if(started)invoke('terminal_info').then(setInfo).catch(report);},2000);
 
 document.getElementById('pin').onclick=async()=>{
   try { await invoke('toggle_pin'); const button=document.getElementById('pin'); button.setAttribute('aria-pressed',String(button.getAttribute('aria-pressed')!=='true')); } catch(e){report(e);}

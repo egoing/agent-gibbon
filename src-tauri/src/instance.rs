@@ -5,6 +5,7 @@ use std::sync::OnceLock;
 pub struct Instance {
     pub id: Option<String>,
     pub label: Option<String>,
+    pub branch: Option<String>,
 }
 impl Instance {
     fn parse(id: Option<String>, name: Option<String>) -> Result<Self, String> {
@@ -25,6 +26,7 @@ impl Instance {
         Ok(Self {
             id: Some(id),
             label,
+            branch: Some(name),
         })
     }
     #[cfg(any(unix, test))]
@@ -80,6 +82,8 @@ mod tests {
             Instance::parse(Some(format!("dev-{}", "b".repeat(24))), Some("same".into())).unwrap();
         assert_ne!(a.directory(501), b.directory(501));
         assert_ne!(a.title(), b.title());
+        assert_eq!(a.branch.as_deref(), Some("same"));
+        assert_eq!(a.branch, b.branch);
         assert!(a.directory(u32::MAX).join("app.sock").as_os_str().len() < 104);
     }
     #[test]

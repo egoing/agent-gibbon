@@ -109,7 +109,7 @@ try:
     assert inspect(a)['stash']['indicator']==escaped
     move(*target);shot('indicator-tip','stash-indicator')
     text=helper('ax',PID,TITLE+'stash-indicator','dump')
-    assert 'Ctrl+Alt+Cmd' in text and '다시 누르면 창 복원' in text,text
+    assert 'Control Option Command' in text and '다시 누르면 창 복원' in text,text
     move(*target);time.sleep(6.1)
     assert '다시 누르면 창 복원' not in helper('ax',PID,TITLE+'stash-indicator','dump')
     move(escaped['x']+escaped['width']-24,escaped['y']+24)

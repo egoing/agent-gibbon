@@ -1,34 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="560" height="252"><rect width="560" height="252" fill="#f3f4f6"/><g font-family="Arial,Apple SD Gothic Neo,sans-serif" fill="#27313c"><text x="24" y="32" font-size="19">Tray Menu · Memo List</text><rect x="24" y="52" width="512" height="152" rx="6" fill="white" stroke="#ccc"/><g font-size="15"><text x="44" y="80"></text><text x="86" y="112">작업 계획 (plan)</text><text opacity="0.45" x="86" y="144">화면 캡처 (capture)</text><text x="86" y="176">에이전트 터미널 (agent-ID)</text></g><text x="24" y="234" font-size="12">설명용 시안 · 열림 100% · 닫힘 45% · 아이콘은 메뉴 글자색</text></g><svg x="58" y="96"
-  xmlns="http://www.w3.org/2000/svg"
-  width="18"
-  height="18"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="590" viewBox="0 0 680 590">
+<rect width="680" height="590" fill="#f3f4f6" />
+<g font-family="Arial,Apple SD Gothic Neo,sans-serif" fill="#27313c">
+<text x="24" y="32" font-size="19">Tray Menu · 최근 목록</text>
+<rect x="24" y="52" width="632" height="436" rx="7" fill="white" stroke="#ccc" />
+<g font-size="15">
+<text x="48" y="80" fill="#68727d">tray-menu-polish</text>
+<text x="48" y="110">메모 관리</text>
+
+<text x="48" y="148">영역 캡처</text>
+<text x="48" y="180">영역 텍스트 메모</text>
+<text x="48" y="212">영역 터미널</text>
+<text x="48" y="244">숨김</text>
+<path d="M36 261H644" stroke="#ddd" />
+<g opacity="1"><text x="84" y="290">작업 계획</text><svg x="48" y="274" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M14 3v4a1 1 0 0 0 1 1h4" />
   <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
   <path d="M9 9l1 0" />
   <path d="M9 13l6 0" />
   <path d="M9 17l6 0" />
-</svg>
-<svg opacity="0.45" x="58" y="128"
-  xmlns="http://www.w3.org/2000/svg"
-  width="18"
-  height="18"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
+</svg></g>
+<g opacity=".45"><text x="84" y="326">화면 캡처</text><svg x="48" y="310" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M15 8h.01" />
   <path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z" />
   <path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5" />
   <path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3" />
-</svg>
-</svg>
+</svg></g>
+<g opacity=".45"><text x="84" y="362">프로젝트 터미널</text><svg x="48" y="346" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M8 9l3 3l-3 3" />
+  <path d="M13 15l3 0" />
+  <path d="M3 4m0 2a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z" />
+</svg></g>
+<text x="84" y="398" fill="#68727d">… 최근 30개를 같은 목록에 표시</text>
+<text x="48" y="430">더보기(12)</text>
+<path d="M36 446H644" stroke="#ddd" />
+<text x="48" y="472">Agent Gibbon 종료</text>
+<text x="624" y="148" text-anchor="end" opacity="0.55">Ctrl ⇧ 1</text><text x="624" y="180" text-anchor="end" opacity="0.55">Ctrl ⇧ 2</text><text x="624" y="212" text-anchor="end" opacity="0.55">Ctrl ⇧ 3</text><text x="624" y="244" text-anchor="end" opacity="0.55">Ctrl Opt ⌘</text></g><g font-size="12">
+<text x="24" y="515">설명용 macOS 시안 · 본문 예시는 일부 생략 · 하위 메뉴 없음</text>
+<text x="24" y="537">실제 창 보임 100% / 숨김 45% · 숨김 항목도 선택 가능 · PTY 상태와 독립</text>
+<text x="24" y="559">최근 30개 · 마지막 갱신 시각 내림차순 · 더보기는 관리 창의 전체 목록</text>
+</g></g></svg>
