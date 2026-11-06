@@ -8,6 +8,7 @@ mod instance;
 mod ipc;
 mod manager;
 
+mod external_apps;
 mod layout;
 mod local_trace;
 mod model;
@@ -490,7 +491,12 @@ fn apply_with_presentation(
             win.hide().map_err(|e| e.to_string())?;
             tray::sync_visibility(app)?;
         }
-        Action::Update | Action::Inspect | Action::List | Action::Diagnostics | Action::Probe => (),
+        Action::Update
+        | Action::Inspect
+        | Action::List
+        | Action::Diagnostics
+        | Action::Probe
+        | Action::App => (),
     }
     // Existing metadata is recollected before the next menu open. Replacing a
     // tracking native menu here would dismiss it during background updates.
@@ -520,6 +526,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(telemetry::Runtime::default())
         .manage(capture::Captures::default())
         .manage(terminal::Terminals::default())
+        .manage(external_apps::ExternalApps::default())
         .manage(ClosedNotes::default())
         .manage(PointerStates::default())
         .manage(initial_focus)
@@ -547,6 +554,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     local_trace::local_flow_begin,
                     local_trace::local_flow_stage,
                     snapshot,
+                    external_apps::external_welcome,
+                    external_apps::external_complete,
+                    external_apps::external_request,
                     terminal::terminal_start,
                     terminal::terminal_write,
                     terminal::terminal_resize,
@@ -614,6 +624,12 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             }
         })
         .on_window_event(|win, event| {
+            if win.label().starts_with("external-") {
+                if matches!(event, tauri::WindowEvent::Destroyed) {
+                    external_apps::picker_closed(win.app_handle(), win.label());
+                }
+                return;
+            }
             if win.label() == manager::LABEL && privacy::onboarding_required(win.app_handle()) {
                 if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
                     win.app_handle().exit(0);
@@ -746,6 +762,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 apply_direct(
                     app.handle(),
                     Request {
+                        external: None,
                         change_mode: None,
                         highlight: None,
                         source_path: None,
@@ -758,6 +775,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     },
                 )?;
             }
+            external_apps::recover(app.handle());
             telemetry::install(app.handle());
             if privacy::onboarding_required(app.handle()) {
                 manager::open(app.handle())?;
@@ -768,6 +786,15 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     let Ok(mut stream) = connection else { continue };
                     let response = match ipc::read_request(&mut stream) {
                         Err(e) => ipc::error(e),
+                        Ok(request) if matches!(request.action, Action::App) => request
+                            .validate()
+                            .and_then(|_| {
+                                if privacy::onboarding_required(&handle) {
+                                    return Err("먼저 약관을 확인하세요".into());
+                                }
+                                external_apps::execute(&handle, request.external.as_ref().unwrap())
+                            })
+                            .unwrap_or_else(ipc::error),
                         Ok(request) => {
                             let (tx, rx) = mpsc::sync_channel(1);
                             let _wait = telemetry::Timing::new("ipc.wait");
@@ -806,6 +833,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     app.run(|_app, _event| {
         if matches!(_event, tauri::RunEvent::Exit) {
             telemetry::shutdown(_app);
+            external_apps::shutdown(_app);
             terminal::shutdown(_app);
         }
         #[cfg(target_os = "macos")]
@@ -842,6 +870,7 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
         apply_direct(
             app,
             Request {
+                external: None,
                 action: Action::Open,
                 id: None,
                 color: None,
@@ -858,8 +887,24 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
 }
 
 fn parse(args: &[String]) -> Result<Request, String> {
+    if args.first().is_some_and(|s| s == "app") {
+        return Ok(Request {
+            external: Some(external_apps::parse(&args[1..])?),
+            action: Action::App,
+            change_mode: None,
+            highlight: None,
+            source_path: None,
+            id: None,
+            color: None,
+            title: None,
+            status: None,
+            markdown: None,
+        });
+    }
+
     let action = match args.first().map(String::as_str) { Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
+        external: None,
         action,
         change_mode: None,
         highlight: None,
@@ -980,6 +1025,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
     if matches!(request.action, Action::Open) && response["ok"] == true {
         // Wait only for initial measurement/show, never for pointer movement.
         let inspect = Request {
+            external: None,
             change_mode: None,
             highlight: None,
             source_path: None,
@@ -1027,7 +1073,7 @@ fn main() {
         )
     } else if args == ["--help"] || args == ["-h"] {
         Ok(
-            json!({"ok":true,"usage":"agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open만 앱을 시작하거나 창을 생성·복원합니다. ID 생략 시 main, close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
+            json!({"ok":true,"usage":"agent-gibbon app list|windows|sessions|select|open --app-id ID --region x,y,w,h|attach --window HWND --region x,y,w,h|release --session ID|cancel --session ID; diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open만 앱을 시작하거나 창을 생성·복원합니다. ID 생략 시 main, close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
         )
     } else {
         cli(&args)

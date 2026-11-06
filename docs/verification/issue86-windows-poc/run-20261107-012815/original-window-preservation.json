@@ -1,0 +1,49 @@
+{
+  "before": {
+    "hwnd": 1967202,
+    "hwnd_hex": "0x1e0462",
+    "pid": 7076,
+    "exe": "C:\\Users\\egoin\\AppData\\Local\\Programs\\orca\\Orca.exe",
+    "rect": [
+      -9,
+      -9,
+      1929,
+      1029
+    ],
+    "topmost": false,
+    "visible": true,
+    "dpi": 120,
+    "placement": {
+      "flags": 2,
+      "showCmd": 3,
+      "min": [
+        -1,
+        -1
+      ],
+      "max": [
+        -1,
+        -1
+      ],
+      "normal": [
+        441,
+        324,
+        2079,
+        1198
+      ]
+    },
+    "placement_hex": "2c0000000200000003000000ffffffffffffffffffffffffffffffffb9010000440100001f080000ae040000"
+  },
+  "after": {
+    "rect": [
+      -9,
+      -9,
+      1929,
+      1029
+    ],
+    "placement_hex": "2c0000000200000003000000ffffffffffffffffffffffffffffffffb9010000440100001f080000ae040000",
+    "topmost": false,
+    "visible": true
+  },
+  "foreground": 6160490,
+  "equal": true
+}

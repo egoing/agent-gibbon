@@ -260,6 +260,7 @@ impl Store {
         let meta: Metadata = serde_json::from_str(header).map_err(|e| e.to_string())?;
         let mut note = Note::default();
         note.apply(&Request {
+            external: None,
             action: Action::Open,
             id: Some(id.clone()),
             color: Some(meta.color),

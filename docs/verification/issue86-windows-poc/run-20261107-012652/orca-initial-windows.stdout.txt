@@ -1,0 +1,37 @@
+{
+  "id": "dadf5856-bec6-4ef6-9fd0-1b4d776c6ae3",
+  "ok": true,
+  "result": {
+    "app": {
+      "name": "Issue86TestWindow",
+      "bundleId": "Issue86TestWindow",
+      "pid": 29596
+    },
+    "windows": [
+      {
+        "index": 0,
+        "app": {
+          "name": "Issue86TestWindow",
+          "bundleId": "Issue86TestWindow",
+          "pid": 29596
+        },
+        "id": 16255166,
+        "title": "ISSUE86-POC-A-task8f3bf6",
+        "x": 80,
+        "y": 100,
+        "width": 640,
+        "height": 420,
+        "isMinimized": false,
+        "isOffscreen": false,
+        "screenIndex": null,
+        "platform": {
+          "backend": "uia",
+          "nativeWindowHandle": 16255166
+        }
+      }
+    ]
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

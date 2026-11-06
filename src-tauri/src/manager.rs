@@ -211,6 +211,7 @@ pub fn manager_set_visibility(
     let response = crate::apply_direct(
         app,
         crate::Request {
+            external: None,
             action: if visible {
                 crate::Action::Open
             } else {

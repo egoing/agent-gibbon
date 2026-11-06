@@ -1,0 +1,61 @@
+{
+  "id": "11e6e762-3f82-4329-834d-e05e1d3c198d",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "35f4b7ee-873a-4732-8410-e20dd7746c37",
+      "app": {
+        "name": "Issue86TestWindow",
+        "bundleId": "Issue86TestWindow",
+        "pid": 25720
+      },
+      "window": {
+        "title": "ISSUE86-POC-A-task8f3bf6",
+        "id": 2491232,
+        "index": null,
+        "x": 220,
+        "y": 180,
+        "width": 640,
+        "height": 420,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=Issue86TestWindow (pid 25720)\nWindow: \"ISSUE86-POC-A-task8f3bf6\", App: Issue86TestWindow.\n\nNo change in the accessibility tree since the previous snapshot.",
+      "elementCount": 11,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      },
+      "treeDiff": {
+        "baseSnapshotId": "f60cdb48-7cbf-4636-a6ce-0d9bb02206a5",
+        "changed": 0,
+        "added": 0,
+        "removed": 0
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "action": {
+      "path": "synthetic",
+      "actionName": null,
+      "fallbackReason": "actionUnsupported",
+      "targetWindowId": 2491232,
+      "targetWindowIndex": null,
+      "verification": {
+        "state": "unverified",
+        "reason": "synthetic_input"
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}
