@@ -260,6 +260,7 @@ fn restore(s: &Session) -> Result<(), String> {
     }
     // Supported sessions start normal and visible; SW_SHOWNOACTIVATE preserves focus.
     let mut p = s.placement;
+    p.flags |= 0x4; // WPF_ASYNCWINDOWPLACEMENT: do not block on a hung foreign queue.
     p.show = 4;
     if unsafe { SetWindowPlacement(h, &p) } == 0 {
         return Err(native_error("창 위치 복원 실패"));
