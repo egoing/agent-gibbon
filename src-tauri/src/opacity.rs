@@ -33,6 +33,15 @@ impl Default for Fade {
 }
 #[cfg(any(target_os = "macos", windows, test))]
 impl Fade {
+    pub fn at(value: f64) -> Self {
+        Self {
+            current: value,
+            target: value,
+            from: value,
+            started: None,
+        }
+    }
+
     pub fn sample(&mut self, target: f64, now: Instant) -> f64 {
         if target >= self.current {
             self.current = target;
@@ -52,6 +61,21 @@ impl Fade {
         }
         self.target = target;
         self.current
+    }
+}
+
+#[cfg(any(target_os = "macos", windows, test))]
+pub fn target(manual: Option<f64>, hovered: bool, attention: bool, folded: bool) -> f64 {
+    if hovered {
+        1.0
+    } else if let Some(alpha) = manual {
+        alpha
+    } else if attention {
+        1.0
+    } else if folded {
+        0.8
+    } else {
+        0.5
     }
 }
 // Only pending fades schedule main-thread work; idle windows do not animate.
@@ -100,6 +124,65 @@ pub fn start(app: tauri::AppHandle) {
 mod tests {
     use super::*;
     #[test]
+    fn hover_temporarily_overrides_manual_choice_and_restores_with_existing_delay() {
+        let now = Instant::now();
+        for manual in [0.1, 0.35, 0.8, 1.0] {
+            for folded in [false, true] {
+                let mut fade = Fade::at(manual);
+                assert_eq!(
+                    fade.sample(target(Some(manual), false, false, folded), now),
+                    manual
+                );
+                assert_eq!(
+                    fade.sample(target(Some(manual), true, false, folded), now),
+                    1.0
+                );
+                let outside = target(Some(manual), false, true, folded);
+                assert_eq!(
+                    outside, manual,
+                    "attention must not overwrite the saved choice"
+                );
+                assert_eq!(fade.sample(outside, now), 1.0);
+                assert_eq!(fade.sample(outside, now + Duration::from_millis(1999)), 1.0);
+                assert!(
+                    (fade.sample(outside, now + Duration::from_millis(2600)) - manual).abs()
+                        < 0.0001
+                );
+            }
+        }
+        assert_eq!(target(None, false, false, false), 0.5);
+        assert_eq!(target(None, false, false, true), 0.8);
+        assert_eq!(target(None, false, true, false), 1.0);
+        assert_eq!(target(None, true, false, false), 1.0);
+    }
+
+    #[test]
+    fn hover_is_local_and_wheel_refresh_starts_at_the_new_saved_value() {
+        let now = Instant::now();
+        let mut hovered = Fade::at(0.35);
+        let mut peer = Fade::at(0.35);
+        assert_eq!(
+            hovered.sample(target(Some(0.35), true, false, false), now),
+            1.0
+        );
+        assert_eq!(
+            peer.sample(target(Some(0.35), false, false, false), now),
+            0.35
+        );
+        // Wheel refresh discards old transitions and starts from the new choice.
+        let mut updated = Fade::at(0.1);
+        assert_eq!(
+            updated.sample(target(Some(0.1), false, false, false), now),
+            0.1
+        );
+        assert_eq!(
+            updated.sample(target(Some(0.1), true, false, false), now),
+            1.0
+        );
+        assert_eq!(target(Some(0.1), false, false, false), 0.1);
+    }
+
+    #[test]
     fn waits_two_seconds_then_eases_and_interrupts_immediately() {
         let now = Instant::now();
         let mut fade = Fade::default();
@@ -114,8 +197,8 @@ mod tests {
     }
 }
 
-// An explicit wheel choice overrides automatic dimming, without changing any
-// note document. None retains the previous behavior until the first gesture.
+// An explicit wheel choice controls idle alpha. Pointer contact temporarily
+// restores full opacity without changing the stored choice or note document.
 use serde::{Deserialize, Serialize};
 use std::{
     io::Write,
@@ -266,6 +349,10 @@ pub fn wheel(app: &tauri::AppHandle, units: f64, chord: bool) {
 pub fn refresh(app: &tauri::AppHandle) {
     for window in app.webview_windows().into_values() {
         if is_memo(window.label()) {
+            // A wheel adjustment applies immediately, even during an old fade.
+            // Ordinary pointer exit keeps the existing delayed fade instead.
+            #[cfg(any(target_os = "macos", windows))]
+            app.state::<Fades>().lock().unwrap().remove(window.label());
             if let Err(e) = crate::sync_opacity(window) {
                 eprintln!("불투명도 적용 실패: {e}");
             }

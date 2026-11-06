@@ -169,59 +169,37 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
         return Ok(1.0);
     }
     let hovered = sync_pointer(&window)?;
-    if let Some(alpha) = opacity::configured(window.app_handle()) {
-        #[cfg(any(target_os = "macos", windows))]
-        window
-            .state::<opacity::Fades>()
-            .lock()
-            .map_err(|e| e.to_string())?
-            .remove(window.label());
-        opacity::set_native(&window, alpha)?;
-        feedback_window::set_opacity(&window, alpha)?;
-        return Ok(alpha);
-    }
+    let manual = opacity::configured(window.app_handle());
     #[cfg(any(target_os = "macos", windows))]
     {
         #[cfg(target_os = "macos")]
         let feedback_hovered = feedback_window::pointer_over(&window);
         #[cfg(windows)]
         let feedback_hovered = false; // Windows uses the memo's own feedback area.
-        let alpha = if hovered
-            || feedback_hovered
-            || entrance::active(&window)
-            || feedback::active(&window)
-        {
-            1.0
-        } else if sizing::folded(&window) {
-            0.8
-        } else {
-            0.5
-        };
+        let alpha = opacity::target(
+            manual,
+            hovered || feedback_hovered,
+            entrance::active(&window) || feedback::active(&window),
+            sizing::folded(&window),
+        );
         let alpha = window
             .state::<opacity::Fades>()
             .lock()
             .map_err(|e| e.to_string())?
             .entry(window.label().into())
-            .or_default()
+            .or_insert_with(|| opacity::Fade::at(manual.unwrap_or(1.0)))
             .sample(alpha, Instant::now());
-        #[cfg(target_os = "macos")]
-        let ptr = window.ns_window().map_err(|e| e.to_string())?;
-        // SAFETY: Tauri owns the live NSWindow, borrowed only on the main thread.
-        #[cfg(target_os = "macos")]
-        unsafe {
-            let native = &*(ptr as *const objc2_app_kit::NSWindow);
-            if native.alphaValue() != alpha {
-                native.setAlphaValue(alpha);
-            }
-        }
-        #[cfg(windows)]
-        windows_window::set_opacity(&window, alpha)?;
-        #[cfg(target_os = "macos")]
+        opacity::set_native(&window, alpha)?;
         feedback_window::set_opacity(&window, alpha)?;
         Ok(alpha)
     }
     #[cfg(not(any(target_os = "macos", windows)))]
     {
+        if let Some(alpha) = manual {
+            opacity::set_native(&window, alpha)?;
+            feedback_window::set_opacity(&window, alpha)?;
+            return Ok(alpha);
+        }
         let _ = (window, hovered);
         Ok(1.0)
     }

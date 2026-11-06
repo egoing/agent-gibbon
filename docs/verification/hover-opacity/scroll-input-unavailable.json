@@ -1,0 +1,16 @@
+{
+  "instance": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore",
+    "id": "dev-edd1ff2d021a706a8df75acd",
+    "name": "hover-opacity-restore",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore/src-tauri/target/debug/agent-gibbon"
+  },
+  "note_id": "opacity-scroll-212e8ccb",
+  "samples": [],
+  "passed": false,
+  "pid": 93761,
+  "verified_executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore/src-tauri/target/debug/agent-gibbon",
+  "test_server_stopped": true,
+  "setting_restored": true
+}
