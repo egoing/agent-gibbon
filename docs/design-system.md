@@ -17,6 +17,12 @@
 - 화면 구성은 [와이어프레임 SVG](design/privacy-onboarding.svg)와 [PNG](design/privacy-onboarding.png)에 제시한다. 프레임 크기는 제안값이며 실제 앱은 기존 관리 창 크기에서 스크롤한다. 기존 메모의 외형·위치·숨김 기준은 바꾸지 않는다.
 - 필수 약관을 체크하기 전 Continue는 비활성화한다. 전송 선택과 묶어 체크하거나 전체 동의를 기본값으로 제공하지 않는다. 저장 실패는 성공으로 표시하지 않는다. 동의·철회·재시작·손상 파일 검증 결과는 [검증 기록](verification/privacy-consent-20261106.md)에 구분해 남긴다. macOS/Windows 개발 빌드와 자동 검사는 통과했으며 실제 네이티브 동의 조작·Windows 프리징 재현은 미검증이다.
 
+### 선택적 진단 동의 활성화 (2026-11-06)
+
+- 사용자 승인으로 진단 원본 최대 30일, 백업 생성 후 30/90일, 오류 누적 통계의 별도 보유를 고지하고 첫 실행과 Settings의 진단 동의 체크박스를 선택 가능하게 한다. 최초에는 해제이며 약관 동의가 선택 동의를 대신하지 않는다. 미완성 운영 정보에서 비활성화하는 방어 조건은 유지한다.
+- 진단 카드에서 전송 대상 Sentry·미국 아이오와·원본 30일과 상세 Privacy Notice를 표시한다. 켜기는 명시적으로 저장하고 끄기는 즉시 철회한다. 문서 해시 변경으로 과거 동의는 자동 승계하지 않는다. Release Health 세션 수집은 SDK와 전송 필터에서 차단한다.
+- [동의 시안 SVG](design/privacy-onboarding.svg)·[PNG](design/privacy-onboarding.png)를 선택 가능·미체크 상태로 갱신한다. 정책과 검증 결과는 [활성화 기록](verification/privacy-choice-enabled-20261106.md)에 구분한다.
+
 - 동의 기록과 설정 반영은 [실제 저장·재실행 검증](verification/privacy-persistence-20261106.md)에서 macOS 테스트 인스턴스의 native UI·파일·앱 상태를 대조했다. 테스트 약관·로컬 수신기를 사용했으며 실제 사용자 동의·공식 Sentry 수신·Windows 검증과 구분한다.
 
 ### Windows 영역 선택 완료 전환 보정 (2026-11-06)

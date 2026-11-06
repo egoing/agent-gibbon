@@ -3,5 +3,5 @@
   "privacy_contact": "egoing+support@gmail.com",
   "recipient": "Functional Software, Inc. (Sentry)",
   "storage_region": "United States (Iowa)",
-  "retention_days": null
+  "retention_days": 30
 }

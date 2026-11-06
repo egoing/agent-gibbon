@@ -39,7 +39,7 @@ fn rejects_unknown_and_nonfinite_frontend_measurements() {
     .is_err());
 }
 #[test]
-fn whole_envelope_scrubs_error_trace_log_session_and_denies_attachments() {
+fn whole_envelope_scrubs_error_trace_log_and_denies_sessions_and_attachments() {
     let secret = "PRIVATE_NOTE_COMMAND_PATH_TOKEN";
     let mut e:p::Event=serde_json::from_value(json!({
         "message":secret,"user":{"username":secret},"request":{"url":"https://example.invalid/PRIVATE_NOTE_COMMAND_PATH_TOKEN"},
@@ -103,7 +103,8 @@ fn whole_envelope_scrubs_error_trace_log_session_and_denies_attachments() {
     assert!(payload.contains("storage.save"));
     assert!(payload.contains("application_function"));
     assert!(payload.contains("duration_ms"));
-    assert_eq!(out.items().count(), 4);
+    assert_eq!(out.items().count(), 3);
+    assert!(!payload.contains("00112233-4455-6677-8899-aabbccddeeff"));
 }
 #[test]
 fn foreign_breadcrumbs_and_logs_are_not_allowed() {
@@ -137,7 +138,8 @@ fn basic_release_and_opted_in_diagnostics_have_separate_features() {
         0.0
     );
     let detailed = options("https://public@example.invalid/42".parse().unwrap(), true);
-    assert!(detailed.enable_logs && detailed.auto_session_tracking);
+    assert!(detailed.enable_logs);
+    assert!(!detailed.auto_session_tracking);
     let sampler = detailed.traces_sampler.unwrap();
     assert_eq!(
         sampler(&sentry::TransactionContext::new(
