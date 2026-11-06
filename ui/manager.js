@@ -2,6 +2,18 @@
 const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const el = id => document.getElementById(id);
 let notes = [], selected = null, busy = false, detailVersion = 0, signature = '';
+// Register settings destinations here; navigation preserves each panel's DOM.
+const settingsSections = ['privacy', 'skills'];
+function settingsSection(selectedSection) {
+  for (const section of settingsSections) {
+    const active = section === selectedSection;
+    el(`settings-${section}`).hidden = !active;
+    el(`settings-${section}-nav`).setAttribute('aria-current', active ? 'page' : 'false');
+  }
+}
+for (const section of settingsSections) {
+  el(`settings-${section}-nav`).onclick = () => settingsSection(section);
+}
 function page(settings) {
   if(window.gibbonPrivacy && !window.gibbonPrivacy.accepted()){window.gibbonPrivacy.showWelcome();return;}
   el('notes-page').hidden = settings;
