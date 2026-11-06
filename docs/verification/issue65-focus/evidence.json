@@ -1,0 +1,489 @@
+{
+  "instance": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/diff",
+    "id": "dev-b09222c3d68057de28b6eb9c",
+    "name": "egoing/diff",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/diff/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/diff/src-tauri/target/debug/agent-gibbon"
+  },
+  "note_ids": [
+    "updates-393ee073-a",
+    "updates-819e99e7-b"
+  ],
+  "samples": [
+    {
+      "stage": "pending-diff",
+      "state": {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 66.0,
+        "dev_label": "DEV egoing/diff · b09222c3",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "global_opacity": null,
+        "highlight_revision": 2,
+        "hovered": false,
+        "id": "updates-393ee073-a",
+        "instance": "dev-b09222c3d68057de28b6eb9c",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>updates-393ee073-a</h1>\n<ul class=\"task-list\"><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">A</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">A</mark></li><li class=\"task-item\">☐ B</li></ul>",
+          "color": "#ffb2b1",
+          "completion_html": null,
+          "edit_on_open": false,
+          "html": "<h1>updates-393ee073-a</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ A</li><li class=\"task-item\">☐ B</li></ul>",
+          "markdown": "# updates-393ee073-a\n- [x] A\n- [ ] B",
+          "quiet_update": false,
+          "removed": true,
+          "revision": 2,
+          "source_path": null,
+          "status": "대기",
+          "title": "Agent Gibbon",
+          "updated_at": 1793981057096
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3496,
+          "y": 2172
+        },
+        "size": {
+          "height": 132,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-b09222c3d68057de28b6eb9c/docs/updates-393ee073-a/index.md",
+        "visible": true
+      },
+      "windows": [
+        {
+          "title": "Item-0",
+          "id": 43582,
+          "bounds": {
+            "X": 1158,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          }
+        },
+        {
+          "bounds": {
+            "X": 17,
+            "Height": 66,
+            "Y": 52,
+            "Width": 300
+          },
+          "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — updates-819e99e7-b",
+          "id": 43586
+        },
+        {
+          "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — updates-393ee073-a",
+          "id": 43584,
+          "bounds": {
+            "X": 1748,
+            "Height": 66,
+            "Y": 1086,
+            "Width": 300
+          }
+        }
+      ]
+    },
+    {
+      "stage": "focus-departure-acknowledged-peer-pending",
+      "state": {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 66.0,
+        "dev_label": "DEV egoing/diff · b09222c3",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "global_opacity": null,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "updates-393ee073-a",
+        "instance": "dev-b09222c3d68057de28b6eb9c",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>updates-393ee073-a</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ A</li><li class=\"task-item\">☐ B</li></ul>",
+          "color": "#ffb2b1",
+          "completion_html": null,
+          "edit_on_open": false,
+          "html": "<h1>updates-393ee073-a</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ A</li><li class=\"task-item\">☐ B</li></ul>",
+          "markdown": "# updates-393ee073-a\n- [x] A\n- [ ] B",
+          "quiet_update": false,
+          "removed": false,
+          "revision": 2,
+          "source_path": null,
+          "status": "대기",
+          "title": "Agent Gibbon",
+          "updated_at": 1793981057096
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3496,
+          "y": 2172
+        },
+        "size": {
+          "height": 132,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-b09222c3d68057de28b6eb9c/docs/updates-393ee073-a/index.md",
+        "visible": true
+      },
+      "windows": [
+        {
+          "title": "Item-0",
+          "id": 43582,
+          "bounds": {
+            "X": 1158,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          }
+        },
+        {
+          "id": 43586,
+          "bounds": {
+            "X": 1748,
+            "Height": 66,
+            "Y": 1020,
+            "Width": 300
+          },
+          "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — updates-819e99e7-b"
+        },
+        {
+          "bounds": {
+            "X": 1748,
+            "Height": 66,
+            "Y": 1086,
+            "Width": 300
+          },
+          "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — updates-393ee073-a",
+          "id": 43584
+        }
+      ]
+    },
+    {
+      "stage": "quiet-completion-survives-hover",
+      "state": {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 66.0,
+        "dev_label": "DEV egoing/diff · b09222c3",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "global_opacity": null,
+        "highlight_revision": null,
+        "hovered": true,
+        "id": "updates-393ee073-a",
+        "instance": "dev-b09222c3d68057de28b6eb9c",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>updates-393ee073-a</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ A</li><li class=\"task-item\">☑ B</li></ul>",
+          "color": "#ffb2b1",
+          "completion_html": "<h1>updates-393ee073-a</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ A</li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">B</mark></li></ul>",
+          "edit_on_open": false,
+          "html": "<h1>updates-393ee073-a</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ A</li><li class=\"task-item\">☑ B</li></ul>",
+          "markdown": "# updates-393ee073-a\n- [x] A\n- [x] B",
+          "quiet_update": true,
+          "removed": false,
+          "revision": 3,
+          "source_path": null,
+          "status": "대기",
+          "title": "Agent Gibbon",
+          "updated_at": 1793981069461
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3496,
+          "y": 2172
+        },
+        "size": {
+          "height": 132,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-b09222c3d68057de28b6eb9c/docs/updates-393ee073-a/index.md",
+        "visible": true
+      },
+      "windows": [
+        {
+          "title": "Item-0",
+          "bounds": {
+            "X": 1158,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          },
+          "id": 43582
+        },
+        {
+          "bounds": {
+            "X": 1748,
+            "Height": 66,
+            "Y": 1020,
+            "Width": 300
+          },
+          "id": 43586,
+          "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — updates-819e99e7-b"
+        },
+        {
+          "id": 43584,
+          "bounds": {
+            "X": 1748,
+            "Height": 66,
+            "Y": 1086,
+            "Width": 300
+          },
+          "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — updates-393ee073-a"
+        }
+      ]
+    },
+    {
+      "stage": "focus-departure-clears-diff-and-completion",
+      "state": {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 66.0,
+        "dev_label": "DEV egoing/diff · b09222c3",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "global_opacity": null,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "updates-393ee073-a",
+        "instance": "dev-b09222c3d68057de28b6eb9c",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>updates-393ee073-a</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ A</li><li class=\"task-item\">☑ B\nfocused update</li></ul>",
+          "color": "#ffb2b1",
+          "completion_html": null,
+          "edit_on_open": false,
+          "html": "<h1>updates-393ee073-a</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ A</li><li class=\"task-item\">☑ B\nfocused update</li></ul>",
+          "markdown": "# updates-393ee073-a\n- [x] A\n- [x] B\nfocused update",
+          "quiet_update": false,
+          "removed": false,
+          "revision": 4,
+          "source_path": null,
+          "status": "대기",
+          "title": "Agent Gibbon",
+          "updated_at": 1793981072239
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3496,
+          "y": 2172
+        },
+        "size": {
+          "height": 132,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-b09222c3d68057de28b6eb9c/docs/updates-393ee073-a/index.md",
+        "visible": true
+      },
+      "windows": [
+        {
+          "bounds": {
+            "X": 1158,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          },
+          "title": "Item-0",
+          "id": 43582
+        },
+        {
+          "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — updates-393ee073-a",
+          "bounds": {
+            "X": 1748,
+            "Height": 66,
+            "Y": 1086,
+            "Width": 300
+          },
+          "id": 43584
+        },
+        {
+          "id": 43586,
+          "bounds": {
+            "X": 1748,
+            "Height": 66,
+            "Y": 1020,
+            "Width": 300
+          },
+          "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — updates-819e99e7-b"
+        }
+      ]
+    },
+    {
+      "stage": "hidden-update-preserved",
+      "state": {
+        "always_on_top": false,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 48.0,
+        "dev_label": "DEV egoing/diff · b09222c3",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "global_opacity": null,
+        "highlight_revision": 3,
+        "hovered": false,
+        "id": "updates-819e99e7-b",
+        "instance": "dev-b09222c3d68057de28b6eb9c",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1><mark class=\"change-removed\">updates-819e99e7-b</mark></h1>\n<ul class=\"task-list\"><li class=\"task-item\"><mark class=\"change-removed\">☑ </mark><mark class=\"change-removed\">A</mark></li><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">B</mark>\n<mark class=\"change-modified\">hidden changed</mark></li></ul>",
+          "color": "#9cb6ff",
+          "completion_html": null,
+          "edit_on_open": false,
+          "html": "<p>hidden changed</p>\n",
+          "markdown": "hidden changed",
+          "quiet_update": false,
+          "removed": true,
+          "revision": 3,
+          "source_path": null,
+          "status": "대기",
+          "title": "Agent Gibbon",
+          "updated_at": 1793981075155
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3496,
+          "y": 2040
+        },
+        "size": {
+          "height": 132,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-b09222c3d68057de28b6eb9c/docs/updates-819e99e7-b/index.md",
+        "visible": false
+      },
+      "windows": [
+        {
+          "title": "Item-0",
+          "id": 43582,
+          "bounds": {
+            "X": 1158,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          }
+        },
+        {
+          "id": 43584,
+          "bounds": {
+            "X": 1748,
+            "Height": 66,
+            "Y": 1086,
+            "Width": 300
+          },
+          "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — updates-393ee073-a"
+        }
+      ]
+    }
+  ],
+  "passed": true,
+  "pid": 87666,
+  "verified_executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/diff/src-tauri/target/debug/agent-gibbon",
+  "test_server_stopped": true
+}

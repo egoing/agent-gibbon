@@ -63,8 +63,8 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
         if (command === 'snapshot') return { ...instance, note: { ...note }, always_on_top: true, feedback_active: feedbackActive, highlight_revision: highlightRevision };
         if (command === 'acknowledge_feedback') {
           if (acknowledgementError) throw acknowledgementError;
-          if (highlightRevision !== args.revision) return false;
-          highlightRevision = null; return true;
+          if (note.revision !== args.revision) return false;
+          highlightRevision = null; note.completion_html = null; return true;
         }
         if (command === 'export_note') { if (exportError) throw exportError; return exportResult; }
         if (command === 'save_note') {
@@ -88,6 +88,8 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
     pollFold: () => timers.find(fn => fn.name === 'pollFold')(), highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
     pollWarp: () => timers.find(fn => fn.name === 'pollWarp')(),
     feedback: active => { feedbackActive = active; },
+    leave: async () => { instance.focused = true; await timers.find(fn => fn.name === 'refresh')(); instance.focused = false; await timers.find(fn => fn.name === 'refresh')(); },
+    state: patch => Object.assign(instance, patch),
     failAcknowledgement: error => { acknowledgementError = error; },
     contact: () => { contact = true; }, failWarp: error => { warpError = error; },
     update: patch => { note = { ...note, ...patch }; }, failSave: error => { saveError = error; } };
@@ -154,7 +156,7 @@ test('failed warp reports error without showing success help or losing draft', a
 });
 
 
-test('feedback persists after opacity expiry and pointer contact until button click, preserving drafts', async () => {
+test('automatic acknowledgement defers during editing and preserves drafts', async () => {
   const app = await setup();
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>', removed: true });
   app.highlight(2); app.feedback(true); await app.refresh();
@@ -163,12 +165,12 @@ test('feedback persists after opacity expiry and pointer contact until button cl
   app.element('markdown').value = '초안';
   app.feedback(false); await app.refresh();
   assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
-  await app.pointers.pointerenter();
+  await app.leave();
   assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
-  await app.action('acknowledge'); // Editing must keep the unread revision.
+  await app.leave(); // Editing must keep the unread revision.
   assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
   await app.action('cancel');
-  await app.action('acknowledge');
+  await app.leave();
   app.highlight(2); await app.refresh(); // Ignore a stale snapshot after acknowledgement.
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
   assert.equal(app.element('markdown').value, '초안');
@@ -191,31 +193,22 @@ test('feedback never reappears when an expired change is saved without editing',
 });
 
 
-test('next body persists through rollover until explicit button click and affects only that note', async () => {
+test('rollover and focus acknowledge only their own current revision without a button', async () => {
   const app = await setup();
   const other = await setup();
   for (const instance of [app, other]) {
-    instance.update({ revision: 2, markdown: '첫 변경', html: '<p>첫 변경</p>', change_html: '<p><mark>첫 변경</mark></p>' });
+    instance.update({ revision: 2, html: '<p>변경</p>', change_html: '<mark>변경</mark>' });
     instance.highlight(2); await instance.refresh();
+    assert.deepEqual(instance.view().buttons, []);
   }
-  await app.pointers.pointerenter();
-  app.update({ revision: 3, markdown: '다음 변경', html: '<p>다음 변경</p>', change_html: '<p><mark>다음 변경</mark></p>' });
+  await app.leave();
+  assert.equal(app.element('content').innerHTML, '<p>변경</p>');
+  assert.equal(other.element('content').innerHTML, '<mark>변경</mark>');
+  app.update({ revision: 3, html: '<p>다음</p>', change_html: '<mark>다음</mark>' });
   app.highlight(3); await app.refresh();
-  assert.equal(app.element('content').innerHTML, '<p><mark>다음 변경</mark></p>');
-  await app.pointers.pointermove?.();
-  await app.events.focus?.();
-  await app.refresh();
-  assert.equal(app.element('content').innerHTML, '<p><mark>다음 변경</mark></p>');
-  await app.pointers.pointerleave();
-  await app.pointers.pointerenter();
-  assert.equal(app.element('content').innerHTML, '<p><mark>다음 변경</mark></p>');
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
-  await app.action('acknowledge');
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
-  assert.equal(app.element('content').innerHTML, '<p>다음 변경</p>');
-  assert.equal(other.element('content').innerHTML, '<p><mark>첫 변경</mark></p>');
+  await app.leave();
+  assert.equal(app.element('content').innerHTML, '<p>다음</p>');
 });
-
 
 test('fold contact preserves editor drafts and restores through the unfold button', async () => {
   const app = await setup();
@@ -283,27 +276,28 @@ test('native pointer notifications are addressed to the originating memo', () =>
 
 test('clear diff button stays hidden without changes and stale clicks preserve newer revisions', async () => {
   const app = await setup();
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
+  assert.equal((app.view().revision === null), true);
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>' });
   app.highlight(2); await app.refresh();
-  app.highlight(3); // A newer backend update arrived before the button request.
-  await app.action('acknowledge');
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
+  app.update({ revision: 3 });
+  app.highlight(3); // A newer backend update arrived before reading.
+  app.state({ focused: true }); await app.refresh();
+  assert.equal((app.view().revision === null), false);
   assert.equal(app.element('content').innerHTML, '<p><mark>변경</mark></p>');
-  assert.equal(app.view().buttons.find(b => b.id === 'acknowledge').disabled, false);
+  assert.deepEqual(app.view().buttons, []);
 });
 
 
 test('external action never consumes memo height', async () => {
   const app = await setup();
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
+  assert.equal((app.view().revision === null), true);
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>' });
   app.highlight(2); await app.refresh();
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
+  assert.equal((app.view().revision === null), false);
   assert.equal(app.calls.filter(([name]) => name === 'fit_note').at(-1)[1].height, 122);
   assert.equal(app.calls.some(([name]) => name === 'drag_note'), false);
-  await app.action('acknowledge');
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
+  await app.leave();
+  assert.equal((app.view().revision === null), true);
   assert.equal(app.calls.filter(([name]) => name === 'fit_note').at(-1)[1].height, 122);
 });
 
@@ -313,14 +307,15 @@ test('failed confirmation keeps cumulative changes and allows retry', async () =
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>누적 변경</mark></p>' });
   app.highlight(2); await app.refresh();
   app.failAcknowledgement('메모 저장 실패');
-  await app.action('acknowledge');
+  await app.leave();
   assert.equal(app.element('content').innerHTML, '<p><mark>누적 변경</mark></p>');
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
-  assert.equal(app.view().buttons.find(b => b.id === 'acknowledge').disabled, false);
+  assert.equal((app.view().revision === null), false);
+  assert.deepEqual(app.view().buttons, []);
   assert.equal(app.view().message, '메모 저장 실패');
   app.failAcknowledgement(null);
-  await app.action('acknowledge');
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
+  await app.leave();
+  await app.expireNotice();
+  assert.equal((app.view().revision === null), true);
   assert.equal(app.element('content').innerHTML, '<p>변경</p>');
   assert.equal(!app.view().error, true);
 });
@@ -388,16 +383,16 @@ test('direct save immediately clears existing diff controls', async () => {
   const app = await setup();
   app.highlight(1);
   await app.refresh();
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
+  assert.equal((app.view().revision === null), false);
   app.element('edit').listeners.click();
   app.element('markdown').value = '직접 수정';
   await app.action('save');
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), true);
+  assert.equal((app.view().revision === null), true);
+  assert.equal((app.view().revision === null), true);
   app.update({ revision: 3, html: '<p>외부 수정</p>', change_html: '<mark>외부 수정</mark>' });
   app.highlight(3);
   await app.refresh();
-  assert.equal(!app.view().buttons.some(b => b.id === 'acknowledge'), false);
+  assert.equal((app.view().revision === null), false);
 });
 
 test('temporary copy notice restores acknowledgement; editing owns the action slot', async () => {
@@ -405,16 +400,16 @@ test('temporary copy notice restores acknowledgement; editing owns the action sl
   app.highlight(1); await app.refresh();
   await app.element('copy').listeners.click();
   assert.equal(app.view().message, '복사했습니다');
-  assert.deepEqual(app.view().buttons.map(b => b.id), ['acknowledge']);
+  assert.deepEqual(app.view().buttons.map(b => b.id), []);
   await app.expireNotice();
-  assert.equal(app.view().message, '변경사항');
+  assert.equal(app.view().message, '');
   app.element('edit').listeners.click();
   await new Promise(setImmediate);
   await app.element('warp').listeners.click();
   assert.deepEqual(app.view().buttons.map(b => b.id), ['cancel', 'save']);
   assert.match(app.view().message, /Option/);
   await app.action('cancel');
-  assert.deepEqual(app.view().buttons.map(b => b.id), ['acknowledge']);
+  assert.deepEqual(app.view().buttons.map(b => b.id), []);
 });
 
 test('save success becomes Toast; save error retains actions and outranks tips', async () => {
@@ -457,7 +452,7 @@ test('hidden memo defers companion creation until its native window is visible',
   assert.equal(app.calls.some(([name]) => name === 'present_feedback'), false);
   instance.visible = true;
   await app.refresh();
-  assert.deepEqual(app.view().buttons.map(b => b.id), ['acknowledge']);
+  assert.deepEqual(app.view().buttons.map(b => b.id), []);
 });
 
  test('foreign Feedback actions cannot save another memo draft', async () => {
@@ -495,14 +490,14 @@ test('copy uses the latest rendered note without confirming or copying deleted d
   await app.element('copy').listeners.click();
   assert.deepEqual(app.calls.find(([name]) => name === 'clipboard-text'), ['clipboard-text', '최신 본문']);
   assert.equal(app.element('content').innerHTML, before);
-  assert.deepEqual(app.view().buttons.map(b => b.id), ['acknowledge']);
+  assert.deepEqual(app.view().buttons.map(b => b.id), []);
   assert.equal(app.calls.some(([name]) => name === 'acknowledge_feedback'), false);
   assert.equal(app.view().message, '복사했습니다');
   app.events.keydown({ key: 'c', metaKey: true, preventDefault() {} });
   await new Promise(setImmediate);
   assert.equal(app.calls.filter(([name]) => name === 'clipboard-text').length, 2);
   await app.expireNotice();
-  assert.equal(app.view().message, '변경사항');
+  assert.equal(app.view().message, '');
   app.element('edit').listeners.click();
   let prevented = false;
   app.events.keydown({ key: 'c', ctrlKey: true, preventDefault() { prevented = true; } });
@@ -598,7 +593,7 @@ test('toolbar shortcuts follow platform and gesture help is shown on button use'
 test('polling and hover never reset placement intent, explicit editing does', async () => {
   const app = await setup();
   await app.refresh(); await app.pollFold(); await app.pollWarp();
-  await app.pointers.pointerenter(); await app.pointers.pointerleave();
+  await app.leave(); await app.pointers.pointerleave();
   assert.equal(app.calls.filter(([name]) => name === 'content_action').length, 0);
   app.element('edit').listeners.click();
   assert.equal(app.calls.filter(([name]) => name === 'content_action').length, 1);
@@ -621,6 +616,33 @@ test('window close terminates while Escape remains a hide action', async () => {
   assert.equal(app.calls.at(-1)[0], 'close_note');
   app.events.keydown({key:'Escape',preventDefault(){},target:{closest(){return null;}}});
   assert.equal(app.calls.at(-1)[0], 'hide_note');
+});
+
+test('rollover and focus entry preserve completion; departure clears it', async () => {
+  const app = await setup(new Map(), {}, { html: '<p>완료</p>', completion_html: '<mark>완료</mark>' });
+  await app.pointers.pointerenter();
+  app.state({ focused: true }); await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<mark>완료</mark>');
+  app.state({ focused: false }); await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<p>완료</p>');
+});
+test('unseen revision arriving on departure survives until another reading session', async () => {
+  const app = await setup(new Map(), { focused: true });
+  app.state({ focused: false });
+  app.update({ revision: 2, html: '<p>new</p>', change_html: '<mark>new</mark>' });
+  app.highlight(2); await app.refresh();
+  assert.equal(app.element('content').innerHTML, '<mark>new</mark>');
+  await app.leave();
+  assert.equal(app.element('content').innerHTML, '<p>new</p>');
+});
+test('companion focus continues the same reading session', async () => {
+  const app = await setup(new Map(), { focused: true });
+  app.update({ revision: 2, html: 'new', change_html: '<mark>new</mark>' });
+  app.highlight(2); await app.refresh();
+  app.state({ focused: false, feedback_surface: { focused: true } }); await app.refresh();
+  assert.equal(app.view().revision, 2);
+  app.state({ feedback_surface: { focused: false } }); await app.refresh();
+  assert.equal(app.view().revision, null);
 });
 
 test('independent memo designs preserve editor drafts and original colors without a note revision',async()=>{

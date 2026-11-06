@@ -127,6 +127,7 @@ impl Store {
     pub fn acknowledge_changes(&self, id: &str, note: &mut Note) -> Result<(), String> {
         let mut next = note.clone();
         next.acknowledge_changes();
+        next.completion_html = None;
         self.save(id, &next)?;
         *note = next;
         Ok(())
@@ -141,6 +142,7 @@ impl Store {
     ) -> Result<(), String> {
         let mut next = note.clone();
         next.save_edit(markdown, revision)?;
+        next.completion_html = None;
         // A successful direct edit confirms the complete content the user just saved.
         next.acknowledge_changes();
         if let Err(error) = self.save(id, &next) {
@@ -263,6 +265,8 @@ impl Store {
             color: Some(meta.color),
             title: Some(meta.title),
             status: Some(meta.status),
+            change_mode: None,
+            highlight: None,
             source_path: meta.source_path,
             markdown: Some(markdown.into()),
         })?;
@@ -277,6 +281,24 @@ impl Store {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn completion_emphasis_is_ephemeral_but_completed_markdown_is_persisted() {
+        let root = tempfile::tempdir().unwrap();
+        let store = Store(root.path().into());
+        let mut note = Note::default();
+        for body in ["- [ ] A", "- [x] A"] {
+            note.apply(&serde_json::from_value(serde_json::json!({
+                "action":"update", "markdown":body, "change_mode":"replace", "highlight":"newly-completed"
+            })).unwrap()).unwrap();
+        }
+        assert!(note.completion_html.is_some());
+        store.save("completion", &note).unwrap();
+        let restored = Store::read(&store.path("completion"), false).unwrap().1;
+        assert_eq!(restored.markdown, "- [x] A");
+        assert!(restored.completion_html.is_none());
+        assert!(!restored.has_pending_changes());
+    }
+
     #[test]
     fn retired_project_without_terminal_metadata_is_preserved_and_not_loaded() {
         let dir = tempfile::tempdir().unwrap();

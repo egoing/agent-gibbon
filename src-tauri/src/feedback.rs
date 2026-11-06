@@ -40,6 +40,7 @@ pub fn highlight_revision(window: &WebviewWindow) -> Option<u64> {
         .copied()
 }
 
+#[cfg(test)]
 fn acknowledge(highlights: &mut BTreeMap<String, u64>, label: &str, revision: u64) -> bool {
     if highlights.get(label) != Some(&revision) {
         return false;
@@ -57,14 +58,18 @@ pub fn acknowledge_feedback(window: WebviewWindow, revision: u64) -> Result<bool
     let note = notes.get_mut(id).ok_or("메모를 찾을 수 없습니다")?;
     let state = window.state::<Feedbacks>();
     let mut highlights = state.highlights.lock().map_err(|e| e.to_string())?;
-    if highlights.get(window.label()) != Some(&revision) {
+    if note.revision != revision || (!note.has_pending_changes() && note.completion_html.is_none())
+    {
         return Ok(false);
     }
     // Persist first: a failed save must leave both the baseline and highlight intact.
     window
         .state::<crate::storage::Store>()
         .acknowledge_changes(id, note)?;
-    Ok(acknowledge(&mut highlights, window.label(), revision))
+    highlights.remove(window.label());
+    drop(highlights);
+    clear(&window);
+    Ok(true)
 }
 
 pub fn active(window: &WebviewWindow) -> bool {
@@ -109,7 +114,7 @@ pub fn changed(
         let mut highlights = state.highlights.lock().map_err(|e| e.to_string())?;
         sync_highlight(&mut highlights, window.label(), after);
     }
-    if !window.is_visible().map_err(|e| e.to_string())? {
+    if after.quiet_update || !window.is_visible().map_err(|e| e.to_string())? {
         return Ok(());
     }
     let first = window

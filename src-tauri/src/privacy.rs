@@ -234,6 +234,8 @@ pub async fn privacy_save(
                         color: None,
                         status: None,
                         markdown: None,
+                        change_mode: None,
+                        highlight: None,
                         source_path: None,
                     },
                 );

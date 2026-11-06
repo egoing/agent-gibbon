@@ -746,6 +746,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 apply_direct(
                     app.handle(),
                     Request {
+                        change_mode: None,
+                        highlight: None,
                         source_path: None,
                         action: Action::Open,
                         id: None,
@@ -845,6 +847,8 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
                 color: None,
                 title: None,
                 markdown: None,
+                change_mode: None,
+                highlight: None,
                 source_path: None,
                 status: None,
             },
@@ -857,6 +861,8 @@ fn parse(args: &[String]) -> Result<Request, String> {
     let action = match args.first().map(String::as_str) { Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
         action,
+        change_mode: None,
+        highlight: None,
         source_path: None,
         id: None,
         color: None,
@@ -869,6 +875,20 @@ fn parse(args: &[String]) -> Result<Request, String> {
         let key = &args[i];
         let value = args.get(i + 1).ok_or("옵션 값이 없습니다")?;
         match key.as_str() {
+            "--change-mode" if request.change_mode.is_none() => {
+                request.change_mode = Some(match value.as_str() {
+                    "diff" => model::ChangeMode::Diff,
+                    "replace" => model::ChangeMode::Replace,
+                    _ => return Err("change-mode는 diff 또는 replace여야 합니다".into()),
+                })
+            }
+            "--highlight" if request.highlight.is_none() => {
+                request.highlight = Some(match value.as_str() {
+                    "none" => model::Highlight::None,
+                    "newly-completed" => model::Highlight::NewlyCompleted,
+                    _ => return Err("highlight는 none 또는 newly-completed여야 합니다".into()),
+                })
+            }
             "--id" if request.id.is_none() => request.id = Some(value.clone()),
             "--color" if request.color.is_none() => request.color = Some(value.clone()),
             "--title" if request.title.is_none() => request.title = Some(value.clone()),
@@ -960,6 +980,8 @@ fn cli(args: &[String]) -> Result<Value, String> {
     if matches!(request.action, Action::Open) && response["ok"] == true {
         // Wait only for initial measurement/show, never for pointer movement.
         let inspect = Request {
+            change_mode: None,
+            highlight: None,
             source_path: None,
             action: Action::Inspect,
             id: request.id,
@@ -1005,7 +1027,7 @@ fn main() {
         )
     } else if args == ["--help"] || args == ["-h"] {
         Ok(
-            json!({"ok":true,"usage":"agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open만 앱을 시작하거나 창을 생성·복원합니다. ID 생략 시 main, close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
+            json!({"ok":true,"usage":"agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open만 앱을 시작하거나 창을 생성·복원합니다. ID 생략 시 main, close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
         )
     } else {
         cli(&args)
@@ -1020,6 +1042,45 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn update_mode_options_parse_and_reject_unsupported_combinations() {
+        let valid = [
+            "update",
+            "--markdown",
+            "- [x] A",
+            "--change-mode",
+            "replace",
+            "--highlight",
+            "newly-completed",
+        ];
+        let request = parse(&valid.map(String::from)).unwrap();
+        assert_eq!(request.change_mode, Some(model::ChangeMode::Replace));
+        assert_eq!(request.highlight, Some(model::Highlight::NewlyCompleted));
+        for args in [
+            vec!["update", "--markdown", "x", "--change-mode", "invalid"],
+            vec![
+                "update",
+                "--markdown",
+                "x",
+                "--change-mode",
+                "replace",
+                "--change-mode",
+                "diff",
+            ],
+            vec![
+                "update",
+                "--markdown",
+                "x",
+                "--highlight",
+                "newly-completed",
+            ],
+            vec!["update", "--change-mode", "replace"],
+            vec!["open", "--markdown", "x", "--change-mode", "replace"],
+        ] {
+            assert!(parse(&args.into_iter().map(String::from).collect::<Vec<_>>()).is_err());
+        }
+    }
+
     #[test]
     fn retired_agent_cli_and_project_ids_are_rejected() {
         assert!(parse(&["agent".into()]).is_err());

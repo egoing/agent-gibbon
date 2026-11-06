@@ -453,6 +453,8 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 apply_direct(
                     app,
                     Request {
+                        change_mode: None,
+                        highlight: None,
                         source_path: None,
                         action: Action::Open,
                         id: Some(id.into()),

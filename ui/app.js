@@ -23,6 +23,8 @@ let displayedHtml;
 let highlightRevision = null;
 let acknowledging = false;
 let acknowledgedRevision = -1;
+let readRevision = null;
+let wasReading = false;
 let editing = false;
 let initialEditHandled = false;
 let saving = false;
@@ -217,7 +219,7 @@ async function refresh(schedule = true) {
       }
       highlightRevision = (state.highlight_revision ?? -1) > acknowledgedRevision ? state.highlight_revision : null;
       publishFeedback();
-      const html = highlightRevision !== null ? state.note.change_html : state.note.html;
+      const html = highlightRevision !== null ? state.note.change_html : (state.note.completion_html ?? state.note.html);
       const changed = displayedHtml !== html;
       if (changed) {
         (flow.measure || ((_stage, work) => work()))('dom', () => { $('content').innerHTML = html; });
@@ -235,6 +237,15 @@ async function refresh(schedule = true) {
         if (state.note.edit_on_open && !state.note.capture) beginEditing();
       }
       await fitContent(flow);
+      const reading = memoVisible && (state.focused || state.feedback_surface?.focused);
+      if (reading && !editing) readRevision = state.note.revision;
+      if (wasReading && !reading) {
+        const observed = readRevision;
+        readRevision = null;
+        if (observed !== null) await acknowledge(observed);
+      }
+      wasReading = !!reading;
+
       if (changed && document.visibilityState === 'visible') {
         // Observation only: do not delay refresh/fit waiting for a hidden WebView.
         flow.frame?.();
@@ -305,25 +316,24 @@ $('content').addEventListener('click', (event) => { if (event.target.closest('a'
 // Native movement arrives even when WKWebView belongs to a background app.
 window.__TAURI__.event.listen('note-pointer-over', ({ payload }) => {
   document.body.classList.toggle('pointer-over', payload);
+
 }, { target: { kind: 'Window', label: win.label } }).catch(failure);
 window.__TAURI__.event.listen('layout-measure', () => { needsFit = true; refresh(false); }).catch(failure);
 refresh();
 
-async function acknowledge() {
-  if (highlightRevision === null || acknowledging) return;
-  contentAction();
-  const observed = highlightRevision;
+async function acknowledge(observed) {
+  if (acknowledging || editing || latestNote?.revision !== observed) return;
   acknowledging = true;
   publishFeedback();
   try {
     const accepted = await invoke('acknowledge_feedback', { revision: observed });
     if (accepted) acknowledgedRevision = Math.max(acknowledgedRevision, observed);
-    if (accepted && highlightRevision === observed) {
+    if (accepted && latestNote.revision === observed) {
+      latestNote.completion_html = null;
       highlightRevision = null;
       displayedHtml = latestNote.html;
       $('content').innerHTML = displayedHtml;
 
-      clearNotice();
       needsFit = true;
       await fitContent();
     }
@@ -334,9 +344,13 @@ async function acknowledge() {
   }
 }
 
-// Pointer contact only updates opacity; diff acknowledgement is explicit.
+// Pointer contact affects chrome/opacity only. Native focus is sampled together
+// with the companion surface so internal control changes do not mark content read.
 document.documentElement.addEventListener('pointerenter', () => invoke('sync_opacity').catch(failure));
 document.documentElement.addEventListener('pointerleave', () => invoke('sync_opacity').catch(failure));
+for (const event of ['tauri://focus', 'tauri://blur']) {
+  window.__TAURI__.event.listen(event, () => refresh(false), { target: { kind: 'Window', label: win.label } }).catch(failure);
+}
 
 function showWarpTip() {
   if (isMac) notify('Option을 누른 채 메모에 포인터를 올려도 이동할 수 있습니다', 'tip');
@@ -398,11 +412,9 @@ pollFold();
 window.__TAURI__.event.listen('feedback-action', ({ payload }) => {
   if (payload.owner !== win.label) return;
   const action = payload.action;
-  if (action === 'acknowledge' && payload.revision !== highlightRevision) return;
   if (action === 'export') return exportNote();
   if (action === 'save') return save();
   else if (action === 'cancel' && editing && !saving) return endEditing();
-  else if (action === 'acknowledge' && !editing) return acknowledge();
 }).catch(failure);
 
 // Themed Tooltip on pointer hover and keyboard focus; native title stays in data.
