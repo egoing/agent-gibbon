@@ -601,11 +601,13 @@ mod tests {
             );
             let shown = memo_icon(entry.icon(), true).unwrap();
             let hidden = memo_icon(entry.icon(), false).unwrap();
-            assert!(shown.rgba().chunks_exact(4).any(|p| p[3] > 0));
+            assert!(shown.rgba().as_chunks::<4>().0.iter().any(|p| p[3] > 0));
             for (a, b) in shown
                 .rgba()
-                .chunks_exact(4)
-                .zip(hidden.rgba().chunks_exact(4))
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .zip(hidden.rgba().as_chunks::<4>().0.iter())
             {
                 assert_eq!(b[3], (a[3] as f32 * 0.45) as u8);
             }
