@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="660" viewBox="0 0 1000 660"><style>text{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#222}</style>
+<rect x="0" y="0" width="1000" height="660" fill="white" stroke="#999"/>
+<text x="28" y="40" font-size="23" font-weight="600">04  터미널 내용</text>
+<text x="28" y="68" font-size="14" font-weight="400">최소 구현 와이어프레임 · 화면 구조만 표현 · 예시 데이터</text>
+<rect x="28" y="96" width="944" height="480" fill="white" stroke="#999"/>
+<path d="M28 150L972 150" stroke="#bbb"/>
+<text x="48" y="130" font-size="18" font-weight="600">Agent Gibbon</text>
+<rect x="700" y="108" width="140" height="30" fill="#eee" stroke="#999"/>
+<text x="728" y="129" font-size="14" font-weight="400">모든 메모</text>
+<rect x="852" y="108" width="96" height="30" fill="white" stroke="#999"/>
+<text x="884" y="129" font-size="14" font-weight="400">설정</text>
+<path d="M280 150L280 576" stroke="#bbb"/>
+<rect x="184" y="168" width="80" height="28" fill="white" stroke="#999"/><text x="194" y="187" font-family="Arial, sans-serif" font-size="12">새로고침</text><text x="48" y="190" font-size="17" font-weight="600">모든 메모</text>
+<text x="54" y="244" font-size="16" font-weight="400">메모 관리 화면 만들기</text>
+<rect x="40" y="276" width="228" height="48" fill="#eee" stroke="#999"/>
+<text x="54" y="306" font-size="16" font-weight="400">[터미널] 작업 폴더</text>
+<text x="54" y="368" font-size="16" font-weight="400">회의 기록</text>
+<rect x="310" y="168" width="150" height="32" fill="white" stroke="#999"/>
+<text x="325" y="190" font-size="14">화면에서 숨기기</text>
+<text x="310" y="240" font-size="21" font-weight="600">작업 폴더</text>
+<path d="M300 262L948 262" stroke="#bbb"/>
+<text x="310" y="304" font-size="16">터미널</text>
+<rect x="310" y="326" width="150" height="32" fill="white" stroke="#999"/>
+<text x="325" y="348" font-size="14">목록에서 삭제</text>
+<text x="310" y="400" font-size="14">에이전트도 같은 공통 도구를 사용합니다.</text>
+<text x="28" y="613" font-size="15" font-weight="400">목록 선택은 미리보기만 변경합니다. 공통 버튼은 선택한 메모를 표시하거나 숨깁니다.</text>
+<text x="28" y="640" font-size="13" font-weight="400">상태는 버튼 문구로만 표시 · 설정에는 도구 없음</text>
+</svg>

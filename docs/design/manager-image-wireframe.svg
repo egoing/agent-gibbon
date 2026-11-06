@@ -15,13 +15,15 @@
 <rect x="40" y="276" width="228" height="48" fill="#eee" stroke="#999"/>
 <text x="54" y="306" font-size="16" font-weight="400">화면 구성 참고</text>
 <text x="54" y="368" font-size="16" font-weight="400">회의 기록</text>
-<text x="310" y="190" font-size="21" font-weight="600">화면 구성 참고</text>
-<path d="M300 212L948 212" stroke="#bbb"/>
-<rect x="310" y="240" width="628" height="300" fill="white" stroke="#999"/>
-<path d="M310 240L938 540" stroke="#bbb"/>
-<path d="M938 240L310 540" stroke="#bbb"/>
+<rect x="310" y="168" width="150" height="32" fill="white" stroke="#999"/>
+<text x="325" y="190" font-size="14">화면에서 숨기기</text>
+<text x="310" y="240" font-size="21" font-weight="600">화면 구성 참고</text>
+<path d="M300 262L948 262" stroke="#bbb"/>
+<rect x="310" y="290" width="628" height="250" fill="white" stroke="#999"/>
+<path d="M310 290L938 540" stroke="#bbb"/>
+<path d="M938 290L310 540" stroke="#bbb"/>
 <rect x="518" y="368" width="212" height="42" fill="white" stroke="#999"/>
 <text x="546" y="395" font-size="18" font-weight="400">이미지 미리보기</text>
-<text x="28" y="613" font-size="15" font-weight="400">목록에서 선택하면 오른쪽 내용만 바뀝니다. 화면 위 메모의 상태는 유지합니다.</text>
-<text x="28" y="640" font-size="13" font-weight="400">앱 미구현 · 읽기 전용 · 검색 / 편집 / 도킹 / 정보 패널 제외</text>
+<text x="28" y="613" font-size="15" font-weight="400">목록 선택은 미리보기만 변경합니다. 공통 버튼은 선택한 메모를 표시하거나 숨깁니다.</text>
+<text x="28" y="640" font-size="13" font-weight="400">상태는 버튼 문구로만 표시 · 설정에는 도구 없음</text>
 </svg>

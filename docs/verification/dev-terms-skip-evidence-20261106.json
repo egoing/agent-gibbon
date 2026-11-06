@@ -1,17 +1,17 @@
 {
   "source_root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel",
   "fixture": {
-    "root": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-ua2fynrj",
-    "id": "dev-fd713e96f8417eeaa1d74e35",
-    "name": "gibbon-terms-smoke-ua2fynrj",
-    "target": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-ua2fynrj/src-tauri/target",
-    "binary": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-ua2fynrj/src-tauri/target/debug/agent-gibbon"
+    "root": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-bhmix4_z",
+    "id": "dev-26e952f5effe54f01e157a1d",
+    "name": "gibbon-terms-smoke-bhmix4_z",
+    "target": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-bhmix4_z/src-tauri/target",
+    "binary": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-bhmix4_z/src-tauri/target/debug/agent-gibbon"
   },
   "note_id": "dev-terms-smoke",
   "cases": [
     {
       "require_terms": false,
-      "server_pid": 79377,
+      "server_pid": 30286,
       "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel/src-tauri/target/debug/agent-gibbon",
       "diagnostics": {
         "diagnostics": {
@@ -30,14 +30,14 @@
           "logs": false,
           "operations": 0,
           "release_health": false,
-          "revision": "1383a64b8a07",
+          "revision": "efa656a547b9",
           "traces_sample_rate": 0.0,
           "watchdog": {
             "stall_threshold_ms": 12000,
             "startup_grace_ms": 30000
           }
         },
-        "instance": "dev-fd713e96f8417eeaa1d74e35",
+        "instance": "dev-26e952f5effe54f01e157a1d",
         "ok": true,
         "privacy": {
           "notice_ready": true,
@@ -53,7 +53,7 @@
     },
     {
       "require_terms": true,
-      "server_pid": 79669,
+      "server_pid": 30660,
       "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel/src-tauri/target/debug/agent-gibbon",
       "diagnostics": {
         "diagnostics": {
@@ -72,14 +72,14 @@
           "logs": false,
           "operations": 0,
           "release_health": false,
-          "revision": "1383a64b8a07",
+          "revision": "efa656a547b9",
           "traces_sample_rate": 0.0,
           "watchdog": {
             "stall_threshold_ms": 12000,
             "startup_grace_ms": 30000
           }
         },
-        "instance": "dev-fd713e96f8417eeaa1d74e35",
+        "instance": "dev-26e952f5effe54f01e157a1d",
         "ok": true,
         "privacy": {
           "notice_ready": true,

@@ -1,0 +1,61 @@
+{
+  "app_pid": 35913,
+  "manager_window": 39537,
+  "instance": "dev-2420851a18a85d0606b0c157",
+  "first_image_after_restart_foreground_preserved": true,
+  "cases": [
+    {
+      "kind": "image",
+      "id": "image-1793936326662915000",
+      "front_before_show": "35913",
+      "front_after_show": "35913",
+      "manager_visible": true,
+      "memo_native_window": 39531,
+      "session_pid": null,
+      "hide_show_session_preserved": true
+    },
+    {
+      "kind": "text",
+      "id": "issue68-progress-2420851a",
+      "front_before_show": "35913",
+      "front_after_show": "35913",
+      "manager_visible": true,
+      "memo_native_window": 39532,
+      "session_pid": null,
+      "hide_show_session_preserved": true
+    },
+    {
+      "kind": "agent",
+      "id": "agent-1793936218271001000",
+      "front_before_show": "35913",
+      "front_after_show": "35913",
+      "manager_visible": true,
+      "memo_native_window": 39558,
+      "session_pid": 43992,
+      "hide_show_session_preserved": true
+    }
+  ],
+  "settings_sidebar_preserved": true,
+  "duplicate_status_removed": true,
+  "before_fix": [
+    {
+      "id": "image-1793936326662915000",
+      "before_frontmost": "23012",
+      "after_frontmost": "16242",
+      "manager_still_onscreen": true
+    },
+    {
+      "id": "agent-1793936218271001000",
+      "before_frontmost": "23012",
+      "after_frontmost": "23012",
+      "manager_still_onscreen": true
+    },
+    {
+      "id": "terminal-1793936350225402000",
+      "before_frontmost": "23012",
+      "after_frontmost": "23012",
+      "manager_still_onscreen": true
+    }
+  ],
+  "geometry_and_visibility_restored": true
+}

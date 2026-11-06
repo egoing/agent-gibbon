@@ -1,0 +1,143 @@
+{
+  "app_pid": 22648,
+  "instance": "dev-2420851a18a85d0606b0c157",
+  "manager_window": 39218,
+  "cases": [
+    {
+      "kind": "text",
+      "id": "issue68-progress-2420851a",
+      "selection_preserved_visibility": true,
+      "toggle_states": [
+        false,
+        true
+      ],
+      "original_visible": true,
+      "frontmost_preserved": true,
+      "session_pid_before": null,
+      "session_pid_after": null
+    },
+    {
+      "kind": "image",
+      "id": "image-1793936326662915000",
+      "selection_preserved_visibility": true,
+      "toggle_states": [
+        false,
+        true
+      ],
+      "original_visible": true,
+      "frontmost_preserved": true,
+      "session_pid_before": null,
+      "session_pid_after": null
+    },
+    {
+      "kind": "agent",
+      "id": "agent-1793936218271001000",
+      "selection_preserved_visibility": true,
+      "toggle_states": [
+        false,
+        true
+      ],
+      "original_visible": true,
+      "frontmost_preserved": true,
+      "session_pid_before": 23059,
+      "session_pid_after": 23059
+    },
+    {
+      "kind": "terminal",
+      "id": "terminal-1793936350225402000",
+      "selection_preserved_visibility": true,
+      "toggle_states": [
+        true,
+        false
+      ],
+      "original_visible": false,
+      "frontmost_preserved": true,
+      "session_pid_before": null,
+      "session_pid_after": null
+    }
+  ],
+  "restored_notes": {
+    "image-1793936326662915000": {
+      "id": "image-1793936326662915000",
+      "instance": "dev-2420851a18a85d0606b0c157",
+      "visible": true,
+      "position": {
+        "x": -432,
+        "y": 506
+      },
+      "size": {
+        "height": 240,
+        "width": 400
+      },
+      "pid": null,
+      "running": null
+    },
+    "issue68-progress-2420851a": {
+      "id": "issue68-progress-2420851a",
+      "instance": "dev-2420851a18a85d0606b0c157",
+      "visible": true,
+      "position": {
+        "x": -600,
+        "y": 160
+      },
+      "size": {
+        "height": 340,
+        "width": 600
+      },
+      "pid": null,
+      "running": null
+    },
+    "main": {
+      "id": "main",
+      "instance": "dev-2420851a18a85d0606b0c157",
+      "visible": true,
+      "position": {
+        "x": -600,
+        "y": 64
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      },
+      "pid": null,
+      "running": null
+    },
+    "agent-1793936218271001000": {
+      "id": "agent-1793936218271001000",
+      "instance": "dev-2420851a18a85d0606b0c157",
+      "visible": true,
+      "position": {
+        "x": 1846,
+        "y": -1578
+      },
+      "size": {
+        "height": 920,
+        "width": 1440
+      },
+      "pid": 23059,
+      "running": true
+    },
+    "terminal-1793936350225402000": {
+      "id": "terminal-1793936350225402000",
+      "instance": "dev-2420851a18a85d0606b0c157",
+      "visible": false,
+      "position": {
+        "x": -2400,
+        "y": 1240
+      },
+      "size": {
+        "height": 708,
+        "width": 1178
+      },
+      "pid": null,
+      "running": false
+    }
+  },
+  "external_cli": {
+    "close_ui_seconds": 1.64,
+    "open_ui_seconds": 1.76,
+    "foreground_manager": true
+  },
+  "old_app_pid": 51335,
+  "old_session_pid": 65873
+}

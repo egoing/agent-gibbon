@@ -1,17 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="660" viewBox="0 0 1000 660"><style>text{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#222}</style>
-<rect x="0" y="0" width="1000" height="660" fill="white" stroke="#999"/>
-<text x="28" y="40" font-size="23" font-weight="600">03  설정</text>
-<text x="28" y="68" font-size="14" font-weight="400">최소 구현 와이어프레임 · 화면 구조만 표현 · 예시 데이터</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="660" viewBox="0 0 1000 660">
+<style>text{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#222}</style>
+<rect width="1000" height="660" fill="white" stroke="#999"/>
+<text x="28" y="40" font-size="23" font-weight="600">03 설정 · 스킬</text>
+<text x="28" y="68" font-size="14">현재 구현 구조 · 스위치 상태는 설명용 · 실제 앱 캡처와 구분</text>
 <rect x="28" y="96" width="944" height="480" fill="white" stroke="#999"/>
-<path d="M28 150L972 150" stroke="#bbb"/>
+<path d="M28 150H972 M248 150V576" stroke="#bbb"/>
 <text x="48" y="130" font-size="18" font-weight="600">Agent Gibbon</text>
 <rect x="700" y="108" width="140" height="30" fill="white" stroke="#999"/>
-<text x="728" y="129" font-size="14" font-weight="400">모든 메모</text>
+<text x="728" y="129" font-size="14">모든 메모</text>
 <rect x="852" y="108" width="96" height="30" fill="#eee" stroke="#999"/>
-<text x="884" y="129" font-size="14" font-weight="400">설정</text>
-<text x="60" y="196" font-size="21" font-weight="600">설정</text>
-<text x="60" y="250" font-size="17" font-weight="400">아직 설정 항목이 없습니다.</text>
-<text x="60" y="282" font-size="15" font-weight="400">필요한 설정을 이 페이지에 추가합니다.</text>
-<text x="28" y="613" font-size="15" font-weight="400">설정은 페이지 자리만 마련합니다. 구체적인 설정 항목은 후속 결정합니다.</text>
-<text x="28" y="640" font-size="13" font-weight="400">앱 미구현 · 읽기 전용 · 검색 / 편집 / 도킹 / 정보 패널 제외</text>
+<text x="884" y="129" font-size="14">설정</text>
+<text x="40" y="184" font-size="17" font-weight="600">설정</text>
+<text x="52" y="227" font-size="16">Privacy &amp; Diagnostics</text>
+<rect x="40" y="248" width="196" height="42" fill="#eee" stroke="#aaa"/>
+<text x="52" y="275" font-size="16">스킬</text>
+<text x="276" y="191" font-size="21" font-weight="600">스킬</text>
+<rect x="276" y="215" width="656" height="144" fill="white" stroke="#bbb"/>
+<path d="M276 267H932" stroke="#ccc"/>
+<circle cx="297" cy="241" r="5" fill="white" stroke="#777"/>
+<text x="315" y="246" font-size="16" font-weight="600">메모 관리</text>
+<path d="M902 238l6 6 6-6" fill="none" stroke="#555" stroke-width="2"/>
+<text x="296" y="299" font-size="16">Agent Gibbon의 메모 생성·조회·갱신·숨기기를 사용합니다.</text>
+<text x="296" y="325" font-size="16">기존 창의 위치와 포커스, 숨김 상태를 유지합니다.</text>
+<text x="824" y="333" font-size="14">Off</text>
+<rect x="860" y="315" width="44" height="26" rx="13" fill="#777"/>
+<circle cx="873" cy="328" r="10" fill="white"/>
+<rect x="276" y="367" width="656" height="144" fill="#eef8ef" stroke="#bbb"/>
+<path d="M276 419H932" stroke="#ccc"/>
+<circle cx="297" cy="393" r="9" fill="#238636" opacity=".1"/>
+<circle cx="297" cy="393" r="5" fill="#238636"/>
+<text x="315" y="398" font-size="16" font-weight="600">작업 진행 표시</text>
+<path d="M902 390l6 6 6-6" fill="none" stroke="#555" stroke-width="2"/>
+<text x="296" y="451" font-size="16">작업 계획과 진행상황을 플로팅 체크리스트 메모로 표시합니다.</text>
+<text x="296" y="477" font-size="16">실제로 끝난 단계와 미검증 범위를 구분합니다.</text>
+<text x="824" y="485" font-size="14">On</text>
+<rect x="860" y="467" width="44" height="26" rx="13" fill="#238636"/>
+<circle cx="891" cy="480" r="10" fill="white"/>
+<text x="28" y="610" font-size="15">아코디언을 접어도 활성 표시 유지 · On/Off는 실제 설치와 로컬 저장 후 반영</text>
+<text x="28" y="638" font-size="13">처음에는 모두 Off · 에이전트 작업 자동 실행 없음 · 이슈 첨부 예시 시안을 교체한 파일이 아님</text>
 </svg>

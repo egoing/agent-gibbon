@@ -1,4 +1,4 @@
-//! Read-only manager, independent of floating memo window state.
+//! Manager selection is read-only; explicit actions use existing window behavior.
 use crate::AppNotes;
 use serde_json::{json, Value};
 use tauri::Manager;
@@ -36,8 +36,13 @@ pub fn manager_notes(
     let notes = state.lock().map_err(|e| e.to_string())?;
     let mut rows: Vec<Value> = notes.iter().map(|(id,note)|json!({"id":id,"title":display_title(note,id),"html":note.html,"capture":note.capture})).collect();
     drop(notes);
+    let app = window.app_handle();
+    // Native window calls must run after releasing the Notes lock.
+    for row in &mut rows {
+        row["visible"] = json!(visible(app, &crate::label(row["id"].as_str().unwrap()))?);
+    }
     for agent in crate::terminal::entries(window.app_handle()) {
-        rows.push(json!({"id":agent.id,"title":agent.display_title(),"kind":agent.kind}));
+        rows.push(json!({"id":agent.id,"title":agent.display_title(),"kind":agent.kind,"visible":visible(app, &agent.id)?}));
     }
     Ok(Value::Array(rows))
 }
@@ -111,6 +116,67 @@ mod tests {
         note.title.clear();
         assert_eq!(display_title(&note, "id"), "id");
     }
+}
+
+// A closed memo/terminal needs a new WebView; never build it from WebView2's
+// synchronous IPC callback on Windows.
+#[cfg_attr(windows, tauri::command(async))]
+#[cfg_attr(not(windows), tauri::command)]
+pub fn manager_set_visibility(
+    window: tauri::WebviewWindow,
+    id: String,
+    visible: bool,
+) -> Result<bool, String> {
+    if window.label() != LABEL {
+        return Err("관리 창에서만 사용할 수 있습니다".into());
+    }
+    let app = window.app_handle();
+    let exists = app
+        .state::<AppNotes>()
+        .lock()
+        .map_err(|e| e.to_string())?
+        .contains_key(&id);
+    // Never create a blank memo when a stale selection has disappeared.
+    let is_terminal = crate::terminal::contains(app, &id);
+    if !exists && !is_terminal {
+        return Err("메모가 없습니다".into());
+    }
+    let label = if is_terminal {
+        id.clone()
+    } else {
+        crate::label(&id)
+    };
+    if visible {
+        crate::focus::discard_restore(app, &label);
+    }
+    let response = crate::apply_direct(
+        app,
+        crate::Request {
+            action: if visible {
+                crate::Action::Open
+            } else {
+                crate::Action::Close
+            },
+            id: Some(id.clone()),
+            color: None,
+            title: None,
+            markdown: None,
+            source_path: None,
+            status: None,
+        },
+    )?;
+    if response["ok"] != true {
+        return Err("메모 표시 상태를 변경하지 못했습니다".into());
+    }
+    self::visible(app, &label)
+}
+
+fn visible(app: &tauri::AppHandle, label: &str) -> Result<bool, String> {
+    let Some(window) = app.get_webview_window(label) else {
+        return Ok(false);
+    };
+    Ok(window.is_visible().map_err(|e| e.to_string())?
+        && !window.is_minimized().map_err(|e| e.to_string())?)
 }
 
 // A closed terminal needs a new WebView; never build it from WebView2's

@@ -1,0 +1,71 @@
+{
+  "instance": "dev-2420851a18a85d0606b0c157",
+  "app_pid": 51335,
+  "manager_window": 39025,
+  "repeat_visible": [
+    {
+      "kind": "text",
+      "id": "issue68-progress-2420851a",
+      "instance": "dev-2420851a18a85d0606b0c157",
+      "visible": true,
+      "position": {
+        "x": -600,
+        "y": 160
+      },
+      "size": {
+        "height": 340,
+        "width": 600
+      },
+      "frontmost_preserved": true
+    },
+    {
+      "kind": "image",
+      "id": "image-1793936326662915000",
+      "instance": "dev-2420851a18a85d0606b0c157",
+      "visible": true,
+      "position": {
+        "x": -400,
+        "y": 500
+      },
+      "size": {
+        "height": 240,
+        "width": 400
+      },
+      "frontmost_preserved": true
+    },
+    {
+      "kind": "agent",
+      "id": "agent-1793936218271001000",
+      "instance": "dev-2420851a18a85d0606b0c157",
+      "visible": true,
+      "position": {
+        "x": 1846,
+        "y": -1578
+      },
+      "size": {
+        "height": 920,
+        "width": 1440
+      },
+      "pid": 65873,
+      "running": true,
+      "frontmost_preserved": true
+    },
+    {
+      "kind": "terminal",
+      "id": "terminal-1793936350225402000",
+      "instance": "dev-2420851a18a85d0606b0c157",
+      "visible": true,
+      "position": {
+        "x": -2400,
+        "y": 1240
+      },
+      "size": {
+        "height": 708,
+        "width": 1178
+      },
+      "pid": null,
+      "running": false,
+      "frontmost_preserved": true
+    }
+  ]
+}

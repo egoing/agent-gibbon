@@ -1,0 +1,145 @@
+{
+  "work_root": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/on-off",
+  "work_instance": "dev-1206da86e9acf14ddf9c123c",
+  "audit_root": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/issue67-native-audit-20261106",
+  "audit_instance": "dev-52f22b348ebf00ad3dacc61e",
+  "pids": [
+    24534,
+    29658,
+    30558
+  ],
+  "manager_windows": [
+    39224,
+    39274
+  ],
+  "note_id": "skills-audit-provenance-67",
+  "note_markdown": "SKILLS-AUDIT-67-20261106 — TEST ONLY",
+  "fixture_root": "/tmp/gibbon-skills-native-fixture-20261106",
+  "settings_after_retry": {
+    "format": 1,
+    "skills": {
+      "agent-gibbon": {
+        "enabled": true,
+        "revision": "79b2f6c9f4a7f6ce7a08b8b94eb798dc70b57e17cf3444472cba7a56f3ea6e27",
+        "placements": [
+          "/private/tmp/gibbon-skills-native-fixture-20261106/home/.agents/skills/agent-gibbon",
+          "/private/tmp/gibbon-skills-native-fixture-20261106/home/.claude/skills/agent-gibbon"
+        ]
+      },
+      "agent-gibbon-progress": {
+        "enabled": true,
+        "revision": "79b2f6c9f4a7f6ce7a08b8b94eb798dc70b57e17cf3444472cba7a56f3ea6e27",
+        "placements": [
+          "/private/tmp/gibbon-skills-native-fixture-20261106/home/.agents/skills/agent-gibbon-progress",
+          "/private/tmp/gibbon-skills-native-fixture-20261106/home/.claude/skills/agent-gibbon-progress"
+        ]
+      }
+    }
+  },
+  "snapshots": {
+    "on": {
+      "tree": "App=agent-gibbon (pid 24534)\nWindow: \"SKILLS AUDIT — TEST ONLY\", App: agent-gibbon.\n\n0 standard window SKILLS AUDIT — TEST ONLY\n\t1 scroll area\n\t\t2 HTML content 메모 관리\n\t\t\t34 container\n\t\t\t\t3 text Agent Gibbon\n\t\t\t\t35 container 관리 탐색\n\t\t\t\t\t36 toggle button 모든 메모, Value: 0\n\t\t\t\t\t37 toggle button 설정, Value: 1\n\t\t\t45 container 설정\n\t\t\t\t46 heading 설정\n\t\t\t\t47 container 설정 항목\n\t\t\t\t\t48 button Privacy & Diagnostics\n\t\t\t\t\t49 button 스킬\n\t\t\t\t67 container Privacy & Diagnostics\n\t\t\t\t68 container 스킬\n\t\t\t\t\t69 heading 스킬\n\t\t\t\t\t70 container\n\t\t\t\t\t\t73 container (expanded)\n\t\t\t\t\t\t\t71 summary (expanded) 메모 관리 On, Value: 1\n\t\t\t\t\t\t\t74 text Agent Gibbon의 메모 생성·조회·갱신·숨기기를 사용합니다. 기존 창의 위치와 포커스, 숨김 상태를 유지합니다.\n\t\t\t\t\t\t\t75 switch (settable) 메모 관리, Value: 1\n\t\t\t\t\t\t72 summary 작업 진행 표시 Off, Value: 0\n\t\t\t66 container Welcome to Agent Gibbon\n\t30 close button\n\t31 full screen button, Secondary Actions: zoom the window\n\t32 minimize button\n\t33 text SKILLS AUDIT — TEST ONLY\n\nNo UI element is currently focused.",
+      "window": {
+        "isOffscreen": false,
+        "screenIndex": 0,
+        "platform": {
+          "layer": 0
+        },
+        "width": 944,
+        "isMinimized": false,
+        "x": 552,
+        "id": 39224,
+        "height": 580,
+        "title": "SKILLS AUDIT — TEST ONLY",
+        "y": 162
+      },
+      "app": {
+        "pid": 24534,
+        "name": "agent-gibbon",
+        "bundleId": null
+      },
+      "screenshot_file": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/aeab66bb-0b78-4241-9e30-2c882fe055a5-screenshot.png"
+    },
+    "independent": {
+      "tree": "App=agent-gibbon (pid 24534)\nWindow: \"SKILLS AUDIT — TEST ONLY\", App: agent-gibbon.\n\n0 standard window SKILLS AUDIT — TEST ONLY\n\t1 scroll area\n\t\t2 HTML content 메모 관리\n\t\t\t34 container\n\t\t\t\t3 text Agent Gibbon\n\t\t\t\t35 container 관리 탐색\n\t\t\t\t\t36 toggle button 모든 메모, Value: 0\n\t\t\t\t\t37 toggle button 설정, Value: 1\n\t\t\t45 container 설정\n\t\t\t\t46 heading 설정\n\t\t\t\t47 container 설정 항목\n\t\t\t\t\t48 button Privacy & Diagnostics\n\t\t\t\t\t49 button 스킬\n\t\t\t\t67 container Privacy & Diagnostics\n\t\t\t\t68 container 스킬\n\t\t\t\t\t69 heading 스킬\n\t\t\t\t\t70 container\n\t\t\t\t\t\t73 container (expanded)\n\t\t\t\t\t\t\t71 summary (expanded) 메모 관리 Off, Value: 1\n\t\t\t\t\t\t\t74 text Agent Gibbon의 메모 생성·조회·갱신·숨기기를 사용합니다. 기존 창의 위치와 포커스, 숨김 상태를 유지합니다.\n\t\t\t\t\t\t\t75 switch (settable) 메모 관리, Value: 0\n\t\t\t\t\t\t76 container (expanded)\n\t\t\t\t\t\t\t72 summary (expanded) 작업 진행 표시 On, Value: 1\n\t\t\t\t\t\t\t77 text 작업 계획과 진행상황을 플로팅 체크리스트 메모로 표시합니다. 실제로 끝난 단계와 미검증 범위를 구분하며 같은 메모를 갱신합니다.\n\t\t\t\t\t\t\t78 switch (settable) 작업 진행 표시, Value: 1\n\t\t\t66 container Welcome to Agent Gibbon\n\t30 close button\n\t31 full screen button, Secondary Actions: zoom the window\n\t32 minimize button\n\t33 text SKILLS AUDIT — TEST ONLY\n\nNo UI element is currently focused.",
+      "window": {
+        "x": 552,
+        "isOffscreen": false,
+        "y": 162,
+        "id": 39224,
+        "screenIndex": 0,
+        "platform": {
+          "layer": 0
+        },
+        "title": "SKILLS AUDIT — TEST ONLY",
+        "isMinimized": false,
+        "height": 580,
+        "width": 944
+      },
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": null,
+        "pid": 24534
+      },
+      "screenshot_file": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/0dca265b-4e43-4e73-9dde-4e26a3b77bb6-screenshot.png"
+    },
+    "failure": {
+      "tree": "App=agent-gibbon (pid 30558)\nWindow: \"SKILLS AUDIT — TEST ONLY\", App: agent-gibbon.\n\n0 standard window SKILLS AUDIT — TEST ONLY\n\t1 scroll area\n\t\t2 HTML content 메모 관리\n\t\t\t3 container\n\t\t\t\t4 text Agent Gibbon\n\t\t\t\t5 container 관리 탐색\n\t\t\t\t\t6 toggle button 모든 메모, Value: 0\n\t\t\t\t\t7 toggle button 설정, Value: 1\n\t\t\t21 container 설정\n\t\t\t\t22 heading 설정\n\t\t\t\t23 container 설정 항목\n\t\t\t\t\t24 button Privacy & Diagnostics\n\t\t\t\t\t25 button 스킬\n\t\t\t\t42 container Privacy & Diagnostics\n\t\t\t\t43 container 스킬\n\t\t\t\t\t44 heading 스킬\n\t\t\t\t\t51 text 에이전트의 스킬 폴더에 쓸 수 없습니다\n\t\t\t\t\t45 container\n\t\t\t\t\t\t48 container (expanded)\n\t\t\t\t\t\t\t46 summary (expanded) 메모 관리 Off, Value: 1\n\t\t\t\t\t\t\t49 text Agent Gibbon의 메모 생성·조회·갱신·숨기기를 사용합니다. 기존 창의 위치와 포커스, 숨김 상태를 유지합니다.\n\t\t\t\t\t\t\t50 switch (settable) 메모 관리, Value: 0\n\t\t\t\t\t\t47 summary 작업 진행 표시 On, Value: 0\n\t\t\t16 container Welcome to Agent Gibbon\n\t17 close button\n\t18 full screen button, Secondary Actions: zoom the window\n\t19 minimize button\n\t20 text SKILLS AUDIT — TEST ONLY\n\nNo UI element is currently focused.",
+      "window": {
+        "width": 944,
+        "isMinimized": false,
+        "screenIndex": 0,
+        "title": "SKILLS AUDIT — TEST ONLY",
+        "x": 552,
+        "y": 162,
+        "id": 39274,
+        "isOffscreen": false,
+        "height": 580,
+        "platform": {
+          "layer": 0
+        }
+      },
+      "app": {
+        "pid": 30558,
+        "name": "agent-gibbon",
+        "bundleId": null
+      },
+      "screenshot_file": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/59879053-836d-495c-af68-460e7586140d-screenshot.png"
+    },
+    "final": {
+      "tree": "App=agent-gibbon (pid 30558)\nWindow: \"SKILLS AUDIT — TEST ONLY\", App: agent-gibbon.\n\n0 standard window SKILLS AUDIT — TEST ONLY\n\t1 scroll area\n\t\t2 HTML content 메모 관리\n\t\t\t3 container\n\t\t\t\t4 text Agent Gibbon\n\t\t\t\t5 container 관리 탐색\n\t\t\t\t\t6 toggle button 모든 메모, Value: 0\n\t\t\t\t\t7 toggle button 설정, Value: 1\n\t\t\t21 container 설정\n\t\t\t\t22 heading 설정\n\t\t\t\t23 container 설정 항목\n\t\t\t\t\t24 button Privacy & Diagnostics\n\t\t\t\t\t25 button 스킬\n\t\t\t\t42 container Privacy & Diagnostics\n\t\t\t\t43 container 스킬\n\t\t\t\t\t44 heading 스킬\n\t\t\t\t\t45 container\n\t\t\t\t\t\t48 container (expanded)\n\t\t\t\t\t\t\t46 summary (expanded) 메모 관리 On, Value: 1\n\t\t\t\t\t\t\t49 text Agent Gibbon의 메모 생성·조회·갱신·숨기기를 사용합니다. 기존 창의 위치와 포커스, 숨김 상태를 유지합니다.\n\t\t\t\t\t\t\t50 switch (settable) 메모 관리, Value: 1\n\t\t\t\t\t\t52 container (expanded)\n\t\t\t\t\t\t\t47 summary (expanded) 작업 진행 표시 On, Value: 1\n\t\t\t\t\t\t\t53 text 작업 계획과 진행상황을 플로팅 체크리스트 메모로 표시합니다. 실제로 끝난 단계와 미검증 범위를 구분하며 같은 메모를 갱신합니다.\n\t\t\t\t\t\t\t54 switch (settable) 작업 진행 표시, Value: 1\n\t\t\t16 container Welcome to Agent Gibbon\n\t17 close button\n\t18 full screen button, Secondary Actions: zoom the window\n\t19 minimize button\n\t20 text SKILLS AUDIT — TEST ONLY\n\nNo UI element is currently focused.",
+      "window": {
+        "screenIndex": 0,
+        "title": "SKILLS AUDIT — TEST ONLY",
+        "width": 944,
+        "id": 39274,
+        "height": 580,
+        "y": 162,
+        "platform": {
+          "layer": 0
+        },
+        "isMinimized": false,
+        "x": 552,
+        "isOffscreen": false
+      },
+      "app": {
+        "pid": 30558,
+        "name": "agent-gibbon",
+        "bundleId": null
+      },
+      "screenshot_file": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/5dd4cf52-01cc-4f93-8076-81371ae80a95-screenshot.png"
+    }
+  },
+  "inspect": {
+    "ok": true,
+    "instance": "dev-52f22b348ebf00ad3dacc61e",
+    "id": "skills-audit-provenance-67",
+    "markdown": "SKILLS-AUDIT-67-20261106 — TEST ONLY"
+  },
+  "upgrade-inspect": {
+    "ok": true,
+    "instance": "dev-52f22b348ebf00ad3dacc61e",
+    "id": "skills-audit-provenance-67",
+    "markdown": "SKILLS-AUDIT-67-20261106 — TEST ONLY"
+  }
+}

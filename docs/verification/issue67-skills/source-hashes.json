@@ -1,0 +1,13 @@
+{
+  "src-tauri/src/main.rs": "b5d6d4d127a27a427f47d3bd1ccef16c32b821e73877be3598b940c2954a2f90",
+  "src-tauri/src/privacy.rs": "a3644b3ddf5a21d2f27bcbf52cb902ca5221e52bfa5a5d718cb19662c0ae1b86",
+  "src-tauri/src/skills.rs": "5a638e39e65aa7cefc29be76d9330a66b23985d7d6a587bb1e6ce9bda563b66b",
+  "src-tauri/src/skills/environment.rs": "2a22533612f44afd331d9451a5e3dd2507c3721bb7b0ddc827d0ff672f84cbf9",
+  "src-tauri/src/skills/installer.rs": "4d7c1e873bbb97f25bcfa1663171a4c8996f8fcd4fd8c327ac04e1d8f22637b2",
+  "ui/manager.html": "cf343cd04587c26476d6fa6bbb09345ff9312e153303f4b04745bf9b63c77d8a",
+  "ui/manager.js": "011f417feb3f02762e40e74326ca380e3ffad4a85a27ca60e4587b2a45895d2c",
+  "ui/manager.css": "3c8444a28cbb2cfbe13bbf5e2a514557797137e42f8edb16328bf9ed4a9cafab",
+  "ui/skills.js": "4cf5de01a4b4b215c1e3a8cb101a48e5b6b9d45ca27c77128f7ed2dbb78c3ee0",
+  "bundled-skills/agent-gibbon-progress/SKILL.md": "60a5047cc61fde09608173bee8670f82216e85b6d64adb40f219e3e7df8b0fda",
+  ".agents/skills/agent-gibbon/SKILL.md": "37f9c35af2c3033523842bc1c26464b63b8d0a8310d981e7447f5771c88ee12b"
+}
