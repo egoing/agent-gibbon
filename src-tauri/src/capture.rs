@@ -419,6 +419,35 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
         #[cfg(not(target_os = "macos"))]
         overlay.set_focus().map_err(err)?;
     }
+    #[cfg(windows)]
+    {
+        // Show/focus can recalculate invisible native borders. Align the final
+        // WebView viewport with the source pixels before accepting selection.
+        let screens = app
+            .state::<Captures>()
+            .0
+            .lock()
+            .map_err(err)?
+            .iter()
+            .map(|(label, s)| {
+                (
+                    label.clone(),
+                    s.bounds.x,
+                    s.bounds.y,
+                    s.image.width(),
+                    s.image.height(),
+                )
+            })
+            .collect::<Vec<_>>();
+        for (label, x, y, width, height) in screens {
+            let overlay = app.get_webview_window(&label).ok_or("캡처 창이 없습니다")?;
+            crate::windows_window::set_client_rect(
+                &overlay,
+                tauri::PhysicalPosition::new(x.round() as i32, y.round() as i32),
+                tauri::PhysicalSize::new(width, height),
+            )?;
+        }
+    }
     Ok(())
 }
 fn failed_selection(window: WebviewWindow) -> Result<(), String> {
@@ -571,6 +600,16 @@ pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
         .map_err(err)?;
     crate::sizing::constrain_image(win, bounds.width, bounds.height)?;
     set_position(win, bounds.x, bounds.y)?;
+    #[cfg(windows)]
+    {
+        let scale = win.scale_factor().map_err(err)?;
+        crate::windows_window::set_client_rect(
+            win,
+            tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
+            tauri::LogicalSize::new(bounds.width, bounds.height).to_physical::<u32>(scale),
+        )
+    }
+    #[cfg(not(windows))]
     win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
         .map_err(err)
 }
@@ -602,8 +641,19 @@ fn create_text_note(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), Str
     win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
         .map_err(err)?;
     set_position(&win, bounds.x, bounds.y)?;
+    #[cfg(windows)]
+    crate::windows_window::set_client_rect(
+        &win,
+        tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
+        tauri::LogicalSize::new(bounds.width, bounds.height)
+            .to_physical::<u32>(win.scale_factor().map_err(err)?),
+    )?;
+    #[cfg(not(windows))]
     win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
         .map_err(err)?;
+    #[cfg(windows)]
+    crate::show_without_focus(&win)?;
+    #[cfg(not(windows))]
     win.show().map_err(err)?;
     win.set_focus().map_err(err)?;
     crate::tray::refresh(app)

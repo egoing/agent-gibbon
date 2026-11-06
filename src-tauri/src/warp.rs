@@ -9,6 +9,10 @@ pub struct Warp {
 }
 pub type Warps = Mutex<BTreeMap<String, Warp>>;
 
+pub(crate) fn is_note_label(label: &str) -> bool {
+    label == "main" || label.starts_with("note-")
+}
+
 // Require an observed outside-to-inside transition. Window movement alone must
 // not re-arm contact; the pointer must actually leave at a different position.
 #[derive(Default)]
@@ -132,22 +136,51 @@ pub(crate) fn close_shortcut_pressed() -> bool {
         use objc2_app_kit::{NSEvent, NSEventModifierFlags as Flags};
         NSEvent::modifierFlags_class().contains(Flags::Control | Flags::Option | Flags::Command)
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    {
+        // The chord belongs to stash; pointer contact never hides a memo.
+        crate::windows_contact::modifiers().stash_chord()
+    }
+    #[cfg(not(any(target_os = "macos", windows)))]
     false
 }
 
 #[tauri::command]
 pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bool, String> {
-    if crate::stash::owns(&window)
+    poll(&window, &state)
+}
+
+#[cfg(windows)]
+pub fn poll_native(window: &tauri::WebviewWindow) -> Result<(), String> {
+    poll(window, &window.state::<Warps>()).map(|_| ())
+}
+
+fn poll(window: &tauri::WebviewWindow, state: &Warps) -> Result<bool, String> {
+    if !is_note_label(window.label()) {
+        return Ok(false);
+    }
+    if crate::capture::active(window.app_handle())
+        || crate::stash::owns(window)
         || crate::stash::chord_busy(window.app_handle())
         || close_shortcut_pressed()
     {
+        // Input paused by capture/stash cannot become a delayed pointer entry
+        // when the overlay or chord ends with the pointer already inside.
+        if let Some(warp) = state
+            .lock()
+            .map_err(|e| e.to_string())?
+            .get_mut(window.label())
+        {
+            warp.contact = Contact::default();
+        }
         return Ok(false);
     }
     #[cfg(target_os = "macos")]
     let alt = objc2_app_kit::NSEvent::modifierFlags_class()
         .contains(objc2_app_kit::NSEventModifierFlags::Option);
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    let alt = crate::windows_contact::modifiers().alt;
+    #[cfg(not(any(target_os = "macos", windows)))]
     let alt = false;
     let mut warps = state.lock().map_err(|e| e.to_string())?;
     let Some(warp) = warps.get_mut(window.label()) else {
@@ -169,7 +202,7 @@ pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bo
         .contact
         .trigger(alt, inside, focused, (cursor.x, cursor.y));
     if moving {
-        move_note(&window, warp)?;
+        move_note(window, warp)?;
         return Ok(true);
     }
     Ok(false)
@@ -178,6 +211,33 @@ pub fn poll_warp(window: tauri::WebviewWindow, state: State<Warps>) -> Result<bo
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn native_contact_targets_only_memo_windows() {
+        for label in ["main", "note-work", "note-agent-work", "note-manager"] {
+            assert!(is_note_label(label), "{label}");
+        }
+        for label in [
+            "manager",
+            "agent-work",
+            "feedback-main",
+            "capture-1-0",
+            "stash-indicator",
+            "",
+        ] {
+            assert!(!is_note_label(label), "{label}");
+        }
+    }
+
+    #[test]
+    fn paused_contact_cannot_fire_on_resume_inside() {
+        let mut contact = Contact::default();
+        assert!(!contact.trigger(true, false, false, (0., 20.)));
+        // Capture/stash takes ownership before entry is sampled.
+        contact = Contact::default();
+        assert!(!contact.trigger(true, true, false, (10., 20.)));
+        assert!(!contact.trigger(true, false, false, (0., 20.)));
+        assert!(contact.trigger(true, true, false, (10., 20.)));
+    }
     #[test]
     fn sides_initial_height_and_monitor_bounds() {
         let area = Rect {

@@ -11,7 +11,7 @@ mod manager;
 mod layout;
 mod local_trace;
 mod model;
-#[cfg(target_os = "macos")]
+#[cfg(any(target_os = "macos", windows))]
 mod opacity;
 mod placement;
 mod privacy;
@@ -25,7 +25,11 @@ mod terminal;
 mod tray;
 mod warp;
 #[cfg(windows)]
+mod windows_contact;
+#[cfg(windows)]
 mod windows_process;
+#[cfg(windows)]
+mod windows_window;
 use model::{Action, Note, Request, MAX_REQUEST};
 use serde_json::{json, Value};
 #[cfg(unix)]
@@ -60,6 +64,11 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
         .build()
         .map_err(|e| e.to_string())?;
     // Region-created notes also have a stable place if later re-included.
+    #[cfg(windows)]
+    {
+        windows_window::install_resize_observer(&win)?;
+        focus::restore(&win);
+    }
     layout::register(&win, true);
     Ok(win)
 }
@@ -84,7 +93,10 @@ fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
     #[cfg(not(target_os = "macos"))]
     {
         #[cfg(windows)]
-        focus::show_without_focus(win)?;
+        {
+            focus::show_without_focus(win)?;
+            sync_opacity(win.clone())?;
+        }
         #[cfg(not(windows))]
         win.show().map_err(|e| e.to_string())?;
         tray::sync_visibility(win.app_handle())
@@ -133,10 +145,14 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
                 as *const objc2_app_kit::NSWindow))
                 .alphaValue());
         }
-        #[cfg(not(target_os = "macos"))]
+        #[cfg(windows)]
+        return windows_window::opacity(&window);
+        #[cfg(not(any(target_os = "macos", windows)))]
         return Ok(1.0);
     }
     if window.label() == manager::LABEL {
+        #[cfg(windows)]
+        windows_window::set_opacity(&window, 1.0)?;
         #[cfg(target_os = "macos")]
         {
             window
@@ -153,10 +169,14 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
         return Ok(1.0);
     }
     let hovered = sync_pointer(&window)?;
-    #[cfg(target_os = "macos")]
+    #[cfg(any(target_os = "macos", windows))]
     {
+        #[cfg(target_os = "macos")]
+        let feedback_hovered = feedback_window::pointer_over(&window);
+        #[cfg(windows)]
+        let feedback_hovered = false; // Windows uses the memo's own feedback area.
         let alpha = if hovered
-            || feedback_window::pointer_over(&window)
+            || feedback_hovered
             || entrance::active(&window)
             || feedback::active(&window)
         {
@@ -173,18 +193,23 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
             .entry(window.label().into())
             .or_default()
             .sample(alpha, Instant::now());
+        #[cfg(target_os = "macos")]
         let ptr = window.ns_window().map_err(|e| e.to_string())?;
         // SAFETY: Tauri owns the live NSWindow, borrowed only on the main thread.
+        #[cfg(target_os = "macos")]
         unsafe {
             let native = &*(ptr as *const objc2_app_kit::NSWindow);
             if native.alphaValue() != alpha {
                 native.setAlphaValue(alpha);
             }
         }
+        #[cfg(windows)]
+        windows_window::set_opacity(&window, alpha)?;
+        #[cfg(target_os = "macos")]
         feedback_window::set_opacity(&window, alpha)?;
         Ok(alpha)
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(not(any(target_os = "macos", windows)))]
     {
         let _ = (window, hovered);
         Ok(1.0)
@@ -623,7 +648,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     feedback_window::sync(&webview);
                 }
             }
-            #[cfg(target_os = "macos")]
+            #[cfg(any(target_os = "macos", windows))]
             if let tauri::WindowEvent::Resized(_) = event {
                 if let Some(webview) = win.app_handle().get_webview_window(win.label()) {
                     if let Err(error) = sizing::native_resize(&webview) {
@@ -642,7 +667,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             local_trace::start(app.handle());
             privacy::initialize(app.handle())?;
             let _startup = telemetry::Timing::new("app.startup");
-            #[cfg(target_os = "macos")]
+            #[cfg(any(target_os = "macos", windows))]
             {
                 app.manage(opacity::Fades::default());
                 opacity::start(app.handle().clone());
@@ -650,6 +675,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Regular);
             if let Some(win) = app.get_webview_window("main") {
+                #[cfg(windows)]
+                windows_window::install_resize_observer(&win)?;
                 win.set_title(&format!("{} — main", instance::current().title()))?;
             }
             let instance = instance::current().id.as_deref();
@@ -692,6 +719,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             tray::refresh(app.handle())?;
             #[cfg(target_os = "macos")]
             sizing::install_contact_monitor(app.handle());
+            #[cfg(windows)]
+            windows_contact::install(app.handle());
             if initial_open {
                 apply_direct(
                     app.handle(),
@@ -861,6 +890,8 @@ fn parse(args: &[String]) -> Result<Request, String> {
 }
 fn cli(args: &[String]) -> Result<Value, String> {
     let request = parse(args)?;
+    // Preserve invalid local IPC paths instead of masking them as startup errors.
+    ipc::directory()?;
     let stream = match ipc::connect() {
         Ok(stream) => stream,
         Err(_) if matches!(request.action, Action::Open | Action::Agent) => {

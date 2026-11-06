@@ -1,6 +1,9 @@
 use std::{
     collections::BTreeMap,
-    sync::Mutex,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    },
     time::{Duration, Instant},
 };
 use tauri::Manager;
@@ -46,29 +49,43 @@ impl Fade {
 }
 // Only pending fades schedule main-thread work; idle windows do not animate.
 pub fn start(app: tauri::AppHandle) {
-    std::thread::spawn(move || loop {
-        std::thread::sleep(Duration::from_millis(16));
-        let labels: Vec<_> = app
-            .state::<Fades>()
-            .lock()
-            .unwrap()
-            .iter()
-            .filter(|(_, fade)| fade.started.is_some())
-            .map(|(label, _)| label.clone())
-            .collect();
-        if labels.is_empty() {
-            continue;
-        }
-        let handle = app.clone();
-        let _ = app.run_on_main_thread(move || {
-            for label in labels {
-                if let Some(window) = handle.get_webview_window(&label) {
-                    let _ = crate::sync_opacity(window);
-                } else {
-                    handle.state::<Fades>().lock().unwrap().remove(&label);
-                }
+    std::thread::spawn(move || {
+        let pending = Arc::new(AtomicBool::new(false));
+        loop {
+            std::thread::sleep(Duration::from_millis(16));
+            if pending.load(Ordering::Acquire) {
+                continue;
             }
-        });
+            let labels: Vec<_> = app
+                .state::<Fades>()
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|(_, fade)| fade.started.is_some())
+                .map(|(label, _)| label.clone())
+                .collect();
+            if labels.is_empty() {
+                continue;
+            }
+            pending.store(true, Ordering::Release);
+            let finished = pending.clone();
+            let handle = app.clone();
+            if app
+                .run_on_main_thread(move || {
+                    for label in labels {
+                        if let Some(window) = handle.get_webview_window(&label) {
+                            let _ = crate::sync_opacity(window);
+                        } else {
+                            handle.state::<Fades>().lock().unwrap().remove(&label);
+                        }
+                    }
+                    finished.store(false, Ordering::Release);
+                })
+                .is_err()
+            {
+                break;
+            }
+        }
     });
 }
 #[cfg(test)]

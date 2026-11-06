@@ -273,11 +273,13 @@ fn geometry(w: &WebviewWindow, r: Rect, scale: f64) -> Result<(), String> {
         let _ = scale;
         w.set_position(tauri::PhysicalPosition::new(r.x as i32, r.y as i32))
             .map_err(err)?;
-        w.set_size(tauri::PhysicalSize::new(
-            r.w.round() as u32,
-            r.h.round() as u32,
-        ))
-        .map_err(err)
+        let size = tauri::PhysicalSize::new(r.w.round() as u32, r.h.round() as u32);
+        #[cfg(windows)]
+        {
+            crate::windows_window::set_outer_size(w, size)
+        }
+        #[cfg(not(windows))]
+        w.set_size(size).map_err(err)
     }
 }
 fn alpha(w: &WebviewWindow, value: f64) -> Result<(), String> {
@@ -285,7 +287,9 @@ fn alpha(w: &WebviewWindow, value: f64) -> Result<(), String> {
     unsafe {
         (&*(w.ns_window().map_err(err)? as *const objc2_app_kit::NSWindow)).setAlphaValue(value);
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    crate::windows_window::set_opacity(w, value)?;
+    #[cfg(not(any(target_os = "macos", windows)))]
     w.eval(format!("document.documentElement.style.opacity='{value}'"))
         .map_err(err)?;
     Ok(())
@@ -519,7 +523,11 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
                     (&*(w.ns_window().map_err(err)? as *const objc2_app_kit::NSWindow)).alphaValue()
                 }
             }
-            #[cfg(not(target_os = "macos"))]
+            #[cfg(windows)]
+            {
+                crate::windows_window::opacity(&w)?
+            }
+            #[cfg(not(any(target_os = "macos", windows)))]
             {
                 1.0
             }
