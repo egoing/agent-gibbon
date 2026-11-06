@@ -596,6 +596,12 @@ fn finish_selection(
             s.mode,
         )
     };
+    // Keep the overlay alive to show an actionable validation error.
+    if mode == SelectionMode::ExternalApp
+        && (bounds.width * scale < 160.0 || bounds.height * scale < 120.0)
+    {
+        return Err("외부 앱 영역은 최소 160×120 물리 px입니다. 더 큰 영역을 선택하세요".into());
+    }
     // Restore the previous app before the new editor deliberately takes focus.
     cleanup_before_create(app)?;
     if mode == SelectionMode::ExternalApp {

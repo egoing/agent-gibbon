@@ -189,6 +189,17 @@ fn snap(hwnd: isize) -> Result<Window, String> {
     })
 }
 unsafe extern "system" fn collect(hwnd: isize, data: isize) -> i32 {
+    // Register observation before the snapshot, so destruction during enumeration
+    // cannot fall into a gap before inventory publication. No foreign state is written.
+    let mut pid = 0;
+    if unsafe { GetWindowThreadProcessId(hwnd, &mut pid) } == 0 || pid == std::process::id() {
+        return 1;
+    }
+    if let Ok(mut known) = OBSERVED_WINDOWS.lock() {
+        known.insert(hwnd);
+    } else {
+        return 1;
+    }
     // EnumWindows calls synchronously while this Vec remains exclusively borrowed.
     if let Ok(w) = snap(hwnd) {
         unsafe { (&mut *(data as *mut Vec<Window>)).push(w) };
@@ -201,10 +212,6 @@ fn windows() -> Result<Vec<Window>, String> {
     if unsafe { EnumWindows(collect, &mut rows as *mut Vec<Window> as isize) } == 0 {
         return Err(native_error("창 목록 조회 실패"));
     }
-    OBSERVED_WINDOWS
-        .lock()
-        .map_err(err)?
-        .extend(rows.iter().map(|w| w.identity.hwnd));
     Ok(rows)
 }
 fn same(id: &Identity) -> bool {
@@ -324,34 +331,43 @@ fn attach(state: &mut State, id: Identity, region: [i32; 4]) -> Result<Value, St
         claim: saved.claim,
     };
     let marker = wide(&session.claim);
-    if unsafe { SetPropW(id.hwnd, marker.as_ptr(), 1) } == 0 {
-        let _ = forget_journal(&session);
-        return Err(native_error(
-            "창 소유 표식 설정 실패; 같은 권한의 일반 앱만 선택하세요",
-        ));
-    }
     let [x, y, w, h] = region;
-    let result = if unsafe { SetWindowPos(id.hwnd, -1, x, y, w, h, 0x4000 | 0x10 | 0x200) } == 0 {
-        Err(native_error("외부 창 배치 실패"))
-    } else {
+    let mut changed = false;
+    let result = (|| -> Result<Window, String> {
+        // File durability is slow enough for a selected HWND to disappear. Recheck
+        // after I/O, then again after claiming, immediately before native mutation.
+        guard_selection(&id, None)?;
+        if unsafe { SetPropW(id.hwnd, marker.as_ptr(), 1) } == 0 {
+            return Err(native_error(
+                "창 소유 표식 설정 실패; 같은 권한의 일반 앱만 선택하세요",
+            ));
+        }
+        guard_selection(&id, Some(&marker))?;
+        changed = true; // Failed APIs may have made partial changes; roll back too.
+        if unsafe { SetWindowPos(id.hwnd, -1, x, y, w, h, 0x4000 | 0x10 | 0x200) } == 0 {
+            return Err(native_error("외부 창 배치 실패"));
+        }
         let deadline = Instant::now() + Duration::from_millis(900);
         loop {
-            if !same(&id) || unsafe { GetPropW(id.hwnd, marker.as_ptr()) } != 1 {
-                break Err("배치 중 창이 종료되었습니다".into());
+            if !same(&id)
+                || WINDOW_EPOCH.load(Ordering::SeqCst) != id.epoch
+                || unsafe { GetPropW(id.hwnd, marker.as_ptr()) } != 1
+            {
+                return Err("배치 중 창 출처/목록이 변경되었습니다".into());
             }
             if let Ok(observed) = snap(id.hwnd) {
                 if observed.rect == region && observed.topmost {
-                    break Ok(observed);
+                    return Ok(observed);
                 }
             }
             if Instant::now() >= deadline {
-                break Err(
+                return Err(
                     "앱의 최소 크기·권한·응답 제한으로 요청 영역을 적용하지 못했습니다".into(),
                 );
             }
             std::thread::sleep(Duration::from_millis(25));
         }
-    };
+    })();
     match result {
         Ok(observed) => {
             state.next += 1;
@@ -360,7 +376,11 @@ fn attach(state: &mut State, id: Identity, region: [i32; 4]) -> Result<Value, St
             state.sessions.insert(key, session);
             Ok(value)
         }
-        Err(e) => match restore(&session) {
+        Err(e) => match if changed {
+            restore(&session)
+        } else {
+            clear_claim(&session)
+        } {
             Ok(()) => Err(e),
             Err(rollback) => {
                 state.next += 1;
@@ -784,4 +804,27 @@ mod tests {
         unsafe { destroyed(0, 0x8001, 42, -4, 1, 0, 0) };
         assert_eq!(WINDOW_EPOCH.load(Ordering::SeqCst), before);
     }
+}
+
+fn guard_selection(id: &Identity, marker: Option<&[u16]>) -> Result<(), String> {
+    // Event ACK checks observer health, not an atomic OS guarantee. The native
+    // identity/property checks remain necessary across asynchronous WinEvents.
+    sync_events()?;
+    if !same(id)
+        || WINDOW_EPOCH.load(Ordering::SeqCst) != id.epoch
+        || marker.is_some_and(|name| unsafe { GetPropW(id.hwnd, name.as_ptr()) } != 1)
+    {
+        return Err("선택 이후 창 출처가 변경되었습니다. 목록을 새로 고치세요".into());
+    }
+    Ok(())
+}
+fn clear_claim(s: &Session) -> Result<(), String> {
+    let name = wide(&s.claim);
+    if same(&s.original.identity)
+        && unsafe { GetPropW(s.original.identity.hwnd, name.as_ptr()) } == 1
+        && unsafe { RemovePropW(s.original.identity.hwnd, name.as_ptr()) } != 1
+    {
+        return Err(native_error("배치 전 창 소유 표식 정리 실패"));
+    }
+    forget_journal(s)
 }
