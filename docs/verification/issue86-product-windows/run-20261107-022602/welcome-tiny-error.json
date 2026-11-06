@@ -1,0 +1,44 @@
+{
+  "id": "09396d08-74da-465b-910f-5aa276640d66",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "fc3c0aef-2dc2-44b9-b53c-5ffaca3a7b03",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": "agent-gibbon",
+        "pid": 26864
+      },
+      "window": {
+        "title": "외부 앱 영역 선택 — Escape로 취소",
+        "id": 9701864,
+        "index": null,
+        "x": -9,
+        "y": -1,
+        "width": 1938,
+        "height": 1090,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 26864)\nWindow: \"외부 앱 영역 선택 — Escape로 취소\", App: agent-gibbon.\n\n1 of 16 elements match \"160\"; showing them with their ancestors.\n0 window 외부 앱 영역 선택 — Escape로 취소\n\t1 pane tauri.localhost/capture.html\n\t\t2 영역 tauri.localhost/capture.html - 웹 콘텐츠\n\t\t\t3 영역\n\t\t\t\t5 영역\n\t\t\t\t\t6 영역\n\t\t\t\t\t\t7 문서 RootWebArea, Value: http://tauri.localhost/capture.html, Secondary Actions: SetValue, Scroll\n\t\t\t\t\t\t\t8 텍스트 외부 앱 영역은 최소 160×120 물리 px입니다. 더 큰 영역을 선택하세요 · Escape로 닫기",
+      "elementCount": 16,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

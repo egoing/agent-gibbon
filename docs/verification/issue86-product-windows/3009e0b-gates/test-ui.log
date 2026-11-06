@@ -1,0 +1,634 @@
+
+> agent-gibbon@0.2.7 test:ui
+> node scripts/test-ui.mjs
+
+TAP version 13
+# Subtest: memo defaults to gray regardless of manager selection, old color mode or OS appearance
+ok 1 - memo defaults to gray regardless of manager selection, old color mode or OS appearance
+  ---
+  duration_ms: 3.0475
+  ...
+# Subtest: inaccessible memo preferences fall back to gray
+ok 2 - inaccessible memo preferences fall back to gray
+  ---
+  duration_ms: 0.1856
+  ...
+# Subtest: independent theme roles and color mode display preserve the individual color across cycles
+ok 3 - independent theme roles and color mode display preserve the individual color across cycles
+  ---
+  duration_ms: 1.786
+  ...
+# Subtest: only the independent system memo choice follows day/night appearance
+ok 4 - only the independent system memo choice follows day/night appearance
+  ---
+  duration_ms: 0.2044
+  ...
+# Subtest: reverse drag clamps to the display and submits one selection
+ok 5 - reverse drag clamps to the display and submits one selection
+  ---
+  duration_ms: 7.3236
+  ...
+# Subtest: click without drag creates no note; Escape cancels
+ok 6 - click without drag creates no note; Escape cancels
+  ---
+  duration_ms: 1.5055
+  ...
+# Subtest: original RGBA pixels are painted before showing, without a load or click event
+ok 7 - original RGBA pixels are painted before showing, without a load or click event
+  ---
+  duration_ms: 2.1214
+  ...
+# Subtest: unusable preview cancels without displaying a black overlay: {"malformed":true}
+ok 8 - unusable preview cancels without displaying a black overlay: {"malformed":true}
+  ---
+  duration_ms: 1.8195
+  ...
+# Subtest: unusable preview cancels without displaying a black overlay: {"noCanvas":true}
+ok 9 - unusable preview cancels without displaying a black overlay: {"noCanvas":true}
+  ---
+  duration_ms: 1.5479
+  ...
+# Subtest: the first pointer press after paint immediately starts selection
+ok 10 - the first pointer press after paint immediately starts selection
+  ---
+  duration_ms: 3.0588
+  ...
+# Subtest: canonical paths, not cwd or basename, determine stable instance IDs
+ok 11 - canonical paths, not cwd or basename, determine stable instance IDs
+  ---
+  duration_ms: 185.0404
+  ...
+# Subtest: development CLI rejects missing, old and foreign binaries without release fallback
+ok 12 - development CLI rejects missing, old and foreign binaries without release fallback # SKIP POSIX executable fixtures; Windows uses native CLI smoke tests
+  ---
+  duration_ms: 0.1064
+  ...
+# Subtest: ordinary contributor build does not fetch official DSN or silently enable transmission
+ok 13 - ordinary contributor build does not fetch official DSN or silently enable transmission
+  ---
+  duration_ms: 105.1481
+  ...
+# Subtest: invalid DSN is rejected without printing the supplied value
+ok 14 - invalid DSN is rejected without printing the supplied value
+  ---
+  duration_ms: 76.0649
+  ...
+# Subtest: font sizes cycle four steps and remain selected across note updates
+ok 15 - font sizes cycle four steps and remain selected across note updates
+  ---
+  duration_ms: 17.0385
+  ...
+# Subtest: editing preserves drafts on polling and failed saves; cancel reveals latest note
+ok 16 - editing preserves drafts on polling and failed saves; cancel reveals latest note
+  ---
+  duration_ms: 5.0009
+  ...
+# Subtest: save returns to rendered content; editor input never drags the window; Escape cancels
+ok 17 - save returns to rendered content; editor input never drags the window; Escape cancels
+  ---
+  duration_ms: 3.9805
+  ...
+# Subtest: failed warp reports error without showing success help or losing draft
+ok 18 - failed warp reports error without showing success help or losing draft
+  ---
+  duration_ms: 3.4316
+  ...
+# Subtest: automatic acknowledgement defers during editing and preserves drafts
+ok 19 - automatic acknowledgement defers during editing and preserves drafts
+  ---
+  duration_ms: 5.3015
+  ...
+# Subtest: feedback never reappears when an expired change is saved without editing
+ok 20 - feedback never reappears when an expired change is saved without editing
+  ---
+  duration_ms: 4.2425
+  ...
+# Subtest: rollover and focus acknowledge only their own current revision without a button
+ok 21 - rollover and focus acknowledge only their own current revision without a button
+  ---
+  duration_ms: 8.902
+  ...
+# Subtest: fold contact preserves editor drafts and restores through the unfold button
+ok 22 - fold contact preserves editor drafts and restores through the unfold button
+  ---
+  duration_ms: 3.65
+  ...
+# Subtest: explicit button folds and unfolds without Control and updates its label
+ok 23 - explicit button folds and unfolds without Control and updates its label
+  ---
+  duration_ms: 3.6103
+  ...
+# Subtest: native rollover updates chrome without a DOM click or pointer event
+ok 24 - native rollover updates chrome without a DOM click or pointer event
+  ---
+  duration_ms: 3.2839
+  ...
+# Subtest: native pointer notifications are addressed to the originating memo
+ok 25 - native pointer notifications are addressed to the originating memo
+  ---
+  duration_ms: 1.1469
+  ...
+# Subtest: clear diff button stays hidden without changes and stale clicks preserve newer revisions
+ok 26 - clear diff button stays hidden without changes and stale clicks preserve newer revisions
+  ---
+  duration_ms: 3.6215
+  ...
+# Subtest: external action never consumes memo height
+ok 27 - external action never consumes memo height
+  ---
+  duration_ms: 4.3923
+  ...
+# Subtest: failed confirmation keeps cumulative changes and allows retry
+ok 28 - failed confirmation keeps cumulative changes and allows retry
+  ---
+  duration_ms: 3.7208
+  ...
+# Subtest: folded note opens from title, blank space, border and icon without starting a drag
+ok 29 - folded note opens from title, blank space, border and icon without starting a drag
+  ---
+  duration_ms: 3.7589
+  ...
+# Subtest: folded click ignores secondary buttons and coalesces pending clicks
+ok 30 - folded click ignores secondary buttons and coalesces pending clicks
+  ---
+  duration_ms: 3.2656
+  ...
+# Subtest: region text note opens a blank editor once, preserves drafts and saves normally
+ok 31 - region text note opens a blank editor once, preserves drafts and saves normally
+  ---
+  duration_ms: 2.774
+  ...
+# Subtest: canceling the initial region editor does not reopen it on polling
+ok 32 - canceling the initial region editor does not reopen it on polling
+  ---
+  duration_ms: 2.5819
+  ...
+# Subtest: direct save immediately clears existing diff controls
+ok 33 - direct save immediately clears existing diff controls
+  ---
+  duration_ms: 3.9425
+  ...
+# Subtest: temporary copy notice restores acknowledgement; editing owns the action slot
+ok 34 - temporary copy notice restores acknowledgement; editing owns the action slot
+  ---
+  duration_ms: 3.6685
+  ...
+# Subtest: save success becomes Toast; save error retains actions and outranks tips
+ok 35 - save success becomes Toast; save error retains actions and outranks tips
+  ---
+  duration_ms: 2.8415
+  ...
+# Subtest: development labels remain distinct from installed memo content
+ok 36 - development labels remain distinct from installed memo content
+  ---
+  duration_ms: 2.7318
+  ...
+# Subtest: delayed surface acknowledgement cannot acknowledge a newer rendered revision
+ok 37 - delayed surface acknowledgement cannot acknowledge a newer rendered revision
+  ---
+  duration_ms: 1.7994
+  ...
+# Subtest: hidden memo defers companion creation until its native window is visible
+ok 38 - hidden memo defers companion creation until its native window is visible
+  ---
+  duration_ms: 2.38
+  ...
+# Subtest: foreign Feedback actions cannot save another memo draft
+ok 39 - foreign Feedback actions cannot save another memo draft
+  ---
+  duration_ms: 3.6133
+  ...
+# Subtest: connected outline follows its own companion and restores after hiding
+ok 40 - connected outline follows its own companion and restores after hiding
+  ---
+  duration_ms: 2.1482
+  ...
+# Subtest: copy uses the latest rendered note without confirming or copying deleted diff text
+ok 41 - copy uses the latest rendered note without confirming or copying deleted diff text
+  ---
+  duration_ms: 2.8928
+  ...
+# Subtest: capture copy invokes native image writing without fetching a data URL
+ok 42 - capture copy invokes native image writing without fetching a data URL
+  ---
+  duration_ms: 1.8992
+  ...
+# Subtest: failed clipboard write reports the error without showing success feedback
+ok 43 - failed clipboard write reports the error without showing success feedback
+  ---
+  duration_ms: 1.5079
+  ...
+# Subtest: Cmd+S and Ctrl+S export viewing notes and toolbar exports the current draft
+ok 44 - Cmd+S and Ctrl+S export viewing notes and toolbar exports the current draft
+  ---
+  duration_ms: 1.9093
+  ...
+# Subtest: cancel and export failure preserve draft and allow retry
+ok 45 - cancel and export failure preserve draft and allow retry
+  ---
+  duration_ms: 1.7317
+  ...
+# Subtest: repeated shortcuts open only one export dialog
+ok 46 - repeated shortcuts open only one export dialog
+  ---
+  duration_ms: 1.6211
+  ...
+# Subtest: Feedback export shortcut targets its own memo draft
+ok 47 - Feedback export shortcut targets its own memo draft
+  ---
+  duration_ms: 2.1314
+  ...
+# Subtest: toolbar shortcuts follow platform and gesture help is shown on button use
+ok 48 - toolbar shortcuts follow platform and gesture help is shown on button use
+  ---
+  duration_ms: 3.3649
+  ...
+# Subtest: polling and hover never reset placement intent, explicit editing does
+ok 49 - polling and hover never reset placement intent, explicit editing does
+  ---
+  duration_ms: 2.2348
+  ...
+# Subtest: content measurement carries the current revision and pending reopen can measure in editor
+ok 50 - content measurement carries the current revision and pending reopen can measure in editor
+  ---
+  duration_ms: 1.733
+  ...
+# Subtest: window close terminates while Escape remains a hide action
+ok 51 - window close terminates while Escape remains a hide action
+  ---
+  duration_ms: 1.6924
+  ...
+# Subtest: rollover and focus entry preserve completion; departure clears it
+ok 52 - rollover and focus entry preserve completion; departure clears it
+  ---
+  duration_ms: 3.38
+  ...
+# Subtest: unseen revision arriving on departure survives until another reading session
+ok 53 - unseen revision arriving on departure survives until another reading session
+  ---
+  duration_ms: 1.6744
+  ...
+# Subtest: companion focus continues the same reading session
+ok 54 - companion focus continues the same reading session
+  ---
+  duration_ms: 1.5911
+  ...
+# Subtest: independent memo designs preserve editor drafts and original colors without a note revision
+ok 55 - independent memo designs preserve editor drafts and original colors without a note revision
+  ---
+  duration_ms: 2.1401
+  ...
+# Subtest: content drag delegates to the backend command that cancels entrance before native dragging
+ok 56 - content drag delegates to the backend command that cancels entrance before native dragging
+  ---
+  duration_ms: 12.7579
+  ...
+# Subtest: editor and non-primary clicks never start entrance-cancelling drag
+ok 57 - editor and non-primary clicks never start entrance-cancelling drag
+  ---
+  duration_ms: 4.0417
+  ...
+# Subtest: Welcome shows installed apps and physical region without moving any window
+ok 58 - Welcome shows installed apps and physical region without moving any window
+  ---
+  duration_ms: 8.4196
+  ...
+# Subtest: existing process requires explicit window selection before attach
+ok 59 - existing process requires explicit window selection before attach
+  ---
+  duration_ms: 2.5962
+  ...
+# Subtest: placement failure retains chooser and error, and permits explicit retry
+ok 60 - placement failure retains chooser and error, and permits explicit retry
+  ---
+  duration_ms: 2.4054
+  ...
+# Subtest: pending launch prevents duplicate starts and cancel targets only that operation
+ok 61 - pending launch prevents duplicate starts and cancel targets only that operation
+  ---
+  duration_ms: 4.3376
+  ...
+# Subtest: app discovery failure preserves existing-window selection and search
+ok 62 - app discovery failure preserves existing-window selection and search
+  ---
+  duration_ms: 2.1638
+  ...
+# Subtest: off opt-in neither starts a flow nor augments application arguments
+ok 63 - off opt-in neither starts a flow nor augments application arguments
+  ---
+  duration_ms: 9.5949
+  ...
+# Subtest: overlapping flows carry distinct IDs; stages never contain application content
+ok 64 - overlapping flows carry distinct IDs; stages never contain application content
+  ---
+  duration_ms: 3.5775
+  ...
+# Subtest: refresh is sampled at most once per two seconds and hidden work is uninstrumented
+ok 65 - refresh is sampled at most once per two seconds and hidden work is uninstrumented
+  ---
+  duration_ms: 4.3383
+  ...
+# Subtest: frames do not delay application result; completion follows second callback; errors close flow
+ok 66 - frames do not delay application result; completion follows second callback; errors close flow
+  ---
+  duration_ms: 3.1852
+  ...
+# Subtest: fit observation preserves application completion while frame waits for fit
+ok 67 - fit observation preserves application completion while frame waits for fit
+  ---
+  duration_ms: 2.179
+  ...
+# Subtest: system light maps to gray, dark maps to black before paint and remains unsaved
+ok 68 - system light maps to gray, dark maps to black before paint and remains unsaved
+  ---
+  duration_ms: 6.9102
+  ...
+# Subtest: all explicit themes survive reload and ignore subsequent system changes; reset resumes tracking
+ok 69 - all explicit themes survive reload and ignore subsequent system changes; reset resumes tracking
+  ---
+  duration_ms: 6.1842
+  ...
+# Subtest: corrupt or inaccessible storage follows system; write failures retain previous selection
+ok 70 - corrupt or inaccessible storage follows system; write failures retain previous selection
+  ---
+  duration_ms: 5.5074
+  ...
+# Subtest: other manager windows update or reset preference; unrelated storage is ignored
+ok 71 - other manager windows update or reset preference; unrelated storage is ignored
+  ---
+  duration_ms: 1.1075
+  ...
+# Subtest: native color changes are serialized and carry only a fixed theme, without delaying the UI
+ok 72 - native color changes are serialized and carry only a fixed theme, without delaying the UI
+  ---
+  duration_ms: 6.5529
+  ...
+# Subtest: native failure reports a separate status and retries without undoing the saved preference
+ok 73 - native failure reports a separate status and retries without undoing the saved preference
+  ---
+  duration_ms: 3.0297
+  ...
+# Subtest: five memo designs persist independently of manager selection and default to gray
+ok 74 - five memo designs persist independently of manager selection and default to gray
+  ---
+  duration_ms: 4.2693
+  ...
+# Subtest: storage changes update memo design without changing manager selection; invalid values reset only memo design
+ok 75 - storage changes update memo design without changing manager selection; invalid values reset only memo design
+  ---
+  duration_ms: 0.8301
+  ...
+# Subtest: manager system is a radio selection and saved colors remain explicit choices
+ok 76 - manager system is a radio selection and saved colors remain explicit choices
+  ---
+  duration_ms: 1.0679
+  ...
+# Subtest: read-only selection, settings navigation and empty result
+ok 77 - read-only selection, settings navigation and empty result
+  ---
+  duration_ms: 14.925
+  ...
+# Subtest: one common show action precedes unchanged content for every memo type
+ok 78 - one common show action precedes unchanged content for every memo type
+  ---
+  duration_ms: 5.3317
+  ...
+# Subtest: show failure stays visible across polling and supports retry without exposing raw errors
+ok 79 - show failure stays visible across polling and supports retry without exposing raw errors
+  ---
+  duration_ms: 2.4815
+  ...
+# Subtest: pending actions use the clicked id, prevent duplicate submission and cannot affect a new selection
+ok 80 - pending actions use the clicked id, prevent duplicate submission and cannot affect a new selection
+  ---
+  duration_ms: 1.7464
+  ...
+# Subtest: visible status toggles to hide and back for every memo kind
+ok 81 - visible status toggles to hide and back for every memo kind
+  ---
+  duration_ms: 3.262
+  ...
+# Subtest: polling external visibility changes keeps the existing controls and inline errors
+ok 82 - polling external visibility changes keeps the existing controls and inline errors
+  ---
+  duration_ms: 2.2155
+  ...
+# Subtest: a query started before a visibility change cannot roll back the confirmed result
+ok 83 - a query started before a visibility change cannot roll back the confirmed result
+  ---
+  duration_ms: 1.8253
+  ...
+# Subtest: settings sections preserve privacy drafts and selected memo across navigation
+ok 84 - settings sections preserve privacy drafts and selected memo across navigation
+  ---
+  duration_ms: 2.4224
+  ...
+# Subtest: More destination returns from Settings to the full list without type prefixes or IDs
+ok 85 - More destination returns from Settings to the full list without type prefixes or IDs
+  ---
+  duration_ms: 3.0384
+  ...
+# Subtest: retired agent records cannot appear in the manager list
+ok 86 - retired agent records cannot appear in the manager list
+  ---
+  duration_ms: 2.1955
+  ...
+# Subtest: required terms do not imply optional sharing; unchecked Continue submits nothing
+ok 87 - required terms do not imply optional sharing; unchecked Continue submits nothing
+  ---
+  duration_ms: 10.5213
+  ...
+# Subtest: unfinished notice disables optional sharing but still allows terms-only use
+ok 88 - unfinished notice disables optional sharing but still allows terms-only use
+  ---
+  duration_ms: 3.4698
+  ...
+# Subtest: stored decline stays declined and settings withdrawal is an explicit false
+ok 89 - stored decline stays declined and settings withdrawal is an explicit false
+  ---
+  duration_ms: 1.8952
+  ...
+# Subtest: unreadable status fails closed; legal documents remain local
+ok 90 - unreadable status fails closed; legal documents remain local
+  ---
+  duration_ms: 3.4001
+  ...
+# Subtest: turning sharing off submits withdrawal without another Save click
+ok 91 - turning sharing off submits withdrawal without another Save click
+  ---
+  duration_ms: 1.853
+  ...
+# Subtest: published notice offers unchecked opt-in; settings only enable after explicit save
+ok 92 - published notice offers unchecked opt-in; settings only enable after explicit save
+  ---
+  duration_ms: 1.7719
+  ...
+# Subtest: development terms skip opens navigation without accepting terms or sharing
+ok 93 - development terms skip opens navigation without accepting terms or sharing
+  ---
+  duration_ms: 2.6568
+  ...
+# Subtest: first diagnostic opt-in after a development skip still requires explicit terms
+ok 94 - first diagnostic opt-in after a development skip still requires explicit terms
+  ---
+  duration_ms: 2.0152
+  ...
+# Subtest: explicit terms verification keeps the welcome gate for an unaccepted instance
+ok 95 - explicit terms verification keeps the welcome gate for an unaccepted instance
+  ---
+  duration_ms: 1.9587
+  ...
+# Subtest: version bump updates all manifests and both lockfiles without changing dependencies
+ok 96 - version bump updates all manifests and both lockfiles without changing dependencies
+  ---
+  duration_ms: 82.538
+  ...
+# Subtest: version drift blocks release and bump without writing files
+ok 97 - version drift blocks release and bump without writing files
+  ---
+  duration_ms: 29.413
+  ...
+# Subtest: release assets require all three platforms and contain independently checkable hashes
+ok 98 - release assets require all three platforms and contain independently checkable hashes
+  ---
+  duration_ms: 7.6459
+  ...
+# Subtest: skills are lazy and independent; immediate toggle preserves accordion state
+ok 99 - skills are lazy and independent; immediate toggle preserves accordion state
+  ---
+  duration_ms: 9.0341
+  ...
+# Subtest: pending install has no optimistic On and prevents duplicate changes
+ok 100 - pending install has no optimistic On and prevents duplicate changes
+  ---
+  duration_ms: 2.0502
+  ...
+# Subtest: installation failure reloads authoritative state and reports the error
+ok 101 - installation failure reloads authoritative state and reports the error
+  ---
+  duration_ms: 3.3544
+  ...
+# Subtest: failed initial load ends loading state and navigation can retry
+ok 102 - failed initial load ends loading state and navigation can retry
+  ---
+  duration_ms: 1.2487
+  ...
+# Subtest: fixed error kinds exclude message/reason; disabled diagnostics install no timers
+ok 103 - fixed error kinds exclude message/reason; disabled diagnostics install no timers
+  ---
+  duration_ms: 11.1702
+  ...
+# Subtest: invoke instrumentation preserves values/rejections but never serializes arguments or errors
+ok 104 - invoke instrumentation preserves values/rejections but never serializes arguments or errors
+  ---
+  duration_ms: 4.2009
+  ...
+# Subtest: lag observers send only durations and skip hidden/sleep intervals; heartbeat has one in flight
+ok 105 - lag observers send only durations and skip hidden/sleep intervals; heartbeat has one in flight
+  ---
+  duration_ms: 2.2504
+  ...
+# Subtest: captured invoke works with frozen Tauri API and source metadata is allowlisted
+ok 106 - captured invoke works with frozen Tauri API and source metadata is allowlisted
+  ---
+  duration_ms: 2.201
+  ...
+# Subtest: explicit terminal stages accept only fixed names and finite visible durations
+ok 107 - explicit terminal stages accept only fixed names and finite visible durations
+  ---
+  duration_ms: 3.097
+  ...
+# Subtest: withdrawal clears pending samples and old callbacks cannot replay after re-opt-in
+ok 108 - withdrawal clears pending samples and old callbacks cannot replay after re-opt-in
+  ---
+  duration_ms: 1.3569
+  ...
+# Subtest: no history uses home preview and retains folder picker and shell without autostart
+ok 109 - no history uses home preview and retains folder picker and shell without autostart
+  ---
+  duration_ms: 5.2971
+  ...
+# Subtest: recent folders show three, expand, select locally and update preview
+ok 110 - recent folders show three, expand, select locally and update preview
+  ---
+  duration_ms: 2.089
+  ...
+# Subtest: task selection updates pressed state and exact preview; Run starts only once
+ok 111 - task selection updates pressed state and exact preview; Run starts only once
+  ---
+  duration_ms: 2.3593
+  ...
+# Subtest: shell remains the only task when no recommended app is installed
+ok 112 - shell remains the only task when no recommended app is installed
+  ---
+  duration_ms: 1.2859
+  ...
+# Subtest: picker refreshes location and preview without starting
+ok 113 - picker refreshes location and preview without starting
+  ---
+  duration_ms: 1.4459
+  ...
+# Subtest: failed Run preserves Welcome, restores Run focus and permits retry
+ok 114 - failed Run preserves Welcome, restores Run focus and permits retry
+  ---
+  duration_ms: 1.6858
+  ...
+# Subtest: failed launch does not move focus when window is inactive
+ok 115 - failed launch does not move focus when window is inactive
+  ---
+  duration_ms: 2.1405
+  ...
+# Subtest: removed agent mode cannot auto launch a PTY
+ok 116 - removed agent mode cannot auto launch a PTY
+  ---
+  duration_ms: 2.0989
+  ...
+# Subtest: rename remains explicit and polling only reads metadata
+ok 117 - rename remains explicit and polling only reads metadata
+  ---
+  duration_ms: 3.44
+  ...
+# Subtest: long folder path and exact command remain available
+ok 118 - long folder path and exact command remain available
+  ---
+  duration_ms: 1.954
+  ...
+# Subtest: cancelled delayed picker preserves local folder selection and blocks Run while pending
+ok 119 - cancelled delayed picker preserves local folder selection and blocks Run while pending
+  ---
+  duration_ms: 1.57
+  ...
+# Subtest: selecting recent folder from home clears the home location hint
+ok 120 - selecting recent folder from home clears the home location hint
+  ---
+  duration_ms: 1.4514
+  ...
+# Subtest: approved wireframe selects a task without starting until Run
+ok 121 - approved wireframe selects a task without starting until Run
+  ---
+  duration_ms: 1.3578
+  ...
+# Subtest: light and dark backgrounds have readable foregrounds
+ok 122 - light and dark backgrounds have readable foregrounds
+  ---
+  duration_ms: 2.2816
+  ...
+# Subtest: sampled RGB space has at least 4.5:1 text contrast
+ok 123 - sampled RGB space has at least 4.5:1 text contrast
+  ---
+  duration_ms: 57.3831
+  ...
+# Subtest: error text retains contrast on saturated memo colors
+ok 124 - error text retains contrast on saturated memo colors
+  ---
+  duration_ms: 0.5998
+  ...
+1..124
+# tests 124
+# suites 0
+# pass 123
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 339.1685

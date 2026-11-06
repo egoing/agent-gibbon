@@ -1,0 +1,202 @@
+[
+  {
+    "viewport": [
+      480,
+      460
+    ],
+    "dpr": 1.25,
+    "buttons": [
+      {
+        "id": "run-task",
+        "text": "실행",
+        "width": 64,
+        "height": 33.10000228881836,
+        "left": 24,
+        "right": 88,
+        "top": 311.20001220703125,
+        "bottom": 344.3000144958496,
+        "textLines": 1
+      },
+      {
+        "id": "refresh",
+        "text": "새로 고침",
+        "width": 77.01250457763672,
+        "height": 33.10000228881836,
+        "left": 96,
+        "right": 173.01250457763672,
+        "top": 311.20001220703125,
+        "bottom": 344.3000144958496,
+        "textLines": 1
+      },
+      {
+        "id": "cancel",
+        "text": "취소",
+        "width": 64,
+        "height": 33.10000228881836,
+        "left": 181.0124969482422,
+        "right": 245.0124969482422,
+        "top": 311.20001220703125,
+        "bottom": 344.3000144958496,
+        "textLines": 1
+      }
+    ],
+    "errors": [],
+    "wrapped": false,
+    "pass": true,
+    "requestedViewport": [
+      480,
+      460
+    ],
+    "screenshot": "after-480x460.png"
+  },
+  {
+    "viewport": [
+      384,
+      368
+    ],
+    "dpr": 1.25,
+    "buttons": [
+      {
+        "id": "run-task",
+        "text": "실행",
+        "width": 64,
+        "height": 33.10000228881836,
+        "left": 24,
+        "right": 88,
+        "top": 222.90000915527344,
+        "bottom": 256.0000114440918,
+        "textLines": 1
+      },
+      {
+        "id": "refresh",
+        "text": "새로 고침",
+        "width": 77.01250457763672,
+        "height": 33.10000228881836,
+        "left": 96,
+        "right": 173.01250457763672,
+        "top": 222.90000915527344,
+        "bottom": 256.0000114440918,
+        "textLines": 1
+      },
+      {
+        "id": "cancel",
+        "text": "취소",
+        "width": 64,
+        "height": 33.10000228881836,
+        "left": 181.0124969482422,
+        "right": 245.0124969482422,
+        "top": 222.90000915527344,
+        "bottom": 256.0000114440918,
+        "textLines": 1
+      }
+    ],
+    "errors": [],
+    "wrapped": false,
+    "pass": true,
+    "requestedViewport": [
+      384,
+      368
+    ],
+    "screenshot": "after-384x368.png"
+  },
+  {
+    "viewport": [
+      320,
+      240
+    ],
+    "dpr": 1.25,
+    "buttons": [
+      {
+        "id": "run-task",
+        "text": "실행",
+        "width": 64,
+        "height": 33.10000228881836,
+        "left": 24,
+        "right": 88,
+        "top": 103.70000457763672,
+        "bottom": 136.80000686645508,
+        "textLines": 1
+      },
+      {
+        "id": "refresh",
+        "text": "새로 고침",
+        "width": 77.01250457763672,
+        "height": 33.10000228881836,
+        "left": 96,
+        "right": 173.01250457763672,
+        "top": 103.70000457763672,
+        "bottom": 136.80000686645508,
+        "textLines": 1
+      },
+      {
+        "id": "cancel",
+        "text": "취소",
+        "width": 64,
+        "height": 33.10000228881836,
+        "left": 181.0124969482422,
+        "right": 245.0124969482422,
+        "top": 103.70000457763672,
+        "bottom": 136.80000686645508,
+        "textLines": 1
+      }
+    ],
+    "errors": [],
+    "wrapped": false,
+    "pass": true,
+    "requestedViewport": [
+      320,
+      240
+    ],
+    "screenshot": "after-320x240.png"
+  },
+  {
+    "viewport": [
+      240,
+      240
+    ],
+    "dpr": 1.25,
+    "buttons": [
+      {
+        "id": "run-task",
+        "text": "실행",
+        "width": 64,
+        "height": 33.10000228881836,
+        "left": 24,
+        "right": 88,
+        "top": 103.0999984741211,
+        "bottom": 136.20000076293945,
+        "textLines": 1
+      },
+      {
+        "id": "refresh",
+        "text": "새로 고침",
+        "width": 77.01250457763672,
+        "height": 33.10000228881836,
+        "left": 96,
+        "right": 173.01250457763672,
+        "top": 103.0999984741211,
+        "bottom": 136.20000076293945,
+        "textLines": 1
+      },
+      {
+        "id": "cancel",
+        "text": "취소",
+        "width": 64,
+        "height": 33.10000228881836,
+        "left": 24,
+        "right": 88,
+        "top": 103.4000015258789,
+        "bottom": 136.50000381469727,
+        "textLines": 1
+      }
+    ],
+    "errors": [],
+    "wrapped": true,
+    "pass": true,
+    "requestedViewport": [
+      240,
+      240
+    ],
+    "screenshot": "after-240x240.png"
+  }
+]

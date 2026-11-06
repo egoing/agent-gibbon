@@ -1,0 +1,37 @@
+{
+  "id": "a6cdf95e-f500-4df6-b7ec-83a64fe5a2dd",
+  "ok": true,
+  "result": {
+    "app": {
+      "name": "agent-gibbon",
+      "bundleId": "agent-gibbon",
+      "pid": 26864
+    },
+    "windows": [
+      {
+        "index": 0,
+        "app": {
+          "name": "agent-gibbon",
+          "bundleId": "agent-gibbon",
+          "pid": 26864
+        },
+        "id": 3541282,
+        "title": "외부 앱 영역 선택 — Escape로 취소",
+        "x": -9,
+        "y": -1,
+        "width": 1938,
+        "height": 1090,
+        "isMinimized": false,
+        "isOffscreen": false,
+        "screenIndex": null,
+        "platform": {
+          "backend": "uia",
+          "nativeWindowHandle": 3541282
+        }
+      }
+    ]
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

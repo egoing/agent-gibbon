@@ -1,0 +1,10 @@
+{
+  "checks": {
+    "position_size": true,
+    "topmost_after_ordinary_activation": true,
+    "real_click_keyboard": true,
+    "release_restore": true
+  },
+  "gate": "PASS",
+  "failure": null
+}

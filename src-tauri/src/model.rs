@@ -27,6 +27,7 @@ pub enum Action {
     List,
     Diagnostics,
     Probe,
+    App,
 }
 
 // Retired dedicated-agent IDs stay reserved, so open/update cannot turn an old
@@ -39,6 +40,8 @@ pub fn retired_agent_id(id: &str) -> bool {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Request {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub external: Option<crate::external_apps::ExternalRequest>,
     pub change_mode: Option<ChangeMode>,
     pub highlight: Option<Highlight>,
     pub action: Action,
@@ -57,6 +60,28 @@ impl Request {
     }
 
     pub fn validate(&self) -> Result<(), String> {
+        if matches!(self.action, Action::App) {
+            if self.id.is_some()
+                || self.color.is_some()
+                || self.title.is_some()
+                || self.markdown.is_some()
+                || self.source_path.is_some()
+                || self.status.is_some()
+                || self.change_mode.is_some()
+                || self.highlight.is_some()
+            {
+                return Err("app에는 메모 옵션을 지정할 수 없습니다".into());
+            }
+            return self
+                .external
+                .as_ref()
+                .ok_or("app 작업이 필요합니다")?
+                .validate();
+        }
+        if self.external.is_some() {
+            return Err("외부 앱 옵션은 app에서만 사용하세요".into());
+        }
+
         if matches!(self.action, Action::Diagnostics | Action::Probe)
             && (self.id.is_some()
                 || self.title.is_some()
@@ -219,6 +244,7 @@ impl Note {
         }
         let mut next = self.clone();
         next.apply(&Request {
+            external: None,
             action: Action::Update,
             id: None,
             color: None,
@@ -796,6 +822,7 @@ mod tests {
     #[test]
     fn retired_agent_ids_are_reserved_while_ordinary_note_ids_still_work() {
         let mut request = Request {
+            external: None,
             change_mode: None,
             highlight: None,
             action: Action::Open,
@@ -998,6 +1025,7 @@ mod tests {
         std::fs::write(&path, "원문").unwrap();
         let mut note = Note::default();
         note.apply(&Request {
+            external: None,
             action: Action::Open,
             id: None,
             title: None,
@@ -1101,6 +1129,7 @@ mod tests {
     fn partial_updates_preserve_unspecified_fields() {
         let mut note = Note::default();
         note.apply(&Request {
+            external: None,
             change_mode: None,
             highlight: None,
             source_path: None,
@@ -1113,6 +1142,7 @@ mod tests {
         })
         .unwrap();
         note.apply(&Request {
+            external: None,
             change_mode: None,
             highlight: None,
             source_path: None,
@@ -1133,6 +1163,7 @@ mod tests {
         let mut note = Note::default();
         assert!(note
             .apply(&Request {
+                external: None,
                 change_mode: None,
                 highlight: None,
                 source_path: None,
@@ -1233,6 +1264,7 @@ mod palette_tests {
             let mut note = Note::with_palette_color(index);
             assert_eq!(note.color, NOTE_COLORS[index % 6]);
             let mut request = Request {
+                external: None,
                 action: Action::Open,
                 id: None,
                 title: None,

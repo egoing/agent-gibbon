@@ -1,0 +1,55 @@
+{
+  "id": "d801d477-5b2b-47f9-b70a-6b9315fad220",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "4dc608d2-b30e-419b-8e65-9afa2532d40c",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": "agent-gibbon",
+        "pid": 26864
+      },
+      "window": {
+        "title": "",
+        "id": 9308062,
+        "index": null,
+        "x": 0,
+        "y": 0,
+        "width": 18,
+        "height": 18,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 26864)\nWindow: \"\", App: agent-gibbon.\n",
+      "elementCount": 0,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "action": {
+      "path": "synthetic",
+      "actionName": "drag",
+      "fallbackReason": null,
+      "verification": {
+        "state": "unverified",
+        "reason": "window_changed"
+      },
+      "targetWindowId": 9308062,
+      "targetWindowIndex": null
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "136b6756-bf51-48a2-86bf-abf23d2f15e2",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "fd7872c6-8d43-4181-8685-9d434c9bde12",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": "agent-gibbon",
+        "pid": 23952
+      },
+      "window": {
+        "title": "Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985867669628500",
+        "id": 984868,
+        "index": null,
+        "x": 291,
+        "y": 219,
+        "width": 618,
+        "height": 622,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 23952)\nWindow: \"Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985867669628500\", App: agent-gibbon.\n\n0 window Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985867669628500\n\t1 title bar Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985867669628500\n\t\t2 menu bar 시스템 메뉴 모음\n\t\t\t3 menu item 시스템\n\t\t4 button\n\t\t5 button\n\t\t6 button 닫기",
+      "elementCount": 7,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "action": {
+      "path": "accessibility",
+      "actionName": "primaryAction",
+      "fallbackReason": null,
+      "targetWindowId": 984868,
+      "targetWindowIndex": null,
+      "verification": {
+        "state": "unverified",
+        "reason": "accessibility_action_unasserted"
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

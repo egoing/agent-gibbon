@@ -176,17 +176,7 @@ mod windows {
     }
     type Handle = *mut c_void;
     type Hook = unsafe extern "system" fn(i32, usize, isize) -> isize;
-    #[repr(C)]
-    struct Message {
-        hwnd: Handle,
-        message: u32,
-        wparam: usize,
-        lparam: isize,
-        time: u32,
-        x: i32,
-        y: i32,
-        private: u32,
-    }
+    use crate::windows_messages::{GetMessageW, Message};
     #[link(name = "user32")]
     extern "system" {
         fn SetWindowsHookExW(
@@ -197,7 +187,6 @@ mod windows {
         ) -> Handle;
         fn CallNextHookEx(hook: Handle, code: i32, wparam: usize, lparam: isize) -> isize;
         fn UnhookWindowsHookEx(hook: Handle) -> i32;
-        fn GetMessageW(message: *mut Message, window: Handle, min: u32, max: u32) -> i32;
         fn TranslateMessage(message: *const Message) -> i32;
         fn DispatchMessageW(message: *const Message) -> isize;
         fn GetAsyncKeyState(key: i32) -> i16;

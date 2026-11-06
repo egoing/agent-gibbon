@@ -1,0 +1,11 @@
+{
+  "actual_Ctrl_Shift_4": true,
+  "overlay_escape_cancel": true,
+  "tiny_overlay_retained": true,
+  "one_line_buttons": true,
+  "selection_does_not_run": true,
+  "existing_disambiguation": true,
+  "run_attaches_selected": true,
+  "actual_welcome_release": true,
+  "actual_welcome_cancel": true
+}

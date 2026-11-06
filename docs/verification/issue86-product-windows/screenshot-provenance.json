@@ -1,0 +1,434 @@
+[
+  {
+    "source": "01-attached.png",
+    "source_sha256": "d6f4633f9e039da4dd5777c621cf79e367b1f5ea9a1f0d7d429ffc939d12573f",
+    "published": "run-20261107-015758\\01-attached-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "02-topmost.png",
+    "source_sha256": "cd667e69ac1cafd642febb7046d0fc6068d73226e91f31a4f95b740e955fc98a",
+    "published": "run-20261107-015758\\02-topmost-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "03-input.png",
+    "source_sha256": "2a2fde6263e8a7470fcac7d217f5e2abfd8e1de116fece069270ee85c372a044",
+    "published": "run-20261107-015758\\03-input-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "04-restored.png",
+    "source_sha256": "6be99e7939677360a16494f30edfb2475528e4610d810b5427cdae0e250c824e",
+    "published": "run-20261107-015758\\04-restored-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "01-attached.png",
+    "source_sha256": "d6f4633f9e039da4dd5777c621cf79e367b1f5ea9a1f0d7d429ffc939d12573f",
+    "published": "run-20261107-015839\\01-attached-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "02-topmost.png",
+    "source_sha256": "946464ca8c4e032fc6a6a1834f6239dc4903715ba59dcc85441597943cba5977",
+    "published": "run-20261107-015839\\02-topmost-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "03-input.png",
+    "source_sha256": "b2e7e04948b5b7730388f3f6b6daefc9172032899a4f7891e25b62d182e6251b",
+    "published": "run-20261107-015839\\03-input-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "04-restored.png",
+    "source_sha256": "8f20991452088664b0c5745a88b29a87b9a83fd5885addaae897a0101fb87eb4",
+    "published": "run-20261107-015839\\04-restored-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\6a5d7fd6-b047-41b0-8307-9b9a7fad669f-screenshot.png",
+    "source_sha256": "093e0263fb925a29d9e98769f69296364ec0a6a6b40b089f4f3e8b9c14b3c69f",
+    "published": "run-20261107-020038\\ui-existing-disambiguation-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\40b93cc7-e20e-4ac8-845c-c6db089fce67-screenshot.png",
+    "source_sha256": "484fbe01b2b63e6770a93bc59067f5f427f14917db0912666d9e05f5a5c3e650",
+    "published": "run-20261107-020038\\ui-filtered-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\bafeb269-ad2b-47b6-ae11-531da176e834-screenshot.png",
+    "source_sha256": "a6aa3bbef20011a35b390155dd6b948b3d9cf64a4902d43ba4102dfb399ac8bb",
+    "published": "run-20261107-020038\\ui-selected-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\989ffee9-a616-412a-8295-1f86e593ff1f-screenshot.png",
+    "source_sha256": "58b15d1b1b0e81ac9fb0a31b90cf36d10e6ef4e30c695b762fe2e447392d2a10",
+    "published": "run-20261107-020038\\ui-window-selected-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-021911\\01-attached.png",
+    "source_sha256": "d6f4633f9e039da4dd5777c621cf79e367b1f5ea9a1f0d7d429ffc939d12573f",
+    "published": "run-20261107-021911\\01-attached-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-021911\\02-topmost.png",
+    "source_sha256": "cd667e69ac1cafd642febb7046d0fc6068d73226e91f31a4f95b740e955fc98a",
+    "published": "run-20261107-021911\\02-topmost-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-021911\\03-input.png",
+    "source_sha256": "2a2fde6263e8a7470fcac7d217f5e2abfd8e1de116fece069270ee85c372a044",
+    "published": "run-20261107-021911\\03-input-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-021911\\04-restored.png",
+    "source_sha256": "6be99e7939677360a16494f30edfb2475528e4610d810b5427cdae0e250c824e",
+    "published": "run-20261107-021911\\04-restored-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-021958\\01-attached.png",
+    "source_sha256": "d6f4633f9e039da4dd5777c621cf79e367b1f5ea9a1f0d7d429ffc939d12573f",
+    "published": "run-20261107-021958\\01-attached-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-021958\\02-topmost.png",
+    "source_sha256": "946464ca8c4e032fc6a6a1834f6239dc4903715ba59dcc85441597943cba5977",
+    "published": "run-20261107-021958\\02-topmost-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-021958\\03-input.png",
+    "source_sha256": "b2e7e04948b5b7730388f3f6b6daefc9172032899a4f7891e25b62d182e6251b",
+    "published": "run-20261107-021958\\03-input-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-021958\\04-restored.png",
+    "source_sha256": "73f299ef95b2c70194604273cdd6d4b8d443e658ceb09c6d7db4ce6e5d965891",
+    "published": "run-20261107-021958\\04-restored-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-022338\\01-attached.png",
+    "source_sha256": "cd667e69ac1cafd642febb7046d0fc6068d73226e91f31a4f95b740e955fc98a",
+    "published": "run-20261107-022338\\01-attached-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-022338\\02-topmost.png",
+    "source_sha256": "946464ca8c4e032fc6a6a1834f6239dc4903715ba59dcc85441597943cba5977",
+    "published": "run-20261107-022338\\02-topmost-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-022338\\03-input.png",
+    "source_sha256": "b2e7e04948b5b7730388f3f6b6daefc9172032899a4f7891e25b62d182e6251b",
+    "published": "run-20261107-022338\\03-input-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-022338\\04-restored.png",
+    "source_sha256": "73f299ef95b2c70194604273cdd6d4b8d443e658ceb09c6d7db4ce6e5d965891",
+    "published": "run-20261107-022338\\04-restored-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\6a8499de-ac0e-4323-bc38-4c19e28ceaf5-screenshot.png",
+    "source_sha256": "0f22b610218235a50108b3cdd5d1c09cf24a9157cabe34dd254a58541d027ee5",
+    "published": "run-20261107-022420\\actual-attached-fixture-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\a0c8c3b7-d759-41ce-a0e3-cc9003b239a0-screenshot.png",
+    "source_sha256": "a0e5dd5d9263a5e8e9d6475e9a5abdfd356d900d3e3995241c7d582639e24b29",
+    "published": "run-20261107-022420\\disambiguation-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\28511fdb-2d55-4407-a119-387a27055d29-screenshot.png",
+    "source_sha256": "de8ebd1cbc826d64647bdba2fc6b961983ccf34cee2a3605c0dfee13d1bd8a2c",
+    "published": "run-20261107-022420\\selected-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\3d3233d9-c806-41bb-867c-f6fc571ec3ae-screenshot.png",
+    "source_sha256": "61123107d59a20b4b90d785f99bca866a3f2b73aa08b7ea82a811cc42b17fa32",
+    "published": "run-20261107-022420\\welcome-filtered-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\80a9abbf-0234-4212-842b-d20bb716f48b-screenshot.png",
+    "source_sha256": "f978d34d587f892119c180a4654bfa3310e6e0594f4f567ba8dfa9684d6a2be8",
+    "published": "run-20261107-022420\\window-selected-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\6a1e0823-5800-4516-b291-588ffadd9bfd-screenshot.png",
+    "source_sha256": "0f22b610218235a50108b3cdd5d1c09cf24a9157cabe34dd254a58541d027ee5",
+    "published": "run-20261107-022602\\actual-attached-fixture-client.png",
+    "crop": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\ca3a686a-0279-4e3d-a462-1f21f508de70-screenshot.png",
+    "source_sha256": "20d1c65e63788551bc5d38e70787cfb215adfc0c0381dd9a01cb37be7b2f603c",
+    "published": "run-20261107-022602\\disambiguation-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\2f030ebb-0e2d-464a-a77c-de503f4a8e55-screenshot.png",
+    "source_sha256": "71e94d2b7eae4df4fc5968efb2f5576529ce44e1c36dde733c1a73258bd4b064",
+    "published": "run-20261107-022602\\release-filtered-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\af03db95-c1d5-42d7-babe-6143456b6bdc-screenshot.png",
+    "source_sha256": "3d1a1072c128f607cff096e6742cf5aa5b23c15386b0cd7dcd7e7fa124395877",
+    "published": "run-20261107-022602\\released-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\5840f886-3e0e-4993-9fb5-02d9e7395da7-screenshot.png",
+    "source_sha256": "451a825e86a440bdd443552b816d1d0e97e84f8da45297abd3c5e3cfbf1f26c0",
+    "published": "run-20261107-022602\\selected-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\65dadb03-900a-4445-9b16-822f39f69233-screenshot.png",
+    "source_sha256": "c7a71b6056c898c8ddc0ac8ffdb88fc1807f45edf657334d5ad95a2be65b0a29",
+    "published": "run-20261107-022602\\welcome-filtered-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\950a9583-9d4e-4964-93ea-21a4798ce999-screenshot.png",
+    "source_sha256": "3e1f9e1d156072af00c72b22a1fbd75ac8c7f940c861a1a1dd71b37fae9c5729",
+    "published": "run-20261107-022602\\window-selected-client.png",
+    "crop": [
+      12,
+      2,
+      606,
+      610
+    ],
+    "operation": "crop only; no rescaling"
+  }
+]

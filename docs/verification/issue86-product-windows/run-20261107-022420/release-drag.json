@@ -1,0 +1,55 @@
+{
+  "id": "65e6cfd4-0fb8-4ab1-abb2-c37d734b921f",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "6ce09927-e615-4d84-9fc1-918e451a940c",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": "agent-gibbon",
+        "pid": 23952
+      },
+      "window": {
+        "title": "외부 앱 영역 선택 — Escape로 취소",
+        "id": 3541360,
+        "index": null,
+        "x": null,
+        "y": null,
+        "width": 0,
+        "height": 0,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 23952)\nWindow: \"외부 앱 영역 선택 — Escape로 취소\", App: agent-gibbon.\n\n0",
+      "elementCount": 1,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "action": {
+      "path": "synthetic",
+      "actionName": "drag",
+      "fallbackReason": null,
+      "targetWindowId": 3541360,
+      "targetWindowIndex": null,
+      "verification": {
+        "state": "unverified",
+        "reason": "synthetic_input"
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

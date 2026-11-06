@@ -1,0 +1,7 @@
+{"utc": "2026-11-06T17:22:45.803525+00:00", "kind": "api", "name": "SetProcessDpiAwarenessContext", "result": 1, "last_error": 0, "args": ["-4"]}
+{"utc": "2026-11-06T17:22:45.803525+00:00", "kind": "api", "name": "PostMessageW", "result": 1, "last_error": 0, "args": ["788114", "16", "0", "0"]}
+{"utc": "2026-11-06T17:22:45.803525+00:00", "kind": "api", "name": "PostMessageW", "result": 1, "last_error": 0, "args": ["3408216", "16", "0", "0"]}
+{"utc": "2026-11-06T17:22:45.803525+00:00", "kind": "api", "name": "AttachThreadInput", "result": 0, "last_error": 87, "args": ["19732", "0", "True"]}
+{"utc": "2026-11-06T17:22:45.811089+00:00", "kind": "api", "name": "SetForegroundWindow", "result": 1, "last_error": 0, "args": ["1967202"]}
+{"utc": "2026-11-06T17:22:46.212111+00:00", "kind": "activation-observation", "requested": 1967202, "foreground": 1967202}
+{"utc": "2026-11-06T17:22:46.212111+00:00", "kind": "api", "name": "SetCursorPos", "result": 1, "last_error": 0, "args": ["1618", "908"]}

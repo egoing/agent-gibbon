@@ -1,0 +1,61 @@
+{
+  "id": "1ab99555-8848-419b-bb45-00417eb184ba",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "687fa7a3-2b42-4bd5-8fc6-393cc18fe537",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": "agent-gibbon",
+        "pid": 23952
+      },
+      "window": {
+        "title": "Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985883271463300",
+        "id": 3606896,
+        "index": null,
+        "x": 291,
+        "y": 219,
+        "width": 618,
+        "height": 622,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 23952)\nWindow: \"Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985883271463300\", App: agent-gibbon.\n\nNo change in the accessibility tree since the previous snapshot.",
+      "elementCount": 149,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      },
+      "treeDiff": {
+        "baseSnapshotId": "3a8a2b58-0dc8-4979-bb74-8743dee8ccfb",
+        "changed": 0,
+        "added": 0,
+        "removed": 0
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "action": {
+      "path": "synthetic",
+      "actionName": "typeText",
+      "fallbackReason": null,
+      "verification": {
+        "state": "unverified",
+        "reason": "synthetic_input"
+      },
+      "targetWindowId": 3606896,
+      "targetWindowIndex": null
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}
