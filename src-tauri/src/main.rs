@@ -16,6 +16,7 @@ mod opacity;
 mod placement;
 mod privacy;
 mod sizing;
+mod skills;
 mod source;
 mod stash;
 mod stash_input;
@@ -495,6 +496,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .invoke_handler({
             let handler: Box<dyn Fn(tauri::ipc::Invoke) -> bool + Send + Sync> =
                 Box::new(tauri::generate_handler![
+                    skills::skills_list,
+                    skills::skills_set,
                     privacy::privacy_status,
                     privacy::privacy_save,
                     privacy::privacy_quit,
@@ -641,6 +644,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .setup(move |app| {
             local_trace::start(app.handle());
             privacy::initialize(app.handle())?;
+            skills::synchronize(app.handle().clone());
             let _startup = telemetry::Timing::new("app.startup");
             #[cfg(target_os = "macos")]
             {
