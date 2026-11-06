@@ -1,0 +1,51 @@
+﻿{
+  "id": "c445a904-5ec6-4a9f-a136-25bd7fe37132",
+  "ok": true,
+  "result": {
+    "platform": "win32",
+    "provider": "orca-computer-use-windows",
+    "providerVersion": "1.0.0",
+    "protocolVersion": 1,
+    "supports": {
+      "apps": {
+        "list": true,
+        "bundleIds": false,
+        "pids": true
+      },
+      "windows": {
+        "list": true,
+        "targetById": true,
+        "targetByIndex": true,
+        "focus": false,
+        "moveResize": false
+      },
+      "observation": {
+        "screenshot": true,
+        "annotatedScreenshot": false,
+        "elementFrames": true,
+        "ocr": false,
+        "treeDiff": true
+      },
+      "actions": {
+        "click": true,
+        "typeText": true,
+        "pressKey": true,
+        "hotkey": true,
+        "pasteText": true,
+        "scroll": true,
+        "drag": true,
+        "setValue": true,
+        "performAction": true
+      },
+      "surfaces": {
+        "menus": false,
+        "dialogs": false,
+        "dock": false,
+        "menubar": false
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

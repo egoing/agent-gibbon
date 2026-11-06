@@ -1,0 +1,34 @@
+작업 시작 최초 git status --short: 출력 없음 (clean)
+작업 루트: C:\Users\egoin\orca\workspaces\agent-gibbon\86-windows-poc
+Windows 실제 소스 SHA: 37dbfed28deac5e01f9764db9b352a8f2495bda4
+전달받은 Mac 기준 SHA: 48041c5e3dcdb6db98e136d0098ab30a6343666a
+브랜치: egoing/86-windows-poc
+
+
+Caption        : Microsoft Windows 11 Home
+Version        : 10.0.26200
+BuildNumber    : 26200
+OSArchitecture : 64-bit
+
+
+
+5.1.26100.9711
+git version 2.43.0.windows.1
+gh version 2.96.0 (2026-07-02)
+https://github.com/cli/cli/releases/tag/v2.96.0
+v20.11.0
+10.2.4
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+cargo 1.99.1 (5f94df478 2026-08-27)
+Python 3.10.11
+1.4.250
+C:/Users/egoin/dev/project/agent-gibbon                            37dbfed [main]
+C:/Users/egoin/.codex/worktrees/2411/window-test                   76d79a5 [egoing/windows-runtime]
+C:/Users/egoin/.codex/worktrees/5674/window-test                   d50dc6f [egoing/windows-visual]
+C:/Users/egoin/.codex/worktrees/99ff/window-test                   4d20bc7 [egoing/windows-contact]
+C:/Users/egoin/orca/workspaces/agent-gibbon/86-windows-poc         37dbfed [egoing/86-windows-poc]
+C:/Users/egoin/orca/workspaces/agent-gibbon/verify-84-ce9ab3e-win  ce9ab3e [egoing/verify-84-ce9ab3e-win]
+Microsoft (R) Visual C# Compiler version 4.8.9221.0
+
+
+"Mandatory Label\High Mandatory Level","Label","S-1-16-12288",""
