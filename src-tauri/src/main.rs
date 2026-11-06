@@ -572,6 +572,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     terminal::welcome::terminal_folder,
                     terminal::welcome::terminal_rename,
                     terminal::welcome::terminal_close,
+                    manager::manager_set_theme,
                     manager::manager_notes,
                     manager::manager_set_visibility,
                     manager::manager_terminal,
@@ -610,7 +611,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 let command = invoke.message.command();
                 let exempt = matches!(
                     command,
-                    "privacy_status"
+                    "manager_set_theme" // Local cosmetic-only manager command.
+                        | "privacy_status"
                         | "privacy_save"
                         | "privacy_quit"
                         | "telemetry_status"

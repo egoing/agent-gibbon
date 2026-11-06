@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-import { themeFor } from '../ui/theme.mjs';
+import { memoThemeFor } from '../ui/theme.mjs';
+import { readMemoAppearance } from '../ui/appearance.mjs';
 import { feedbackView, durations } from '../ui/feedback-state.mjs';
 
 async function setup(storage = new Map()) {
@@ -28,7 +29,7 @@ async function setup(storage = new Map()) {
   const context = vm.createContext({
     navigator: { platform: "MacIntel" },
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
-    themeFor, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
+    memoThemeFor, readMemoAppearance, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
       body: { appendChild() {}, classList: { toggle() {} } },
       getElementById: element, querySelectorAll: () => [],
@@ -52,6 +53,7 @@ async function setup(storage = new Map()) {
       window: { getCurrentWindow: () => ({ startDragging: async () => calls.push(['drag']) }) },
     } },
   });
+  context.window.localStorage = context.localStorage;
   vm.runInContext(readFileSync(new URL('../ui/app.js', import.meta.url), 'utf8').replace(/^import .*;$/gm, ''), context);
   await new Promise(setImmediate);
   return { element, styles, events, calls, refresh: () => timers.find(fn => fn.name === 'refresh')(),

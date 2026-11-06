@@ -3,11 +3,11 @@
   letter-spacing: -.025em;
   color: var(--foreground);
   background: transparent;
-  --background: #20252e;
-  --foreground: #ffffff;
-  --border: #63666d;
-  --panel: #1d2129;
-  color-scheme: dark;
+  --background: #dfe2dd;
+  --foreground: #2c2f7e;
+  --border: #a0a3bc;
+  --panel: #cdd0d3;
+  color-scheme: light;
 }
 * { box-sizing: border-box; }
 body { user-select: none; -webkit-user-select: none; cursor: grab; margin: 0; height: 100vh; background: transparent; overflow: hidden; display: flex; flex-direction: column; }
@@ -116,3 +116,6 @@ body.feedback-above.feedback-full #memo-surface { border-top-left-radius: 0; }
 #controls > button { flex-shrink: 0; }
 #controls > button[aria-disabled="true"] { opacity: .4; cursor: default; }
 body.folded #toolbar-items { overflow: visible; }
+
+/* Keep keyboard focus readable even on the white theme's subtle panel. */
+#controls button:focus-visible { outline: 2px solid var(--foreground); outline-offset: -2px; }
