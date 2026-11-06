@@ -149,7 +149,7 @@ def main():
                     violations.append({'destination_mismatch': note, 'actual': actual_frame, 'planned': plan})
         if not all(s['visible'] and not s['auto_layout_excluded'] for s in states.values()):
             violations.append('visibility/exclusion mismatch')
-        actual = sorted(expected, key=lambda n: (-states[n]['position']['x'], states[n]['position']['y']))
+        actual = sorted(expected, key=lambda n: (-states[n]['position']['x'], -states[n]['position']['y']))
         if actual != expected:
             violations.append({'actual_order': actual, 'expected_order': expected})
         for i, note in enumerate(expected):
