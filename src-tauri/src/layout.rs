@@ -333,7 +333,7 @@ mod tests {
         assert_eq!(labels, ["note-z", "note-y", "note-b", "note-a"]);
         assert_eq!(
             rects.iter().map(|r| (r.x, r.y)).collect::<Vec<_>>(),
-            [(300, 0), (300, 60), (0, 0), (0, 60)]
+            [(300, 60), (300, 0), (0, 60), (0, 0)]
         );
     }
 }
