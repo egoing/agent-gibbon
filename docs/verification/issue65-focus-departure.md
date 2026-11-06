@@ -23,3 +23,9 @@
 - 이번 macOS native 범위 Conf 5, Risk Medium. Windows·Intel 실제 GUI 및 모든 편집 조합은 여전히 미검증이다.
 
 최신 main `ab14680` 통합 후 Rust 169개·UI 103개·Rustfmt·Clippy·개발 빌드와 native smoke 재검증을 통과했다. 최종 실행 근거 JSON/캡처는 이 통합 빌드에서 갱신했다. 변경 전용 Feedback도 숨김을 확인했다.
+
+## 독립 테마 main 통합 후 최종 결과
+
+- 코드/배포 내용 검증 대상 SHA `3c555f33b8b68c3034879a41b29df166689f1384`. 최신 `main`의 독립 OTU 메모 테마를 보존해 충돌을 해결했다. Rust 169개·UI 117개·Rustfmt·Clippy·개발 빌드 통과.
+- native smoke도 최종 빌드에서 통과했다. 서버 PID **66025**, `passed:true`, `test_server_stopped:true`. 이 디렉터리의 evidence.json/완료 강조 캡처는 이 최종 실행 결과로 갱신했다.
+- 세 플랫폼 검사는 [실행 42247220460](https://github.com/egoing/agent-gibbon/actions/runs/42247220460)에서 위 SHA를 대상으로 수행한다. 이전 두 실행은 새 배포 내용/새 main 통합으로 취소했으며 통과 근거로 사용하지 않는다. 최종 CI 결과·병합·main SHA 일치와 이슈 종료는 [PR #83](https://github.com/egoing/agent-gibbon/pull/83)·[이슈 #65](https://github.com/egoing/agent-gibbon/issues/65)에 기록한다. 이 이후 검증 JSON·문서만 변경되며 제품 코드/배포 자산은 위 SHA와 동일하다.
