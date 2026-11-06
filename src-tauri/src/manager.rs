@@ -12,16 +12,58 @@ pub fn open(app: &tauri::AppHandle) -> Result<(), String> {
         window.show().map_err(|e| e.to_string())?;
         return window.set_focus().map_err(|e| e.to_string());
     }
-    tauri::WebviewWindowBuilder::new(app, LABEL, tauri::WebviewUrl::App("manager.html".into()))
-        .title(format!(
-            "{} — 메모 관리",
-            crate::instance::current().title()
-        ))
-        .transparent(false)
-        .inner_size(944.0, 480.0)
-        .min_inner_size(600.0, 360.0)
-        .build()
-        .map_err(|e| e.to_string())?;
+    let builder =
+        tauri::WebviewWindowBuilder::new(app, LABEL, tauri::WebviewUrl::App("manager.html".into()))
+            .title(format!(
+                "{} — 메모 관리",
+                crate::instance::current().title()
+            ))
+            .transparent(false)
+            .inner_size(944.0, 480.0)
+            .min_inner_size(600.0, 360.0);
+    // Preserve native traffic lights, dragging and sizing; let the window's
+    // background show through instead of a separate system-colored strip.
+    #[cfg(target_os = "macos")]
+    let builder = builder
+        .title_bar_style(tauri::TitleBarStyle::Transparent)
+        .hidden_title(true)
+        .background_color(tauri::window::Color(223, 226, 221, 255));
+    builder.build().map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ManagerTheme {
+    White,
+    Gray,
+    Black,
+}
+
+// Cosmetic only, including before onboarding. No arbitrary window, color,
+// app-wide appearance, memo state or persisted consent crosses this command.
+#[tauri::command]
+pub fn manager_set_theme(window: tauri::WebviewWindow, theme: ManagerTheme) -> Result<(), String> {
+    if window.label() != LABEL {
+        return Err("관리 창에서만 테마를 변경할 수 있습니다".into());
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let color = match theme {
+            ManagerTheme::White => tauri::window::Color(248, 248, 248, 255),
+            ManagerTheme::Gray => tauri::window::Color(223, 226, 221, 255),
+            ManagerTheme::Black => tauri::window::Color(38, 38, 39, 255),
+        };
+        // Use the native Window layer; macOS WebView background setters are
+        // unsupported. Do not use set_theme, which is app-wide on macOS.
+        window
+            .as_ref()
+            .window()
+            .set_background_color(Some(color))
+            .map_err(|e| e.to_string())?;
+    }
+    #[cfg(not(target_os = "macos"))]
+    let _ = theme;
     Ok(())
 }
 

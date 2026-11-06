@@ -1,0 +1,35 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-77-otu-themes",
+  "base_sha": "30a39e9354b0c7298048d7e9b98af65b29c92012",
+  "instance": "dev-f1d9811e5ba88a2ec84a8faa",
+  "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-77-otu-themes/src-tauri/target/debug/agent-gibbon",
+  "note_id": "issue77-theme-plan",
+  "note_inspect_ok": true,
+  "native_runs": [
+    {
+      "pid": 59593,
+      "manager_window_id": 41281,
+      "purpose": "three themes, same system color explicit choice, memo invariants"
+    },
+    {
+      "pid": 65330,
+      "manager_window_id": 41416,
+      "purpose": "restart persistence, black local document, system reset"
+    }
+  ],
+  "manager_title": "Agent Gibbon [DEV egoing/issue-77-otu-themes · f1d9811e] — 메모 관리",
+  "privacy": {
+    "notice_ready": true,
+    "onboarding_required": false,
+    "sharing_allowed": false,
+    "terms_accepted": false,
+    "terms_skipped": true
+  },
+  "theme_note_state_preserved": true,
+  "asset_sha256": {
+    "ui/manager-theme.js": "76d3ccf7cc8186e3273d793480b3245766ebf174e8e8fba3ca2146fc1dbd435b",
+    "ui/manager.css": "669258c2afef430292aa1417002ae8723ddad73719c35d7d311b95966eb39f59",
+    "ui/manager.html": "9a435bc7cd9c6ade7dd53ab9c222170706f4c1d4522002231fe236701a151516",
+    "ui/manager.js": "e5485483c3175abb7436879754e3db1a8e9ce11bf18fc9527665b5bce273abbb"
+  }
+}

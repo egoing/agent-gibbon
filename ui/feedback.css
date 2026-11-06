@@ -1,4 +1,4 @@
-:root { font: var(--font-ui)/var(--line-ui) -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; color: var(--foreground); background: transparent; color-scheme: dark; }
+:root { font: var(--font-ui)/var(--line-ui) -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif; color: var(--foreground); background: transparent; color-scheme: light; --background:#dfe2dd; --foreground:#2c2f7e; --border:#a0a3bc; --primary:#cdd0d3; --error:#8c2222; }
 * { box-sizing: border-box; }
 html { overflow-x: hidden; overflow-y: auto; }
 body { margin: 0; cursor: default; background: transparent; }

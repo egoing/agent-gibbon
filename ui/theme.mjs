@@ -25,3 +25,14 @@ export function themeFor(color) {
     panel: mix(light ? 1 : 0, 0.1),
   };
 }
+
+// Independent memo designs. Stored per-memo colors are used only for color.
+const memoThemes = {
+  white: { background: '#f8f8f8', foreground: '#2d2d2d', border: '#d6d6d6', panel: '#ffffff', error: '#8c2222', scheme: 'light' },
+  gray: { background: '#dfe2dd', foreground: '#2c2f7e', border: '#a0a3bc', panel: '#cdd0d3', error: '#8c2222', scheme: 'light' },
+  black: { background: '#262627', foreground: '#dfe2dd', border: '#444444', panel: '#393938', error: '#ffb4ab', scheme: 'dark' },
+};
+export function memoThemeFor(color, {design = 'gray', systemDark = false} = {}) {
+  const resolved = design === 'system' ? (systemDark ? 'black' : 'gray') : design;
+  return design === 'color' ? {...themeFor(color), background: color} : {...(memoThemes[resolved] || memoThemes.gray)};
+}

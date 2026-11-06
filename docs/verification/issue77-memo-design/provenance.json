@@ -1,0 +1,61 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-77-otu-themes",
+  "base_sha": "30a39e9354b0c7298048d7e9b98af65b29c92012",
+  "instance": "dev-f1d9811e5ba88a2ec84a8faa",
+  "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-77-otu-themes/src-tauri/target/debug/agent-gibbon",
+  "latest_pid": 24337,
+  "latest_note_id": "issue77-system-preview",
+  "latest_marker": "SYSPREVIEW77-f1d9811e",
+  "latest_cli_ok": true,
+  "latest_native_note_window_id": 42432,
+  "latest_manager_gui": "unverified: native status menu could not be opened by CGEvent or AXPress; no fallback to other app/worktree",
+  "earlier_native_core_design_run": {
+    "pid": 88357,
+    "manager_window_id": 42270,
+    "note_window_id": 42264,
+    "note_id": "issue77-independent-probe",
+    "verified": "four fixed/color designs and independence, no note/color/geometry/visibility/focus/pin/opacity changes; before system and preview UI additions"
+  },
+  "privacy": {
+    "notice_ready": true,
+    "onboarding_required": false,
+    "sharing_allowed": false,
+    "terms_accepted": false,
+    "terms_skipped": true
+  },
+  "asset_sha256": {
+    "ui/appearance.mjs": "a55a9803c3f79239a4844fe63ca295f222d465c8964f67920a3800154834f88d",
+    "ui/theme.mjs": "a2f169042e5e0bcb51ddf85ac8851e0223e927fd70becfc9eb41638956bdda51",
+    "ui/app.js": "a3310ca745bfc8215a8fb807278ddec9ae80b5a983a5ed24c6450024d9a9e9be",
+    "ui/feedback.js": "137e720f2aefffe358f0e1872955fa2d0ebd9bb4a51239b8a1e0aaac0bc17739",
+    "ui/style.css": "14f18d44efc5e850e695fa86bd62c989e2555777f5f50de5e4be2f356e89d82a",
+    "ui/feedback.css": "f5d198b7a5809e54d46892f6fd1455d5b6ecb50fb8affb082a70a0f38ba82e48",
+    "ui/manager.html": "768544fb81c9049d84da2ddab6d6f10d0e4d87f4902a39c66d647f9aeb084ea7",
+    "ui/manager-theme.js": "8e9169e8a4e1718b3901f8a747f4259d3a3170346bef7e5bd4983adf31d06d0c",
+    "ui/memo-preview.js": "3681796059691251eb348116469771bd16f533203e445a169f5ad518825dccd9",
+    "ui/manager.css": "7e31dbd62fe188dffb4b685a205850ae9f9a299a0db08b8b6df8bb9546913cb5"
+  },
+  "followup_system_alignment": {
+    "verification": "Chromium 944/600px DOM order, right edge, line wrapping, keyboard, 20 combinations; native manager remains unverified",
+    "asset_sha256": {
+      "ui/manager.html": "12a3811e93dc42656fa859b032b20948867e0696dfd1e6c3f5644d65816e98d4",
+      "ui/manager.css": "f16c11bce2ec739136e8dfa01f2e2f479ac714052248aa20046a670f10c4176c"
+    }
+  },
+  "restart_native_verification": {
+    "date": "2026-11-07",
+    "old_pid": 24337,
+    "pid": 51969,
+    "manager_window_id": 42550,
+    "note_id": "issue77-system-preview",
+    "instance": "dev-f1d9811e5ba88a2ec84a8faa",
+    "manager_restored_frame": {
+      "x": 147,
+      "y": 144,
+      "width": 944,
+      "height": 508
+    },
+    "verified": "system last/right alignment in both groups, two samples, persisted independent selections, original note data and visibility/focus/pin/frame preserved",
+    "limitations": "actual OS switching, 600px native, Windows/Intel/full CI remain unverified"
+  }
+}
