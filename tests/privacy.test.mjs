@@ -15,7 +15,7 @@ function setup(initial={terms_accepted:false,sharing:false,notice_ready:true},fa
    if(name==='privacy_save'){
     if(!args.termsAccepted)throw Error('terms required');
     if(args.shareDiagnostics&&!state.notice_ready)throw Error('Sharing unavailable');
-    state={...state,terms_accepted:true,sharing:args.shareDiagnostics};return state;
+    state={...state,terms_accepted:true,allowed:args.shareDiagnostics,sharing:args.shareDiagnostics};return state;
    }
  }}}};
  vm.runInNewContext(source,{window,document:{getElementById:id=>elements.get(id)},Boolean,Error});
@@ -53,4 +53,15 @@ test('turning sharing off submits withdrawal without another Save click',async()
  const s=setup({terms_accepted:true,sharing:true,notice_ready:true});await tick();
  s.elements.get('privacy-setting-share').checked=false;s.elements.get('privacy-setting-share').listeners.change();await tick();
  assert.equal(s.calls.find(c=>c.name==='privacy_save').args.shareDiagnostics,false);
+});
+
+test('published notice offers unchecked opt-in; settings only enable after explicit save',async()=>{
+ const s=setup({terms_accepted:true,allowed:false,sharing:false,notice_ready:true});await tick();const e=s.elements;
+ assert.equal(e.get('privacy-setting-share').disabled,false);
+ assert.equal(e.get('privacy-setting-share').checked,false);
+ assert.equal(e.get('privacy-settings-draft').hidden,true);
+ e.get('privacy-setting-share').checked=true;e.get('privacy-setting-share').listeners.change();await tick();
+ assert.equal(s.calls.filter(c=>c.name==='privacy_save').length,0);
+ await e.get('privacy-save').onclick();
+ assert.equal(s.calls.find(c=>c.name==='privacy_save').args.shareDiagnostics,true);
 });

@@ -188,20 +188,13 @@ pub fn envelope(input: Envelope) -> Envelope {
                     out.add_item(t);
                 }
             }
-            p::EnvelopeItem::SessionUpdate(s) => {
-                let mut s = s.clone();
-                s.distinct_id = None;
-                s.attributes.ip_address = None;
-                s.attributes.user_agent = None;
-                out.add_item(s);
-            }
             p::EnvelopeItem::ItemContainer(p::ItemContainer::Logs(logs)) => {
                 let logs: Vec<_> = logs.iter().cloned().filter_map(log).collect();
                 if !logs.is_empty() {
                     out.add_item(logs);
                 }
             }
-            // Attachments, replay, native memory dumps and unknown future item types are denied.
+            // Sessions/aggregates, attachments, replay, dumps and unknown types are denied.
             _ => (),
         }
     }

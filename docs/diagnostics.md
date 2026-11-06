@@ -7,16 +7,16 @@
 | 조건 | SDK와 외부 전송 |
 | --- | --- |
 | 동의 기록 없음·거부·손상·이전 정책 버전 | 초기화하지 않음, 전송 없음 |
-| 운영자·문의처·지역·보유기간 미확정(현재) | 선택 동의 비활성, 전송 없음 |
+| 포크/사용자 빌드의 운영 정보 중 미확정 항목이 있음 | 선택 동의 비활성, 전송 없음 |
 | DSN·개발 진단 플래그만 존재 | 동의를 대체하지 않음, 전송 없음 |
 | 현재 문서에 대한 약관 및 별도 전송 동의 + 확정된 운영 정보 + 유효 DSN | 허용된 진단만 전송; 개발 빌드는 명시적 진단 실행도 필요 |
 | `AGENT_GIBBON_TELEMETRY=off` | 동의가 있어도 모두 차단 |
 
-첫 실행의 필수 약관과 선택적 전송을 구분하며 전송은 기본 해제다. [약관·개인정보 초안](legal/README.md)과 관리 창의 Privacy & Diagnostics에서 범위를 확인한다. 정책 해시는 약관·개인정보 안내·운영 정보에 연결돼 문서가 달라지면 과거 동의로 전송하지 않는다. 로컬 동의 파일은 instance별 `privacy/<instance>/consent.json`이며 계정·장치 식별자를 만들지 않는다.
+첫 실행의 필수 약관과 선택적 전송을 구분하며 전송은 기본 해제다. [약관·개인정보 안내](legal/README.md)과 관리 창의 Privacy & Diagnostics에서 범위를 확인한다. 정책 해시는 약관·개인정보 안내·운영 정보에 연결돼 문서가 달라지면 과거 동의로 전송하지 않는다. 로컬 동의 파일은 instance별 `privacy/<instance>/consent.json`이며 계정·장치 식별자를 만들지 않는다.
 
 SDK 초기화 전과 최종 HTTP 요청 직전에 동의를 확인한다. 전송 큐는 최대 64개 envelope, 각 직렬화 payload는 최대 512KiB이고 HTTP 요청 제한 시간은 3초다. 철회는 새 요청을 차단하고 이미 시작한 요청의 종료를 기다린 뒤 완료되며, 이전 동의 세대의 queue/log/session은 다시 동의해도 재전송되지 않는다. SDK 종료 시 flush도 이 경계를 우회하지 않는다. 과거 서버 데이터와 로컬 자료는 자동 삭제되지 않는다.
 
-현재 `src-tauri/src/privacy/notice.json`의 운영 정보가 미정이므로 아래 개발 명령을 실행해도 전송은 활성화되지 않는다. 재시작 없이 설정에서 철회할 수 있고, 진단 모드 변경 이벤트는 프런트 측정 타이머와 관찰자도 정리한다.
+현재 공식 운영 고지는 원본 최대 30일·별도 백업/오류 누적 통계 기준으로 확정되어 첫 실행과 설정에서 진단 동의를 선택할 수 있다. 기본값은 해제이며 DSN이나 개발 플래그만으로 전송하지 않는다. 재시작 없이 설정에서 철회할 수 있고, 진단 모드 변경 이벤트는 프런트 측정 타이머와 관찰자도 정리한다.
 
 자신의 Sentry 프로젝트를 쓰는 공헌자는 `AGENT_GIBBON_SENTRY_DSN`을 **빌드 프로세스의 환경변수**로 제공하고 다음 명령을 실행한다. `.env`는 자동으로 읽지 않는다.
 
@@ -44,7 +44,7 @@ Windows는 `npm.cmd`를 사용한다. `gh api`를 지원하는 인증된 GitHub 
 - **Long tasks / long animation frames:** 해당 WebView가 PerformanceObserver 타입을 지원할 때만 지속 시간을 기록한다. 스크립트 URL·attribution·DOM은 보내지 않는다. WebView2와 WKWebView의 지원 차이를 숨기지 않는다.
 - **오류 진단:** Rust panic 스택·네이티브 image 식별자, WebView 오류 종류와 허용된 앱 JS 파일명·행·열을 보낸다. 오류 문구·Promise reason·소스 문맥·로컬 절대 경로·frame 변수는 제거한다.
 - **Sentry Logs / breadcrumbs:** 느린 작업 및 앱 수명의 고정 작업명·시간을 수집한다. console/stdout/셸 로그를 연결하지 않는다.
-- **Release health:** 상세 모드에서만 익명 세션의 시작·종료·오류 상태를 활성화한다. 버전+커밋, OS·CPU 아키텍처, production/development로 비교한다. 사용자·장치 식별자는 제거한다.
+- **Release health:** 세션 통계 보유기간 확인 전 비활성화한다. SDK 자동 세션을 끄고 세션·세션 집계 envelope도 차단하며 상태의 `release_health`는 항상 false다.
 - **프리징 감시:** 독립 Rust 스레드가 네이티브 UI 응답과 실제 표시 중인 WebView heartbeat를 구분한다. 시작 30초 유예 후 12초 응답 중단을 감지하고, 중단/복구 시 에피소드별 한 번 보고한다. 네이티브가 멈추면 WebView 중복 보고는 억제한다. 잠자기·프로세스 전체 일시 정지와 숨긴 창의 타이머 지연은 별도로 처리한다. 네이티브 큐에는 확인 작업을 최대 한 개만 남긴다.
 - **로컬 기록:** 상세 모드의 중단/복구 고정 이벤트를 앱 데이터의 `diagnostics/<instance>/recent.json`에 최대 64개 저장한다. 창 ID·메모·명령 없이 빌드·시각·유형·지연만 남긴다. UI 스레드에서 디스크에 쓰지 않고, 큐·파일 크기를 제한하며 원자적으로 교체한다. 끄더라도 기존 로컬 기록은 자동 삭제하지 않는다.
 
@@ -95,7 +95,7 @@ WebView 측정은 기존 2초 집계 경로로만 보내며, 상세 모드가 �
 
 진단 모드의 일반 trace 기본 샘플링은 100%, 높은 빈도의 snapshot/inspect/list/터미널 쓰기·출력·조회는 최대 1%다. `AGENT_GIBBON_TRACE_SAMPLE_RATE`를 0~1로 지정하면 일반 구간을 낮출 수 있다. 시작·probe는 상세 모드에서 항상 측정한다. 오류·진단 로그는 trace 샘플링과 별도로 제한한다: 분당 WebView 오류 20개, 작업 로그 120개, 중단/복구 알림 10개, probe 2개. 이는 프로세스별 한도이며 여러 앱의 합산 한도는 아니다. Sentry 측 요금·프로젝트 할당량도 별도로 적용된다.
 
-전송 경계는 SDK의 `before_send`만으로 보호하지 않는다. 오류·transaction·로그·session envelope를 모두 허용 목록으로 재구성하고 알 수 없는 항목, 첨부파일·replay를 차단한다. 메모 본문·제목·상태·연결 경로, 명령/출력/입력 키, clipboard, DOM, 화면, 사용자명·장치명, IP 필드는 보내지 않는다. 네트워크 서버는 연결 IP 주소를 볼 수 있다.
+전송 경계는 SDK의 `before_send`만으로 보호하지 않는다. 오류·transaction·로그 envelope를 허용 목록으로 재구성하고 session·session 집계와 알 수 없는 항목, 첨부파일·replay를 차단한다. 메모 본문·제목·상태·연결 경로, 명령/출력/입력 키, clipboard, DOM, 화면, 사용자명·장치명, IP 필드는 보내지 않는다. 네트워크 서버는 연결 IP 주소를 볼 수 있다.
 
 세션 리플레이, 화면 녹화, 메모 첨부, 네이티브 메모리 덤프, 함수별 CPU sampling profiling은 이 Rust/Tauri 구성에 추가하지 않았다. 지원하지 않는 SDK 옵션을 켰다고 주장하지 않으며, OS 수준 교착·GPU 문제의 최종 원인은 별도 현장 도구가 필요할 수 있다. 강제 종료·오프라인·OS 자체 정지는 모든 이벤트의 보존/전송을 보장하지 않는다.
 
@@ -103,6 +103,10 @@ WebView 측정은 기존 2초 집계 경로로만 보내며, 상세 모드가 �
 
 Actions의 `AGENT_GIBBON_SENTRY_DSN` secret/variable을 공식 release 빌드에서만 주입한다. 기본 수집 모드와 자세한 공지 내용은 [README](../README.md)의 Sentry 절을 따른다. 이번 변경은 공개 버전 태그나 설치 앱 자동 업데이트를 수행하지 않는다.
 
-현재 동의·철회·loopback 전송 경계와 macOS 무전송 검증은 [동의 검증 기록](verification/privacy-consent-20261106.md)을 따른다. [이전 Sentry 수신 검증](verification/sentry-observability-20261106.md)은 동의 정책 변경 전의 기록이며, 현재 초안 빌드의 실제 전송 근거로 사용하지 않는다.
+현재 동의·철회·loopback 전송 경계와 macOS 무전송 검증은 [동의 검증 기록](verification/privacy-consent-20261106.md)을 따른다. [이전 Sentry 수신 검증](verification/sentry-observability-20261106.md)은 동의 정책 변경 전의 기록이며, 현재 동의 정책 빌드의 실제 전송 근거로 사용하지 않는다.
 
 공식 근거: [Sentry Rust SDK](https://docs.rs/sentry/0.42.0/sentry/), [ClientOptions](https://docs.rs/sentry-core/0.42.0/sentry_core/struct.ClientOptions.html), [Sentry envelope](https://develop.sentry.dev/sdk/envelopes/), [Sentry spans 조회](https://docs.sentry.io/api/explore/query-explore-events-in-table-format/).
+
+## 동의 선택 활성화 — 2026-11-06
+
+원본 30일·백업 생성 후 30/90일·오류 누적 횟수 별도 고지를 반영했다. 개인정보 안내 2026-11-06.3의 정책 해시 변경으로 과거 동의는 자동 승계하지 않는다. Release Health 세션은 SDK와 전송 경계에서 차단한다. 현재 검증은 [동의 활성화 기록](verification/privacy-choice-enabled-20261106.md)을 따른다.

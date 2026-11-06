@@ -1,0 +1,95 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/privacy-persistence-audit-20261106",
+  "instance": "dev-d715a196521bf7c65b1aaa05",
+  "base_head": "02cefc78e20347968ada041422b105e2080c0e93",
+  "critical_source_sha256": {
+    "src-tauri/src/privacy.rs": "8fc9e9c97a964d6bb619a6c0f70eff0fc9090514cc1fcaa932b6bb0c48de1afa",
+    "ui/privacy.js": "a7d770dc97796800f24884fd8c389d2d9d650375e6403e12cc61520b48bd3a03",
+    "ui/manager.html": "d8d9a203dd05d1a7897b064b3fb04450fe3a0e8619bb69c3649578243d0d0dc4",
+    "ui/manager.js": "d1a14cbe683cccfca6746cf9c55c0d8a76302f37f6d6acc9f1a14f22c3ea432c",
+    "src-tauri/src/telemetry.rs": "81124d7f8d1d0cc728737c280ee8528fcbbf5c45def5a5122b42e991e4d7ddfc",
+    "src-tauri/src/telemetry/transport.rs": "57ae9479ec68116e900cba510553726620552824157e66221b371fb41148eed6"
+  },
+  "fixture_changes": [
+    "docs/legal/terms.md",
+    "docs/legal/privacy.md",
+    "src-tauri/src/privacy/notice.json",
+    "src-tauri/tauri.conf.json"
+  ],
+  "records": {
+    "settings_on": {
+      "format": 1,
+      "policy": "a53f18952643ca4ee24de9033bed8ab0ca64292a4bd43f850a9def1cbecf19b0",
+      "terms": true,
+      "sharing": true,
+      "decided_at": 1793929566
+    },
+    "settings_off": {
+      "format": 1,
+      "policy": "a53f18952643ca4ee24de9033bed8ab0ca64292a4bd43f850a9def1cbecf19b0",
+      "terms": true,
+      "sharing": false,
+      "decided_at": 1793929715
+    },
+    "first_run_on": {
+      "format": 1,
+      "policy": "a53f18952643ca4ee24de9033bed8ab0ca64292a4bd43f850a9def1cbecf19b0",
+      "terms": true,
+      "sharing": true,
+      "decided_at": 1793929778
+    }
+  },
+  "withdrawal_network": {
+    "before": {
+      "requests": 25,
+      "bytes": 240783
+    },
+    "after": {
+      "requests": 25,
+      "bytes": 240783
+    },
+    "probe": {
+      "error": "Sentry diagnostics are disabled",
+      "ok": false
+    }
+  },
+  "final_runtime": {
+    "diagnostics": {
+      "detailed": false,
+      "diagnostic_limit": 120,
+      "enabled": false,
+      "environment": "development",
+      "frontend_errors": 0,
+      "heartbeats": 3,
+      "journal": {
+        "capacity": 64,
+        "enabled": false,
+        "failures": 0,
+        "writes": 0
+      },
+      "logs": false,
+      "operations": 8,
+      "release_health": false,
+      "revision": "02cefc78e203",
+      "traces_sample_rate": 0.0,
+      "watchdog": {
+        "stall_threshold_ms": 12000,
+        "startup_grace_ms": 30000
+      }
+    },
+    "instance": "dev-d715a196521bf7c65b1aaa05",
+    "ok": true,
+    "privacy": {
+      "notice_ready": true,
+      "sharing_allowed": false,
+      "terms_accepted": true
+    }
+  },
+  "main_consent_unchanged": true,
+  "final_loopback_receiver_counts": {
+    "requests": 32,
+    "bytes": 246644
+  },
+  "test_app_stopped": true,
+  "test_http_receiver_stopped": true
+}

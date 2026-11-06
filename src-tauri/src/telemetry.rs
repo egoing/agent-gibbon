@@ -1,4 +1,4 @@
-//! One allowlisted egress for errors, traces, logs and release health. Never accept content.
+//! One allowlisted egress for errors, traces and logs. Sessions stay disabled.
 mod journal;
 mod privacy;
 mod transport;
@@ -185,7 +185,8 @@ fn options(dsn: sentry::types::Dsn, detailed: bool) -> sentry::ClientOptions {
         attach_stacktrace: true,
         in_app_include: vec!["agent_gibbon"],
         enable_logs: detailed,
-        auto_session_tracking: detailed,
+        // Release Health stays off until its aggregate retention is confirmed.
+        auto_session_tracking: false,
         max_breadcrumbs: 40,
         traces_sampler: Some(Arc::new(move |ctx| {
             if !detailed {
@@ -420,7 +421,7 @@ pub fn telemetry_status() -> Value {
     status()
 }
 pub fn status() -> Value {
-    json!({"enabled":enabled(),"detailed":detailed(),"environment":if cfg!(debug_assertions){"development"}else{"production"},"traces_sample_rate":if detailed(){sample_rate()}else{0.0},"logs":detailed(),"release_health":detailed(),"revision":env!("AGENT_GIBBON_BUILD_REVISION"),"operations":OPERATIONS.load(Ordering::Relaxed),"heartbeats":HEARTBEATS.load(Ordering::Relaxed),"frontend_errors":ERRORS.load(Ordering::Relaxed),"diagnostic_limit":MAX_DIAGNOSTICS,"watchdog":watchdog::status(),"journal":journal::status()})
+    json!({"enabled":enabled(),"detailed":detailed(),"environment":if cfg!(debug_assertions){"development"}else{"production"},"traces_sample_rate":if detailed(){sample_rate()}else{0.0},"logs":detailed(),"release_health":false,"revision":env!("AGENT_GIBBON_BUILD_REVISION"),"operations":OPERATIONS.load(Ordering::Relaxed),"heartbeats":HEARTBEATS.load(Ordering::Relaxed),"frontend_errors":ERRORS.load(Ordering::Relaxed),"diagnostic_limit":MAX_DIAGNOSTICS,"watchdog":watchdog::status(),"journal":journal::status()})
 }
 #[tauri::command]
 pub fn telemetry_heartbeat(

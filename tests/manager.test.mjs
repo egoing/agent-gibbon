@@ -7,7 +7,7 @@ function setup() {
   const elements = new Map();
   const make = () => ({ hidden: false, children: [], dataset: {}, parentElement: { scrollTop: 0 }, setAttribute(k,v) { this[k] = v; }, append(x) { this.children.push(x); }, replaceChildren() { this.children = []; this.textContent = ''; }, addEventListener() {}, focus() {} });
   for (const id of ['notes-page','settings-page','notes-nav','settings-nav','retry','refresh','detail','list','error']) elements.set(id, make());
-  let data = [{id:'hidden',title:'숨긴 메모',html:'<p>내용</p>',capture:null}];
+  let data = [{id:'hidden',title:'숨긴 메모',html:'<h1>숨긴 메모</h1><p>내용</p>',capture:null}];
   const calls = [];
   const context = vm.createContext({document:{getElementById:id=>elements.get(id),createElement:make,hidden:false}, window:{__TAURI__:{core:{invoke:async name=>{ calls.push(name); return data; }}},addEventListener(){}},setInterval(){}});
   vm.runInContext(source,context);
@@ -17,11 +17,13 @@ test('read-only selection, settings navigation and empty result', async () => {
   const app = setup(); await new Promise(setImmediate);
   assert.match(app.elements.get('detail').textContent,/선택/);
   app.elements.get('list').children[0].onclick();
-  assert.equal(app.elements.get('detail').children[0].textContent,'숨긴 메모');
+  assert.equal(app.elements.get('detail').children.length,1);
+  assert.equal(app.elements.get('detail').children[0].innerHTML,'<h1>숨긴 메모</h1><p>내용</p>');
   app.elements.get('settings-nav').onclick();
   assert.equal(app.elements.get('notes-page').hidden,true);
   app.elements.get('notes-nav').onclick(); await new Promise(setImmediate);
-  assert.equal(app.elements.get('detail').children[0].textContent,'숨긴 메모');
+  assert.equal(app.elements.get('detail').children.length,1);
+  assert.equal(app.elements.get('detail').children[0].innerHTML,'<h1>숨긴 메모</h1><p>내용</p>');
   assert.deepEqual([...new Set(app.calls)],['manager_notes']);
   app.setData([]); await app.run('refresh(true)');
   assert.match(app.elements.get('detail').textContent,/없습니다/);

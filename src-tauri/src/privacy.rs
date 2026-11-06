@@ -272,6 +272,12 @@ mod tests {
         assert_eq!(c.decided_at, 1);
     }
     #[test]
+    fn published_notice_enables_choice_without_granting_consent() {
+        assert!(notice_ready());
+        assert!(!Choice::default().current());
+        assert!(!Choice::default().sharing);
+    }
+    #[test]
     fn unfinished_notice_cannot_enable_sharing() {
         let d: Deployment = serde_json::from_str(r#"{"operator":null,"privacy_contact":null,"recipient":"Sentry","storage_region":null,"retention_days":null}"#).unwrap();
         assert!(!d.ready());

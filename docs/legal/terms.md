@@ -1,8 +1,8 @@
 # Agent Gibbon 이용약관 — 초안
 
-버전: 2026-11-06.1
+버전: 2026-11-06.2
 
-이 문서는 Agent Gibbon 프로젝트 관리자가 제공하는 데스크톱 앱의 최소 이용 조건 초안입니다. 운영자의 정식 이름과 개인정보 문의 창구는 아직 미정입니다. 정식 배포 전에 확정하며, 현재 문의는 프로젝트 저장소의 Issues를 이용할 수 있습니다. 공개 문의에는 메모 원문·명령·계정 정보·기타 개인정보를 올리지 마세요.
+이 문서는 egoing이 제공하는 Agent Gibbon 데스크톱 앱의 최소 이용 조건 초안입니다. 운영자는 egoing이며 개인정보 문의는 egoing+support@gmail.com으로 보낼 수 있습니다. 일반적인 프로젝트 문의는 저장소의 Issues도 이용할 수 있습니다. 공개 문의에는 메모 원문·명령·계정 정보·기타 개인정보를 올리지 마세요.
 
 ## 1. 앱의 제공 범위
 
@@ -29,4 +29,5 @@ Agent Gibbon은 기기에 메모·이미지·터미널 창을 표시하고 로�
 사용자는 앱을 종료하거나 삭제해 이용을 중단할 수 있습니다. 삭제가 로컬 자료나 이미 전송한 진단 자료를 자동 삭제한다는 뜻은 아닙니다. 중요한 이용 조건이나 진단 목적·항목이 바뀌면 앱에서 새 내용을 제시하고 필요한 동의를 다시 받습니다. 서비스 개선 전송 동의는 Settings → Privacy & Diagnostics에서 언제든 철회할 수 있습니다.
 
 프로젝트: https://github.com/egoing/agent-gibbon
-문의(임시): https://github.com/egoing/agent-gibbon/issues
+개인정보 문의: egoing+support@gmail.com
+일반 프로젝트 문의: https://github.com/egoing/agent-gibbon/issues
