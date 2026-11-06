@@ -126,6 +126,9 @@ async fn lifecycle(
 }
 
 pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
+    if !crate::privacy::accepted(app) {
+        return;
+    }
     trace("trigger");
     if LAUNCH_QUEUED.swap(true, Ordering::AcqRel) {
         return;

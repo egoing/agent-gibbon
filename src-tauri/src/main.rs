@@ -13,6 +13,7 @@ mod model;
 #[cfg(target_os = "macos")]
 mod opacity;
 mod placement;
+mod privacy;
 mod sizing;
 mod source;
 mod stash;
@@ -283,8 +284,16 @@ fn apply_with_presentation(
     presentation: entrance::Presentation,
 ) -> Result<Value, String> {
     request.validate()?;
+    if !privacy::accepted(app) && !matches!(request.action, Action::Diagnostics | Action::Probe) {
+        manager::open(app)?;
+        return Ok(
+            json!({"ok":false,"onboarding_required":true,"error":"Review the Terms of Use in the manager; sharing is optional","instance":instance::current().id}),
+        );
+    }
     if matches!(request.action, Action::Diagnostics) {
-        return Ok(json!({"ok":true,"diagnostics":telemetry::status()}));
+        return Ok(
+            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"privacy":{"terms_accepted":privacy::accepted(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
+        );
     }
     if matches!(request.action, Action::Probe) {
         return Ok(telemetry::probe());
@@ -420,8 +429,6 @@ fn apply_with_presentation(
     response
 }
 fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
-    let _sentry = telemetry::init();
-    let startup = telemetry::Timing::new("app.startup");
     let initial_focus = if initial_open {
         focus::Targets::initial()
     } else {
@@ -433,6 +440,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     let app = builder
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
+        .manage(privacy::Privacy::default())
+        .manage(telemetry::Runtime::default())
         .manage(capture::Captures::default())
         .manage(terminal::Terminals::default())
         .manage(ClosedNotes::default())
@@ -450,51 +459,82 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             "main".to_string(),
             Note::default(),
         )])))
-        .invoke_handler(tauri::generate_handler![
-            snapshot,
-            terminal::terminal_start,
-            terminal::terminal_write,
-            terminal::terminal_resize,
-            terminal::terminal_hide,
-            terminal::terminal_info,
-            terminal::welcome::terminal_welcome,
-            terminal::welcome::terminal_folder,
-            terminal::welcome::terminal_rename,
-            terminal::welcome::terminal_close,
-            manager::manager_notes,
-            manager::manager_terminal,
-            manager::manager_image,
-            layout::content_action,
-            feedback_window::present_feedback,
-            feedback_window::feedback_snapshot,
-            feedback_window::layout_feedback,
-            feedback_window::feedback_action,
-            capture::capture_screen,
-            capture::capture_ready,
-            capture::capture_failed,
-            capture::finish_capture,
-            capture::cancel_capture,
-            capture::note_image,
-            capture::copy_note_image,
-            telemetry::report_frontend_error,
-            telemetry::telemetry_status,
-            telemetry::telemetry_heartbeat,
-            entrance::drag_note,
-            hide_note,
-            close_note,
-            toggle_pin,
-            sync_opacity,
-            feedback::acknowledge_feedback,
-            save_note,
-            export::export_note,
-            warp::warp_note,
-            warp::poll_warp,
-            sizing::fit_note,
-            sizing::poll_fold,
-            sizing::toggle_fold,
-            sizing::manual_resize
-        ])
+        .invoke_handler({
+            let handler: Box<dyn Fn(tauri::ipc::Invoke) -> bool + Send + Sync> =
+                Box::new(tauri::generate_handler![
+                    privacy::privacy_status,
+                    privacy::privacy_save,
+                    privacy::privacy_quit,
+                    snapshot,
+                    terminal::terminal_start,
+                    terminal::terminal_write,
+                    terminal::terminal_resize,
+                    terminal::terminal_hide,
+                    terminal::terminal_info,
+                    terminal::welcome::terminal_welcome,
+                    terminal::welcome::terminal_folder,
+                    terminal::welcome::terminal_rename,
+                    terminal::welcome::terminal_close,
+                    manager::manager_notes,
+                    manager::manager_terminal,
+                    manager::manager_image,
+                    layout::content_action,
+                    feedback_window::present_feedback,
+                    feedback_window::feedback_snapshot,
+                    feedback_window::layout_feedback,
+                    feedback_window::feedback_action,
+                    capture::capture_screen,
+                    capture::capture_ready,
+                    capture::capture_failed,
+                    capture::finish_capture,
+                    capture::cancel_capture,
+                    capture::note_image,
+                    capture::copy_note_image,
+                    telemetry::report_frontend_error,
+                    telemetry::telemetry_status,
+                    telemetry::telemetry_heartbeat,
+                    entrance::drag_note,
+                    hide_note,
+                    close_note,
+                    toggle_pin,
+                    sync_opacity,
+                    feedback::acknowledge_feedback,
+                    save_note,
+                    export::export_note,
+                    warp::warp_note,
+                    warp::poll_warp,
+                    sizing::fit_note,
+                    sizing::poll_fold,
+                    sizing::toggle_fold,
+                    sizing::manual_resize
+                ]);
+            move |invoke: tauri::ipc::Invoke| {
+                let command = invoke.message.command();
+                let exempt = matches!(
+                    command,
+                    "privacy_status"
+                        | "privacy_save"
+                        | "privacy_quit"
+                        | "telemetry_status"
+                        | "report_frontend_error"
+                );
+                if !exempt && !privacy::accepted(invoke.message.webview_ref().app_handle()) {
+                    invoke
+                        .resolver
+                        .reject("Review the Terms of Use in the manager first");
+                    true
+                } else {
+                    handler(invoke)
+                }
+            }
+        })
         .on_window_event(|win, event| {
+            if win.label() == manager::LABEL && !privacy::accepted(win.app_handle()) {
+                if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
+                    win.app_handle().exit(0);
+                }
+                return;
+            }
             if win.label().starts_with("terminal-") {
                 if matches!(
                     event,
@@ -566,6 +606,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             }
         })
         .setup(move |app| {
+            privacy::initialize(app.handle())?;
+            let _startup = telemetry::Timing::new("app.startup");
             #[cfg(target_os = "macos")]
             {
                 app.manage(opacity::Fades::default());
@@ -631,6 +673,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 )?;
             }
             telemetry::install(app.handle());
+            if !privacy::accepted(app.handle()) {
+                manager::open(app.handle())?;
+            }
             let handle = app.handle().clone();
             std::thread::spawn(move || {
                 for connection in endpoint.listener.incoming() {
@@ -668,7 +713,6 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         })
         .build(tauri::generate_context!())
         .map_err(|e| e.to_string())?;
-    drop(startup);
     app.run(|_app, _event| {
         if matches!(_event, tauri::RunEvent::Exit) {
             telemetry::shutdown(_app);

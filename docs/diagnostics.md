@@ -4,15 +4,19 @@
 
 ## 실행 모드
 
-| 빌드·실행 조건 | 오류 | 상세 진단 |
-| --- | --- | --- |
-| DSN 없는 소스 빌드 | 꺼짐 | 꺼짐 |
-| 일반 debug 또는 테스트 | 꺼짐 | 꺼짐 |
-| DSN 있는 공식 release | 기존 최소 오류 수집 | 기본 꺼짐 |
-| DSN 포함 빌드 + 명시적 `AGENT_GIBBON_DIAGNOSTICS=1` | 켜짐 | 켜짐 |
-| `AGENT_GIBBON_TELEMETRY=off` | 모두 꺼짐 | 모두 꺼짐 |
+| 조건 | SDK와 외부 전송 |
+| --- | --- |
+| 동의 기록 없음·거부·손상·이전 정책 버전 | 초기화하지 않음, 전송 없음 |
+| 운영자·문의처·지역·보유기간 미확정(현재) | 선택 동의 비활성, 전송 없음 |
+| DSN·개발 진단 플래그만 존재 | 동의를 대체하지 않음, 전송 없음 |
+| 현재 문서에 대한 약관 및 별도 전송 동의 + 확정된 운영 정보 + 유효 DSN | 허용된 진단만 전송; 개발 빌드는 명시적 진단 실행도 필요 |
+| `AGENT_GIBBON_TELEMETRY=off` | 동의가 있어도 모두 차단 |
 
-일반 사용자용 동의 설정 UI는 아직 없다. 설치·실행만으로 상세 진단을 활성화하지 않는다. 진단 모드는 운영자가 실행 환경에서 명시적으로 켜며 이번 세 개발환경 배포도 이 모드다. 수집 끄기는 해당 환경변수를 설정하고 앱을 완전히 재실행해야 적용된다. 이미 전송한 데이터는 이 설정으로 삭제되지 않는다.
+첫 실행의 필수 약관과 선택적 전송을 구분하며 전송은 기본 해제다. [약관·개인정보 초안](legal/README.md)과 관리 창의 Privacy & Diagnostics에서 범위를 확인한다. 정책 해시는 약관·개인정보 안내·운영 정보에 연결돼 문서가 달라지면 과거 동의로 전송하지 않는다. 로컬 동의 파일은 instance별 `privacy/<instance>/consent.json`이며 계정·장치 식별자를 만들지 않는다.
+
+SDK 초기화 전과 최종 HTTP 요청 직전에 동의를 확인한다. 전송 큐는 최대 64개 envelope, 각 직렬화 payload는 최대 512KiB이고 HTTP 요청 제한 시간은 3초다. 철회는 새 요청을 차단하고 이미 시작한 요청의 종료를 기다린 뒤 완료되며, 이전 동의 세대의 queue/log/session은 다시 동의해도 재전송되지 않는다. SDK 종료 시 flush도 이 경계를 우회하지 않는다. 과거 서버 데이터와 로컬 자료는 자동 삭제되지 않는다.
+
+현재 `src-tauri/src/privacy/notice.json`의 운영 정보가 미정이므로 아래 개발 명령을 실행해도 전송은 활성화되지 않는다. 재시작 없이 설정에서 철회할 수 있고, 진단 모드 변경 이벤트는 프런트 측정 타이머와 관찰자도 정리한다.
 
 자신의 Sentry 프로젝트를 쓰는 공헌자는 `AGENT_GIBBON_SENTRY_DSN`을 **빌드 프로세스의 환경변수**로 제공하고 다음 명령을 실행한다. `.env`는 자동으로 읽지 않는다.
 
@@ -75,6 +79,6 @@ WebView 측정은 기존 2초 집계 경로로만 보내며, 상세 모드가 �
 
 Actions의 `AGENT_GIBBON_SENTRY_DSN` secret/variable을 공식 release 빌드에서만 주입한다. 기본 수집 모드와 자세한 공지 내용은 [README](../README.md)의 Sentry 절을 따른다. 이번 변경은 공개 버전 태그나 설치 앱 자동 업데이트를 수행하지 않는다.
 
-검증은 네트워크 없는 오류/trace/log/session 필터·모드 경계·watchdog 상태 검사와 실제 앱에서 명시적인 probe 수신 검사를 구분한다. 실제 수신 결과는 [검증 기록](verification/sentry-observability-20261106.md)에 남긴다.
+현재 동의·철회·loopback 전송 경계와 macOS 무전송 검증은 [동의 검증 기록](verification/privacy-consent-20261106.md)을 따른다. [이전 Sentry 수신 검증](verification/sentry-observability-20261106.md)은 동의 정책 변경 전의 기록이며, 현재 초안 빌드의 실제 전송 근거로 사용하지 않는다.
 
 공식 근거: [Sentry Rust SDK](https://docs.rs/sentry/0.42.0/sentry/), [ClientOptions](https://docs.rs/sentry-core/0.42.0/sentry_core/struct.ClientOptions.html), [Sentry envelope](https://develop.sentry.dev/sdk/envelopes/), [Sentry spans 조회](https://docs.sentry.io/api/explore/query-explore-events-in-table-format/).

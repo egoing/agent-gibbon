@@ -5,18 +5,19 @@ import { readFileSync } from 'node:fs';
 const source=readFileSync(new URL('../ui/telemetry.js',import.meta.url),'utf8');
 const tick=()=>new Promise(r=>setImmediate(r));
 function setup(enabled=true){
- const listeners={},calls=[],timers=[],observers=[];let time=0,fail=false,pending=false;
+ const listeners={},native={},calls=[],timers=[],observers=[];let time=0,fail=false,pending=false;
  class Observer{static supportedEntryTypes=['longtask','long-animation-frame'];constructor(fn){this.fn=fn;observers.push(this);}observe(){}}
  const window={document:{visibilityState:'visible'},performance:{now:()=>time},PerformanceObserver:Observer,
   requestAnimationFrame:fn=>fn(),setInterval:(fn,ms)=>{timers.push({fn,ms});},addEventListener:(kind,fn)=>{listeners[kind]=fn;},
-  __TAURI__:{core:{invoke:(command,args)=>{calls.push({command,args});if(command==='telemetry_status')return Promise.resolve({enabled,detailed:enabled});if(command==='telemetry_heartbeat'&&pending)return new Promise(()=>{});if(fail)return Promise.reject(Error('private error'));return Promise.resolve('value');}}}};
+  __TAURI__:{event:{listen:async(kind,fn)=>{native[kind]=fn;return()=>{};}},core:{invoke:(command,args)=>{calls.push({command,args});if(command==='telemetry_status')return Promise.resolve({enabled,detailed:enabled});if(command==='telemetry_heartbeat'&&pending)return new Promise(()=>{});if(fail)return Promise.reject(Error('private error'));return Promise.resolve('value');}}}};
  Object.freeze(window.__TAURI__.core);
  vm.runInNewContext(source,{window,Map,Number});
- return{window,calls,timers,listeners,observers,setTime:n=>{time=n;},fail:()=>{fail=true;},pending:()=>{pending=true;}};
+ return{window,calls,timers,listeners,native,observers,setTime:n=>{time=n;},fail:()=>{fail=true;},pending:()=>{pending=true;}};
 }
 test('fixed error kinds exclude message/reason; disabled diagnostics install no timers',async()=>{
  const s=setup(false);await tick();s.listeners.error({message:'PRIVATE_NOTE'});s.listeners.unhandledrejection({reason:'PRIVATE_PATH'});await tick();
- assert.deepEqual(s.calls.map(c=>c.command),['telemetry_status','report_frontend_error','report_frontend_error']);assert(!JSON.stringify(s.calls).includes('PRIVATE'));assert.equal(s.timers.length,0);
+ assert.deepEqual(s.calls.map(c=>c.command),['telemetry_status']);assert(!JSON.stringify(s.calls).includes('PRIVATE'));assert.equal(s.timers.length,0);
+ const allowed=setup();await tick();allowed.calls.length=0;allowed.listeners.error({message:'PRIVATE_NOTE'});allowed.listeners.unhandledrejection({reason:'PRIVATE_PATH'});await tick();assert.equal(allowed.calls.filter(c=>c.command==='report_frontend_error').length,2);assert(!JSON.stringify(allowed.calls).includes('PRIVATE'));
 });
 test('invoke instrumentation preserves values/rejections but never serializes arguments or errors',async()=>{
  const s=setup();await tick();const invoke=s.window.gibbonInvoke;s.calls.length=0;
@@ -45,4 +46,13 @@ test('explicit terminal stages accept only fixed names and finite visible durati
  const report=s.calls.find(c=>c.command==='telemetry_heartbeat');
  assert.equal(report.args.measurements.length,1);assert.equal(report.args.measurements[0].op,'terminal.ui.ready');
  assert(!JSON.stringify(report).includes('PRIVATE'));
+});
+
+test('withdrawal clears pending samples and old callbacks cannot replay after re-opt-in',async()=>{
+ const s=setup();await tick();const old=s.window.gibbonMeasure;old('terminal.ui.ready',111);
+ s.native['privacy-changed']({payload:{detailed:false}});assert.equal(s.window.gibbonMeasure,undefined);
+ s.calls.length=0;for(const t of s.timers)t.fn();await tick();assert.equal(s.calls.some(c=>c.command==='telemetry_heartbeat'),false);
+ s.native['privacy-changed']({payload:{detailed:true}});await tick();s.calls.length=0;
+ old('terminal.ui.ready',111);s.window.gibbonMeasure('terminal.ui.ready',222);s.timers.at(-1).fn();await tick();
+ const report=s.calls.find(c=>c.command==='telemetry_heartbeat');assert.equal(report.args.measurements.length,1);assert.equal(report.args.measurements[0].duration_ms,222);
 });

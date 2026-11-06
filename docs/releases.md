@@ -47,3 +47,7 @@ OS·CPU·대상 triple·Rust 도구 버전·Cargo 매니페스트와 lockfile �
 캐시는 GitHub의 브랜치 접근 범위를 따릅니다. 다른 브랜치의 캐시를 항상 쓸 수 있는 것은 아니며, 기본 브랜치에서 생성한 캐시는 후속 브랜치·태그 실행이 재사용할 수 있습니다. 캐시 삭제·용량 제한·도구나 의존성 변경으로 다시 생성될 수 있습니다. 인증 정보·환경 파일·서명 키는 캐시 대상으로 추가하지 않습니다.
 
 참고: [Rust cache 공식 설명](https://github.com/Swatinem/rust-cache), [GitHub Actions 캐시 접근 범위](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#restrictions-for-accessing-a-cache).
+
+## 첫 실행 동의와 운영 정보
+
+DSN이 있는 공식 빌드도 현재 정책에 대한 별도 전송 동의가 없으면 SDK를 초기화하지 않는다. 운영자·연락처·저장 지역·보유기간이 미정인 현재 초안은 `src-tauri/src/privacy/notice.json`의 readiness 검사로 전송을 막는다. 정식 운영 정보와 개인정보 안내를 함께 확정하고 서버의 보유기간·IP 설정을 실제로 확인한 뒤 새 정책 버전으로 동의를 받아야 한다. 약관 동의만으로 진단 전송을 허용하지 않는다.

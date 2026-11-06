@@ -120,6 +120,14 @@ pub fn status() -> Value {
     json!({"stall_threshold_ms":STALL.as_millis(),"startup_grace_ms":GRACE.as_millis()})
 }
 pub fn install(app: &tauri::AppHandle) {
+    if let Some(w) = app.try_state::<Watchdog>() {
+        if let Ok(mut s) = w.state.lock() {
+            s.native = Instant::now();
+            s.native_reported = false;
+            s.views.clear();
+        }
+        return;
+    }
     let w = Watchdog::default();
     let state = w.state.clone();
     let stop = w.stop.clone();
@@ -134,6 +142,14 @@ pub fn install(app: &tauri::AppHandle) {
             // Machine sleep / suspended process is not a UI freeze.
             let resumed = now.duration_since(previous) > Duration::from_secs(8);
             previous = now;
+            if !detailed() {
+                if let Ok(mut s) = state.lock() {
+                    s.native = now;
+                    s.native_reported = false;
+                    s.views.clear();
+                }
+                continue;
+            }
             if let Ok(mut s) = state.lock() {
                 if resumed {
                     s.native = now;
@@ -157,6 +173,10 @@ pub fn install(app: &tauri::AppHandle) {
             let target = app.clone();
             if app
                 .run_on_main_thread(move || {
+                    if !detailed() {
+                        pending_done.store(false, Ordering::Relaxed);
+                        return;
+                    }
                     let now = Instant::now();
                     let windows = target.webview_windows();
                     if let Ok(mut s) = state.lock() {

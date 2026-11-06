@@ -1,6 +1,6 @@
 //! SDK event hooks do not cover transactions. Filter *every* envelope at egress.
 use super::*;
-use sentry::{Envelope, Transport, TransportFactory};
+use sentry::Envelope;
 
 fn safe_tags(tags: &mut p::Map<String, String>) {
     tags.retain(|k, v| match k.as_str() {
@@ -207,26 +207,4 @@ pub fn envelope(input: Envelope) -> Envelope {
     }
     out
 }
-pub struct Factory;
-impl TransportFactory for Factory {
-    fn create_transport(&self, opts: &sentry::ClientOptions) -> Arc<dyn Transport> {
-        Arc::new(PrivateTransport(
-            sentry::transports::DefaultTransportFactory.create_transport(opts),
-        ))
-    }
-}
-struct PrivateTransport(Arc<dyn Transport>);
-impl Transport for PrivateTransport {
-    fn send_envelope(&self, e: Envelope) {
-        let e = envelope(e);
-        if e.items().next().is_some() {
-            self.0.send_envelope(e);
-        }
-    }
-    fn flush(&self, d: Duration) -> bool {
-        self.0.flush(d)
-    }
-    fn shutdown(&self, d: Duration) -> bool {
-        self.0.shutdown(d)
-    }
-}
+pub use super::transport::Factory;

@@ -1,6 +1,30 @@
 <!doctype html>
-<html lang="ko"><head><script src="telemetry.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>메모 관리</title><link rel="stylesheet" href="manager.css"><script src="manager.js" defer></script></head>
+<html lang="ko"><head><script src="telemetry.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>메모 관리</title><link rel="stylesheet" href="manager.css"><script src="privacy.js" defer></script><script src="manager.js" defer></script></head>
 <body><header><strong>Agent Gibbon</strong><nav aria-label="관리 탐색"><button id="notes-nav" aria-pressed="true">모든 메모</button><button id="settings-nav" aria-pressed="false">설정</button></nav></header>
 <div id="error" role="alert" hidden>메모를 읽지 못했습니다. <button id="retry">다시 시도</button></div>
-<main id="notes-page"><aside aria-label="메모 목록"><div class="list-heading"><h2>모든 메모</h2><button id="refresh" aria-label="메모 목록 새로고침">새로고침</button></div><div id="list"></div></aside><section id="detail" aria-label="메모 상세" tabindex="0"><p>메모를 선택하세요.</p></section></main>
-<section id="settings-page" hidden><h1>설정</h1><p>아직 설정 항목이 없습니다.</p></section></body></html>
+<main id="notes-page" hidden><aside aria-label="메모 목록"><div class="list-heading"><h2>모든 메모</h2><button id="refresh" aria-label="메모 목록 새로고침">새로고침</button></div><div id="list"></div></aside><section id="detail" aria-label="메모 상세" tabindex="0"><p>메모를 선택하세요.</p></section></main>
+<section id="settings-page" hidden><h1>Settings</h1><div class="privacy-card privacy-settings"><h2>Privacy &amp; Diagnostics</h2><p>Your choice is stored locally.</p>
+<div class="privacy-box"><label class="privacy-choice"><input id="privacy-setting-share" type="checkbox" disabled> Service improvement sharing</label><p id="privacy-sharing-status" role="status">Not sharing</p><p>Sanitized errors, app/OS versions, operation timings and freeze diagnostics.</p><p>No notes, terminal input/output, clipboard or screenshots.</p></div>
+<p>Turning this off saves withdrawal immediately. Turning it on requires Save Changes. A request already started before withdrawal may finish. Previously uploaded information is handled separately.</p>
+<p id="privacy-settings-draft" class="privacy-notice">Draft configuration: sharing is unavailable until operator, storage region and retention details are published.</p>
+<div class="privacy-links"><button id="privacy-settings-terms" type="button">Read Terms</button><button id="privacy-settings-notice" type="button">Privacy Notice</button></div>
+<div class="privacy-actions"><span id="privacy-save-result" role="status"></span><button id="privacy-save" type="button" disabled>Save Changes</button></div></div></section>
+<section id="privacy-welcome" aria-labelledby="privacy-welcome-title">
+  <div class="privacy-card">
+    <h1 id="privacy-welcome-title">Welcome to Agent Gibbon</h1><h2>Terms &amp; Privacy</h2>
+    <p>Nothing is sent until you choose.</p>
+    <div class="privacy-box"><h3>Terms of Use</h3><p>Local desktop app. Your content stays on your device.</p><button id="privacy-read-terms" type="button">Read Terms</button></div>
+    <label class="privacy-choice"><input id="privacy-terms" type="checkbox" aria-required="true" disabled> I agree to the Terms of Use <span>(required)</span></label>
+    <div class="privacy-box"><h3>Service improvement diagnostics</h3>
+      <label class="privacy-choice"><input id="privacy-share" type="checkbox" disabled> Share diagnostics <span>(optional)</span></label>
+      <p>Includes sanitized errors, app/OS versions, operation timings and freeze diagnostics.</p>
+      <p>Excludes notes, terminal input/output, clipboard and screenshots.</p><button id="privacy-read-notice" type="button">Privacy Notice</button></div>
+    <p id="privacy-draft" class="privacy-notice">Draft: operator, storage region and retention details are not final. Sharing is unavailable until these details are published.</p>
+    <p>You can use every feature without sharing diagnostics.</p>
+    <div class="privacy-actions"><button id="privacy-exit" type="button">Exit</button><button id="privacy-continue" type="button" disabled>Continue</button></div>
+  </div>
+</section>
+<div id="privacy-error" role="alert" hidden></div><button id="privacy-retry" type="button" hidden>Reload privacy choices</button>
+<p id="privacy-storage-warning" role="status" hidden>Local choices could not be read. Review the current terms; sharing remains off.</p>
+<section id="privacy-document" class="privacy-document" aria-labelledby="privacy-document-title" tabindex="-1" hidden><div class="privacy-document-heading"><h2 id="privacy-document-title"></h2><button id="privacy-document-close" type="button">Close document</button></div><article id="privacy-document-content"></article></section>
+</body></html>

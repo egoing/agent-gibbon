@@ -6,7 +6,7 @@ use std::{
     io::Write,
     sync::{atomic::AtomicU64, mpsc, OnceLock},
 };
-static SENDER: OnceLock<mpsc::SyncSender<Value>> = OnceLock::new();
+static SENDER: OnceLock<mpsc::SyncSender<(u64, Value)>> = OnceLock::new();
 static WRITES: AtomicU64 = AtomicU64::new(0);
 static FAILURES: AtomicU64 = AtomicU64::new(0);
 const LIMIT: usize = 64;
@@ -23,7 +23,7 @@ pub fn start(app: &tauri::AppHandle) {
                 .unwrap_or("installed"),
         )
         .join("recent.json");
-    let (sender, receiver) = mpsc::sync_channel(32);
+    let (sender, receiver) = mpsc::sync_channel::<(u64, Value)>(32);
     if SENDER.set(sender).is_err() {
         return;
     }
@@ -34,7 +34,10 @@ pub fn start(app: &tauri::AppHandle) {
             .unwrap_or_default();
         // Never preserve unknown or manually injected history fields.
         history.retain(valid);
-        while let Ok(value) = receiver.recv() {
+        while let Ok((epoch, value)) = receiver.recv() {
+            if !detailed() || super::transport::epoch() != Some(epoch) {
+                continue;
+            }
             history.push_back(value);
             while history.len() > LIMIT {
                 history.pop_front();
@@ -83,16 +86,16 @@ fn write(path: &std::path::Path, history: &VecDeque<Value>) -> std::io::Result<(
 }
 pub fn record(message: &str, kind: &str, elapsed_ms: f64) {
     let v = json!({"message":message,"kind":kind,"duration_ms":elapsed_ms.min(600_000.),"timestamp":SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap_or_default().as_secs(),"build":env!("AGENT_GIBBON_BUILD_REVISION")});
-    if valid(&v) {
-        if let Some(s) = SENDER.get() {
-            if s.try_send(v).is_err() {
+    if valid(&v) && detailed() {
+        if let (Some(s), Some(epoch)) = (SENDER.get(), super::transport::epoch()) {
+            if s.try_send((epoch, v)).is_err() {
                 FAILURES.fetch_add(1, Ordering::Relaxed);
             }
         }
     }
 }
 pub fn status() -> Value {
-    json!({"enabled":SENDER.get().is_some(),"capacity":LIMIT,"writes":WRITES.load(Ordering::Relaxed),"failures":FAILURES.load(Ordering::Relaxed)})
+    json!({"enabled":detailed() && SENDER.get().is_some(),"capacity":LIMIT,"writes":WRITES.load(Ordering::Relaxed),"failures":FAILURES.load(Ordering::Relaxed)})
 }
 #[cfg(test)]
 mod tests {

@@ -9,7 +9,7 @@ fn transmission_requires_embedded_dsn_and_explicit_development_opt_in() {
     assert!(dsn(false, false, false, embedded).is_some());
     assert!(dsn(false, false, true, None).is_none());
     assert!(dsn(false, false, true, Some("not a dsn")).is_none());
-    assert!(init().is_none());
+    assert!(init(false).is_none());
 }
 #[test]
 fn rejects_unknown_and_nonfinite_frontend_measurements() {

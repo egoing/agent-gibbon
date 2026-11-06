@@ -1,0 +1,6 @@
+{
+  "identifier": "privacy-events",
+  "description": "Receive local diagnostic consent changes without granting clipboard or window control permissions.",
+  "windows": ["manager", "main", "note-*", "terminal-*", "agent-*", "capture-*", "feedback-*", "stash-indicator"],
+  "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
+}

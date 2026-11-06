@@ -1,6 +1,7 @@
 //! One allowlisted egress for errors, traces, logs and release health. Never accept content.
 mod journal;
 mod privacy;
+mod transport;
 mod watchdog;
 
 use sentry::{protocol as p, TransactionOrSpan};
@@ -14,7 +15,7 @@ use std::{
     },
     time::{Duration, Instant, SystemTime},
 };
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 
 static ENABLED: AtomicBool = AtomicBool::new(false);
 static DETAILED: AtomicBool = AtomicBool::new(false);
@@ -215,7 +216,10 @@ fn options(dsn: sentry::types::Dsn, detailed: bool) -> sentry::ClientOptions {
         ..Default::default()
     }
 }
-pub fn init() -> Option<sentry::ClientInitGuard> {
+pub fn init(consented: bool) -> Option<sentry::ClientInitGuard> {
+    if !consented {
+        return None;
+    }
     if std::env::var("AGENT_GIBBON_TELEMETRY").as_deref() == Ok("off") {
         return None;
     }
@@ -225,22 +229,58 @@ pub fn init() -> Option<sentry::ClientInitGuard> {
         diagnostic_mode(),
         option_env!("AGENT_GIBBON_SENTRY_DSN"),
     )?;
-    let guard = sentry::init(options(
-        dsn,
-        std::env::var("AGENT_GIBBON_DIAGNOSTICS").as_deref() == Ok("1"),
-    ));
+    let guard = sentry::Hub::run(sentry::Hub::main(), || sentry::init(options(dsn, true)));
     ENABLED.store(true, Ordering::Relaxed);
-    DETAILED.store(
-        std::env::var("AGENT_GIBBON_DIAGNOSTICS").as_deref() == Ok("1"),
-        Ordering::Relaxed,
-    );
-    sentry::configure_scope(|s| {
-        s.set_tag("app.arch", std::env::consts::ARCH);
-        s.set_tag("app.os", std::env::consts::OS);
-        s.set_tag("app.build", env!("AGENT_GIBBON_BUILD_REVISION"));
+    DETAILED.store(true, Ordering::Relaxed);
+    sentry::Hub::run(sentry::Hub::main(), || {
+        sentry::configure_scope(|s| {
+            s.set_tag("app.arch", std::env::consts::ARCH);
+            s.set_tag("app.os", std::env::consts::OS);
+            s.set_tag("app.build", env!("AGENT_GIBBON_BUILD_REVISION"));
+        })
     });
     log("app.ready", 0.0);
     Some(guard)
+}
+#[derive(Default)]
+pub struct Runtime(std::sync::Mutex<Option<sentry::ClientInitGuard>>);
+pub fn revoke(app: &tauri::AppHandle) {
+    ENABLED.store(false, Ordering::SeqCst);
+    DETAILED.store(false, Ordering::SeqCst);
+    transport::permit(false);
+    let old = app
+        .state::<Runtime>()
+        .0
+        .lock()
+        .unwrap_or_else(|e| e.into_inner())
+        .take();
+    sentry::Hub::main().bind_client(None);
+    drop(old);
+    let _ = app.emit("privacy-changed", status());
+}
+pub fn refresh(app: &tauri::AppHandle) {
+    let allowed = crate::privacy::sharing(app)
+        && std::env::var("AGENT_GIBBON_TELEMETRY").as_deref() != Ok("off");
+    if !allowed {
+        revoke(app);
+        return;
+    }
+    let runtime = app.state::<Runtime>();
+    let mut guard = runtime.0.lock().unwrap_or_else(|e| e.into_inner());
+    if guard.is_none() {
+        transport::permit(true);
+        *guard = init(true);
+        if guard.is_none() {
+            transport::permit(false);
+        }
+    }
+    drop(guard);
+    install(app);
+}
+fn bind_client() {
+    if enabled() {
+        sentry::Hub::current().bind_client(sentry::Hub::main().client());
+    }
 }
 pub fn enabled() -> bool {
     ENABLED.load(Ordering::Relaxed)
@@ -259,6 +299,7 @@ pub struct Timing {
 impl Timing {
     pub fn new(op: &'static str) -> Self {
         let span = (detailed() && allowed(op)).then(|| {
+            bind_client();
             let span = PARENTS
                 .with(|p| {
                     p.borrow()
@@ -305,6 +346,7 @@ fn log(op: &str, ms: f64) {
         return;
     }
     DIAGNOSTICS.fetch_add(1, Ordering::Relaxed);
+    bind_client();
     sentry::Hub::current().capture_log(p::Log {
         level: p::LogLevel::Info,
         body: "Agent Gibbon operation".into(),
@@ -341,6 +383,7 @@ pub fn diagnostic(message: &'static str, kind: &'static str, elapsed_ms: f64) {
     if !take_budget(2) {
         return;
     }
+    bind_client();
     sentry::with_scope(
         |s| {
             s.set_tag("window.kind", kind);
@@ -425,6 +468,7 @@ const SOURCES: &[&str] = &[
     "terminal-ime.js",
     "toolbar.js",
     "manager.js",
+    "privacy.js",
     "feedback.js",
     "capture.js",
     "stash.js",
@@ -470,6 +514,7 @@ pub fn report_frontend_error(
         }),
         ..Default::default()
     });
+    bind_client();
     sentry::capture_event(event);
 }
 
@@ -480,6 +525,7 @@ pub fn probe() -> Value {
     if !take_budget(3) {
         return json!({"ok":false,"error":"Diagnostic probe rate limited"});
     }
+    bind_client();
     let t = Timing::new("diagnostic.probe");
     log("diagnostic.probe", 0.0);
     let event = sentry::capture_message("Agent Gibbon diagnostic probe", sentry::Level::Info);

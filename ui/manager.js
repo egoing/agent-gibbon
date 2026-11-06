@@ -3,11 +3,13 @@ const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const el = id => document.getElementById(id);
 let notes = [], selected = null, busy = false, detailVersion = 0, signature = '';
 function page(settings) {
+  if(window.gibbonPrivacy && !window.gibbonPrivacy.accepted()){window.gibbonPrivacy.showWelcome();return;}
   el('notes-page').hidden = settings;
   el('settings-page').hidden = !settings;
   el('notes-nav').setAttribute('aria-pressed', String(!settings));
   el('settings-nav').setAttribute('aria-pressed', String(settings));
   if (!settings) refresh();
+  else window.gibbonPrivacy?.refresh().catch(()=>{});
 }
 el('notes-nav').onclick = () => page(false);
 el('settings-nav').onclick = () => page(true);
@@ -49,6 +51,7 @@ function render() {
   list.parentElement.scrollTop = scroll;
 }
 async function refresh(force = false) {
+  if(window.gibbonPrivacy && !window.gibbonPrivacy.accepted())return;
   if (busy) return;
   busy = true;
   try {
@@ -66,4 +69,7 @@ async function refresh(force = false) {
 el('detail').addEventListener('click', event => { if (event.target.closest('a')) event.preventDefault(); });
 window.addEventListener('focus', () => refresh());
 setInterval(() => { if (!document.hidden && !el('notes-page').hidden) refresh(); }, 2000);
-refresh();
+if(window.gibbonPrivacy){
+  window.gibbonPrivacy.onAccepted=()=>page(false);
+  window.gibbonPrivacy.ready.then(()=>{if(window.gibbonPrivacy.accepted())page(false);}).catch(()=>{});
+}else refresh();
