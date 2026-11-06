@@ -20,6 +20,8 @@
 
 - 개발 앱은 `npm run dev`로 실행하거나, `npm run dev:build` 후 `./scripts/agent-gibbon-dev open`으로 시작한다. 개발 메모 조회·갱신·숨기기에도 반드시 `scripts/agent-gibbon-dev`를 사용한다. 일반 `scripts/agent-gibbon`은 설치 앱의 기본 통신 경로를 사용하므로 개발 테스트에 대신 사용하지 않는다.
 - 개발 실행기는 워크트리의 실제 절대 경로 해시로 인스턴스 ID를 정하고 Unix socket과 중복 실행 잠금을 분리한다. `npm run dev:info`로 ID와 실행 파일 경로를 확인한다. 환경변수는 실행기가 설정하며, 개발 CLI는 해당 워크트리에서 빌드한 debug 바이너리만 사용한다. 바이너리가 없거나 출처가 다르면 다시 빌드하며 설치본·release로 대체하지 않는다.
+- debug 개발 인스턴스는 약관 확인을 기본 생략한다. 사용자가 약관 흐름 검증을 명시적으로 요청한 경우에만 앱 시작 전에 `AGENT_GIBBON_REQUIRE_TERMS=1`을 지정한다(예: `AGENT_GIBBON_REQUIRE_TERMS=1 npm run dev`). 이미 실행 중인 앱에는 소급 적용되지 않으며 현재 정책의 기존 수락 기록은 유지한다. 설치 앱·기본 인스턴스·release 빌드는 생략 대상이 아니다.
+- 약관 확인 생략은 약관 수락이나 진단 전송 동의가 아니다. 동의 기록을 대신 생성·변경하지 않으며, 명시적인 별도 전송 동의가 없으면 SDK 초기화와 외부 진단 전송을 계속 차단한다. 실제 수락과 생략 여부는 개발 CLI `diagnostics`의 `privacy.terms_accepted`·`terms_skipped`·`onboarding_required`로 구분한다. 구현·검증 범위는 [개발 약관 검증 기록](docs/verification/dev-terms-skip-20261106.md)을 따른다.
 - 기존 설치 앱과 다른 워크트리의 프로세스를 종료하지 않는다. 검증에서 직접 시작한 프로세스만 정확한 바이너리 경로와 PID로 식별해 종료한다. `close`는 메모 숨기기이며 프로세스 종료가 아니다. 사용자 포커스·창 위치·숨김 상태를 보존한다.
 - 같은 메모 ID는 인스턴스별로 독립적이지만 `--file`로 연결한 원본 파일은 공유될 수 있으므로 테스트 파일도 워크트리별로 분리한다.
 - 격리 회귀는 두 워크트리를 각각 빌드한 뒤 `python3 scripts/isolation-smoke.py --peer /다른/워크트리/절대경로`로 확인한다. 두 개발 앱은 실행되지 않은 상태여야 하며 기존 기본 앱은 실행 중이어야 한다. 상세 실행법은 [README](README.md), CLI 사용법은 [로컬 스킬](.agents/skills/agent-gibbon/SKILL.md), 검증 범위와 한계는 [검증 기록](docs/verification.md)을 따른다.

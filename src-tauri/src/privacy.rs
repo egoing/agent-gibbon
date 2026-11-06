@@ -1,4 +1,5 @@
-//! Local, version-bound consent. Missing/corrupt/old choices always fail closed.
+//! Local, version-bound consent. Diagnostic choices always fail closed;
+//! development access can skip the terms gate without granting consent.
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -107,6 +108,23 @@ pub fn accepted(app: &tauri::AppHandle) -> bool {
     app.try_state::<Privacy>()
         .is_some_and(|p| p.0.lock().is_ok_and(|s| s.choice.current()))
 }
+fn skip_terms(
+    debug: bool,
+    development_instance: bool,
+    require_terms: Option<&std::ffi::OsStr>,
+) -> bool {
+    debug && development_instance && require_terms != Some(std::ffi::OsStr::new("1"))
+}
+pub fn terms_skipped() -> bool {
+    skip_terms(
+        cfg!(debug_assertions),
+        crate::instance::current().id.is_some(),
+        std::env::var_os("AGENT_GIBBON_REQUIRE_TERMS").as_deref(),
+    )
+}
+pub fn onboarding_required(app: &tauri::AppHandle) -> bool {
+    !terms_skipped() && !accepted(app)
+}
 pub fn sharing(app: &tauri::AppHandle) -> bool {
     notice_ready()
         && app.try_state::<Privacy>().is_some_and(|p| {
@@ -117,7 +135,7 @@ pub fn sharing(app: &tauri::AppHandle) -> bool {
 pub fn status(app: &tauri::AppHandle) -> Value {
     let p = app.state::<Privacy>();
     let state = p.0.lock().unwrap_or_else(|e| e.into_inner());
-    json!({"terms_accepted":state.choice.current(),"allowed":state.choice.current() && state.choice.sharing && notice_ready(),
+    json!({"terms_accepted":state.choice.current(),"terms_skipped":terms_skipped(),"allowed":state.choice.current() && state.choice.sharing && notice_ready(),
         "sharing":state.choice.current() && state.choice.sharing && notice_ready() && crate::telemetry::enabled(),
         "notice_ready":notice_ready(),"policy":policy(),"load_failed":state.load_failed,
         "terms_html":crate::model::render(TERMS),"notice_html":crate::model::render(NOTICE)})
@@ -276,6 +294,22 @@ mod tests {
         assert!(notice_ready());
         assert!(!Choice::default().current());
         assert!(!Choice::default().sharing);
+    }
+    #[test]
+    fn terms_skip_is_limited_to_debug_development_instances_and_can_be_disabled() {
+        assert!(skip_terms(true, true, None));
+        assert!(!skip_terms(true, true, Some(std::ffi::OsStr::new("1"))));
+        for (debug, development) in [(false, false), (false, true), (true, false)] {
+            assert!(!skip_terms(debug, development, None));
+            assert!(!skip_terms(
+                debug,
+                development,
+                Some(std::ffi::OsStr::new("0"))
+            ));
+        }
+        // Skipping a UI gate does not create a current choice or authorize sharing.
+        let missing = Choice::default();
+        assert!(!missing.current() && !missing.sharing);
     }
     #[test]
     fn unfinished_notice_cannot_enable_sharing() {

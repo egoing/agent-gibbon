@@ -126,7 +126,7 @@ async fn lifecycle(
 }
 
 pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
-    if !crate::privacy::accepted(app) {
+    if crate::privacy::onboarding_required(app) {
         return;
     }
     trace("trigger");

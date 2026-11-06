@@ -1,0 +1,203 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel",
+  "instance": "dev-67cc0e13d61c6b98b34c3f11",
+  "base": "1383a64b8a070adfcf81bad2f4fa055a7b1add47",
+  "fixture": "Legal text only; sharing false; seeded opacity 35%; consent removed after test",
+  "native_pids": [
+    10346,
+    11355
+  ],
+  "cli": {
+    "native-plan": {
+      "ok": true,
+      "instance": "dev-67cc0e13d61c6b98b34c3f11",
+      "id": "opacity71-plan",
+      "opacity": 0.35,
+      "global_opacity": 0.35,
+      "visible": true,
+      "focused": false,
+      "position": {
+        "x": 1786,
+        "y": 1426
+      },
+      "size": {
+        "height": 272,
+        "width": 600
+      },
+      "always_on_top": true,
+      "markdown": "# 전역 투명도 · #71\n- [x] 이슈와 Orca 워크스페이스 생성\n- [x] 전역 휠·설정 저장 구현\n- [x] Rust 136개·UI 81개·Clippy·빌드\n- [ ] 테스트 인스턴스 다중 메모·저장값 복원 확인\n- [ ] 검증 기록·리뷰 준비\n\n테스트 전용 문서·동의 기록 사용 / 진단 전송 꺼짐.",
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행"
+    },
+    "native-peer": {
+      "ok": true,
+      "instance": "dev-67cc0e13d61c6b98b34c3f11",
+      "id": "opacity71-peer",
+      "opacity": 0.35,
+      "global_opacity": 0.35,
+      "visible": true,
+      "focused": false,
+      "position": {
+        "x": 1786,
+        "y": 1602
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      },
+      "always_on_top": true,
+      "markdown": "OPACITY71_PEER_67cc0e13",
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행"
+    },
+    "hidden-before": {
+      "ok": true,
+      "instance": "dev-67cc0e13d61c6b98b34c3f11",
+      "id": "opacity71-peer",
+      "opacity": 0.35,
+      "global_opacity": 0.35,
+      "visible": false,
+      "focused": false,
+      "position": {
+        "x": 3496,
+        "y": 322
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      },
+      "always_on_top": true,
+      "markdown": "OPACITY71_PEER_67cc0e13",
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행"
+    },
+    "hidden-after": {
+      "ok": true,
+      "instance": "dev-67cc0e13d61c6b98b34c3f11",
+      "id": "opacity71-peer",
+      "opacity": 0.35,
+      "global_opacity": 0.35,
+      "visible": false,
+      "focused": false,
+      "position": {
+        "x": 3496,
+        "y": 322
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      },
+      "always_on_top": true,
+      "markdown": "OPACITY71_HIDDEN_UPDATE_67cc0e13",
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행"
+    },
+    "restart-inspect": {
+      "ok": true,
+      "instance": "dev-67cc0e13d61c6b98b34c3f11",
+      "id": "opacity71-peer",
+      "opacity": 0.35,
+      "global_opacity": 0.35,
+      "visible": true,
+      "focused": false,
+      "position": {
+        "x": 1786,
+        "y": 1602
+      },
+      "size": {
+        "height": 96,
+        "width": 600
+      },
+      "always_on_top": true,
+      "markdown": "OPACITY71_HIDDEN_UPDATE_67cc0e13",
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행"
+    },
+    "restart-hidden-plan": {
+      "ok": true,
+      "instance": "dev-67cc0e13d61c6b98b34c3f11",
+      "id": "opacity71-plan",
+      "opacity": 0.35,
+      "global_opacity": 0.35,
+      "visible": false,
+      "focused": false,
+      "position": {
+        "x": 1748,
+        "y": 494
+      },
+      "size": {
+        "height": 480,
+        "width": 600
+      },
+      "always_on_top": true,
+      "markdown": "# 전역 투명도 · #71\n- [x] 이슈와 Orca 워크스페이스 생성\n- [x] 전역 휠·설정 저장 구현\n- [x] Rust 136개·UI 81개·Clippy·빌드\n- [ ] 테스트 인스턴스 다중 메모·저장값 복원 확인\n- [ ] 검증 기록·리뷰 준비\n\n테스트 전용 문서·동의 기록 사용 / 진단 전송 꺼짐.",
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행"
+    }
+  },
+  "native_windows": {
+    "native-windows": [
+      {
+        "kCGWindowOwnerPID": 10346,
+        "kCGWindowNumber": 39169,
+        "kCGWindowName": "Agent Gibbon [DEV global-memo-opacity-wheel · 67cc0e13] — opacity71-peer",
+        "kCGWindowAlpha": 0.3499999940395355,
+        "kCGWindowBounds": {
+          "Height": 48,
+          "Width": 300,
+          "X": 893,
+          "Y": 801
+        },
+        "kCGWindowIsOnscreen": true
+      },
+      {
+        "kCGWindowOwnerPID": 10346,
+        "kCGWindowNumber": 39167,
+        "kCGWindowName": "Agent Gibbon [DEV global-memo-opacity-wheel · 67cc0e13] — opacity71-plan",
+        "kCGWindowAlpha": 0.3499999940395355,
+        "kCGWindowBounds": {
+          "Height": 136,
+          "Width": 300,
+          "X": 1748,
+          "Y": 25
+        },
+        "kCGWindowIsOnscreen": true
+      }
+    ],
+    "restart-windows": [
+      {
+        "kCGWindowOwnerPID": 11355,
+        "kCGWindowNumber": 39179,
+        "kCGWindowName": "Agent Gibbon [DEV global-memo-opacity-wheel · 67cc0e13] — opacity71-peer · Feedback",
+        "kCGWindowAlpha": 0.3499999940395355,
+        "kCGWindowBounds": {
+          "Height": 36,
+          "Width": 104,
+          "X": 1089,
+          "Y": 849
+        },
+        "kCGWindowIsOnscreen": true
+      },
+      {
+        "kCGWindowOwnerPID": 11355,
+        "kCGWindowNumber": 39172,
+        "kCGWindowName": "Agent Gibbon [DEV global-memo-opacity-wheel · 67cc0e13] — opacity71-plan",
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "Height": 240,
+          "Width": 300,
+          "X": 874,
+          "Y": 247
+        },
+        "kCGWindowIsOnscreen": null
+      },
+      {
+        "kCGWindowOwnerPID": 11355,
+        "kCGWindowNumber": 39171,
+        "kCGWindowName": "Agent Gibbon [DEV global-memo-opacity-wheel · 67cc0e13] — opacity71-peer",
+        "kCGWindowAlpha": 0.3499999940395355,
+        "kCGWindowBounds": {
+          "Height": 48,
+          "Width": 300,
+          "X": 893,
+          "Y": 801
+        },
+        "kCGWindowIsOnscreen": true
+      }
+    ]
+  }
+}

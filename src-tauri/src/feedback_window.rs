@@ -348,20 +348,12 @@ pub fn pointer_over(parent: &WebviewWindow) -> bool {
         })
 }
 
-#[cfg(target_os = "macos")]
 pub fn set_opacity(parent: &WebviewWindow, alpha: f64) -> Result<(), String> {
     if let Some(child) = parent
         .app_handle()
         .get_webview_window(&label(parent.label()))
     {
-        let ptr = child.ns_window().map_err(|e| e.to_string())?;
-        // SAFETY: opacity synchronization runs on the main thread; Tauri owns NSWindow.
-        unsafe {
-            let native = &*(ptr as *const objc2_app_kit::NSWindow);
-            if native.alphaValue() != alpha {
-                native.setAlphaValue(alpha);
-            }
-        }
+        crate::opacity::set_native(&child, alpha)?;
     }
     Ok(())
 }

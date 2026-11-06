@@ -11,7 +11,6 @@ mod manager;
 mod layout;
 mod local_trace;
 mod model;
-#[cfg(target_os = "macos")]
 mod opacity;
 mod placement;
 mod privacy;
@@ -66,6 +65,7 @@ fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindo
 // Called only on Tauri's main thread. macOS `show()` makes the window key;
 // ordering it front directly preserves the user's active application.
 fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
+    sync_opacity(win.clone())?;
     if stash::owns(win) {
         return Ok(());
     }
@@ -75,7 +75,6 @@ fn show_without_focus(win: &tauri::WebviewWindow) -> Result<(), String> {
         // SAFETY: Tauri owns this live NSWindow; main-thread callers retain win
         // throughout the synchronous call and never store the borrowed pointer.
         unsafe {
-            sync_opacity(win.clone())?;
             (&*(ptr as *const objc2_app_kit::NSWindow)).orderFrontRegardless();
             focus::restore(win);
         }
@@ -153,6 +152,17 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
         return Ok(1.0);
     }
     let hovered = sync_pointer(&window)?;
+    if let Some(alpha) = opacity::configured(window.app_handle()) {
+        #[cfg(target_os = "macos")]
+        window
+            .state::<opacity::Fades>()
+            .lock()
+            .map_err(|e| e.to_string())?
+            .remove(window.label());
+        opacity::set_native(&window, alpha)?;
+        feedback_window::set_opacity(&window, alpha)?;
+        return Ok(alpha);
+    }
     #[cfg(target_os = "macos")]
     {
         let alpha = if hovered
@@ -220,7 +230,7 @@ fn inspect_window_traced(
     trace.stage(Stage::Opacity);
     let hovered = pointer_over(win)?;
     trace.stage(Stage::Response);
-    let result = json!({"ok":true,"stash":stash::inspect(win.app_handle()),"feedback_surface":surface,"hovered":hovered,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"animating":entrance::active(win),"auto_layout_excluded":layout::excluded(win),"layout_pending":sizing::pending(win),"content_height_cap":sizing::content_height(win),"layout_destination":entrance::destination(win).map(|d|json!({"x":d.position.x,"y":d.position.y,"width":d.size.width,"height":d.size.height})),"visible":visible,"focused":focused,"folded": sizing::folded(win), "always_on_top":pinned,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}});
+    let result = json!({"ok":true,"stash":stash::inspect(win.app_handle()),"feedback_surface":surface,"hovered":hovered,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"global_opacity":opacity::configured(win.app_handle()),"animating":entrance::active(win),"auto_layout_excluded":layout::excluded(win),"layout_pending":sizing::pending(win),"content_height_cap":sizing::content_height(win),"layout_destination":entrance::destination(win).map(|d|json!({"x":d.position.x,"y":d.position.y,"width":d.size.width,"height":d.size.height})),"visible":visible,"focused":focused,"folded": sizing::folded(win), "always_on_top":pinned,"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}});
     trace.complete();
     Ok(result)
 }
@@ -317,7 +327,9 @@ fn apply_with_presentation(
     presentation: entrance::Presentation,
 ) -> Result<Value, String> {
     request.validate()?;
-    if !privacy::accepted(app) && !matches!(request.action, Action::Diagnostics | Action::Probe) {
+    if privacy::onboarding_required(app)
+        && !matches!(request.action, Action::Diagnostics | Action::Probe)
+    {
         manager::open(app)?;
         return Ok(
             json!({"ok":false,"onboarding_required":true,"error":"Review the Terms of Use in the manager; sharing is optional","instance":instance::current().id}),
@@ -325,7 +337,7 @@ fn apply_with_presentation(
     }
     if matches!(request.action, Action::Diagnostics) {
         return Ok(
-            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"privacy":{"terms_accepted":privacy::accepted(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
+            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
         );
     }
     if matches!(request.action, Action::Probe) {
@@ -551,7 +563,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                         | "telemetry_status"
                         | "report_frontend_error"
                 );
-                if !exempt && !privacy::accepted(invoke.message.webview_ref().app_handle()) {
+                if !exempt
+                    && privacy::onboarding_required(invoke.message.webview_ref().app_handle())
+                {
                     invoke
                         .resolver
                         .reject("Review the Terms of Use in the manager first");
@@ -562,7 +576,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             }
         })
         .on_window_event(|win, event| {
-            if win.label() == manager::LABEL && !privacy::accepted(win.app_handle()) {
+            if win.label() == manager::LABEL && privacy::onboarding_required(win.app_handle()) {
                 if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
                     win.app_handle().exit(0);
                 }
@@ -641,6 +655,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .setup(move |app| {
             local_trace::start(app.handle());
             privacy::initialize(app.handle())?;
+            opacity::initialize(app.handle())?;
             let _startup = telemetry::Timing::new("app.startup");
             #[cfg(target_os = "macos")]
             {
@@ -707,7 +722,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 )?;
             }
             telemetry::install(app.handle());
-            if !privacy::accepted(app.handle()) {
+            if privacy::onboarding_required(app.handle()) {
                 manager::open(app.handle())?;
             }
             let handle = app.handle().clone();

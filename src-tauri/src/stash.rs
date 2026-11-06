@@ -126,6 +126,9 @@ fn modifiers() -> (u8, bool) {
         (0, false)
     }
 }
+pub fn input_owned(app: &tauri::AppHandle) -> bool {
+    app.state::<Stash>().lease.lock().unwrap().is_some()
+}
 pub fn chord_busy(app: &tauri::AppHandle) -> bool {
     let state = app.state::<Stash>();
     let c = state.chord.lock().unwrap();
@@ -137,6 +140,9 @@ fn poll_shortcut(app: &tauri::AppHandle) {
     modifier_event(app, mask, shift);
 }
 pub fn modifier_event(app: &tauri::AppHandle, mask: u8, shift: bool) {
+    if mask != 7 || shift {
+        crate::opacity::reset_wheel(app);
+    }
     let state = app.state::<Stash>();
     let fire = state
         .chord
@@ -147,7 +153,6 @@ pub fn modifier_event(app: &tauri::AppHandle, mask: u8, shift: bool) {
         trigger(app);
     }
 }
-#[cfg(target_os = "macos")]
 pub fn cancel_chord(app: &tauri::AppHandle) {
     let state = app.state::<Stash>();
     let mut chord = state.chord.lock().unwrap();
@@ -620,6 +625,9 @@ fn tick(app: &tauri::AppHandle) -> Result<(), String> {
                     .filter(|label| !label.starts_with("capture-"))
                 {
                     if let Some(w) = app.get_webview_window(label) {
+                        if crate::opacity::configured(app).is_some() {
+                            crate::sync_opacity(w.clone())?;
+                        }
                         crate::feedback_window::sync(&w);
                     }
                 }
@@ -796,6 +804,21 @@ mod tests {
         assert!(!c.sample(0, false, false));
         assert!(!c.sample(3, false, false));
         assert!(!c.sample(0, false, false));
+    }
+    #[test]
+    fn opacity_wheel_cancels_stash_until_all_modifiers_are_released() {
+        let mut c = Chord::default();
+        for mask in [1, 3, 7] {
+            assert!(!c.sample(mask, false, false));
+        }
+        // The shared observer marks any wheel as mixed input, even at an
+        // opacity limit or when a fractional notch has not changed the value.
+        assert!(!c.sample(7, false, true));
+        for mask in [3, 7, 1, 0] {
+            assert!(!c.sample(mask, false, false));
+        }
+        assert!(!c.sample(7, false, false));
+        assert!(c.sample(0, false, false));
     }
     #[test]
     fn reverse_animation_has_exact_endpoints_and_continuous_retarget() {

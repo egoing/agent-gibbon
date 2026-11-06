@@ -1,0 +1,98 @@
+{
+  "source_root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel",
+  "fixture": {
+    "root": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-ua2fynrj",
+    "id": "dev-fd713e96f8417eeaa1d74e35",
+    "name": "gibbon-terms-smoke-ua2fynrj",
+    "target": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-ua2fynrj/src-tauri/target",
+    "binary": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-ua2fynrj/src-tauri/target/debug/agent-gibbon"
+  },
+  "note_id": "dev-terms-smoke",
+  "cases": [
+    {
+      "require_terms": false,
+      "server_pid": 79377,
+      "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel/src-tauri/target/debug/agent-gibbon",
+      "diagnostics": {
+        "diagnostics": {
+          "detailed": false,
+          "diagnostic_limit": 120,
+          "enabled": false,
+          "environment": "development",
+          "frontend_errors": 0,
+          "heartbeats": 0,
+          "journal": {
+            "capacity": 64,
+            "enabled": false,
+            "failures": 0,
+            "writes": 0
+          },
+          "logs": false,
+          "operations": 0,
+          "release_health": false,
+          "revision": "1383a64b8a07",
+          "traces_sample_rate": 0.0,
+          "watchdog": {
+            "stall_threshold_ms": 12000,
+            "startup_grace_ms": 30000
+          }
+        },
+        "instance": "dev-fd713e96f8417eeaa1d74e35",
+        "ok": true,
+        "privacy": {
+          "notice_ready": true,
+          "onboarding_required": false,
+          "sharing_allowed": false,
+          "terms_accepted": false,
+          "terms_skipped": true
+        }
+      },
+      "open_ok": true,
+      "consent_file_created": false,
+      "inspect_verified": true
+    },
+    {
+      "require_terms": true,
+      "server_pid": 79669,
+      "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel/src-tauri/target/debug/agent-gibbon",
+      "diagnostics": {
+        "diagnostics": {
+          "detailed": false,
+          "diagnostic_limit": 120,
+          "enabled": false,
+          "environment": "development",
+          "frontend_errors": 0,
+          "heartbeats": 0,
+          "journal": {
+            "capacity": 64,
+            "enabled": false,
+            "failures": 0,
+            "writes": 0
+          },
+          "logs": false,
+          "operations": 0,
+          "release_health": false,
+          "revision": "1383a64b8a07",
+          "traces_sample_rate": 0.0,
+          "watchdog": {
+            "stall_threshold_ms": 12000,
+            "startup_grace_ms": 30000
+          }
+        },
+        "instance": "dev-fd713e96f8417eeaa1d74e35",
+        "ok": true,
+        "privacy": {
+          "notice_ready": true,
+          "onboarding_required": true,
+          "sharing_allowed": false,
+          "terms_accepted": false,
+          "terms_skipped": false
+        }
+      },
+      "open_ok": false,
+      "consent_file_created": false,
+      "inspect_verified": false
+    }
+  ],
+  "result": "passed"
+}

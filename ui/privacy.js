@@ -4,7 +4,7 @@
   const el = id => document.getElementById(id);
   let state = null, busy = false;
   const api = window.gibbonPrivacy = {
-    accepted: () => Boolean(state?.terms_accepted),
+    accepted: () => Boolean(state?.terms_accepted || state?.terms_skipped),
     onAccepted: null,
     showWelcome: () => { el('manager-navigation').hidden=true; el('privacy-welcome').hidden=false; el('notes-page').hidden=true; el('settings-page').hidden=true; },
     refresh,
@@ -15,7 +15,7 @@
     el('privacy-welcome').hidden=accepted;
     el('manager-navigation').hidden=!accepted;
     if(!busy){
-      el('privacy-terms').checked=accepted;
+      el('privacy-terms').checked=Boolean(state?.terms_accepted);
       el('privacy-share').checked=Boolean(state?.allowed ?? state?.sharing);
       el('privacy-setting-share').checked=Boolean(state?.allowed ?? state?.sharing);
     }
@@ -38,6 +38,15 @@
     if(busy || !state) return;
     if(onboarding && !el('privacy-terms').checked) return;
     const sharing=el(onboarding?'privacy-share':'privacy-setting-share').checked;
+    // Development access is not a recorded agreement. Ask explicitly before
+    // saving a first diagnostic choice, even when the welcome gate was skipped.
+    if(!onboarding && !state.terms_accepted) {
+      if(sharing) {
+        api.showWelcome();
+        el('privacy-share').checked=true;
+      } else el('privacy-save-result').textContent='Not sharing. No changes to save.';
+      return;
+    }
     busy=true; render(); error('');
     try {
       state=await invoke('privacy_save',{termsAccepted:true,shareDiagnostics:sharing});

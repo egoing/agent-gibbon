@@ -65,3 +65,33 @@ test('published notice offers unchecked opt-in; settings only enable after expli
  await e.get('privacy-save').onclick();
  assert.equal(s.calls.find(c=>c.name==='privacy_save').args.shareDiagnostics,true);
 });
+
+test('development terms skip opens navigation without accepting terms or sharing',async()=>{
+ const s=setup({terms_accepted:false,terms_skipped:true,allowed:false,sharing:false,notice_ready:true});await tick();const e=s.elements;
+ assert.equal(s.window.gibbonPrivacy.accepted(),true);
+ assert.equal(e.get('privacy-welcome').hidden,true);
+ assert.equal(e.get('manager-navigation').hidden,false);
+ assert.equal(e.get('privacy-terms').checked,false);
+ assert.equal(e.get('privacy-setting-share').checked,false);
+ await e.get('privacy-save').onclick();
+ assert.equal(s.calls.filter(c=>c.name==='privacy_save').length,0);
+});
+
+test('first diagnostic opt-in after a development skip still requires explicit terms',async()=>{
+ const s=setup({terms_accepted:false,terms_skipped:true,allowed:false,sharing:false,notice_ready:true});await tick();const e=s.elements;
+ e.get('privacy-setting-share').checked=true;await e.get('privacy-save').onclick();
+ assert.equal(e.get('privacy-welcome').hidden,false);
+ assert.equal(e.get('privacy-terms').checked,false);
+ assert.equal(e.get('privacy-share').checked,true);
+ await e.get('privacy-continue').onclick();
+ assert.equal(s.calls.filter(c=>c.name==='privacy_save').length,0);
+ e.get('privacy-terms').checked=true;await e.get('privacy-continue').onclick();
+ assert.deepEqual(JSON.parse(JSON.stringify(s.calls.find(c=>c.name==='privacy_save').args)),{termsAccepted:true,shareDiagnostics:true});
+});
+
+test('explicit terms verification keeps the welcome gate for an unaccepted instance',async()=>{
+ const s=setup({terms_accepted:false,terms_skipped:false,allowed:false,sharing:false,notice_ready:true});await tick();
+ assert.equal(s.window.gibbonPrivacy.accepted(),false);
+ assert.equal(s.elements.get('privacy-welcome').hidden,false);
+ assert.equal(s.elements.get('manager-navigation').hidden,true);
+});

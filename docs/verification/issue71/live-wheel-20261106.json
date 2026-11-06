@@ -1,0 +1,24 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel",
+  "instance": "dev-67cc0e13d61c6b98b34c3f11",
+  "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel/src-tauri/target/debug/agent-gibbon",
+  "pid": 11798,
+  "memo": {
+    "ok": true,
+    "instance": "dev-67cc0e13d61c6b98b34c3f11",
+    "id": "opacity-wheel-check",
+    "global_opacity": 1.0,
+    "opacity": 1.0,
+    "visible": true
+  },
+  "shortcut": "Ctrl+Alt+Cmd",
+  "native_windows": [
+    {
+      "kCGWindowOwnerPID": 11798,
+      "kCGWindowNumber": 39665,
+      "kCGWindowName": "Agent Gibbon [DEV global-memo-opacity-wheel · 67cc0e13] — opacity-wheel-check",
+      "kCGWindowAlpha": 1
+    }
+  ],
+  "observation": "재실행 직후 CLI 0.35에서 이후 1.0으로 변경 관측; 물리 장치 이벤트·방향·상하한 전체는 기록하지 않음"
+}

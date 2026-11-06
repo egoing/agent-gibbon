@@ -9,10 +9,13 @@
 | 동의 기록 없음·거부·손상·이전 정책 버전 | 초기화하지 않음, 전송 없음 |
 | 포크/사용자 빌드의 운영 정보 중 미확정 항목이 있음 | 선택 동의 비활성, 전송 없음 |
 | DSN·개발 진단 플래그만 존재 | 동의를 대체하지 않음, 전송 없음 |
+| debug 개발 인스턴스의 약관 확인 생략 | 기능 진입만 허용; 실제 수락·별도 전송 동의가 없으면 SDK 초기화·전송 없음 |
 | 현재 문서에 대한 약관 및 별도 전송 동의 + 확정된 운영 정보 + 유효 DSN | 허용된 진단만 전송; 개발 빌드는 명시적 진단 실행도 필요 |
 | `AGENT_GIBBON_TELEMETRY=off` | 동의가 있어도 모두 차단 |
 
 첫 실행의 필수 약관과 선택적 전송을 구분하며 전송은 기본 해제다. [약관·개인정보 안내](legal/README.md)과 관리 창의 Privacy & Diagnostics에서 범위를 확인한다. 정책 해시는 약관·개인정보 안내·운영 정보에 연결돼 문서가 달라지면 과거 동의로 전송하지 않는다. 로컬 동의 파일은 instance별 `privacy/<instance>/consent.json`이며 계정·장치 식별자를 만들지 않는다.
+
+debug 개발 인스턴스는 약관 확인을 기본 생략하되 동의 파일을 만들거나 변경하지 않는다. `diagnostics.privacy`는 실제 `terms_accepted`와 `terms_skipped`·`onboarding_required`를 구분한다. 사용자가 약관 검증을 요청하면 앱 시작 전에 `AGENT_GIBBON_REQUIRE_TERMS=1`을 지정한다. 설정에서 최초 진단 전송을 저장하려는 경우에는 기존 약관·선택 동의 화면에서 명시적으로 확인한다. [개발 약관 검증 기록](verification/dev-terms-skip-20261106.md)에 실행 범위와 한계를 남긴다.
 
 SDK 초기화 전과 최종 HTTP 요청 직전에 동의를 확인한다. 전송 큐는 최대 64개 envelope, 각 직렬화 payload는 최대 512KiB이고 HTTP 요청 제한 시간은 3초다. 철회는 새 요청을 차단하고 이미 시작한 요청의 종료를 기다린 뒤 완료되며, 이전 동의 세대의 queue/log/session은 다시 동의해도 재전송되지 않는다. SDK 종료 시 flush도 이 경계를 우회하지 않는다. 과거 서버 데이터와 로컬 자료는 자동 삭제되지 않는다.
 
@@ -62,7 +65,7 @@ $env:AGENT_GIBBON_TELEMETRY = 'off'
 powershell -NoProfile -File scripts/windows-hang-evidence.ps1
 ```
 
-이미 실행 중인 앱에는 환경변수가 소급 적용되지 않는다. 기존 사용자 프로세스는 임의 종료하지 않는다. 첫 실행 약관은 사용자가 검토하며 점검 도구가 대신 동의하거나 우회하지 않는다.
+이미 실행 중인 앱에는 환경변수가 소급 적용되지 않는다. 기존 사용자 프로세스는 임의 종료하지 않는다. debug 개발 인스턴스의 기본 생략은 동의 기록을 만들지 않으며, 약관 검증 모드와 배포 앱에서는 사용자가 검토하고 점검 도구가 대신 동의하지 않는다.
 
 - 파일: Tauri 앱 데이터의 `diagnostics/<instance>/local-stages.json`. Windows에서는 `%APPDATA%\org.egoing.floatnote\diagnostics\<instance>\local-stages.json`이다. 재시작 시 이전 실행 파일을 덮어쓰므로 멈춘 앱을 재시작하기 **전에** 사본을 남긴다.
 - 내용: 실행 PID·시작 시각·빌드 표식, 실행 내 숫자 호출 번호, 고정 작업/단계 이름, 프로세스 시작 후 단조 증가 마이크로초만 기록한다. 창 ID·메모·제목·경로·명령·출력·화면·장치 식별자를 입력받지 않으며 Sentry 경로와 연결하지 않는다.

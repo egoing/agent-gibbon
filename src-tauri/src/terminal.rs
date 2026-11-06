@@ -376,6 +376,9 @@ pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
         window
     };
     let _show = crate::telemetry::Timing::new("terminal.window.show");
+    if crate::opacity::configured(app).is_some() {
+        crate::sync_opacity(win.clone())?;
+    }
     // User explicitly opens a terminal, but background CLI/tray restore preserves focus.
     #[cfg(target_os = "macos")]
     unsafe {
