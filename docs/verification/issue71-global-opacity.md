@@ -55,3 +55,4 @@
 - 실행 직후 `global_opacity`·창 적용 값은 0.35였고 이후 사용자 확인 과정에서 둘 다 1.0으로 바뀌었다. 같은 PID·`— opacity-wheel-check` 제목의 네이티브 창 39665에서도 실제 alpha 1.0을 확인했다. [실행 근거](issue71/live-wheel-20261106.json)에 필드를 줄여 보관했다.
 - 이 결과는 입력 담당 확보 후 실제 설정 변화·창 반영의 근거다. 물리 장치 이벤트 자체를 기록하거나 장치별 양방향·상하한·Shift 조합을 모두 검증한 것은 아니며, 위 Windows·다른 GUI 조합의 한계는 유지한다.
 - 커밋·병합 승인 후 최신 `origin/main`의 스킬·공통 메모 표시 변경을 통합했다. 초기화에서 불투명도 설정과 스킬 동기화를 모두 유지하고 통합본 Rust 149개·UI 95개, Clippy·개발 빌드를 확인했다. 과거 네이티브 창 캡처를 이 통합본의 전체 GUI 검증으로 재사용하지 않는다.
+- 원격 [첫 통합 CI](https://github.com/egoing/agent-gibbon/actions/runs/42192059157)에서 Windows Rust 135개·UI 검사는 통과했지만 macOS 전용 `Fades` 별칭이 Windows 테스트에도 포함되어 Clippy의 `dead_code` 검사에 실패했다. 별칭·컬렉션 import만 macOS로 제한하고 `Fade` 알고리즘 단위 검사는 Windows에서도 유지하도록 보정했다. 이 실패 실행을 Windows 빌드 통과로 간주하지 않는다.

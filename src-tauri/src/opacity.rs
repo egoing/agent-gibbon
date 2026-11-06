@@ -1,4 +1,4 @@
-#[cfg(any(target_os = "macos", test))]
+#[cfg(target_os = "macos")]
 use std::collections::BTreeMap;
 use std::{
     sync::Mutex,
@@ -6,7 +6,7 @@ use std::{
 };
 use tauri::Manager;
 
-#[cfg(any(target_os = "macos", test))]
+#[cfg(target_os = "macos")]
 pub type Fades = Mutex<BTreeMap<String, Fade>>;
 #[cfg(any(target_os = "macos", test))]
 pub struct Fade {
