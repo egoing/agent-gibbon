@@ -509,6 +509,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     terminal::welcome::terminal_rename,
                     terminal::welcome::terminal_close,
                     manager::manager_notes,
+                    manager::manager_set_visibility,
                     manager::manager_terminal,
                     manager::manager_image,
                     layout::content_action,
