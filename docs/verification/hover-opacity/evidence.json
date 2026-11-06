@@ -1,0 +1,785 @@
+{
+  "instance": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore",
+    "id": "dev-edd1ff2d021a706a8df75acd",
+    "name": "hover-opacity-restore",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore/src-tauri/target/debug/agent-gibbon"
+  },
+  "note_ids": [
+    "hover-opacity-fd3a8f30-a",
+    "hover-opacity-fd3a8f30-b"
+  ],
+  "samples": [
+    {
+      "stage": "outside-35",
+      "windows": [
+        {
+          "bounds": {
+            "X": 1160,
+            "Height": 422,
+            "Y": 25,
+            "Width": 396
+          },
+          "alpha": 1,
+          "title": "",
+          "id": 40389
+        },
+        {
+          "bounds": {
+            "X": 1164,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          },
+          "title": "Item-0",
+          "alpha": 1,
+          "id": 40384
+        },
+        {
+          "id": 40388,
+          "bounds": {
+            "X": 60,
+            "Height": 49,
+            "Y": 160,
+            "Width": 300
+          },
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-b",
+          "alpha": 0.3499999940395355
+        },
+        {
+          "bounds": {
+            "X": 1748,
+            "Height": 49,
+            "Y": 25,
+            "Width": 300
+          },
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a",
+          "alpha": 0.3499999940395355,
+          "id": 40386
+        }
+      ],
+      "front_pid": "16242",
+      "notes": [
+        {
+          "id": "hover-opacity-fd3a8f30-a",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 0.35,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 3496,
+            "y": 50
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        },
+        {
+          "id": "hover-opacity-fd3a8f30-b",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 0.35,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 120,
+            "y": 320
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        }
+      ]
+    },
+    {
+      "stage": "hover-one-peer-unchanged",
+      "windows": [
+        {
+          "title": "",
+          "alpha": 1,
+          "id": 40389,
+          "bounds": {
+            "X": 1160,
+            "Height": 422,
+            "Y": 25,
+            "Width": 396
+          }
+        },
+        {
+          "alpha": 1,
+          "bounds": {
+            "X": 1164,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          },
+          "id": 40384,
+          "title": "Item-0"
+        },
+        {
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-b",
+          "id": 40388,
+          "bounds": {
+            "X": 60,
+            "Height": 49,
+            "Y": 160,
+            "Width": 300
+          },
+          "alpha": 0.3499999940395355
+        },
+        {
+          "alpha": 1,
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a",
+          "bounds": {
+            "X": 1748,
+            "Height": 49,
+            "Y": 25,
+            "Width": 300
+          },
+          "id": 40386
+        }
+      ],
+      "front_pid": "16242",
+      "notes": [
+        {
+          "id": "hover-opacity-fd3a8f30-a",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 1.0,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 3496,
+            "y": 50
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        },
+        {
+          "id": "hover-opacity-fd3a8f30-b",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 0.35,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 120,
+            "y": 320
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        }
+      ]
+    },
+    {
+      "stage": "leave-delay",
+      "windows": [
+        {
+          "title": "",
+          "alpha": 1,
+          "id": 40389,
+          "bounds": {
+            "X": 1160,
+            "Height": 422,
+            "Y": 25,
+            "Width": 396
+          }
+        },
+        {
+          "title": "Item-0",
+          "bounds": {
+            "X": 1164,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          },
+          "alpha": 1,
+          "id": 40384
+        },
+        {
+          "alpha": 0.3499999940395355,
+          "id": 40388,
+          "bounds": {
+            "X": 60,
+            "Height": 49,
+            "Y": 160,
+            "Width": 300
+          },
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-b"
+        },
+        {
+          "bounds": {
+            "X": 1748,
+            "Height": 49,
+            "Y": 25,
+            "Width": 300
+          },
+          "alpha": 1,
+          "id": 40386,
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a"
+        }
+      ],
+      "front_pid": "16242",
+      "notes": [
+        {
+          "id": "hover-opacity-fd3a8f30-a",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 1.0,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 3496,
+            "y": 50
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        },
+        {
+          "id": "hover-opacity-fd3a8f30-b",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 0.35,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 120,
+            "y": 320
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        }
+      ]
+    },
+    {
+      "stage": "leave-restored-35",
+      "windows": [
+        {
+          "bounds": {
+            "X": 1160,
+            "Height": 422,
+            "Y": 25,
+            "Width": 396
+          },
+          "title": "",
+          "alpha": 1,
+          "id": 40389
+        },
+        {
+          "bounds": {
+            "X": 1164,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          },
+          "id": 40384,
+          "alpha": 1,
+          "title": "Item-0"
+        },
+        {
+          "bounds": {
+            "X": 60,
+            "Height": 49,
+            "Y": 160,
+            "Width": 300
+          },
+          "alpha": 1,
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-b",
+          "id": 40388
+        },
+        {
+          "alpha": 0.3499999940395355,
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a",
+          "id": 40386,
+          "bounds": {
+            "X": 1748,
+            "Height": 49,
+            "Y": 25,
+            "Width": 300
+          }
+        }
+      ],
+      "front_pid": "16242",
+      "notes": [
+        {
+          "id": "hover-opacity-fd3a8f30-a",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 0.35,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 3496,
+            "y": 50
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        },
+        {
+          "id": "hover-opacity-fd3a8f30-b",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 1.0,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 120,
+            "y": 320
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        }
+      ]
+    },
+    {
+      "stage": "feedback-outside-35",
+      "windows": [
+        {
+          "title": "",
+          "alpha": 1,
+          "bounds": {
+            "X": 1160,
+            "Height": 422,
+            "Y": 25,
+            "Width": 396
+          },
+          "id": 40389
+        },
+        {
+          "title": "Item-0",
+          "bounds": {
+            "X": 1164,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          },
+          "id": 40384,
+          "alpha": 1
+        },
+        {
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a · Feedback",
+          "alpha": 0.3499999940395355,
+          "bounds": {
+            "X": 1944,
+            "Height": 36,
+            "Y": 74,
+            "Width": 104
+          },
+          "id": 40393
+        },
+        {
+          "alpha": 0.3499999940395355,
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a",
+          "bounds": {
+            "X": 1748,
+            "Height": 49,
+            "Y": 25,
+            "Width": 300
+          },
+          "id": 40386
+        },
+        {
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-b",
+          "id": 40388,
+          "bounds": {
+            "X": 60,
+            "Height": 49,
+            "Y": 160,
+            "Width": 300
+          },
+          "alpha": 0.3499999940395355
+        }
+      ],
+      "front_pid": "16242",
+      "notes": [
+        {
+          "id": "hover-opacity-fd3a8f30-a",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 0.35,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 3496,
+            "y": 50
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": 2
+        },
+        {
+          "id": "hover-opacity-fd3a8f30-b",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 0.35,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 120,
+            "y": 320
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        }
+      ]
+    },
+    {
+      "stage": "feedback-only-hover-both-100",
+      "windows": [
+        {
+          "id": 40389,
+          "alpha": 1,
+          "bounds": {
+            "X": 1160,
+            "Height": 422,
+            "Y": 25,
+            "Width": 396
+          },
+          "title": ""
+        },
+        {
+          "id": 40384,
+          "bounds": {
+            "X": 1164,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          },
+          "alpha": 1,
+          "title": "Item-0"
+        },
+        {
+          "id": 40393,
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a · Feedback",
+          "bounds": {
+            "X": 1944,
+            "Height": 36,
+            "Y": 74,
+            "Width": 104
+          },
+          "alpha": 1
+        },
+        {
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a",
+          "bounds": {
+            "X": 1748,
+            "Height": 49,
+            "Y": 25,
+            "Width": 300
+          },
+          "id": 40386,
+          "alpha": 1
+        },
+        {
+          "id": 40388,
+          "alpha": 0.3499999940395355,
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-b",
+          "bounds": {
+            "X": 60,
+            "Height": 49,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "front_pid": "16242",
+      "notes": [
+        {
+          "id": "hover-opacity-fd3a8f30-a",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 1.0,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 3496,
+            "y": 50
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": 2
+        },
+        {
+          "id": "hover-opacity-fd3a8f30-b",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 0.35,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 120,
+            "y": 320
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        }
+      ]
+    },
+    {
+      "stage": "reenter-interrupts-fade",
+      "windows": [
+        {
+          "id": 40389,
+          "alpha": 1,
+          "title": "",
+          "bounds": {
+            "X": 1160,
+            "Height": 422,
+            "Y": 25,
+            "Width": 396
+          }
+        },
+        {
+          "id": 40384,
+          "title": "Item-0",
+          "bounds": {
+            "X": 1164,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          },
+          "alpha": 1
+        },
+        {
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a · Feedback",
+          "alpha": 1,
+          "id": 40393,
+          "bounds": {
+            "X": 1944,
+            "Height": 36,
+            "Y": 74,
+            "Width": 104
+          }
+        },
+        {
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a",
+          "id": 40386,
+          "alpha": 1,
+          "bounds": {
+            "X": 1748,
+            "Height": 49,
+            "Y": 25,
+            "Width": 300
+          }
+        },
+        {
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-b",
+          "bounds": {
+            "X": 60,
+            "Height": 49,
+            "Y": 160,
+            "Width": 300
+          },
+          "alpha": 0.3499999940395355,
+          "id": 40388
+        }
+      ],
+      "front_pid": "16242",
+      "notes": [
+        {
+          "id": "hover-opacity-fd3a8f30-a",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 1.0,
+          "global_opacity": 0.35,
+          "hovered": true,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 3496,
+            "y": 50
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": 2
+        },
+        {
+          "id": "hover-opacity-fd3a8f30-b",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 0.35,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 120,
+            "y": 320
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        }
+      ]
+    },
+    {
+      "stage": "both-restored-35",
+      "windows": [
+        {
+          "id": 40389,
+          "alpha": 1,
+          "title": "",
+          "bounds": {
+            "X": 1160,
+            "Height": 422,
+            "Y": 25,
+            "Width": 396
+          }
+        },
+        {
+          "bounds": {
+            "X": 1164,
+            "Height": 24,
+            "Y": 0,
+            "Width": 34
+          },
+          "title": "Item-0",
+          "alpha": 1,
+          "id": 40384
+        },
+        {
+          "alpha": 0.3499999940395355,
+          "id": 40393,
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a · Feedback",
+          "bounds": {
+            "X": 1944,
+            "Height": 36,
+            "Y": 74,
+            "Width": 104
+          }
+        },
+        {
+          "bounds": {
+            "X": 1748,
+            "Height": 49,
+            "Y": 25,
+            "Width": 300
+          },
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-a",
+          "id": 40386,
+          "alpha": 0.3499999940395355
+        },
+        {
+          "title": "Agent Gibbon [DEV hover-opacity-restore · edd1ff2d] — hover-opacity-fd3a8f30-b",
+          "id": 40388,
+          "bounds": {
+            "X": 60,
+            "Height": 49,
+            "Y": 160,
+            "Width": 300
+          },
+          "alpha": 0.3499999940395355
+        }
+      ],
+      "front_pid": "16242",
+      "notes": [
+        {
+          "id": "hover-opacity-fd3a8f30-a",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 0.35,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 3496,
+            "y": 50
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": 2
+        },
+        {
+          "id": "hover-opacity-fd3a8f30-b",
+          "instance": "dev-edd1ff2d021a706a8df75acd",
+          "opacity": 0.35,
+          "global_opacity": 0.35,
+          "hovered": false,
+          "visible": true,
+          "focused": false,
+          "position": {
+            "x": 120,
+            "y": 320
+          },
+          "size": {
+            "height": 98,
+            "width": 600
+          },
+          "always_on_top": true,
+          "highlight_revision": null
+        }
+      ]
+    }
+  ],
+  "passed": true,
+  "pid": 96663,
+  "binary_command": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore/src-tauri/target/debug/agent-gibbon --serve",
+  "verified_executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore/src-tauri/target/debug/agent-gibbon",
+  "test_server_stopped": true,
+  "setting_restored": true
+}

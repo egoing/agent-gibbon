@@ -1,6 +1,6 @@
 //! Observe only whether a chord was mixed with other input. Never retain key
-//! contents or suppress/modify an event destined for another application.
-//! The same observer routes the explicit three-modifier vertical wheel gesture.
+//! contents. Only the explicit three-modifier vertical wheel gesture is consumed;
+//! all other input is forwarded unchanged.
 use std::sync::atomic::{AtomicBool, Ordering};
 static USED: AtomicBool = AtomicBool::new(false);
 pub fn used() -> bool {
@@ -60,7 +60,6 @@ pub fn install(app: &tauri::AppHandle) -> bool {
         | NSEventMask::LeftMouseDown
         | NSEventMask::RightMouseDown
         | NSEventMask::OtherMouseDown
-        | NSEventMask::ScrollWheel
         | NSEventMask::FlagsChanged;
     fn observe(app: &tauri::AppHandle, event: NonNull<NSEvent>) {
         // Event flags preserve fast press/release order even if the run loop is
@@ -78,22 +77,7 @@ pub fn install(app: &tauri::AppHandle) -> bool {
             crate::stash::modifier_event(app, mask, f.intersects(F::Shift | F::Function));
         } else {
             crate::stash::cancel_chord(app);
-            if event.r#type() == objc2_app_kit::NSEventType::ScrollWheel {
-                use objc2_app_kit::{NSEventModifierFlags as F, NSEventPhase};
-                let f = event.modifierFlags();
-                let chord = f.contains(F::Control | F::Option | F::Command)
-                    && !f.intersects(F::Shift | F::Function)
-                    && !held_input()
-                    && event.momentumPhase() == NSEventPhase::None;
-                let units = mac_wheel_units(
-                    event.scrollingDeltaY(),
-                    event.hasPreciseScrollingDeltas(),
-                    event.isDirectionInvertedFromDevice(),
-                );
-                crate::opacity::wheel(app, units, chord);
-            } else {
-                crate::opacity::reset_wheel(app);
-            }
+            crate::opacity::reset_wheel(app);
         }
     }
     let handle = app.clone();
@@ -110,7 +94,47 @@ pub fn install(app: &tauri::AppHandle) -> bool {
         m.borrow_mut()
             .extend(global.into_iter().chain(local).map(Monitor))
     });
-    ready
+    ready && macos_wheel::install(app.clone())
+}
+#[cfg(target_os = "macos")]
+mod macos_wheel;
+
+#[cfg(any(target_os = "macos", windows, test))]
+fn capture_wheel(owned: bool, chord: bool, units: f64) -> bool {
+    owned && chord && units.is_finite() && units != 0.
+}
+
+#[cfg(any(target_os = "macos", test))]
+#[derive(Default)]
+struct MacScrollCapture {
+    gesture: bool,
+}
+#[cfg(any(target_os = "macos", test))]
+impl MacScrollCapture {
+    fn consume(&mut self, eligible: bool, owned: bool, phase: u64, momentum: u64) -> bool {
+        if !owned {
+            self.gesture = false;
+            return false;
+        }
+        // NSEventPhase Began / MayBegin always starts a fresh gesture.
+        if phase & (1 | 32) != 0 {
+            self.gesture = false;
+        }
+        if eligible {
+            self.gesture = phase != 0;
+            return true;
+        }
+        if self.gesture && (phase != 0 || momentum != 0) {
+            // Consume the tail of our trackpad gesture without changing alpha,
+            // even if modifiers were released before momentum finished.
+            if momentum & (8 | 16) != 0 || phase & 16 != 0 {
+                self.gesture = false;
+            }
+            return true;
+        }
+        self.gesture = false;
+        false
+    }
 }
 #[cfg(windows)]
 pub fn install(app: &tauri::AppHandle) -> bool {
@@ -209,12 +233,16 @@ mod windows {
                     0.
                 };
                 let handle = app.clone();
+                let capture = capture_wheel(crate::stash::input_owned(app), chord, units);
                 // Hooks must return promptly. Native windows and persistence are
                 // touched on the app's main thread, never inside the hook.
-                let _ = app.run_on_main_thread(move || {
+                let queued = app.run_on_main_thread(move || {
                     crate::stash::cancel_chord(&handle);
                     crate::opacity::wheel(&handle, units, chord);
                 });
+                if capture && queued.is_ok() {
+                    return 1;
+                }
             }
         }
         CallNextHookEx(std::ptr::null_mut(), code, w, l)
@@ -251,6 +279,37 @@ mod windows {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn consumes_only_owned_opacity_wheel_including_fractional_and_limit_input() {
+        for units in [-20., -1., -0.25, 0.25, 1., 20.] {
+            assert!(capture_wheel(true, true, units));
+            assert!(!capture_wheel(false, true, units));
+            assert!(!capture_wheel(true, false, units));
+        }
+        for units in [0., f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+            assert!(!capture_wheel(true, true, units));
+        }
+    }
+    #[test]
+    fn captured_trackpad_tail_never_leaks_but_the_next_gesture_is_normal() {
+        let mut capture = MacScrollCapture::default();
+        assert!(!capture.consume(false, true, 1, 0));
+        assert!(!capture.consume(false, true, 8, 0));
+        assert!(!capture.consume(false, true, 0, 1));
+        assert!(capture.consume(true, true, 1, 0));
+        assert!(capture.consume(true, true, 4, 0));
+        assert!(capture.consume(false, true, 8, 0));
+        assert!(capture.consume(false, true, 0, 1));
+        assert!(capture.consume(false, true, 0, 4));
+        assert!(capture.consume(false, true, 0, 8));
+        assert!(!capture.consume(false, true, 0, 4));
+        assert!(capture.consume(true, true, 1, 0));
+        assert!(!capture.consume(false, true, 1, 0));
+        assert!(!capture.consume(false, true, 4, 0));
+        assert!(capture.consume(true, true, 1, 0));
+        assert!(!capture.consume(false, false, 4, 0));
+        assert!(!capture.consume(false, true, 0, 4));
+    }
     #[test]
     fn normalizes_physical_direction_and_precise_wheels() {
         assert_eq!(mac_wheel_units(3., false, false), 1.);

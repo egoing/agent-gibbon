@@ -60,7 +60,11 @@ async function start(choice, trigger){
   };
   try{
     if(selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
-    await invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output,choice});
+    await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('terminal.start', async flow => {
+      await flow.invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output,choice});
+      flow.stage('response');
+      flow.frame?.();
+    });
     started=true;status.textContent='';measure();
     if(trigger && document.hasFocus() && (document.activeElement===trigger || document.activeElement===document.body))terminal.focus();
   }catch(e){

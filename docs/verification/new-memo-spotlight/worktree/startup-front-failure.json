@@ -1,0 +1,73 @@
+{
+  "origin": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement",
+    "id": "dev-dab6365756cd9981d7d0ff67",
+    "name": "egoing/bottom-right-memo-placement",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target/debug/agent-gibbon"
+  },
+  "cases": [
+    {
+      "manual_percent": null,
+      "samples": [
+        {
+          "stage": "new-at-cursor",
+          "windows": [
+            {
+              "bounds": {
+                "X": 1122,
+                "Height": 24,
+                "Y": 0,
+                "Width": 34
+              },
+              "id": 41171,
+              "alpha": 1,
+              "title": "Item-0"
+            },
+            {
+              "id": 41175,
+              "alpha": 1,
+              "title": "Agent Gibbon [DEV egoing/bottom-right-memo-placement · dab63657] — spotlight-7d0a3f0e-a",
+              "bounds": {
+                "X": 662,
+                "Height": 420,
+                "Y": 512,
+                "Width": 300
+              }
+            }
+          ],
+          "notes": [
+            {
+              "id": "spotlight-7d0a3f0e-a",
+              "instance": "dev-dab6365756cd9981d7d0ff67",
+              "opacity": 1.0,
+              "hovered": false,
+              "visible": true,
+              "focused": false,
+              "always_on_top": true,
+              "position": {
+                "x": 1324,
+                "y": 1024
+              },
+              "size": {
+                "height": 840,
+                "width": 600
+              },
+              "animating": true,
+              "layout_pending": false
+            }
+          ],
+          "pointer": "650.0 500.0"
+        }
+      ],
+      "pid": 56622,
+      "executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target/debug/agent-gibbon",
+      "lsof": "p56622\nftxt\nn/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/bottom-left-memo-placement/src-tauri/target/debug/agent-gibbon\nftxt\nn/Library/Preferences/Logging/.plist-cache.DeLYj5iT\nftxt\nn/private/var/db/timezone/tz/2026e.1.0/icutz/icutz44l.dat\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/SystemAppearance.car\nftxt\nn/private/var/db/analyticsd/events.allowlist\nftxt\nn/usr/lib/libobjc-trampolines.dylib\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/InputManager.loctable\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/DictationManager.loctable\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/WritingTools.loctable\nftxt\nn/System/Library/Caches/com.apple.IntlDataCache.le.kbdx\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/MenuCommands.loctable\nftxt\nn/System/Library/Input Methods/KoreanIM.app/Contents/PlugIns/KIM_Extension.appex/Contents/Resources/InfoPlist.loctable\nftxt\nn/System/Library/CoreServices/SystemVersion.bundle/English.lproj/SystemVersion.strings\nftxt\nn/usr/lib/dyld\nftxt\nn/usr/share/icu/icudt76l.dat\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/Aqua.car\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/FauxVibrantLight.car\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/VibrantLight.car\nftxt\nn/System/Library/PrivateFrameworks/SFSymbols.framework/Versions/A/Resources/CoreGlyphs.bundle/Contents/Resources/Assets.car\nftxt\nn/System/Library/Keyboard Layouts/AppleKeyboardLayouts.bundle/Contents/Resources/AppleKeyboardLayouts-L.dat\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/0/com.apple.LaunchServices.dv/com.apple.LaunchServices-6291460-v2.csstore\nftxt\nn/System/Library/Keyboard Layouts/AppleKeyboardLayouts.bundle/Contents/Resources/InfoPlist.loctable\nftxt\nn/System/Library/Extensions/AGXMetalG13X.bundle/Contents/Resources/ds.g13s\nftxt\nn/System/Library/Fonts/SFNS.ttf\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/STORAGE_ACCESS_PROMPT_QUIRKS.wplist\nftxt\nn/System/Library/PrivateFrameworks/MarkupUI.framework/PlugIns/Markup.appex/Contents/Resources/InfoPlist.loctable\nftxt\nn/System/Library/PrivateFrameworks/ShareKit.framework/Versions/A/PlugIns/ShareSheetUI.appex/Contents/Resources/InfoPlist.loctable\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/RESTRICTED_OPENER_DOMAINS.wplist\nftxt\nn/System/Library/Extensions/AppleMetalOpenGLRenderer.bundle/Contents/MacOS/AppleMetalOpenGLRenderer\nftxt\nn/System/Library/PrivateFrameworks/ShareKit.framework/Versions/A/Resources/ShareKit.loctable\nftxt\nn/System/Library/PrivateFrameworks/CoreUI.framework/Versions/A/Resources/DesignLibrary-macOS.bundle/Contents/Resources/macOSRepositories/LightStandard.car\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/STORAGE_ACCESS_USER_AGENT_STRING_QUIRKS.wplist\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Google/unwanted_software,osx,url_expression\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/ALLOWED_QUERY_PARAM.wplist\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.WebPrivacy/QUERY_PARAM.wplist\nftxt\nn/System/Library/Extensions/AGXMetalG13X.bundle/Contents/MacOS/AGXMetalG13X\nftxt\nn/System/Library/Frameworks/CoreImage.framework/Versions/A/Resources/Keys.loctable\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/DarkAqua.car\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/FauxVibrantDark.car\nftxt\nn/System/Library/Frameworks/AppKit.framework/Versions/C/Resources/Common.loctable\nftxt\nn/System/Library/Fonts/Helvetica.ttc\nftxt\nn/System/Library/Frameworks/CoreImage.framework/Versions/A/Resources/Filters.loctable\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Google/malware,osx,url_expression\nftxt\nn/System/Library/CoreServices/SystemAppearance.bundle/Contents/Resources/VibrantDark.car\nftxt\nn/private/var/db/nsurlstoraged/dafsaData.bin\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Google/social_engineering,osx,url_expression\nftxt\nn/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/C/com.apple.Safari.SafeBrowsing/Apple/social_engineering,any_platform,url_expression\nftxt\nn/System/Library/Frameworks/CoreImage.framework/Versions/A/Resources/Descriptions.loctable"
+    }
+  ],
+  "passed": false,
+  "alpha_mismatches": [],
+  "error": "AssertionError('Show changed foreground app')",
+  "server_stopped": true,
+  "setting_restored": true
+}

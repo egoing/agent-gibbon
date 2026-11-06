@@ -9,3 +9,6 @@
 - [디자인 기준](../design-system.md), [와이어프레임](../design/privacy-onboarding.png), [진단 구현](../diagnostics.md)을 함께 관리한다.
 
 작성 시 확인한 기본 기준: [개인정보 보호법 제15조](https://www.law.go.kr/법령/개인정보보호법/제15조), [제22조](https://www.law.go.kr/법령/개인정보보호법/제22조), [제28조의8](https://www.law.go.kr/법령/개인정보보호법/제28조의8), [EDPB의 동의 기준](https://www.edpb.europa.eu/sme/be-compliant/process-personal-data-lawfully_en), [Sentry의 저장 지역 안내](https://www.sentry.help/en/articles/13965013-where-are-your-data-servers-located).
+
+
+#64의 로컬 흐름 계측은 기존 실행 전 opt-in 로컬 기록의 확장이며 Sentry 전송 항목에 상관 번호를 추가하지 않는다. `measurement.origin=webview.aggregate`는 기존 왕복 지연·횟수 집계의 해석 표식이다. 새 snapshot 자식 span도 고정 작업명과 시간만 사용한다. 전송 대상·내용 범주·보유기간·동의 방식은 바꾸지 않아 이용약관·개인정보 고지 본문과 정책 해시는 유지한다. 상세 범위와 미검증 조건은 [진단 안내](../diagnostics.md#64-로컬-흐름-연결과-개별-snapshot)에 기록한다.

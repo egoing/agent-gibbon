@@ -36,7 +36,7 @@ pub struct Item {
     pub max: i64,
 }
 
-/// Right-to-left columns, top-to-bottom free spans. Allocate bounded heights
+/// Right-to-left columns, bottom-to-top free spans. Allocate bounded heights
 /// across each span; integer remainders belong to the first items (no gaps).
 pub fn stack(area: Rect, width: i64, items: &[Item], obstacles: &[Rect]) -> Vec<Rect> {
     if width <= 0 || area.height <= 0 {
@@ -63,7 +63,12 @@ pub fn stack(area: Rect, width: i64, items: &[Item], obstacles: &[Rect]) -> Vec<
                 .collect();
         }
         spans.sort_unstable();
-        slots.extend(spans.into_iter().map(|(top, bottom)| (right, top, bottom)));
+        slots.extend(
+            spans
+                .into_iter()
+                .rev()
+                .map(|(top, bottom)| (right, top, bottom)),
+        );
         right -= width;
     }
     let mut result = Vec::new();
@@ -105,15 +110,15 @@ pub fn stack(area: Rect, width: i64, items: &[Item], obstacles: &[Rect]) -> Vec<
                 extra -= add;
             }
         }
-        let mut y = top;
+        let mut y = bottom;
         for (h, item) in heights.into_iter().zip(chosen) {
+            y -= h;
             result.push(Rect {
                 x: right - item.width,
                 y,
                 width: item.width,
                 height: h,
             });
-            y += h;
         }
     }
     result
@@ -124,8 +129,9 @@ pub fn least_overlap(area: Rect, size: (i64, i64), occupied: &[Rect]) -> Option<
     if size.0 <= 0 || size.1 <= 0 || size.0 > area.width || size.1 > area.height {
         return None;
     }
-    let mut xs = vec![area.x, area.right() - size.0];
-    let mut ys = vec![area.y, area.bottom() - size.1];
+    let mut xs = vec![area.right() - size.0, area.x];
+    // Equal-overlap candidates prefer the same bottom-right origin as stacking.
+    let mut ys = vec![area.bottom() - size.1, area.y];
     for r in occupied {
         xs.extend([r.x - size.0, r.right()]);
         ys.extend([r.y - size.1, r.bottom()]);
@@ -189,8 +195,9 @@ mod tests {
             r.iter().map(|r| r.height).collect::<Vec<_>>(),
             vec![48, 123, 48]
         );
-        assert_eq!(r[1].y, r[0].bottom());
-        assert_eq!(r[2].y, r[1].bottom());
+        assert_eq!(r[0].bottom(), area().bottom());
+        assert_eq!(r[1].bottom(), r[0].y);
+        assert_eq!(r[2].bottom(), r[1].y);
     }
     #[test]
     fn zero_gap_fills_exact_horizontal_and_vertical_slots() {
@@ -209,24 +216,24 @@ mod tests {
         assert_eq!(
             stack(area, 300, &[item; 4], &[]),
             vec![
-                rect(-300, 30, 300, 240),
                 rect(-300, 270, 300, 240),
-                rect(-600, 30, 300, 240),
+                rect(-300, 30, 300, 240),
                 rect(-600, 270, 300, 240),
+                rect(-600, 30, 300, 240),
             ]
         );
         assert_eq!(stack(area, 300, &[item; 5], &[]).len(), 4);
     }
     #[test]
-    fn ordinary_notes_fill_top_down_then_left() {
+    fn ordinary_notes_fill_bottom_up_then_left() {
         let r = stack(area(), 300, &[text(); 5], &[]);
         assert_eq!(r.len(), 5);
-        assert_eq!((r[0].x, r[0].y), (600, 30));
+        assert_eq!((r[0].x, r[0].bottom()), (600, 1030));
         assert_eq!(r[0].height + r[1].height + r[2].height, 1000);
-        assert_eq!(r[1].y, r[0].bottom());
-        assert_eq!(r[2].y, r[1].bottom());
-        assert_eq!((r[3].x, r[3].y), (300, 30));
-        assert_eq!(r[4].y, r[3].bottom());
+        assert_eq!(r[1].bottom(), r[0].y);
+        assert_eq!(r[2].bottom(), r[1].y);
+        assert_eq!((r[3].x, r[3].bottom()), (300, 1030));
+        assert_eq!(r[4].bottom(), r[3].y);
         assert!(r
             .iter()
             .all(|r| r.fits(area()) && r.height >= 48 && r.height <= 420));
@@ -245,9 +252,9 @@ mod tests {
             height: 200,
         };
         let r = stack(a, 300, &[text(); 7], &[obstacle]);
-        assert_eq!(r[0].y, -30);
-        assert_eq!(r[0].bottom(), 200);
+        assert_eq!((r[0].x, r[0].bottom()), (-300, a.bottom()));
         assert_eq!(r[1].y, 400);
+        assert_eq!(r[2].bottom(), 200);
         for (i, rect) in r.iter().enumerate() {
             assert!(rect.fits(a));
             assert!(!rect.conflicts(obstacle, 0));
@@ -266,7 +273,8 @@ mod tests {
         };
         let r = stack(a, 300, &[text(); 3], &[]);
         assert_eq!(r.iter().map(|r| r.height).sum::<i64>(), 1001);
-        assert_eq!(r.last().unwrap().bottom(), a.bottom());
+        assert_eq!(r[0].bottom(), a.bottom());
+        assert_eq!(r.last().unwrap().y, a.y);
     }
     #[test]
     fn full_screen_and_short_slots() {
@@ -298,7 +306,28 @@ mod tests {
         ];
         let r = stack(area(), 300, &items, &[]);
         assert_eq!((r[0].width, r[0].height), (210, 420));
+        assert_eq!(
+            (r[0].right(), r[0].bottom()),
+            (area().right(), area().bottom())
+        );
         assert_eq!(r[1].height, 12);
-        assert_eq!(r.last().unwrap().bottom(), area().bottom());
+        assert_eq!(r[1].bottom(), r[0].y);
+        assert_eq!(r.last().unwrap().y, area().y);
+    }
+    #[test]
+    fn overflow_minimizes_overlap_then_prefers_bottom_right() {
+        let a = area();
+        let (_, r) = least_overlap(a, (300, 48), &[a]).unwrap();
+        assert_eq!((r.right(), r.bottom()), (a.right(), a.bottom()));
+        let obstacle = Rect {
+            x: a.right() - 300,
+            y: a.bottom() - 100,
+            width: 300,
+            height: 100,
+        };
+        let (score, r) = least_overlap(a, (300, 48), &[obstacle]).unwrap();
+        assert_eq!(score, 0);
+        assert!(!r.conflicts(obstacle, 0));
+        assert!(r.fits(a));
     }
 }
