@@ -204,6 +204,7 @@ pub async fn privacy_save(
         drop(local);
         crate::telemetry::refresh(&app);
         if first_acceptance {
+            crate::skills::synchronize(app.clone());
             let target = app.clone();
             let _ = app.run_on_main_thread(move || {
                 let _ = crate::apply_direct(

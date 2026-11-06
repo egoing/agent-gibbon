@@ -468,6 +468,10 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
                 geometry(&w, frame.rect, frame.scale)?;
                 alpha(&w, frame.alpha)?;
                 show_frame(&w)?;
+                // Windows focusability changes during show may replace the
+                // layered style. Reapply the saved alpha before the first frame.
+                #[cfg(windows)]
+                alpha(&w, frame.alpha)?;
             }
         }
         return Ok(());

@@ -39,6 +39,11 @@ impl Targets {
 pub fn remember(app: &tauri::AppHandle, label: &str) {
     app.state::<Targets>().remember(label);
 }
+// Explicit manager actions start a fresh focus-preservation transaction. A
+// restored, never-shown WebView may still remember the app active at startup.
+pub fn discard_restore(app: &tauri::AppHandle, label: &str) {
+    app.state::<Targets>().0.lock().unwrap().remove(label);
+}
 #[cfg(any(target_os = "macos", windows))]
 pub fn restore(window: &tauri::WebviewWindow) {
     let previous = window
