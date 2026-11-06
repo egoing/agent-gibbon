@@ -58,9 +58,16 @@
 
 - 실제 GUI 범위는 macOS ARM64의 일반 텍스트 메모다. Windows·Intel, 메뉴/Dock 직접 복원·영역 생성·이미지·터미널·전체 접어두기 조합의 GUI는 미검증이다. 해당 코드 경로 전체를 통과로 간주하지 않는다.
 - 기존 사각형 기반 hover 판정과 여러 화면의 좌표 정책은 변경하지 않았다.
-- 커밋 승인을 받기 전이므로 원격 push와 세 플랫폼 수동 CI는 미실행이다. 창 제어 변경이므로 커밋·push 후 대상 SHA의 전체 검사가 필요하다. 배포 태그와 공개 릴리스는 생성하지 않는다.
+- 최초 로컬 검증 시점에는 커밋 승인 전이어서 원격 push와 세 플랫폼 수동 CI를 실행하지 않았다. 승인 후 검사 완료는 아래 통합 기록을 따른다. 창 제어 변경이므로 커밋·push 후 대상 SHA의 전체 검사가 필요하다. 배포 태그와 공개 릴리스는 생성하지 않는다.
 - Conf 5는 기록된 macOS 실제 창 범위에 한정하며 Risk Low다.
 
 ## 통합 진행 — 사용자 승인 후
 
 사용자가 이 워크스페이스의 커밋·병합·push·이슈 기록·종료를 승인했다. 배치 변경과 스포트라이트 보정을 별도 커밋으로 보존한 뒤 같은 작업 브랜치에서 전체 플랫폼 검사를 요청한다. 앞의 승인 대기 설명은 최초 로컬 검증 시점의 상태이며, 원격 검사 결과와 대상 SHA는 후속 통합 기록으로 구분한다.
+
+### 세 플랫폼 검사 완료와 PR
+
+- 이슈 [#78](https://github.com/egoing/agent-gibbon/issues/78), PR [#79](https://github.com/egoing/agent-gibbon/pull/79). 배치 커밋 `a701a68`, 강조 보정 커밋 `f54c34ee7a8822d0c09d7ba099d67ee15d5a40f6`을 같은 작업 브랜치에 push했다.
+- 창 제어와 플랫폼 간 영향을 이유로 `gh workflow run release.yml --ref egoing/bottom-right-memo-placement`를 실행했다. [실행 42230331380](https://github.com/egoing/agent-gibbon/actions/runs/42230331380)의 `headSha`가 위 코드 SHA와 일치하고 macOS ARM64·Intel·Windows x64의 Rust/UI 테스트·Rustfmt·Clippy·설치 파일 빌드가 모두 성공함을 확인했다.
+- 만료되지 않은 비어 있지 않은 artifact 세 개를 확인했다: `installer-macos-arm64` 7,438,066바이트, `installer-macos-x64` 7,871,564바이트, `installer-windows-x64` 4,952,456바이트. 정확한 최종 메타데이터와 단계별 결과는 [CI 근거](new-memo-spotlight/ci-42230331380.json)를 따른다. 수동 실행 정책에 따라 `publish`는 skipped이며 공개 릴리스는 만들지 않았다.
+- CI 뒤의 통합 기록 커밋은 문서·검사 JSON만 바꾸며 제품 코드와 검증 스크립트는 검사한 코드 SHA와 동일하다. 해당 코드 SHA의 결과를 문서 후속 SHA에서 다시 실행한 결과로 보고하지 않는다. Windows·Intel 실제 GUI 및 실제 설치 검증은 여전히 포함하지 않는다.

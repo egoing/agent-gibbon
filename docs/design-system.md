@@ -678,4 +678,4 @@ SVG 3개와 PNG 3개를 함께 갱신했다. PNG 렌더링과 배치 육안 확�
 ### 새 메모 스포트라이트 보정 (2026-11-06)
 
 - 새로 표시하는 메모의 등장 강조와 기존 창의 재배치 전환을 분리했다. 수동 투명도 설정에서도 새 메모를 선명하게 표시하며, 숨겨진 WebView 측정 중 진행된 fade는 실제 표시 전에 초기화한다. 포커스·핀·숨김·배치 기준과 변경 알림 우선순위는 유지한다.
-- [투명도 시안 SVG](design/global-opacity-wheel.svg)·[PNG](design/global-opacity-wheel.png)를 새 메모 100%, 기존 메모 저장값의 관계로 갱신했다. 구현·실행 검증과 한계는 [검증 기록](verification/new-memo-spotlight-20261106.md)을 따른다. Rust 157개·UI 95개, Rustfmt·Clippy·개발 빌드와 macOS ARM64의 자동 50%·수동 35% 실제 창 검증을 통과했다. Windows·Intel 실제 GUI와 세 플랫폼 원격 CI는 미검증이다.
+- [투명도 시안 SVG](design/global-opacity-wheel.svg)·[PNG](design/global-opacity-wheel.png)를 새 메모 100%, 기존 메모 저장값의 관계로 갱신했다. 구현·실행 검증과 한계는 [검증 기록](verification/new-memo-spotlight-20261106.md)을 따른다. Rust 157개·UI 95개, Rustfmt·Clippy·개발 빌드와 macOS ARM64의 자동 50%·수동 35% 실제 창 검증을 통과했다. Windows·Intel 실제 GUI는 미검증이다. 코드 SHA `f54c34e`의 macOS ARM64·Intel·Windows x64 전체 검사와 설치 파일 빌드는 [실행 42230331380](https://github.com/egoing/agent-gibbon/actions/runs/42230331380)에서 통과했고 비어 있지 않은 artifact 세 개를 확인했다. 실제 설치·GUI 검증과 구분한다.
