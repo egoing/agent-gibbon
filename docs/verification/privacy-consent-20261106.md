@@ -51,6 +51,24 @@
 
 [SVG](../design/privacy-onboarding.svg)를 `rsvg-convert`로 [PNG](../design/privacy-onboarding.png) 렌더링해 겹침·잘림을 시각 확인했다. 영문 레이블, 필수/선택 분리, 기본 해제, 초안 차단, 설정의 즉시 철회를 표현한다. 실제 Manager Window는 기존 크기에서 스크롤한다. [디자인 시스템](../design-system.md)의 해당 기준을 함께 갱신했다.
 
-실제 네이티브 UI에서 최초 약관 수락·설정 변경·키보드 탐색, 운영 정보가 확정된 빌드의 실제 Sentry 수신, Windows/Intel 빌드·GUI는 미검증이다. iMac은 사용자가 요청한 절전을 유지하며 깨우지 않았다. Windows는 원격 연결 불가 상태로 이번 변경을 배포하지 않았다. 공개 릴리스·태그·설치 앱 업데이트는 수행하지 않았다.
+실제 네이티브 UI에서 최초 약관 수락·설정 변경·키보드 탐색, 운영 정보가 확정된 빌드의 실제 Sentry 수신, Intel 빌드·GUI는 미검증이다. iMac은 사용자가 요청한 절전을 유지하며 깨우지 않았다. Windows는 최초 검사 시 원격 연결 불가였으나 이후 복구되어 아래 범위까지 배포·검증했다. 공개 릴리스·태그·설치 앱 업데이트는 수행하지 않았다.
 
 확신도: 자동 동의/전송 경계 **Conf 3**, macOS 실제 거부 상태/loopback 무전송은 해당 관찰 범위에서 **Conf 5**. 위험도 **Medium**(동의 상태와 앱 첫 실행 경로 변경).
+
+## Windows 연결 복구 후 배포·검증
+
+Orca `window` 환경의 연결이 복구되어 같은 작업에서 Windows 개발 앱까지 반영했다.
+
+- 루트: `C:\Users\egoin\dev\project\agent-gibbon`, instance: `dev-fbc7d562e05aec4798036a95`.
+- 기존 `ebfc935` 위 4개 수정 파일(capture/manager/terminal/welcome)이 이미 커밋한 `2d1b3b48`과 일치하는지 `git diff --quiet`로 확인했다. 무관한 변경·스테이징이 없는 것도 검사했다.
+- 변경을 `%TEMP%\agent-gibbon-pre-consent-20261106.patch`에 백업하고, 이미 원격에 포함된 수정만 작업 트리에서 정리한 뒤 `git pull --ff-only`로 **790d2453486a92a09b9f3c598b4e46c593ca6485**를 반영했다. 백업은 보존했다.
+- 이전 앱 PID 20796의 정확한 실행 파일 경로를 확인해 종료했다. 다른 개발 인스턴스나 설치 앱은 종료하지 않았다.
+- `cargo test`: **108개 통과**. `npm.cmd run test:ui`: **79개 통과, 1개 skip**. skip은 POSIX 실행 파일 fixture 기반 개발 CLI 테스트이며 Windows용 native CLI 검증과 구분한다. Rustfmt·Clippy `-D warnings`·`npm.cmd run dev:build` 통과.
+- PowerShell의 `ErrorActionPreference=Stop`이 cargo의 stderr 진행 출력에서 검사를 중단해 한 번 재실행했다. 컴파일 오류로 간주하지 않았고, 최종 결과는 실제 cargo exit code와 로그로 확인했다.
+- `scripts\agent-gibbon-dev.cmd open --id privacy-no-consent-20261106 --markdown CONSENT-GATE-WINDOWS-LOCAL-ONLY`는 `onboarding_required:true`, `ok:false`, `OPEN_EXIT=1`로 정상 거절됐다. 메모 생성 성공으로 기록하지 않는다. 약관이나 선택적 전송 동의를 대신 저장하지 않았다.
+- 최신 앱 PID **23488**, 실행 파일 `C:\Users\egoin\dev\project\agent-gibbon\src-tauri\target\debug\agent-gibbon.exe`. CIM의 PID/실행 파일 경로, dev:info의 root/id/binary와 diagnostics 응답 instance를 대조했다.
+- 진단 응답 revision `790d2453486a`, `terms_accepted:false`, `sharing_allowed:false`, `notice_ready:false`; SDK·detailed·logs·release_health·journal false, 진단 카운터 모두 0. probe는 `Sentry diagnostics are disabled`로 거절됐다.
+- 빌드/실행에 실제 Sentry DSN이나 관리 토큰을 넣지 않았다. Windows에서 Sentry 실제 수신이나 별도 loopback 네트워크 관찰까지 수행한 것은 아니다.
+- Windows 로그는 `%TEMP%\gibbon-consent-{rust,ui,clippy,build}.log`, 로컬 원격 응답은 `/tmp/gibbon-windows-consent-run.json`에 남겼다.
+- `orca computer list-windows --app pid:23488 --environment window --json`는 **forbidden**: 이 페어링에 `desktop-control` 권한이 없다. 다른 방식으로 우회하지 않았다. 실제 첫 실행 화면 캡처·동의 버튼·터미널 반복 생성/좌표·프리징 재현은 미검증이다. 단순 실행·CLI 응답만으로 Windows 프리징 해결을 확정하지 않는다.
+- iMac은 절전 유지로 이번 변경 미배포다. Windows는 첫 실행 동의 확인과 남은 프리징 검증을 위해 실행 상태로 남겼으며, 해결 확인 전 절전 완료로 보고하지 않는다.
