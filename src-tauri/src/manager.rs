@@ -137,8 +137,17 @@ pub fn manager_set_visibility(
         .map_err(|e| e.to_string())?
         .contains_key(&id);
     // Never create a blank memo when a stale selection has disappeared.
-    if !exists && !crate::terminal::contains(app, &id) {
+    let is_terminal = crate::terminal::contains(app, &id);
+    if !exists && !is_terminal {
         return Err("메모가 없습니다".into());
+    }
+    let label = if is_terminal {
+        id.clone()
+    } else {
+        crate::label(&id)
+    };
+    if visible {
+        crate::focus::discard_restore(app, &label);
     }
     let response = crate::apply_direct(
         app,
@@ -159,11 +168,6 @@ pub fn manager_set_visibility(
     if response["ok"] != true {
         return Err("메모 표시 상태를 변경하지 못했습니다".into());
     }
-    let label = if crate::terminal::contains(app, &id) {
-        id
-    } else {
-        crate::label(&id)
-    };
     self::visible(app, &label)
 }
 

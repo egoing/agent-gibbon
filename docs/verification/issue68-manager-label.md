@@ -19,10 +19,13 @@
 - 텍스트·이미지·터미널 SVG의 중복 상태 문구를 지우고 rsvg-convert 2.62.3으로 PNG 3개를 렌더링했다. PNG를 직접 열어 버튼 한 개와 여백·잘림 없음을 확인했다. Settings 자산은 변경하지 않았다.
 - [텍스트 시안](../design/manager-notes-wireframe.png), [이미지 시안](../design/manager-image-wireframe.png), [터미널 시안](../design/manager-terminal-wireframe.png).
 
-## 실행 중 앱과 한계
+## 문구 제거 직후의 실행 상태와 한계
 
 같은 개발 CLI의 진행 메모 inspect에서 `ok: true`, 예상 instance, 고유 본문 표식 `ISSUE68-2420851A-20261106`을 확인했다. 사용자에 의해 숨겨진 상태는 update 시에도 유지한다. 실행 중 개발 앱은 앞선 PID 22648이며 현재 Codex 세션이 있으므로 이번 문구 제거를 반영하는 재시작은 수행하지 않았다. 새 빌드 준비와 현재 앱 반영을 구분한다.
 
 최신 문구 제거의 native GUI·Windows·Intel 실행은 미검증이다. 이전 토글의 native 검증은 중복 문구가 있던 버전에 대한 기록이다. 커밋·push·병합은 하지 않았다.
 
 Conf 4 (실제 UI 자산의 브라우저 검사), Risk Low (중복 문구 제거, 위치 정책과 IPC 유지).
+
+
+사용자 승인 후 최신 main 통합·native 적용·관리 창 포커스 보정 결과는 [최종 통합 기록](issue68-delivery.md)을 따른다. 위 미실행 설명은 당시 상태이며 후속 실행과 구분한다.
