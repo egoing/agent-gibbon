@@ -14,7 +14,7 @@ fn home() -> Result<PathBuf, String> {
         .filter(|p| p.is_dir())
         .ok_or("홈 폴더를 찾을 수 없습니다".into())
 }
-fn latest(agents: impl Iterator<Item = Agent>) -> Option<PathBuf> {
+fn latest(agents: impl Iterator<Item = Terminal>) -> Option<PathBuf> {
     agents
         .filter(|a| a.kind == Kind::Terminal && a.last_path.as_ref().is_some_and(|p| p.is_dir()))
         .max_by_key(|a| a.path_updated)
@@ -30,7 +30,7 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
             .map_err(err)?
             .as_nanos()
     );
-    let agent = Agent {
+    let agent = Terminal {
         id: id.clone(),
         bounds,
         physical_position: cfg!(windows),
@@ -38,10 +38,11 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
         last_path,
         recent_paths: Vec::new(),
         path_updated: 0,
+        updated_at: 0,
         title: String::new(),
     };
     save(&root(app), &agent)?;
-    state.agents.lock().map_err(err)?.insert(id.clone(), agent);
+    state.records.lock().map_err(err)?.insert(id.clone(), agent);
     open(app, &id)?;
     crate::tray::refresh(app)?;
     inspect(app, &id)
@@ -63,7 +64,7 @@ fn default_shell() -> Result<PathBuf, String> {
         )
     }
 }
-fn remember_path(agent: &mut Agent, path: PathBuf, updated: u64) {
+fn remember_path(agent: &mut Terminal, path: PathBuf, updated: u64) {
     // Migrate the former single-path record on the first directory change.
     if let Some(old) = agent.last_path.as_ref() {
         if old != &path {
@@ -89,7 +90,7 @@ fn remember_path(agent: &mut Agent, path: PathBuf, updated: u64) {
     agent.last_path = Some(path);
     agent.path_updated = updated;
 }
-fn recent_directories(agents: impl Iterator<Item = Agent>) -> Vec<RecentPath> {
+fn recent_directories(agents: impl Iterator<Item = Terminal>) -> Vec<RecentPath> {
     let mut paths = BTreeMap::<PathBuf, u64>::new();
     for a in agents.filter(|a| a.kind == Kind::Terminal) {
         let mut recent = a.recent_paths;
@@ -221,23 +222,9 @@ fn choices(paths: &[PathBuf]) -> Vec<Value> {
     })
     .collect()
 }
-fn generic(window: &WebviewWindow) -> Result<String, String> {
-    let id = caller(window)?;
-    if window
-        .state::<Terminals>()
-        .agents
-        .lock()
-        .map_err(err)?
-        .get(&id)
-        .is_none_or(|a| a.kind != Kind::Terminal)
-    {
-        return Err("범용 터미널에서만 사용할 수 있습니다".into());
-    }
-    Ok(id)
-}
 #[tauri::command]
 pub fn terminal_welcome(window: WebviewWindow) -> Result<Value, String> {
-    let id = generic(&window)?;
+    let id = caller(&window)?;
     let info = inspect(window.app_handle(), &id)?;
     let home = home()?;
     let recent = recent_directories(entries(window.app_handle()).into_iter());
@@ -268,7 +255,7 @@ pub fn terminal_welcome(window: WebviewWindow) -> Result<Value, String> {
 }
 #[tauri::command]
 pub async fn terminal_folder(window: WebviewWindow, path: Option<String>) -> Result<Value, String> {
-    let id = generic(&window)?;
+    let id = caller(&window)?;
     let app = window.app_handle().clone();
     tauri::async_runtime::spawn_blocking(move || {
         if app
@@ -306,7 +293,7 @@ pub(super) fn set_path(app: &tauri::AppHandle, id: &str, path: PathBuf) -> Resul
         return Err("사용 가능한 폴더가 아닙니다".into());
     }
     let state = app.state::<Terminals>();
-    let mut agents = state.agents.lock().map_err(err)?;
+    let mut agents = state.records.lock().map_err(err)?;
     let agent = agents.get_mut(id).ok_or("터미널 창이 없습니다")?;
     if agent.kind != Kind::Terminal {
         return Ok(());
@@ -319,15 +306,16 @@ pub(super) fn set_path(app: &tauri::AppHandle, id: &str, path: PathBuf) -> Resul
 }
 #[tauri::command]
 pub fn terminal_rename(window: WebviewWindow, title: String) -> Result<Value, String> {
-    let id = generic(&window)?;
+    let id = caller(&window)?;
     if title.chars().count() > 120 || title.contains(['\n', '\r']) {
         return Err("제목은 한 줄, 120자 이하여야 합니다".into());
     }
     {
         let state = window.state::<Terminals>();
-        let mut agents = state.agents.lock().map_err(err)?;
+        let mut agents = state.records.lock().map_err(err)?;
         let a = agents.get_mut(&id).ok_or("터미널 창이 없습니다")?;
         a.title = title.trim().into();
+        a.updated_at = now();
         save(&root(window.app_handle()), a)?;
     }
     crate::tray::refresh(window.app_handle())?;
@@ -365,7 +353,7 @@ fn process_cwd(_pid: u32) -> Option<PathBuf> {
 pub(super) fn refresh_path(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     let state = app.state::<Terminals>();
     if state
-        .agents
+        .records
         .lock()
         .map_err(err)?
         .get(id)
@@ -391,7 +379,7 @@ pub(super) fn refresh_path(app: &tauri::AppHandle, id: &str) -> Result<(), Strin
     Ok(())
 }
 pub(super) fn start(
-    agent: &Agent,
+    agent: &Terminal,
     choice: &str,
     dimensions: PtySize,
 ) -> Result<(Session, Box<dyn Read + Send>), String> {
@@ -450,7 +438,6 @@ fn start_shell(
         writer: Box::new(std::io::sink()),
         child: OwnedChild(Some(child)),
         program: "shell".into(),
-        found: None,
         prompt,
     };
     let _attach = crate::telemetry::Timing::new("terminal.io.attach");
@@ -562,8 +549,9 @@ fn finish_close(
 #[cfg(test)]
 mod tests {
     use super::*;
-    fn agent(path: Option<PathBuf>, updated: u64) -> Agent {
-        Agent {
+    #[cfg(test)]
+    fn agent(path: Option<PathBuf>, updated: u64) -> Terminal {
+        Terminal {
             physical_position: false,
             id: "terminal-1".into(),
             bounds: crate::capture::ImageNote {
@@ -576,6 +564,7 @@ mod tests {
             last_path: path,
             recent_paths: Vec::new(),
             path_updated: updated,
+            updated_at: 0,
             title: String::new(),
         }
     }
@@ -595,7 +584,7 @@ mod tests {
         remember_path(&mut a, chosen.clone(), 100);
         assert_eq!(a.recent_paths.len(), 20);
         assert_eq!(a.recent_paths[0].path, chosen);
-        let restored: Agent = serde_json::from_value(serde_json::to_value(&a).unwrap()).unwrap();
+        let restored: Terminal = serde_json::from_value(serde_json::to_value(&a).unwrap()).unwrap();
         let duplicate = agent(Some(chosen.clone()), 99);
         std::fs::remove_dir(root.path().join("p24")).unwrap();
         let recent = recent_directories([restored, duplicate].into_iter());
@@ -715,11 +704,11 @@ mod tests {
         });
         session.writer.write_all(b"/bin/sh -c 'exit 7'; printf '\\123\\110\\105\\114\\114\\137\\101\\114\\111\\126\\105\\n'\r").unwrap();
         session.writer.flush().unwrap();
-        let deadline = Instant::now() + std::time::Duration::from_secs(5);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
         let mut output = String::new();
         while !output.contains("SHELL_ALIVE") {
             output.push_str(
-                &rx.recv_timeout(deadline.saturating_duration_since(Instant::now()))
+                &rx.recv_timeout(deadline.saturating_duration_since(std::time::Instant::now()))
                     .unwrap(),
             );
         }
@@ -792,6 +781,7 @@ impl DirectoryReport {
 #[cfg(test)]
 mod report_tests {
     use super::*;
+    #[cfg(test)]
     #[test]
     fn directory_control_sequence_survives_chunks_without_retaining_transcript() {
         let mut parser = DirectoryReport::default();
@@ -817,22 +807,15 @@ pub fn delete(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     if state.sessions.lock().map_err(err)?.contains_key(id) {
         return Err("먼저 터미널 창을 종료하세요".into());
     }
-    let a = state
-        .agents
-        .lock()
-        .map_err(err)?
-        .get(id)
-        .cloned()
-        .ok_or("터미널이 없습니다")?;
-    if a.kind != Kind::Terminal {
-        return Err("기존 에이전트는 여기서 삭제하지 않습니다".into());
+    if !state.records.lock().map_err(err)?.contains_key(id) {
+        return Err("터미널이 없습니다".into());
     }
     if let Some(w) = app.get_webview_window(id) {
         crate::stash::release(&w)?;
         w.destroy().map_err(err)?;
     }
     std::fs::remove_file(metadata(&root(app)).join(format!("{id}.json"))).map_err(err)?;
-    state.agents.lock().map_err(err)?.remove(id);
+    state.records.lock().map_err(err)?.remove(id);
     crate::tray::refresh(app)
 }
 
@@ -909,7 +892,7 @@ impl PromptState {
 }
 pub(super) fn touch_path(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     let state = app.state::<Terminals>();
-    let mut agents = state.agents.lock().map_err(err)?;
+    let mut agents = state.records.lock().map_err(err)?;
     if let Some(agent) = agents
         .get_mut(id)
         .filter(|a| a.kind == Kind::Terminal && a.last_path.is_some())
@@ -923,6 +906,7 @@ pub(super) fn touch_path(app: &tauri::AppHandle, id: &str) -> Result<(), String>
 #[cfg(test)]
 mod lifecycle_tests {
     use super::*;
+    #[cfg(test)]
     #[test]
     fn queued_startup_prompt_cannot_mark_submitted_builtin_idle() {
         let mut prompt = PromptState::new();
@@ -966,10 +950,10 @@ mod lifecycle_tests {
             }
         });
         let mut parser = DirectoryReport::default();
-        let deadline = Instant::now() + std::time::Duration::from_secs(5);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
         while !session.prompt.ready {
             parser.feed(
-                &rx.recv_timeout(deadline.saturating_duration_since(Instant::now()))
+                &rx.recv_timeout(deadline.saturating_duration_since(std::time::Instant::now()))
                     .unwrap(),
             );
             if parser.take_prompt(&session.prompt.token) {
@@ -986,9 +970,9 @@ mod lifecycle_tests {
         assert!(descendants(pid).unwrap().is_empty());
         assert!(busy(&mut session));
         drop(session);
-        let deadline = Instant::now() + std::time::Duration::from_secs(5);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
         while unsafe { libc::kill(pid as i32, 0) } == 0 {
-            assert!(Instant::now() < deadline, "shell was not reaped");
+            assert!(std::time::Instant::now() < deadline, "shell was not reaped");
             std::thread::sleep(std::time::Duration::from_millis(10));
         }
 
@@ -1005,13 +989,16 @@ mod lifecycle_tests {
         let pid = session.child.process_id().unwrap();
         session.writer.write_all(b"sleep 60 & wait\r").unwrap();
         session.writer.flush().unwrap();
-        let deadline = Instant::now() + std::time::Duration::from_secs(5);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
         let children = loop {
             let children = descendants(pid).unwrap();
             if !children.is_empty() {
                 break children;
             }
-            assert!(Instant::now() < deadline, "background child did not start");
+            assert!(
+                std::time::Instant::now() < deadline,
+                "background child did not start"
+            );
             std::thread::sleep(std::time::Duration::from_millis(10));
         };
         assert!(busy(&mut session));

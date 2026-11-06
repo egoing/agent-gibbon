@@ -1,0 +1,853 @@
+{
+  "pid": 31185,
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/tray-menu-polish",
+  "instance": "dev-1fd207d59c82431a32969a4a",
+  "checks": [],
+  "original_pointer": {
+    "y": -282,
+    "width": 2048,
+    "height": 1152,
+    "scale": 2,
+    "x": 1224
+  },
+  "proof": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": false,
+    "content_height_cap": 152.0,
+    "dev_label": "DEV tray-menu-polish · 1fd207d5",
+    "feedback_active": false,
+    "feedback_surface": null,
+    "focused": false,
+    "folded": false,
+    "global_opacity": 1.0,
+    "highlight_revision": 9,
+    "hovered": false,
+    "id": "tray76-proof-1fd207",
+    "instance": "dev-1fd207d59c82431a32969a4a",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<h1>트레이 메뉴 #76 · 에이전트 기능 제거</h1>\n<ul class=\"task-list\"><li class=\"task-item\"><mark class=\"change-removed\">☑ </mark><mark class=\"change-removed\">전용 에이전트의 생성·CLI·자동 실행 경로 조사</mark></li><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">전용 기능과 UI 제거, 이전 저장 파일 보존</mark></li><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">일반 터미널 회귀·빌드·네이티브 메뉴 확인</mark></li><li class=\"task-item\"><mark class=\"change-removed\">☐ </mark><mark class=\"change-removed\">디자인 문서·시안·검증 기록 갱신</mark>\n<mark class=\"change-removed\">기존 트레이 개선 변경을 이어서 작업합니다. 커밋은 승인 전까지 하지 않습니다.</mark>\n<mark class=\"change-modified\">검증 표식: tray76-proof-1fd207</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">전용 생성·CLI·자동 탐색/실행 코드 제거</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">이전 에이전트 파일 보존·복원 차단 검사</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">Rust 149·UI 97·Clippy·개발 빌드</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☐ </mark><mark class=\"change-modified\">네이티브 목록·일반 터미널 실행/숨김 복원</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☐ </mark><mark class=\"change-modified\">디자인 시안·검증 기록 마무리</mark>\n<mark class=\"change-modified\">커밋은 승인 전까지 하지 않습니다.</mark></li></ul>",
+      "color": "#fee93e",
+      "edit_on_open": false,
+      "html": "<h1>트레이 메뉴 #76 · 에이전트 기능 제거</h1>\n<p>검증 표식: tray76-proof-1fd207</p>\n<ul class=\"task-list\"><li class=\"task-item\">☑ 전용 생성·CLI·자동 탐색/실행 코드 제거</li><li class=\"task-item\">☑ 이전 에이전트 파일 보존·복원 차단 검사</li><li class=\"task-item\">☑ Rust 149·UI 97·Clippy·개발 빌드</li><li class=\"task-item\">☐ 네이티브 목록·일반 터미널 실행/숨김 복원</li><li class=\"task-item\">☐ 디자인 시안·검증 기록 마무리\n커밋은 승인 전까지 하지 않습니다.</li></ul>",
+      "markdown": "# 트레이 메뉴 #76 · 에이전트 기능 제거\n검증 표식: tray76-proof-1fd207\n- [x] 전용 생성·CLI·자동 탐색/실행 코드 제거\n- [x] 이전 에이전트 파일 보존·복원 차단 검사\n- [x] Rust 149·UI 97·Clippy·개발 빌드\n- [ ] 네이티브 목록·일반 터미널 실행/숨김 복원\n- [ ] 디자인 시안·검증 기록 마무리\n커밋은 승인 전까지 하지 않습니다.\n",
+      "removed": true,
+      "revision": 9,
+      "source_path": null,
+      "status": "열린 메뉴에서 백그라운드 갱신",
+      "title": "트레이 검증",
+      "updated_at": 1793972096935
+    },
+    "ok": true,
+    "opacity": 1.0,
+    "position": {
+      "x": 3496,
+      "y": 50
+    },
+    "size": {
+      "height": 232,
+      "width": 600
+    },
+    "stash": {
+      "active": true,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": -332.0,
+        "y": 1057.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd",
+      "tip_visible": false,
+      "windows": [
+        "note-tray76-proof-1fd207"
+      ]
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-1fd207d59c82431a32969a4a/docs/tray76-proof-1fd207/index.md",
+    "visible": false
+  },
+  "terminal_source": {
+    "bounds": {
+      "height": 280.0,
+      "width": 400.0,
+      "x": 850.0,
+      "y": 380.0
+    },
+    "cwd": "/Users/egoinglee",
+    "id": "terminal-1793961625951752000",
+    "instance": "dev-1fd207d59c82431a32969a4a",
+    "kind": "terminal",
+    "last_path": "/Users/egoinglee",
+    "ok": true,
+    "pid": null,
+    "position": {
+      "x": 1700,
+      "y": 760
+    },
+    "program": null,
+    "pty_size": null,
+    "running": false,
+    "size": {
+      "height": 560,
+      "width": 800
+    },
+    "title": "egoinglee",
+    "visible": true
+  },
+  "native_origin": {
+    "screens": [
+      {
+        "frame": [
+          0,
+          0,
+          2048,
+          1152
+        ],
+        "visible": [
+          0,
+          0,
+          2048,
+          1127
+        ],
+        "scale": 2
+      },
+      {
+        "frame": [
+          -1728,
+          35,
+          1728,
+          1117
+        ],
+        "visible": [
+          -1728,
+          35,
+          1728,
+          1085
+        ],
+        "scale": 2
+      },
+      {
+        "frame": [
+          0,
+          1152,
+          1920,
+          1080
+        ],
+        "visible": [
+          0,
+          1152,
+          1920,
+          1080
+        ],
+        "scale": 2
+      }
+    ],
+    "windows": [
+      {
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowSharingState": 1,
+        "kCGWindowAlpha": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowNumber": 41006,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-no-agent-overflow",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerName": "agent-gibbon"
+      },
+      {
+        "kCGWindowNumber": 41004,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowBounds": {
+          "X": 0,
+          "Height": 24,
+          "Y": 0,
+          "Width": 2048
+        },
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowStoreType": 1,
+        "kCGWindowAlpha": 1,
+        "kCGWindowName": "",
+        "kCGWindowSharingState": 1,
+        "kCGWindowLayer": 0
+      },
+      {
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowName": "",
+        "kCGWindowBounds": {
+          "X": 0,
+          "Height": 500,
+          "Y": 652,
+          "Width": 500
+        },
+        "kCGWindowNumber": 40941,
+        "kCGWindowStoreType": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowLayer": 0,
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerName": "agent-gibbon"
+      },
+      {
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — stash-indicator",
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowBounds": {
+          "X": -332,
+          "Height": 48,
+          "Y": 1057,
+          "Width": 320
+        },
+        "kCGWindowNumber": 40940,
+        "kCGWindowLayer": 5,
+        "kCGWindowAlpha": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerPID": 31185
+      },
+      {
+        "kCGWindowBounds": {
+          "X": 1190,
+          "Height": 24,
+          "Y": 0,
+          "Width": 34
+        },
+        "kCGWindowNumber": 40939,
+        "kCGWindowLayer": 25,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowSharingState": 1,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowAlpha": 1,
+        "kCGWindowName": "Item-0"
+      },
+      {
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-overflow",
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowNumber": 40936,
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowAlpha": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowSharingState": 1
+      },
+      {
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-22",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowStoreType": 1,
+        "kCGWindowNumber": 40934,
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowLayer": 5,
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowOwnerName": "agent-gibbon"
+      },
+      {
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-20",
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowStoreType": 1,
+        "kCGWindowNumber": 40932,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowAlpha": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowSharingState": 1
+      },
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowNumber": 40931,
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowLayer": 5,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-19",
+        "kCGWindowSharingState": 1
+      },
+      {
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-18",
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowNumber": 40930,
+        "kCGWindowStoreType": 1,
+        "kCGWindowAlpha": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowSharingState": 1,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowLayer": 5
+      },
+      {
+        "kCGWindowLayer": 5,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowNumber": 40929,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-17",
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerPID": 31185
+      },
+      {
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowSharingState": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowNumber": 40928,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-16",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowAlpha": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        }
+      },
+      {
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowNumber": 40925,
+        "kCGWindowStoreType": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowSharingState": 1,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-13"
+      },
+      {
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowAlpha": 1,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-11",
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowNumber": 40923,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowLayer": 5
+      },
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-10",
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowNumber": 40922,
+        "kCGWindowSharingState": 1,
+        "kCGWindowAlpha": 1
+      },
+      {
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowNumber": 40921,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-09",
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerPID": 31185
+      },
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowAlpha": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowNumber": 40919,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-07"
+      },
+      {
+        "kCGWindowNumber": 40917,
+        "kCGWindowAlpha": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-05",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowSharingState": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerPID": 31185
+      },
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-04",
+        "kCGWindowSharingState": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowNumber": 40916,
+        "kCGWindowMemoryUsage": 2288
+      },
+      {
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-03",
+        "kCGWindowAlpha": 1,
+        "kCGWindowNumber": 40915,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowSharingState": 1
+      },
+      {
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowLayer": 5,
+        "kCGWindowSharingState": 1,
+        "kCGWindowAlpha": 1,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-02",
+        "kCGWindowStoreType": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowNumber": 40914,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowOwnerPID": 31185
+      },
+      {
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-01",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowNumber": 40913,
+        "kCGWindowAlpha": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowStoreType": 1,
+        "kCGWindowLayer": 5
+      },
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-00",
+        "kCGWindowAlpha": 1,
+        "kCGWindowNumber": 40912,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        }
+      },
+      {
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 1760,
+          "Height": 50,
+          "Y": 255,
+          "Width": 140
+        },
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — image-1793961656878280000",
+        "kCGWindowNumber": 40911,
+        "kCGWindowStoreType": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerName": "agent-gibbon"
+      },
+      {
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowNumber": 40910,
+        "kCGWindowAlpha": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowLayer": 5,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — main",
+        "kCGWindowStoreType": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        }
+      },
+      {
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-23",
+        "kCGWindowLayer": 5,
+        "kCGWindowAlpha": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowNumber": 40935,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowOwnerPID": 31185
+      },
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowName": "",
+        "kCGWindowNumber": 41005,
+        "kCGWindowBounds": {
+          "X": 0,
+          "Height": 24,
+          "Y": 0,
+          "Width": 2048
+        },
+        "kCGWindowLayer": 0,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowSharingState": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowAlpha": 1
+      },
+      {
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowName": "",
+        "kCGWindowNumber": 41003,
+        "kCGWindowStoreType": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 0,
+          "Height": 24,
+          "Y": 0,
+          "Width": 2048
+        },
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowLayer": 0
+      },
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowBounds": {
+          "X": 850,
+          "Height": 280,
+          "Y": 380,
+          "Width": 400
+        },
+        "kCGWindowStoreType": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowNumber": 41001,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — terminal-1793961625951752000",
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 5
+      },
+      {
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — 메모 관리",
+        "kCGWindowBounds": {
+          "X": 552,
+          "Height": 480,
+          "Y": 187,
+          "Width": 944
+        },
+        "kCGWindowNumber": 41008,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 0,
+        "kCGWindowStoreType": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowSharingState": 1,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowAlpha": 1
+      },
+      {
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowNumber": 41002,
+        "kCGWindowStoreType": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowName": "",
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowLayer": 0,
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowBounds": {
+          "X": 0,
+          "Height": 24,
+          "Y": 0,
+          "Width": 2048
+        }
+      },
+      {
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowAlpha": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowSharingState": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-proof",
+        "kCGWindowNumber": 40937,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        }
+      },
+      {
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowNumber": 40933,
+        "kCGWindowAlpha": 1,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-21",
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowLayer": 5,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        }
+      },
+      {
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowSharingState": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowStoreType": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowLayer": 5,
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowNumber": 40924,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-12"
+      },
+      {
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowLayer": 5,
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowSharingState": 1,
+        "kCGWindowAlpha": 1,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-08",
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowNumber": 40920
+      },
+      {
+        "kCGWindowNumber": 40918,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowSharingState": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-06",
+        "kCGWindowStoreType": 1,
+        "kCGWindowAlpha": 1
+      },
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowStoreType": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowNumber": 40927,
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-15"
+      },
+      {
+        "kCGWindowLayer": 5,
+        "kCGWindowAlpha": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowStoreType": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 1748,
+          "Height": 116,
+          "Y": 25,
+          "Width": 300
+        },
+        "kCGWindowNumber": 40938,
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-proof-1fd207",
+        "kCGWindowOwnerPID": 31185
+      },
+      {
+        "kCGWindowName": "Agent Gibbon [DEV tray-menu-polish · 1fd207d5] — tray76-9e86b2-14",
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowBounds": {
+          "X": 874,
+          "Height": 240,
+          "Y": 247,
+          "Width": 300
+        },
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerPID": 31185,
+        "kCGWindowLayer": 5,
+        "kCGWindowAlpha": 1,
+        "kCGWindowNumber": 40926
+      }
+    ]
+  },
+  "retired_files_sha256": {
+    "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-1fd207d59c82431a32969a4a/docs/.agent-gibbon-terminals/agent-1793961593071508000.json": "1dbd50624ebb68d88f839959a72763163b671330fedf2a73075c8e392dd3c509"
+  },
+  "rejected": [
+    {
+      "args": [
+        "agent"
+      ],
+      "exit": 1,
+      "response": {
+        "error": "사용법: agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list",
+        "ok": false
+      }
+    },
+    {
+      "args": [
+        "open",
+        "--id",
+        "agent-1793961593071508000"
+      ],
+      "exit": 1,
+      "response": {
+        "error": "전용 에이전트 기능이 제거되어 이전 에이전트 창을 열거나 변경할 수 없습니다",
+        "ok": false
+      }
+    }
+  ],
+  "tray_frame": [
+    1189.0,
+    0.0,
+    36.0,
+    24.0
+  ]
+}

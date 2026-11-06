@@ -6,7 +6,7 @@ const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const win = window.__TAURI__.window.getCurrentWindow();
 const $ = (id) => document.getElementById(id);
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
-const shortcut = key => isMac ? `⌘${key}` : `Ctrl+${key}`;
+const shortcut = key => isMac ? `Command ${key}` : `Ctrl ${key}`;
 $('export').title = `파일로 저장 · ${shortcut('S')}`;
 let revision = -1;
 let appearanceSignature;

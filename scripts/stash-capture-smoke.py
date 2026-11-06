@@ -40,13 +40,13 @@ with tempfile.TemporaryDirectory(prefix='gibbon-stash-capture-') as tmp:
         assert inspect()['stash']['shortcut']=='Ctrl+Alt+Cmd'
         time.sleep(1.1);run(tmp/'pointer','move',600,500);wait(lambda:not inspect()['animating'])
         before=inspect();assert any(ID in w.get('kCGWindowName','') for w in native()['windows'])
-        select('전체 창 접어두기 / 복원 · Ctrl+Alt+Cmd');wait(lambda:not inspect()['visible'])
-        select('전체 창 접어두기 / 복원 · Ctrl+Alt+Cmd');wait(lambda:inspect()['visible'] and not inspect()['stash']['active'])
+        select('숨김\tCtrl Opt ⌘');wait(lambda:not inspect()['visible'])
+        select('숨김\tCtrl Opt ⌘');wait(lambda:inspect()['visible'] and not inspect()['stash']['active'])
         assert inspect()['position']==before['position'] and inspect()['size']==before['size']
         check('actual PID-specific tray item toggles and restores exact geometry')
         state=inspect();title='Agent Gibbon ['+state['dev_label']+'] — '+ID
         run(tmp/'ax',PID,title,'position',500,350);time.sleep(.2);before=inspect()
-        select('영역 캡처 · Ctrl+Shift+1')
+        select('영역 캡처\tCtrl ⇧ 1')
         def overlays():return [w for w in native()['windows'] if '영역 캡처' in w.get('kCGWindowName','')]
         original=wait(overlays);REPORT['overlays_before']=original
         key();wait(lambda:not inspect()['stash']['animating'] and inspect()['stash']['active']);assert not overlays()

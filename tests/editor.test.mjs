@@ -584,7 +584,7 @@ test('Feedback export shortcut targets its own memo draft', async () => {
 
 
 test('toolbar shortcuts follow platform and gesture help is shown on button use', async () => {
-  for (const [platform, modifier] of [['MacIntel', '⌘'], ['Win32', 'Ctrl+']]) {
+  for (const [platform, modifier] of [['MacIntel', 'Command '], ['Win32', 'Ctrl ']]) {
     const app = await setup(new Map(), {}, {}, platform);
     assert.equal(app.element('export').title, `파일로 저장 · ${modifier}S`);
     assert.equal(app.element('copy').title, `본문 복사 · ${modifier}C`);
