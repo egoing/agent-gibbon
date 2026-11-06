@@ -792,21 +792,6 @@ fn sync_events() -> Result<(), String> {
     }
     Ok(())
 }
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn destroy_event_invalidates_inventory_but_child_accessibility_events_do_not() {
-        OBSERVED_WINDOWS.lock().unwrap().insert(42);
-        let before = WINDOW_EPOCH.load(Ordering::SeqCst);
-        unsafe { destroyed(0, 0x8001, 42, 0, 0, 0, 0) };
-        assert!(WINDOW_EPOCH.load(Ordering::SeqCst) > before);
-        let before = WINDOW_EPOCH.load(Ordering::SeqCst);
-        unsafe { destroyed(0, 0x8001, 42, -4, 1, 0, 0) };
-        assert_eq!(WINDOW_EPOCH.load(Ordering::SeqCst), before);
-    }
-}
-
 fn guard_selection(id: &Identity, marker: Option<&[u16]>) -> Result<(), String> {
     // Event ACK checks observer health, not an atomic OS guarantee. The native
     // identity/property checks remain necessary across asynchronous WinEvents.
@@ -828,4 +813,19 @@ fn clear_claim(s: &Session) -> Result<(), String> {
         return Err(native_error("배치 전 창 소유 표식 정리 실패"));
     }
     forget_journal(s)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn destroy_event_invalidates_inventory_but_child_accessibility_events_do_not() {
+        OBSERVED_WINDOWS.lock().unwrap().insert(42);
+        let before = WINDOW_EPOCH.load(Ordering::SeqCst);
+        unsafe { destroyed(0, 0x8001, 42, 0, 0, 0, 0) };
+        assert!(WINDOW_EPOCH.load(Ordering::SeqCst) > before);
+        let before = WINDOW_EPOCH.load(Ordering::SeqCst);
+        unsafe { destroyed(0, 0x8001, 42, -4, 1, 0, 0) };
+        assert_eq!(WINDOW_EPOCH.load(Ordering::SeqCst), before);
+    }
 }
