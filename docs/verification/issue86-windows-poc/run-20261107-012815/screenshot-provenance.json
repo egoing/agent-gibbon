@@ -1,0 +1,50 @@
+[
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-windows-poc\\docs\\verification\\issue86-windows-poc\\run-20261107-012815\\01-initial-A.png",
+    "published": "01-initial-A-client.png",
+    "source_sha256": "c6adf7e5fe070ff12b8d96bbca51bd3e00c67550d8db4baaaaafd7d5dfc0bdab",
+    "crop_box": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-windows-poc\\docs\\verification\\issue86-windows-poc\\run-20261107-012815\\02-position-A.png",
+    "published": "02-position-A-client.png",
+    "source_sha256": "9eda2e0ecb8dea20f101f03ea52be9918a1824c457d29b8a113b1fc0b2ac4f43",
+    "crop_box": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-windows-poc\\docs\\verification\\issue86-windows-poc\\run-20261107-012815\\07-restored-A.png",
+    "published": "07-restored-A-client.png",
+    "source_sha256": "80a6f1c2dee1192884a6ba4800f3962f59f6677a123f9349b6481ba21b50a97c",
+    "crop_box": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  },
+  {
+    "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\414001da-58cc-40d9-a2c8-88ea327c1db2-screenshot.png",
+    "published": "00-orca-native-capture-client.png",
+    "source_sha256": "d017a15f43667f9c474e208407b257339d46ecc798a6ff407339dd2a679fe52a",
+    "crop_box": [
+      12,
+      2,
+      628,
+      408
+    ],
+    "operation": "crop only; no rescaling"
+  }
+]

@@ -174,6 +174,35 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     menu.append(
         &MenuItem::with_id(
             app,
+            "capture-external",
+            if cfg!(windows) {
+                format!(
+                    "영역 외부 앱\t{}",
+                    crate::presentation::tray_shortcut("Ctrl+Shift+4")
+                )
+            } else {
+                "영역 외부 앱 (Windows 전용)".into()
+            },
+            cfg!(windows),
+            None::<&str>,
+        )
+        .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(
+            app,
+            "release-external",
+            "외부 앱 고정 모두 해제",
+            cfg!(windows),
+            None::<&str>,
+        )
+        .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(
+            app,
             "stash-toggle",
             format!(
                 "숨김\t{}",
@@ -304,7 +333,11 @@ fn template_icons(app: &tauri::AppHandle, menu: &Menu<tauri::Wry>) -> Result<(),
             .map(|item| {
                 matches!(
                     item.id().as_ref(),
-                    "capture-image" | "capture-text" | "capture-terminal" | "stash-toggle"
+                    "capture-image"
+                        | "capture-text"
+                        | "capture-terminal"
+                        | "capture-external"
+                        | "stash-toggle"
                 )
             })
             .collect::<Vec<_>>();
@@ -444,6 +477,17 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             } else if event.id.as_ref() == "capture-text" {
                 crate::capture::trigger(app, crate::capture::SelectionMode::Text);
                 Ok(())
+            } else if event.id.as_ref() == "capture-external" {
+                crate::capture::trigger(app, crate::capture::SelectionMode::ExternalApp);
+                Ok(())
+            } else if event.id.as_ref() == "release-external" {
+                let app = app.clone();
+                std::thread::spawn(move || {
+                    if let Err(e) = crate::external_apps::release_all(&app) {
+                        eprintln!("외부 앱 해제 실패: {e}");
+                    }
+                });
+                Ok(())
             } else if event.id.as_ref() == "capture-terminal" {
                 crate::capture::trigger(app, crate::capture::SelectionMode::Terminal);
                 Ok(())
@@ -453,6 +497,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 apply_direct(
                     app,
                     Request {
+                        external: None,
                         change_mode: None,
                         highlight: None,
                         source_path: None,

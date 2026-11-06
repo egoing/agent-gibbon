@@ -1,0 +1,2 @@
+# 실제 입력의 후행 공백과 Windows 원본 로그 bytes를 보존한다.
+run-*/* -text whitespace=-blank-at-eol

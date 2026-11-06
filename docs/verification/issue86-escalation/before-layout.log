@@ -1,0 +1,215 @@
+[
+  {
+    "viewport": [
+      480,
+      460
+    ],
+    "dpr": 1.25,
+    "buttons": [
+      {
+        "id": "run-task",
+        "text": "����",
+        "width": 72,
+        "height": 91.5999984741211,
+        "left": 24,
+        "right": 96,
+        "top": 252,
+        "bottom": 343.5999984741211,
+        "textLines": 1
+      },
+      {
+        "id": "refresh",
+        "text": "���� ��ħ",
+        "width": 25.600000381469727,
+        "height": 91.5999984741211,
+        "left": 104,
+        "right": 129.60000038146973,
+        "top": 252,
+        "bottom": 343.5999984741211,
+        "textLines": 4
+      },
+      {
+        "id": "cancel",
+        "text": "���",
+        "width": 25.600000381469727,
+        "height": 91.5999984741211,
+        "left": 137.60000610351562,
+        "right": 163.20000648498535,
+        "top": 252,
+        "bottom": 343.5999984741211,
+        "textLines": 2
+      }
+    ],
+    "errors": [
+      "refresh: label/target clipped, wrapped, undersized or unreachable",
+      "cancel: label/target clipped, wrapped, undersized or unreachable"
+    ],
+    "wrapped": false,
+    "pass": false,
+    "requestedViewport": [
+      480,
+      460
+    ],
+    "screenshot": "before-480x460.png"
+  },
+  {
+    "viewport": [
+      384,
+      368
+    ],
+    "dpr": 1.25,
+    "buttons": [
+      {
+        "id": "run-task",
+        "text": "����",
+        "width": 72,
+        "height": 91.5999984741211,
+        "left": 24,
+        "right": 96,
+        "top": 164.5,
+        "bottom": 256.0999984741211,
+        "textLines": 1
+      },
+      {
+        "id": "refresh",
+        "text": "���� ��ħ",
+        "width": 25.600000381469727,
+        "height": 91.5999984741211,
+        "left": 104,
+        "right": 129.60000038146973,
+        "top": 164.5,
+        "bottom": 256.0999984741211,
+        "textLines": 4
+      },
+      {
+        "id": "cancel",
+        "text": "���",
+        "width": 25.600000381469727,
+        "height": 91.5999984741211,
+        "left": 137.60000610351562,
+        "right": 163.20000648498535,
+        "top": 164.5,
+        "bottom": 256.0999984741211,
+        "textLines": 2
+      }
+    ],
+    "errors": [
+      "refresh: label/target clipped, wrapped, undersized or unreachable",
+      "cancel: label/target clipped, wrapped, undersized or unreachable"
+    ],
+    "wrapped": false,
+    "pass": false,
+    "requestedViewport": [
+      384,
+      368
+    ],
+    "screenshot": "before-384x368.png"
+  },
+  {
+    "viewport": [
+      320,
+      240
+    ],
+    "dpr": 1.25,
+    "buttons": [
+      {
+        "id": "run-task",
+        "text": "����",
+        "width": 72,
+        "height": 91.5999984741211,
+        "left": 24,
+        "right": 96,
+        "top": 74.0999984741211,
+        "bottom": 165.6999969482422,
+        "textLines": 1
+      },
+      {
+        "id": "refresh",
+        "text": "���� ��ħ",
+        "width": 25.600000381469727,
+        "height": 91.5999984741211,
+        "left": 104,
+        "right": 129.60000038146973,
+        "top": 74.0999984741211,
+        "bottom": 165.6999969482422,
+        "textLines": 4
+      },
+      {
+        "id": "cancel",
+        "text": "���",
+        "width": 25.600000381469727,
+        "height": 91.5999984741211,
+        "left": 137.60000610351562,
+        "right": 163.20000648498535,
+        "top": 74.0999984741211,
+        "bottom": 165.6999969482422,
+        "textLines": 2
+      }
+    ],
+    "errors": [
+      "refresh: label/target clipped, wrapped, undersized or unreachable",
+      "cancel: label/target clipped, wrapped, undersized or unreachable"
+    ],
+    "wrapped": false,
+    "pass": false,
+    "requestedViewport": [
+      320,
+      240
+    ],
+    "screenshot": "before-320x240.png"
+  },
+  {
+    "viewport": [
+      240,
+      240
+    ],
+    "dpr": 1.25,
+    "buttons": [
+      {
+        "id": "run-task",
+        "text": "����",
+        "width": 72,
+        "height": 91.5999984741211,
+        "left": 24,
+        "right": 96,
+        "top": 74.30000305175781,
+        "bottom": 165.9000015258789,
+        "textLines": 1
+      },
+      {
+        "id": "refresh",
+        "text": "���� ��ħ",
+        "width": 25.600000381469727,
+        "height": 91.5999984741211,
+        "left": 104,
+        "right": 129.60000038146973,
+        "top": 74.30000305175781,
+        "bottom": 165.9000015258789,
+        "textLines": 4
+      },
+      {
+        "id": "cancel",
+        "text": "���",
+        "width": 25.600000381469727,
+        "height": 91.5999984741211,
+        "left": 137.60000610351562,
+        "right": 163.20000648498535,
+        "top": 74.30000305175781,
+        "bottom": 165.9000015258789,
+        "textLines": 2
+      }
+    ],
+    "errors": [
+      "refresh: label/target clipped, wrapped, undersized or unreachable",
+      "cancel: label/target clipped, wrapped, undersized or unreachable",
+      "narrow viewport did not wrap actions"
+    ],
+    "wrapped": false,
+    "pass": false,
+    "requestedViewport": [
+      240,
+      240
+    ],
+    "screenshot": "before-240x240.png"
+  }
+]

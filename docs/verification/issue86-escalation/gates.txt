@@ -1,0 +1,6 @@
+fmt exit=0 command=cargo fmt --manifest-path src-tauri/Cargo.toml --check
+test exit=0 command=cargo test --manifest-path src-tauri/Cargo.toml --locked
+check exit=0 command=cargo check --manifest-path src-tauri/Cargo.toml --locked
+clippy exit=0 command=cargo clippy --manifest-path src-tauri/Cargo.toml --locked --all-targets -- -D warnings
+ui exit=0 command=npm run test:ui
+dev-build exit=0 command=npm run dev:build

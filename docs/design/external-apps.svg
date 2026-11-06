@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="770" viewBox="0 0 1120 770"><rect width="1120" height="770" fill="#e6e8eb"/><g font-family="Arial,Apple SD Gothic Neo,sans-serif">
+<text x="24" y="30" font-size="16" fill="#20252e" font-weight="600">Windows · 선택 영역 → 앱/창 선택 → 실행</text>
+<rect x="24" y="48" width="480" height="690" rx="4" fill="#20252e" stroke="#667080"/>
+<text x="40" y="72" font-size="12" fill="#f0f0f0" font-weight="400">Agent Gibbon · 외부 앱</text>
+<text x="464" y="72" font-size="16" fill="#f0f0f0" font-weight="400">×</text>
+<text x="48" y="112" font-size="13" fill="#f0f0f0" font-weight="600">앱 선택</text>
+<text x="48" y="139" font-size="11" fill="#bac3cf" font-weight="400">선택 영역: 220, 180 · 640×420 px</text>
+<text x="48" y="162" font-size="11" fill="#bac3cf" font-weight="400">앱을 선택한 다음 실행하면 선택 영역에 상단 고정합니다.</text>
+<text x="48" y="192" font-size="11" fill="#bac3cf" font-weight="400">설치된 앱 / 열린 창 검색</text>
+<rect x="48" y="204" width="432" height="34" rx="4" fill="#191e26" stroke="#667080"/>
+<rect x="48" y="250" width="432" height="32" rx="4" fill="#414e63" stroke="none"/>
+<text x="58" y="271" font-size="13" fill="#f0f0f0" font-weight="400">예시 편집기</text>
+<text x="58" y="305" font-size="13" fill="#f0f0f0" font-weight="400">다른 데스크톱 앱</text>
+<text x="48" y="353" font-size="13" fill="#f0f0f0" font-weight="600">열린 창</text>
+<text x="48" y="377" font-size="11" fill="#bac3cf" font-weight="400">기존 창은 직접 선택해야 이동합니다.</text>
+<text x="58" y="413" font-size="13" fill="#f0f0f0" font-weight="400">작업 메모 — 예시 편집기</text>
+<rect x="48" y="447" width="72" height="32" rx="4" fill="#303844" stroke="#667080"/>
+<text x="64" y="468" font-size="13" fill="#f0f0f0" font-weight="400">실행</text>
+<rect x="130" y="447" width="104" height="32" rx="4" fill="#303844" stroke="#667080"/>
+<text x="146" y="468" font-size="13" fill="#f0f0f0" font-weight="400">새로 고침</text>
+<rect x="244" y="447" width="72" height="32" rx="4" fill="#303844" stroke="#667080"/>
+<text x="260" y="468" font-size="13" fill="#f0f0f0" font-weight="400">취소</text>
+<text x="48" y="509" font-size="11" fill="#bac3cf" font-weight="400">Start Menu의 classic .exe 바로가기</text>
+<text x="48" y="530" font-size="11" fill="#bac3cf" font-weight="400">Store 앱은 열린 창 목록에서 선택</text>
+<text x="48" y="575" font-size="13" fill="#f0f0f0" font-weight="600">플로팅 중인 창</text>
+<text x="48" y="605" font-size="13" fill="#f0f0f0" font-weight="400">작업 메모</text>
+<rect x="402" y="583" width="64" height="30" rx="4" fill="#303844" stroke="#667080"/>
+<text x="418" y="604" font-size="13" fill="#f0f0f0" font-weight="400">해제</text>
+<text x="48" y="649" font-size="11" fill="#bac3cf" font-weight="400">해제: 원래 위치·크기·고정 상태 복원</text>
+<text x="48" y="671" font-size="11" fill="#bac3cf" font-weight="400">시작된 외부 앱은 종료하지 않음</text>
+<text x="48" y="705" font-size="11" fill="#bac3cf" font-weight="400">설명용 예시 · 실제 설치 앱/실행 캡처가 아님</text>
+<text x="548" y="75" font-size="15" fill="#20252e" font-weight="600">외부 앱은 독립 네이티브 창</text>
+<rect x="548" y="104" width="548" height="345" rx="4" fill="#fff0ed" stroke="#667080"/>
+<text x="566" y="129" font-size="12" fill="#20252e" font-weight="400">일반 창 · 활성 상태</text>
+<rect x="590" y="154" width="450" height="246" rx="4" fill="#e2fcff" stroke="#667080"/>
+<text x="606" y="180" font-size="12" fill="#20252e" font-weight="400">선택한 외부 앱 · 비활성 상태에서도 상단 유지</text>
+<rect x="608" y="202" width="410" height="123" rx="4" fill="white" stroke="#667080"/>
+<text x="624" y="235" font-size="14" fill="#20252e" font-weight="400">직접 클릭하고 키보드로 입력</text>
+<text x="606" y="371" font-size="12" fill="#20252e" font-weight="400">Gibbon WebView 안에 임베딩하지 않음</text>
+<text x="548" y="493" font-size="14" fill="#20252e" font-weight="600">해제 경로</text>
+<text x="548" y="522" font-size="13" fill="#20252e" font-weight="400">Welcome의 개별 해제 / 트레이의 모든 고정 해제</text>
+<text x="548" y="551" font-size="13" fill="#20252e" font-weight="400">CLI app release --session ID</text>
+<text x="548" y="599" font-size="12" fill="#20252e" font-weight="400">취소·실패는 늦은 연결을 막고 앱을 강제 종료하지 않음</text>
+<text x="548" y="627" font-size="12" fill="#20252e" font-weight="400">최소 크기를 채우지 못하면 원상 복원 + 오류</text>
+<text x="548" y="655" font-size="12" fill="#20252e" font-weight="400">최소화·최대화·숨긴 창은 보통 크기로 복원 후 선택</text>
+<text x="548" y="683" font-size="12" fill="#20252e" font-weight="400">Windows 전용 · 다른 OS의 CLI는 명시적 오류</text>
+<text x="548" y="721" font-size="12" fill="#20252e" font-weight="400">구조 시안이며 실기 검증 결과는 별도 기록</text>
+</g></svg>
