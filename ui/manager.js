@@ -19,7 +19,9 @@ async function detail() {
   const version = ++detailVersion, note = notes.find(n => n.id === selected);
   const target = el('detail'); target.replaceChildren();
   if (!note) { target.textContent = notes.length ? '메모를 선택하세요.' : '아직 메모가 없습니다.'; return; }
-  const title = document.createElement('h1'); title.textContent = note.title || note.id; target.append(title);
+  if (note.kind || note.capture) {
+    const title = document.createElement('h1'); title.textContent = note.title || note.id; target.append(title);
+  }
   if (note.kind) {
     const kind=document.createElement('p');kind.textContent=note.kind==='terminal'?'터미널':'에이전트';target.append(kind);
     const open=document.createElement('button');open.textContent='화면에 띄우기';open.onclick=()=>invoke('manager_terminal',{id:note.id,action:'open'}).catch(()=>{el('error').hidden=false;});target.append(open);
