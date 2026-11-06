@@ -1,0 +1,391 @@
+{
+  "instance": {
+    "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/diff",
+    "id": "dev-b09222c3d68057de28b6eb9c",
+    "name": "egoing/diff",
+    "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/diff/src-tauri/target",
+    "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/diff/src-tauri/target/debug/agent-gibbon"
+  },
+  "prefix": "demo65-c655c8",
+  "pid": 11174,
+  "verified_executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/diff/src-tauri/target/debug/agent-gibbon",
+  "samples": [
+    {
+      "case": "01-diff",
+      "window": {
+        "bounds": {
+          "X": 1748,
+          "Height": 68,
+          "Y": 126,
+          "Width": 300
+        },
+        "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — demo65-c655c8-01-diff",
+        "id": 43048
+      },
+      "state": {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 68.0,
+        "dev_label": "DEV egoing/diff · b09222c3",
+        "feedback_active": true,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "global_opacity": null,
+        "highlight_revision": 2,
+        "hovered": false,
+        "id": "demo65-c655c8-01-diff",
+        "instance": "dev-b09222c3d68057de28b6eb9c",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>① 일반 변경 알림</h1>\n<p><mark class=\"change-removed\">배포 대상: 테스트 환경</mark>\n<mark class=\"change-modified\">배포 대상: 운영 환경</mark></p>\n<p>읽은 뒤 다른 메모로 포커스를 옮기면 변경 표시가 사라집니다.</p>\n",
+          "color": "#dcecff",
+          "completion_html": null,
+          "edit_on_open": false,
+          "html": "<h1>① 일반 변경 알림</h1>\n<p>배포 대상: 운영 환경</p>\n<p>읽은 뒤 다른 메모로 포커스를 옮기면 변경 표시가 사라집니다.</p>\n",
+          "markdown": "# ① 일반 변경 알림\n\n배포 대상: 운영 환경\n\n읽은 뒤 다른 메모로 포커스를 옮기면 변경 표시가 사라집니다.",
+          "quiet_update": false,
+          "removed": true,
+          "revision": 2,
+          "source_path": null,
+          "status": "대기",
+          "title": "01-diff",
+          "updated_at": 1793979056992
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 3496,
+          "y": 252
+        },
+        "size": {
+          "height": 136,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-b09222c3d68057de28b6eb9c/docs/demo65-c655c8-01-diff/index.md",
+        "visible": true
+      }
+    },
+    {
+      "case": "02-plain",
+      "window": {
+        "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — demo65-c655c8-02-plain",
+        "id": 43049,
+        "bounds": {
+          "X": 1748,
+          "Height": 68,
+          "Y": 194,
+          "Width": 300
+        }
+      },
+      "state": {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 68.0,
+        "dev_label": "DEV egoing/diff · b09222c3",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "global_opacity": null,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "demo65-c655c8-02-plain",
+        "instance": "dev-b09222c3d68057de28b6eb9c",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>② 조용한 교체</h1>\n<p>상태: 준비 완료</p>\n<p>알림·변경 강조 없이 최신 본문만 표시합니다.</p>\n",
+          "color": "#e5e5e5",
+          "completion_html": null,
+          "edit_on_open": false,
+          "html": "<h1>② 조용한 교체</h1>\n<p>상태: 준비 완료</p>\n<p>알림·변경 강조 없이 최신 본문만 표시합니다.</p>\n",
+          "markdown": "# ② 조용한 교체\n\n상태: 준비 완료\n\n알림·변경 강조 없이 최신 본문만 표시합니다.",
+          "quiet_update": true,
+          "removed": false,
+          "revision": 2,
+          "source_path": null,
+          "status": "대기",
+          "title": "02-plain",
+          "updated_at": 1793979057093
+        },
+        "ok": true,
+        "opacity": 0.5,
+        "position": {
+          "x": 3496,
+          "y": 388
+        },
+        "size": {
+          "height": 136,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-b09222c3d68057de28b6eb9c/docs/demo65-c655c8-02-plain/index.md",
+        "visible": true
+      }
+    },
+    {
+      "case": "03-complete",
+      "window": {
+        "bounds": {
+          "X": 1748,
+          "Height": 102,
+          "Y": 262,
+          "Width": 300
+        },
+        "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — demo65-c655c8-03-complete",
+        "id": 43050
+      },
+      "state": {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 102.0,
+        "dev_label": "DEV egoing/diff · b09222c3",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "global_opacity": null,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "demo65-c655c8-03-complete",
+        "instance": "dev-b09222c3d68057de28b6eb9c",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>③ 이번에 두 항목 완료</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ 자료 확인</li><li class=\"task-item\">☑ 구현</li><li class=\"task-item\">☐ 검증</li></ul>\n<p>이번 완료 두 항목을 함께 강조합니다.</p>\n",
+          "color": "#e4f2dd",
+          "completion_html": "<h1>③ 이번에 두 항목 완료</h1>\n<ul class=\"task-list\"><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">자료 확인</mark></li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">구현</mark></li><li class=\"task-item\">☐ 검증</li></ul>\n<p>이번 완료 두 항목을 함께 강조합니다.</p>\n",
+          "edit_on_open": false,
+          "html": "<h1>③ 이번에 두 항목 완료</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ 자료 확인</li><li class=\"task-item\">☑ 구현</li><li class=\"task-item\">☐ 검증</li></ul>\n<p>이번 완료 두 항목을 함께 강조합니다.</p>\n",
+          "markdown": "# ③ 이번에 두 항목 완료\n\n- [x] 자료 확인\n- [x] 구현\n- [ ] 검증\n\n이번 완료 두 항목을 함께 강조합니다.",
+          "quiet_update": true,
+          "removed": false,
+          "revision": 2,
+          "source_path": null,
+          "status": "대기",
+          "title": "03-complete",
+          "updated_at": 1793979057175
+        },
+        "ok": true,
+        "opacity": 0.5,
+        "position": {
+          "x": 3496,
+          "y": 524
+        },
+        "size": {
+          "height": 204,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-b09222c3d68057de28b6eb9c/docs/demo65-c655c8-03-complete/index.md",
+        "visible": true
+      }
+    },
+    {
+      "case": "04-next",
+      "window": {
+        "bounds": {
+          "X": 1748,
+          "Height": 102,
+          "Y": 364,
+          "Width": 300
+        },
+        "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — demo65-c655c8-04-next",
+        "id": 43051
+      },
+      "state": {
+        "always_on_top": true,
+        "animating": false,
+        "auto_layout_excluded": false,
+        "content_height_cap": 102.0,
+        "dev_label": "DEV egoing/diff · b09222c3",
+        "feedback_active": false,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "global_opacity": null,
+        "highlight_revision": null,
+        "hovered": false,
+        "id": "demo65-c655c8-04-next",
+        "instance": "dev-b09222c3d68057de28b6eb9c",
+        "layout_destination": null,
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>④ 연속 갱신 · 최신 완료만</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ A: 자료 확인</li><li class=\"task-item\">☑ B: 구현</li><li class=\"task-item\">☐ C: 검증</li></ul>\n<p>A 다음 B를 완료하면 B만 강조합니다.</p>\n",
+          "color": "#fff0c9",
+          "completion_html": "<h1>④ 연속 갱신 · 최신 완료만</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ A: 자료 확인</li><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">B: 구현</mark></li><li class=\"task-item\">☐ C: 검증</li></ul>\n<p>A 다음 B를 완료하면 B만 강조합니다.</p>\n",
+          "edit_on_open": false,
+          "html": "<h1>④ 연속 갱신 · 최신 완료만</h1>\n<ul class=\"task-list\"><li class=\"task-item\">☑ A: 자료 확인</li><li class=\"task-item\">☑ B: 구현</li><li class=\"task-item\">☐ C: 검증</li></ul>\n<p>A 다음 B를 완료하면 B만 강조합니다.</p>\n",
+          "markdown": "# ④ 연속 갱신 · 최신 완료만\n\n- [x] A: 자료 확인\n- [x] B: 구현\n- [ ] C: 검증\n\nA 다음 B를 완료하면 B만 강조합니다.",
+          "quiet_update": true,
+          "removed": false,
+          "revision": 3,
+          "source_path": null,
+          "status": "대기",
+          "title": "04-next",
+          "updated_at": 1793979057385
+        },
+        "ok": true,
+        "opacity": 0.5,
+        "position": {
+          "x": 3496,
+          "y": 728
+        },
+        "size": {
+          "height": 204,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-b09222c3d68057de28b6eb9c/docs/demo65-c655c8-04-next/index.md",
+        "visible": true
+      }
+    },
+    {
+      "case": "05-mixed",
+      "window": {
+        "title": "Agent Gibbon [DEV egoing/diff · b09222c3] — demo65-c655c8-05-mixed",
+        "id": 43052,
+        "bounds": {
+          "X": 17,
+          "Height": 103,
+          "Y": 52,
+          "Width": 300
+        }
+      },
+      "state": {
+        "always_on_top": true,
+        "animating": true,
+        "auto_layout_excluded": false,
+        "content_height_cap": 103.0,
+        "dev_label": "DEV egoing/diff · b09222c3",
+        "feedback_active": true,
+        "feedback_surface": null,
+        "focused": false,
+        "folded": false,
+        "global_opacity": null,
+        "highlight_revision": 3,
+        "hovered": false,
+        "id": "demo65-c655c8-05-mixed",
+        "instance": "dev-b09222c3d68057de28b6eb9c",
+        "layout_destination": {
+          "height": 206,
+          "width": 600,
+          "x": 3496,
+          "y": 932
+        },
+        "layout_pending": false,
+        "note": {
+          "capture": null,
+          "change_html": "<h1>⑤ 중요한 변경 + 완료 체크</h1>\n<p><mark class=\"change-removed\">배포 대상: 테스트 환경</mark>\n<mark class=\"change-modified\">배포 대상: 운영 환경</mark></p>\n<ul class=\"task-list\"><li class=\"task-item\">☑ 검증 완료</li></ul>\n<p>읽은 뒤 다른 메모로 포커스를 옮기면 diff와 완료 강조가 사라집니다.</p>\n",
+          "color": "#f2dff0",
+          "completion_html": "<h1>⑤ 중요한 변경 + 완료 체크</h1>\n<p>배포 대상: 운영 환경</p>\n<ul class=\"task-list\"><li class=\"task-item\"><mark class=\"change-modified\">☑ </mark><mark class=\"change-modified\">검증 완료</mark></li></ul>\n<p>읽은 뒤 다른 메모로 포커스를 옮기면 diff와 완료 강조가 사라집니다.</p>\n",
+          "edit_on_open": false,
+          "html": "<h1>⑤ 중요한 변경 + 완료 체크</h1>\n<p>배포 대상: 운영 환경</p>\n<ul class=\"task-list\"><li class=\"task-item\">☑ 검증 완료</li></ul>\n<p>읽은 뒤 다른 메모로 포커스를 옮기면 diff와 완료 강조가 사라집니다.</p>\n",
+          "markdown": "# ⑤ 중요한 변경 + 완료 체크\n\n배포 대상: 운영 환경\n- [x] 검증 완료\n\n읽은 뒤 다른 메모로 포커스를 옮기면 diff와 완료 강조가 사라집니다.",
+          "quiet_update": true,
+          "removed": true,
+          "revision": 3,
+          "source_path": null,
+          "status": "대기",
+          "title": "05-mixed",
+          "updated_at": 1793979057585
+        },
+        "ok": true,
+        "opacity": 1.0,
+        "position": {
+          "x": 34,
+          "y": 104
+        },
+        "size": {
+          "height": 206,
+          "width": 600
+        },
+        "stash": {
+          "active": false,
+          "animating": false,
+          "indicator": {
+            "height": 48.0,
+            "width": 320.0,
+            "x": 864.0,
+            "y": 295.0
+          },
+          "indicator_moving": false,
+          "restoring": false,
+          "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+          "tip_visible": false,
+          "windows": null
+        },
+        "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-b09222c3d68057de28b6eb9c/docs/demo65-c655c8-05-mixed/index.md",
+        "visible": true
+      }
+    }
+  ],
+  "front_preserved": true,
+  "pointer_restored": true
+}

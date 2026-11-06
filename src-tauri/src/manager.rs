@@ -161,6 +161,8 @@ pub fn manager_set_visibility(
             color: None,
             title: None,
             markdown: None,
+            change_mode: None,
+            highlight: None,
             source_path: None,
             status: None,
         },

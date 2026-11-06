@@ -4,6 +4,19 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 pub const MAX_REQUEST: u64 = 1024 * 1024;
 
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum ChangeMode {
+    Diff,
+    Replace,
+}
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum Highlight {
+    None,
+    NewlyCompleted,
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Action {
@@ -20,6 +33,8 @@ pub enum Action {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Request {
+    pub change_mode: Option<ChangeMode>,
+    pub highlight: Option<Highlight>,
     pub action: Action,
     pub id: Option<String>,
     pub color: Option<String>,
@@ -49,6 +64,14 @@ impl Request {
             return Err(
                 "agent/diagnostics/diagnostics-probe 명령에는 옵션을 지정할 수 없습니다".into(),
             );
+        }
+        if self.change_mode.is_some() || self.highlight.is_some() {
+            if !matches!(self.action, Action::Update) || self.markdown.is_none() {
+                return Err("갱신 모드·강조는 본문이 있는 update에만 지정할 수 있습니다".into());
+            }
+            if self.highlight.is_some() && self.change_mode != Some(ChangeMode::Replace) {
+                return Err("highlight는 change-mode replace와 함께 사용하세요".into());
+            }
         }
         let id = self.id();
         if id.is_empty()
@@ -107,6 +130,8 @@ pub struct Note {
     pub color: String,
     pub html: String,
     pub change_html: String,
+    pub completion_html: Option<String>,
+    pub quiet_update: bool,
     pub removed: bool,
     pub markdown: String,
     pub source_path: Option<String>,
@@ -125,6 +150,8 @@ impl Default for Note {
             color: "#20252e".into(),
             html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),
             change_html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),
+            completion_html: None,
+            quiet_update: false,
             removed: false,
             markdown: "작업 내용을 기다리고 있습니다.".into(),
             source_path: None,
@@ -187,6 +214,8 @@ impl Note {
             color: None,
             title: None,
             status: None,
+            change_mode: None,
+            highlight: None,
             source_path: self.source_path.clone(),
             markdown: Some(markdown),
         })?;
@@ -205,6 +234,18 @@ impl Note {
         ) {
             return Ok(());
         }
+        // Validate a mixed update before changing any metadata. Quiet changes must
+        // never erase an important pending change or return later as noisy diff.
+        let quiet_base = if request.change_mode == Some(ChangeMode::Replace) {
+            match (&self.change_base, &request.markdown) {
+                (Some(base), Some(next)) if next != &self.markdown => {
+                    Some(rebase_quiet(base, &self.markdown, next)?)
+                }
+                _ => None,
+            }
+        } else {
+            None
+        };
         if let Some(color) = &request.color {
             self.color = color.to_ascii_lowercase();
         }
@@ -212,10 +253,30 @@ impl Note {
             self.title = title.clone();
         }
         if let Some(markdown) = &request.markdown {
-            if self.revision == 0 {
+            self.quiet_update = request.change_mode == Some(ChangeMode::Replace);
+            if request.change_mode == Some(ChangeMode::Replace) && self.markdown != *markdown {
+                self.completion_html = if request.highlight == Some(Highlight::NewlyCompleted) {
+                    let ranges = newly_completed(&self.markdown, markdown);
+                    (!ranges.is_empty()).then(|| render_changes(markdown, &ranges))
+                } else {
+                    None
+                };
+                if let Some(base) = quiet_base {
+                    self.change_base = Some(base);
+                    if let Some(base) = &self.change_base {
+                        let (ranges, removed) = changed_lines(base, markdown);
+                        self.change_html = render_diff(base, markdown, &ranges);
+                        self.removed = removed;
+                    }
+                } else if self.change_base.is_none() {
+                    self.change_html = render(markdown);
+                    self.removed = false;
+                }
+            } else if self.revision == 0 {
                 self.change_html = render(markdown);
                 self.removed = false;
             } else if self.markdown != *markdown {
+                self.completion_html = None;
                 let base = self
                     .change_base
                     .get_or_insert_with(|| self.markdown.clone());
@@ -240,6 +301,64 @@ impl Note {
         self.revision += 1;
         Ok(())
     }
+}
+
+// Quiet edits can cross an outstanding diff only on unchanged, position-stable
+// rows. Ambiguous/overlapping changes are rejected atomically, never acknowledged.
+fn rebase_quiet(base: &str, old: &str, new: &str) -> Result<String, String> {
+    let mut a: Vec<_> = base.split_inclusive('\n').collect();
+    let b: Vec<_> = old.split_inclusive('\n').collect();
+    let c: Vec<_> = new.split_inclusive('\n').collect();
+    let conflict = || {
+        "미확인 변경과 겹치는 조용한 교체입니다. 메모를 확인하거나 diff 모드로 갱신하세요"
+            .to_string()
+    };
+    if a.len() != b.len() || b.len() != c.len() {
+        return Err(conflict());
+    }
+    for i in 0..b.len() {
+        if b[i] != c[i] {
+            if a[i] != b[i] {
+                return Err(conflict());
+            }
+            a[i] = c[i];
+        }
+    }
+    Ok(a.concat())
+}
+
+fn newly_completed(old: &str, new: &str) -> Vec<std::ops::Range<usize>> {
+    fn tasks(body: &str) -> Vec<(String, bool, std::ops::Range<usize>)> {
+        let mut result = Vec::new();
+        for (event, range) in Parser::new_ext(body, Options::ENABLE_TASKLISTS).into_offset_iter() {
+            if let Event::TaskListMarker(checked) = event {
+                let start = body[..range.start].rfind('\n').map_or(0, |i| i + 1);
+                let end = body[range.end..]
+                    .find('\n')
+                    .map_or(body.len(), |i| range.end + i);
+                let key = format!("{}[]{}", &body[start..range.start], &body[range.end..end]);
+                result.push((key, checked, start..end));
+            }
+        }
+        result
+    }
+    let a = tasks(old);
+    let b = tasks(new);
+    let mut old_counts = std::collections::BTreeMap::new();
+    let mut new_counts = std::collections::BTreeMap::new();
+    for (key, checked, _) in &a {
+        let entry = old_counts.entry(key).or_insert((0usize, *checked));
+        entry.0 += 1;
+    }
+    for (key, _, _) in &b {
+        *new_counts.entry(key).or_insert(0usize) += 1;
+    }
+    b.iter()
+        .filter(|(key, checked, _)| {
+            *checked && old_counts.get(key) == Some(&(1, false)) && new_counts.get(key) == Some(&1)
+        })
+        .map(|(_, _, range)| range.clone())
+        .collect()
 }
 
 // Line-based LCS keeps unchanged islands. Bound quadratic work for 1 MiB
@@ -566,6 +685,87 @@ fn render_styled(markdown: &str, changes: &[std::ops::Range<usize>], kinds: &[&s
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn request65(body: &str, mode: &str) -> Request {
+        serde_json::from_value(serde_json::json!({"action":"update", "markdown":body,
+            "change_mode":mode, "highlight": if mode == "replace" { Some("newly-completed") } else { None }})).unwrap()
+    }
+    #[test]
+    fn quiet_completion_tracks_only_latest_and_never_changes_source() {
+        let mut note = Note::default();
+        note.apply(&request65("- [ ] A\n- [ ] B", "replace"))
+            .unwrap();
+        note.apply(&request65("- [x] A\n- [ ] B", "replace"))
+            .unwrap();
+        assert!(note.change_base.is_none());
+        assert!(note
+            .completion_html
+            .as_ref()
+            .unwrap()
+            .contains("change-modified"));
+        let previous = note.completion_html.clone();
+        note.apply(&request65("- [x] A\n- [ ] B", "replace"))
+            .unwrap();
+        assert_eq!(previous, note.completion_html);
+        note.apply(&request65("- [x] A\n- [x] B", "replace"))
+            .unwrap();
+        let html = note.completion_html.as_ref().unwrap();
+        assert!(!html.contains("change-modified\">A"));
+        assert!(html.contains("change-modified\">B"));
+        note.acknowledge_changes();
+        assert!(note.completion_html.is_some());
+        note.apply(&request65("- [ ] A\n- [x] B", "replace"))
+            .unwrap();
+        assert!(note.completion_html.is_none());
+        assert!(!note.markdown.contains("mark"));
+    }
+    #[test]
+    fn task_identity_handles_reorder_duplicates_nested_and_code() {
+        assert_eq!(
+            newly_completed("- [ ] A\n- [ ] B", "- [x] B\n- [x] A").len(),
+            2
+        );
+        assert!(newly_completed("- [ ] A\n- [ ] A", "- [x] A\n- [ ] A").is_empty());
+        assert_eq!(
+            newly_completed("- [ ] A\n  - [ ] B", "- [x] A\n  - [x] B").len(),
+            2
+        );
+        assert!(newly_completed("", "- [x] added").is_empty());
+        assert!(newly_completed("```\n- [ ] A\n```", "```\n- [x] A\n```").is_empty());
+    }
+    #[test]
+    fn mixed_quiet_update_preserves_diff_and_rejects_overlap_atomically() {
+        let mut note = Note::default();
+        note.apply(&request65("old\n- [ ] A", "diff")).unwrap();
+        note.apply(&request65("important\n- [ ] A", "diff"))
+            .unwrap();
+        note.apply(&request65("important\n- [x] A", "replace"))
+            .unwrap();
+        assert_eq!(note.change_base.as_deref(), Some("old\n- [x] A"));
+        let rev = note.revision;
+        assert!(note
+            .apply(&request65("overlap\n- [x] A", "replace"))
+            .is_err());
+        assert_eq!(note.revision, rev);
+        assert_eq!(note.markdown, "important\n- [x] A");
+        note.acknowledge_changes();
+        note.apply(&request65("next\n- [x] A", "diff")).unwrap();
+        assert!(!note.change_html.contains("☐"));
+        assert!(note.completion_html.is_none());
+    }
+    #[test]
+    fn update_options_are_strictly_validated() {
+        for value in [
+            serde_json::json!({"action":"inspect","change_mode":"replace"}),
+            serde_json::json!({"action":"update","markdown":"x","highlight":"newly-completed"}),
+            serde_json::json!({"action":"update","markdown":"x","change_mode":"diff","highlight":"none"}),
+        ] {
+            assert!(serde_json::from_value::<Request>(value)
+                .unwrap()
+                .validate()
+                .is_err());
+        }
+    }
+
     fn changed_note(old: &str, new: &str) -> Note {
         let mut note = Note::default();
         for (action, body) in [("open", old), ("update", new)] {
@@ -771,6 +971,8 @@ mod tests {
             color: None,
             status: None,
             markdown: Some("원문".into()),
+            change_mode: None,
+            highlight: None,
             source_path: Some(path.to_str().unwrap().into()),
         })
         .unwrap();
@@ -866,6 +1068,8 @@ mod tests {
     fn partial_updates_preserve_unspecified_fields() {
         let mut note = Note::default();
         note.apply(&Request {
+            change_mode: None,
+            highlight: None,
             source_path: None,
             id: None,
             color: None,
@@ -876,6 +1080,8 @@ mod tests {
         })
         .unwrap();
         note.apply(&Request {
+            change_mode: None,
+            highlight: None,
             source_path: None,
             id: None,
             color: None,
@@ -894,6 +1100,8 @@ mod tests {
         let mut note = Note::default();
         assert!(note
             .apply(&Request {
+                change_mode: None,
+                highlight: None,
                 source_path: None,
                 id: None,
                 color: None,
@@ -997,6 +1205,8 @@ mod palette_tests {
                 title: None,
                 status: None,
                 markdown: Some("새 메모".into()),
+                change_mode: None,
+                highlight: None,
                 source_path: None,
                 color: None,
             };
