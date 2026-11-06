@@ -4,7 +4,9 @@ const el = id => document.getElementById(id);
 let notes = [], selected = null, busy = false, detailVersion = 0, signature = '';
 // Register settings destinations here; navigation preserves each panel's DOM.
 const settingsSections = ['privacy', 'skills'];
+let selectedSettingsSection = 'privacy';
 function settingsSection(selectedSection) {
+  selectedSettingsSection = selectedSection;
   for (const section of settingsSections) {
     const active = section === selectedSection;
     el(`settings-${section}`).hidden = !active;
@@ -12,7 +14,10 @@ function settingsSection(selectedSection) {
   }
 }
 for (const section of settingsSections) {
-  el(`settings-${section}-nav`).onclick = () => settingsSection(section);
+  el(`settings-${section}-nav`).onclick = () => {
+    settingsSection(section);
+    if (section === 'skills') window.gibbonSkills?.refresh();
+  };
 }
 function page(settings) {
   if(window.gibbonPrivacy && !window.gibbonPrivacy.accepted()){window.gibbonPrivacy.showWelcome();return;}
@@ -21,6 +26,7 @@ function page(settings) {
   el('notes-nav').setAttribute('aria-pressed', String(!settings));
   el('settings-nav').setAttribute('aria-pressed', String(settings));
   if (!settings) refresh();
+  else if (selectedSettingsSection === 'skills') window.gibbonSkills?.refresh();
   else window.gibbonPrivacy?.refresh().catch(()=>{});
 }
 el('notes-nav').onclick = () => page(false);

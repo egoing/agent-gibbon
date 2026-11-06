@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="660" viewBox="0 0 1000 660">
 <style>text{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#222}</style>
 <rect width="1000" height="660" fill="white" stroke="#999"/>
-<text x="28" y="40" font-size="23" font-weight="600">03 설정 · 사이드바</text>
-<text x="28" y="68" font-size="14">화면 구조 시안 · 실제 앱 캡처가 아님</text>
+<text x="28" y="40" font-size="23" font-weight="600">03 설정 · 스킬</text>
+<text x="28" y="68" font-size="14">현재 구현 구조 · 스위치 상태는 설명용 · 실제 앱 캡처와 구분</text>
 <rect x="28" y="96" width="944" height="480" fill="white" stroke="#999"/>
 <path d="M28 150H972 M248 150V576" stroke="#bbb"/>
 <text x="48" y="130" font-size="18" font-weight="600">Agent Gibbon</text>
@@ -11,26 +11,31 @@
 <rect x="852" y="108" width="96" height="30" fill="#eee" stroke="#999"/>
 <text x="884" y="129" font-size="14">설정</text>
 <text x="40" y="184" font-size="17" font-weight="600">설정</text>
-<rect x="40" y="203" width="196" height="64" fill="#eee" stroke="#aaa"/>
-<text x="52" y="228" font-size="16">Privacy &amp;</text>
-<text x="52" y="252" font-size="16">Diagnostics</text>
-<text x="52" y="299" font-size="16">스킬</text>
-<text x="276" y="191" font-size="21" font-weight="600">Privacy &amp; Diagnostics</text>
-<text x="276" y="221" font-size="16">Your choice is stored locally.</text>
-<rect x="276" y="244" width="656" height="169" rx="8" fill="#fafafa" stroke="#bbb"/>
-<rect x="294" y="269" width="18" height="18" fill="white" stroke="#aaa"/>
-<text x="324" y="284" font-size="16">I agree to diagnostic sharing (optional)</text>
-<text x="294" y="318" font-size="14">Not sharing</text>
-<text x="294" y="348" font-size="14">Sanitized errors, versions, timings and freeze diagnostics.</text>
-<text x="294" y="378" font-size="14">No notes, terminal input/output, clipboard or screenshots.</text>
-<text x="276" y="445" font-size="14">Turning this off saves withdrawal immediately.</text>
-<text x="276" y="467" font-size="14">Turning it on requires Save Changes.</text>
-<rect x="276" y="485" width="128" height="36" fill="white" stroke="#aaa"/>
-<text x="291" y="509" font-size="16">Read Terms</text>
-<rect x="416" y="485" width="150" height="36" fill="white" stroke="#aaa"/>
-<text x="430" y="509" font-size="16">Privacy Notice</text>
-<rect x="778" y="530" width="154" height="34" fill="white" stroke="#aaa"/>
-<text x="794" y="553" font-size="16">Save Changes</text>
-<text x="28" y="610" font-size="15">왼쪽 메뉴와 오른쪽 본문은 각각 스크롤 · 메뉴 전환 시 기존 입력 유지</text>
-<text x="28" y="638" font-size="13">스킬 메뉴는 진입점만 제공 · 설치·On/Off·업데이트 기능은 이슈 #67 후속 범위</text>
+<text x="52" y="227" font-size="16">Privacy &amp; Diagnostics</text>
+<rect x="40" y="248" width="196" height="42" fill="#eee" stroke="#aaa"/>
+<text x="52" y="275" font-size="16">스킬</text>
+<text x="276" y="191" font-size="21" font-weight="600">스킬</text>
+<rect x="276" y="215" width="656" height="144" fill="white" stroke="#bbb"/>
+<path d="M276 267H932" stroke="#ccc"/>
+<circle cx="297" cy="241" r="5" fill="white" stroke="#777"/>
+<text x="315" y="246" font-size="16" font-weight="600">메모 관리</text>
+<path d="M902 238l6 6 6-6" fill="none" stroke="#555" stroke-width="2"/>
+<text x="296" y="299" font-size="16">Agent Gibbon의 메모 생성·조회·갱신·숨기기를 사용합니다.</text>
+<text x="296" y="325" font-size="16">기존 창의 위치와 포커스, 숨김 상태를 유지합니다.</text>
+<text x="824" y="333" font-size="14">Off</text>
+<rect x="860" y="315" width="44" height="26" rx="13" fill="#777"/>
+<circle cx="873" cy="328" r="10" fill="white"/>
+<rect x="276" y="367" width="656" height="144" fill="#eef8ef" stroke="#bbb"/>
+<path d="M276 419H932" stroke="#ccc"/>
+<circle cx="297" cy="393" r="9" fill="#238636" opacity=".1"/>
+<circle cx="297" cy="393" r="5" fill="#238636"/>
+<text x="315" y="398" font-size="16" font-weight="600">작업 진행 표시</text>
+<path d="M902 390l6 6 6-6" fill="none" stroke="#555" stroke-width="2"/>
+<text x="296" y="451" font-size="16">작업 계획과 진행상황을 플로팅 체크리스트 메모로 표시합니다.</text>
+<text x="296" y="477" font-size="16">실제로 끝난 단계와 미검증 범위를 구분합니다.</text>
+<text x="824" y="485" font-size="14">On</text>
+<rect x="860" y="467" width="44" height="26" rx="13" fill="#238636"/>
+<circle cx="891" cy="480" r="10" fill="white"/>
+<text x="28" y="610" font-size="15">아코디언을 접어도 활성 표시 유지 · On/Off는 실제 설치와 로컬 저장 후 반영</text>
+<text x="28" y="638" font-size="13">처음에는 모두 Off · 에이전트 작업 자동 실행 없음 · 이슈 첨부 예시 시안을 교체한 파일이 아님</text>
 </svg>

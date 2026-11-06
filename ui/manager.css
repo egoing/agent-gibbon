@@ -17,3 +17,26 @@
 .settings-content .privacy-card{padding:0}
 .settings-content .privacy-links,.settings-content .privacy-actions{flex-wrap:wrap}
 @media(max-width:680px){#settings-page{grid-template-columns:164px minmax(0,1fr)}.settings-content{padding:16px}.settings-sidebar{padding:16px 8px}.settings-sidebar button{font-size:14px;padding:8px}}
+
+#skills-list{max-width:720px;margin-top:20px}
+.skill-item{border:1px solid #bbb;margin:8px 0;background:#fff;overflow-wrap:anywhere}
+.skill-item[data-enabled=true]{background:#eef8ef}
+.skill-item summary{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;list-style:none;min-height:48px;font-weight:600}
+.skill-item summary::-webkit-details-marker{display:none}
+.skill-item summary::after{content:'';width:9px;height:9px;border-right:2px solid #555;border-bottom:2px solid #555;transform:rotate(-45deg);margin-left:auto;flex-shrink:0}
+.skill-item[open] summary::after{transform:rotate(45deg)}
+.skill-item summary:focus-visible{outline:2px solid #333;outline-offset:-3px}
+.skill-dot{width:11px;height:11px;flex:0 0 11px;border:1px solid #777;border-radius:50%;background:#fff}
+.skill-item[data-enabled=true] .skill-dot{border-color:#238636;background:#238636;box-shadow:0 0 0 4px #2386361a}
+.skill-status-label{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.skill-body{display:flex;align-items:center;justify-content:space-between;gap:24px;border-top:1px solid #ccc;padding:18px 20px}
+.skill-body p{margin:0;max-width:540px}
+.skill-switch{display:flex;align-items:center;gap:12px;flex-shrink:0;border:0;background:transparent;padding:8px 0 8px 8px;min-height:40px}
+.skill-switch-track{display:block;width:44px;height:26px;border-radius:13px;background:#777;padding:3px}
+.skill-switch-track::after{content:'';display:block;width:20px;height:20px;border-radius:50%;background:white}
+.skill-switch[aria-checked=true] .skill-switch-track{background:#238636}
+.skill-switch[aria-checked=true] .skill-switch-track::after{transform:translateX(18px)}
+.settings-feedback{border:1px solid #b77;padding:12px;color:#722;background:#f8eeee;overflow-wrap:anywhere;max-width:720px}
+@media(max-width:680px){.skill-body{align-items:flex-start;flex-direction:column;gap:12px;padding:16px}.skill-switch{align-self:flex-end}.skill-item summary{padding:12px}}
+
+.skill-switch[aria-disabled=true]{opacity:.55;cursor:progress}
