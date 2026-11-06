@@ -1,7 +1,7 @@
 {
-  "operator": null,
-  "privacy_contact": null,
+  "operator": "egoing",
+  "privacy_contact": "egoing+support@gmail.com",
   "recipient": "Functional Software, Inc. (Sentry)",
-  "storage_region": null,
+  "storage_region": "United States (Iowa)",
   "retention_days": null
 }
