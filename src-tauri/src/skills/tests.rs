@@ -2,7 +2,7 @@ use super::*;
 use std::io::Write;
 
 struct Fixture {
-    dir: tempfile::TempDir,
+    _tempdir: tempfile::TempDir,
     service: Service,
 }
 impl Fixture {
@@ -21,7 +21,10 @@ impl Fixture {
             },
             revision: "release-1".into(),
         };
-        Self { dir, service }
+        Self {
+            _tempdir: dir,
+            service,
+        }
     }
     fn agent(&self, name: &str) {
         let path = self.service.environment.paths[0].join(if cfg!(windows) {
@@ -199,7 +202,7 @@ fn state_write_failure_rolls_back_every_agent_copy() {
 fn on_replaces_symlink_entry_without_modifying_its_shared_source() {
     let f = Fixture::new();
     f.agent("codex");
-    let source = f.dir.path().join("shared-skill");
+    let source = f._tempdir.path().join("shared-skill");
     fs::create_dir_all(&source).unwrap();
     fs::write(source.join("SKILL.md"), "shared original").unwrap();
     let dest = f.installed("agent-gibbon");
@@ -232,7 +235,7 @@ fn cross_instance_lock_refuses_parallel_changes() {
 #[test]
 fn catalog_is_real_self_contained_resources_and_does_not_ship_example_capabilities() {
     for s in catalog() {
-        assert!(s.markdown.starts_with("---\n"));
+        assert_eq!(s.markdown.lines().next(), Some("---"));
         assert!(s.markdown.contains(&format!("name: {}", s.id)));
         assert!(!s.markdown.contains("TODO"));
         assert!(!s.markdown.contains("AGENT_GIBBON_SKILLS_TEST_ROOT"));

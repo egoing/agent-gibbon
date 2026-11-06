@@ -82,3 +82,7 @@ Conf 4 / Risk Medium. 네이티브 로컬 파일 경로는 실제 확인했고 �
 사용자가 다른 인스턴스를 종료하고 현재 구현을 실행하라고 명시했다. 실행 파일 절대 경로를 확인한 PID 22648(memo-show-common)·70065(이전 on-off)·70637(기본 체크아웃)을 종료하고, 현재 루트에서 `npm run dev:build` 후 `npm run dev -- --no-watch`로 최신 앱을 실행했다. 이후 실행 파일 조회에서 Agent Gibbon은 현재 루트의 PID 17134 하나만 남았다.
 
 `inspect --id issue67-work-20261106`의 `ok:true`, instance `dev-1206da86e9acf14ddf9c123c`, ID·본문을 대조했다. Manager는 같은 PID의 창 39476, 제목 `Agent Gibbon [DEV egoing/on-off · 1206da86] — 메모 관리`로 특정했다. 설정 → 스킬의 두 실제 summary를 native 트리와 [현재 워크트리 실행 화면](issue67-skills/current-worktree-running.png)에서 확인했다. On/Off와 개인정보 선택은 조작하지 않았다. 기존에 숨긴 main과 진행 메모는 숨김을 유지했다. 이 후속 확인은 최신 UI의 실제 작업 루트 실행이며 설치·업데이트 동작 검증은 위의 격리 fixture 범위를 따른다.
+
+## 병합 전 Windows CI 보정
+
+PR #72의 첫 Windows 실행에서 Rust 126개 중 스킬 리소스 형식 검사 1개가 CRLF 줄바꿈 때문에 실패했다. 첫 행을 `lines()`로 읽어 YAML 구분선을 검사하도록 바꾸고, Unix 링크 검사에서만 직접 사용하는 TempDir 보관 필드를 `_tempdir`로 명명해 Windows의 미사용 경고를 제거했다. 제품 설치·저장 코드는 바꾸지 않았다. 로컬 스킬 12개와 Clippy를 다시 통과했으며, 최종 Windows·macOS ARM64·Intel 자동 검사/빌드 결과는 PR #72의 마지막 head CI를 따른다. 해당 CI 빌드가 실제 플랫폼 UI나 배포 업그레이드 검증을 대신하지 않는다.
