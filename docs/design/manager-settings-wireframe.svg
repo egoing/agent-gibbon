@@ -1,17 +1,36 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="660" viewBox="0 0 1000 660"><style>text{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#222}</style>
-<rect x="0" y="0" width="1000" height="660" fill="white" stroke="#999"/>
-<text x="28" y="40" font-size="23" font-weight="600">03  설정</text>
-<text x="28" y="68" font-size="14" font-weight="400">최소 구현 와이어프레임 · 화면 구조만 표현 · 예시 데이터</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="660" viewBox="0 0 1000 660">
+<style>text{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#222}</style>
+<rect width="1000" height="660" fill="white" stroke="#999"/>
+<text x="28" y="40" font-size="23" font-weight="600">03 설정 · 사이드바</text>
+<text x="28" y="68" font-size="14">화면 구조 시안 · 실제 앱 캡처가 아님</text>
 <rect x="28" y="96" width="944" height="480" fill="white" stroke="#999"/>
-<path d="M28 150L972 150" stroke="#bbb"/>
+<path d="M28 150H972 M248 150V576" stroke="#bbb"/>
 <text x="48" y="130" font-size="18" font-weight="600">Agent Gibbon</text>
 <rect x="700" y="108" width="140" height="30" fill="white" stroke="#999"/>
-<text x="728" y="129" font-size="14" font-weight="400">모든 메모</text>
+<text x="728" y="129" font-size="14">모든 메모</text>
 <rect x="852" y="108" width="96" height="30" fill="#eee" stroke="#999"/>
-<text x="884" y="129" font-size="14" font-weight="400">설정</text>
-<text x="60" y="196" font-size="21" font-weight="600">설정</text>
-<text x="60" y="250" font-size="17" font-weight="400">아직 설정 항목이 없습니다.</text>
-<text x="60" y="282" font-size="15" font-weight="400">필요한 설정을 이 페이지에 추가합니다.</text>
-<text x="28" y="613" font-size="15" font-weight="400">설정은 페이지 자리만 마련합니다. 구체적인 설정 항목은 후속 결정합니다.</text>
-<text x="28" y="640" font-size="13" font-weight="400">앱 미구현 · 읽기 전용 · 검색 / 편집 / 도킹 / 정보 패널 제외</text>
+<text x="884" y="129" font-size="14">설정</text>
+<text x="40" y="184" font-size="17" font-weight="600">설정</text>
+<rect x="40" y="203" width="196" height="64" fill="#eee" stroke="#aaa"/>
+<text x="52" y="228" font-size="16">Privacy &amp;</text>
+<text x="52" y="252" font-size="16">Diagnostics</text>
+<text x="52" y="299" font-size="16">스킬</text>
+<text x="276" y="191" font-size="21" font-weight="600">Privacy &amp; Diagnostics</text>
+<text x="276" y="221" font-size="16">Your choice is stored locally.</text>
+<rect x="276" y="244" width="656" height="169" rx="8" fill="#fafafa" stroke="#bbb"/>
+<rect x="294" y="269" width="18" height="18" fill="white" stroke="#aaa"/>
+<text x="324" y="284" font-size="16">I agree to diagnostic sharing (optional)</text>
+<text x="294" y="318" font-size="14">Not sharing</text>
+<text x="294" y="348" font-size="14">Sanitized errors, versions, timings and freeze diagnostics.</text>
+<text x="294" y="378" font-size="14">No notes, terminal input/output, clipboard or screenshots.</text>
+<text x="276" y="445" font-size="14">Turning this off saves withdrawal immediately.</text>
+<text x="276" y="467" font-size="14">Turning it on requires Save Changes.</text>
+<rect x="276" y="485" width="128" height="36" fill="white" stroke="#aaa"/>
+<text x="291" y="509" font-size="16">Read Terms</text>
+<rect x="416" y="485" width="150" height="36" fill="white" stroke="#aaa"/>
+<text x="430" y="509" font-size="16">Privacy Notice</text>
+<rect x="778" y="530" width="154" height="34" fill="white" stroke="#aaa"/>
+<text x="794" y="553" font-size="16">Save Changes</text>
+<text x="28" y="610" font-size="15">왼쪽 메뉴와 오른쪽 본문은 각각 스크롤 · 메뉴 전환 시 기존 입력 유지</text>
+<text x="28" y="638" font-size="13">스킬 메뉴는 진입점만 제공 · 설치·On/Off·업데이트 기능은 이슈 #67 후속 범위</text>
 </svg>

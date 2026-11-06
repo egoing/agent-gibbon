@@ -6,7 +6,7 @@ const source = readFileSync(new URL('../ui/manager.js', import.meta.url), 'utf8'
 function setup() {
   const elements = new Map();
   const make = () => ({ hidden: false, children: [], dataset: {}, parentElement: { scrollTop: 0 }, setAttribute(k,v) { this[k] = v; }, append(x) { this.children.push(x); }, replaceChildren() { this.children = []; this.textContent = ''; }, addEventListener() {}, focus() {} });
-  for (const id of ['notes-page','settings-page','notes-nav','settings-nav','retry','refresh','detail','list','error']) elements.set(id, make());
+  for (const id of ['notes-page','settings-page','notes-nav','settings-nav','retry','refresh','detail','list','error','settings-privacy','settings-skills','settings-privacy-nav','settings-skills-nav']) elements.set(id, make());
   let data = [{id:'hidden',title:'숨긴 메모',html:'<h1>숨긴 메모</h1><p>내용</p>',capture:null}];
   const calls = [];
   const context = vm.createContext({document:{getElementById:id=>elements.get(id),createElement:make,hidden:false}, window:{__TAURI__:{core:{invoke:async name=>{ calls.push(name); return data; }}},addEventListener(){}},setInterval(){}});
@@ -27,4 +27,26 @@ test('read-only selection, settings navigation and empty result', async () => {
   assert.deepEqual([...new Set(app.calls)],['manager_notes']);
   app.setData([]); await app.run('refresh(true)');
   assert.match(app.elements.get('detail').textContent,/없습니다/);
+});
+test('settings sections preserve privacy drafts and selected memo across navigation', async () => {
+  const app = setup(); await new Promise(setImmediate);
+  const e = id => app.elements.get(id);
+  e('list').children[0].onclick();
+  e('settings-nav').onclick();
+  e('settings-privacy').draft = 'unsaved sharing choice';
+  e('settings-skills-nav').onclick();
+  assert.equal(e('settings-privacy').hidden, true);
+  assert.equal(e('settings-skills').hidden, false);
+  assert.equal(e('settings-skills-nav')['aria-current'], 'page');
+  assert.equal(e('settings-privacy-nav')['aria-current'], 'false');
+  e('notes-nav').onclick(); e('settings-nav').onclick();
+  assert.equal(e('settings-skills').hidden, false);
+  e('settings-privacy-nav').onclick();
+  assert.equal(e('settings-privacy').hidden, false);
+  assert.equal(e('settings-skills').hidden, true);
+  assert.equal(e('settings-privacy').draft, 'unsaved sharing choice');
+  assert.equal(e('settings-privacy-nav')['aria-current'], 'page');
+  e('notes-nav').onclick();
+  assert.match(e('detail').children[0].innerHTML, /숨긴 메모/);
+  assert.deepEqual([...new Set(app.calls)], ['manager_notes']);
 });
