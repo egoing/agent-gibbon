@@ -521,79 +521,95 @@ pub async fn terminal_start(
     rows: u16,
     output: Channel<Vec<u8>>,
     choice: Option<String>,
+    local_flow: Option<u64>,
 ) -> Result<Value, String> {
+    let mut worker_call = {
+        let _scope = crate::local_trace::webview_scope(&window, local_flow);
+        crate::local_trace::Call::begin("terminal.worker", crate::local_trace::Stage::UiQueue)
+    };
     let id = caller(&window)?;
     let app = window.app_handle().clone();
     tauri::async_runtime::spawn_blocking(move || {
-        let _timing = crate::telemetry::Timing::new("terminal.start");
-        let dimensions = size(cols, rows)?;
-        let state = app.state::<Terminals>();
-        let reservation = Start::reserve(&state, &id)?;
-        let agent = state
-            .agents
-            .lock()
-            .map_err(err)?
-            .get(&id)
-            .cloned()
-            .ok_or("터미널 창이 없습니다")?;
-        let (session, mut reader) = if agent.kind == Kind::Terminal {
-            welcome::start(&agent, choice.as_deref().unwrap_or("shell"), dimensions)?
-        } else {
-            start_session(&state.discovery, &root(&app).join(&id), dimensions)?
-        };
-        let watched_session = Arc::downgrade(&reservation.finish(session)?);
-        welcome::touch_path(&app, &id)?;
-        let watched_app = app.clone();
-        let watched_id = id.clone();
-        // Raw bytes preserve UTF-8 across arbitrary PTY read boundaries.
-        std::thread::spawn(move || {
-            let mut directory_report = welcome::DirectoryReport::default();
-            let mut bytes = [0u8; 8192];
-            loop {
-                match reader.read(&mut bytes) {
-                    Ok(0) | Err(_) => break,
-                    Ok(n) => {
-                        let _timing = crate::telemetry::Timing::new("terminal.output");
-                        let paths = {
-                            let _filter = crate::telemetry::Timing::new("terminal.output.filter");
-                            directory_report.feed(&bytes[..n])
-                        };
-                        let state = watched_app.state::<Terminals>();
-                        let sessions = state.sessions.lock().unwrap();
-                        if sessions
-                            .get(&watched_id)
-                            .and_then(running)
-                            .is_some_and(|s| {
-                                std::ptr::eq(Arc::as_ptr(&s), watched_session.as_ptr())
-                            })
-                        {
-                            let Some(watched_session) = watched_session.upgrade() else {
-                                break;
+        let _scope = worker_call.scope();
+        worker_call.stage(crate::local_trace::Stage::UiExecute);
+        let result = (|| {
+            let _timing = crate::telemetry::Timing::new("terminal.start");
+            let dimensions = size(cols, rows)?;
+            let state = app.state::<Terminals>();
+            let reservation = Start::reserve(&state, &id)?;
+            let agent = state
+                .agents
+                .lock()
+                .map_err(err)?
+                .get(&id)
+                .cloned()
+                .ok_or("터미널 창이 없습니다")?;
+            let (session, mut reader) = if agent.kind == Kind::Terminal {
+                welcome::start(&agent, choice.as_deref().unwrap_or("shell"), dimensions)?
+            } else {
+                start_session(&state.discovery, &root(&app).join(&id), dimensions)?
+            };
+            let watched_session = Arc::downgrade(&reservation.finish(session)?);
+            welcome::touch_path(&app, &id)?;
+            let watched_app = app.clone();
+            let watched_id = id.clone();
+            let output_parent = crate::local_trace::current();
+            // Raw bytes preserve UTF-8 across arbitrary PTY read boundaries.
+            std::thread::spawn(move || {
+                let mut directory_report = welcome::DirectoryReport::default();
+                let mut bytes = [0u8; 8192];
+                loop {
+                    match reader.read(&mut bytes) {
+                        Ok(0) | Err(_) => break,
+                        Ok(n) => {
+                            let _scope = crate::local_trace::Scope::enter(output_parent);
+                            let _timing = crate::telemetry::Timing::new("terminal.output");
+                            let paths = {
+                                let _filter =
+                                    crate::telemetry::Timing::new("terminal.output.filter");
+                                directory_report.feed(&bytes[..n])
                             };
-                            let mut s = watched_session.lock().unwrap();
-                            if directory_report.take_prompt(&s.prompt.token) {
-                                s.prompt.report();
+                            let state = watched_app.state::<Terminals>();
+                            let sessions = state.sessions.lock().unwrap();
+                            if sessions
+                                .get(&watched_id)
+                                .and_then(running)
+                                .is_some_and(|s| {
+                                    std::ptr::eq(Arc::as_ptr(&s), watched_session.as_ptr())
+                                })
+                            {
+                                let Some(watched_session) = watched_session.upgrade() else {
+                                    break;
+                                };
+                                let mut s = watched_session.lock().unwrap();
+                                if directory_report.take_prompt(&s.prompt.token) {
+                                    s.prompt.report();
+                                }
+                                drop(s);
+                                for path in paths {
+                                    let _ = welcome::set_path(&watched_app, &watched_id, path);
+                                }
                             }
-                            drop(s);
-                            for path in paths {
-                                let _ = welcome::set_path(&watched_app, &watched_id, path);
-                            }
+                            drop(sessions);
+                            // Keep draining after the webview closes: a full PTY can block shell exit.
+                            let _dispatch =
+                                crate::telemetry::Timing::new("terminal.output.dispatch");
+                            let _ = output.send(bytes[..n].to_vec());
                         }
-                        drop(sessions);
-                        // Keep draining after the webview closes: a full PTY can block shell exit.
-                        let _dispatch = crate::telemetry::Timing::new("terminal.output.dispatch");
-                        let _ = output.send(bytes[..n].to_vec());
                     }
                 }
-            }
-            let state = watched_app.state::<Terminals>();
-            if let Some(session) = watched_session.upgrade() {
-                let _ = observe_exit(&mut session.lock().unwrap(), &state.discovery);
-            }
-            let _ = output
-                .send(b"\r\n[PTY \xec\x84\xb8\xec\x85\x98 \xec\xa2\x85\xeb\xa3\x8c]\r\n".to_vec());
-        });
-        inspect(&app, &id)
+                let state = watched_app.state::<Terminals>();
+                if let Some(session) = watched_session.upgrade() {
+                    let _ = observe_exit(&mut session.lock().unwrap(), &state.discovery);
+                }
+                let _ = output.send(
+                    b"\r\n[PTY \xec\x84\xb8\xec\x85\x98 \xec\xa2\x85\xeb\xa3\x8c]\r\n".to_vec(),
+                );
+            });
+            inspect(&app, &id)
+        })();
+        worker_call.finish(result.is_ok());
+        result
     })
     .await
     .map_err(err)?
