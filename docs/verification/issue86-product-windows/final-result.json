@@ -1,0 +1,54 @@
+{
+  "source_sha": "27e5321049ad42b2e75848221ac27f9990df3055",
+  "instance": "dev-048cf12677f7f889066b5597",
+  "checks": {
+    "mandatory": {
+      "move_resize": true,
+      "topmost_after_B": true,
+      "actual_input": true,
+      "release_restore": true,
+      "minimum_rollback": true,
+      "stale_refusal": true
+    },
+    "launches": {
+      "new_shortcut_launch": true,
+      "shortcut_working_directory": true,
+      "existing_explicit_selection": true,
+      "cancel_no_late_attach": true,
+      "pending_timeout": true
+    },
+    "recovery": {
+      "crash_journal_restore": true,
+      "guard_mismatch_no_touch": true,
+      "orderly_wm_quit_restore": true
+    },
+    "ui": {
+      "actual_Ctrl_Shift_4": true,
+      "overlay_escape_cancel": true,
+      "tiny_overlay_retained": true,
+      "one_line_buttons": true,
+      "selection_does_not_run": true,
+      "existing_disambiguation": true,
+      "run_attaches_selected": true,
+      "actual_welcome_release": true,
+      "actual_welcome_cancel": true
+    }
+  },
+  "runs": {
+    "mandatory": "run-20261107-022338",
+    "launches": "run-20261107-022353",
+    "recovery": "run-20261107-022543",
+    "ui": "run-20261107-022602"
+  },
+  "mandatory_product_facts": "PASS",
+  "source_modified": false,
+  "diagnostics_opt_in": false,
+  "evidence_branch": "verify/issue86-product-windows-27e5321",
+  "limitations": [
+    "actual tray GUI release/quit not verified",
+    "actual recycled HWND/PID not reproduced; only own-window claim mismatch simulated",
+    "direct attach/chooser-close race overlap not confirmed",
+    "mixed DPI/multiple monitors/Medium integrity/UAC not verified",
+    "other installed Gibbon was not running at preservation baseline; no preservation PASS claimed"
+  ]
+}

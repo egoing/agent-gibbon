@@ -1,0 +1,53 @@
+   Compiling agent-gibbon v0.2.7 (C:\Users\egoin\orca\workspaces\agent-gibbon\86-product-verification\src-tauri)
+error: function `PeekMessageW` is never used
+  --> src\external_apps\windows.rs:51:8
+   |
+51 |     fn PeekMessageW(message: *mut Message, hwnd: isize, min: u32, max: u32, remove: u32) -> i32;
+   |        ^^^^^^^^^^^^
+   |
+   = note: `-D dead-code` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[expect(dead_code)]` or `#[allow(dead_code)]`
+
+error: this `if` statement can be collapsed
+   --> src\external_apps\windows.rs:736:5
+    |
+736 | /     if event == 0x8001 && hwnd != 0 && object == 0 && child == 0 {
+737 | |         if OBSERVED_WINDOWS
+738 | |             .lock()
+739 | |             .is_ok_and(|mut known| known.remove(&hwnd))
+...   |
+743 | |     }
+    | |_____^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_if
+    = note: `-D clippy::collapsible-if` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_if)]`
+help: collapse nested if block
+    |
+736 ~     if event == 0x8001 && hwnd != 0 && object == 0 && child == 0
+737 ~         && OBSERVED_WINDOWS
+738 |             .lock()
+...
+741 |             WINDOW_EPOCH.fetch_add(1, Ordering::SeqCst);
+742 ~         }
+    |
+
+error: `GetMessageW` redeclared with a different signature
+   --> src\stash_input.rs:200:9
+    |
+200 |         fn GetMessageW(message: *mut Message, window: Handle, min: u32, max: u32) -> i32;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this signature doesn't match the previous declaration
+    |
+   ::: src\external_apps\windows.rs:52:5
+    |
+ 52 |     fn GetMessageW(message: *mut Message, hwnd: isize, min: u32, max: u32) -> i32;
+    |     ------------------------------------------------------------------------------ `GetMessageW` previously declared here
+    |
+    = note: expected `unsafe extern "system" fn(*mut external_apps::windows::Message, isize, u32, u32) -> i32`
+               found `unsafe extern "system" fn(*mut stash_input::windows::Message, *mut std::ffi::c_void, u32, u32) -> i32`
+    = note: `-D clashing-extern-declarations` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clashing_extern_declarations)]`
+
+error: could not compile `agent-gibbon` (bin "agent-gibbon") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `agent-gibbon` (bin "agent-gibbon" test) due to 3 previous errors

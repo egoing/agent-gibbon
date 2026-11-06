@@ -1,0 +1,55 @@
+{
+  "id": "2ce8d7a5-e942-4176-bf1d-5b276e0f9020",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "cd4b1f8e-2988-42c9-ae85-c9cefa118fff",
+      "app": {
+        "name": "Issue86ProductWindow",
+        "bundleId": "Issue86ProductWindow",
+        "pid": 19100
+      },
+      "window": {
+        "title": "ISSUE86-PRODUCT-A-task6b023e9f",
+        "id": 3017072,
+        "index": null,
+        "x": 220,
+        "y": 180,
+        "width": 640,
+        "height": 420,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=Issue86ProductWindow (pid 19100)\nWindow: \"ISSUE86-PRODUCT-A-task6b023e9f\", App: Issue86ProductWindow.\n\n0 window ISSUE86-PRODUCT-A-task6b023e9f\n\t1 text ISSUE86-PRODUCT-A-task6b023e9f Dedicated external process / ordinary WinForms editor\n\t2 document PoCEditor, Secondary Actions: Scroll\n\t3 button ClickProbe\n\t4 text clicks=1\n\t5 title bar ISSUE86-PRODUCT-A-task6b023e9f\n\t\t6 menu bar 시스템 메뉴 모음\n\t\t\t7 menu item 시스템\n\t\t8 button 최소화\n\t\t9 button 최대화\n\t\t10 button 닫기",
+      "elementCount": 11,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      }
+    },
+    "screenshot": {
+      "format": "png",
+      "width": 640,
+      "height": 420,
+      "scale": 1,
+      "path": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\2ce8d7a5-e942-4176-bf1d-5b276e0f9020-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-07T17:23:49.023Z"
+    },
+    "screenshotStatus": {
+      "state": "captured",
+      "metadata": {
+        "engine": "unknown",
+        "windowId": 3017072
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

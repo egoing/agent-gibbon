@@ -1,0 +1,55 @@
+{
+  "id": "741723d9-d7b0-4658-b65b-12daef22df3c",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "b0a19647-c1f6-4240-aab3-9e0dce4951d4",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": "agent-gibbon",
+        "pid": 23952
+      },
+      "window": {
+        "title": "Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985867669628500",
+        "id": 984868,
+        "index": null,
+        "x": 291,
+        "y": 219,
+        "width": 618,
+        "height": 622,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 23952)\nWindow: \"Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985867669628500\", App: agent-gibbon.\n\n0 window Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985867669628500\n\t1 pane 외부 앱\n\t\t2 영역 외부 앱 - 웹 콘텐츠\n\t\t\t3 영역\n\t\t\t\t4 영역\n\t\t\t\t5 영역\n\t\t\t\t\t6 영역\n\t\t\t\t\t\t7 문서 외부 앱, Value: http://tauri.localhost/external-apps.html, Secondary Actions: SetValue, Scroll\n\t\t\t\t\t\t\t8 지역 외부 앱 선택, Secondary Actions: Scroll\n\t\t\t\t\t\t\t\t9 제목 앱 선택\n\t\t\t\t\t\t\t\t10 텍스트 선택 영역: 291, 219 · 640×420 px\n\t\t\t\t\t\t\t\t11 텍스트 앱을 선택한 다음 실행하면 선택 영역에 상단 고정합니다.\n\t\t\t\t\t\t\t\t12 텍스트 설치된 앱 / 열린 창 검색\n\t\t\t\t\t\t\t\t13 편집 설치된 앱 / 열린 창 검색, Value: ISSUE86-PRODUCT, Secondary Actions: SetValue\n\t\t\t\t\t\t\t\t14 그룹 설치된 앱\n\t\t\t\t\t\t\t\t\t15 전환 버튼 ISSUE86-PRODUCT-6b023e9f-UI, Secondary Actions: Toggle\n\t\t\t\t\t\t\t\t16 제목 열린 창\n\t\t\t\t\t\t\t\t17 텍스트 기존 창은 직접 선택해야 이동합니다. 최소화·최대화 창은 보통 크기로 복원한 뒤 선택하세요.\n\t\t\t\t\t\t\t\t18 그룹 열린 창\n\t\t\t\t\t\t\t\t\t19 전환 버튼 ISSUE86-PRODUCT-UIA-task6b023e9f, Secondary Actions: Toggle\n\t\t\t\t\t\t\t\t\t20 전환 버튼 ISSUE86-PRODUCT-UIB-task6b023e9f, Secondary Actions: Toggle\n\t\t\t\t\t\t\t\t21 단추 실행\n\t\t\t\t\t\t\t\t22 단추 새로 고침\n\t\t\t\t\t\t\t\t23 단추 취소\n\t\t\t\t\t\t\t\t24 텍스트 Start Menu의 classic .exe 바로가기; Store 앱은 열린 창 목록 사용\n\t\t\t\t\t\t\t\t25 제목 플로팅 중인 창\n\t\t\t\t\t\t\t\t26 텍스트 해제는 원래 위치·크기·상단 고정을 복원합니다. 앱을 종료하지 않습니다. 트레이에서도 이 인스턴스의 모든 고정을 해제할 수 있습니다.\n\t\t\t\t\t\t27 영역\n\t28 title bar Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985867669628500\n\t\t29 menu bar 시스템 메뉴 모음\n\t\t\t30 menu item 시스템\n\t\t31 button 최소화\n\t\t32 button 최대화\n\t\t33 button 닫기",
+      "elementCount": 34,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "action": {
+      "path": "synthetic",
+      "actionName": "typeText",
+      "fallbackReason": null,
+      "verification": {
+        "state": "unverified",
+        "reason": "synthetic_input"
+      },
+      "targetWindowId": 984868,
+      "targetWindowIndex": null
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

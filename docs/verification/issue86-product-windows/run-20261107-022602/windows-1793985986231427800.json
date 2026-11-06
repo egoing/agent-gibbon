@@ -1,0 +1,37 @@
+{
+  "id": "072c67d0-6d04-44dc-a98f-59f582259aa5",
+  "ok": true,
+  "result": {
+    "app": {
+      "name": "agent-gibbon",
+      "bundleId": "agent-gibbon",
+      "pid": 26864
+    },
+    "windows": [
+      {
+        "index": 0,
+        "app": {
+          "name": "agent-gibbon",
+          "bundleId": "agent-gibbon",
+          "pid": 26864
+        },
+        "id": 3606818,
+        "title": "Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985986104233700",
+        "x": 291,
+        "y": 219,
+        "width": 618,
+        "height": 622,
+        "isMinimized": false,
+        "isOffscreen": false,
+        "screenIndex": null,
+        "platform": {
+          "backend": "uia",
+          "nativeWindowHandle": 3606818
+        }
+      }
+    ]
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

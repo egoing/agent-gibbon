@@ -1,0 +1,26 @@
+{
+  "os": "Windows-10-10.0.26200-SP0",
+  "python": "3.10.11",
+  "node": "v20.11.0",
+  "npm": "10.2.4",
+  "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+  "source_sha": "0a4c154611b598495b9a88fce8b5b1f42cb888df",
+  "checks": {
+    "npm ci": 0,
+    "cargo fmt --manifest-path src-tauri/Cargo.toml --all -- --check": 0,
+    "cargo test --locked --manifest-path src-tauri/Cargo.toml": {
+      "exit": 0,
+      "passed": 177
+    },
+    "cargo check --locked --manifest-path src-tauri/Cargo.toml": 0,
+    "cargo clippy --locked --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings": 0,
+    "npm run test:ui": {
+      "exit": 0,
+      "passed": 123,
+      "skipped": 1
+    },
+    "npm run dev:build": 0
+  },
+  "product_runtime": "NOT RUN: coordinator requested final UI/window verification at forthcoming corrected SHA"
+}

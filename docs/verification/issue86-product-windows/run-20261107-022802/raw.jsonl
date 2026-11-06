@@ -1,0 +1,9 @@
+{"utc": "2026-11-06T17:28:02.082929+00:00", "kind": "api", "name": "SetProcessDpiAwarenessContext", "result": 1, "last_error": 0, "args": ["-4"]}
+{"utc": "2026-11-06T17:28:02.083929+00:00", "kind": "api", "name": "PostMessageW", "result": 1, "last_error": 0, "args": ["2622518", "16", "0", "0"]}
+{"utc": "2026-11-06T17:28:02.084928+00:00", "kind": "api", "name": "PostMessageW", "result": 1, "last_error": 0, "args": ["7603810", "16", "0", "0"]}
+{"utc": "2026-11-06T17:28:02.190090+00:00", "kind": "api", "name": "AttachThreadInput", "result": 1, "last_error": 0, "args": ["12380", "4228", "True"]}
+{"utc": "2026-11-06T17:28:02.190090+00:00", "kind": "api", "name": "SetForegroundWindow", "result": 1, "last_error": 0, "args": ["1967202"]}
+{"utc": "2026-11-06T17:28:02.191485+00:00", "kind": "api", "name": "AttachThreadInput", "result": 1, "last_error": 0, "args": ["12380", "4228", "False"]}
+{"utc": "2026-11-06T17:28:02.607337+00:00", "kind": "activation-observation", "requested": 1967202, "foreground": 1967202}
+{"utc": "2026-11-06T17:28:02.607337+00:00", "kind": "api", "name": "SetCursorPos", "result": 1, "last_error": 0, "args": ["1618", "908"]}
+{"utc": "2026-11-06T17:28:02.607337+00:00", "kind": "final-user-state", "foreground_expected": 1967202, "foreground_actual": 1967202, "cursor_expected": [1618, 908], "cursor_actual": [1618, 908], "owned_windows_closed": true}

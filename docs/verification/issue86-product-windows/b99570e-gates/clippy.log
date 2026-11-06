@@ -1,0 +1,19 @@
+   Compiling agent-gibbon v0.2.7 (C:\Users\egoin\orca\workspaces\agent-gibbon\86-product-verification\src-tauri)
+error: items after a test module
+   --> src\external_apps\windows.rs:795:1
+    |
+795 | mod tests {
+    | ^^^^^^^^^
+...
+809 | fn guard_selection(id: &Identity, marker: Option<&[u16]>) -> Result<(), String> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+...
+821 | fn clear_claim(s: &Session) -> Result<(), String> {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
+    = note: `-D clippy::items-after-test-module` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::items_after_test_module)]`
+    = help: move the items to before the test module was defined
+
+error: could not compile `agent-gibbon` (bin "agent-gibbon" test) due to 1 previous error

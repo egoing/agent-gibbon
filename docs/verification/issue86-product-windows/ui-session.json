@@ -1,0 +1,24 @@
+{
+  "out": "C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-product-verification\\docs\\verification\\issue86-product-windows\\run-20261107-022418",
+  "binary": "C:\\Users\\egoin\\AppData\\Local\\Temp\\gibbon-product-ui-6b023e9f-_6pyq111\\Issue86ProductUI.exe",
+  "owned": [
+    {
+      "pid": 34600,
+      "hwnd": 2622518,
+      "editor": 3146592,
+      "button": 7669782
+    },
+    {
+      "pid": 26840,
+      "hwnd": 7603810,
+      "editor": 1968486,
+      "button": 6293702
+    }
+  ],
+  "foreground": 1967202,
+  "cursor": [
+    1618,
+    908
+  ],
+  "shortcut": "C:\\Users\\egoin\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\ISSUE86-PRODUCT-6b023e9f-UI.lnk"
+}
