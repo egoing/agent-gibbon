@@ -6,10 +6,527 @@
     "target": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore/src-tauri/target",
     "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore/src-tauri/target/debug/agent-gibbon"
   },
-  "note_id": "opacity-scroll-212e8ccb",
-  "samples": [],
-  "passed": false,
-  "pid": 93761,
+  "note_id": "opacity-scroll-f6030b92",
+  "samples": [
+    {
+      "stage": "baseline",
+      "receiver": {
+        "count": 0,
+        "window": {
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowSharingState": 1,
+          "kCGWindowOwnerPID": 5889,
+          "kCGWindowNumber": 40429,
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowAlpha": 1,
+          "kCGWindowLayer": 0,
+          "kCGWindowOwnerName": "probe",
+          "kCGWindowStoreType": 1,
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          },
+          "kCGWindowName": "Agent Gibbon separate scroll receiver"
+        },
+        "pid": 5889,
+        "x": 1000,
+        "y": 2000
+      },
+      "opacity": 0.35,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "stage": "normal-scroll-delivered",
+      "receiver": {
+        "x": 1000,
+        "pid": 5889,
+        "window": {
+          "kCGWindowOwnerPID": 5889,
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          },
+          "kCGWindowLayer": 0,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowName": "Agent Gibbon separate scroll receiver",
+          "kCGWindowSharingState": 1,
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowAlpha": 1,
+          "kCGWindowStoreType": 1,
+          "kCGWindowNumber": 40429,
+          "kCGWindowOwnerName": "probe"
+        },
+        "count": 1,
+        "y": 1970
+      },
+      "opacity": 0.35,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "stage": "chord-scroll-consumed",
+      "receiver": {
+        "pid": 5889,
+        "window": {
+          "kCGWindowNumber": 40429,
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          },
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowLayer": 0,
+          "kCGWindowName": "Agent Gibbon separate scroll receiver",
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowAlpha": 1,
+          "kCGWindowStoreType": 1,
+          "kCGWindowOwnerName": "probe",
+          "kCGWindowSharingState": 1,
+          "kCGWindowOwnerPID": 5889
+        },
+        "y": 1970,
+        "count": 1,
+        "x": 1000
+      },
+      "opacity": 0.4,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "stage": "shift-scroll-delivered",
+      "receiver": {
+        "x": 990,
+        "y": 1970,
+        "window": {
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowLayer": 0,
+          "kCGWindowName": "Agent Gibbon separate scroll receiver",
+          "kCGWindowOwnerPID": 5889,
+          "kCGWindowStoreType": 1,
+          "kCGWindowAlpha": 1,
+          "kCGWindowNumber": 40429,
+          "kCGWindowSharingState": 1,
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          },
+          "kCGWindowOwnerName": "probe"
+        },
+        "count": 2,
+        "pid": 5889
+      },
+      "opacity": 0.4,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "stage": "horizontal-scroll-delivered",
+      "receiver": {
+        "pid": 5889,
+        "y": 1970,
+        "count": 3,
+        "window": {
+          "kCGWindowAlpha": 1,
+          "kCGWindowSharingState": 1,
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          },
+          "kCGWindowStoreType": 1,
+          "kCGWindowOwnerPID": 5889,
+          "kCGWindowNumber": 40429,
+          "kCGWindowName": "Agent Gibbon separate scroll receiver",
+          "kCGWindowOwnerName": "probe",
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowLayer": 0,
+          "kCGWindowMemoryUsage": 2288
+        },
+        "x": 960
+      },
+      "opacity": 0.4,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "stage": "partial-precise-consumed",
+      "receiver": {
+        "count": 3,
+        "y": 1970,
+        "pid": 5889,
+        "x": 960,
+        "window": {
+          "kCGWindowStoreType": 1,
+          "kCGWindowName": "Agent Gibbon separate scroll receiver",
+          "kCGWindowOwnerPID": 5889,
+          "kCGWindowAlpha": 1,
+          "kCGWindowSharingState": 1,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowNumber": 40429,
+          "kCGWindowLayer": 0,
+          "kCGWindowOwnerName": "probe",
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          }
+        }
+      },
+      "opacity": 0.4,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "stage": "precise-step-consumed",
+      "receiver": {
+        "x": 960,
+        "pid": 5889,
+        "window": {
+          "kCGWindowOwnerName": "probe",
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowStoreType": 1,
+          "kCGWindowAlpha": 1,
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          },
+          "kCGWindowLayer": 0,
+          "kCGWindowNumber": 40429,
+          "kCGWindowSharingState": 1,
+          "kCGWindowOwnerPID": 5889,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowName": "Agent Gibbon separate scroll receiver"
+        },
+        "count": 3,
+        "y": 1970
+      },
+      "opacity": 0.45,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "stage": "gesture-end-after-release-consumed",
+      "receiver": {
+        "window": {
+          "kCGWindowNumber": 40429,
+          "kCGWindowOwnerPID": 5889,
+          "kCGWindowSharingState": 1,
+          "kCGWindowName": "Agent Gibbon separate scroll receiver",
+          "kCGWindowAlpha": 1,
+          "kCGWindowStoreType": 1,
+          "kCGWindowOwnerName": "probe",
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          },
+          "kCGWindowLayer": 0,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowMemoryUsage": 2288
+        },
+        "pid": 5889,
+        "y": 1970,
+        "x": 960,
+        "count": 3
+      },
+      "opacity": 0.45,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "stage": "captured-momentum-consumed",
+      "receiver": {
+        "x": 960,
+        "pid": 5889,
+        "window": {
+          "kCGWindowNumber": 40429,
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowOwnerPID": 5889,
+          "kCGWindowAlpha": 1,
+          "kCGWindowLayer": 0,
+          "kCGWindowName": "Agent Gibbon separate scroll receiver",
+          "kCGWindowStoreType": 1,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowOwnerName": "probe",
+          "kCGWindowSharingState": 1,
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          }
+        },
+        "count": 3,
+        "y": 1970
+      },
+      "opacity": 0.45,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "stage": "momentum-end-consumed",
+      "receiver": {
+        "x": 960,
+        "window": {
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowName": "Agent Gibbon separate scroll receiver",
+          "kCGWindowNumber": 40429,
+          "kCGWindowAlpha": 1,
+          "kCGWindowStoreType": 1,
+          "kCGWindowOwnerName": "probe",
+          "kCGWindowOwnerPID": 5889,
+          "kCGWindowSharingState": 1,
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          },
+          "kCGWindowLayer": 0
+        },
+        "pid": 5889,
+        "count": 3,
+        "y": 1970
+      },
+      "opacity": 0.45,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "stage": "upper-limit-still-consumed",
+      "receiver": {
+        "count": 3,
+        "pid": 5889,
+        "y": 1970,
+        "x": 960,
+        "window": {
+          "kCGWindowAlpha": 1,
+          "kCGWindowNumber": 40429,
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          },
+          "kCGWindowSharingState": 1,
+          "kCGWindowLayer": 0,
+          "kCGWindowName": "Agent Gibbon separate scroll receiver",
+          "kCGWindowStoreType": 1,
+          "kCGWindowIsOnscreen": true,
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowOwnerName": "probe",
+          "kCGWindowOwnerPID": 5889
+        }
+      },
+      "opacity": 1.0,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "stage": "normal-scroll-resumed",
+      "receiver": {
+        "x": 960,
+        "y": 1940,
+        "window": {
+          "kCGWindowAlpha": 1,
+          "kCGWindowStoreType": 1,
+          "kCGWindowName": "Agent Gibbon separate scroll receiver",
+          "kCGWindowOwnerName": "probe",
+          "kCGWindowLayer": 0,
+          "kCGWindowBounds": {
+            "X": 100,
+            "Height": 428,
+            "Y": 474,
+            "Width": 500
+          },
+          "kCGWindowMemoryUsage": 2288,
+          "kCGWindowOwnerPID": 5889,
+          "kCGWindowNumber": 40429,
+          "kCGWindowSharingState": 1,
+          "kCGWindowIsOnscreen": true
+        },
+        "count": 4,
+        "pid": 5889
+      },
+      "opacity": 1.0,
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd",
+        "tip_visible": false,
+        "windows": null
+      }
+    }
+  ],
+  "passed": true,
+  "pid": 5771,
   "verified_executable": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/hover-opacity-restore/src-tauri/target/debug/agent-gibbon",
   "test_server_stopped": true,
   "setting_restored": true

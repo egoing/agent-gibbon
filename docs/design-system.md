@@ -668,7 +668,7 @@ SVG 3개와 PNG 3개를 함께 갱신했다. PNG 렌더링과 배치 육안 확�
 
 [SVG 시안](design/global-opacity-wheel.svg) · [PNG 시안](design/global-opacity-wheel.png). 위 우선순위는 기존 자동 투명도 절보다 우선하며 시안은 설명용이다. 구현·실행 검증 범위와 한계는 [#71 검증 기록](verification/issue71-global-opacity.md)을 따른다.
 
-롤오버 복원은 후속 사용자 요청으로 수동값 우선순위를 조정한 변경이다. 기존 #71의 검증을 새 동작의 실행 근거로 사용하지 않으며 [롤오버 복원 검증](verification/hover-opacity-restore-20261106.md)에 이번 구현·실행 범위를 기록한다.
+롤오버 복원과 조절 휠 전파 차단은 후속 사용자 요청으로 적용한 변경이다. 기존 #71의 검증을 새 동작의 실행 근거로 사용하지 않으며 [롤오버 복원 검증](verification/hover-opacity-restore-20261106.md)에 이번 구현·실행 범위를 기록한다. Rust 155개·UI 95개와 Rustfmt·Clippy·개발 빌드, macOS ARM64의 native alpha·별도 앱 수신을 통한 합성 휠 차단 검증을 통과했다. Windows·Intel 실제 GUI와 물리 장치별 입력 검증은 포함하지 않는다.
 
 - 적용·검증: Rust 136개·UI 81개, Rustfmt·Clippy·개발 빌드 통과. 테스트 전용 약관/동의 기록을 사용한 macOS ARM64 인스턴스에서 두 메모의 실제 native alpha 35%, 숨김 갱신 상태 보존과 재시작 복원을 확인했다. 원문 문서·제품 빌드를 복원했다. 전역 입력이 다른 인스턴스에서 사용 중이어서 물리 휠 종단 조작은 미검증이며 Windows·터미널·접힘/Feedback·전체 전환 GUI 한계는 위 검증 기록을 따른다.
 - 후속 사용자 재실행 세션에서 이 개발 앱이 입력 잠금을 확보한 뒤 설정·창 적용 값의 35% → 100% 변화와 같은 PID의 native alpha 100%를 확인했다. 장치별 양방향·상하한 전체 입력 검증을 대신하지 않으며 [추가 실행 기록](verification/issue71-global-opacity.md#사용자-재실행-세션의-추가-확인)에 출처와 한계를 남겼다.
