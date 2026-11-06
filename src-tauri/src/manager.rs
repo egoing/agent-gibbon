@@ -10,7 +10,7 @@ pub fn open(app: &tauri::AppHandle) -> Result<(), String> {
         crate::stash::release(&window)?;
         window.unminimize().map_err(|e| e.to_string())?;
         window.show().map_err(|e| e.to_string())?;
-        return window.set_focus().map_err(|e| e.to_string());
+        return focus(&window);
     }
     let builder =
         tauri::WebviewWindowBuilder::new(app, LABEL, tauri::WebviewUrl::App("manager.html".into()))
@@ -28,7 +28,19 @@ pub fn open(app: &tauri::AppHandle) -> Result<(), String> {
         .title_bar_style(tauri::TitleBarStyle::Transparent)
         .hidden_title(true)
         .background_color(tauri::window::Color(223, 226, 221, 255));
-    builder.build().map_err(|e| e.to_string())?;
+    let window = builder.build().map_err(|e| e.to_string())?;
+    focus(&window)
+}
+
+fn focus(window: &tauri::WebviewWindow) -> Result<(), String> {
+    window.set_focus().map_err(|e| e.to_string())?;
+    // macOS deminiaturization is animated. Tao's set_focus is a no-op while
+    // isMiniaturized is still true, even after unminimize/show were requested.
+    // Activate only for this explicit manager open, without a delayed retry
+    // that could steal focus after the user has switched to another app.
+    #[cfg(target_os = "macos")]
+    objc2_app_kit::NSRunningApplication::currentApplication()
+        .activateWithOptions(objc2_app_kit::NSApplicationActivationOptions::empty());
     Ok(())
 }
 
