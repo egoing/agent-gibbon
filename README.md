@@ -352,3 +352,26 @@ Agent Gibbon의 소스 코드는 [MIT 라이선스](LICENSE)로 공개합니다.
 Ctrl+Shift+3 또는 트레이의 **영역 터미널**에서 위치를 선택하면 Welcome이 열립니다. 마지막 폴더(기록이 없으면 홈)에서 설치된 앱 또는 셸을 시작할 수 있습니다. 앱 명령이 끝나면 같은 셸로 돌아갑니다. 닫기는 종료이며 작업 중이면 확인합니다. 핀 해제 후 포커스 이동·세 보조키·CLI `close`는 실행을 유지하는 숨김입니다.
 
 종료한 터미널은 목록에 남고 다시 열면 마지막 위치·크기·경로를 복원한 Welcome을 보여 줍니다. 전용 에이전트의 영역 생성·자동 실행·`agent` CLI 명령은 제거했습니다. 예전 에이전트 파일은 삭제하지 않으며 목록·복원 대상에서 제외합니다. [디자인 기준](docs/design-system.md#terminal-welcome--57-2026-11-05)과 [플랫폼별 검증 범위](docs/verification/issue57-terminal-welcome.md)를 참고하세요.
+
+## Windows 외부 앱
+
+Windows의 Ctrl+Shift+4 또는 트레이 **영역 외부 앱**으로 영역을 드래그한 뒤, Welcome에서 설치 앱 또는 열린 창을 선택하고 실행합니다. 외부 앱은 독립 네이티브 창으로 해당 물리 영역에 배치되고 일반 창보다 위에 고정됩니다. 클릭·키보드는 외부 앱이 직접 처리합니다. 해제는 Welcome의 개별 버튼 또는 트레이 **외부 앱 고정 모두 해제**를 사용하며 앱을 종료하지 않고 원래 배치를 복원합니다.
+
+자동 탐색은 Start Menu의 classic `.exe` 바로가기입니다. 이미 실행 중인 앱은 이동할 창을 다시 선택해야 합니다. Store 앱/중계 프로세스는 열린 창 목록을 사용하고, 최소화·최대화 창은 보통 크기로 복원한 뒤 선택하세요. 앱 최소 크기로 영역을 채울 수 없으면 복원 후 오류를 알립니다. 취소·실패 때 새로 시작한 앱을 강제 종료하지 않습니다. 다른 OS에는 이 기능을 등록하지 않으며 CLI도 명시적 오류를 반환합니다.
+
+실행 중인 앱의 기존 로컬 CLI에서 사용할 수 있습니다. 개발 검증에서는 반드시 해당 워크트리의 `scripts/agent-gibbon-dev`(Windows `.cmd`)를 사용합니다.
+
+```text
+agent-gibbon app select
+agent-gibbon app list
+agent-gibbon app windows
+agent-gibbon app open --app-id <목록의 ID> --region -1200,80,640,480
+agent-gibbon app attach --window <목록의 HWND> --region 220,180,640,420
+agent-gibbon app sessions
+agent-gibbon app cancel --session <launch-ID>
+agent-gibbon app release --session <floating-ID>
+```
+
+`open`은 launch ID를 즉시 반환하며 `sessions`에서 완료/실패를 확인합니다. 선택한 앱이 여러 창을 만들거나 12초 안에 단일 대상이 확인되지 않으면 열린 창 목록에서 다시 선택합니다. 세션은 인스턴스당 최대 32개입니다. 외부 창 출처를 확인할 수 없거나 다른 Gibbon 인스턴스가 관리 중이면 거절합니다. 복원용 상태는 로컬에만 저장하며, 같은 인스턴스를 다시 시작하면 비정상 종료 전 상태 복원을 시도합니다. 원래 외부 프로세스가 사라졌거나 HWND가 재사용됐으면 그 새 창은 변경하지 않습니다.
+
+현재 구현·검증의 정확한 범위와 제약은 [#86 검증 기록](docs/verification/issue86.md), UI 기준은 [디자인 시스템](docs/design-system.md)을 따릅니다. 선행 PoC만으로 모든 설치 앱·혼합 DPI·표준 권한·UAC 경계 지원을 보장하지 않습니다.

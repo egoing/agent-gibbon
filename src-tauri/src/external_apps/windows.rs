@@ -1,4 +1,5 @@
 use super::*;
+use crate::windows_messages::{GetMessageW, Message, PeekMessageW};
 use fs2::FileExt;
 use std::os::windows::process::CommandExt;
 use std::sync::{
@@ -48,8 +49,6 @@ extern "system" {
         flags: u32,
     ) -> isize;
     fn UnhookWinEvent(hook: isize) -> i32;
-    fn PeekMessageW(message: *mut Message, hwnd: isize, min: u32, max: u32, remove: u32) -> i32;
-    fn GetMessageW(message: *mut Message, hwnd: isize, min: u32, max: u32) -> i32;
     fn PostThreadMessageW(thread: u32, message: u32, wparam: usize, lparam: isize) -> i32;
     fn SetPropW(hwnd: isize, name: *const u16, value: isize) -> i32;
     fn GetPropW(hwnd: isize, name: *const u16) -> isize;
@@ -713,17 +712,6 @@ static OBSERVED_WINDOWS: Mutex<std::collections::BTreeSet<isize>> =
 static EVENT_ACK: AtomicU64 = AtomicU64::new(0);
 static EVENT_REQUEST: AtomicU64 = AtomicU64::new(0);
 static EVENT_THREAD: OnceLock<Result<u32, String>> = OnceLock::new();
-#[repr(C)]
-#[derive(Default)]
-struct Message {
-    hwnd: isize,
-    message: u32,
-    wparam: usize,
-    lparam: isize,
-    time: u32,
-    point: Point,
-    private: u32,
-}
 unsafe extern "system" fn destroyed(
     _hook: isize,
     event: u32,
@@ -733,13 +721,15 @@ unsafe extern "system" fn destroyed(
     _thread: u32,
     _time: u32,
 ) {
-    if event == 0x8001 && hwnd != 0 && object == 0 && child == 0 {
-        if OBSERVED_WINDOWS
+    if event == 0x8001
+        && hwnd != 0
+        && object == 0
+        && child == 0
+        && OBSERVED_WINDOWS
             .lock()
             .is_ok_and(|mut known| known.remove(&hwnd))
-        {
-            WINDOW_EPOCH.fetch_add(1, Ordering::SeqCst);
-        }
+    {
+        WINDOW_EPOCH.fetch_add(1, Ordering::SeqCst);
     }
 }
 fn start_events() -> Result<u32, String> {
@@ -752,10 +742,10 @@ fn start_events() -> Result<u32, String> {
                     let _ = tx.send(Err(native_error("창 생명주기 감시 실패")));
                     return;
                 }
-                // SetWinEventHook establishes the receiving thread's message queue.
-                let _ = tx.send(Ok(unsafe { GetCurrentThreadId() }));
                 let mut message = Message::default();
-                while unsafe { GetMessageW(&mut message, 0, 0, 0) } > 0 {
+                unsafe { PeekMessageW(&mut message, std::ptr::null_mut(), 0, 0, 0) };
+                let _ = tx.send(Ok(unsafe { GetCurrentThreadId() }));
+                while unsafe { GetMessageW(&mut message, std::ptr::null_mut(), 0, 0) } > 0 {
                     if message.message == 0x8001 {
                         EVENT_ACK.fetch_max(message.wparam as u64, Ordering::SeqCst);
                     }

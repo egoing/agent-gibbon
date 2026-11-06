@@ -29,6 +29,8 @@ mod warp;
 #[cfg(windows)]
 mod windows_contact;
 #[cfg(windows)]
+mod windows_messages;
+#[cfg(windows)]
 mod windows_process;
 #[cfg(windows)]
 mod windows_window;
