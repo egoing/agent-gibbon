@@ -6,19 +6,21 @@
   const api = window.gibbonPrivacy = {
     accepted: () => Boolean(state?.terms_accepted),
     onAccepted: null,
-    showWelcome: () => { el('privacy-welcome').hidden=false; el('notes-page').hidden=true; el('settings-page').hidden=true; },
+    showWelcome: () => { el('manager-navigation').hidden=true; el('privacy-welcome').hidden=false; el('notes-page').hidden=true; el('settings-page').hidden=true; },
     refresh,
   };
   function error(message) { el('privacy-error').textContent=message; el('privacy-error').hidden=!message; el('privacy-retry').hidden=!message; }
   function render() {
     const accepted=api.accepted(), ready=Boolean(state?.notice_ready);
     el('privacy-welcome').hidden=accepted;
+    el('manager-navigation').hidden=!accepted;
     if(!busy){
       el('privacy-terms').checked=accepted;
       el('privacy-share').checked=Boolean(state?.allowed ?? state?.sharing);
       el('privacy-setting-share').checked=Boolean(state?.allowed ?? state?.sharing);
     }
     el('privacy-share').disabled=busy || !ready;
+    el('privacy-share').setAttribute('aria-describedby',ready?'':'privacy-draft');
     el('privacy-setting-share').disabled=busy || !ready;
     el('privacy-continue').disabled=busy || !state || !el('privacy-terms').checked;
     el('privacy-save').disabled=busy || !state;
