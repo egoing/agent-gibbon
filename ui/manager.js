@@ -11,6 +11,18 @@ function syncVisibility() {
   visibilityView.button.textContent = note.visible ? '화면에서 숨기기' : '화면에 띄우기';
   visibilityView.button.disabled = visibilityPending.has(note.id);
 }
+// Register settings destinations here; navigation preserves each panel's DOM.
+const settingsSections = ['privacy', 'skills'];
+function settingsSection(selectedSection) {
+  for (const section of settingsSections) {
+    const active = section === selectedSection;
+    el(`settings-${section}`).hidden = !active;
+    el(`settings-${section}-nav`).setAttribute('aria-current', active ? 'page' : 'false');
+  }
+}
+for (const section of settingsSections) {
+  el(`settings-${section}-nav`).onclick = () => settingsSection(section);
+}
 function page(settings) {
   if(window.gibbonPrivacy && !window.gibbonPrivacy.accepted()){window.gibbonPrivacy.showWelcome();return;}
   el('notes-page').hidden = settings;

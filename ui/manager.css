@@ -7,3 +7,15 @@
 .privacy-agreement{margin:20px 0 0;padding-top:16px;border-top:1px solid #ddd}.privacy-choice .privacy-choice-label{color:inherit}
 
 .detail-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:16px}.detail-error{flex-basis:100%;margin:0;font-size:14px}
+
+/* Settings shares the manager's two-panel navigation structure. */
+#settings-page{display:grid;grid-template-columns:220px minmax(0,1fr);flex:1;min-height:0;padding:0;overflow:hidden}
+.settings-sidebar h1{font-size:17px;margin:0 0 16px}
+.settings-sidebar nav{display:flex;flex-direction:column;gap:8px}
+.settings-sidebar button{width:100%;min-height:36px;padding:8px 12px;text-align:left;border-color:transparent;overflow-wrap:anywhere}
+.settings-sidebar button[aria-current=page]{background:#eee;border-color:#aaa}
+.settings-content{min-width:0;overflow:auto;padding:20px 28px;scrollbar-gutter:stable}
+.settings-content h2{font-size:21px;margin:12px 0}
+.settings-content .privacy-card{padding:0}
+.settings-content .privacy-links,.settings-content .privacy-actions{flex-wrap:wrap}
+@media(max-width:680px){#settings-page{grid-template-columns:164px minmax(0,1fr)}.settings-content{padding:16px}.settings-sidebar{padding:16px 8px}.settings-sidebar button{font-size:14px;padding:8px}}
