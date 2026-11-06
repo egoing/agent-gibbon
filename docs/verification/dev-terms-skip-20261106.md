@@ -54,3 +54,5 @@ Rust 검사는 debug/개발 인스턴스의 조합과 명시적 약관 검증 �
 ## 최신 main 통합 검사
 
 `origin/main`의 스킬 관리·공통 메모 표시 변경을 통합하고 초기화 순서 충돌을 해결했다. 통합본에서 `npm test`의 Rust 149개·UI 95개, `npm run check`, `npm run dev:build`가 통과했다. 같은 임시 개발 실행기 검사도 다시 통과했다. 새 스킬 동기화가 사용자 설치본을 건드리지 않도록 이 재검증에서는 debug 전용 `AGENT_GIBBON_SKILLS_TEST_ROOT`를 임시 fixture 아래로 지정했다. 위 JSON 실행 근거는 통합본의 최신 두 실행으로 갱신했다. 플랫폼별 원격 CI와 실제 Windows UI 검증은 별도 범위다.
+
+이후 Windows 호환성 수정이 포함된 원격 main `37dbfed`를 추가 통합해 Rust 151개·UI 95개, Clippy·개발 빌드를 확인했다. JSON은 이 최종 통합본에서 다시 실행한 두 경우로 갱신했다. 해당 fixture에만 35% 설정을 준비해 실제 CLI의 창 적용 값도 대조했으며 사용자 인스턴스의 외형 설정은 바꾸지 않았다.

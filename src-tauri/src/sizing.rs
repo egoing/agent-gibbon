@@ -49,7 +49,9 @@ fn set_image_ratio(window: &WebviewWindow, size: Option<LogicalSize<f64>>) -> Re
             native.setContentResizeIncrements(increments);
         }
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    crate::windows_window::set_image_ratio(window, size)?;
+    #[cfg(not(any(target_os = "macos", windows)))]
     let _ = (window, size);
     Ok(())
 }
@@ -137,6 +139,30 @@ pub fn manual_resize(window: WebviewWindow, sizes: State<Sizes>) -> Result<(), S
     Ok(())
 }
 
+#[cfg(windows)]
+pub fn native_resize(window: &WebviewWindow) -> Result<(), String> {
+    let sizes = window.state::<Sizes>();
+    // A programmatic frame update may reenter Resized while fold/fit owns Sizes.
+    // Keep WM_SIZING latched until a later native event, measurement, or frame.
+    let Ok(states) = sizes.0.try_lock() else {
+        return Ok(());
+    };
+    if !crate::windows_window::take_native_resize(window)? {
+        return Ok(());
+    }
+    let folded = states
+        .get(window.label())
+        .is_some_and(|s| s.expanded.is_some());
+    drop(states);
+    crate::entrance::cancel(window)?;
+    if folded {
+        return Err("접힌 메모는 펼친 뒤 크기를 조절하세요".into());
+    }
+    // Latest main stores user intent in layout exclusions, not Sizes.manual.
+    crate::layout::mark(window, true);
+    Ok(())
+}
+
 #[tauri::command]
 pub fn fit_note(
     window: WebviewWindow,
@@ -144,6 +170,8 @@ pub fn fit_note(
     height: f64,
     revision: u64,
 ) -> Result<bool, String> {
+    #[cfg(windows)]
+    native_resize(&window)?;
     if !width.is_finite() || !height.is_finite() {
         return Err("유효하지 않은 패널 크기입니다".into());
     }
@@ -238,13 +266,22 @@ pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, Str
         || crate::stash::owns(&window)
         || crate::stash::chord_busy(window.app_handle())
     {
-        return Ok(folded(&window));
+        let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
+        let state = states.entry(window.label().into()).or_default();
+        // Entry observed before capture/stash must not trigger later inside.
+        state.contact = crate::warp::Contact::default();
+        return Ok(state.expanded.is_some());
     }
     #[cfg(target_os = "macos")]
     let control = objc2_app_kit::NSEvent::modifierFlags_class()
         .contains(objc2_app_kit::NSEventModifierFlags::Control)
         && !crate::warp::close_shortcut_pressed();
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    let control = {
+        let modifiers = crate::windows_contact::modifiers();
+        modifiers.control && !modifiers.stash_chord()
+    };
+    #[cfg(not(any(target_os = "macos", windows)))]
     let control = false;
     let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
     let state = states.entry(window.label().into()).or_default();
@@ -265,7 +302,7 @@ pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, Str
     Ok(state.expanded.is_some())
 }
 
-// All values share desktop logical coordinates, including mixed-DPI displays.
+// Convert non-macOS physical values together so the folded margin stays 4 DIP.
 type ContactGeometry = ((f64, f64), (f64, f64, f64, f64));
 fn contact_geometry(window: &WebviewWindow) -> Result<ContactGeometry, String> {
     #[cfg(target_os = "macos")]
@@ -290,9 +327,15 @@ fn contact_geometry(window: &WebviewWindow) -> Result<ContactGeometry, String> {
         let c = window.cursor_position().map_err(|e| e.to_string())?;
         let p = window.outer_position().map_err(|e| e.to_string())?;
         let s = window.outer_size().map_err(|e| e.to_string())?;
+        let scale = window.scale_factor().map_err(|e| e.to_string())?;
         Ok((
-            (c.x, c.y),
-            (p.x as f64, p.y as f64, s.width as f64, s.height as f64),
+            (c.x / scale, c.y / scale),
+            (
+                p.x as f64 / scale,
+                p.y as f64 / scale,
+                s.width as f64 / scale,
+                s.height as f64 / scale,
+            ),
         ))
     }
 }

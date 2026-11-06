@@ -56,3 +56,5 @@
 - 이 결과는 입력 담당 확보 후 실제 설정 변화·창 반영의 근거다. 물리 장치 이벤트 자체를 기록하거나 장치별 양방향·상하한·Shift 조합을 모두 검증한 것은 아니며, 위 Windows·다른 GUI 조합의 한계는 유지한다.
 - 커밋·병합 승인 후 최신 `origin/main`의 스킬·공통 메모 표시 변경을 통합했다. 초기화에서 불투명도 설정과 스킬 동기화를 모두 유지하고 통합본 Rust 149개·UI 95개, Clippy·개발 빌드를 확인했다. 과거 네이티브 창 캡처를 이 통합본의 전체 GUI 검증으로 재사용하지 않는다.
 - 원격 [첫 통합 CI](https://github.com/egoing/agent-gibbon/actions/runs/42192059157)에서 Windows Rust 135개·UI 검사는 통과했지만 macOS 전용 `Fades` 별칭이 Windows 테스트에도 포함되어 Clippy의 `dead_code` 검사에 실패했다. 별칭·컬렉션 import만 macOS로 제한하고 `Fade` 알고리즘 단위 검사는 Windows에서도 유지하도록 보정했다. 이 실패 실행을 Windows 빌드 통과로 간주하지 않는다.
+- 보정 커밋 `30cd533`의 [CI](https://github.com/egoing/agent-gibbon/actions/runs/42192511194)는 macOS ARM64·Intel·Windows의 테스트·Rustfmt·Clippy·설치 파일 빌드를 모두 통과했다. 반영 직전 원격 main에 추가된 Windows 호환성 커밋 `37dbfed`도 통합했다. Windows native alpha는 새 `windows_window` 공통 구현을 재사용하고, 자동 fade가 Windows에서도 사용되므로 별칭·애니메이션 실행의 컴파일 범위를 두 지원 플랫폼으로 맞췄다. 수동값을 적용할 때 양쪽 플랫폼의 대기 fade를 정리한다.
+- 이 최종 통합본의 로컬 Rust 151개·UI 95개, Clippy·개발 빌드가 통과했다. 별도 개발 fixture에서 약관 기본 생략·명시적 제한과 35% 설정의 실제 CLI 창 적용 값도 다시 확인했다. 추가 원격 main 내용이 있으므로 `30cd533`의 CI를 최종 통합본 자체의 CI로 간주하지 않는다.

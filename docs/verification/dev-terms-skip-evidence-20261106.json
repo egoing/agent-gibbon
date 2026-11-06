@@ -1,17 +1,17 @@
 {
   "source_root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel",
   "fixture": {
-    "root": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-bhmix4_z",
-    "id": "dev-26e952f5effe54f01e157a1d",
-    "name": "gibbon-terms-smoke-bhmix4_z",
-    "target": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-bhmix4_z/src-tauri/target",
-    "binary": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-bhmix4_z/src-tauri/target/debug/agent-gibbon"
+    "root": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-mvgl8fvm",
+    "id": "dev-b7300517e107d7772bfaadb1",
+    "name": "gibbon-terms-smoke-mvgl8fvm",
+    "target": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-mvgl8fvm/src-tauri/target",
+    "binary": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon-terms-smoke-mvgl8fvm/src-tauri/target/debug/agent-gibbon"
   },
   "note_id": "dev-terms-smoke",
   "cases": [
     {
       "require_terms": false,
-      "server_pid": 30286,
+      "server_pid": 60712,
       "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel/src-tauri/target/debug/agent-gibbon",
       "diagnostics": {
         "diagnostics": {
@@ -30,14 +30,14 @@
           "logs": false,
           "operations": 0,
           "release_health": false,
-          "revision": "efa656a547b9",
+          "revision": "30cd533b830c",
           "traces_sample_rate": 0.0,
           "watchdog": {
             "stall_threshold_ms": 12000,
             "startup_grace_ms": 30000
           }
         },
-        "instance": "dev-26e952f5effe54f01e157a1d",
+        "instance": "dev-b7300517e107d7772bfaadb1",
         "ok": true,
         "privacy": {
           "notice_ready": true,
@@ -49,11 +49,17 @@
       },
       "open_ok": true,
       "consent_file_created": false,
-      "inspect_verified": true
+      "inspect_verified": true,
+      "fixture_opacity": {
+        "global_opacity": 0.35,
+        "opacity": 0.35,
+        "instance": "dev-b7300517e107d7772bfaadb1",
+        "id": "dev-terms-smoke"
+      }
     },
     {
       "require_terms": true,
-      "server_pid": 30660,
+      "server_pid": 61003,
       "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/global-memo-opacity-wheel/src-tauri/target/debug/agent-gibbon",
       "diagnostics": {
         "diagnostics": {
@@ -72,14 +78,14 @@
           "logs": false,
           "operations": 0,
           "release_health": false,
-          "revision": "efa656a547b9",
+          "revision": "30cd533b830c",
           "traces_sample_rate": 0.0,
           "watchdog": {
             "stall_threshold_ms": 12000,
             "startup_grace_ms": 30000
           }
         },
-        "instance": "dev-26e952f5effe54f01e157a1d",
+        "instance": "dev-b7300517e107d7772bfaadb1",
         "ok": true,
         "privacy": {
           "notice_ready": true,
@@ -91,7 +97,8 @@
       },
       "open_ok": false,
       "consent_file_created": false,
-      "inspect_verified": false
+      "inspect_verified": false,
+      "fixture_opacity": null
     }
   ],
   "result": "passed"

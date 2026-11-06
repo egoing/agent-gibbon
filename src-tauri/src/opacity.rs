@@ -1,21 +1,26 @@
-#[cfg(target_os = "macos")]
+#[cfg(any(target_os = "macos", windows))]
 use std::collections::BTreeMap;
+#[cfg(any(target_os = "macos", windows))]
+use std::sync::{
+    atomic::{AtomicBool, Ordering},
+    Arc,
+};
 use std::{
     sync::Mutex,
     time::{Duration, Instant},
 };
 use tauri::Manager;
 
-#[cfg(target_os = "macos")]
+#[cfg(any(target_os = "macos", windows))]
 pub type Fades = Mutex<BTreeMap<String, Fade>>;
-#[cfg(any(target_os = "macos", test))]
+#[cfg(any(target_os = "macos", windows, test))]
 pub struct Fade {
     current: f64,
     target: f64,
     from: f64,
     started: Option<Instant>,
 }
-#[cfg(any(target_os = "macos", test))]
+#[cfg(any(target_os = "macos", windows, test))]
 impl Default for Fade {
     fn default() -> Self {
         Self {
@@ -26,7 +31,7 @@ impl Default for Fade {
         }
     }
 }
-#[cfg(any(target_os = "macos", test))]
+#[cfg(any(target_os = "macos", windows, test))]
 impl Fade {
     pub fn sample(&mut self, target: f64, now: Instant) -> f64 {
         if target >= self.current {
@@ -50,31 +55,45 @@ impl Fade {
     }
 }
 // Only pending fades schedule main-thread work; idle windows do not animate.
-#[cfg(target_os = "macos")]
+#[cfg(any(target_os = "macos", windows))]
 pub fn start(app: tauri::AppHandle) {
-    std::thread::spawn(move || loop {
-        std::thread::sleep(Duration::from_millis(16));
-        let labels: Vec<_> = app
-            .state::<Fades>()
-            .lock()
-            .unwrap()
-            .iter()
-            .filter(|(_, fade)| fade.started.is_some())
-            .map(|(label, _)| label.clone())
-            .collect();
-        if labels.is_empty() {
-            continue;
-        }
-        let handle = app.clone();
-        let _ = app.run_on_main_thread(move || {
-            for label in labels {
-                if let Some(window) = handle.get_webview_window(&label) {
-                    let _ = crate::sync_opacity(window);
-                } else {
-                    handle.state::<Fades>().lock().unwrap().remove(&label);
-                }
+    std::thread::spawn(move || {
+        let pending = Arc::new(AtomicBool::new(false));
+        loop {
+            std::thread::sleep(Duration::from_millis(16));
+            if pending.load(Ordering::Acquire) {
+                continue;
             }
-        });
+            let labels: Vec<_> = app
+                .state::<Fades>()
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|(_, fade)| fade.started.is_some())
+                .map(|(label, _)| label.clone())
+                .collect();
+            if labels.is_empty() {
+                continue;
+            }
+            pending.store(true, Ordering::Release);
+            let finished = pending.clone();
+            let handle = app.clone();
+            if app
+                .run_on_main_thread(move || {
+                    for label in labels {
+                        if let Some(window) = handle.get_webview_window(&label) {
+                            let _ = crate::sync_opacity(window);
+                        } else {
+                            handle.state::<Fades>().lock().unwrap().remove(&label);
+                        }
+                    }
+                    finished.store(false, Ordering::Release);
+                })
+                .is_err()
+            {
+                break;
+            }
+        }
     });
 }
 #[cfg(test)]
@@ -271,38 +290,11 @@ pub fn set_native(window: &tauri::WebviewWindow, value: f64) -> Result<(), Strin
         }
     }
     #[cfg(windows)]
-    windows::set(window, value)?;
+    crate::windows_window::set_opacity(window, value)?;
     #[cfg(not(any(target_os = "macos", windows)))]
     let _ = (window, value);
     Ok(())
 }
-#[cfg(windows)]
-mod windows {
-    use std::ffi::c_void;
-    type Hwnd = *mut c_void;
-    #[link(name = "user32")]
-    extern "system" {
-        fn GetWindowLongPtrW(hwnd: Hwnd, index: i32) -> isize;
-        fn SetWindowLongPtrW(hwnd: Hwnd, index: i32, value: isize) -> isize;
-        fn SetLayeredWindowAttributes(hwnd: Hwnd, color: u32, alpha: u8, flags: u32) -> i32;
-    }
-    pub fn set(window: &tauri::WebviewWindow, value: f64) -> Result<(), String> {
-        let hwnd = window.hwnd().map_err(|e| e.to_string())?.0 as Hwnd;
-        unsafe {
-            let style = GetWindowLongPtrW(hwnd, -20);
-            if style & 0x80000 == 0 {
-                SetWindowLongPtrW(hwnd, -20, style | 0x80000);
-            }
-            if SetLayeredWindowAttributes(hwnd, 0, (value.clamp(0., 1.) * 255.).round() as u8, 2)
-                == 0
-            {
-                return Err(std::io::Error::last_os_error().to_string());
-            }
-        }
-        Ok(())
-    }
-}
-
 #[cfg(test)]
 mod global_tests {
     use super::*;

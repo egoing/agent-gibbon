@@ -44,6 +44,7 @@ pub fn directory() -> Result<PathBuf, String> {
             .as_deref()
             .unwrap_or("installed"),
     );
+    validate_windows_socket_path(&path.join("app.sock"))?;
     fs::create_dir_all(&path).map_err(|e| e.to_string())?;
     if fs::symlink_metadata(&path)
         .map_err(|e| e.to_string())?
@@ -53,6 +54,21 @@ pub fn directory() -> Result<PathBuf, String> {
         return Err("IPC directory cannot be a symbolic link".into());
     }
     Ok(path)
+}
+
+#[cfg(windows)]
+fn validate_windows_socket_path(path: &std::path::Path) -> Result<(), String> {
+    // Winsock AF_UNIX uses UTF-8 and reserves one of sun_path's 108 bytes for NUL.
+    let path = path
+        .to_str()
+        .ok_or("Windows IPC 경로는 UTF-8이어야 합니다")?;
+    if path.len() > 107 {
+        return Err(format!(
+            "Windows IPC 경로가 UTF-8 107바이트 제한을 초과했습니다 ({}바이트). 현재 LOCALAPPDATA 경로에서는 실행할 수 없습니다.",
+            path.len()
+        ));
+    }
+    Ok(())
 }
 
 pub struct Endpoint {
@@ -148,6 +164,17 @@ pub fn error(message: impl ToString) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(windows)]
+    #[test]
+    fn windows_socket_limit_counts_utf8_bytes() {
+        use std::path::Path;
+        assert!(validate_windows_socket_path(Path::new(&"a".repeat(107))).is_ok());
+        assert!(validate_windows_socket_path(Path::new(&"a".repeat(108))).is_err());
+        assert!(validate_windows_socket_path(Path::new(&"한".repeat(35))).is_ok());
+        let error = validate_windows_socket_path(Path::new(&"한".repeat(36))).unwrap_err();
+        assert!(error.contains("108바이트"));
+        assert!(error.contains("LOCALAPPDATA"));
+    }
     #[test]
     fn independent_locks_and_stale_socket_recovery() {
         let root =

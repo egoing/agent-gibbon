@@ -140,7 +140,25 @@ fn geometry(
         native.setFrame_display(frame, false);
         Ok(())
     }
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(windows)]
+    {
+        // Destination/transition sizes describe the entire native frame. Moving
+        // first lets a cross-monitor DPI change settle before logical conversion.
+        window
+            .set_position(PhysicalPosition::new(
+                p.x.round() as i32,
+                p.y.round() as i32,
+            ))
+            .map_err(|e| e.to_string())?;
+        if let Some(size) = size {
+            crate::windows_window::set_outer_size(
+                window,
+                size.to_physical::<u32>(window.scale_factor().map_err(|e| e.to_string())?),
+            )?;
+        }
+        Ok(())
+    }
+    #[cfg(not(any(target_os = "macos", windows)))]
     {
         if let Some(size) = size {
             window.set_size(size).map_err(|e| e.to_string())?;
@@ -499,6 +517,8 @@ fn await_frame(rx: &mpsc::Receiver<bool>, timeout: Duration, late: impl FnOnce()
     }
 }
 fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, String> {
+    #[cfg(windows)]
+    crate::sizing::native_resize(window)?;
     let state = window.state::<Entrances>();
     let mut flights = state.0.lock().map_err(|e| e.to_string())?;
     if flights

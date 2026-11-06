@@ -243,7 +243,12 @@ pub fn reflow(app: &tauri::AppHandle, opened: &WebviewWindow) -> Result<Destinat
             entrance::cancel(&w)?;
             #[cfg(target_os = "macos")]
             entrance::place(&w, dest)?;
-            #[cfg(not(target_os = "macos"))]
+            #[cfg(windows)]
+            {
+                w.set_position(dest.position).map_err(|e| e.to_string())?;
+                crate::windows_window::set_outer_size(&w, dest.size)?;
+            }
+            #[cfg(not(any(target_os = "macos", windows)))]
             {
                 // Keep the existing physical-coordinate path on other OSes.
                 w.set_size(dest.size).map_err(|e| e.to_string())?;
