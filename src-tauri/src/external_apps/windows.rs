@@ -1,6 +1,10 @@
 use super::*;
 use fs2::FileExt;
 use std::os::windows::process::CommandExt;
+use std::sync::{
+    atomic::{AtomicU64, Ordering},
+    OnceLock,
+};
 use std::{
     fs::{File, OpenOptions},
     io::Read,
@@ -34,6 +38,22 @@ struct Placement {
 }
 #[link(name = "user32")]
 extern "system" {
+    fn SetWinEventHook(
+        min: u32,
+        max: u32,
+        module: isize,
+        callback: unsafe extern "system" fn(isize, u32, isize, i32, i32, u32, u32),
+        pid: u32,
+        thread: u32,
+        flags: u32,
+    ) -> isize;
+    fn UnhookWinEvent(hook: isize) -> i32;
+    fn PeekMessageW(message: *mut Message, hwnd: isize, min: u32, max: u32, remove: u32) -> i32;
+    fn GetMessageW(message: *mut Message, hwnd: isize, min: u32, max: u32) -> i32;
+    fn PostThreadMessageW(thread: u32, message: u32, wparam: usize, lparam: isize) -> i32;
+    fn SetPropW(hwnd: isize, name: *const u16, value: isize) -> i32;
+    fn GetPropW(hwnd: isize, name: *const u16) -> isize;
+    fn RemovePropW(hwnd: isize, name: *const u16) -> isize;
     fn EnumWindows(callback: unsafe extern "system" fn(isize, isize) -> i32, param: isize) -> i32;
     fn IsWindow(hwnd: isize) -> i32;
     fn IsWindowVisible(hwnd: isize) -> i32;
@@ -50,6 +70,7 @@ extern "system" {
 }
 #[link(name = "kernel32")]
 extern "system" {
+    fn GetCurrentThreadId() -> u32;
     fn OpenProcess(access: u32, inherit: i32, pid: u32) -> isize;
     fn CloseHandle(handle: isize) -> i32;
     fn QueryFullProcessImageNameW(handle: isize, flags: u32, name: *mut u16, len: *mut u32) -> i32;
@@ -63,6 +84,8 @@ extern "system" {
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 struct Identity {
+    #[serde(default)]
+    epoch: u64,
     hwnd: isize,
     pid: u32,
     created: u64,
@@ -82,12 +105,14 @@ struct App {
     label: String,
     exe: String,
     arguments: String,
+    directory: String,
 }
 struct Session {
     original: Window,
     placement: Placement,
     _lease: File,
     journal: std::path::PathBuf,
+    claim: String,
 }
 #[derive(Default)]
 pub(super) struct State {
@@ -125,6 +150,7 @@ fn identity(hwnd: isize) -> Result<Identity, String> {
         return Err(native_error("외부 창 출처 확인 실패"));
     }
     Ok(Identity {
+        epoch: WINDOW_EPOCH.load(Ordering::SeqCst),
         hwnd,
         pid,
         created,
@@ -171,14 +197,21 @@ unsafe extern "system" fn collect(hwnd: isize, data: isize) -> i32 {
     1
 }
 fn windows() -> Result<Vec<Window>, String> {
+    sync_events()?;
     let mut rows = Vec::new();
     if unsafe { EnumWindows(collect, &mut rows as *mut Vec<Window> as isize) } == 0 {
         return Err(native_error("창 목록 조회 실패"));
     }
+    OBSERVED_WINDOWS
+        .lock()
+        .map_err(err)?
+        .extend(rows.iter().map(|w| w.identity.hwnd));
     Ok(rows)
 }
 fn same(id: &Identity) -> bool {
-    identity(id.hwnd).is_ok_and(|v| v == *id)
+    identity(id.hwnd).is_ok_and(|v| {
+        v.hwnd == id.hwnd && v.pid == id.pid && v.created == id.created && v.exe == id.exe
+    })
 }
 fn placement(hwnd: isize) -> Result<Placement, String> {
     let mut p = Placement {
@@ -198,7 +231,10 @@ fn forget_journal(s: &Session) -> Result<(), String> {
     }
 }
 fn restore(s: &Session) -> Result<(), String> {
-    if !same(&s.original.identity) {
+    let marker = wide(&s.claim);
+    if !same(&s.original.identity)
+        || unsafe { GetPropW(s.original.identity.hwnd, marker.as_ptr()) } != 1
+    {
         return forget_journal(s);
     } // Never touch a recycled HWND/PID.
     let h = s.original.identity.hwnd;
@@ -226,6 +262,9 @@ fn restore(s: &Session) -> Result<(), String> {
     loop {
         if let Ok(w) = snap(h) {
             if w.rect == s.original.rect && w.topmost == s.original.topmost {
+                if unsafe { RemovePropW(h, marker.as_ptr()) } != 1 {
+                    return Err(native_error("창 소유 표식 해제 확인 실패"));
+                }
                 return forget_journal(s);
             }
         }
@@ -239,8 +278,9 @@ fn attach(state: &mut State, id: Identity, region: [i32; 4]) -> Result<Value, St
     if state.shutting_down {
         return Err("앱 종료 중입니다".into());
     }
-    if !same(&id) {
-        return Err("선택 이후 창 출처가 변경되었습니다. 목록을 새로 고치세요".into());
+    sync_events()?;
+    if !same(&id) || WINDOW_EPOCH.load(Ordering::SeqCst) != id.epoch {
+        return Err("선택 이후 창 목록/출처가 변경되었습니다. 목록을 새로 고치세요".into());
     }
     let original = snap(id.hwnd)?;
     if unsafe { IsIconic(id.hwnd) } != 0 || unsafe { IsZoomed(id.hwnd) } != 0 {
@@ -258,6 +298,14 @@ fn attach(state: &mut State, id: Identity, region: [i32; 4]) -> Result<Value, St
         rect: original.rect,
         topmost: original.topmost,
         placement: placement(id.hwnd)?,
+        claim: format!(
+            "AgentGibbon.Floating.{}.{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map_err(err)?
+                .as_nanos()
+        ),
     };
     std::fs::create_dir_all(&state.root).map_err(err)?;
     let journal = state
@@ -274,14 +322,22 @@ fn attach(state: &mut State, id: Identity, region: [i32; 4]) -> Result<Value, St
         placement: saved.placement,
         _lease: lease,
         journal,
+        claim: saved.claim,
     };
+    let marker = wide(&session.claim);
+    if unsafe { SetPropW(id.hwnd, marker.as_ptr(), 1) } == 0 {
+        let _ = forget_journal(&session);
+        return Err(native_error(
+            "창 소유 표식 설정 실패; 같은 권한의 일반 앱만 선택하세요",
+        ));
+    }
     let [x, y, w, h] = region;
     let result = if unsafe { SetWindowPos(id.hwnd, -1, x, y, w, h, 0x4000 | 0x10 | 0x200) } == 0 {
         Err(native_error("외부 창 배치 실패"))
     } else {
         let deadline = Instant::now() + Duration::from_millis(900);
         loop {
-            if !same(&id) {
+            if !same(&id) || unsafe { GetPropW(id.hwnd, marker.as_ptr()) } != 1 {
                 break Err("배치 중 창이 종료되었습니다".into());
             }
             if let Ok(observed) = snap(id.hwnd) {
@@ -318,7 +374,7 @@ fn attach(state: &mut State, id: Identity, region: [i32; 4]) -> Result<Value, St
 }
 fn catalog() -> Result<Vec<App>, String> {
     // Read classic desktop Start Menu shortcuts only. Resolve, never execute script targets.
-    const SCRIPT: &str = r#"[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); $ws=New-Object -ComObject WScript.Shell; $roots=@([Environment]::GetFolderPath('Programs'),[Environment]::GetFolderPath('CommonPrograms')); $rows=@(Get-ChildItem -LiteralPath $roots -Filter *.lnk -Recurse -ErrorAction SilentlyContinue | Select-Object -First 500 | ForEach-Object { $l=$ws.CreateShortcut($_.FullName); if($l.TargetPath -match '(?i)\.exe$' -and (Test-Path -LiteralPath $l.TargetPath -PathType Leaf)) { [pscustomobject]@{id=$_.FullName;label=$_.BaseName;exe=$l.TargetPath;arguments=$l.Arguments} } }); ConvertTo-Json -InputObject $rows -Compress"#;
+    const SCRIPT: &str = r#"[Console]::OutputEncoding=[Text.UTF8Encoding]::new($false); $ws=New-Object -ComObject WScript.Shell; $roots=@([Environment]::GetFolderPath('Programs'),[Environment]::GetFolderPath('CommonPrograms')); $rows=@(Get-ChildItem -LiteralPath $roots -Filter *.lnk -Recurse -ErrorAction SilentlyContinue | Select-Object -First 500 | ForEach-Object { $l=$ws.CreateShortcut($_.FullName); if($l.TargetPath -match '(?i)\.exe$' -and (Test-Path -LiteralPath $l.TargetPath -PathType Leaf)) { [pscustomobject]@{id=$_.FullName;label=$_.BaseName;exe=$l.TargetPath;arguments=$l.Arguments;directory=[Environment]::ExpandEnvironmentVariables($l.WorkingDirectory)} } }); ConvertTo-Json -InputObject $rows -Compress"#;
     let output = tempfile::tempfile().map_err(err)?;
     let mut child = Command::new("powershell.exe")
         .args(["-NoProfile", "-NonInteractive", "-Command", SCRIPT])
@@ -461,8 +517,20 @@ pub(super) fn execute(app: &tauri::AppHandle, r: &ExternalRequest) -> Result<Val
                 }) {
                     return;
                 }
+                let directory = if selected.directory.is_empty() {
+                    std::path::Path::new(&selected.exe)
+                        .parent()
+                        .map(std::path::Path::to_path_buf)
+                        .unwrap_or_default()
+                } else {
+                    std::path::PathBuf::from(&selected.directory)
+                };
                 let launch = Command::new(&selected.exe)
                     .raw_arg(&selected.arguments)
+                    .current_dir(directory)
+                    .stdin(Stdio::null())
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::null())
                     .spawn();
                 let mut child = match launch {
                     Ok(c) => c,
@@ -562,6 +630,7 @@ pub(super) fn release_all(app: &tauri::AppHandle) -> Result<(), String> {
 #[derive(Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Saved {
+    claim: String,
     identity: Identity,
     rect: [i32; 4],
     topmost: bool,
@@ -582,6 +651,7 @@ fn lease(id: &Identity) -> Result<File, String> {
     Ok(f)
 }
 pub(super) fn initialize(app: &tauri::AppHandle) -> Result<(), String> {
+    start_events()?;
     let store = app.state::<ExternalApps>();
     let mut s = store.inner.lock().map_err(err)?;
     if s.initialized {
@@ -617,6 +687,7 @@ pub(super) fn initialize(app: &tauri::AppHandle) -> Result<(), String> {
             placement: saved.placement,
             _lease: f,
             journal: path,
+            claim: saved.claim,
         };
         if let Err(e) = restore(&session) {
             s.next += 1;
@@ -627,4 +698,100 @@ pub(super) fn initialize(app: &tauri::AppHandle) -> Result<(), String> {
     }
     s.initialized = true;
     Ok(())
+}
+
+fn wide(s: &str) -> Vec<u16> {
+    s.encode_utf16().chain(std::iter::once(0)).collect()
+}
+
+// Observe destruction without adding properties or hooks to unselected apps.
+// A destruction invalidates every outstanding selection conservatively; the
+// selected window's property then guards its entire attached/recovery lifetime.
+static WINDOW_EPOCH: AtomicU64 = AtomicU64::new(0);
+static OBSERVED_WINDOWS: Mutex<std::collections::BTreeSet<isize>> =
+    Mutex::new(std::collections::BTreeSet::new());
+static EVENT_ACK: AtomicU64 = AtomicU64::new(0);
+static EVENT_REQUEST: AtomicU64 = AtomicU64::new(0);
+static EVENT_THREAD: OnceLock<Result<u32, String>> = OnceLock::new();
+#[repr(C)]
+#[derive(Default)]
+struct Message {
+    hwnd: isize,
+    message: u32,
+    wparam: usize,
+    lparam: isize,
+    time: u32,
+    point: Point,
+    private: u32,
+}
+unsafe extern "system" fn destroyed(
+    _hook: isize,
+    event: u32,
+    hwnd: isize,
+    object: i32,
+    child: i32,
+    _thread: u32,
+    _time: u32,
+) {
+    if event == 0x8001 && hwnd != 0 && object == 0 && child == 0 {
+        if OBSERVED_WINDOWS
+            .lock()
+            .is_ok_and(|mut known| known.remove(&hwnd))
+        {
+            WINDOW_EPOCH.fetch_add(1, Ordering::SeqCst);
+        }
+    }
+}
+fn start_events() -> Result<u32, String> {
+    EVENT_THREAD
+        .get_or_init(|| {
+            let (tx, rx) = std::sync::mpsc::sync_channel(1);
+            std::thread::spawn(move || {
+                let hook = unsafe { SetWinEventHook(0x8001, 0x8001, 0, destroyed, 0, 0, 2) };
+                if hook == 0 {
+                    let _ = tx.send(Err(native_error("창 생명주기 감시 실패")));
+                    return;
+                }
+                // SetWinEventHook establishes the receiving thread's message queue.
+                let _ = tx.send(Ok(unsafe { GetCurrentThreadId() }));
+                let mut message = Message::default();
+                while unsafe { GetMessageW(&mut message, 0, 0, 0) } > 0 {
+                    if message.message == 0x8001 {
+                        EVENT_ACK.fetch_max(message.wparam as u64, Ordering::SeqCst);
+                    }
+                }
+                unsafe { UnhookWinEvent(hook) };
+            });
+            rx.recv_timeout(Duration::from_secs(2)).map_err(err)?
+        })
+        .clone()
+}
+fn sync_events() -> Result<(), String> {
+    let thread = start_events()?;
+    let token = EVENT_REQUEST.fetch_add(1, Ordering::SeqCst) + 1;
+    if unsafe { PostThreadMessageW(thread, 0x8001, token as usize, 0) } == 0 {
+        return Err(native_error("창 생명주기 확인 실패"));
+    }
+    let deadline = Instant::now() + Duration::from_millis(500);
+    while EVENT_ACK.load(Ordering::SeqCst) < token {
+        if Instant::now() >= deadline {
+            return Err("창 생명주기 확인 시간 초과".into());
+        }
+        std::thread::sleep(Duration::from_millis(2));
+    }
+    Ok(())
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn destroy_event_invalidates_inventory_but_child_accessibility_events_do_not() {
+        OBSERVED_WINDOWS.lock().unwrap().insert(42);
+        let before = WINDOW_EPOCH.load(Ordering::SeqCst);
+        unsafe { destroyed(0, 0x8001, 42, 0, 0, 0, 0) };
+        assert!(WINDOW_EPOCH.load(Ordering::SeqCst) > before);
+        let before = WINDOW_EPOCH.load(Ordering::SeqCst);
+        unsafe { destroyed(0, 0x8001, 42, -4, 1, 0, 0) };
+        assert_eq!(WINDOW_EPOCH.load(Ordering::SeqCst), before);
+    }
 }

@@ -241,8 +241,21 @@ pub async fn external_request(
     let app = window.app_handle().clone();
     let owner = window.label().to_string();
     tauri::async_runtime::spawn_blocking(move || {
+        if !app
+            .state::<ExternalApps>()
+            .bounds
+            .lock()
+            .map_err(err)?
+            .contains_key(&owner)
+        {
+            return Err("선택 창이 닫혀 작업을 취소했습니다".into());
+        }
         let result = execute(&app, &request)?;
-        if let Some(launch) = result.get("launch").and_then(Value::as_str) {
+        if let Some(launch) = result
+            .get("launch")
+            .or_else(|| result.get("session"))
+            .and_then(Value::as_str)
+        {
             app.state::<ExternalApps>()
                 .pending_owners
                 .lock()
@@ -258,7 +271,12 @@ pub async fn external_request(
                 let _ = execute(
                     &app,
                     &ExternalRequest {
-                        operation: "cancel".into(),
+                        operation: if launch.starts_with("launch-") {
+                            "cancel"
+                        } else {
+                            "release"
+                        }
+                        .into(),
                         session: Some(launch.into()),
                         app_id: None,
                         window: None,
@@ -325,7 +343,12 @@ pub fn picker_closed(app: &tauri::AppHandle, label: &str) {
             let _ = execute(
                 &app,
                 &ExternalRequest {
-                    operation: "cancel".into(),
+                    operation: if key.starts_with("launch-") {
+                        "cancel"
+                    } else {
+                        "release"
+                    }
+                    .into(),
                     session: Some(key),
                     app_id: None,
                     window: None,
