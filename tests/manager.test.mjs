@@ -42,7 +42,6 @@ test('one common show action precedes unchanged content for every memo type', as
     {id:'empty',title:'빈 메모',html:''},
     {id:'image',title:'이미지',capture:{}},
     {id:'terminal',title:'터미널',kind:'terminal'},
-    {id:'agent',title:'에이전트',kind:'agent'}
   ];
   app.setData(rows); await app.run('refresh(true)');
   assert.equal(app.elements.get('detail').children.length,0);
@@ -92,7 +91,7 @@ test('pending actions use the clicked id, prevent duplicate submission and canno
 });
 
 test('visible status toggles to hide and back for every memo kind', async () => {
-  for (const row of [{id:'text'},{id:'image',capture:{}},{id:'agent',kind:'agent'},{id:'terminal',kind:'terminal'}]) {
+  for (const row of [{id:'text'},{id:'image',capture:{}},{id:'terminal',kind:'terminal'}]) {
     const app = setup(); await tick(); app.setData([{...row,visible:true}]); await app.run('refresh(true)');
     app.elements.get('list').children[0].onclick(); await tick();
     assert.equal(openButton(app).textContent,'화면에서 숨기기');
@@ -148,4 +147,24 @@ test('settings sections preserve privacy drafts and selected memo across navigat
   e('notes-nav').onclick();
   assert.match(e('detail').children[1].innerHTML, /숨긴 메모/);
   assert.deepEqual([...new Set(app.calls)], ['manager_notes']);
+});
+
+test('More destination returns from Settings to the full list without type prefixes or IDs', async () => {
+  const app = setup(); await tick();
+  app.setData(Array.from({length:31}, (_,i) => ({id:`internal-${i}`,title:`제목 ${i}`,kind:'terminal',visible:false})));
+  app.elements.get('settings-nav').onclick();
+  app.run('window.gibbonShowNotes()'); await tick();
+  assert.equal(app.elements.get('notes-page').hidden,false);
+  assert.equal(app.elements.get('list').children.length,31);
+  assert.equal(app.elements.get('list').children[0].textContent,'제목 0');
+  assert.equal(app.elements.get('list').children[30].textContent,'제목 30');
+});
+
+
+test('retired agent records cannot appear in the manager list', async () => {
+  const app = setup(); await tick();
+  app.setData([{id:'agent-123',title:'이전 에이전트',kind:'agent'}, {id:'terminal-456',title:'터미널',kind:'terminal'}]);
+  await app.run('refresh(true)');
+  assert.equal(app.elements.get('list').children.length,1);
+  assert.equal(app.elements.get('list').children[0].textContent,'터미널');
 });

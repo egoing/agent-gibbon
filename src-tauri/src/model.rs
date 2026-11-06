@@ -8,13 +8,19 @@ pub const MAX_REQUEST: u64 = 1024 * 1024;
 #[serde(rename_all = "lowercase")]
 pub enum Action {
     Open,
-    Agent,
     Update,
     Close,
     Inspect,
     List,
     Diagnostics,
     Probe,
+}
+
+// Retired dedicated-agent IDs stay reserved, so open/update cannot turn an old
+// project directory into a Markdown note or overwrite its index.md.
+pub fn retired_agent_id(id: &str) -> bool {
+    id.strip_prefix("agent-")
+        .is_some_and(|suffix| !suffix.is_empty() && suffix.bytes().all(|b| b.is_ascii_digit()))
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -36,21 +42,22 @@ impl Request {
     }
 
     pub fn validate(&self) -> Result<(), String> {
-        if matches!(
-            self.action,
-            Action::Agent | Action::Diagnostics | Action::Probe
-        ) && (self.id.is_some()
-            || self.title.is_some()
-            || self.markdown.is_some()
-            || self.source_path.is_some()
-            || self.status.is_some()
-            || self.color.is_some())
+        if matches!(self.action, Action::Diagnostics | Action::Probe)
+            && (self.id.is_some()
+                || self.title.is_some()
+                || self.markdown.is_some()
+                || self.source_path.is_some()
+                || self.status.is_some()
+                || self.color.is_some())
         {
-            return Err(
-                "agent/diagnostics/diagnostics-probe 명령에는 옵션을 지정할 수 없습니다".into(),
-            );
+            return Err("diagnostics/diagnostics-probe 명령에는 옵션을 지정할 수 없습니다".into());
         }
         let id = self.id();
+        if retired_agent_id(id) {
+            return Err(
+                "전용 에이전트 기능이 제거되어 이전 에이전트 창을 열거나 변경할 수 없습니다".into(),
+            );
+        }
         if id.is_empty()
             || id.len() > 64
             || !id
@@ -583,6 +590,27 @@ mod tests {
             .expect("changed content has a separate safe highlight rendering")
             .to_string()
     }
+    #[test]
+    fn retired_agent_ids_are_reserved_while_ordinary_note_ids_still_work() {
+        let mut request = Request {
+            action: Action::Open,
+            id: Some("agent-123".into()),
+            title: None,
+            markdown: None,
+            source_path: None,
+            status: None,
+            color: None,
+        };
+        assert!(request.validate().is_err());
+        request.action = Action::Update;
+        request.markdown = Some("must not overwrite a project".into());
+        assert!(request.validate().is_err());
+        request.id = Some("agent-notes".into());
+        assert!(request.validate().is_ok());
+        request.id = Some("terminal-123".into());
+        assert!(request.validate().is_ok());
+    }
+
     #[test]
     fn cumulative_diff_keeps_unconfirmed_changes_and_omits_intermediate_versions() {
         let mut note = changed_note("원본\n유지\n", "중간\n유지\n추가\n");

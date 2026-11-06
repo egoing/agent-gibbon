@@ -13,6 +13,7 @@ mod local_trace;
 mod model;
 mod opacity;
 mod placement;
+mod presentation;
 mod privacy;
 mod sizing;
 mod skills;
@@ -375,20 +376,8 @@ fn apply_with_presentation(
         Action::Close => "ipc.close",
         Action::Inspect => "ipc.inspect",
         Action::List => "ipc.list",
-        Action::Agent => "ipc.agent",
         _ => unreachable!(),
     });
-    if matches!(request.action, Action::Agent) {
-        return terminal::create(
-            app,
-            capture::ImageNote {
-                x: 120.,
-                y: 120.,
-                width: 720.,
-                height: 460.,
-            },
-        );
-    }
     if terminal::contains(app, request.id()) {
         return terminal::handle(app, &request);
     }
@@ -480,16 +469,11 @@ fn apply_with_presentation(
             win.hide().map_err(|e| e.to_string())?;
             tray::sync_visibility(app)?;
         }
-        Action::Update
-        | Action::Inspect
-        | Action::List
-        | Action::Agent
-        | Action::Diagnostics
-        | Action::Probe => (),
+        Action::Update | Action::Inspect | Action::List | Action::Diagnostics | Action::Probe => (),
     }
-    let menu_changed = existing
-        .as_ref()
-        .is_none_or(|previous| previous.title != next.title);
+    // Existing metadata is recollected before the next menu open. Replacing a
+    // tracking native menu here would dismiss it during background updates.
+    let menu_changed = existing.is_none();
     let response = inspect_window(&win, &id, &next);
     state.lock().map_err(|e| e.to_string())?.insert(id, next);
     if menu_changed {
@@ -542,7 +526,6 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     terminal::terminal_start,
                     terminal::terminal_write,
                     terminal::terminal_resize,
-                    terminal::terminal_hide,
                     terminal::terminal_info,
                     terminal::welcome::terminal_welcome,
                     terminal::welcome::terminal_folder,
@@ -634,15 +617,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 }
                 return;
             }
-            if win.label().starts_with("agent-") || win.label() == manager::LABEL {
-                if win.label().starts_with("agent-")
-                    && matches!(
-                        event,
-                        tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)
-                    )
-                {
-                    terminal::geometry(win);
-                }
+            if win.label() == manager::LABEL {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                     api.prevent_close();
                     if let Some(w) = win.app_handle().get_webview_window(win.label()) {
@@ -852,7 +827,7 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
 }
 
 fn parse(args: &[String]) -> Result<Request, String> {
-    let action = match args.first().map(String::as_str) { Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("agent") => Action::Agent, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
+    let action = match args.first().map(String::as_str) { Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
         action,
         source_path: None,
@@ -914,7 +889,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
     ipc::directory()?;
     let stream = match ipc::connect() {
         Ok(stream) => stream,
-        Err(_) if matches!(request.action, Action::Open | Action::Agent) => {
+        Err(_) if matches!(request.action, Action::Open) => {
             let mut child = Command::new(std::env::current_exe().map_err(|e| e.to_string())?);
             child
                 .arg("--serve")
@@ -1018,6 +993,15 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn retired_agent_cli_and_project_ids_are_rejected() {
+        assert!(parse(&["agent".into()]).is_err());
+        for action in ["open", "update", "inspect", "close"] {
+            assert!(parse(&[action.into(), "--id".into(), "agent-123".into()]).is_err());
+        }
+        assert!(serde_json::from_str::<Action>("\"agent\"").is_err());
+    }
+
     #[test]
     fn invalid_commands_and_duplicate_content_fail() {
         for args in [

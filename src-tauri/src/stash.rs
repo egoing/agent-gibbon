@@ -399,7 +399,10 @@ fn place_indicator(app: &tauri::AppHandle, area: Rect, top: bool, tip: bool) -> 
 }
 fn set_tip(app: &tauri::AppHandle, w: &WebviewWindow, tip: bool) -> Result<(), String> {
     let text = if tip {
-        format!("{} · 다시 누르면 창 복원", shortcut(app))
+        format!(
+            "{} · 다시 누르면 창 복원",
+            crate::presentation::shortcut(&shortcut(app))
+        )
     } else {
         String::new()
     };

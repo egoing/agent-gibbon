@@ -25,6 +25,17 @@ pub fn open(app: &tauri::AppHandle) -> Result<(), String> {
     Ok(())
 }
 
+// More always targets the full list even when Settings was previously selected.
+pub fn open_list(app: &tauri::AppHandle) -> Result<(), String> {
+    open(app)?;
+    if let Some(window) = app.get_webview_window(LABEL) {
+        window
+            .eval("window.gibbonShowNotes?.()")
+            .map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
 #[tauri::command]
 pub fn manager_notes(
     window: tauri::WebviewWindow,
@@ -42,7 +53,7 @@ pub fn manager_notes(
         row["visible"] = json!(visible(app, &crate::label(row["id"].as_str().unwrap()))?);
     }
     for agent in crate::terminal::entries(window.app_handle()) {
-        rows.push(json!({"id":agent.id,"title":agent.display_title(),"kind":agent.kind,"visible":visible(app, &agent.id)?}));
+        rows.push(json!({"id":agent.id,"title":crate::presentation::list_title(&agent.title, &agent.id, crate::presentation::Kind::Terminal),"kind":agent.kind,"visible":visible(app, &agent.id)?}));
     }
     Ok(Value::Array(rows))
 }
@@ -86,14 +97,20 @@ fn display_title(note: &crate::model::Note, id: &str) -> String {
             }
         }
     }
-    let text = text.trim();
-    if !text.is_empty() {
-        text.to_string()
-    } else if !note.title.trim().is_empty() {
-        note.title.clone()
+    let raw = if text.trim().is_empty() {
+        &note.title
     } else {
-        id.to_string()
-    }
+        &text
+    };
+    crate::presentation::list_title(
+        raw,
+        id,
+        if note.capture.is_some() {
+            crate::presentation::Kind::Capture
+        } else {
+            crate::presentation::Kind::Note
+        },
+    )
 }
 
 #[cfg(test)]
@@ -114,7 +131,7 @@ mod tests {
         note.markdown = "".into();
         assert_eq!(display_title(&note, "id"), "메타 제목");
         note.title.clear();
-        assert_eq!(display_title(&note, "id"), "id");
+        assert_eq!(display_title(&note, "id"), "메모");
     }
 }
 

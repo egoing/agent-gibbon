@@ -164,6 +164,15 @@ impl Store {
             if !entry_type_is_directory(&path)? {
                 continue;
             }
+            // Retired project directories stay private even if their old terminal
+            // metadata is missing; never parse project index.md as an app note.
+            if path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(crate::model::retired_agent_id)
+            {
+                continue;
+            }
             // Agent project files are not application-owned Markdown records.
             if path.file_name().is_some_and(|name| {
                 self.0
@@ -268,6 +277,27 @@ impl Store {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn retired_project_without_terminal_metadata_is_preserved_and_not_loaded() {
+        let dir = tempfile::tempdir().unwrap();
+        let store = Store(dir.path().to_path_buf());
+        let project = dir.path().join("agent-123");
+        fs::create_dir(&project).unwrap();
+        let index = project.join("index.md");
+        fs::write(&index, "user project without application metadata").unwrap();
+        store.save("ordinary", &Note::default()).unwrap();
+        for _ in 0..2 {
+            let notes = store.load().unwrap();
+            assert_eq!(notes.len(), 1);
+            assert!(notes.contains_key("ordinary"));
+        }
+        assert_eq!(
+            fs::read_to_string(index).unwrap(),
+            "user project without application metadata"
+        );
+        assert!(!dir.path().join(".agent-gibbon-terminals").exists());
+    }
+
     #[test]
     fn cumulative_baseline_survives_restart_and_confirmation_is_transactional() {
         let root = std::env::temp_dir().join(format!("gibbon-baseline-{}", std::process::id()));

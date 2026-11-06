@@ -45,7 +45,7 @@ with tempfile.TemporaryDirectory(prefix='gibbon-regions-') as folder:
         prefix=f'tell application "System Events" to tell (first application process whose unix id is {pid}) to '
         a,b,c,d=map(float,apple(prefix+'get {position, size} of menu bar item 1 of menu bar 2').split(','))
         run([folder/'mouse','click',a+c/2,b+d/2]);time.sleep(.15)
-        label='영역 캡처 · Ctrl+Shift+1' if mode=='image' else '영역 텍스트 메모 · Ctrl+Shift+2'
+        label='영역 캡처\tCtrl ⇧ 1' if mode=='image' else '영역 텍스트 메모\tCtrl ⇧ 2'
         apple(prefix+'click menu item '+json.dumps(label,ensure_ascii=False)+' of menu 1 of menu bar item 1 of menu bar 2')
         time.sleep(1)
         native=json.loads(run([folder/'native',pid]));LOG.setdefault('overlays',[]).append(native)
@@ -95,11 +95,13 @@ with tempfile.TemporaryDirectory(prefix='gibbon-regions-') as folder:
         LOG['image_after']=image_state;LOG['text_after']=inspect(text)
         check('region edit/pin action re-includes; next normal open reflows text and preserves image ratio without enlarging original')
         # A real native menu reopen takes the direct presentation path.
+        restore_title='일반 메모 복원 '+PREFIX
+        cli('update',extra,'--title',restore_title)
         cli('close',extra)
         prefix=f'tell application "System Events" to tell (first application process whose unix id is {pid}) to '
         a,b,c,d=map(float,apple(prefix+'get {position, size} of menu bar item 1 of menu bar 2').split(','))
         run([folder/'mouse','click',a+c/2,b+d/2]);time.sleep(.15)
-        apple(prefix+'click menu item '+json.dumps(f'Agent Gibbon ({extra})')+' of menu 1 of menu bar item 1 of menu bar 2')
+        apple(prefix+'click menu item '+json.dumps(restore_title[:30])+' of menu 1 of menu bar item 1 of menu bar 2')
         restored=wait(extra);assert not restored['focused']
         check('native tray hidden-note restore uses direct layout and preserves focus')
     finally:

@@ -1,4 +1,4 @@
-//! Local PTYs, scoped to the calling agent window. Shell commands stay backend-owned; selected directories are validated.
+//! Local PTYs, scoped to the calling terminal window. Shell commands stay backend-owned; selected directories are validated.
 use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -7,11 +7,9 @@ use std::{
     io::{Read, Write},
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
-    time::Instant,
 };
 use tauri::{ipc::Channel, Manager, WebviewWindow};
 
-mod discovery;
 pub mod welcome;
 pub use welcome::{create as create_terminal, request_close};
 
@@ -19,7 +17,7 @@ fn err(e: impl std::fmt::Display) -> String {
     e.to_string()
 }
 #[derive(Clone, Serialize, Deserialize)]
-pub struct Agent {
+pub struct Terminal {
     pub id: String,
     pub bounds: crate::capture::ImageNote,
     // Older terminal metadata stores logical origins. New Windows selections
@@ -35,6 +33,8 @@ pub struct Agent {
     #[serde(default)]
     pub path_updated: u64,
     #[serde(default)]
+    pub updated_at: u64,
+    #[serde(default)]
     pub title: String,
 }
 #[derive(Clone, Serialize, Deserialize)]
@@ -46,10 +46,9 @@ pub struct RecentPath {
 #[serde(rename_all = "lowercase")]
 pub enum Kind {
     #[default]
-    Agent,
     Terminal,
 }
-impl Agent {
+impl Terminal {
     fn position(&self) -> tauri::Position {
         #[cfg(windows)]
         if self.physical_position {
@@ -64,9 +63,6 @@ impl Agent {
     pub fn display_title(&self) -> String {
         if !self.title.trim().is_empty() {
             return self.title.clone();
-        }
-        if self.kind == Kind::Agent {
-            return "에이전트 터미널".into();
         }
         self.last_path
             .as_ref()
@@ -103,7 +99,6 @@ struct Session {
     writer: Box<dyn Write + Send>,
     child: OwnedChild,
     program: String,
-    found: Option<discovery::Found>,
     prompt: welcome::PromptState,
 }
 impl Drop for Session {
@@ -122,12 +117,10 @@ impl Drop for Session {
         if self.child.try_wait().ok().flatten().is_none() {
             if let Some(pid) = self.child.process_id() {
                 // Include background jobs: job-control shells give them separate groups.
-                if self.found.is_none() {
-                    if let Some(children) = welcome::descendants(pid) {
-                        for child in children.into_iter().rev() {
-                            unsafe {
-                                libc::kill(child, libc::SIGKILL);
-                            }
+                if let Some(children) = welcome::descendants(pid) {
+                    for child in children.into_iter().rev() {
+                        unsafe {
+                            libc::kill(child, libc::SIGKILL);
                         }
                     }
                 }
@@ -153,9 +146,8 @@ enum Slot {
 }
 #[derive(Default)]
 pub struct Terminals {
-    agents: Mutex<BTreeMap<String, Agent>>,
+    records: Mutex<BTreeMap<String, Terminal>>,
     sessions: Mutex<BTreeMap<String, Slot>>,
-    discovery: discovery::Discovery,
 }
 struct Start<'a> {
     state: &'a Terminals,
@@ -208,42 +200,59 @@ fn metadata(root: &Path) -> PathBuf {
     root.join(".agent-gibbon-terminals")
 }
 fn valid_id(id: &str) -> bool {
-    id.strip_prefix("agent-")
-        .or_else(|| id.strip_prefix("terminal-"))
+    id.strip_prefix("terminal-")
         .is_some_and(|s| !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit()))
         && id.len() <= 64
 }
-fn save(root: &Path, agent: &Agent) -> Result<(), String> {
+fn save(root: &Path, agent: &Terminal) -> Result<(), String> {
     std::fs::create_dir_all(metadata(root)).map_err(err)?;
     let path = metadata(root).join(format!("{}.json", agent.id));
     let tmp = path.with_extension("tmp");
     std::fs::write(&tmp, serde_json::to_vec(agent).map_err(err)?).map_err(err)?;
     std::fs::rename(tmp, path).map_err(err)
 }
-pub fn restore(app: &tauri::AppHandle) -> Result<(), String> {
-    let path = metadata(&root(app));
+// Read legacy dedicated-agent metadata only to recognize and ignore it. Never
+// rewrite/remove its metadata or project directory, and never load it as a PTY.
+fn read_records(root: &Path) -> Result<Vec<Terminal>, String> {
+    let path = metadata(root);
     if !path.exists() {
-        return Ok(());
+        return Ok(Vec::new());
     }
-    let state = app.state::<Terminals>();
-    let mut agents = state.agents.lock().map_err(err)?;
+    let mut records = Vec::new();
     for entry in std::fs::read_dir(path).map_err(err)? {
         let path = entry.map_err(err)?.path();
         if path.extension().and_then(|x| x.to_str()) != Some("json") {
             continue;
         }
-        let agent: Agent =
+        let value: Value =
             serde_json::from_slice(&std::fs::read(path).map_err(err)?).map_err(err)?;
-        if !valid_id(&agent.id) {
-            return Err("잘못된 에이전트 ID".into());
+        if value["kind"] == "agent"
+            || value["id"]
+                .as_str()
+                .is_some_and(crate::model::retired_agent_id)
+        {
+            continue;
         }
-        agents.insert(agent.id.clone(), agent);
+        let record: Terminal = serde_json::from_value(value).map_err(err)?;
+        if !valid_id(&record.id) {
+            return Err("잘못된 터미널 ID".into());
+        }
+        records.push(record);
+    }
+    Ok(records)
+}
+pub fn restore(app: &tauri::AppHandle) -> Result<(), String> {
+    let restored = read_records(&root(app))?;
+    let state = app.state::<Terminals>();
+    let mut records = state.records.lock().map_err(err)?;
+    for record in restored {
+        records.insert(record.id.clone(), record);
     }
     Ok(())
 }
-pub fn entries(app: &tauri::AppHandle) -> Vec<Agent> {
+pub fn entries(app: &tauri::AppHandle) -> Vec<Terminal> {
     app.state::<Terminals>()
-        .agents
+        .records
         .lock()
         .unwrap()
         .values()
@@ -252,61 +261,21 @@ pub fn entries(app: &tauri::AppHandle) -> Vec<Agent> {
 }
 pub fn contains(app: &tauri::AppHandle, id: &str) -> bool {
     app.state::<Terminals>()
-        .agents
+        .records
         .lock()
         .unwrap()
         .contains_key(id)
-}
-pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Result<Value, String> {
-    if !cfg!(target_os = "macos") {
-        return Err("에이전트 터미널 MVP는 macOS에서만 지원합니다".into());
-    }
-    let stamp = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map_err(err)?
-        .as_nanos();
-    let agent = Agent {
-        id: format!("agent-{stamp}"),
-        bounds,
-        physical_position: cfg!(windows),
-        kind: Kind::Agent,
-        last_path: None,
-        recent_paths: Vec::new(),
-        path_updated: 0,
-        title: String::new(),
-    };
-    let cwd = root(app).join(&agent.id);
-    // Refuse existing paths; never adopt someone else's project directory.
-    let builder = std::fs::DirBuilder::new();
-    #[cfg(unix)]
-    let mut builder = builder;
-    #[cfg(unix)]
-    {
-        use std::os::unix::fs::DirBuilderExt;
-        builder.mode(0o700);
-    }
-    std::fs::create_dir_all(root(app)).map_err(err)?;
-    builder.create(&cwd).map_err(err)?;
-    save(&root(app), &agent)?;
-    app.state::<Terminals>()
-        .agents
-        .lock()
-        .map_err(err)?
-        .insert(agent.id.clone(), agent.clone());
-    open(app, &agent.id)?;
-    crate::tray::refresh(app)?;
-    inspect(app, &agent.id)
 }
 pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     let _root = crate::telemetry::Timing::new("terminal.window.open");
     let agent = app
         .state::<Terminals>()
-        .agents
+        .records
         .lock()
         .map_err(err)?
         .get(id)
         .cloned()
-        .ok_or("에이전트 창이 없습니다")?;
+        .ok_or("터미널 창이 없습니다")?;
     crate::focus::remember(app, id);
     let win = if let Some(win) = app.get_webview_window(id) {
         win
@@ -396,14 +365,14 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
     welcome::refresh_path(app, id)?;
     let agent = app
         .state::<Terminals>()
-        .agents
+        .records
         .lock()
         .map_err(err)?
         .get(id)
         .cloned()
         .ok_or("터미널 창이 없습니다")?;
     if !contains(app, id) {
-        return Err("에이전트 창이 없습니다".into());
+        return Err("터미널 창이 없습니다".into());
     }
     let win = app.get_webview_window(id);
     let session = app
@@ -415,7 +384,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         .and_then(running);
     let (pid, program, size, running) = if let Some(session) = session {
         let mut s = session.lock().map_err(err)?;
-        let running = observe_exit(&mut s, &app.state::<Terminals>().discovery)?;
+        let running = observe_exit(&mut s)?;
         (
             s.child.process_id(),
             Some(s.program.clone()),
@@ -426,7 +395,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         (None, None, None, false)
     };
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"title":agent.display_title(),"cwd":if agent.kind == Kind::Agent {Some(root(app).join(id))} else {agent.last_path.clone()},"last_path":agent.last_path,"bounds":agent.bounds,"pid":pid,"program":program,"running":running,"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"bounds":agent.bounds,"pid":pid,"program":program,"running":running,"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
     )
 }
 pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value, String> {
@@ -437,17 +406,18 @@ pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value,
             if let Some(win) = app.get_webview_window(id) {
                 crate::stash::release(&win)?;
                 win.hide().map_err(err)?;
+                crate::tray::sync_visibility(app)?;
             }
         }
         crate::Action::Inspect => (),
-        _ => return Err("에이전트 창은 내용 갱신을 지원하지 않습니다".into()),
+        _ => return Err("터미널 창은 내용 갱신을 지원하지 않습니다".into()),
     }
     inspect(app, id)
 }
 fn caller(window: &WebviewWindow) -> Result<String, String> {
     let id = window.label();
     if !contains(window.app_handle(), id) {
-        return Err("에이전트 창이 아닙니다".into());
+        return Err("터미널 창이 아닙니다".into());
     }
     Ok(id.into())
 }
@@ -462,56 +432,8 @@ fn size(cols: u16, rows: u16) -> Result<PtySize, String> {
         pixel_height: 0,
     })
 }
-// Exits can be authentication/trust failures. Invalidate on a confirmed
-// abnormal exit, but never automatically restart an already-spawned CLI.
-fn observe_exit(session: &mut Session, discovery: &discovery::Discovery) -> Result<bool, String> {
-    match session.child.try_wait().map_err(err)? {
-        Some(status) => {
-            if !status.success() {
-                if let Some(found) = &session.found {
-                    discovery.invalidate(found);
-                }
-            }
-            Ok(false)
-        }
-        None => Ok(true),
-    }
-}
-fn start_session(
-    discovery: &discovery::Discovery,
-    cwd: &Path,
-    dimensions: PtySize,
-) -> Result<(Session, Box<dyn Read + Send>), String> {
-    // One shared budget also bounds rediscovery after a spawn failure.
-    let deadline = Instant::now() + discovery::TOTAL_TIMEOUT;
-    let pair = {
-        let _timing = crate::telemetry::Timing::new("terminal.pty.create");
-        native_pty_system().openpty(dimensions).map_err(err)?
-    };
-    let (found, child) = discovery.spawn(deadline, |found| {
-        let mut command = CommandBuilder::new(&found.executable);
-        command.cwd(cwd);
-        command.env("PATH", &found.path);
-        command.env("TERM", "xterm-256color");
-        command.env_remove("NO_COLOR");
-        let _timing = crate::telemetry::Timing::new("terminal.process.spawn");
-        crate::telemetry::checkpoint("terminal.process.spawn");
-        pair.slave.spawn_command(command).map_err(err)
-    })?;
-    drop(pair.slave);
-    // Session owns the child before fallible reader/writer acquisition.
-    let mut session = Session {
-        master: pair.master,
-        writer: Box::new(std::io::sink()),
-        child: OwnedChild(Some(child)),
-        program: found.program.clone(),
-        found: Some(found),
-        prompt: welcome::PromptState::default(),
-    };
-    let _attach = crate::telemetry::Timing::new("terminal.io.attach");
-    let reader = session.master.try_clone_reader().map_err(err)?;
-    session.writer = session.master.take_writer().map_err(err)?;
-    Ok((session, reader))
+fn observe_exit(session: &mut Session) -> Result<bool, String> {
+    Ok(session.child.try_wait().map_err(err)?.is_none())
 }
 
 #[tauri::command]
@@ -530,17 +452,14 @@ pub async fn terminal_start(
         let state = app.state::<Terminals>();
         let reservation = Start::reserve(&state, &id)?;
         let agent = state
-            .agents
+            .records
             .lock()
             .map_err(err)?
             .get(&id)
             .cloned()
             .ok_or("터미널 창이 없습니다")?;
-        let (session, mut reader) = if agent.kind == Kind::Terminal {
-            welcome::start(&agent, choice.as_deref().unwrap_or("shell"), dimensions)?
-        } else {
-            start_session(&state.discovery, &root(&app).join(&id), dimensions)?
-        };
+        let (session, mut reader) =
+            welcome::start(&agent, choice.as_deref().unwrap_or("shell"), dimensions)?;
         let watched_session = Arc::downgrade(&reservation.finish(session)?);
         welcome::touch_path(&app, &id)?;
         let watched_app = app.clone();
@@ -586,9 +505,8 @@ pub async fn terminal_start(
                     }
                 }
             }
-            let state = watched_app.state::<Terminals>();
             if let Some(session) = watched_session.upgrade() {
-                let _ = observe_exit(&mut session.lock().unwrap(), &state.discovery);
+                let _ = observe_exit(&mut session.lock().unwrap());
             }
             let _ = output
                 .send(b"\r\n[PTY \xec\x84\xb8\xec\x85\x98 \xec\xa2\x85\xeb\xa3\x8c]\r\n".to_vec());
@@ -638,7 +556,6 @@ pub fn terminal_resize(window: WebviewWindow, cols: u16, rows: u16) -> Result<()
         .resize(size(cols, rows)?)
         .map_err(err)
 }
-#[tauri::command]
 pub fn terminal_hide(window: WebviewWindow) -> Result<(), String> {
     caller(&window)?;
     crate::stash::release(&window)?;
@@ -658,7 +575,7 @@ pub fn geometry(window: &tauri::Window) {
         return;
     }
     let state = app.state::<Terminals>();
-    let Ok(mut agents) = state.agents.lock() else {
+    let Ok(mut agents) = state.records.lock() else {
         return;
     };
     if let Some(agent) = agents.get_mut(window.label()) {
@@ -691,12 +608,13 @@ mod tests {
     #[test]
     fn legacy_logical_and_windows_physical_origins_survive_restore() {
         let legacy = json!({"id":"terminal-123","bounds":{"x":-1600.,"y":240.,"width":720.,"height":460.},"kind":"terminal"});
-        let mut agent: Agent = serde_json::from_value(legacy).unwrap();
+        let mut agent: Terminal = serde_json::from_value(legacy).unwrap();
         assert!(!agent.physical_position);
         let old: tauri::PhysicalPosition<i32> = agent.position().to_physical(1.25);
         assert_eq!((old.x, old.y), (-2000, 300));
         agent.physical_position = true;
-        let restored: Agent = serde_json::from_value(serde_json::to_value(agent).unwrap()).unwrap();
+        let restored: Terminal =
+            serde_json::from_value(serde_json::to_value(agent).unwrap()).unwrap();
         assert!(restored.physical_position);
         assert_eq!((restored.bounds.x, restored.bounds.y), (-1600., 240.));
         #[cfg(windows)]
@@ -709,13 +627,14 @@ mod tests {
     fn approved_recent_folders_survive_metadata_roundtrip() {
         let value = json!({"id":"terminal-123","bounds":{"x":0.,"y":0.,"width":720.,"height":460.},"kind":"terminal","recent_paths":[{"path":"/tmp/project","updated":42}]});
         let restored =
-            serde_json::to_value(serde_json::from_value::<Agent>(value.clone()).unwrap()).unwrap();
+            serde_json::to_value(serde_json::from_value::<Terminal>(value.clone()).unwrap())
+                .unwrap();
         assert_eq!(restored["recent_paths"], value["recent_paths"]);
     }
     #[test]
     fn welcome_metadata_preserves_only_last_path_title_and_geometry() {
         let original = json!({"id":"terminal-123","bounds":{"x":11.,"y":22.,"width":720.,"height":460.},"kind":"terminal","last_path":"/tmp/project","path_updated":42,"title":"내 작업"});
-        let agent: Agent = serde_json::from_value(original.clone()).unwrap();
+        let agent: Terminal = serde_json::from_value(original.clone()).unwrap();
         let restored = serde_json::to_value(agent).unwrap();
         for key in ["kind", "last_path", "path_updated", "title", "bounds"] {
             assert_eq!(restored.get(key), original.get(key), "lost {key}");
@@ -726,180 +645,76 @@ mod tests {
         assert!(!valid_id("terminal-../x"));
     }
     #[test]
-    fn existing_agent_metadata_stays_an_agent_without_path_history() {
-        let agent: Agent = serde_json::from_value(
-            json!({"id":"agent-123","bounds":{"x":1.,"y":2.,"width":640.,"height":400.}}),
-        )
-        .unwrap();
-        let restored = serde_json::to_value(agent).unwrap();
-        assert_eq!(restored.get("kind"), Some(&json!("agent")));
-        assert!(restored.get("last_path").is_none_or(Value::is_null));
+    fn retired_agent_records_are_ignored_without_changing_metadata_or_projects() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(metadata(dir.path())).unwrap();
+        let records = [
+            (
+                "agent-123",
+                json!({"id":"agent-123","bounds":{"x":1.,"y":2.,"width":640.,"height":400.}}),
+            ),
+            (
+                "agent-456",
+                json!({"id":"agent-456","kind":"agent","bounds":{"x":3.,"y":4.,"width":640.,"height":400.}}),
+            ),
+            (
+                "terminal-789",
+                json!({"id":"terminal-789","kind":"terminal","title":"保管","last_path":"/tmp","bounds":{"x":5.,"y":6.,"width":640.,"height":400.}}),
+            ),
+        ];
+        for (id, value) in &records {
+            std::fs::write(
+                metadata(dir.path()).join(format!("{id}.json")),
+                serde_json::to_vec(value).unwrap(),
+            )
+            .unwrap();
+            std::fs::create_dir(dir.path().join(id)).unwrap();
+            std::fs::write(dir.path().join(id).join("index.md"), "user project").unwrap();
+        }
+        for _ in 0..2 {
+            let loaded = read_records(dir.path()).unwrap();
+            assert_eq!(loaded.len(), 1);
+            assert_eq!(loaded[0].id, "terminal-789");
+            assert_eq!(loaded[0].title, "保管");
+        }
+        for (id, value) in &records {
+            assert_eq!(
+                std::fs::read(metadata(dir.path()).join(format!("{id}.json"))).unwrap(),
+                serde_json::to_vec(value).unwrap()
+            );
+            assert_eq!(
+                std::fs::read_to_string(dir.path().join(id).join("index.md")).unwrap(),
+                "user project"
+            );
+        }
     }
     #[test]
     fn reservation_is_per_window_and_released_on_failure() {
         let state = Terminals::default();
-        let first = Start::reserve(&state, "agent-1").unwrap();
-        assert!(Start::reserve(&state, "agent-1").is_err());
-        let other = Start::reserve(&state, "agent-2").unwrap();
+        let first = Start::reserve(&state, "terminal-1").unwrap();
+        assert!(Start::reserve(&state, "terminal-1").is_err());
+        let other = Start::reserve(&state, "terminal-2").unwrap();
         assert!(state.sessions.try_lock().is_ok());
         drop(first);
-        assert!(Start::reserve(&state, "agent-1").is_ok());
+        assert!(Start::reserve(&state, "terminal-1").is_ok());
         drop(other);
         assert!(state.sessions.lock().unwrap().is_empty());
         assert!(!valid_id("agent-../x"));
-        assert!(valid_id("agent-123"));
+        assert!(!valid_id("agent-123"));
         assert!(size(0, 24).is_err());
-    }
-    #[cfg(unix)]
-    #[test]
-    fn pty_fixture_invalidates_failed_cli_and_keeps_existing_session_responsive() {
-        use std::os::unix::fs::PermissionsExt;
-        use std::time::Duration;
-        // Environment changes belong to an isolated test process, never the
-        // parallel cargo test runner or a real installed model CLI.
-        if let Some(folder) = std::env::var_os("GIBBON_PTY_FIXTURE") {
-            let folder = PathBuf::from(folder);
-            let state = Arc::new(Terminals::default());
-            let reservation = Start::reserve(&state, "agent-1").unwrap();
-            let (session, mut reader) =
-                start_session(&state.discovery, &folder, size(80, 24).unwrap()).unwrap();
-            let pid = session.child.process_id().unwrap();
-            reservation.finish(session).unwrap();
-            let existing = running(state.sessions.lock().unwrap().get("agent-1").unwrap()).unwrap();
-            let (tx, rx) = std::sync::mpsc::channel();
-            std::thread::spawn(move || {
-                let mut buf = [0; 4096];
-                while let Ok(n) = reader.read(&mut buf) {
-                    if n == 0 {
-                        break;
-                    }
-                    if tx
-                        .send(String::from_utf8_lossy(&buf[..n]).into_owned())
-                        .is_err()
-                    {
-                        break;
-                    }
-                }
-            });
-            let ready = rx.recv_timeout(Duration::from_secs(3)).unwrap();
-            assert!(ready.contains("FIXTURE_READY"));
-            // Keep the old PTY alive while invalidating discovery and forcing
-            // a slow shell for a different window.
-            std::fs::remove_file(folder.join("bin/codex")).unwrap();
-            let next = state.clone();
-            let cwd = folder.clone();
-            let worker = std::thread::spawn(move || {
-                let reserved = Start::reserve(&next, "agent-2").unwrap();
-                let result = start_session(&next.discovery, &cwd, size(90, 30).unwrap());
-                drop(reserved);
-                result
-            });
-            let until = Instant::now() + Duration::from_secs(3);
-            while !folder.join("shell-started").exists() {
-                assert!(Instant::now() < until);
-                std::thread::sleep(Duration::from_millis(10));
-            }
-            let t = Instant::now();
-            assert!(state.sessions.try_lock().is_ok());
-            {
-                let mut s = existing.lock().unwrap();
-                s.writer.write_all(b"fixture-input\n").unwrap();
-                s.writer.flush().unwrap();
-                s.master.resize(size(97, 31).unwrap()).unwrap();
-                assert_eq!(s.master.get_size().unwrap().cols, 97);
-                assert!(s.child.try_wait().unwrap().is_none());
-            }
-            assert!(t.elapsed() < Duration::from_millis(200));
-            let mut output = String::new();
-            let until = Instant::now() + Duration::from_secs(3);
-            while !output.contains("ECHO:fixture-input") {
-                output.push_str(
-                    &rx.recv_timeout(until.saturating_duration_since(Instant::now()))
-                        .unwrap(),
-                );
-            }
-            let (second, _reader) = worker.join().unwrap().unwrap();
-            assert_eq!(second.program, "codex");
-            drop(second);
-            // A CLI may reject authentication/trust and exit immediately.
-            // Observe and invalidate it without an automatic restart.
-            let failed = folder.join("failed");
-            std::fs::write(&failed, "#!/bin/sh\nexit 23\n").unwrap();
-            std::fs::set_permissions(&failed, std::fs::Permissions::from_mode(0o700)).unwrap();
-            std::fs::rename(failed, folder.join("fallback/codex")).unwrap();
-            let reserved = Start::reserve(&state, "agent-3").unwrap();
-            let (mut exited, _) =
-                start_session(&state.discovery, &folder, size(80, 24).unwrap()).unwrap();
-            let calls = std::fs::read_to_string(folder.join("shell-started")).unwrap();
-            let until = Instant::now() + Duration::from_secs(3);
-            while observe_exit(&mut exited, &state.discovery).unwrap() {
-                assert!(Instant::now() < until);
-                std::thread::sleep(Duration::from_millis(10));
-            }
-            assert_eq!(
-                calls,
-                std::fs::read_to_string(folder.join("shell-started")).unwrap()
-            );
-            drop(exited);
-            drop(reserved);
-            assert!(Start::reserve(&state, "agent-3").is_ok());
-            // The next explicit request rediscovers the unchanged failed CLI.
-            let (mut retried, _) =
-                start_session(&state.discovery, &folder, size(80, 24).unwrap()).unwrap();
-            assert!(
-                std::fs::read_to_string(folder.join("shell-started"))
-                    .unwrap()
-                    .len()
-                    > calls.len()
-            );
-            retried.child.kill().unwrap();
-            drop(retried);
-            let fixed = folder.join("fixed");
-            std::fs::write(&fixed, "#!/bin/sh\nprintf 'RECOVERED\\n'\nsleep 60\n").unwrap();
-            std::fs::set_permissions(&fixed, std::fs::Permissions::from_mode(0o700)).unwrap();
-            std::fs::rename(fixed, folder.join("fallback/codex")).unwrap();
-            assert!(start_session(&state.discovery, &folder, size(80, 24).unwrap()).is_ok());
-            drop(existing);
-            state.sessions.lock().unwrap().clear();
-            let status = std::process::Command::new("/bin/ps")
-                .args(["-o", "stat=", "-p", &pid.to_string()])
-                .output()
-                .unwrap();
-            assert!(status.stdout.is_empty());
-            return;
-        }
-        let dir = tempfile::tempdir().unwrap();
-        for name in ["bin", "fallback"] {
-            std::fs::create_dir(dir.path().join(name)).unwrap();
-        }
-        let body="#!/bin/sh\nprintf 'FIXTURE_READY\\n'\nwhile IFS= read -r line; do printf 'ECHO:%s\\n' \"$line\"; done\n";
-        for name in ["bin/codex", "fallback/codex"] {
-            let p = dir.path().join(name);
-            std::fs::write(&p, body).unwrap();
-            std::fs::set_permissions(p, std::fs::Permissions::from_mode(0o700)).unwrap();
-        }
-        let shell = dir.path().join("shell");
-        std::fs::write(&shell,format!("#!/bin/sh\necho call >> '{}/shell-started'\n/bin/sleep .8\nprintf '\\nAGENT_GIBBON_PATH={}/fallback:/usr/bin:/bin\\n'\n",dir.path().display(),dir.path().display())).unwrap();
-        std::fs::set_permissions(&shell, std::fs::Permissions::from_mode(0o700)).unwrap();
-        let result=std::process::Command::new(std::env::current_exe().unwrap()).args(["--exact","terminal::tests::pty_fixture_invalidates_failed_cli_and_keeps_existing_session_responsive","--nocapture"]).env("GIBBON_PTY_FIXTURE",dir.path()).env("PATH",format!("{}:/usr/bin:/bin",dir.path().join("bin").display())).env("SHELL",shell).output().unwrap();
-        assert!(
-            result.status.success(),
-            "{}\n{}",
-            String::from_utf8_lossy(&result.stdout),
-            String::from_utf8_lossy(&result.stderr)
-        );
     }
     #[test]
     fn metadata_does_not_claim_project_index() {
         let dir = tempfile::tempdir().unwrap();
-        let a = Agent {
+        let a = Terminal {
             physical_position: false,
-            kind: Kind::Agent,
+            kind: Kind::Terminal,
             last_path: None,
             recent_paths: Vec::new(),
             path_updated: 0,
+            updated_at: 0,
             title: String::new(),
-            id: "agent-123".into(),
+            id: "terminal-123".into(),
             bounds: crate::capture::ImageNote {
                 x: 1.,
                 y: 2.,

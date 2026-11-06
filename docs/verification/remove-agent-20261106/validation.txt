@@ -1,0 +1,10 @@
+$ npm test
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.26s
+test result: ok. 150 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.81s
+ℹ tests 97
+ℹ pass 97
+ℹ fail 0
+$ npm run check
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.88s
+$ npm run dev:build
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.08s
