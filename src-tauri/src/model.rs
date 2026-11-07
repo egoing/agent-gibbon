@@ -173,18 +173,20 @@ pub struct Note {
 }
 impl Default for Note {
     fn default() -> Self {
+        let markdown = include_str!("welcome.md").trim().to_owned();
+        let html = render(&markdown);
         Self {
             local_mutation: None,
             edit_on_open: false,
             capture: None,
             title: "Agent Gibbon".into(),
             color: "#20252e".into(),
-            html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),
-            change_html: "<p>작업 내용을 기다리고 있습니다.</p>".into(),
+            html: html.clone(),
+            change_html: html,
             completion_html: None,
             quiet_update: false,
             removed: false,
-            markdown: "작업 내용을 기다리고 있습니다.".into(),
+            markdown,
             source_path: None,
             status: "대기".into(),
             updated_at: 0,
