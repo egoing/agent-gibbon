@@ -40,7 +40,7 @@ with tempfile.TemporaryDirectory() as tmp:
         focus=helper('front');helper('key')
         initial=wait(lambda s:s['active'] and not s['animating'] and s['tip_visible'])
         time.sleep(.15);shot('initial');r=cli('inspect')['stash']['indicator']
-        text=helper('ax',pid,title,'dump');assert '다시 누르면 창 복원' in text and 'Control Option Command' in text
+        text=helper('ax',pid,title,'dump');assert '다시 누르면 창 복원' in text and 'Ctrl Opt ⌘' in text
         assert helper('front')==focus
         report['checks'].append('initial settled bubble + mascot, actual key, unchanged frontmost PID')
         time.sleep(6.1);helper('pointer','move',r['x']+r['width']-24,r['y']+24)
