@@ -1,0 +1,2 @@
+# Preserve captured PowerShell evidence bytes; source whitespace checks stay enabled.
+*.log -text -whitespace

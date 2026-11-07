@@ -1,0 +1,37 @@
+{
+  "id": "a865c6cb-9649-4066-9208-9dcbbb142828",
+  "ok": true,
+  "result": {
+    "app": {
+      "name": "agent-gibbon",
+      "bundleId": "agent-gibbon",
+      "pid": 26864
+    },
+    "windows": [
+      {
+        "index": 0,
+        "app": {
+          "name": "agent-gibbon",
+          "bundleId": "agent-gibbon",
+          "pid": 26864
+        },
+        "id": 9308062,
+        "title": "",
+        "x": 0,
+        "y": 0,
+        "width": 18,
+        "height": 18,
+        "isMinimized": false,
+        "isOffscreen": false,
+        "screenIndex": null,
+        "platform": {
+          "backend": "uia",
+          "nativeWindowHandle": 9308062
+        }
+      }
+    ]
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

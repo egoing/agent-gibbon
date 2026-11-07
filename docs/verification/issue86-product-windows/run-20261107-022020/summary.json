@@ -1,0 +1,7 @@
+{
+  "new_shortcut_launch": true,
+  "shortcut_working_directory": true,
+  "existing_explicit_selection": true,
+  "cancel_no_late_attach": true,
+  "pending_timeout": true
+}

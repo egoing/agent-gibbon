@@ -1,0 +1,68 @@
+diff --git a/src-tauri/src/external_apps/windows.rs b/src-tauri/src/external_apps/windows.rs
+index d419b1f..10ae66f 100644
+--- a/src-tauri/src/external_apps/windows.rs
++++ b/src-tauri/src/external_apps/windows.rs
+@@ -792,21 +792,6 @@ fn sync_events() -> Result<(), String> {
+     }
+     Ok(())
+ }
+-#[cfg(test)]
+-mod tests {
+-    use super::*;
+-    #[test]
+-    fn destroy_event_invalidates_inventory_but_child_accessibility_events_do_not() {
+-        OBSERVED_WINDOWS.lock().unwrap().insert(42);
+-        let before = WINDOW_EPOCH.load(Ordering::SeqCst);
+-        unsafe { destroyed(0, 0x8001, 42, 0, 0, 0, 0) };
+-        assert!(WINDOW_EPOCH.load(Ordering::SeqCst) > before);
+-        let before = WINDOW_EPOCH.load(Ordering::SeqCst);
+-        unsafe { destroyed(0, 0x8001, 42, -4, 1, 0, 0) };
+-        assert_eq!(WINDOW_EPOCH.load(Ordering::SeqCst), before);
+-    }
+-}
+-
+ fn guard_selection(id: &Identity, marker: Option<&[u16]>) -> Result<(), String> {
+     // Event ACK checks observer health, not an atomic OS guarantee. The native
+     // identity/property checks remain necessary across asynchronous WinEvents.
+@@ -829,3 +814,18 @@ fn clear_claim(s: &Session) -> Result<(), String> {
+     }
+     forget_journal(s)
+ }
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn destroy_event_invalidates_inventory_but_child_accessibility_events_do_not() {
++        OBSERVED_WINDOWS.lock().unwrap().insert(42);
++        let before = WINDOW_EPOCH.load(Ordering::SeqCst);
++        unsafe { destroyed(0, 0x8001, 42, 0, 0, 0, 0) };
++        assert!(WINDOW_EPOCH.load(Ordering::SeqCst) > before);
++        let before = WINDOW_EPOCH.load(Ordering::SeqCst);
++        unsafe { destroyed(0, 0x8001, 42, -4, 1, 0, 0) };
++        assert_eq!(WINDOW_EPOCH.load(Ordering::SeqCst), before);
++    }
++}
+diff --git a/ui/external-apps.css b/ui/external-apps.css
+index d9bdcfc..162e47c 100644
+--- a/ui/external-apps.css
++++ b/ui/external-apps.css
+@@ -1 +1,4 @@
+-body{background:#20252e;color:#f0f0f0;font:13px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0}#welcome{height:100%;padding:24px}#welcome h2{margin-top:24px}.hint,#region,#limit{font-size:11px;color:#bac3cf}#search{width:100%;box-sizing:border-box;background:#191e26;border:1px solid #667080;padding:8px;margin:6px 0 12px;user-select:text;-webkit-user-select:text}#apps,#windows{max-height:220px;overflow:auto}#welcome .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}#welcome .actions button,#sessions button{padding:6px 12px;background:#303844;border:1px solid #667080}#welcome button:disabled{opacity:.5;cursor:default}#status{padding:0;max-height:none;overflow:visible;white-space:pre-wrap}#sessions .session{display:flex;justify-content:space-between;gap:12px;margin-top:8px;align-items:center}#sessions .session span{overflow-wrap:anywhere}#welcome .select-row{overflow-wrap:anywhere}#welcome .select-row span{pointer-events:none}#welcome label{font-size:11px;color:#bac3cf}
++body{background:#20252e;color:#f0f0f0;font:13px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0}#welcome{height:100%;padding:24px}#welcome h2{margin-top:24px}.hint,#region,#limit{font-size:11px;color:#bac3cf}#search{width:100%;box-sizing:border-box;background:#191e26;border:1px solid #667080;padding:8px;margin:6px 0 12px;user-select:text;-webkit-user-select:text}#apps,#windows{max-height:220px;overflow:auto}#welcome .external-app-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}#welcome .external-app-actions button,#sessions button{padding:6px 12px;background:#303844;border:1px solid #667080}#welcome button:disabled{opacity:.5;cursor:default}#status{padding:0;max-height:none;overflow:visible;white-space:pre-wrap}#sessions .session{display:flex;justify-content:space-between;gap:12px;margin-top:8px;align-items:center}#sessions .session span{overflow-wrap:anywhere}#welcome .select-row{overflow-wrap:anywhere}#welcome .select-row span{pointer-events:none}#welcome label{font-size:11px;color:#bac3cf}
++
++/* Text actions must not inherit the 24px note-toolbar icon width. */
++#welcome .external-app-actions button{width:auto;min-width:64px;flex:0 0 auto;white-space:nowrap}
+diff --git a/ui/external-apps.html b/ui/external-apps.html
+index 88e5ab5..21e1d37 100644
+--- a/ui/external-apps.html
++++ b/ui/external-apps.html
+@@ -2,7 +2,7 @@
+ <h1>앱 선택</h1><p id="region"></p><p class="hint">앱을 선택한 다음 실행하면 선택 영역에 상단 고정합니다.</p>
+ <label for="search">설치된 앱 / 열린 창 검색</label><input id="search" type="search" autocomplete="off">
+ <div id="apps" aria-label="설치된 앱"></div><h2>열린 창</h2><p class="hint">기존 창은 직접 선택해야 이동합니다. 최소화·최대화 창은 보통 크기로 복원한 뒤 선택하세요.</p><div id="windows" aria-label="열린 창"></div>
+-<div class="actions"><button id="run-task" disabled>실행</button><button id="refresh">새로 고침</button><button id="cancel">취소</button></div>
++<div class="external-app-actions"><button id="run-task" disabled>실행</button><button id="refresh">새로 고침</button><button id="cancel">취소</button></div>
+ <p id="status" role="status" aria-live="polite"></p><p id="limit" class="hint"></p>
+ <h2>플로팅 중인 창</h2><div id="sessions"></div><p class="hint">해제는 원래 위치·크기·상단 고정을 복원합니다. 앱을 종료하지 않습니다. 트레이에서도 이 인스턴스의 모든 고정을 해제할 수 있습니다.</p>
+ </div></section><script src="external-apps.js"></script></body></html>

@@ -1,0 +1,8 @@
+{
+  "move_resize": true,
+  "topmost_after_B": false,
+  "actual_input": true,
+  "release_restore": true,
+  "minimum_rollback": true,
+  "stale_refusal": true
+}

@@ -24,6 +24,7 @@ pub enum SelectionMode {
     Image,
     Text,
     Terminal,
+    ExternalApp,
 }
 struct Screen {
     mode: SelectionMode,
@@ -99,6 +100,17 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
     {
         eprintln!("터미널 단축키 등록 실패 (메뉴에서 실행 가능): {error}");
     }
+    #[cfg(windows)]
+    if let Err(error) = app
+        .global_shortcut()
+        .on_shortcut("Ctrl+Shift+4", |app, _, event| {
+            if event.state() == ShortcutState::Pressed {
+                trigger(app, SelectionMode::ExternalApp);
+            }
+        })
+    {
+        eprintln!("외부 앱 단축키 등록 실패 (메뉴에서 실행 가능): {error}");
+    }
     Ok(())
 }
 static LAUNCH_QUEUED: AtomicBool = AtomicBool::new(false);
@@ -126,6 +138,10 @@ async fn lifecycle(
 
 pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
     if crate::privacy::onboarding_required(app) {
+        return;
+    }
+    #[cfg(not(windows))]
+    if mode == SelectionMode::ExternalApp {
         return;
     }
     trace("trigger");
@@ -249,6 +265,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
             SelectionMode::Image => "영역 캡처 — Escape로 취소",
             SelectionMode::Text => "빈 메모 영역 선택 — Escape로 취소",
             SelectionMode::Terminal => "터미널 영역 선택 — Escape로 취소",
+            SelectionMode::ExternalApp => "외부 앱 영역 선택 — Escape로 취소",
         })
         .decorations(false)
         .resizable(false)
@@ -579,8 +596,20 @@ fn finish_selection(
             s.mode,
         )
     };
+    // Keep the overlay alive to show an actionable validation error.
+    if mode == SelectionMode::ExternalApp
+        && (bounds.width * scale < 160.0 || bounds.height * scale < 120.0)
+    {
+        return Err("외부 앱 영역은 최소 160×120 물리 px입니다. 더 큰 영역을 선택하세요".into());
+    }
     // Restore the previous app before the new editor deliberately takes focus.
     cleanup_before_create(app)?;
+    if mode == SelectionMode::ExternalApp {
+        let mut physical = bounds;
+        physical.width *= scale;
+        physical.height *= scale;
+        return crate::external_apps::create(app, physical);
+    }
     if mode == SelectionMode::Terminal {
         return crate::terminal::create_terminal(app, bounds).map(|_| ());
     }

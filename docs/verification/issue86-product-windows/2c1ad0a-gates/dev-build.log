@@ -1,0 +1,6 @@
+
+> agent-gibbon@0.2.7 dev:build
+> node scripts/dev.mjs build
+
+   Compiling agent-gibbon v0.2.7 (C:\Users\egoin\orca\workspaces\agent-gibbon\86-product-verification\src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.66s

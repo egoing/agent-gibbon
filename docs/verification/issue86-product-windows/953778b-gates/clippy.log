@@ -1,0 +1,16 @@
+   Compiling agent-gibbon v0.2.7 (C:\Users\egoin\orca\workspaces\agent-gibbon\86-product-verification\src-tauri)
+error[E0282]: type annotations needed for `&_`
+   --> src\external_apps\windows.rs:208:34
+    |
+208 |         .extend(rows.iter().map(|w| w.identity.hwnd));
+    |                                  ^  ---------- type must be known at this point
+    |
+help: consider giving this closure parameter an explicit type, where the type for type parameter `T` is specified
+    |
+208 |         .extend(rows.iter().map(|w: &T| w.identity.hwnd));
+    |                                   ++++
+
+For more information about this error, try `rustc --explain E0282`.
+error: could not compile `agent-gibbon` (bin "agent-gibbon") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `agent-gibbon` (bin "agent-gibbon" test) due to 1 previous error

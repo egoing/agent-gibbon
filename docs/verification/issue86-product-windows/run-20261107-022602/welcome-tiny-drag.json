@@ -1,0 +1,55 @@
+{
+  "id": "bf84239e-7079-47d1-b17c-82b909a93d4c",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "139a400f-fd62-48d2-a8ae-89dbaa6829fb",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": "agent-gibbon",
+        "pid": 26864
+      },
+      "window": {
+        "title": "외부 앱 영역 선택 — Escape로 취소",
+        "id": 9701864,
+        "index": null,
+        "x": -9,
+        "y": -1,
+        "width": 1938,
+        "height": 1090,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 26864)\nWindow: \"외부 앱 영역 선택 — Escape로 취소\", App: agent-gibbon.\n\n0 window 외부 앱 영역 선택 — Escape로 취소\n\t1 pane tauri.localhost/capture.html\n\t\t2 영역 tauri.localhost/capture.html - 웹 콘텐츠\n\t\t\t3 영역\n\t\t\t\t4 영역\n\t\t\t\t5 영역\n\t\t\t\t\t6 영역\n\t\t\t\t\t\t7 문서 RootWebArea, Value: http://tauri.localhost/capture.html, Secondary Actions: SetValue, Scroll\n\t\t\t\t\t\t\t8 텍스트 8 × 8 · Escape 취소\n\t\t\t\t\t\t9 영역\n\t10 title bar 외부 앱 영역 선택 — Escape로 취소\n\t\t11 menu bar 시스템 메뉴 모음\n\t\t\t12 menu item 시스템\n\t\t13 button 최소화\n\t\t14 button 최대화\n\t\t15 button 닫기",
+      "elementCount": 16,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "action": {
+      "path": "synthetic",
+      "actionName": "drag",
+      "fallbackReason": null,
+      "targetWindowId": 9701864,
+      "targetWindowIndex": null,
+      "verification": {
+        "state": "unverified",
+        "reason": "synthetic_input"
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

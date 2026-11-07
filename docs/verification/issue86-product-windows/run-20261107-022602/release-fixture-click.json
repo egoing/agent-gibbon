@@ -1,0 +1,61 @@
+{
+  "id": "07aeee4c-e3b4-4b20-bcc1-30a722af9411",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "d8da2230-8d47-4d7c-8658-4256429eb70e",
+      "app": {
+        "name": "Issue86ProductUI",
+        "bundleId": "Issue86ProductUI",
+        "pid": 34600
+      },
+      "window": {
+        "title": "ISSUE86-PRODUCT-UIA-task6b023e9f",
+        "id": 2622518,
+        "index": null,
+        "x": 291,
+        "y": 219,
+        "width": 640,
+        "height": 420,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=Issue86ProductUI (pid 34600)\nWindow: \"ISSUE86-PRODUCT-UIA-task6b023e9f\", App: Issue86ProductUI.\n\nNo change in the accessibility tree since the previous snapshot.",
+      "elementCount": 11,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      },
+      "treeDiff": {
+        "baseSnapshotId": "cfc2d45f-d5f8-4a3d-94fb-e9994ff34bf0",
+        "changed": 0,
+        "added": 0,
+        "removed": 0
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "action": {
+      "path": "synthetic",
+      "actionName": null,
+      "fallbackReason": "actionUnsupported",
+      "targetWindowId": 2622518,
+      "targetWindowIndex": null,
+      "verification": {
+        "state": "unverified",
+        "reason": "synthetic_input"
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

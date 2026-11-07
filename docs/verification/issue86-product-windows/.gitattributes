@@ -1,0 +1,8 @@
+# 원본 터미널 출력·JSON·캡처의 바이트와 체크섬을 그대로 보존한다.
+* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# 원본 실행 출력의 마지막 빈 줄·공백 정렬은 변형하지 않는다.
+*.log -whitespace
+*.stdout.txt -whitespace
+*.stderr.txt -whitespace
+*.tsv -whitespace
+token-integrity.txt -whitespace

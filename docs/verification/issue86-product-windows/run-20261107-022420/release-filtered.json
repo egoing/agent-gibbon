@@ -1,0 +1,56 @@
+{
+  "id": "2f330353-f78c-4530-83f9-2993f98922b5",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "cb3f11f8-295d-4e8f-9e36-1a70075460be",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": "agent-gibbon",
+        "pid": 23952
+      },
+      "window": {
+        "title": "Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985883271463300",
+        "id": 3606896,
+        "index": null,
+        "x": 291,
+        "y": 219,
+        "width": 618,
+        "height": 622,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "Unfiltered app/window labels omitted for privacy; no screenshot published.",
+      "elementCount": 149,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      }
+    },
+    "screenshot": {
+      "format": "png",
+      "width": 618,
+      "height": 622,
+      "scale": 1,
+      "path": "C:\\Users\\egoin\\AppData\\Local\\Temp\\orca-computer-use\\2f330353-f78c-4530-83f9-2993f98922b5-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-07T17:24:50.543Z"
+    },
+    "screenshotStatus": {
+      "state": "captured",
+      "metadata": {
+        "engine": "unknown",
+        "windowId": 3606896
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  },
+  "privacy_redaction": true
+}

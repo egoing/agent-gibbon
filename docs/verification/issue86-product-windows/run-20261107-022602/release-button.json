@@ -1,0 +1,61 @@
+{
+  "id": "2f613eed-034f-4935-a5ca-3eb6ab878352",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "ecbca829-2fc0-43ac-8dbd-314bf5576735",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": "agent-gibbon",
+        "pid": 26864
+      },
+      "window": {
+        "title": "Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985986104233700",
+        "id": 3606818,
+        "index": null,
+        "x": 291,
+        "y": 219,
+        "width": 618,
+        "height": 622,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 26864)\nWindow: \"Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985986104233700\", App: agent-gibbon.\n\nChanges since the previous snapshot (~ changed, - removed). Unchanged elements are omitted and keep their indexes.\n~ \t\t\t\t\t\t\t\t26\n~ \t\t\t\t\t\t\t\t27",
+      "elementCount": 36,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      },
+      "treeDiff": {
+        "baseSnapshotId": "e382fc23-d264-4b35-afd1-8d16dd5855bb",
+        "changed": 2,
+        "added": 0,
+        "removed": 0
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    },
+    "action": {
+      "path": "accessibility",
+      "actionName": "primaryAction",
+      "fallbackReason": null,
+      "targetWindowId": 3606818,
+      "targetWindowIndex": null,
+      "verification": {
+        "state": "unverified",
+        "reason": "accessibility_action_unasserted"
+      }
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}

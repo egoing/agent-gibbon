@@ -1,0 +1,30 @@
+{
+  "source_sha": "27e5321049ad42b2e75848221ac27f9990df3055",
+  "previous_sha": "3009e0b619fdbfc5ed38f065ad7b5ef05ef9e7f7",
+  "external_source_byte_identical": true,
+  "previous_blobs": [
+    "100644 blob 130887b97430e86f7465cd733ff28dbc88199f14\tsrc-tauri/src/capture.rs",
+    "100644 blob e177eb8261bf32c9b91a4c6308e84f10e02e4fc8\tsrc-tauri/src/external_apps.rs",
+    "100644 blob 10ae66f7353949a8fde2c430ad7b7e3d90ab43f8\tsrc-tauri/src/external_apps/windows.rs",
+    "100644 blob 162e47c219ab21ca4898782996aaf4ea4815ec37\tui/external-apps.css",
+    "100644 blob 21e1d37fb414b2af7c53a8e6cbbf896a62d2c217\tui/external-apps.html",
+    "100644 blob 70d6e4f17365270afa534537c3033e15647b8aad\tui/external-apps.js"
+  ],
+  "final_blobs": [
+    "100644 blob 130887b97430e86f7465cd733ff28dbc88199f14\tsrc-tauri/src/capture.rs",
+    "100644 blob e177eb8261bf32c9b91a4c6308e84f10e02e4fc8\tsrc-tauri/src/external_apps.rs",
+    "100644 blob 10ae66f7353949a8fde2c430ad7b7e3d90ab43f8\tsrc-tauri/src/external_apps/windows.rs",
+    "100644 blob 162e47c219ab21ca4898782996aaf4ea4815ec37\tui/external-apps.css",
+    "100644 blob 21e1d37fb414b2af7c53a8e6cbbf896a62d2c217\tui/external-apps.html",
+    "100644 blob 70d6e4f17365270afa534537c3033e15647b8aad\tui/external-apps.js"
+  ],
+  "all_changed_paths": [
+    "docs/design-system.md",
+    "docs/verification/issue84-manager-open.md",
+    "docs/verification/issue84-manager-open/evidence.json",
+    "docs/verification/issue84-manager-open/manager.png",
+    "scripts/manager-open-native.swift",
+    "scripts/manager-open-smoke.py",
+    "src-tauri/src/manager.rs"
+  ]
+}

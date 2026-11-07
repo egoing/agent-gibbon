@@ -1,0 +1,5 @@
+
+> agent-gibbon@0.2.7 dev:info
+> node scripts/dev.mjs info
+
+{"root":"C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-windows-escalation","id":"dev-d83e74df06998bfab2fb836c","name":"egoing/86-windows-escalation-fix","target":"C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-windows-escalation\\src-tauri\\target","binary":"C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-windows-escalation\\src-tauri\\target\\debug\\agent-gibbon.exe"}

@@ -1,0 +1,7 @@
+{
+  "checks": {
+    "position_size": true
+  },
+  "gate": "CLOSED",
+  "failure": "Traceback (most recent call last):\n  File \"C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-windows-poc\\docs\\verification\\issue86-windows-poc\\run-poc.py\", line 149, in <module>\n    click(*point_in(b,80,15),b)\n  File \"C:\\Users\\egoin\\orca\\workspaces\\agent-gibbon\\86-windows-poc\\docs\\verification\\issue86-windows-poc\\run-poc.py\", line 87, in click\n    assert root==expected_root, \"Input point is covered by a different window; no input sent\"\nAssertionError: Input point is covered by a different window; no input sent\n"
+}

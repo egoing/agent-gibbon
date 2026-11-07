@@ -1,0 +1,5 @@
+{
+  "crash_journal_restore": true,
+  "guard_mismatch_no_touch": true,
+  "orderly_wm_quit_restore": true
+}

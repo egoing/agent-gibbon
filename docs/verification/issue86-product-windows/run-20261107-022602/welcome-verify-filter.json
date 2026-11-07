@@ -1,0 +1,45 @@
+{
+  "id": "26bbc4e1-8eb5-408b-aec5-5d770492949e",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "59331f28-a824-4750-9a66-90689ded2ecd",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": "agent-gibbon",
+        "pid": 26864
+      },
+      "window": {
+        "title": "Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985969737796500",
+        "id": 9767400,
+        "index": null,
+        "x": 291,
+        "y": 219,
+        "width": 618,
+        "height": 622,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "Unfiltered app/window labels omitted for privacy; no screenshot published.",
+      "elementCount": 34,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  },
+  "privacy_redaction": true
+}

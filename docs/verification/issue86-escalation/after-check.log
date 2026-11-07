@@ -1,0 +1,8 @@
+cargo :    Compiling agent-gibbon v0.2.7 (C:\Users\egoin\orca\workspaces\agent-gibbon\86-windows-escalation\src-tauri)
+위치 줄:1 문자:1
++ cargo check --manifest-path src-tauri/Cargo.toml --locked *> docs/ver ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (   Compiling ag...tion\src-tauri):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.04s

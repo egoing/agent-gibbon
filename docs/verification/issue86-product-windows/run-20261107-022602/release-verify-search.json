@@ -1,0 +1,44 @@
+{
+  "id": "4ce975e7-9a52-43b8-b27b-2a7a615505ca",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "id": "e2c7fa82-9af6-4500-ba0a-0f75b45ca9df",
+      "app": {
+        "name": "agent-gibbon",
+        "bundleId": "agent-gibbon",
+        "pid": 26864
+      },
+      "window": {
+        "title": "Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985986104233700",
+        "id": 3606818,
+        "index": null,
+        "x": 291,
+        "y": 219,
+        "width": 618,
+        "height": 622,
+        "isMinimized": null,
+        "isOffscreen": null,
+        "screenIndex": null
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 26864)\nWindow: \"Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985986104233700\", App: agent-gibbon.\n\n2 of 149 elements match \"검색\"; showing them with their ancestors.\n0 window Agent Gibbon [DEV detached@27e5321 · 048cf126] — external-1793985986104233700\n\t1 pane 외부 앱\n\t\t2 영역 외부 앱 - 웹 콘텐츠\n\t\t\t3 영역\n\t\t\t\t5 영역\n\t\t\t\t\t6 영역\n\t\t\t\t\t\t7 문서 외부 앱, Value: http://tauri.localhost/external-apps.html, Secondary Actions: SetValue, Scroll\n\t\t\t\t\t\t\t8 지역 외부 앱 선택, Secondary Actions: Scroll\n\t\t\t\t\t\t\t\t12 텍스트 설치된 앱 / 열린 창 검색\n\t\t\t\t\t\t\t\t13 편집 설치된 앱 / 열린 창 검색, Secondary Actions: SetValue",
+      "elementCount": 149,
+      "focusedElementId": null,
+      "truncation": {
+        "truncated": false,
+        "maxNodes": 1200,
+        "maxDepth": 64,
+        "maxDepthReached": false
+      }
+    },
+    "screenshot": null,
+    "screenshotStatus": {
+      "state": "skipped",
+      "reason": "no_screenshot_flag"
+    }
+  },
+  "_meta": {
+    "runtimeId": "3b86dfe5-2b52-45bb-b010-0b75295c6b78"
+  }
+}
