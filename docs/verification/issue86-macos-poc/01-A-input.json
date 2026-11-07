@@ -1,0 +1,41 @@
+{
+  "frontPID": 10506,
+  "frontToBack": [
+    {
+      "kCGWindowAlpha": 1,
+      "kCGWindowBounds": {
+        "Height": 360,
+        "Width": 560,
+        "X": 220,
+        "Y": 180
+      },
+      "kCGWindowIsOnscreen": true,
+      "kCGWindowLayer": 0,
+      "kCGWindowMemoryUsage": 2288,
+      "kCGWindowName": "Issue86 Mac PoC A",
+      "kCGWindowNumber": 44381,
+      "kCGWindowOwnerName": "probe",
+      "kCGWindowOwnerPID": 10506,
+      "kCGWindowSharingState": 1,
+      "kCGWindowStoreType": 1
+    },
+    {
+      "kCGWindowAlpha": 1,
+      "kCGWindowBounds": {
+        "Height": 360,
+        "Width": 560,
+        "X": 320,
+        "Y": 230
+      },
+      "kCGWindowIsOnscreen": true,
+      "kCGWindowLayer": 0,
+      "kCGWindowMemoryUsage": 2288,
+      "kCGWindowName": "Issue86 Mac PoC B",
+      "kCGWindowNumber": 44388,
+      "kCGWindowOwnerName": "probe",
+      "kCGWindowOwnerPID": 10510,
+      "kCGWindowSharingState": 1,
+      "kCGWindowStoreType": 1
+    }
+  ]
+}

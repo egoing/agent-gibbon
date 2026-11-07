@@ -1,0 +1,10 @@
+{
+  "recorded_at": "2026-11-07T00:54:22.042653+00:00",
+  "phase": "post-run; not measured at process launch",
+  "binary_path": "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+  "binary_sha256": "0bb868f2d6b5efcf6f2eaedafd1720bf0e02aea0a3311dc3e2ef49542f240308",
+  "binary_mtime": "2026-11-07T00:49:09.288149+00:00",
+  "source_sha256": "d4f165acc752ca57ec5efd36de3e670fb554ca1a5b80bbc7c97f5092dc38578c",
+  "build_command": "swiftc /Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe.swift -o /Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+  "build_result": "exit 0 observed in execution tool; contemporaneous standalone build log not preserved"
+}

@@ -1,0 +1,20 @@
+{
+  "01-A-input.json": "a366a843ac8422dc8b37e632360015bf3105b5af673beba7a20c3c56e5371bc5",
+  "01-A-input.png": "ec8434c50d5f3ab29754e2964cb995ba11f915ca74d15d98434c5566d3c7e123",
+  "02-A-raised.json": "53158e5c5591ee5e73099941ca939355c0a8c183d3f9d7d1f732db9ecbf5474a",
+  "02-A-raised.png": "33393afadec47c6e6d293079e0cd41b133bf4027b602f5ed9e3cd33dbd213d03",
+  "03-B-active-after-A-raise.json": "53158e5c5591ee5e73099941ca939355c0a8c183d3f9d7d1f732db9ecbf5474a",
+  "03-B-active-after-A-raise.png": "d47fe5aebf4b0594f3057407f286dbf530e1c9f72e3631077a5fd617ec9644f4",
+  "attempt1/probe.swift": "0724c9da4ee2f0b18f36fbebb363cceeca47aabdc1e2d74e93ef826642121cbb",
+  "attempt1/result.json": "0d0ddf1c53629824514d64d43e80fe2cbf9574e26acf59c8c99c63054d60474f",
+  "attempt1/run.py": "89e648c66e4c6b404a03950dae5137b3d25cdaf7bc7c4626f37a2ae480e14157",
+  "attempt2/probe.swift": "93abbdd5dcc19e3a9183e1ec1217e645bcad163cdbb8e6c526f28571f48a6936",
+  "attempt2/result.json": "b44352d05ecc0f0a1ee38297cb762be3a1b6192498cf7d9662703912f7097b5a",
+  "attempt2/run.py": "89e648c66e4c6b404a03950dae5137b3d25cdaf7bc7c4626f37a2ae480e14157",
+  "attempt3/probe.swift": "d4f165acc752ca57ec5efd36de3e670fb554ca1a5b80bbc7c97f5092dc38578c",
+  "attempt3/result.json": "404f172dadd273cefde457e7953de20f47e0d5381b2123f53fbbdf90a8b7258e",
+  "attempt3/run.py": "89e648c66e4c6b404a03950dae5137b3d25cdaf7bc7c4626f37a2ae480e14157",
+  "probe.swift": "d4f165acc752ca57ec5efd36de3e670fb554ca1a5b80bbc7c97f5092dc38578c",
+  "result.json": "059750f3596e2682a179e8dc40ffd3992a77c38925304e4f7d9239491b5c86a1",
+  "run.py": "abc0fcf307148bba5594f6da4b774a70a5673c09602fe2b0662f9d92412f7064"
+}

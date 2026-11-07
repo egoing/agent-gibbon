@@ -45,6 +45,10 @@ Windows 기존 1 SKIP은 TAP 12, `tests/dev-instance.test.mjs:26`의 `developmen
 
 Mac 진행 메모 `issue86-progress`는 최초 baseline 개발 빌드에서 시작한 PID 65061 / 위 워크트리 binary에 속한다. inspect의 instance·ID·본문을 확인하고 update만 사용했다. 사용자 위치·숨김을 보존하기 위해 앱을 재시작하지 않았으며, 이 진행 메모를 최신 제품 GUI 실행 증거로 사용하지 않는다. Mac의 새 외부 앱 CLI 오류/비활성 트레이 실제 UI는 별도 실행하지 않았고 소스 분기·타입·빌드만 검사했다.
 
+## 후속 Mac 선행 검증 — 2026-11-07
+
+사용자의 추가 요청으로 [Mac PoC](issue86-macos-poc/README.md)를 수행했다. 외부 AppKit 프로세스 A/B를 새로 시작해 실제 이동·크기·클릭·문자 입력·기하학 복원을 확인했다. 그러나 B 활성 상태에서 A에 AXRaise가 0을 반환해도 화면과 CGWindow 순서가 B→A였고 실제 B 클릭 뒤에도 같았다. **지속 topmost FAIL, pin/unpin SKIP으로 Mac 제품 구현 게이트는 닫힌 상태**다. Mac 전체의 불가능 증명 또는 Windows 제품 테스트 실패로 해석하지 않는다. 이 후속 PoC는 위에 기록한 Mac 제품 CLI/트레이 미실행 범위를 대체하지 않는다. 제품·UI·지원 OS는 바꾸지 않았다. 새 HEAD의 제품 5종·전체 플랫폼 CI를 재실행한 것으로 표시하지 않는다.
+
 ## 독립 감사와 한계
 
 [독립 감사 보고서](issue86-audit.md)의 검토자는 구현 이력을 상속하지 않고 원문 요구사항, base/red/attempts ref·전체 diff·실행 로그·시안을 검토했다. 테스트 완화·스코프 이탈은 미발동이며 발견한 기능 경합/시작 폴더/복원 대기 문제를 보완한 후 재검토했다. 최신 Windows 원본 관측과 전체 플랫폼 CI도 별도로 대조하며 최종 판정/실행 URL/headSha는 [PR #88의 검증 표](https://github.com/egoing/agent-gibbon/pull/88)에 기록한다. CI 미완료를 PASS로 표시하지 않는다.

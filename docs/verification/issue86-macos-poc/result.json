@@ -1,0 +1,1009 @@
+{
+  "events": [
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "environment"
+      ],
+      "exit": 0,
+      "stdout": "{\"displays\":[{\"frame\":\"{{0, 0}, {2048, 1152}}\",\"scale\":2},{\"frame\":\"{{-1728, 35}, {1728, 1117}}\",\"scale\":2},{\"frame\":\"{{0, 1152}, {1920, 1080}}\",\"scale\":2}],\"frontPID\":16242,\"pointer\":[708,1002],\"postEvents\":true,\"screenCapture\":true,\"trusted\":true}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "ec8ab42318aebcb177742257255a587c6aa6d11b\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "sw_vers"
+      ],
+      "exit": 0,
+      "stdout": "ProductName:\t\tmacOS\nProductVersion:\t\t15.6.1\nBuildVersion:\t\t24G90\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "swift",
+        "--version"
+      ],
+      "exit": 0,
+      "stdout": "Apple Swift version 6.2.4 (swiftlang-6.2.4.1.4 clang-1700.6.4.2)\nTarget: arm64-apple-macosx15.0\n",
+      "stderr": "swift-driver version: 1.127.15 "
+    },
+    {
+      "command": [
+        "ps",
+        "-p",
+        "10506",
+        "-o",
+        "comm="
+      ],
+      "exit": 0,
+      "stdout": "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "state",
+        "10506"
+      ],
+      "exit": 0,
+      "stdout": "{\"actions\":[\"AXRaise\"],\"attributeError\":0,\"attributes\":[\"AXFocused\",\"AXFullScreen\",\"AXTitle\",\"AXChildrenInNavigationOrder\",\"AXFrame\",\"AXPosition\",\"AXGrowArea\",\"AXMinimizeButton\",\"AXDocument\",\"AXSections\",\"AXCloseButton\",\"AXMain\",\"AXActivationPoint\",\"AXFullScreenButton\",\"AXProxy\",\"AXDefaultButton\",\"AXMinimized\",\"AXChildren\",\"AXRole\",\"AXParent\",\"AXTitleUIElement\",\"AXCancelButton\",\"AXModal\",\"AXSubrole\",\"AXZoomButton\",\"AXRoleDescription\",\"AXSize\",\"AXToolbarButton\"],\"frontPID\":10510,\"pid\":10506,\"title\":\"Issue86 Mac PoC A\",\"windows\":[{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":328,\"Width\":480,\"X\":100,\"Y\":624},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC A\",\"kCGWindowNumber\":44381,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10506,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}],\"writable\":{\"AXActivationPoint\":false,\"AXCancelButton\":false,\"AXChildren\":false,\"AXChildrenInNavigationOrder\":false,\"AXCloseButton\":false,\"AXDefaultButton\":false,\"AXDocument\":false,\"AXFocused\":false,\"AXFrame\":false,\"AXFullScreen\":true,\"AXFullScreenButton\":false,\"AXGrowArea\":false,\"AXMain\":true,\"AXMinimizeButton\":false,\"AXMinimized\":true,\"AXModal\":false,\"AXParent\":false,\"AXPosition\":true,\"AXProxy\":false,\"AXRole\":false,\"AXRoleDescription\":false,\"AXSections\":true,\"AXSize\":true,\"AXSubrole\":false,\"AXTitle\":false,\"AXTitleUIElement\":false,\"AXToolbarButton\":false,\"AXZoomButton\":false}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "ps",
+        "-p",
+        "10510",
+        "-o",
+        "comm="
+      ],
+      "exit": 0,
+      "stdout": "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "state",
+        "10510"
+      ],
+      "exit": 0,
+      "stdout": "{\"actions\":[\"AXRaise\"],\"attributeError\":0,\"attributes\":[\"AXFocused\",\"AXFullScreen\",\"AXTitle\",\"AXChildrenInNavigationOrder\",\"AXFrame\",\"AXPosition\",\"AXGrowArea\",\"AXMinimizeButton\",\"AXDocument\",\"AXSections\",\"AXCloseButton\",\"AXMain\",\"AXActivationPoint\",\"AXFullScreenButton\",\"AXProxy\",\"AXDefaultButton\",\"AXMinimized\",\"AXChildren\",\"AXRole\",\"AXParent\",\"AXTitleUIElement\",\"AXCancelButton\",\"AXModal\",\"AXSubrole\",\"AXZoomButton\",\"AXRoleDescription\",\"AXSize\",\"AXToolbarButton\"],\"frontPID\":10510,\"pid\":10510,\"title\":\"Issue86 Mac PoC B\",\"windows\":[{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":328,\"Width\":480,\"X\":100,\"Y\":624},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC B\",\"kCGWindowNumber\":44388,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10510,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}],\"writable\":{\"AXActivationPoint\":false,\"AXCancelButton\":false,\"AXChildren\":false,\"AXChildrenInNavigationOrder\":false,\"AXCloseButton\":false,\"AXDefaultButton\":false,\"AXDocument\":false,\"AXFocused\":false,\"AXFrame\":false,\"AXFullScreen\":true,\"AXFullScreenButton\":false,\"AXGrowArea\":false,\"AXMain\":true,\"AXMinimizeButton\":false,\"AXMinimized\":true,\"AXModal\":false,\"AXParent\":false,\"AXPosition\":true,\"AXProxy\":false,\"AXRole\":false,\"AXRoleDescription\":false,\"AXSections\":true,\"AXSize\":true,\"AXSubrole\":false,\"AXTitle\":false,\"AXTitleUIElement\":false,\"AXToolbarButton\":false,\"AXZoomButton\":false}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "move",
+        "10506",
+        "220",
+        "180",
+        "560",
+        "360"
+      ],
+      "exit": 0,
+      "stdout": "{\"positionResult\":0,\"sizeResult\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "state",
+        "10506"
+      ],
+      "exit": 0,
+      "stdout": "{\"actions\":[\"AXRaise\"],\"attributeError\":0,\"attributes\":[\"AXFocused\",\"AXFullScreen\",\"AXTitle\",\"AXChildrenInNavigationOrder\",\"AXFrame\",\"AXPosition\",\"AXGrowArea\",\"AXMinimizeButton\",\"AXDocument\",\"AXSections\",\"AXCloseButton\",\"AXMain\",\"AXActivationPoint\",\"AXFullScreenButton\",\"AXProxy\",\"AXDefaultButton\",\"AXMinimized\",\"AXChildren\",\"AXRole\",\"AXParent\",\"AXTitleUIElement\",\"AXCancelButton\",\"AXModal\",\"AXSubrole\",\"AXZoomButton\",\"AXRoleDescription\",\"AXSize\",\"AXToolbarButton\"],\"frontPID\":10510,\"pid\":10506,\"title\":\"Issue86 Mac PoC A\",\"windows\":[{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":360,\"Width\":560,\"X\":220,\"Y\":180},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC A\",\"kCGWindowNumber\":44381,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10506,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}],\"writable\":{\"AXActivationPoint\":false,\"AXCancelButton\":false,\"AXChildren\":false,\"AXChildrenInNavigationOrder\":false,\"AXCloseButton\":false,\"AXDefaultButton\":false,\"AXDocument\":false,\"AXFocused\":false,\"AXFrame\":false,\"AXFullScreen\":true,\"AXFullScreenButton\":false,\"AXGrowArea\":false,\"AXMain\":true,\"AXMinimizeButton\":false,\"AXMinimized\":true,\"AXModal\":false,\"AXParent\":false,\"AXPosition\":true,\"AXProxy\":false,\"AXRole\":false,\"AXRoleDescription\":false,\"AXSections\":true,\"AXSize\":true,\"AXSubrole\":false,\"AXTitle\":false,\"AXTitleUIElement\":false,\"AXToolbarButton\":false,\"AXZoomButton\":false}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "move",
+        "10510",
+        "320",
+        "230",
+        "560",
+        "360"
+      ],
+      "exit": 0,
+      "stdout": "{\"positionResult\":0,\"sizeResult\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "activate",
+        "10506"
+      ],
+      "exit": 0,
+      "stdout": "{\"activate\":0}\n",
+      "stderr": ""
+    },
+    {
+      "activate": {
+        "activate": 0
+      }
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "state",
+        "10506"
+      ],
+      "exit": 0,
+      "stdout": "{\"actions\":[\"AXRaise\"],\"attributeError\":0,\"attributes\":[\"AXFocused\",\"AXFullScreen\",\"AXTitle\",\"AXChildrenInNavigationOrder\",\"AXFrame\",\"AXPosition\",\"AXGrowArea\",\"AXMinimizeButton\",\"AXDocument\",\"AXSections\",\"AXCloseButton\",\"AXMain\",\"AXActivationPoint\",\"AXFullScreenButton\",\"AXProxy\",\"AXDefaultButton\",\"AXMinimized\",\"AXChildren\",\"AXRole\",\"AXParent\",\"AXTitleUIElement\",\"AXCancelButton\",\"AXModal\",\"AXSubrole\",\"AXZoomButton\",\"AXRoleDescription\",\"AXSize\",\"AXToolbarButton\"],\"frontPID\":10506,\"pid\":10506,\"title\":\"Issue86 Mac PoC A\",\"windows\":[{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":360,\"Width\":560,\"X\":220,\"Y\":180},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC A\",\"kCGWindowNumber\":44381,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10506,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}],\"writable\":{\"AXActivationPoint\":false,\"AXCancelButton\":false,\"AXChildren\":false,\"AXChildrenInNavigationOrder\":false,\"AXCloseButton\":false,\"AXDefaultButton\":false,\"AXDocument\":false,\"AXFocused\":false,\"AXFrame\":false,\"AXFullScreen\":true,\"AXFullScreenButton\":false,\"AXGrowArea\":false,\"AXMain\":true,\"AXMinimizeButton\":false,\"AXMinimized\":true,\"AXModal\":false,\"AXParent\":false,\"AXPosition\":true,\"AXProxy\":false,\"AXRole\":false,\"AXRoleDescription\":false,\"AXSections\":true,\"AXSize\":true,\"AXSubrole\":false,\"AXTitle\":false,\"AXTitleUIElement\":false,\"AXToolbarButton\":false,\"AXZoomButton\":false}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "input",
+        "10506",
+        "340",
+        "420"
+      ],
+      "exit": 0,
+      "stdout": "{\"pid\":10506,\"posted\":true}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "input",
+        "10506",
+        "370",
+        "350",
+        "MAC86_REAL_INPUT"
+      ],
+      "exit": 0,
+      "stdout": "{\"pid\":10506,\"posted\":true}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "order",
+        "10506",
+        "10510"
+      ],
+      "exit": 0,
+      "stdout": "{\"frontPID\":10506,\"frontToBack\":[{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":360,\"Width\":560,\"X\":220,\"Y\":180},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC A\",\"kCGWindowNumber\":44381,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10506,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1},{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":360,\"Width\":560,\"X\":320,\"Y\":230},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC B\",\"kCGWindowNumber\":44388,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10510,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "screencapture",
+        "-x",
+        "-R220,180,560,360",
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/01-A-input.png"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "level",
+        "10506"
+      ],
+      "exit": 0,
+      "stdout": "{\"attribute\":\"AXWindowLevel (capability probe; not an Apple public AX attribute)\",\"setResult\":-25205,\"settable\":false,\"settableResult\":-25205}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "activate",
+        "10510"
+      ],
+      "exit": 0,
+      "stdout": "{\"activate\":0}\n",
+      "stderr": ""
+    },
+    {
+      "activate": {
+        "activate": 0
+      }
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "state",
+        "10510"
+      ],
+      "exit": 0,
+      "stdout": "{\"actions\":[\"AXRaise\"],\"attributeError\":0,\"attributes\":[\"AXFocused\",\"AXFullScreen\",\"AXTitle\",\"AXChildrenInNavigationOrder\",\"AXFrame\",\"AXPosition\",\"AXGrowArea\",\"AXMinimizeButton\",\"AXDocument\",\"AXSections\",\"AXCloseButton\",\"AXMain\",\"AXActivationPoint\",\"AXFullScreenButton\",\"AXProxy\",\"AXDefaultButton\",\"AXMinimized\",\"AXChildren\",\"AXRole\",\"AXParent\",\"AXTitleUIElement\",\"AXCancelButton\",\"AXModal\",\"AXSubrole\",\"AXZoomButton\",\"AXRoleDescription\",\"AXSize\",\"AXToolbarButton\"],\"frontPID\":10510,\"pid\":10510,\"title\":\"Issue86 Mac PoC B\",\"windows\":[{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":360,\"Width\":560,\"X\":320,\"Y\":230},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC B\",\"kCGWindowNumber\":44388,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10510,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}],\"writable\":{\"AXActivationPoint\":false,\"AXCancelButton\":false,\"AXChildren\":false,\"AXChildrenInNavigationOrder\":false,\"AXCloseButton\":false,\"AXDefaultButton\":false,\"AXDocument\":false,\"AXFocused\":false,\"AXFrame\":false,\"AXFullScreen\":true,\"AXFullScreenButton\":false,\"AXGrowArea\":false,\"AXMain\":true,\"AXMinimizeButton\":false,\"AXMinimized\":true,\"AXModal\":false,\"AXParent\":false,\"AXPosition\":true,\"AXProxy\":false,\"AXRole\":false,\"AXRoleDescription\":false,\"AXSections\":true,\"AXSize\":true,\"AXSubrole\":false,\"AXTitle\":false,\"AXTitleUIElement\":false,\"AXToolbarButton\":false,\"AXZoomButton\":false}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "raise",
+        "10506"
+      ],
+      "exit": 0,
+      "stdout": "{\"raiseResult\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "order",
+        "10506",
+        "10510"
+      ],
+      "exit": 0,
+      "stdout": "{\"frontPID\":10510,\"frontToBack\":[{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":360,\"Width\":560,\"X\":320,\"Y\":230},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC B\",\"kCGWindowNumber\":44388,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10510,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1},{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":360,\"Width\":560,\"X\":220,\"Y\":180},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC A\",\"kCGWindowNumber\":44381,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10506,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "screencapture",
+        "-x",
+        "-R220,180,560,360",
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/02-A-raised.png"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "input",
+        "10510",
+        "830",
+        "400"
+      ],
+      "exit": 0,
+      "stdout": "{\"pid\":10510,\"posted\":true}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "input",
+        "10510",
+        "440",
+        "470"
+      ],
+      "exit": 0,
+      "stdout": "{\"pid\":10510,\"posted\":true}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "order",
+        "10506",
+        "10510"
+      ],
+      "exit": 0,
+      "stdout": "{\"frontPID\":10510,\"frontToBack\":[{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":360,\"Width\":560,\"X\":320,\"Y\":230},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC B\",\"kCGWindowNumber\":44388,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10510,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1},{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":360,\"Width\":560,\"X\":220,\"Y\":180},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC A\",\"kCGWindowNumber\":44381,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10506,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "screencapture",
+        "-x",
+        "-R220,180,560,360",
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/03-B-active-after-A-raise.png"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "order",
+        "10506",
+        "10510"
+      ],
+      "exit": 0,
+      "stdout": "{\"frontPID\":10510,\"frontToBack\":[{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":360,\"Width\":560,\"X\":320,\"Y\":230},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC B\",\"kCGWindowNumber\":44388,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10510,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1},{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":360,\"Width\":560,\"X\":220,\"Y\":180},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC A\",\"kCGWindowNumber\":44381,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10506,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "move",
+        "10506",
+        "100",
+        "624",
+        "480",
+        "328"
+      ],
+      "exit": 0,
+      "stdout": "{\"positionResult\":0,\"sizeResult\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "state",
+        "10506"
+      ],
+      "exit": 0,
+      "stdout": "{\"actions\":[\"AXRaise\"],\"attributeError\":0,\"attributes\":[\"AXFocused\",\"AXFullScreen\",\"AXTitle\",\"AXChildrenInNavigationOrder\",\"AXFrame\",\"AXPosition\",\"AXGrowArea\",\"AXMinimizeButton\",\"AXDocument\",\"AXSections\",\"AXCloseButton\",\"AXMain\",\"AXActivationPoint\",\"AXFullScreenButton\",\"AXProxy\",\"AXDefaultButton\",\"AXMinimized\",\"AXChildren\",\"AXRole\",\"AXParent\",\"AXTitleUIElement\",\"AXCancelButton\",\"AXModal\",\"AXSubrole\",\"AXZoomButton\",\"AXRoleDescription\",\"AXSize\",\"AXToolbarButton\"],\"frontPID\":10510,\"pid\":10506,\"title\":\"Issue86 Mac PoC A\",\"windows\":[{\"kCGWindowAlpha\":1,\"kCGWindowBounds\":{\"Height\":328,\"Width\":480,\"X\":100,\"Y\":624},\"kCGWindowIsOnscreen\":true,\"kCGWindowLayer\":0,\"kCGWindowMemoryUsage\":2288,\"kCGWindowName\":\"Issue86 Mac PoC A\",\"kCGWindowNumber\":44381,\"kCGWindowOwnerName\":\"probe\",\"kCGWindowOwnerPID\":10506,\"kCGWindowSharingState\":1,\"kCGWindowStoreType\":1}],\"writable\":{\"AXActivationPoint\":false,\"AXCancelButton\":false,\"AXChildren\":false,\"AXChildrenInNavigationOrder\":false,\"AXCloseButton\":false,\"AXDefaultButton\":false,\"AXDocument\":false,\"AXFocused\":false,\"AXFrame\":false,\"AXFullScreen\":true,\"AXFullScreenButton\":false,\"AXGrowArea\":false,\"AXMain\":true,\"AXMinimizeButton\":false,\"AXMinimized\":true,\"AXModal\":false,\"AXParent\":false,\"AXPosition\":true,\"AXProxy\":false,\"AXRole\":false,\"AXRoleDescription\":false,\"AXSections\":true,\"AXSize\":true,\"AXSubrole\":false,\"AXTitle\":false,\"AXTitleUIElement\":false,\"AXToolbarButton\":false,\"AXZoomButton\":false}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "activate",
+        "16242"
+      ],
+      "exit": 0,
+      "stdout": "{\"activate\":0}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "restorePointer",
+        "708",
+        "1002"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+        "environment"
+      ],
+      "exit": 0,
+      "stdout": "{\"displays\":[{\"frame\":\"{{0, 0}, {2048, 1152}}\",\"scale\":2},{\"frame\":\"{{-1728, 35}, {1728, 1117}}\",\"scale\":2},{\"frame\":\"{{0, 1152}, {1920, 1080}}\",\"scale\":2}],\"frontPID\":16242,\"pointer\":[708,1002],\"postEvents\":true,\"screenCapture\":true,\"trusted\":true}\n",
+      "stderr": ""
+    }
+  ],
+  "environment": {
+    "displays": [
+      {
+        "frame": "{{0, 0}, {2048, 1152}}",
+        "scale": 2
+      },
+      {
+        "frame": "{{-1728, 35}, {1728, 1117}}",
+        "scale": 2
+      },
+      {
+        "frame": "{{0, 1152}, {1920, 1080}}",
+        "scale": 2
+      }
+    ],
+    "frontPID": 16242,
+    "pointer": [
+      708,
+      1002
+    ],
+    "postEvents": true,
+    "screenCapture": true,
+    "trusted": true
+  },
+  "sourceSHA": "ec8ab42318aebcb177742257255a587c6aa6d11b",
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t15.6.1\nBuildVersion:\t\t24G90\n",
+  "swift": "Apple Swift version 6.2.4 (swiftlang-6.2.4.1.4 clang-1700.6.4.2)\nTarget: arm64-apple-macosx15.0\n",
+  "sourceHash": "d4f165acc752ca57ec5efd36de3e670fb554ca1a5b80bbc7c97f5092dc38578c",
+  "identities": [
+    {
+      "pid": 10506,
+      "exe": "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+      "initial": {
+        "actions": [
+          "AXRaise"
+        ],
+        "attributeError": 0,
+        "attributes": [
+          "AXFocused",
+          "AXFullScreen",
+          "AXTitle",
+          "AXChildrenInNavigationOrder",
+          "AXFrame",
+          "AXPosition",
+          "AXGrowArea",
+          "AXMinimizeButton",
+          "AXDocument",
+          "AXSections",
+          "AXCloseButton",
+          "AXMain",
+          "AXActivationPoint",
+          "AXFullScreenButton",
+          "AXProxy",
+          "AXDefaultButton",
+          "AXMinimized",
+          "AXChildren",
+          "AXRole",
+          "AXParent",
+          "AXTitleUIElement",
+          "AXCancelButton",
+          "AXModal",
+          "AXSubrole",
+          "AXZoomButton",
+          "AXRoleDescription",
+          "AXSize",
+          "AXToolbarButton"
+        ],
+        "frontPID": 10510,
+        "pid": 10506,
+        "title": "Issue86 Mac PoC A",
+        "windows": [
+          {
+            "kCGWindowAlpha": 1,
+            "kCGWindowBounds": {
+              "Height": 328,
+              "Width": 480,
+              "X": 100,
+              "Y": 624
+            },
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowLayer": 0,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowName": "Issue86 Mac PoC A",
+            "kCGWindowNumber": 44381,
+            "kCGWindowOwnerName": "probe",
+            "kCGWindowOwnerPID": 10506,
+            "kCGWindowSharingState": 1,
+            "kCGWindowStoreType": 1
+          }
+        ],
+        "writable": {
+          "AXActivationPoint": false,
+          "AXCancelButton": false,
+          "AXChildren": false,
+          "AXChildrenInNavigationOrder": false,
+          "AXCloseButton": false,
+          "AXDefaultButton": false,
+          "AXDocument": false,
+          "AXFocused": false,
+          "AXFrame": false,
+          "AXFullScreen": true,
+          "AXFullScreenButton": false,
+          "AXGrowArea": false,
+          "AXMain": true,
+          "AXMinimizeButton": false,
+          "AXMinimized": true,
+          "AXModal": false,
+          "AXParent": false,
+          "AXPosition": true,
+          "AXProxy": false,
+          "AXRole": false,
+          "AXRoleDescription": false,
+          "AXSections": true,
+          "AXSize": true,
+          "AXSubrole": false,
+          "AXTitle": false,
+          "AXTitleUIElement": false,
+          "AXToolbarButton": false,
+          "AXZoomButton": false
+        }
+      }
+    },
+    {
+      "pid": 10510,
+      "exe": "/Users/egoinglee/.codex/artifacts/agent-gibbon-is2-86/macos-poc/probe",
+      "initial": {
+        "actions": [
+          "AXRaise"
+        ],
+        "attributeError": 0,
+        "attributes": [
+          "AXFocused",
+          "AXFullScreen",
+          "AXTitle",
+          "AXChildrenInNavigationOrder",
+          "AXFrame",
+          "AXPosition",
+          "AXGrowArea",
+          "AXMinimizeButton",
+          "AXDocument",
+          "AXSections",
+          "AXCloseButton",
+          "AXMain",
+          "AXActivationPoint",
+          "AXFullScreenButton",
+          "AXProxy",
+          "AXDefaultButton",
+          "AXMinimized",
+          "AXChildren",
+          "AXRole",
+          "AXParent",
+          "AXTitleUIElement",
+          "AXCancelButton",
+          "AXModal",
+          "AXSubrole",
+          "AXZoomButton",
+          "AXRoleDescription",
+          "AXSize",
+          "AXToolbarButton"
+        ],
+        "frontPID": 10510,
+        "pid": 10510,
+        "title": "Issue86 Mac PoC B",
+        "windows": [
+          {
+            "kCGWindowAlpha": 1,
+            "kCGWindowBounds": {
+              "Height": 328,
+              "Width": 480,
+              "X": 100,
+              "Y": 624
+            },
+            "kCGWindowIsOnscreen": true,
+            "kCGWindowLayer": 0,
+            "kCGWindowMemoryUsage": 2288,
+            "kCGWindowName": "Issue86 Mac PoC B",
+            "kCGWindowNumber": 44388,
+            "kCGWindowOwnerName": "probe",
+            "kCGWindowOwnerPID": 10510,
+            "kCGWindowSharingState": 1,
+            "kCGWindowStoreType": 1
+          }
+        ],
+        "writable": {
+          "AXActivationPoint": false,
+          "AXCancelButton": false,
+          "AXChildren": false,
+          "AXChildrenInNavigationOrder": false,
+          "AXCloseButton": false,
+          "AXDefaultButton": false,
+          "AXDocument": false,
+          "AXFocused": false,
+          "AXFrame": false,
+          "AXFullScreen": true,
+          "AXFullScreenButton": false,
+          "AXGrowArea": false,
+          "AXMain": true,
+          "AXMinimizeButton": false,
+          "AXMinimized": true,
+          "AXModal": false,
+          "AXParent": false,
+          "AXPosition": true,
+          "AXProxy": false,
+          "AXRole": false,
+          "AXRoleDescription": false,
+          "AXSections": true,
+          "AXSize": true,
+          "AXSubrole": false,
+          "AXTitle": false,
+          "AXTitleUIElement": false,
+          "AXToolbarButton": false,
+          "AXZoomButton": false
+        }
+      }
+    }
+  ],
+  "original": {
+    "Height": 328,
+    "Width": 480,
+    "X": 100,
+    "Y": 624
+  },
+  "moveAPI": {
+    "positionResult": 0,
+    "sizeResult": 0
+  },
+  "moved": {
+    "actions": [
+      "AXRaise"
+    ],
+    "attributeError": 0,
+    "attributes": [
+      "AXFocused",
+      "AXFullScreen",
+      "AXTitle",
+      "AXChildrenInNavigationOrder",
+      "AXFrame",
+      "AXPosition",
+      "AXGrowArea",
+      "AXMinimizeButton",
+      "AXDocument",
+      "AXSections",
+      "AXCloseButton",
+      "AXMain",
+      "AXActivationPoint",
+      "AXFullScreenButton",
+      "AXProxy",
+      "AXDefaultButton",
+      "AXMinimized",
+      "AXChildren",
+      "AXRole",
+      "AXParent",
+      "AXTitleUIElement",
+      "AXCancelButton",
+      "AXModal",
+      "AXSubrole",
+      "AXZoomButton",
+      "AXRoleDescription",
+      "AXSize",
+      "AXToolbarButton"
+    ],
+    "frontPID": 10510,
+    "pid": 10506,
+    "title": "Issue86 Mac PoC A",
+    "windows": [
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "Height": 360,
+          "Width": 560,
+          "X": 220,
+          "Y": 180
+        },
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 0,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Issue86 Mac PoC A",
+        "kCGWindowNumber": 44381,
+        "kCGWindowOwnerName": "probe",
+        "kCGWindowOwnerPID": 10506,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1
+      }
+    ],
+    "writable": {
+      "AXActivationPoint": false,
+      "AXCancelButton": false,
+      "AXChildren": false,
+      "AXChildrenInNavigationOrder": false,
+      "AXCloseButton": false,
+      "AXDefaultButton": false,
+      "AXDocument": false,
+      "AXFocused": false,
+      "AXFrame": false,
+      "AXFullScreen": true,
+      "AXFullScreenButton": false,
+      "AXGrowArea": false,
+      "AXMain": true,
+      "AXMinimizeButton": false,
+      "AXMinimized": true,
+      "AXModal": false,
+      "AXParent": false,
+      "AXPosition": true,
+      "AXProxy": false,
+      "AXRole": false,
+      "AXRoleDescription": false,
+      "AXSections": true,
+      "AXSize": true,
+      "AXSubrole": false,
+      "AXTitle": false,
+      "AXTitleUIElement": false,
+      "AXToolbarButton": false,
+      "AXZoomButton": false
+    }
+  },
+  "movement": "PASS",
+  "realInput": {
+    "active": true,
+    "clicks": 1,
+    "pid": 10506,
+    "text": "MAC86_REAL_INPUT"
+  },
+  "input": "PASS",
+  "01-A-input": {
+    "frontPID": 10506,
+    "frontToBack": [
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "Height": 360,
+          "Width": 560,
+          "X": 220,
+          "Y": 180
+        },
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 0,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Issue86 Mac PoC A",
+        "kCGWindowNumber": 44381,
+        "kCGWindowOwnerName": "probe",
+        "kCGWindowOwnerPID": 10506,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1
+      },
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "Height": 360,
+          "Width": 560,
+          "X": 320,
+          "Y": 230
+        },
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 0,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Issue86 Mac PoC B",
+        "kCGWindowNumber": 44388,
+        "kCGWindowOwnerName": "probe",
+        "kCGWindowOwnerPID": 10510,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1
+      }
+    ]
+  },
+  "levelProbe": {
+    "attribute": "AXWindowLevel (capability probe; not an Apple public AX attribute)",
+    "setResult": -25205,
+    "settable": false,
+    "settableResult": -25205
+  },
+  "raiseAPI": {
+    "raiseResult": 0
+  },
+  "02-A-raised": {
+    "frontPID": 10510,
+    "frontToBack": [
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "Height": 360,
+          "Width": 560,
+          "X": 320,
+          "Y": 230
+        },
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 0,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Issue86 Mac PoC B",
+        "kCGWindowNumber": 44388,
+        "kCGWindowOwnerName": "probe",
+        "kCGWindowOwnerPID": 10510,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1
+      },
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "Height": 360,
+          "Width": 560,
+          "X": 220,
+          "Y": 180
+        },
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 0,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Issue86 Mac PoC A",
+        "kCGWindowNumber": 44381,
+        "kCGWindowOwnerName": "probe",
+        "kCGWindowOwnerPID": 10506,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1
+      }
+    ]
+  },
+  "backgroundRaiseObserved": false,
+  "B-real-click": {
+    "active": true,
+    "clicks": 1,
+    "pid": 10510,
+    "text": ""
+  },
+  "03-B-active-after-A-raise": {
+    "frontPID": 10510,
+    "frontToBack": [
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "Height": 360,
+          "Width": 560,
+          "X": 320,
+          "Y": 230
+        },
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 0,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Issue86 Mac PoC B",
+        "kCGWindowNumber": 44388,
+        "kCGWindowOwnerName": "probe",
+        "kCGWindowOwnerPID": 10510,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1
+      },
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "Height": 360,
+          "Width": 560,
+          "X": 220,
+          "Y": 180
+        },
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 0,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Issue86 Mac PoC A",
+        "kCGWindowNumber": 44381,
+        "kCGWindowOwnerName": "probe",
+        "kCGWindowOwnerPID": 10506,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1
+      }
+    ]
+  },
+  "topmost": "FAIL",
+  "after-one-second": {
+    "frontPID": 10510,
+    "frontToBack": [
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "Height": 360,
+          "Width": 560,
+          "X": 320,
+          "Y": 230
+        },
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 0,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Issue86 Mac PoC B",
+        "kCGWindowNumber": 44388,
+        "kCGWindowOwnerName": "probe",
+        "kCGWindowOwnerPID": 10510,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1
+      },
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "Height": 360,
+          "Width": 560,
+          "X": 220,
+          "Y": 180
+        },
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 0,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Issue86 Mac PoC A",
+        "kCGWindowNumber": 44381,
+        "kCGWindowOwnerName": "probe",
+        "kCGWindowOwnerPID": 10506,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1
+      }
+    ]
+  },
+  "restoreAPI": {
+    "positionResult": 0,
+    "sizeResult": 0
+  },
+  "restored": {
+    "actions": [
+      "AXRaise"
+    ],
+    "attributeError": 0,
+    "attributes": [
+      "AXFocused",
+      "AXFullScreen",
+      "AXTitle",
+      "AXChildrenInNavigationOrder",
+      "AXFrame",
+      "AXPosition",
+      "AXGrowArea",
+      "AXMinimizeButton",
+      "AXDocument",
+      "AXSections",
+      "AXCloseButton",
+      "AXMain",
+      "AXActivationPoint",
+      "AXFullScreenButton",
+      "AXProxy",
+      "AXDefaultButton",
+      "AXMinimized",
+      "AXChildren",
+      "AXRole",
+      "AXParent",
+      "AXTitleUIElement",
+      "AXCancelButton",
+      "AXModal",
+      "AXSubrole",
+      "AXZoomButton",
+      "AXRoleDescription",
+      "AXSize",
+      "AXToolbarButton"
+    ],
+    "frontPID": 10510,
+    "pid": 10506,
+    "title": "Issue86 Mac PoC A",
+    "windows": [
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "Height": 328,
+          "Width": 480,
+          "X": 100,
+          "Y": 624
+        },
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 0,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowName": "Issue86 Mac PoC A",
+        "kCGWindowNumber": 44381,
+        "kCGWindowOwnerName": "probe",
+        "kCGWindowOwnerPID": 10506,
+        "kCGWindowSharingState": 1,
+        "kCGWindowStoreType": 1
+      }
+    ],
+    "writable": {
+      "AXActivationPoint": false,
+      "AXCancelButton": false,
+      "AXChildren": false,
+      "AXChildrenInNavigationOrder": false,
+      "AXCloseButton": false,
+      "AXDefaultButton": false,
+      "AXDocument": false,
+      "AXFocused": false,
+      "AXFrame": false,
+      "AXFullScreen": true,
+      "AXFullScreenButton": false,
+      "AXGrowArea": false,
+      "AXMain": true,
+      "AXMinimizeButton": false,
+      "AXMinimized": true,
+      "AXModal": false,
+      "AXParent": false,
+      "AXPosition": true,
+      "AXProxy": false,
+      "AXRole": false,
+      "AXRoleDescription": false,
+      "AXSections": true,
+      "AXSize": true,
+      "AXSubrole": false,
+      "AXTitle": false,
+      "AXTitleUIElement": false,
+      "AXToolbarButton": false,
+      "AXZoomButton": false
+    }
+  },
+  "restoreGeometry": "PASS",
+  "unpin": "NOT_APPLICABLE: no persistent pin obtained; no level changed",
+  "status": "COMPLETED_WITH_TOPMOST_FAILURE",
+  "cleanup": [
+    {
+      "pid": 10506,
+      "exit": -15
+    },
+    {
+      "pid": 10510,
+      "exit": -15
+    }
+  ],
+  "focusRestore": {
+    "activate": 0
+  },
+  "finalEnvironment": {
+    "displays": [
+      {
+        "frame": "{{0, 0}, {2048, 1152}}",
+        "scale": 2
+      },
+      {
+        "frame": "{{-1728, 35}, {1728, 1117}}",
+        "scale": 2
+      },
+      {
+        "frame": "{{0, 1152}, {1920, 1080}}",
+        "scale": 2
+      }
+    ],
+    "frontPID": 16242,
+    "pointer": [
+      708,
+      1002
+    ],
+    "postEvents": true,
+    "screenCapture": true,
+    "trusted": true
+  }
+}
