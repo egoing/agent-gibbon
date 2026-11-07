@@ -1,6 +1,6 @@
 # 자동 릴리스
 
-`.github/workflows/release.yml`은 `v*` 태그 push 또는 `workflow_dispatch` 수동 요청으로 실행합니다. 일반 브랜치 push는 이 워크플로를 실행하지 않습니다. 수동 실행도 세 플랫폼의 검증·설치 파일·서명 updater 자산·`latest.json`·체크섬까지 만들고 완성 자산을 Actions artifact로 보관하지만 GitHub Release를 만들지는 않습니다. 수동 실행은 각 runner에서 일회용 updater 키를 만들어 빌드 검증에만 씁니다. 버전이 일치하는 `vX.Y.Z` 태그 push만 검증·빌드 성공 후 공개로 이어집니다. 수동 실행을 요청하려면 이 워크플로가 기본 브랜치에 있어야 합니다.
+`.github/workflows/release.yml`은 `v*` 태그 push 또는 `workflow_dispatch` 수동 요청으로 실행합니다. 일반 브랜치 push는 이 워크플로를 실행하지 않습니다. 수동 실행도 세 플랫폼의 검증·설치 파일·서명 updater 자산·`latest.json`·체크섬까지 만들고 완성 자산을 Actions artifact로 보관하지만 GitHub Release를 만들지는 않습니다. 수동 실행은 각 runner에서 일회용 updater 키를 만들어 빌드 검증에만 씁니다. 버전이 일치하는 `vX.Y.Z` 태그 push만 검증·빌드 성공 후 Draft를 준비합니다. 수동 실행을 요청하려면 이 워크플로가 기본 브랜치에 있어야 합니다.
 
 ## 필요할 때 전체 검사 요청
 
@@ -50,7 +50,7 @@ git push origin v0.2.8
 - lockfile을 고정하여 Apple Silicon DMG, Intel DMG, Windows NSIS EXE와 세 플랫폼의 updater 자산을 빌드합니다. updater target은 `darwin-aarch64`, `darwin-x86_64`, `windows-x86_64`이며 Linux는 지원 범위에 포함하지 않습니다. CI는 화면 조작이나 실제 설치 검증을 대신하지 않습니다.
 - 모든 빌드 성공 후 정확한 버전의 설치 파일과 updater 번들·서명 세트를 확인합니다. 서명은 Tauri updater가 읽는 Base64 minisign 형식이어야 하며, 실제 payload·trusted comment의 Ed25519 서명을 검증합니다. trusted comment는 manifest의 안정 버전·플랫폼 파일명과 일치해야 합니다. macOS updater 아카이브는 CPU별 이름으로 바꾼 뒤 다시 서명합니다. 앱은 `requireSignedVersion`을 켜 두어 실제 서명을 검증하고, 서명에 포함된 버전과 manifest 버전이 다르면 업데이트를 거부합니다. 자산이 모두 유효할 때 `latest.json`과 설치 파일·updater 번들·서명·플랫폼별 공개 키 파일의 `SHA256SUMS.txt`를 생성합니다.
 - `latest.json`은 각 release에 업로드되는 정적 manifest입니다. `version`과 세 플랫폼별 `url`·Base64 `signature`를 담고, URL은 해당 `vX.Y.Z` GitHub Release의 updater 파일을 가리킵니다. 앱은 GitHub Releases의 `latest/download/latest.json`을 조회하므로 새 버전을 `--latest`로 공개하면 별도 업데이트 서버 없이 manifest와 번들을 가져옵니다.
-- 게시 작업에만 `contents: write`를 부여합니다. Draft에 파일을 모두 업로드한 뒤 공개합니다. 한 플랫폼이라도 실패하면 게시 작업이 실행되지 않습니다.
+- 게시 작업에만 `contents: write`를 부여합니다. Draft에 파일을 업로드하고 검증한 뒤 대기합니다. 태그 실행의 성공과 대상 버전을 확인하고, 사용자가 공개를 지시하면 `gh release edit vX.Y.Z --draft=false --latest`로 공개한 뒤 latest.json과 세 다운로드 URL을 확인합니다. 한 플랫폼이라도 실패하면 게시 작업이 실행되지 않습니다.
 - 업로드 실패 시 남은 Draft는 자동 덮어쓰지 않습니다. 담당자가 실패 원인과 Draft를 확인하고 미공개 Draft를 정리한 후 실패 작업을 재실행합니다. 이미 공개한 버전은 새 버전으로 수정합니다.
 
 ## 자동 업데이트 서명 키와 최초 업데이트

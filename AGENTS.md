@@ -37,7 +37,7 @@
 ## 버전과 릴리스
 
 - 상세 절차와 현재 배포 조건은 [자동 릴리스 안내](docs/releases.md), 실행 설정은 `.github/workflows/release.yml`을 따른다.
-- 버전은 `npm run version:set -- X.Y.Z`로 npm·Cargo·Tauri와 lockfile을 함께 올리고 `npm run version:check`로 확인한다. 버전 변경만으로 공개하지 않으며, 배포할 커밋에 일치하는 `vX.Y.Z` 태그를 push하면 자동 릴리스가 시작된다. 기존 태그·공개 릴리스 자산을 덮어쓰지 않는다.
+- 버전은 `npm run version:set -- X.Y.Z`로 npm·Cargo·Tauri와 lockfile을 함께 올리고 `npm run version:check`로 확인한다. 버전 변경만으로 공개하지 않으며, 배포할 커밋에 일치하는 `vX.Y.Z` 태그를 push하면 공식 서명 빌드와 Draft 준비가 시작된다. 공개는 별도 사용자 지시 후 진행한다. 기존 태그·공개 릴리스 자산을 덮어쓰지 않는다.
 - macOS ARM64·Intel DMG와 Windows x64 NSIS EXE의 테스트·Rustfmt·Clippy·빌드가 모두 성공하고 설치 파일 세 개와 체크섬이 준비된 뒤에만 공개한다. 일반 브랜치 push는 Release 워크플로를 실행하지 않는다. `workflow_dispatch` 수동 실행은 전체 검증·빌드와 artifact 보관만 수행하며 공개하지 않는다.
 - 에이전트는 모든 변경에서 관련 로컬 검사를 수행한다. OS별 코드·전역 입력·창 제어·의존성/lockfile·빌드 및 배포 설정을 변경하거나 플랫폼 간 영향이 불확실하면, 검토할 커밋을 작업 브랜치에 push한 뒤 `gh workflow run release.yml --ref <작업-브랜치>`로 전체 플랫폼 검사를 요청한다. 문서·단순 문구 변경은 관련 로컬 검사로 마칠 수 있다. 검사용 태그는 발행하지 않으며 배포 태그는 실제 배포가 승인된 경우에만 사용한다.
 - 전체 검사 요청 시 이유·대상 브랜치·커밋 SHA를 기록하고, 실행 URL·`headSha`·플랫폼별 결과를 확인해 보고한다. 새 커밋을 push하면 이전 SHA의 통과를 현재 변경의 검증으로 보고하지 않으며, 여전히 전체 검사가 필요한 변경이면 다시 요청한다. 실행 실패·미실행·대기는 통과와 구분한다. 실행·조회 예시는 [자동 릴리스 안내](docs/releases.md#필요할-때-전체-검사-요청)를 따른다.
