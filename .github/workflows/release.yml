@@ -45,15 +45,15 @@ jobs:
           - runner: macos-15
             target: aarch64-apple-darwin
             bundles: app,dmg
-            asset: macos-arm64
+            asset: darwin-aarch64
           - runner: macos-15-intel
             target: x86_64-apple-darwin
             bundles: app,dmg
-            asset: macos-x64
+            asset: darwin-x86_64
           - runner: windows-2022
             target: x86_64-pc-windows-msvc
             bundles: nsis
-            asset: windows-x64
+            asset: windows-x86_64
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -85,18 +85,93 @@ jobs:
         shell: bash
         env:
           AGENT_GIBBON_SENTRY_DSN: ${{ secrets.AGENT_GIBBON_SENTRY_DSN || vars.AGENT_GIBBON_SENTRY_DSN }}
+          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+          RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_UPDATER_PUBLIC_KEY: ${{ vars.TAURI_UPDATER_PUBLIC_KEY }}
         run: |
           if [ -z "$AGENT_GIBBON_SENTRY_DSN" ]; then
             echo '::warning::Sentry DSN is not configured; these binaries will not send diagnostics.'
           fi
-          npm exec tauri build -- --target '${{ matrix.target }}' --bundles '${{ matrix.bundles }}' -- --locked
+          if [ -n "$RELEASE_TAG" ]; then
+            if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ] || [ -z "$TAURI_UPDATER_PUBLIC_KEY" ]; then
+              echo '::error::Tagged releases require TAURI_SIGNING_PRIVATE_KEY and the TAURI_UPDATER_PUBLIC_KEY repository variable.'
+              exit 1
+            fi
+          else
+            # Manual runs validate updater builds with a disposable per-runner key; it is never published.
+            ephemeral_key="$RUNNER_TEMP/tauri-updater.key"
+            npm exec -- tauri signer generate --write-keys "$ephemeral_key" --ci >/dev/null 2>&1
+            TAURI_SIGNING_PRIVATE_KEY="$ephemeral_key"
+            TAURI_SIGNING_PRIVATE_KEY_PASSWORD=''
+            TAURI_UPDATER_PUBLIC_KEY="$(cat "$ephemeral_key.pub")"
+          fi
+          export TAURI_SIGNING_PRIVATE_KEY TAURI_SIGNING_PRIVATE_KEY_PASSWORD TAURI_UPDATER_PUBLIC_KEY
+          node scripts/updater-build-config.mjs "$RUNNER_TEMP/updater-build-config.json"
+          npm exec tauri build -- --target '${{ matrix.target }}' --bundles '${{ matrix.bundles }}' --config "$RUNNER_TEMP/updater-build-config.json" -- --locked
       - name: Collect installers
         shell: bash
+        env:
+          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+          RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_UPDATER_PUBLIC_KEY: ${{ vars.TAURI_UPDATER_PUBLIC_KEY }}
         run: |
+          if [ -z "$RELEASE_TAG" ]; then
+            TAURI_SIGNING_PRIVATE_KEY=''
+            TAURI_SIGNING_PRIVATE_KEY_PATH="$RUNNER_TEMP/tauri-updater.key"
+            TAURI_SIGNING_PRIVATE_KEY_PASSWORD=''
+            TAURI_UPDATER_PUBLIC_KEY="$(cat "$RUNNER_TEMP/tauri-updater.key.pub")"
+          elif [ -f "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            TAURI_SIGNING_PRIVATE_KEY_PATH="$TAURI_SIGNING_PRIVATE_KEY"
+            TAURI_SIGNING_PRIVATE_KEY=''
+          fi
+          if [ -n "${TAURI_SIGNING_PRIVATE_KEY_PATH:-}" ]; then
+            export TAURI_SIGNING_PRIVATE_KEY_PATH
+          else
+            unset TAURI_SIGNING_PRIVATE_KEY_PATH
+          fi
+          if { [ -z "$TAURI_SIGNING_PRIVATE_KEY" ] && [ -z "${TAURI_SIGNING_PRIVATE_KEY_PATH:-}" ]; } || [ -z "$TAURI_UPDATER_PUBLIC_KEY" ]; then
+            echo 'Updater signing key material is unavailable in the artifact collection job.'
+            exit 1
+          fi
+          if [ -n "${TAURI_SIGNING_PRIVATE_KEY_PATH:-}" ]; then unset TAURI_SIGNING_PRIVATE_KEY; else export TAURI_SIGNING_PRIVATE_KEY; fi
+          export TAURI_SIGNING_PRIVATE_KEY_PASSWORD
           mkdir -p release-assets
-          for file in src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*.exe; do
-            if [ -f "$file" ]; then cp "$file" release-assets/; fi
-          done
+          if [ '${{ matrix.target }}' = 'aarch64-apple-darwin' ] || [ '${{ matrix.target }}' = 'x86_64-apple-darwin' ]; then
+            shopt -s nullglob
+            dmgs=(src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg)
+            if [ "${#dmgs[@]}" -ne 1 ]; then
+              echo 'Expected exactly one macOS DMG installer.'
+              exit 1
+            fi
+            if [ '${{ matrix.target }}' = 'aarch64-apple-darwin' ]; then installer_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_aarch64.dmg"; else installer_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_x64.dmg"; fi
+            cp "${dmgs[0]}" "release-assets/$installer_name"
+            bundles=(src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app.tar.gz)
+            if [ "${#bundles[@]}" -ne 1 ] || [ ! -f "${bundles[0]}.sig" ]; then
+              echo 'Expected exactly one signed macOS updater archive.'
+              exit 1
+            fi
+            if [ '${{ matrix.target }}' = 'aarch64-apple-darwin' ]; then updater_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_darwin-aarch64.app.tar.gz"; else updater_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_darwin-x86_64.app.tar.gz"; fi
+            cp "${bundles[0]}" "release-assets/$updater_name"
+            npm exec -- tauri signer sign --app-version "$RELEASE_VERSION" "release-assets/$updater_name" >/dev/null 2>&1
+            if [ '${{ matrix.target }}' = 'aarch64-apple-darwin' ]; then public_key_name='darwin-aarch64.pub'; else public_key_name='darwin-x86_64.pub'; fi
+          else
+            shopt -s nullglob
+            installers=(src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*-setup.exe)
+            if [ "${#installers[@]}" -ne 1 ] || [ ! -f "${installers[0]}.sig" ]; then
+              echo 'Expected exactly one signed Windows NSIS updater installer.'
+              exit 1
+            fi
+            installer_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_x64-setup.exe"
+            cp "${installers[0]}" "release-assets/$installer_name"
+            updater_name="$installer_name"
+            npm exec -- tauri signer sign --app-version "$RELEASE_VERSION" "release-assets/$updater_name" >/dev/null 2>&1
+            public_key_name='windows-x86_64.pub'
+          fi
+          printf '%s' "$TAURI_UPDATER_PUBLIC_KEY" > "release-assets/$public_key_name"
       - uses: actions/upload-artifact@v4
         with:
           name: installer-${{ matrix.asset }}
@@ -104,12 +179,9 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-  publish:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+  assemble:
     needs: [validate, build]
     runs-on: ubuntu-24.04
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -122,10 +194,36 @@ jobs:
           pattern: installer-*
           path: release-assets
           merge-multiple: true
-      - name: Validate complete asset set and generate checksums
+      - name: Validate signed updater assets, generate manifest and checksums
         env:
           RELEASE_VERSION: ${{ needs.validate.outputs.version }}
-        run: node scripts/release-assets.mjs release-assets "$RELEASE_VERSION"
+          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+          TAURI_UPDATER_PUBLIC_KEY: ${{ vars.TAURI_UPDATER_PUBLIC_KEY }}
+        run: node scripts/release-assets.mjs release-assets "$RELEASE_VERSION" updater
+      - uses: actions/upload-artifact@v4
+        with:
+          name: complete-release-assets
+          path: release-assets/*
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: [validate, build, assemble]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          name: complete-release-assets
+          path: release-assets
       - name: Upload to draft, then publish
         env:
           GH_TOKEN: ${{ github.token }}
@@ -135,4 +233,38 @@ jobs:
           # A failed upload leaves a draft for inspection. Never replace an existing release.
           gh release create "$RELEASE_TAG" --verify-tag --draft --title "Agent Gibbon $RELEASE_TAG" --generate-notes
           gh release upload "$RELEASE_TAG" release-assets/*
+          expected_assets="$(find release-assets -maxdepth 1 -type f -exec basename {} \; | LC_ALL=C sort)"
+          actual_assets="$(gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | LC_ALL=C sort)"
+          if [ "$actual_assets" != "$expected_assets" ]; then
+            echo '::error::Uploaded release asset names differ from the validated local asset set.'
+            diff -u <(printf '%s\n' "$expected_assets") <(printf '%s\n' "$actual_assets") || true
+            exit 1
+          fi
+          node --input-type=module <<'NODE'
+          import { readFileSync, readdirSync } from 'node:fs';
+          const manifest = JSON.parse(readFileSync('release-assets/latest.json', 'utf8'));
+          const expectedTargets = ['darwin-aarch64', 'darwin-x86_64', 'windows-x86_64'];
+          const targets = Object.keys(manifest.platforms).sort();
+          if (JSON.stringify(targets) !== JSON.stringify(expectedTargets)) throw new Error('Updater manifest target set is incomplete.');
+          if (`v${manifest.version}` !== process.env.RELEASE_TAG) throw new Error('Updater manifest version does not match the release tag.');
+          const localNames = new Set(readdirSync('release-assets'));
+          for (const target of expectedTargets) {
+            const url = new URL(manifest.platforms[target].url);
+            const filename = decodeURIComponent(url.pathname.split('/').at(-1));
+            if (!filename.startsWith('Agent.Gibbon_') || filename.includes(' ') || !localNames.has(filename)) {
+              throw new Error(`Updater manifest asset name is not present with its canonical filename: ${target}`);
+            }
+            if (url.origin !== 'https://github.com' || url.pathname !== `/${process.env.GH_REPO}/releases/download/${process.env.RELEASE_TAG}/${filename}`) {
+              throw new Error(`Updater manifest URL does not point to this tagged release: ${target}`);
+            }
+          }
+          NODE
           gh release edit "$RELEASE_TAG" --draft=false --latest
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          const manifest = JSON.parse(readFileSync('release-assets/latest.json', 'utf8'));
+          for (const [target, platform] of Object.entries(manifest.platforms)) {
+            const response = await fetch(platform.url, { method: 'HEAD', redirect: 'follow', signal: AbortSignal.timeout(30000) });
+            if (!response.ok) throw new Error(`Published updater asset URL failed its public HEAD check for ${target}: HTTP ${response.status}`);
+          }
+          NODE

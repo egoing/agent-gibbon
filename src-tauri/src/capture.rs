@@ -138,7 +138,7 @@ async fn lifecycle(
 }
 
 pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
-    if crate::privacy::onboarding_required(app) {
+    if crate::updater::frozen(app) || crate::privacy::onboarding_required(app) {
         return;
     }
     trace("trigger");
@@ -190,6 +190,15 @@ fn launch(app: &tauri::AppHandle, mode: SelectionMode) {
         eprintln!("화면 캡처 실패: {error}");
     }
 }
+pub fn update_blocked(app: &tauri::AppHandle) -> bool {
+    LAUNCH_QUEUED.load(Ordering::Acquire)
+        || app
+            .state::<Captures>()
+            .0
+            .lock()
+            .map(|s| !s.is_empty())
+            .unwrap_or(true)
+}
 pub fn active(app: &tauri::AppHandle) -> bool {
     app.state::<Captures>()
         .0
@@ -204,6 +213,7 @@ extern "C" {
     fn CGRequestScreenCaptureAccess() -> bool;
 }
 fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
+    let _update_activity = crate::updater::activity(app)?;
     #[cfg(not(windows))]
     let _root = crate::telemetry::Timing::new("capture.prepare");
     trace("begin");

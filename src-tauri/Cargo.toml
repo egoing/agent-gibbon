@@ -1,6 +1,6 @@
 [package]
 name = "agent-gibbon"
-version = "0.2.7"
+version = "0.2.9"
 edition = "2021"
 license = "MIT"
 default-run = "agent-gibbon"
@@ -26,6 +26,7 @@ base64 = "0.22"
 tauri-plugin-dialog = "2"
 tempfile = "3"
 portable-pty = "0.9"
+tauri-plugin-updater = "2"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
@@ -50,3 +51,6 @@ opt-level = 2
 opt-level = 2
 [profile.dev.package.base64]
 opt-level = 2
+
+[dev-dependencies]
+tauri = { version = "2", features = ["test"] }

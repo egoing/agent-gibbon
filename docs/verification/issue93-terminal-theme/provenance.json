@@ -1,0 +1,1111 @@
+{
+  "root": "/Users/egoinglee/.codex/worktrees/cd0d/agent-gibbon",
+  "instance": "dev-347f6deb27841f629bb0e49e",
+  "base_sha": "962301168cbac037310f47ca8e13fbf0bae646a8",
+  "red_sha": "4539a6efa80bd13b344345e4ddd74bc5fa74dd42",
+  "binary": "/Users/egoinglee/.codex/worktrees/cd0d/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "native_pid": 70200,
+  "native_window_id": 45094,
+  "native_window_title": "Agent Gibbon [DEV codex/93-terminal-theme-contrast · 347f6deb] — terminal-93001",
+  "native_inspect": {
+    "bounds": {
+      "height": 700.0,
+      "width": 720.0,
+      "x": 500.0,
+      "y": 300.0
+    },
+    "cwd": "/tmp",
+    "id": "terminal-93001",
+    "instance": "dev-347f6deb27841f629bb0e49e",
+    "kind": "terminal",
+    "last_path": "/tmp",
+    "ok": true,
+    "pid": null,
+    "position": {
+      "x": 1000,
+      "y": 600
+    },
+    "program": null,
+    "pty_size": null,
+    "running": false,
+    "size": {
+      "height": 1400,
+      "width": 1440
+    },
+    "title": "검증93 테마 대비",
+    "visible": true
+  },
+  "native_capture": "FAIL: screencapture could not create image from window; no native color verification claimed",
+  "browser_cases": [
+    {
+      "width": 720,
+      "height": 700,
+      "design": "gray",
+      "dark": false,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        }
+      ],
+      "background": "#dfe2dd",
+      "overflow": false
+    },
+    {
+      "width": 720,
+      "height": 700,
+      "design": "white",
+      "dark": false,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(248, 248, 248)",
+          "contrast": 12.967863104574322
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(248, 248, 248)",
+          "contrast": 12.967863104574322
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(248, 248, 248)",
+          "contrast": 12.967863104574322
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        }
+      ],
+      "background": "#f8f8f8",
+      "overflow": false
+    },
+    {
+      "width": 720,
+      "height": 700,
+      "design": "black",
+      "dark": false,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        }
+      ],
+      "background": "#262627",
+      "overflow": false
+    },
+    {
+      "width": 720,
+      "height": 700,
+      "design": "color",
+      "dark": false,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(32, 37, 46)",
+          "contrast": 15.379052570458315
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(32, 37, 46)",
+          "contrast": 15.379052570458315
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(32, 37, 46)",
+          "contrast": 15.379052570458315
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        }
+      ],
+      "background": "#20252e",
+      "overflow": false
+    },
+    {
+      "width": 720,
+      "height": 700,
+      "design": "system",
+      "dark": true,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        }
+      ],
+      "background": "#262627",
+      "overflow": false
+    },
+    {
+      "width": 720,
+      "height": 700,
+      "design": "system",
+      "dark": false,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        }
+      ],
+      "background": "#dfe2dd",
+      "overflow": false
+    },
+    {
+      "width": 720,
+      "height": 700,
+      "design": "gray",
+      "dark": true,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        }
+      ],
+      "background": "#dfe2dd",
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "design": "gray",
+      "dark": false,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        }
+      ],
+      "background": "#dfe2dd",
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "design": "white",
+      "dark": false,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(248, 248, 248)",
+          "contrast": 12.967863104574322
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(248, 248, 248)",
+          "contrast": 12.967863104574322
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(248, 248, 248)",
+          "contrast": 12.967863104574322
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(45, 45, 45)",
+          "background": "rgb(255, 255, 255)",
+          "contrast": 13.772077281869057
+        }
+      ],
+      "background": "#f8f8f8",
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "design": "black",
+      "dark": false,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        }
+      ],
+      "background": "#262627",
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "design": "color",
+      "dark": false,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(32, 37, 46)",
+          "contrast": 15.379052570458315
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(32, 37, 46)",
+          "contrast": 15.379052570458315
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(32, 37, 46)",
+          "contrast": 15.379052570458315
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(255, 255, 255)",
+          "background": "rgb(29, 33, 41)",
+          "contrast": 16.131462775889503
+        }
+      ],
+      "background": "#20252e",
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "design": "system",
+      "dark": true,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(38, 38, 39)",
+          "contrast": 11.562808167509212
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(223, 226, 221)",
+          "background": "rgb(57, 57, 56)",
+          "contrast": 8.842145597197373
+        }
+      ],
+      "background": "#262627",
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "design": "system",
+      "dark": false,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        }
+      ],
+      "background": "#dfe2dd",
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "design": "gray",
+      "dark": true,
+      "results": [
+        {
+          "selector": "#choose-folder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recent-folders .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": ".folder-parent",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#home-hint",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#recommendations .select-row[aria-pressed=\"true\"]",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#run-task",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#command-preview",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#title-details summary",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(223, 226, 221)",
+          "contrast": 8.84874647359453
+        },
+        {
+          "selector": "#rename-title",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-form button",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        },
+        {
+          "selector": "#rename-title::placeholder",
+          "foreground": "rgb(44, 47, 126)",
+          "background": "rgb(205, 208, 211)",
+          "contrast": 7.470531345693342
+        }
+      ],
+      "background": "#dfe2dd",
+      "overflow": false
+    }
+  ],
+  "sha256": {
+    "ui/terminal.css": "fcd43d4c5630951256928b49eb13d333ae6ff752c8017f84167dce10619352cb",
+    "ui/terminal.html": "f81599eef064c4c7ea76982ba67451da36d484fcdf61c7a2861b4f1ff47a8bec",
+    "ui/terminal-appearance.mjs": "50e92b94f853e14d2af49940b46ee035f5bf716071eac7497f4a1d524ad8257b",
+    "scripts/terminal-theme-smoke.mjs": "895441d59b0694f979c2df2ecea4d4ae460f7fcbb2f1e610b53b64c567cfb25d"
+  }
+}

@@ -7,6 +7,9 @@ mod focus;
 mod instance;
 mod ipc;
 mod manager;
+mod update_policy;
+mod update_restore;
+mod updater;
 
 mod layout;
 mod local_trace;
@@ -372,6 +375,7 @@ fn apply_with_presentation(
     request: Request,
     presentation: entrance::Presentation,
 ) -> Result<Value, String> {
+    let _activity = updater::activity(app)?;
     request.validate()?;
     if privacy::onboarding_required(app)
         && !matches!(request.action, Action::Diagnostics | Action::Probe)
@@ -383,7 +387,7 @@ fn apply_with_presentation(
     }
     if matches!(request.action, Action::Diagnostics) {
         return Ok(
-            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
+            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"updater":updater::diagnostics(app),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
         );
     }
     if matches!(request.action, Action::Probe) {
@@ -538,6 +542,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(feedback::Feedbacks::default())
         .manage(feedback_window::Surfaces::default())
         .manage(entrance::Entrances::default())
+        .manage(updater::Updates::default())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(layout::Exclusions::default())
         .manage(layout::OpenOrder::default())
         .manage(sizing::Sizes::default())
@@ -549,6 +555,14 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .invoke_handler({
             let handler: Box<dyn Fn(tauri::ipc::Invoke) -> bool + Send + Sync> =
                 Box::new(tauri::generate_handler![
+                    updater::updater_status,
+                    updater::updater_check,
+                    updater::updater_install,
+                    updater::updater_notice_status,
+                    updater::updater_notice_ready,
+                    updater::updater_notice_install,
+                    updater::updater_notice_dismiss,
+                    updater::updater_ack,
                     skills::skills_list,
                     skills::skills_set,
                     privacy::privacy_status,
@@ -612,6 +626,12 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     return true;
                 }
                 let command = invoke.message.command();
+                if updater::frozen(invoke.message.webview_ref().app_handle())
+                    && !command.starts_with("updater_")
+                {
+                    invoke.resolver.reject("업데이트 설치를 준비하고 있습니다");
+                    return true;
+                }
                 let exempt = matches!(
                     command,
                     "manager_set_theme" // Local cosmetic-only manager command.
@@ -644,6 +664,17 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                     api.prevent_close();
                     let _ = win.hide();
+                }
+                return;
+            }
+            if win.label() == "updater-notice" {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    if let Some(window) = win.app_handle().get_webview_window(win.label()) {
+                        if let Err(error) = updater::close_notice(&window) {
+                            eprintln!("업데이트 안내를 닫지 못했습니다: {error}");
+                        }
+                    }
                 }
                 return;
             }
@@ -761,6 +792,14 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     capture::place(&win, &bounds)?;
                 }
             }
+            let restored_update = match update_restore::restore(app.handle()) {
+                Ok(restored) => restored,
+                Err(error) => {
+                    eprintln!("업데이트 창 복원 실패: {error}");
+                    true
+                }
+            };
+            updater::initialize(app.handle());
             tray::install(app.handle())?;
             capture::install(app.handle())?;
             stash::install(app.handle())?;
@@ -769,7 +808,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::install_contact_monitor(app.handle());
             #[cfg(windows)]
             windows_contact::install(app.handle());
-            if initial_open {
+            if initial_open && !restored_update {
                 apply_direct(
                     app.handle(),
                     Request {
@@ -853,6 +892,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
 
 #[cfg(target_os = "macos")]
 fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
+    let _update_activity = updater::activity(app)?;
     let mut visible = false;
     // Only note windows count; capture overlays must not prevent reopening.
     let ids: Vec<_> = app
