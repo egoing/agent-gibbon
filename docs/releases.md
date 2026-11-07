@@ -1,6 +1,6 @@
 # 자동 릴리스
 
-`.github/workflows/release.yml`은 `v*` 태그 push 또는 `workflow_dispatch` 수동 요청으로 실행합니다. 일반 브랜치 push는 이 워크플로를 실행하지 않습니다. 수동 실행도 세 플랫폼의 검증·설치 파일·서명 updater 자산·`latest.json`·체크섬까지 만들고 완성 자산을 Actions artifact로 보관하지만 GitHub Release를 만들지는 않습니다. 수동 실행은 각 runner에서 일회용 updater 키를 만들어 빌드 검증에만 씁니다. 버전이 일치하는 `vX.Y.Z` 태그 push만 검증·빌드 성공 후 공개로 이어집니다. 수동 실행을 요청하려면 이 워크플로가 기본 브랜치에 있어야 합니다.
+`.github/workflows/release.yml`은 `v*` 태그 push 또는 `workflow_dispatch` 수동 요청으로 실행합니다. 일반 브랜치 push는 이 워크플로를 실행하지 않습니다. 수동 실행도 세 플랫폼의 검증·설치 파일·서명 updater 자산·`latest.json`·체크섬까지 만들고 완성 자산을 Actions artifact로 보관하지만 GitHub Release를 만들지는 않습니다. 수동 실행은 각 runner에서 일회용 updater 키를 만들어 빌드 검증에만 씁니다. 버전이 일치하는 `vX.Y.Z` 태그 push만 검증·빌드 성공 후 Draft를 준비합니다. 수동 실행을 요청하려면 이 워크플로가 기본 브랜치에 있어야 합니다.
 
 ## 필요할 때 전체 검사 요청
 
@@ -50,7 +50,7 @@ git push origin v0.2.8
 - lockfile을 고정하여 Apple Silicon DMG, Intel DMG, Windows NSIS EXE와 세 플랫폼의 updater 자산을 빌드합니다. updater target은 `darwin-aarch64`, `darwin-x86_64`, `windows-x86_64`이며 Linux는 지원 범위에 포함하지 않습니다. CI는 화면 조작이나 실제 설치 검증을 대신하지 않습니다.
 - 모든 빌드 성공 후 정확한 버전의 설치 파일과 updater 번들·서명 세트를 확인합니다. 서명은 Tauri updater가 읽는 Base64 minisign 형식이어야 하며, 실제 payload·trusted comment의 Ed25519 서명을 검증합니다. trusted comment는 manifest의 안정 버전·플랫폼 파일명과 일치해야 합니다. macOS updater 아카이브는 CPU별 이름으로 바꾼 뒤 다시 서명합니다. 앱은 `requireSignedVersion`을 켜 두어 실제 서명을 검증하고, 서명에 포함된 버전과 manifest 버전이 다르면 업데이트를 거부합니다. 자산이 모두 유효할 때 `latest.json`과 설치 파일·updater 번들·서명·플랫폼별 공개 키 파일의 `SHA256SUMS.txt`를 생성합니다.
 - `latest.json`은 각 release에 업로드되는 정적 manifest입니다. `version`과 세 플랫폼별 `url`·Base64 `signature`를 담고, URL은 해당 `vX.Y.Z` GitHub Release의 updater 파일을 가리킵니다. 앱은 GitHub Releases의 `latest/download/latest.json`을 조회하므로 새 버전을 `--latest`로 공개하면 별도 업데이트 서버 없이 manifest와 번들을 가져옵니다.
-- 게시 작업에만 `contents: write`를 부여합니다. Draft에 파일을 모두 업로드한 뒤 공개합니다. 한 플랫폼이라도 실패하면 게시 작업이 실행되지 않습니다.
+- 게시 작업에만 `contents: write`를 부여합니다. Draft에 파일을 업로드하고 검증한 뒤 대기합니다. 태그 실행의 성공과 대상 버전을 확인하고, 사용자가 공개를 지시하면 `gh release edit vX.Y.Z --draft=false --latest`로 공개한 뒤 latest.json과 세 다운로드 URL을 확인합니다. 한 플랫폼이라도 실패하면 게시 작업이 실행되지 않습니다.
 - 업로드 실패 시 남은 Draft는 자동 덮어쓰지 않습니다. 담당자가 실패 원인과 Draft를 확인하고 미공개 Draft를 정리한 후 실패 작업을 재실행합니다. 이미 공개한 버전은 새 버전으로 수정합니다.
 
 ## 자동 업데이트 서명 키와 최초 업데이트
@@ -64,7 +64,7 @@ git push origin v0.2.8
 - 장기 개인 키 생성과 보관은 릴리스 준비 작업입니다. 2026-11-07 사용자 승인으로 Mac Keychain(service `AGENT_GIBBON_TAURI_UPDATER`, account는 로컬 로그인 사용자)과 Actions secret/공개 variable에 등록했습니다. Enpass 백업 항목을 저장한 뒤 다시 열어 비밀 필드의 길이와 공개 키·복구 설명을 확인했습니다. 마스킹된 비밀 키의 원문 일치 및 실제 복구는 검증하지 않았습니다. 키를 잃으면 기존 설치본의 업데이트 서명을 만들 수 없으므로 두 백업의 접근성과 복구 가능성을 확인해야 합니다.
 - `workflow_dispatch`는 각 플랫폼 runner에서 일회용 키를 만들고 빌드 및 manifest 검증 후 폐기합니다. 이 키는 공개되지 않고 다음 실행에도 재사용되지 않으므로 수동 실행 artifact는 실제 배포 키로 서명된 업데이트가 아닙니다.
 
-현재 공개된 `0.2.7` 이하 설치본에는 updater 공개 키가 포함되어 있지 않습니다. 해당 사용자는 updater가 포함된 첫 버전을 한 번 수동으로 내려받아 설치해야 이후 버전부터 앱 내 업데이트를 받을 수 있습니다. 태그를 공개하기 전에 macOS와 Windows 각각에서 첫 설치와 이후 업데이트를 확인해야 합니다.
+`0.2.7` 이하 설치본에는 updater 공개 키가 포함되어 있지 않습니다. `0.2.8`은 다운로드 URL 오류가 있으므로, `0.2.8` 이하 사용자는 `0.2.9` 이상을 한 번 수동 설치해야 이후 버전부터 앱 내 업데이트를 받을 수 있습니다. 새 버전 공개 후에는 이전 정상 배포판에서 확인·다운로드·설치·재시작과 실제 실행 버전을 확인하고, 수행한 플랫폼과 미검증 플랫폼을 구분해 기록합니다.
 
 ## 오류 수집과 OS 서명
 

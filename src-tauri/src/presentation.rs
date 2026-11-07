@@ -47,16 +47,10 @@ fn shortcut_for(raw: &str, mac: bool) -> String {
 fn chord(raw: &str, mac: bool) -> String {
     raw.split('+')
         .map(|part| match part {
-            "Ctrl" | "Control" => {
-                if mac {
-                    "Control"
-                } else {
-                    "Ctrl"
-                }
-            }
+            "Ctrl" | "Control" => "Ctrl",
             "Alt" | "Option" => {
                 if mac {
-                    "Option"
+                    "Opt"
                 } else {
                     "Alt"
                 }
@@ -64,7 +58,7 @@ fn chord(raw: &str, mac: bool) -> String {
             "Shift" => "⇧",
             "Cmd" | "Command" | "Win" | "Super" => {
                 if mac {
-                    "Command"
+                    "⌘"
                 } else {
                     "Win"
                 }
@@ -124,13 +118,13 @@ mod tests {
     #[test]
     fn display_keys_follow_os_without_changing_raw_contract() {
         let raw = "Ctrl+Shift+1";
-        assert_eq!(shortcut_for(raw, true), "Control ⇧ 1");
+        assert_eq!(shortcut_for(raw, true), "Ctrl ⇧ 1");
         assert_eq!(shortcut_for(raw, false), "Ctrl ⇧ 1");
-        assert_eq!(shortcut_for("Ctrl+Alt+Cmd", true), "Control Option Command");
+        assert_eq!(shortcut_for("Ctrl+Alt+Cmd", true), "Ctrl Opt ⌘");
         assert_eq!(shortcut_for("Ctrl+Alt+Win", false), "Ctrl Alt Win");
         assert_eq!(
             shortcut_for("Ctrl+Alt+Cmd 사용 중 · 트레이로 실행", true),
-            "Control Option Command 사용 중 · 트레이로 실행"
+            "Ctrl Opt ⌘ 사용 중 · 트레이로 실행"
         );
         assert_eq!(raw, "Ctrl+Shift+1");
     }
@@ -148,8 +142,8 @@ mod tests {
         );
         assert_eq!(
             shortcut_for("Ctrl+Alt+Cmd 사용 중 · 트레이로 실행", true),
-            "Control Option Command 사용 중 · 트레이로 실행"
+            "Ctrl Opt ⌘ 사용 중 · 트레이로 실행"
         );
-        assert_eq!(shortcut_for("Ctrl+Alt+Cmd", true), "Control Option Command");
+        assert_eq!(shortcut_for("Ctrl+Alt+Cmd", true), "Ctrl Opt ⌘");
     }
 }

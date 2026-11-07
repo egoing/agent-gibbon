@@ -41,3 +41,9 @@ GUI 버튼 조작·실제 첫 약관 수락 흐름·저장 메모의 프로세�
 ## 마무리 검증 — 2026-11-08
 
 최종 문구 상태에서 `npm test`(Rust 206개·UI 169개), `npm run check`, Rustfmt, `git diff --check`를 다시 실행해 통과했다. 이 시점 개발 앱은 실행 중이 아니므로 진행 메모를 다시 열거나 다른 인스턴스로 대체하지 않았다. 위 2026-11-07 실제 CLI 검증은 당시의 실행 기록이며 이번 마무리에서 재실행한 것으로 간주하지 않는다.
+
+### 최신 main 통합 검증
+
+기준 `origin/main` = `5f138f97d79c79a5846e1be6c73ba8519ad2d999`와 통합했다. 디자인 문서 상단 충돌은 최초 안내와 기존 업데이트 UI 절을 모두 보존해 해결했다. 통합 후 Rust 208개·UI 172개, Clippy, Rustfmt, `npm run dev:build`, `npm run version:check`(0.2.11) 통과. 버전 변경은 기존 main에서 가져온 것으로 이번 PR의 변경은 아니다. `git diff origin/main --check`는 통과했다. 병합 중 전체 staged diff 검사에서 기존 main의 `docs/verification/issue54-checks/rust.log` 끝 빈 줄이 검출됐으며, 이번 작업과 무관한 기존 기록은 변경하지 않았다.
+
+PR 범위는 안내 문구·기본 본문 렌더링·정적 대기 문구 제거·관련 디자인/검증 문서 7개 파일이다. OS별 코드·의존성·릴리스 설정의 PR 차이는 없어 전체 플랫폼 CI는 요청하지 않았다. 관련 이슈는 #113이며 병합 SHA와 로컬 main 동기화 결과는 해당 이슈의 마무리 댓글에 기록한다. 이 워크트리는 Codex 작업용이며 Orca 워크스페이스 삭제 대상이 아니다.

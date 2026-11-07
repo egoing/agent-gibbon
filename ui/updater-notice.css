@@ -13,16 +13,18 @@
   :root { --surface:#262627; --text:#dfe2dd; --muted:#b9bcb7; --border:#444; --control-border:#8a8d88; --button:#393938; --focus:#dfe2dd; }
 }
 * { box-sizing:border-box }
-body { margin:0; min-width:320px; background:var(--surface); color:var(--text) }
-main { padding:22px 24px 18px }
-.eyebrow { margin:0 0 5px; color:var(--muted); font-size:11px; letter-spacing:.06em }
-h1 { margin:0; font-size:19px; line-height:1.35 }
-.version { margin:7px 0 12px; color:var(--muted) }
-#notice-message { margin:0; padding:10px 12px; border:1px solid var(--border); background:color-mix(in srgb,var(--button) 55%,var(--surface)); border-radius:4px; overflow-wrap:anywhere }
-.detail { margin:10px 0 0; color:var(--muted); font-size:12px }
-.actions { display:flex; justify-content:flex-end; gap:8px; margin-top:16px }
-button { min-height:36px; padding:6px 12px; border:1px solid var(--control-border); border-radius:3px; background:var(--button); color:var(--text); font:inherit; cursor:pointer }
+html, body { height:100%; overflow:hidden }
+body { margin:0; background:var(--surface); color:var(--text) }
+main { height:100%; padding:14px 16px; display:flex; flex-direction:column; gap:12px }
+.notice-content { min-height:0; flex:1; overflow:auto; overflow-wrap:anywhere }
+h1 { margin:0; font-size:16px; line-height:1.4 }
+.version { margin:4px 0 0; color:var(--muted); font-size:12px }
+#notice-message { margin:8px 0 0; font-size:13px }
+[hidden] { display:none!important }
+.actions { display:flex; justify-content:flex-end; gap:8px; flex-shrink:0 }
+button { min-height:32px; padding:5px 10px; border:1px solid var(--control-border); border-radius:4px; background:var(--button); color:var(--text); font:13px/1.5 system-ui,sans-serif; cursor:pointer }
+#notice-install { background:var(--text); color:var(--surface); border-color:var(--text) }
 button:focus-visible { outline:2px solid var(--focus); outline-offset:2px }
-button:disabled { color:var(--muted); cursor:default; opacity:.72 }
+button:disabled { cursor:default; opacity:.65 }
 button:hover:not(:disabled) { filter:brightness(.94) }
 @media (prefers-color-scheme: dark) { button:hover:not(:disabled) { filter:brightness(1.16) } }

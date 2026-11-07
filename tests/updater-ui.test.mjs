@@ -97,3 +97,23 @@ test('request errors use safe text and expose an alert', async () => {
   assert.equal(app.elements.get('updater-message').textContent, '업데이트를 확인하지 못했습니다. 다시 시도하세요.');
   assert.equal(app.elements.get('updater-message').attrs.role, 'alert');
 });
+
+test('compact settings hide unavailable installation and empty detail', async () => {
+  const app = setup();
+  await app.run('window.gibbonUpdater.refresh()');
+  assert.equal(app.elements.get('updater-install').hidden, true);
+  assert.equal(app.elements.get('updater-message').hidden, true);
+  app.setStatus({ phase: 'ready', current_version: '1.2.3', version: '1.3.0', message: '편집을 저장한 뒤 다시 시도하세요.' });
+  await app.run('window.gibbonUpdater.refresh()');
+  assert.equal(app.elements.get('updater-install').hidden, false);
+  assert.equal(app.elements.get('updater-message').hidden, false);
+  assert.equal(app.elements.get('updater-install').disabled, false);
+  app.setStatus({ phase: 'preparing', version: '1.3.0', message: '작업 상태 확인 중' });
+  await app.run('window.gibbonUpdater.refresh()');
+  assert.equal(app.elements.get('updater-install').hidden, false);
+  assert.equal(app.elements.get('updater-install').disabled, true);
+  app.setStatus({ phase: 'error', message: '서명 검증 실패' });
+  await app.run('window.gibbonUpdater.refresh()');
+  assert.equal(app.elements.get('updater-install').hidden, true);
+  assert.equal(app.elements.get('updater-message').attrs.role, 'alert');
+});
