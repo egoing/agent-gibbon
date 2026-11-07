@@ -196,26 +196,17 @@ fn show_frame(w: &WebviewWindow) -> Result<(), String> {
 }
 struct EscapeGate {
     armed: bool,
-    last: Option<Instant>,
 }
 impl EscapeGate {
-    fn step(&mut self, distance: f64, now: Instant, tip_visible: bool) -> bool {
-        // The initial hint must not swallow the first approach. Only a hint
-        // after an escape protects reading time; do not queue reentry in it.
-        if self.last.is_some() && tip_visible {
-            return false;
-        }
+    fn step(&mut self, distance: f64) -> bool {
+        // Only sampled while stationary. A flight disarms the gate and input
+        // during flight is not queued. Hint lifetime never blocks a fresh exit
+        // and reentry; hysteresis prevents a held pointer from chasing the icon.
         if distance > 96.0 {
             self.armed = true;
         }
-        if self.armed
-            && distance < 56.0
-            && self
-                .last
-                .is_none_or(|last| now.duration_since(last) >= Duration::from_secs(2))
-        {
+        if self.armed && distance < 56.0 {
             self.armed = false;
-            self.last = Some(now);
             true
         } else {
             false
@@ -565,10 +556,7 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
         animating: true,
         area,
         top: false,
-        gate: EscapeGate {
-            armed: true,
-            last: None,
-        },
+        gate: EscapeGate { armed: true },
         tip_until: now,
         displayed: None,
         flight: None,
@@ -696,7 +684,7 @@ fn tick(app: &tauri::AppHandle) -> Result<(), String> {
         geometry(&w, next, w.scale_factor().map_err(err)?)?;
         return Ok(());
     }
-    if s.displayed.is_some() && s.gate.step(distance, now, now < s.tip_until) {
+    if s.displayed.is_some() && s.gate.step(distance) {
         s.top = !s.top;
         s.flight = Some((r, now));
         s.displayed = Some((s.top, false));
@@ -858,29 +846,27 @@ mod tests {
         assert_eq!((end.x, end.y, end.w, end.h), (r.x, r.y, r.w, r.h));
     }
     #[test]
-    fn escape_requires_exit_and_cooldown() {
-        let now = Instant::now();
-        let mut g = EscapeGate {
-            armed: true,
-            last: None,
-        };
-        assert!(
-            g.step(20., now, true),
-            "initial hint permits first approach"
-        );
-        assert!(!g.step(20., now + Duration::from_secs(3), true));
-        assert!(!g.step(100., now + Duration::from_secs(3), true));
-        assert!(
-            !g.step(20., now + Duration::from_secs(7), false),
-            "protected exit is not queued"
-        );
-        assert!(!g.step(96., now + Duration::from_secs(7), false));
-        assert!(!g.step(100., now + Duration::from_secs(7), false));
-        assert!(!g.step(56., now + Duration::from_secs(7), false));
-        assert!(g.step(20., now + Duration::from_secs(7), false));
-        g.step(100., now + Duration::from_secs(7), false);
-        assert!(!g.step(20., now + Duration::from_millis(7500), false));
-        assert!(g.step(20., now + Duration::from_secs(9), false));
+    fn reentry_during_hint_does_not_wait_for_hint_or_cooldown() {
+        let mut gate = EscapeGate { armed: true };
+        for _ in 0..3 {
+            assert!(gate.step(20.));
+            assert!(!gate.step(100.));
+        }
+    }
+    #[test]
+    fn escape_requires_fresh_exit_and_reentry_without_pointer_chase() {
+        let mut gate = EscapeGate { armed: true };
+        assert!(!gate.step(56.));
+        assert!(gate.step(55.));
+        // Arrival under a stationary pointer, and jitter in the hysteresis
+        // band, must not schedule another flight even after the hint expires.
+        for distance in [0., 55., 56., 70., 96., 20., 0.] {
+            assert!(!gate.step(distance));
+        }
+        assert!(!gate.step(97.));
+        assert!(!gate.step(56.));
+        assert!(gate.step(55.));
+        assert!(!gate.step(55.));
     }
     #[test]
     fn unplugged_and_oversized_rectangles_stay_in_work_area() {

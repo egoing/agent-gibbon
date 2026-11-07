@@ -105,8 +105,10 @@ try:
     settled=wait(a,lambda s:not s['stash']['indicator_moving'] and s['stash']['tip_visible'])
     escaped=settled['stash']['indicator'];report['indicator_escaped']=escaped
     assert any(min(r['y'],escaped['y']) < v['indicator']['y'] < max(r['y'],escaped['y']) for v in motion),motion
-    move(escaped['x']+escaped['width']-24,escaped['y']+24);time.sleep(.3)
-    assert inspect(a)['stash']['indicator']==escaped
+    move(escaped['x']+escaped['width']-24,escaped['y']+24)
+    wait(a,lambda s:s['stash']['indicator_moving'] and not s['stash']['tip_visible'])
+    move(*target)
+    escaped=wait(a,lambda s:not s['stash']['indicator_moving'] and s['stash']['tip_visible'])['stash']['indicator']
     move(*target);shot('indicator-tip','stash-indicator')
     text=helper('ax',PID,TITLE+'stash-indicator','dump')
     assert 'Control Option Command' in text and '다시 누르면 창 복원' in text,text
@@ -115,7 +117,7 @@ try:
     move(escaped['x']+escaped['width']-24,escaped['y']+24)
     wait(a,lambda s:s['stash']['indicator_moving']);move(*target)
     wait(a,lambda s:not s['stash']['indicator_moving'] and s['stash']['tip_visible'])
-    passed('cursor-monitor icon, escape, 6s readable actual-key tip, cooldown/reentry, no focus steal')
+    passed('cursor-monitor icon, immediate reentry, independent 6s actual-key tip, no focus steal')
     cli('update',a,'--markdown',f'# {PREFIX}\n외부 갱신')
     assert not inspect(a)['visible']
     cli('open',d,'--markdown',PREFIX+' 새 창');wait(d,lambda s:s['visible'])

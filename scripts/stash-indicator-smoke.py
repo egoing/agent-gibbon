@@ -52,9 +52,11 @@ with tempfile.TemporaryDirectory() as tmp:
         end=wait(lambda s:not s['indicator_moving'] and s['tip_visible']);save('flight',frames)
         y=end['indicator']['y'];assert any(min(y,r['y'])<s['indicator']['y']<max(y,r['y']) for s in frames)
         time.sleep(.15);shot('arrived');assert helper('front')==focus
-        helper('pointer','move',end['indicator']['x']+end['indicator']['width']-24,y+24);time.sleep(.5)
-        assert not cli('inspect')['stash']['indicator_moving']
-        report['checks'].append('intermediate eased flight positions, no bubble during flight, bubble after arrival, cooldown')
+        helper('pointer','move',end['indicator']['x']+end['indicator']['width']-24,y+24)
+        wait(lambda s:s['indicator_moving'] and not s['tip_visible'])
+        helper('pointer','move',600,500)
+        wait(lambda s:not s['indicator_moving'] and s['tip_visible'])
+        report['checks'].append('intermediate eased flight positions, no bubble during flight, bubble after arrival, immediate reentry')
         helper('pointer','move',600,500);helper('key');wait(lambda s:not s['active'])
         assert cli('inspect')['visible'];report['checks'].append('same shortcut restores note')
         report['result']='passed'

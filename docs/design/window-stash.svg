@@ -22,7 +22,7 @@
 <path class="tip" d="M702 252H936V264L944 270L936 276V287H702Z"/><text x="714" y="274" style="font-size:12px">Ctrl+Alt+Cmd · 다시 누르면 창 복원</text><text x="568" y="155">420ms ease-out · 이동 / 축소 / 흐려짐 → 숨김</text>
 <text x="30" y="354" class="label">03 · 420ms 이징 이동 → 정지 후 말풍선</text><text x="550" y="354" class="label">04 · 같은 420ms 애니메이션으로 복원</text>
 <rect class="screen" x="30" y="373" width="460" height="180" rx="4"/><rect class="screen" x="550" y="373" width="460" height="180" rx="4"/>
-<path class="tip" d="M185 388H427V398L435 404L427 410V422H185Z"/><text x="195" y="409" style="font-size:12px">Ctrl+Alt+Cmd · 다시 누르면 창 복원</text>
+<path class="tip" d="M245 388H427V398L435 404L427 410V422H245Z"/><text x="253" y="409" style="font-size:12px">내용에 맞춘 안내 크기</text>
 <g transform="translate(438 384)" fill="none" stroke="#514b40" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
  <path d="M10 29Q7 35 12 38H28Q33 35 30 29" fill="#786e59"/>
  <ellipse cx="7" cy="18" rx="4" ry="5" fill="#a99875"/><ellipse cx="33" cy="18" rx="4" ry="5" fill="#a99875"/>
@@ -36,7 +36,7 @@
 </g>
 <path d="M458 516V439m-6 8 6-8 6 8" fill="none" stroke="#929cab" stroke-width="2" stroke-dasharray="6 5"/>
 <path d="m448 525 1-21 15 15-8 0-2 8z" fill="#fff" stroke="#263238"/>
-<text x="48" y="469">56px 접근 / 96px 바깥으로 나가 재진입</text><text x="48" y="497">첫 접근 즉시 회피 · 이후 안내 6초 보호</text><text x="48" y="525">이동 중 말풍선 숨김 · 정지 후 6초 안내</text>
+<text x="48" y="469">56px 접근 / 96px 바깥으로 나가 재진입</text><text x="48" y="497">매 도착 후 이탈·재진입 즉시 회피</text><text x="48" y="525">이동 중 입력 예약 없음 · 정지 후 최대 6초 안내</text>
 <rect class="memo" x="575" y="400" width="175" height="90" rx="4"/><text x="587" y="424">편집 중인 메모</text><text x="587" y="452">커지고 선명해지며 복원</text><rect class="memo" x="790" y="398" width="150" height="12" rx="4"/>
 <rect x="805" y="448" width="110" height="75" rx="4" fill="#c9eff7" stroke="#7c9fa8"/><text x="820" y="488">캡처 메모</text>
 <text x="30" y="594">원래 숨겨진 창은 열지 않음 · 개별 열기/숨기기 우선 · 새 열기는 기존 창을 재배치하지 않음</text><text x="30" y="622">현재 프레임에서 방향 반전 · 원래 위치로 복원 · 모니터 해제 시 화면 안 보정</text>
