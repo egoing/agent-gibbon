@@ -1,0 +1,28 @@
+:root {
+  color-scheme: light dark;
+  --surface: #f8f8f8;
+  --text: #2d2d2d;
+  --muted: #626262;
+  --border: #d6d6d6;
+  --control-border: #858585;
+  --button: #ffffff;
+  --focus: #2d2d2d;
+  font: 14px/1.5 system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --surface:#262627; --text:#dfe2dd; --muted:#b9bcb7; --border:#444; --control-border:#8a8d88; --button:#393938; --focus:#dfe2dd; }
+}
+* { box-sizing:border-box }
+body { margin:0; min-width:320px; background:var(--surface); color:var(--text) }
+main { padding:22px 24px 18px }
+.eyebrow { margin:0 0 5px; color:var(--muted); font-size:11px; letter-spacing:.06em }
+h1 { margin:0; font-size:19px; line-height:1.35 }
+.version { margin:7px 0 12px; color:var(--muted) }
+#notice-message { margin:0; padding:10px 12px; border:1px solid var(--border); background:color-mix(in srgb,var(--button) 55%,var(--surface)); border-radius:4px; overflow-wrap:anywhere }
+.detail { margin:10px 0 0; color:var(--muted); font-size:12px }
+.actions { display:flex; justify-content:flex-end; gap:8px; margin-top:16px }
+button { min-height:36px; padding:6px 12px; border:1px solid var(--control-border); border-radius:3px; background:var(--button); color:var(--text); font:inherit; cursor:pointer }
+button:focus-visible { outline:2px solid var(--focus); outline-offset:2px }
+button:disabled { color:var(--muted); cursor:default; opacity:.72 }
+button:hover:not(:disabled) { filter:brightness(.94) }
+@media (prefers-color-scheme: dark) { button:hover:not(:disabled) { filter:brightness(1.16) } }

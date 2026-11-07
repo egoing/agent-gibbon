@@ -1,16 +1,17 @@
 //! Downloading never grants permission to exit. Native activity reservations and
 //! an acknowledgement from every WebView precede the final installation gate.
 use crate::update_policy::Safety;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{
     sync::{Arc, Mutex},
     time::{Duration, Instant},
 };
-use tauri::{Emitter, Manager};
+use tauri::{Emitter, Manager, WebviewWindow, WebviewWindowBuilder};
 use tauri_plugin_updater::{Update, UpdaterExt};
 const ENDPOINT: &str =
     "https://github.com/egoing/agent-gibbon/releases/latest/download/latest.json";
 const IDLE_SECONDS: f64 = 300.;
+const NOTICE_LABEL: &str = "updater-notice";
 const PUBLIC_KEY: &str = match option_env!("TAURI_UPDATER_PUBLIC_KEY") {
     Some(key) => key,
     None => "",
@@ -42,6 +43,10 @@ pub struct Updates {
     status: Mutex<Status>,
     pending: Mutex<Option<(Update, Vec<u8>)>>,
     safety: Arc<Mutex<Safety>>,
+    notice_lock: Mutex<()>,
+    notice_pending_version: Mutex<Option<String>>,
+    notice_loaded: Mutex<bool>,
+    notice_displayed_version: Mutex<Option<String>>,
 }
 pub struct Activity(Arc<Mutex<Safety>>);
 impl Drop for Activity {
@@ -81,6 +86,28 @@ fn set(app: &tauri::AppHandle, phase: &str, message: &str) {
         s.message = message.into();
     }
 }
+fn set_ready_message(app: &tauri::AppHandle, version: &str, message: &str) {
+    if let Ok(mut current) = app.state::<Updates>().status.lock() {
+        if current.phase == "ready" && current.version.as_deref() == Some(version) {
+            current.message = message.into();
+        }
+    }
+}
+fn set_install_message(
+    app: &tauri::AppHandle,
+    version: &str,
+    phase: &str,
+    message: &str,
+) -> Result<(), String> {
+    let updates = app.state::<Updates>();
+    let mut current = updates.status.lock().map_err(err)?;
+    if current.phase != "preparing" || current.version.as_deref() != Some(version) {
+        return Err("업데이트 상태가 바뀌어 설치를 보류했습니다".into());
+    }
+    current.phase = phase.into();
+    current.message = message.into();
+    Ok(())
+}
 fn manager(window: &tauri::WebviewWindow) -> Result<(), String> {
     if window.label() != crate::manager::LABEL {
         Err("관리 창에서만 업데이트를 실행할 수 있습니다".into())
@@ -107,6 +134,41 @@ pub async fn updater_install(window: tauri::WebviewWindow) -> Result<Status, Str
         .await
         .map_err(err)??;
     status(window.app_handle())
+}
+fn notice_window(window: &WebviewWindow) -> Result<(), String> {
+    if window.label() == NOTICE_LABEL {
+        Ok(())
+    } else {
+        Err("업데이트 안내 창에서만 실행할 수 있습니다".into())
+    }
+}
+#[tauri::command]
+pub fn updater_notice_status(window: WebviewWindow) -> Result<Status, String> {
+    notice_window(&window)?;
+    status(window.app_handle())
+}
+#[tauri::command]
+pub fn updater_notice_ready(window: WebviewWindow) -> Result<(), String> {
+    notice_window(&window)?;
+    *window
+        .state::<Updates>()
+        .notice_loaded
+        .lock()
+        .map_err(err)? = true;
+    present_pending_notice(&window)
+}
+#[tauri::command]
+pub async fn updater_notice_install(window: WebviewWindow) -> Result<Status, String> {
+    notice_window(&window)?;
+    let app = window.app_handle().clone();
+    tauri::async_runtime::spawn_blocking(move || install(&app, false))
+        .await
+        .map_err(err)??;
+    status(window.app_handle())
+}
+#[tauri::command]
+pub fn updater_notice_dismiss(window: WebviewWindow) -> Result<(), String> {
+    close_notice(&window)
 }
 #[tauri::command]
 pub fn updater_ack(window: tauri::WebviewWindow, epoch: u64, safe: bool) -> Result<(), String> {
@@ -238,7 +300,315 @@ fn ready(app: &tauri::AppHandle, update: Update, bytes: Vec<u8>) -> Result<(), S
     s.message = "다운로드와 서명 검증을 마쳤습니다. 작업이 안전하게 끝나면 설치합니다".into();
     *app.state::<Updates>().pending.lock().map_err(err)? = Some((update, bytes));
     *app.state::<Updates>().status.lock().map_err(err)? = s;
+    evaluate_ready_later(app);
     Ok(())
+}
+
+#[derive(Deserialize, Serialize)]
+struct NoticeRecord {
+    version: String,
+}
+
+fn notice_record_path(app: &tauri::AppHandle) -> std::path::PathBuf {
+    app.state::<crate::storage::Store>()
+        .0
+        .join(".update-notice.json")
+}
+
+fn read_notice_version(path: &std::path::Path) -> Option<String> {
+    std::fs::read(path)
+        .ok()
+        .and_then(|bytes| serde_json::from_slice::<NoticeRecord>(&bytes).ok())
+        .map(|record| record.version)
+}
+
+fn last_notice_version(app: &tauri::AppHandle) -> Option<String> {
+    read_notice_version(&notice_record_path(app))
+}
+
+fn write_notice_version(path: &std::path::Path, version: &str) -> Result<(), String> {
+    use std::io::Write;
+    let parent = path.parent().ok_or("업데이트 안내 상태 폴더가 없습니다")?;
+    std::fs::create_dir_all(parent).map_err(err)?;
+    let mut temp = tempfile::Builder::new()
+        .prefix(".update-notice-")
+        .tempfile_in(parent)
+        .map_err(err)?;
+    serde_json::to_writer(
+        &mut temp,
+        &NoticeRecord {
+            version: version.into(),
+        },
+    )
+    .map_err(err)?;
+    temp.write_all(b"\n").map_err(err)?;
+    temp.as_file().sync_all().map_err(err)?;
+    temp.persist(path).map_err(|e| err(e.error))?;
+    Ok(())
+}
+
+fn close_notice_version(displayed: Option<&str>, _current_status: Option<&str>) -> Option<String> {
+    displayed.map(str::to_owned)
+}
+
+fn mark_notice_seen(app: &tauri::AppHandle, version: &str) -> Result<(), String> {
+    write_notice_version(&notice_record_path(app), version)
+}
+
+fn evaluate_ready_later(app: &tauri::AppHandle) {
+    if !enabled() {
+        return;
+    }
+    let app = app.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        evaluate_ready(&app, true);
+    });
+}
+
+fn preflight_reason(app: &tauri::AppHandle) -> Option<String> {
+    if crate::terminal::update_blocked(app).unwrap_or(true) {
+        return Some("터미널 작업이 실행 중이거나 시작되고 있습니다. 종료를 선택해 작업을 마친 뒤, 숨긴 터미널도 관리 창에서 삭제하고 다시 시도하세요.".into());
+    }
+    if crate::capture::update_blocked(app) {
+        return Some("화면 캡처나 영역 선택이 끝난 뒤 다시 시도하세요.".into());
+    }
+    if crate::stash::active(app) || crate::stash::chord_busy(app) {
+        return Some("메모 숨김·복원 동작이 끝난 뒤 다시 시도하세요.".into());
+    }
+    crate::update_restore::check(app).err()
+}
+
+fn evaluate_ready(app: &tauri::AppHandle, try_automatic_install: bool) {
+    if !enabled() || crate::privacy::onboarding_required(app) {
+        return;
+    }
+    let Ok(current) = status(app) else { return };
+    if current.phase != "ready" {
+        return;
+    }
+    let Some(version) = current.version else {
+        return;
+    };
+    let native_reason = preflight_reason(app);
+    let idle = idle_seconds();
+    let idle_ready = crate::update_policy::idle_hold_reason(idle, IDLE_SECONDS).is_none();
+    if try_automatic_install && native_reason.is_none() && idle_ready {
+        // Attempt immediately after verification once idle is already met.
+        // install() repeats every safety check before writing state or restart.
+        let _ = install(app, true);
+    }
+    let Ok(current) = status(app) else { return };
+    if current.phase != "ready" {
+        return;
+    }
+    let reason =
+        crate::update_policy::ready_hold_reason(idle, IDLE_SECONDS, native_reason.as_deref());
+    if let Some(reason) = reason {
+        set_ready_message(app, &version, &reason);
+    } else if current
+        .message
+        .starts_with("다운로드와 서명 검증을 마쳤습니다")
+    {
+        set_ready_message(
+            app,
+            &version,
+            "작업 중인 창이 있어 자동 설치를 보류했습니다. 상태를 확인한 뒤 다시 시도하세요.",
+        );
+    }
+    if let Err(error) = show_ready_notice(app) {
+        set_ready_message(
+            app,
+            &version,
+            "새 버전은 준비됐지만 안내 창을 표시하지 못했습니다. 설정에서 업데이트 상태를 확인하세요.",
+        );
+        eprintln!("업데이트 안내 창 표시 실패: {error}");
+    }
+}
+
+fn show_without_focus(window: &WebviewWindow) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let ptr = window.ns_window().map_err(err)?;
+        // SAFETY: Tauri owns this live NSWindow and this closure runs on the
+        // main thread. Ordering front does not make it key.
+        unsafe {
+            (&*(ptr as *const objc2_app_kit::NSWindow)).orderFrontRegardless();
+        }
+        crate::focus::restore(window);
+    }
+    #[cfg(windows)]
+    {
+        crate::windows_window::show_without_focus(window)?;
+        crate::focus::restore(window);
+    }
+    #[cfg(not(any(target_os = "macos", windows)))]
+    window.show().map_err(err)?;
+    Ok(())
+}
+
+fn show_ready_notice(app: &tauri::AppHandle) -> Result<(), String> {
+    let current = status(app)?;
+    if current.phase != "ready" || frozen(app) {
+        return Ok(());
+    }
+    let Some(version) = current.version else {
+        return Ok(());
+    };
+    let updates = app.state::<Updates>();
+    let loaded = {
+        let _serial = updates.notice_lock.lock().map_err(err)?;
+        if !crate::update_policy::should_show_notice(&version, last_notice_version(app).as_deref())
+        {
+            return Ok(());
+        }
+        *updates.notice_pending_version.lock().map_err(err)? = Some(version.clone());
+        *updates.notice_loaded.lock().map_err(err)?
+    };
+    on_main(app, move |app| {
+        let updates = app.state::<Updates>();
+        let _serial = updates.notice_lock.lock().map_err(err)?;
+        if updates
+            .notice_pending_version
+            .lock()
+            .map_err(err)?
+            .as_deref()
+            != Some(&version)
+        {
+            return Ok(());
+        }
+        let current = updates.status.lock().map_err(err)?;
+        if current.phase != "ready"
+            || current.version.as_deref() != Some(&version)
+            || frozen(&app)
+            || !crate::update_policy::should_show_notice(
+                &version,
+                last_notice_version(&app).as_deref(),
+            )
+        {
+            return Ok(());
+        }
+        let window = if let Some(window) = app.get_webview_window(NOTICE_LABEL) {
+            window
+        } else {
+            crate::focus::remember(&app, NOTICE_LABEL);
+            WebviewWindowBuilder::new(
+                &app,
+                NOTICE_LABEL,
+                tauri::WebviewUrl::App("updater-notice.html".into()),
+            )
+            .title("Agent Gibbon · 업데이트 준비 완료")
+            .inner_size(430., 320.)
+            .min_inner_size(360., 280.)
+            .decorations(true)
+            .resizable(true)
+            .always_on_top(true)
+            .skip_taskbar(true)
+            .visible(false)
+            .focused(false)
+            .background_throttling(tauri::utils::config::BackgroundThrottlingPolicy::Disabled)
+            .build()
+            .map_err(err)?
+        };
+        place_notice(&app, &window)?;
+        if loaded {
+            if !window.is_visible().map_err(err)? {
+                mark_notice_seen(&app, &version)?;
+                show_without_focus(&window)?;
+            } else {
+                mark_notice_seen(&app, &version)?;
+            }
+            *updates.notice_displayed_version.lock().map_err(err)? = Some(version.clone());
+            *updates.notice_pending_version.lock().map_err(err)? = None;
+        }
+        drop(current);
+        Ok(())
+    })
+}
+
+fn place_notice(app: &tauri::AppHandle, window: &WebviewWindow) -> Result<(), String> {
+    if let Ok(Some(monitor)) = window
+        .current_monitor()
+        .map(|m| m.or_else(|| app.primary_monitor().ok().flatten()))
+    {
+        let work = monitor.work_area();
+        let scale = window.scale_factor().map_err(err)?;
+        let width = (430. * scale).round() as i32;
+        let margin = (24. * scale).round() as i32;
+        window
+            .set_position(tauri::PhysicalPosition::new(
+                work.position.x + work.size.width as i32 - width - margin,
+                work.position.y + margin,
+            ))
+            .map_err(err)?;
+    }
+    Ok(())
+}
+
+fn present_pending_notice(window: &WebviewWindow) -> Result<(), String> {
+    let app = window.app_handle();
+    let updates = app.state::<Updates>();
+    let _serial = updates.notice_lock.lock().map_err(err)?;
+    let Some(version) = updates.notice_pending_version.lock().map_err(err)?.clone() else {
+        return Ok(());
+    };
+    drop(_serial);
+    on_main(app, {
+        let window = window.clone();
+        move |app| {
+            let updates = app.state::<Updates>();
+            let _serial = updates.notice_lock.lock().map_err(err)?;
+            if updates
+                .notice_pending_version
+                .lock()
+                .map_err(err)?
+                .as_deref()
+                != Some(&version)
+            {
+                return Ok(());
+            }
+            let current = updates.status.lock().map_err(err)?;
+            if current.phase != "ready"
+                || current.version.as_deref() != Some(&version)
+                || frozen(&app)
+                || !crate::update_policy::should_show_notice(
+                    &version,
+                    last_notice_version(&app).as_deref(),
+                )
+            {
+                return Ok(());
+            }
+            if window.is_visible().map_err(err)? {
+                mark_notice_seen(&app, &version)?;
+            } else {
+                mark_notice_seen(&app, &version)?;
+                show_without_focus(&window)?;
+            }
+            *updates.notice_displayed_version.lock().map_err(err)? = Some(version.clone());
+            *updates.notice_pending_version.lock().map_err(err)? = None;
+            drop(current);
+            Ok(())
+        }
+    })
+}
+
+pub fn close_notice(window: &WebviewWindow) -> Result<(), String> {
+    notice_window(window)?;
+    let app = window.app_handle();
+    let updates = app.state::<Updates>();
+    let _serial = updates.notice_lock.lock().map_err(err)?;
+    let current_version = status(app)?.version;
+    let displayed_version = updates
+        .notice_displayed_version
+        .lock()
+        .map_err(err)?
+        .clone();
+    if let Some(version) =
+        close_notice_version(displayed_version.as_deref(), current_version.as_deref())
+    {
+        mark_notice_seen(app, &version)?;
+    }
+    *updates.notice_pending_version.lock().map_err(err)? = None;
+    window.hide().map_err(err)
 }
 fn check_failed(current: &mut Status, previous: Option<Status>) {
     if let Some(mut ready) = previous {
@@ -338,29 +708,38 @@ fn safe_native(app: &tauri::AppHandle) -> Result<(), String> {
     }
     Ok(())
 }
-fn release(app: &tauri::AppHandle) {
-    if let Ok(mut s) = app.state::<Updates>().safety.lock() {
-        s.release();
+fn release(app: &tauri::AppHandle, epoch: u64) {
+    let released = app
+        .state::<Updates>()
+        .safety
+        .lock()
+        .is_ok_and(|mut safety| safety.release_epoch(epoch));
+    if released {
+        let _ = app.emit("updater-release", ());
     }
-    let _ = app.emit("updater-release", ());
 }
 fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
     if !enabled() {
         return Ok(());
     }
-    if automatic && idle_seconds().is_none_or(|s| s < IDLE_SECONDS) {
+    if !crate::update_policy::idle_allows_install(automatic, idle_seconds(), IDLE_SECONDS) {
         return Ok(());
     }
-    {
+    let install_version = {
         let state = app.state::<Updates>();
         let mut s = state.status.lock().map_err(err)?;
         if s.phase != "ready" {
             return Ok(());
         }
+        let Some(version) = s.version.clone() else {
+            return Ok(());
+        };
         s.phase = "preparing".into();
         s.message = "작업 상태를 확인하고 있습니다".into();
-    }
+        version
+    };
     let mut snapshot_written = false;
+    let mut prepared_epoch = None;
     let result: Result<(), String> = (|| {
         if crate::privacy::onboarding_required(app) {
             return Err("먼저 약관을 확인하세요".into());
@@ -368,15 +747,18 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
         let epoch = on_main(app, |app| {
             safe_native(&app)?;
             let labels: Vec<String> = app.webview_windows().keys().cloned().collect();
-            let epoch = app
-                .state::<Updates>()
-                .safety
-                .lock()
-                .map_err(err)?
-                .prepare(labels)?;
-            app.emit("updater-prepare", epoch).map_err(err)?;
+            let epoch = {
+                let state = app.state::<Updates>();
+                let mut safety = state.safety.lock().map_err(err)?;
+                safety.prepare(labels)?
+            };
+            if let Err(error) = app.emit("updater-prepare", epoch) {
+                release(&app, epoch);
+                return Err(err(error));
+            }
             Ok(epoch)
         })?;
+        prepared_epoch = Some(epoch);
         let deadline = Instant::now() + Duration::from_secs(3);
         loop {
             if app.state::<Updates>().safety.lock().map_err(err)?.refused() {
@@ -392,8 +774,18 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
             }
             std::thread::sleep(Duration::from_millis(50));
         }
+        let expected_version = install_version.clone();
         on_main(app, move |app| {
             safe_native(&app)?;
+            {
+                let updates = app.state::<Updates>();
+                let current = updates.status.lock().map_err(err)?;
+                if current.phase != "preparing"
+                    || current.version.as_deref() != Some(&expected_version)
+                {
+                    return Err("업데이트 상태가 바뀌어 설치를 보류했습니다".into());
+                }
+            }
             let safety = app.state::<Updates>();
             let gate = safety.safety.lock().map_err(err)?;
             if gate.epoch != epoch || !gate.ready() {
@@ -406,7 +798,12 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
             Ok(())
         })?;
         snapshot_written = true;
-        set(app, "installing", "업데이트를 설치하고 재시작합니다");
+        set_install_message(
+            app,
+            &install_version,
+            "installing",
+            "업데이트를 설치하고 재시작합니다",
+        )?;
         let pending = app.state::<Updates>();
         let pending = pending.pending.lock().map_err(err)?;
         let (update, bytes) = pending.as_ref().ok_or("다운로드된 업데이트가 없습니다")?;
@@ -420,8 +817,17 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
         if snapshot_written {
             crate::update_restore::discard(app);
         }
-        set(app, "ready", reason);
-        release(app);
+        if let Ok(mut current) = app.state::<Updates>().status.lock() {
+            if matches!(current.phase.as_str(), "preparing" | "installing")
+                && current.version.as_deref() == Some(&install_version)
+            {
+                current.phase = "ready".into();
+                current.message = reason.clone();
+            }
+        }
+        if let Some(epoch) = prepared_epoch {
+            release(app, epoch);
+        }
     }
     // A blocked installation is a retryable ready state, exposed to the UI.
     Ok(())
@@ -452,6 +858,7 @@ pub fn initialize(app: &tauri::AppHandle) {
             }
             let _ = install(&app, !resumed);
             resumed = false;
+            evaluate_ready(&app, false);
         }
     });
 }
@@ -655,5 +1062,33 @@ mod tests {
         assert_eq!(current.total, Some(123));
         check_failed(&mut current, None);
         assert_eq!(current.phase, "error");
+    }
+
+    #[test]
+    fn notice_version_is_atomically_persisted_and_deduplicated_across_reads() {
+        let root = tempfile::tempdir().unwrap();
+        let path = root.path().join("nested").join(".update-notice.json");
+        assert_eq!(read_notice_version(&path), None);
+        write_notice_version(&path, "1.3.0").unwrap();
+        assert_eq!(read_notice_version(&path).as_deref(), Some("1.3.0"));
+        assert!(!crate::update_policy::should_show_notice(
+            "1.3.0",
+            read_notice_version(&path).as_deref()
+        ));
+        assert!(crate::update_policy::should_show_notice(
+            "1.4.0",
+            read_notice_version(&path).as_deref()
+        ));
+        write_notice_version(&path, "1.4.0").unwrap();
+        assert_eq!(read_notice_version(&path).as_deref(), Some("1.4.0"));
+    }
+
+    #[test]
+    fn closing_an_old_notice_does_not_mark_a_newer_downloading_version_as_seen() {
+        assert_eq!(
+            close_notice_version(Some("1.3.0"), Some("1.4.0")),
+            Some("1.3.0".into())
+        );
+        assert_eq!(close_notice_version(None, Some("1.4.0")), None);
     }
 }

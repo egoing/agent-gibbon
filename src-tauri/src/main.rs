@@ -547,6 +547,10 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     updater::updater_status,
                     updater::updater_check,
                     updater::updater_install,
+                    updater::updater_notice_status,
+                    updater::updater_notice_ready,
+                    updater::updater_notice_install,
+                    updater::updater_notice_dismiss,
                     updater::updater_ack,
                     skills::skills_list,
                     skills::skills_set,
@@ -633,6 +637,17 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             if win.label() == manager::LABEL && privacy::onboarding_required(win.app_handle()) {
                 if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
                     win.app_handle().exit(0);
+                }
+                return;
+            }
+            if win.label() == "updater-notice" {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    if let Some(window) = win.app_handle().get_webview_window(win.label()) {
+                        if let Err(error) = updater::close_notice(&window) {
+                            eprintln!("업데이트 안내를 닫지 못했습니다: {error}");
+                        }
+                    }
                 }
                 return;
             }

@@ -106,3 +106,15 @@ Unix에서는 자손 PID와 foreground/process group에 SIGKILL을 보내며 Win
 `updater-build-config.mjs`가 환경의 공개 키를 JSON overlay의 `plugins.updater.pubkey`에 정확히 전달하도록 고쳤다. 값 보존·키 누락 거부 테스트 2개 및 전체 Node 140개, workflow YAML·11개 bash 구문 검사를 통과했다. 독립 감사자는 추가 blocker와 테스트 완화·baseline 퇴행·스코프 이탈이 없음을 확인했다. 운영 키를 교체하지 않았으며 재시도 결과와 최종 SHA는 PR에 기록한다.
 
 일회용 키를 생성해 실제 로컬 `tauri build --bundles app --config <overlay> -- --locked`를 실행했다. 앱·updater tar.gz·서명 파일 생성과 종료 코드 0을 확인했다(`/tmp/issue87-local-sign-build.log`). 테스트 개인 키는 임시 디렉터리 정리와 함께 폐기했고 설치된 앱은 교체하지 않았다. Windows 첫 CI도 동일한 공개 키 누락 오류임을 로그로 확인했다.
+
+## 추가 요구사항: 준비 완료 안내
+
+2026-11-07 사용자가 다운로드·서명 검증 완료 즉시 자동 설치 가능 여부를 검사하고, 보류 시 새 버전·구체적인 정리 방법과 `업데이트하고 재시작` 버튼을 제공하도록 확정했다. 별도 안내 창은 기존 메모·설정 창을 열거나 이동하지 않으며 버전별 표시 기록으로 반복 안내를 막는다. 버튼은 idle만 생략하고 PTY·편집·저장·캡처 등 안전 검사와 창 복원 경로를 유지한다.
+
+UI 준비 완료 이후 main thread에서 버전·ready·frozen 상태를 재검사해 창을 표시한다. 설치 예약은 획득한 epoch만 해제하며, 오래된 안내 평가가 진행 중인 설치 상태를 덮지 않는다. 닫기는 실제 표시한 버전만 기록한다. 새 안내 창은 메모 복원 대상에서 제외하고 이벤트 수신 권한만 제공한다. debug 자동 네트워크·안내는 계속 비활성화한다.
+
+최초 UI 테스트의 파일 부재 ENOENT는 유효한 red로 계산하지 않았다. 작업자는 터미널 보류 사유보다 idle 사유가 먼저 나오는 assertion 불일치를 재현했다고 보고했으나 원본 실패 로그를 보존·재확인하지 못했으므로 유효한 red 증거로 계산하지 않는다. 독립 감사에서 발견한 상태 덮어쓰기/예약 해제 경쟁과 오래된 안내 버전 기록을 수정했고 재검토에서 추가 blocker 없음, 테스트 완화·스코프 이탈 미발동을 확인했다. 추가 테스트 중 일부는 구현 후 작성했으므로 전체 추가 구현이 test-first였다고 주장하지 않는다.
+
+새 안내의 실환경 포커스·화면 크기·표시 후 지연 활성화는 미검증이며 시안 렌더와 코드/VM 검증으로 구분한다. 실제 앱 교체·새 릴리스 공개도 수행하지 않았다. 이전 SHA e6b89f1의 전체 CI 성공은 추가 변경의 실행 증거로 사용하지 않으며 새 SHA 검증은 PR #90에 기록한다.
+
+추가 변경 최종 로컬 결과: Rust 186개·Node 142개, cargo check --all-targets·Clippy -D warnings·Rustfmt·개발 바이너리 빌드 통과. `/tmp/issue87-cargo-test.log`, `/tmp/issue87-cargo-check.log`, `/tmp/issue87-clippy.log`, `/tmp/issue87-fmt.log`, `/tmp/issue87-notice-ui-full.log`, `/tmp/issue87-dev-build.log`. 독립 감사에서 기존 테스트 삭제·완화·퇴행·범위 이탈 미발동을 최종 확인했다. 추가 안내 기능은 유효한 red 원본 증거 부재로 is2 TDD 조건 충족을 주장하지 않는다.

@@ -7,6 +7,36 @@ pub struct Safety {
     pub epoch: u64,
     pub acknowledgements: BTreeMap<String, Option<bool>>,
 }
+
+/// A release gets one user-visible ready notice per version. The record is
+/// persisted by the updater after the non-focusing window is presented.
+pub fn should_show_notice(version: &str, last_shown: Option<&str>) -> bool {
+    !version.is_empty() && last_shown != Some(version)
+}
+
+pub fn idle_hold_reason(idle_seconds: Option<f64>, threshold: f64) -> Option<&'static str> {
+    match idle_seconds {
+        Some(seconds) if seconds.is_finite() && seconds >= threshold => None,
+        Some(_) => Some(
+            "최근 입력이 있어 자동 설치를 보류했습니다. 5분 동안 조작하지 않으면 자동 설치합니다.",
+        ),
+        None => Some("사용자 입력 상태를 확인할 수 없어 자동 설치를 보류했습니다."),
+    }
+}
+
+pub fn idle_allows_install(automatic: bool, idle_seconds: Option<f64>, threshold: f64) -> bool {
+    !automatic || idle_hold_reason(idle_seconds, threshold).is_none()
+}
+
+pub fn ready_hold_reason(
+    idle_seconds: Option<f64>,
+    threshold: f64,
+    native_reason: Option<&str>,
+) -> Option<String> {
+    native_reason
+        .map(str::to_owned)
+        .or_else(|| idle_hold_reason(idle_seconds, threshold).map(str::to_owned))
+}
 impl Safety {
     pub fn enter(&mut self) -> Result<(), String> {
         if self.frozen {
@@ -43,6 +73,14 @@ impl Safety {
         self.frozen = false;
         self.acknowledgements.clear();
     }
+
+    pub fn release_epoch(&mut self, epoch: u64) -> bool {
+        if !self.frozen || self.epoch != epoch {
+            return false;
+        }
+        self.release();
+        true
+    }
 }
 #[cfg(test)]
 mod tests {
@@ -77,5 +115,54 @@ mod tests {
         assert!(s.ready());
         s.release();
         assert!(!s.ready());
+    }
+
+    #[test]
+    fn ready_notice_is_deduplicated_by_exact_release_version() {
+        assert!(should_show_notice("1.3.0", None));
+        assert!(!should_show_notice("1.3.0", Some("1.3.0")));
+        assert!(should_show_notice("1.4.0", Some("1.3.0")));
+        assert!(!should_show_notice("", None));
+    }
+
+    #[test]
+    fn idle_gate_produces_a_specific_reason_or_allows_automatic_install() {
+        assert!(idle_hold_reason(Some(299.9), 300.0).is_some());
+        assert!(idle_hold_reason(None, 300.0).is_some());
+        assert_eq!(idle_hold_reason(Some(300.0), 300.0), None);
+        assert!(idle_hold_reason(Some(f64::NAN), 300.0).is_some());
+    }
+
+    #[test]
+    fn manual_install_skips_only_the_idle_gate() {
+        assert!(!idle_allows_install(true, Some(40.0), 300.0));
+        assert!(idle_allows_install(false, Some(40.0), 300.0));
+        assert!(!idle_allows_install(true, None, 300.0));
+        assert!(idle_allows_install(true, Some(300.0), 300.0));
+    }
+
+    #[test]
+    fn stale_installer_cannot_release_a_newer_frozen_epoch() {
+        let mut s = Safety::default();
+        let first = s.prepare(vec!["note-a".into()]).unwrap();
+        assert!(s.release_epoch(first));
+        let second = s.prepare(vec!["note-b".into()]).unwrap();
+        assert_ne!(first, second);
+        assert!(!s.release_epoch(first));
+        assert!(s.frozen);
+        assert!(!s.ready());
+        assert!(s.release_epoch(second));
+    }
+
+    #[test]
+    fn concrete_native_block_reason_precedes_the_idle_reminder() {
+        assert_eq!(
+            ready_hold_reason(
+                Some(40.0),
+                300.0,
+                Some("터미널 작업을 마친 뒤 다시 시도하세요.")
+            ),
+            Some("터미널 작업을 마친 뒤 다시 시도하세요.".into())
+        );
     }
 }

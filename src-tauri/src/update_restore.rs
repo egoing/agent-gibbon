@@ -92,23 +92,46 @@ fn state(window: &WebviewWindow) -> Result<WindowState, String> {
     })
 }
 
-/// Persist note contents and their current physical window presentation.
-/// Terminal windows are conservatively blocked until their welcome state can
-/// be restored without opening/focusing them.
-pub fn save(app: &AppHandle) -> Result<(), String> {
+/// Non-mutating gate shared by the readiness notice and the final save.
+pub fn check(app: &AppHandle) -> Result<(), String> {
     if path(app).exists() {
         return Err("이전 업데이트의 창 복원을 먼저 완료해야 합니다".into());
     }
     let windows = app.webview_windows();
     if windows.keys().any(|label| label.starts_with("terminal-")) {
-        return Err("터미널 창이 열려 있어 업데이트를 보류합니다".into());
+        return Err(
+            "터미널 시작 화면이 남아 있습니다. 관리 창에서 터미널을 삭제한 뒤 다시 설치하세요."
+                .into(),
+        );
     }
-    if crate::stash::active(app) {
-        return Err("메모 보관 동작 중에는 업데이트를 보류합니다".into());
+    if crate::stash::active(app) || crate::stash::chord_busy(app) {
+        return Err("메모 숨김·복원 동작이 끝난 뒤 다시 설치하세요.".into());
     }
-    if crate::capture::active(app) {
-        return Err("화면 캡처 중에는 업데이트를 보류합니다".into());
+    if crate::capture::update_blocked(app) {
+        return Err("화면 캡처나 영역 선택이 끝난 뒤 다시 설치하세요.".into());
     }
+    let mut count = 0;
+    for window in windows.values() {
+        if !permitted_label(window.label()) {
+            continue;
+        }
+        count += 1;
+        if crate::sizing::folded(window) || crate::sizing::pending(window) {
+            return Err("접힌 메모를 펼치고 진행 중인 크기 조정을 마친 뒤 다시 설치하세요.".into());
+        }
+    }
+    if count > MAX_WINDOWS {
+        return Err("열린 창이 너무 많아 업데이트를 보류했습니다.".into());
+    }
+    Ok(())
+}
+
+/// Persist note contents and their current physical window presentation.
+/// Terminal windows are conservatively blocked until their welcome state can
+/// be restored without opening/focusing them.
+pub fn save(app: &AppHandle) -> Result<(), String> {
+    check(app)?;
+    let windows = app.webview_windows();
 
     let mut snapshot_windows = Vec::new();
     for window in windows.values() {
@@ -116,13 +139,7 @@ pub fn save(app: &AppHandle) -> Result<(), String> {
         if !permitted_label(label) {
             continue;
         }
-        if crate::sizing::folded(window) || crate::sizing::pending(window) {
-            return Err("메모 크기 변경 중에는 업데이트를 보류합니다".into());
-        }
         snapshot_windows.push(state(window)?);
-    }
-    if snapshot_windows.len() > MAX_WINDOWS {
-        return Err("열린 창이 너무 많아 업데이트를 보류합니다".into());
     }
 
     // Persist every live note first, including the startup `main` note, so a
