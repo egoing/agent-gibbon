@@ -496,9 +496,9 @@ fn show_ready_notice(app: &tauri::AppHandle) -> Result<(), String> {
                 NOTICE_LABEL,
                 tauri::WebviewUrl::App("updater-notice.html".into()),
             )
-            .title("Agent Gibbon · 업데이트 준비 완료")
-            .inner_size(430., 320.)
-            .min_inner_size(360., 280.)
+            .title("Agent Gibbon · 업데이트")
+            .inner_size(360., 140.)
+            .min_inner_size(320., 140.)
             .decorations(true)
             .resizable(true)
             .always_on_top(true)
@@ -525,19 +525,37 @@ fn show_ready_notice(app: &tauri::AppHandle) -> Result<(), String> {
     })
 }
 
+// Work area and outer size are physical pixels; only the inset is logical.
+fn notice_position(
+    work: &tauri::PhysicalRect<i32, u32>,
+    size: tauri::PhysicalSize<u32>,
+    scale: f64,
+) -> tauri::PhysicalPosition<i32> {
+    let margin = (16. * scale).round() as i64;
+    let axis = |start: i32, available: u32, occupied: u32| {
+        let space = i64::from(available)
+            .saturating_sub(i64::from(occupied))
+            .max(0);
+        (i64::from(start) + (space - margin).max(0)).clamp(i64::from(i32::MIN), i64::from(i32::MAX))
+            as i32
+    };
+    tauri::PhysicalPosition::new(
+        axis(work.position.x, work.size.width, size.width),
+        axis(work.position.y, work.size.height, size.height),
+    )
+}
+
 fn place_notice(app: &tauri::AppHandle, window: &WebviewWindow) -> Result<(), String> {
-    if let Ok(Some(monitor)) = window
+    if let Some(monitor) = window
         .current_monitor()
-        .map(|m| m.or_else(|| app.primary_monitor().ok().flatten()))
+        .map_err(err)?
+        .or(app.primary_monitor().map_err(err)?)
     {
-        let work = monitor.work_area();
-        let scale = window.scale_factor().map_err(err)?;
-        let width = (430. * scale).round() as i32;
-        let margin = (24. * scale).round() as i32;
         window
-            .set_position(tauri::PhysicalPosition::new(
-                work.position.x + work.size.width as i32 - width - margin,
-                work.position.y + margin,
+            .set_position(notice_position(
+                monitor.work_area(),
+                window.outer_size().map_err(err)?,
+                monitor.scale_factor(),
             ))
             .map_err(err)?;
     }
@@ -922,6 +940,36 @@ mod tests {
     fn manifest(version: &str) -> serde_json::Value {
         json!({"version":version,"platforms":{"darwin-aarch64":{"url":format!("https://github.com/egoing/agent-gibbon/releases/download/v{version}/app.tar.gz"),"signature":"invalid"}}})
     }
+    #[test]
+    fn notice_sits_inside_bottom_right_work_area_with_real_outer_size() {
+        let work = tauri::PhysicalRect {
+            position: tauri::PhysicalPosition::new(0, 48),
+            size: tauri::PhysicalSize::new(1920, 1032),
+        };
+        let size = tauri::PhysicalSize::new(720, 324);
+        assert_eq!(
+            notice_position(&work, size, 2.),
+            tauri::PhysicalPosition::new(1168, 724)
+        );
+        let work = tauri::PhysicalRect {
+            position: tauri::PhysicalPosition::new(-1920, -1080),
+            size: tauri::PhysicalSize::new(1920, 1040),
+        };
+        assert_eq!(
+            notice_position(&work, tauri::PhysicalSize::new(360, 162), 1.),
+            tauri::PhysicalPosition::new(-376, -218)
+        );
+        // A resized or unusually small work area cannot move the title bar off its top/left.
+        assert_eq!(
+            notice_position(&work, tauri::PhysicalSize::new(2400, 1400), 1.5),
+            work.position
+        );
+        assert_eq!(
+            notice_position(&work, tauri::PhysicalSize::new(400, 300), 1.5),
+            tauri::PhysicalPosition::new(-424, -364)
+        );
+    }
+
     #[test]
     fn production_comparator_rejects_equal_older_and_prerelease_versions() {
         let app = app();

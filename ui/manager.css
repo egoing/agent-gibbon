@@ -95,3 +95,15 @@ input:focus-visible,a:focus-visible{outline:2px solid var(--manager-focus);outli
 
 /* System follows the fixed choices in DOM/keyboard order and stays at the right. */
 .theme-options .theme-system-option{margin-inline-start:auto;padding-inline-start:16px}
+
+/* Compact update status uses the manager palette without nested skill cards. */
+.updater-card{max-width:480px;margin-top:24px;overflow-wrap:anywhere}
+.updater-card p{margin:0;font-size:13px}
+#updater-status{font-size:15px;font-weight:600}
+#updater-version{margin-top:6px;color:var(--manager-muted)}
+.updater-progress-row{margin-top:12px}
+#updater-progress{display:block;width:100%;height:6px;margin-bottom:10px;accent-color:var(--manager-text)}
+#updater-progress[hidden],#updater-message[hidden],#updater-install[hidden]{display:none}
+.updater-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.updater-actions button{min-height:32px;padding:5px 12px;font-size:13px}
+#updater-install:not(:disabled){background:var(--manager-text);color:var(--manager-bg);border-color:var(--manager-text)}
