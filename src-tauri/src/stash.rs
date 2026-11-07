@@ -395,7 +395,11 @@ fn place_indicator(app: &tauri::AppHandle, area: Rect, top: bool, tip: bool) -> 
     let factor = scale / unit(scale);
     geometry(&w, indicator_rect(area, top, factor), scale)?;
     set_tip(app, &w, tip)?;
-    crate::show_without_focus(&w)
+    // The click-through indicator owns its CSS transparency. On Windows Tao
+    // adds WS_EX_LAYERED for cursor passthrough without setting a native alpha;
+    // the memo reveal path's GetLayeredWindowAttributes would fail and make
+    // tick's error recovery restore every stashed window immediately.
+    show_frame(&w)
 }
 fn set_tip(app: &tauri::AppHandle, w: &WebviewWindow, tip: bool) -> Result<(), String> {
     let text = if tip {
