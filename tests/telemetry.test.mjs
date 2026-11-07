@@ -56,3 +56,14 @@ test('withdrawal clears pending samples and old callbacks cannot replay after re
  old('terminal.ui.ready',111);s.window.gibbonMeasure('terminal.ui.ready',222);s.timers.at(-1).fn();await tick();
  const report=s.calls.find(c=>c.command==='telemetry_heartbeat');assert.equal(report.args.measurements.length,1);assert.equal(report.args.measurements[0].duration_ms,222);
 });
+
+test('snapshot calls keep values and failures but never create summary measurements; heartbeat survives',async()=>{
+ const s=setup();await tick();s.calls.length=0;
+ s.setTime(10);assert.equal(await s.window.gibbonInvoke('snapshot',{private:'PRIVATE_NOTE'}),'value');
+ s.fail();await assert.rejects(s.window.gibbonInvoke('snapshot',{private:'PRIVATE_NOTE'}));
+ s.timers.find(t=>t.ms===2000).fn();await tick();
+ const reports=s.calls.filter(c=>c.command==='telemetry_heartbeat');
+ assert.equal(reports.length,1);
+ assert.equal(reports[0].args.measurements.length,0);
+ assert(!JSON.stringify(reports).includes('PRIVATE'));
+});

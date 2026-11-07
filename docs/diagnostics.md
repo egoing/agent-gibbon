@@ -42,8 +42,8 @@ Windows는 `npm.cmd`를 사용한다. `gh api`를 지원하는 인증된 GitHub 
 
 ## 상세 진단 항목
 
-- **Tracing / spans:** 시작, IPC 대기·명령, 창 생성, Markdown 렌더, 저장·복원, 터미널 시작·쓰기·출력·리사이즈의 Rust 구간을 측정한다. 동기 중첩 작업은 같은 trace의 자식 span이 된다.
-- **WebView 측정:** 허용된 앱 명령의 왕복 지연·성공/실패 횟수, 클릭부터 두 animation frame까지의 시간, 타이머 지연을 숫자로 집계한다. 2초 구간별 최대 지연과 횟수이며 모든 개별 호출의 분포가 아니다. `measurement.origin`의 `rust` / `webview.aggregate`로 개별 Rust 실행과 WebView 집계를 구분한다. 개별 snapshot의 Rust root는 `snapshot.request`이며 집계 transaction `snapshot`과 다른 이름이다.
+- **Tracing / spans:** 시작, IPC 대기·명령, 창 생성, Markdown 렌더, 저장·복원, 터미널 시작·쓰기·출력·리사이즈의 Rust 구간을 측정한다. 동기 중첩 작업은 같은 trace의 자식 span이 된다. CLI의 `ipc.wait` 수신 스레드에서 UI callback으로는 Sentry 부모 handle을 명시적으로 전달하므로 `ipc.open/update/close/inspect/list`와 그 동기 하위 단계도 같은 trace에 포함된다.
+- **WebView 측정:** 허용된 앱 명령의 왕복 지연·성공/실패 횟수, 클릭부터 두 animation frame까지의 시간, 타이머 지연을 숫자로 집계한다. 2초 구간별 최대 지연과 횟수이며 모든 개별 호출의 분포가 아니다. `measurement.origin`의 `rust` / `webview.aggregate`로 개별 Rust 실행과 WebView 집계를 구분한다. snapshot은 이 WebView 요약 집계 대상에서 제외한다. 개별 snapshot의 Rust root `snapshot.request`와 자식 span은 유지하고, 요약 transaction `snapshot`은 생성·전송하지 않는다.
 - **Long tasks / long animation frames:** 해당 WebView가 PerformanceObserver 타입을 지원할 때만 지속 시간을 기록한다. 스크립트 URL·attribution·DOM은 보내지 않는다. WebView2와 WKWebView의 지원 차이를 숨기지 않는다.
 - **오류 진단:** Rust panic 스택·네이티브 image 식별자, WebView 오류 종류와 허용된 앱 JS 파일명·행·열을 보낸다. 오류 문구·Promise reason·소스 문맥·로컬 절대 경로·frame 변수는 제거한다.
 - **Sentry Logs / breadcrumbs:** 느린 작업 및 앱 수명의 고정 작업명·시간을 수집한다. console/stdout/셸 로그를 연결하지 않는다.
@@ -79,7 +79,7 @@ powershell -NoProfile -File scripts/windows-hang-evidence.ps1
 
 ### 단계별 trace/span 이름
 
-운영 이름과 레이블은 국제화와 쿼리 재사용을 위해 고정된 영어 이름을 사용한다. 동적 메모 제목·ID·경로·실행 명령을 이름에 붙이지 않는다. 같은 Rust 동기 호출 흐름의 하위 구간은 부모 trace의 자식 span이며, 서로 다른 UI callback·thread·WebView 집계 사이에 자동으로 trace가 이어진다고 가정하지 않는다.
+운영 이름과 레이블은 국제화와 쿼리 재사용을 위해 고정된 영어 이름을 사용한다. 동적 메모 제목·ID·경로·실행 명령을 이름에 붙이지 않는다. 같은 Rust 동기 호출 흐름의 하위 구간은 부모 trace의 자식 span이며, IPC 수신 → UI callback과 터미널 시작/캡처 요청 → worker(및 캡처 UI callback) 경계를 명시적 부모 handle로 연결한다. 그 외 UI callback·thread·WebView 집계 사이의 자동 연결을 가정하지 않는다.
 
 | 흐름 | 영어 작업 이름 | 해석 |
 | --- | --- | --- |
@@ -129,3 +129,30 @@ Actions의 `AGENT_GIBBON_SENTRY_DSN` secret/variable을 공식 release 빌드에
 Sentry 개별 Rust snapshot root `snapshot.request`는 기존 고빈도 작업과 같이 최대 1% 샘플링이다. 자식은 `note.state.notes_wait`, `notes_copy`, `opacity`, `feedback`, `position`, `size`, `visibility`, `focus`, `pin`, `response`다(각 이름의 앞에 `note.state.`). 잠금 획득 대기와 잠금 안 복사를 구분하고 네이티브 조회 전에 Notes 잠금을 해제한다. `opacity`/`feedback`은 각각 여러 관련 조회를 포함한다. `response`는 응답 Value 구성과 남은 상태 조회를 포함하며 Tauri의 최종 직렬화·IPC 전달은 포함하지 않는다. 개별 실행 자식은 같은 trace지만 WebView의 집계 transaction과 원격으로 이어지지는 않는다. 프로파일이나 샘플링 수치를 이유로 고빈도 전송을 100%로 올리지 않는다.
 
 [대표 실행·로컬 프로파일링 절차와 현재 검증](verification/issue64-trace-continuity-20261106.md)을 따른다. 원격 수신, Windows Browser Profiling, WKWebView 함수/렌더링 프로파일은 각각 별도 실행 근거가 필요하다.
+
+### IPC 스레드 부모 전달 — #64
+
+- trace ID를 복사해 transaction을 재시작하지 않고 SDK 부모 handle의 직접 자식 span을 만든다. 샘플링 결정을 그대로 상속한다. inspect/list 요청은 `ipc.wait` 루트 생성부터 최대 1%를 적용하므로 자식 연결이 폴링 전송량을 높이지 않는다. 이 분류는 내부 sampler 입력이며 외부 필드로 추가하지 않는다.
+- 부모 handle은 callback이 처리되거나 폐기될 때까지 조상을 유지한다. 수신 대기가 먼저 끝난 경우에도 자식이 끝난 뒤 transaction을 끝내며, callback 취소·큐 등록 실패 시 마지막 handle 해제로 정리한다. 영구 정지·프로세스 종료는 미완료 trace 손실 가능성이 있다.
+- UI callback은 현재 스레드의 기존 문맥을 잠시 교체하고 정상 반환·오류·panic 시 복원한다. 동시 요청은 각각의 부모를 사용한다. 로컬 recorder의 scope/parent/cause ID는 전달 handle에 포함하지 않으며 전송 필터도 유지한다.
+- handle은 기존 전송 gate의 동의 세대에 묶인다. 철회·재활성화 후 이전 handle로 span·작업 로그를 시작하거나 완료 전송하지 않는다. span 종료와 작업 로그는 시작 당시 SDK hub/client를 유지해 검사 직후 철회·재활성화가 경합해도 새 클라이언트로 갈아타지 않는다. 전송 직전의 기존 transport 세대 검사도 유지한다. 동의 전/상세 비활성 상태에서 캡처한 빈 문맥 역시 새 활성 세대의 루트로 승격하지 않는다.
+- UI의 5초 실행 기한·6초 수신 제한과 snapshot 상태 읽기와 snapshot을 제외한 2초 WebView 집계는 유지한다. 터미널의 장기 output worker를 부모 수명에 묶거나 WebView 개별 요청 프로토콜을 신설하지 않는다. 현재 추가된 worker 경계는 아래 절을 따른다.
+- 검증 근거와 미실행 범위는 [스레드 문맥 검증 기록](verification/sentry-thread-context-20261107.md)을 따른다. in-memory/loopback 테스트는 실제 Sentry 서버 수신 증거가 아니다.
+
+### snapshot 요약 제거와 자식 span 기기 정보 — #64 후속
+
+- 여러 snapshot 호출의 구간 최대값을 실제 요청 한 번처럼 보이게 하던 요약 `snapshot` transaction을 제거했다. 프런트의 계측 대상에서 snapshot을 제외하고, 백엔드는 구버전 화면이 보내는 유효한 snapshot 샘플을 무시한다. 최종 envelope와 작업 로그의 허용 목록에서도 snapshot 요약을 차단한다.
+- heartbeat 자체와 멈춤 감시, 실제 snapshot 앱 기능 및 `snapshot.request → note.state.*` 개별 trace는 유지한다. 개별 요청은 여전히 최대 1% 샘플링이며 WebView 요청별 프로토콜이나 대체 metrics는 도입하지 않는다. 따라서 snapshot의 프런트 왕복 최대 지연·횟수·실패 횟수 요약 관측은 사라진다. Rust 처리 span은 WebView 왕복 전체 시간의 대체물이 아니다. 다른 작업의 WebView 집계는 기존대로 남는다.
+- 최종 전송 필터에서 루트와 모든 허용된 자식 span에 현재 빌드의 `app.os`, `app.arch`, `app.build`를 같은 값으로 넣는다. 전달된 다른 값이나 비허용 태그는 신뢰하지 않는다. 메모/사용자/장치 식별자, 로컬 flow/parent/cause는 추가하지 않는다. 서버에서의 실제 기기 필터 조회 성공은 별도 수신 검증 사항이다.
+- 스레드 전달은 CLI 수신 → UI callback에 이어 터미널 시작 및 캡처 worker까지 확장했다(아래 절). 장기 터미널 output reader와 WebView 왕복 전체는 동일 시작 trace에 연결하지 않는다. 장기 reader를 시작 trace에 계속 붙이면 해당 trace가 터미널 종료까지 끝나지 않을 수 있고, 출력의 최대 1% 샘플링 경계도 달라지기 때문이다.
+- [후속 검증 기록](verification/sentry-summary-metadata-20261107.md)에 TDD와 검사 범위를 기록한다. 기존 동의 범주의 성능 항목을 줄이고 기존 고정 기기 정보를 자식에도 적용하는 변경으로, 수집 목적·전송 대상·보유기간·동의 방식은 유지한다.
+
+### 터미널·캡처 worker 부모 전달 — #64 추가
+
+- `terminal.request`는 Rust의 terminal_start 요청 수락 지점에서 시작하고 spawn_blocking의 `terminal.start → terminal.pty.create/process.spawn/io.attach`를 같은 trace로 연결한다. worker 큐 대기를 포함하되 WebView에서 호출하기 전 시간/프런트 왕복 전체를 측정한다고 표시하지 않는다.
+- `capture.request`는 승인된 트레이/단축키 요청을 worker에 보내기 전에 시작한다. Windows의 lifecycle worker와 비Windows의 worker → UI callback 모두 같은 부모를 설치하며, 실제 `capture.prepare` 및 화면 열거/캡처/overlay 생성 단계가 그 자식이다.
+- Windows finish/cancel/failed의 lifecycle 호출도 각각 큐 등록 전에 `capture.request`를 만들고 worker의 해당 처리 span과 잠금/정리 단계를 연결한다. 화면 선택을 기다리는 사람의 조작 시간이나 WebView 이미지 decode/paint 전체를 하나의 부모에 붙이지 않는다.
+- source thread의 TLS/로컬 recorder scope를 유지하지 않는 Send 전용 부모 lease만 큐로 전달한다. 목적 스레드에서만 RAII scope를 설치하고 복원한다. 기존 epoch·클라이언트·sampling 결정과 마지막 lease의 자식→조상 종료 규칙을 재사용한다. 실패/취소 시 미실행 closure가 drop되면 lease도 해제한다.
+- 장기 PTY reader에는 시작 부모 lease를 넘기지 않는다. 요청 trace는 reader 생존 중에도 끝나며 각 terminal.output의 별도 최대1% 샘플링과 하위 filter/dispatch span은 유지한다. 따라서 터미널의 수명 전체가 한 trace가 되는 것은 아니다.
+- 이 변경은 진단 내부 구현이므로 디자인 시스템에 상세를 추가하지 않는다. 사용자 피드백에 따라 앞서 넣었던 요약/메타정보 기술 세부도 디자인 시스템에서 제거하고 이 문서와 검증 기록으로 모았다. UI·동의·포커스·창 배치·capture lifecycle 잠금 순서는 유지한다.
+- 구현/모의 검증과 실제 worker의 native/Sentry 수신 증거는 [worker 검증 기록](verification/sentry-workers-20261107.md)에서 구분한다.

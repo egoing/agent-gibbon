@@ -452,7 +452,9 @@ pub async fn terminal_start(
     };
     let id = caller(&window)?;
     let app = window.app_handle().clone();
+    let sentry_parent = crate::telemetry::TimingContext::request("terminal.request");
     tauri::async_runtime::spawn_blocking(move || {
+        let _sentry_scope = sentry_parent.enter();
         let _scope = worker_call.scope();
         worker_call.stage(crate::local_trace::Stage::UiExecute);
         let result = (|| {
