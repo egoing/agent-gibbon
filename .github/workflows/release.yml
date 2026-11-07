@@ -27,7 +27,7 @@ jobs:
       - id: version
         name: Check versions and tag
         env:
-          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+          RELEASE_TAG: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
         run: |
           if [ -n "$RELEASE_TAG" ]; then
             VERSION=$(node scripts/release-version.mjs check "$RELEASE_TAG")
@@ -85,10 +85,10 @@ jobs:
         shell: bash
         env:
           AGENT_GIBBON_SENTRY_DSN: ${{ secrets.AGENT_GIBBON_SENTRY_DSN || vars.AGENT_GIBBON_SENTRY_DSN }}
-          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+          RELEASE_TAG: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
           RELEASE_VERSION: ${{ needs.validate.outputs.version }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && secrets.TAURI_SIGNING_PRIVATE_KEY || '' }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD || '' }}
           TAURI_UPDATER_PUBLIC_KEY: ${{ vars.TAURI_UPDATER_PUBLIC_KEY }}
         run: |
           if [ -z "$AGENT_GIBBON_SENTRY_DSN" ]; then
@@ -113,10 +113,10 @@ jobs:
       - name: Collect installers
         shell: bash
         env:
-          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+          RELEASE_TAG: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
           RELEASE_VERSION: ${{ needs.validate.outputs.version }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && secrets.TAURI_SIGNING_PRIVATE_KEY || '' }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD || '' }}
           TAURI_UPDATER_PUBLIC_KEY: ${{ vars.TAURI_UPDATER_PUBLIC_KEY }}
         run: |
           if [ -z "$RELEASE_TAG" ]; then
@@ -197,7 +197,7 @@ jobs:
       - name: Validate signed updater assets, generate manifest and checksums
         env:
           RELEASE_VERSION: ${{ needs.validate.outputs.version }}
-          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
+          RELEASE_TAG: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
           TAURI_UPDATER_PUBLIC_KEY: ${{ vars.TAURI_UPDATER_PUBLIC_KEY }}
         run: node scripts/release-assets.mjs release-assets "$RELEASE_VERSION" updater
       - uses: actions/upload-artifact@v4
