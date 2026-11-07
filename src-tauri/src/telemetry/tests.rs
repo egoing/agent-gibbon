@@ -160,7 +160,7 @@ fn basic_release_and_opted_in_diagnostics_have_separate_features() {
 fn aggregate_tag_survives_but_local_correlation_never_leaves_envelope() {
     let mut input = sentry::Envelope::new();
     let mut t = p::Transaction {
-        name: Some("snapshot".into()),
+        name: Some("save_note".into()),
         ..Default::default()
     };
     t.tags
@@ -712,4 +712,40 @@ fn every_child_span_gets_trusted_platform_build_metadata_at_final_egress() {
         );
         assert!(!child.tags.contains_key("private"));
     }
+}
+
+#[test]
+fn legacy_snapshot_summary_never_creates_a_transaction_or_blocks_other_measurements() {
+    let (hub, capture, _) = timing_harness(1.0);
+    sentry::Hub::run(hub, || {
+        report_measurement(
+            Measurement {
+                op: "snapshot".into(),
+                duration_ms: 5000.,
+                count: 2,
+                failure_count: 1,
+            },
+            "memo",
+        );
+        assert!(captured_transactions(&capture).is_empty());
+        report_measurement(
+            Measurement {
+                op: "save_note".into(),
+                duration_ms: 2.,
+                count: 1,
+                failure_count: 0,
+            },
+            "memo",
+        );
+    });
+    let transactions = captured_transactions(&capture);
+    assert_eq!(transactions.len(), 1);
+    assert_eq!(transactions[0].name.as_deref(), Some("save_note"));
+    assert_eq!(
+        transactions[0]
+            .tags
+            .get("measurement.origin")
+            .map(String::as_str),
+        Some("webview.aggregate")
+    );
 }

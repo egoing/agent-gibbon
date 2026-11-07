@@ -113,7 +113,6 @@ pub const OPERATIONS_ALLOWED: &[&str] = &[
     "terminal.folder",
     "terminal.rename",
     "terminal.close",
-    "snapshot",
     "snapshot.request",
     "note.state.notes_wait",
     "note.state.notes_copy",
@@ -211,7 +210,6 @@ fn options(dsn: sentry::types::Dsn, detailed: bool) -> sentry::ClientOptions {
                     ctx.name(),
                     "terminal.write"
                         | "terminal.output"
-                        | "snapshot"
                         | "snapshot.request"
                         | "ipc.inspect"
                         | "ipc.list"
@@ -554,7 +552,7 @@ fn one() -> u32 {
     1
 }
 fn valid_measurement(m: &Measurement) -> bool {
-    allowed(&m.op)
+    (m.op == "snapshot" || allowed(&m.op))
         && m.duration_ms.is_finite()
         && (0.0..=600_000.).contains(&m.duration_ms)
         && (1..=10_000).contains(&m.count)
@@ -582,30 +580,39 @@ pub fn telemetry_heartbeat(
     watchdog::beat(window.app_handle(), window.label());
     let kind = watchdog::kind(window.label());
     for m in measurements {
-        let started = SystemTime::now()
-            .checked_sub(Duration::from_secs_f64(m.duration_ms / 1000.))
-            .unwrap_or(SystemTime::now());
-        let t = sentry::start_transaction_with_timestamp(
-            sentry::TransactionContext::new(&m.op, &m.op),
-            started,
-        );
-        t.set_tag("window.kind", kind);
-        t.set_tag("measurement.origin", "webview.aggregate");
-        t.set_data("duration_ms", json!(m.duration_ms));
-        t.set_data("count", json!(m.count));
-        t.set_data("failure_count", json!(m.failure_count));
-        t.set_status(if m.failure_count > 0 {
-            p::SpanStatus::InternalError
-        } else {
-            p::SpanStatus::Ok
-        });
-        t.finish();
-        if m.duration_ms >= 100. {
-            log(&m.op, m.duration_ms);
-        }
+        report_measurement(m, kind);
     }
     Ok(())
 }
+// Keep accepting bounded legacy snapshot inputs so old WebViews still beat the
+// watchdog, but never turn their summary maximum into a synthetic transaction.
+fn report_measurement(m: Measurement, kind: &str) {
+    if m.op == "snapshot" {
+        return;
+    }
+    let started = SystemTime::now()
+        .checked_sub(Duration::from_secs_f64(m.duration_ms / 1000.))
+        .unwrap_or(SystemTime::now());
+    let t = sentry::start_transaction_with_timestamp(
+        sentry::TransactionContext::new(&m.op, &m.op),
+        started,
+    );
+    t.set_tag("window.kind", kind);
+    t.set_tag("measurement.origin", "webview.aggregate");
+    t.set_data("duration_ms", json!(m.duration_ms));
+    t.set_data("count", json!(m.count));
+    t.set_data("failure_count", json!(m.failure_count));
+    t.set_status(if m.failure_count > 0 {
+        p::SpanStatus::InternalError
+    } else {
+        p::SpanStatus::Ok
+    });
+    t.finish();
+    if m.duration_ms >= 100. {
+        log(&m.op, m.duration_ms);
+    }
+}
+
 const SOURCES: &[&str] = &[
     "app.js",
     "telemetry.js",

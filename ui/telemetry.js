@@ -23,7 +23,7 @@
     });
   }
   const operations = new Map([
-    ['snapshot', 'snapshot'], ['save_note', 'save_note'], ['export_note', 'export_note'],
+    ['save_note', 'save_note'], ['export_note', 'export_note'],
     ['toggle_pin', 'toggle_pin'], ['hide_note', 'hide_note'], ['close_note', 'close_note'],
     ['warp_note', 'warp_note'], ['toggle_fold', 'toggle_fold'], ['capture_screen', 'capture_screen'],
     ['finish_capture', 'finish_capture'], ['copy_note_image', 'copy_note_image'],
