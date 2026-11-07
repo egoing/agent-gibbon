@@ -1134,4 +1134,77 @@ mod tests {
         assert_ne!(label("main"), label("note-main"));
         assert_ne!(label("x"), label("note-x"));
     }
+    #[test]
+    fn web_cli_opens_welcome_without_a_url() {
+        let request = parse(&["web", "--id", "web-review"].map(String::from))
+            .expect("web 명령은 URL 없이 Welcome을 열 수 있어야 합니다");
+        let value = serde_json::to_value(&request).unwrap();
+        assert_eq!(value["action"], "web");
+        assert_eq!(request.id(), "web-review");
+        assert!(value.get("url").is_none_or(serde_json::Value::is_null));
+    }
+
+    #[test]
+    fn web_cli_accepts_http_https_and_local_development_pages() {
+        for url in [
+            "https://example.com/path?q=hello#section",
+            "http://127.0.0.1:3000/",
+            "http://localhost:8080/",
+            "http://[::1]:3000/",
+        ] {
+            let request = parse(&["web", "--id", "web-review", "--url", url].map(String::from))
+                .unwrap_or_else(|error| panic!("유효한 웹 URL {url}: {error}"));
+            let value = serde_json::to_value(request).unwrap();
+            assert_eq!(value["action"], "web");
+            assert_eq!(value["url"], url);
+        }
+    }
+
+    #[test]
+    fn web_cli_rejects_unsafe_urls_before_connecting_or_starting_the_app() {
+        for url in [
+            "",
+            "example.com",
+            "javascript:alert(1)",
+            "data:text/html,hello",
+            "file:///etc/passwd",
+            "tauri://localhost/",
+            "https://tauri.localhost/",
+            "http://ipc.localhost/",
+            "https://user:password@example.com/",
+            "https://example.com/\npath",
+            "https://example.com/\tpath",
+        ] {
+            let error = match parse(&["web", "--id", "web-review", "--url", url].map(String::from))
+            {
+                Ok(_) => panic!("위험하거나 모호한 URL을 허용했습니다: {url:?}"),
+                Err(error) => error,
+            };
+            assert!(
+                error.contains("URL"),
+                "URL 검증 오류여야 합니다: {url:?}: {error}"
+            );
+        }
+    }
+
+    #[test]
+    fn web_cli_rejects_note_content_and_duplicate_url_options() {
+        for args in [
+            vec!["web", "--markdown", "본문"],
+            vec!["web", "--color", "#112233"],
+            vec![
+                "web",
+                "--url",
+                "https://example.com/",
+                "--url",
+                "https://example.org/",
+            ],
+            vec!["open", "--url", "https://example.com/"],
+            vec!["update", "--url", "https://example.com/"],
+            vec!["web", "--id", "main"],
+            vec!["web", "--id", "terminal-123"],
+        ] {
+            assert!(parse(&args.into_iter().map(String::from).collect::<Vec<_>>()).is_err());
+        }
+    }
 }
