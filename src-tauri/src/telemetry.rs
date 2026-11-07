@@ -202,17 +202,23 @@ fn options(dsn: sentry::types::Dsn, detailed: bool) -> sentry::ClientOptions {
             }
             if matches!(ctx.name(), "app.startup" | "diagnostic.probe") {
                 1.0
-            } else if matches!(
-                ctx.name(),
-                "terminal.write"
-                    | "terminal.output"
-                    | "snapshot"
-                    | "snapshot.request"
-                    | "ipc.inspect"
-                    | "ipc.list"
-                    | "terminal.info"
-                    | "terminal.output.parse"
-            ) {
+            } else if ctx
+                .custom()
+                .and_then(|c| c.get("ipc.polling"))
+                .and_then(Value::as_bool)
+                == Some(true)
+                || matches!(
+                    ctx.name(),
+                    "terminal.write"
+                        | "terminal.output"
+                        | "snapshot"
+                        | "snapshot.request"
+                        | "ipc.inspect"
+                        | "ipc.list"
+                        | "terminal.info"
+                        | "terminal.output.parse"
+                )
+            {
                 rate.min(0.01)
             } else {
                 rate
@@ -299,14 +305,71 @@ pub fn detailed() -> bool {
     enabled() && DETAILED.load(Ordering::Relaxed)
 }
 
-thread_local! { static PARENTS: RefCell<Vec<TransactionOrSpan>> = const {RefCell::new(Vec::new())}; }
+// Only Sentry handles live here. Local recorder IDs never enter this context.
+thread_local! { static PARENTS: RefCell<Vec<TimingContext>> = const {RefCell::new(Vec::new())}; }
+
+struct TimingSpan {
+    span: TransactionOrSpan,
+    // Pin the originating client: a late log must not bind a re-enabled client.
+    hub: Arc<sentry::Hub>,
+    gate: Arc<transport::Gate>,
+    epoch: u64,
+    start: Instant,
+    // Keep every ancestor alive until this span has finished, including late callbacks.
+    _parent: Option<Arc<TimingSpan>>,
+}
+impl Drop for TimingSpan {
+    fn drop(&mut self) {
+        if self.gate.current() == Some(self.epoch) {
+            self.span.set_data(
+                "duration_ms",
+                json!(self.start.elapsed().as_secs_f64() * 1000.),
+            );
+            sentry::Hub::run(self.hub.clone(), || self.span.clone().finish());
+        }
+    }
+}
+
+/// An explicit, process-local parent lease. It preserves the SDK's sampling
+/// decision and keeps the transaction alive until queued work is dropped/done.
+#[derive(Clone)]
+pub struct TimingContext {
+    span: Option<Arc<TimingSpan>>,
+    gate: Arc<transport::Gate>,
+    epoch: Option<u64>,
+}
+impl TimingContext {
+    /// Replace rather than append: unrelated work on the destination thread
+    /// must never become the parent. Even an empty/stale context is a barrier.
+    pub fn enter(self) -> TimingScope {
+        let previous = PARENTS.with(|p| std::mem::replace(&mut *p.borrow_mut(), vec![self]));
+        TimingScope {
+            previous,
+            _thread: std::marker::PhantomData,
+        }
+    }
+}
+pub struct TimingScope {
+    previous: Vec<TimingContext>,
+    _thread: std::marker::PhantomData<std::rc::Rc<()>>,
+}
+impl Drop for TimingScope {
+    fn drop(&mut self) {
+        // Drop leases outside the RefCell borrow (finishing may invoke SDK hooks).
+        let old = PARENTS
+            .with(|p| std::mem::replace(&mut *p.borrow_mut(), std::mem::take(&mut self.previous)));
+        drop(old);
+    }
+}
+
 /// Nested Rust timings are child spans, never named with note IDs, paths or commands.
 pub struct Timing {
     local: crate::local_trace::Call,
     _scope: crate::local_trace::Scope,
-    span: Option<TransactionOrSpan>,
+    context: TimingContext,
     op: &'static str,
     start: Instant,
+    _thread: std::marker::PhantomData<std::rc::Rc<()>>,
 }
 fn timing_span(parent: Option<&TransactionOrSpan>, op: &'static str) -> TransactionOrSpan {
     parent
@@ -319,22 +382,68 @@ fn timing_span(parent: Option<&TransactionOrSpan>, op: &'static str) -> Transact
 }
 impl Timing {
     pub fn new(op: &'static str) -> Self {
+        Self::start(op, false)
+    }
+    pub fn ipc_wait(polling: bool) -> Self {
+        Self::start("ipc.wait", polling)
+    }
+    fn start(op: &'static str, polling: bool) -> Self {
+        if detailed() {
+            bind_client();
+        }
+        Self::with_gate(op, polling, detailed(), transport::gate().clone())
+    }
+    fn with_gate(
+        op: &'static str,
+        polling: bool,
+        detailed: bool,
+        gate: Arc<transport::Gate>,
+    ) -> Self {
         let local = crate::local_trace::Call::begin(op, crate::local_trace::Stage::Dispatch);
         let scope = local.scope();
-        let span = (detailed() && allowed(op)).then(|| {
-            bind_client();
-            let span = PARENTS.with(|p| timing_span(p.borrow().last(), op));
+        let parent = PARENTS.with(|p| p.borrow().last().cloned());
+        let epoch = gate.current();
+        let valid = parent
+            .as_ref()
+            .is_none_or(|p| Arc::ptr_eq(&p.gate, &gate) && p.epoch == epoch && p.span.is_some());
+        let span = if let (true, Some(epoch)) = (detailed && allowed(op) && valid, epoch) {
+            let ancestor = parent.and_then(|p| p.span);
+            let span = if ancestor.is_none() && polling {
+                let mut ctx = sentry::TransactionContext::new(op, op);
+                ctx.custom_insert("ipc.polling".into(), json!(true));
+                TransactionOrSpan::Transaction(sentry::start_transaction(ctx))
+            } else {
+                timing_span(ancestor.as_ref().map(|p| &p.span), op)
+            };
             span.set_tag("measurement.origin", "rust");
-            PARENTS.with(|p| p.borrow_mut().push(span.clone()));
-            span
-        });
+            let hub = ancestor
+                .as_ref()
+                .map(|p| p.hub.clone())
+                .unwrap_or_else(|| Arc::new(sentry::Hub::new_from_top(sentry::Hub::current())));
+            Some(Arc::new(TimingSpan {
+                span,
+                hub,
+                gate: gate.clone(),
+                epoch,
+                start: Instant::now(),
+                _parent: ancestor,
+            }))
+        } else {
+            None
+        };
+        let context = TimingContext { span, gate, epoch };
+        PARENTS.with(|p| p.borrow_mut().push(context.clone()));
         Self {
             local,
             _scope: scope,
-            span,
+            context,
             op,
             start: Instant::now(),
+            _thread: std::marker::PhantomData,
         }
+    }
+    pub fn context(&self) -> TimingContext {
+        self.context.clone()
     }
 }
 impl Drop for Timing {
@@ -342,50 +451,68 @@ impl Drop for Timing {
         if !std::thread::panicking() {
             self.local.complete();
         }
-        if let Some(span) = self.span.take() {
-            PARENTS.with(|p| {
-                p.borrow_mut().pop();
-            });
-            let ms = self.start.elapsed().as_secs_f64() * 1000.;
-            span.set_data("duration_ms", json!(ms));
+        let old = PARENTS.with(|p| p.borrow_mut().pop());
+        drop(old);
+        if let Some(span) = self
+            .context
+            .span
+            .as_ref()
+            .filter(|s| s.gate.current() == Some(s.epoch))
+        {
             if std::thread::panicking() {
-                span.set_status(p::SpanStatus::InternalError);
+                span.span.set_status(p::SpanStatus::InternalError);
             }
-            span.finish();
             OPERATIONS.fetch_add(1, Ordering::Relaxed);
+            let ms = self.start.elapsed().as_secs_f64() * 1000.;
             if ms >= 100. {
-                log(self.op, ms);
+                log_for(self.op, ms, Some(span));
             }
         }
     }
 }
 fn log(op: &str, ms: f64) {
-    if !detailed() || !allowed(op) || !take_budget(0) {
+    let parent = PARENTS.with(|p| p.borrow().last().cloned());
+    if parent
+        .as_ref()
+        .is_some_and(|p| p.epoch.is_none() || p.gate.current() != p.epoch || p.span.is_none())
+    {
+        return;
+    }
+    log_for(op, ms, parent.as_ref().and_then(|p| p.span.as_ref()));
+}
+fn log_for(op: &str, ms: f64, parent: Option<&Arc<TimingSpan>>) {
+    if !detailed()
+        || !allowed(op)
+        || parent.is_some_and(|p| p.gate.current() != Some(p.epoch))
+        || !take_budget(0)
+    {
         return;
     }
     DIAGNOSTICS.fetch_add(1, Ordering::Relaxed);
-    bind_client();
-    sentry::Hub::current().capture_log(p::Log {
-        level: p::LogLevel::Info,
-        body: "Agent Gibbon operation".into(),
-        trace_id: PARENTS.with(|parents| {
-            parents
-                .borrow()
-                .last()
-                .map(|s| s.get_trace_context().trace_id)
-        }),
-        timestamp: SystemTime::now(),
-        severity_number: None,
-        attributes: p::Map::from_iter([
-            ("operation".into(), p::LogAttribute(json!(op))),
-            ("duration_ms".into(), p::LogAttribute(json!(ms))),
-        ]),
-    });
-    sentry::add_breadcrumb(p::Breadcrumb {
-        category: Some("app.operation".into()),
-        message: Some(op.into()),
-        data: p::Map::from_iter([("duration_ms".into(), json!(ms))]),
-        ..Default::default()
+    let hub = if let Some(parent) = parent {
+        parent.hub.clone()
+    } else {
+        bind_client();
+        sentry::Hub::current()
+    };
+    sentry::Hub::run(hub, || {
+        sentry::Hub::current().capture_log(p::Log {
+            level: p::LogLevel::Info,
+            body: "Agent Gibbon operation".into(),
+            trace_id: parent.map(|p| p.span.get_trace_context().trace_id),
+            timestamp: SystemTime::now(),
+            severity_number: None,
+            attributes: p::Map::from_iter([
+                ("operation".into(), p::LogAttribute(json!(op))),
+                ("duration_ms".into(), p::LogAttribute(json!(ms))),
+            ]),
+        });
+        sentry::add_breadcrumb(p::Breadcrumb {
+            category: Some("app.operation".into()),
+            message: Some(op.into()),
+            data: p::Map::from_iter([("duration_ms".into(), json!(ms))]),
+            ..Default::default()
+        });
     });
 }
 /// Static stage marker: makes a stage that never finishes visible in bounded
