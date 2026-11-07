@@ -445,6 +445,7 @@ pub async fn terminal_start(
     choice: Option<String>,
     local_flow: Option<u64>,
 ) -> Result<Value, String> {
+    let _update_activity = crate::updater::activity(window.app_handle())?;
     let mut worker_call = {
         let _scope = crate::local_trace::webview_scope(&window, local_flow);
         crate::local_trace::Call::begin("terminal.worker", crate::local_trace::Stage::UiQueue)
@@ -611,6 +612,15 @@ pub fn geometry(window: &tauri::Window) {
         }
     }
 }
+pub fn update_blocked(app: &tauri::AppHandle) -> Result<bool, String> {
+    Ok(!app
+        .state::<Terminals>()
+        .sessions
+        .lock()
+        .map_err(err)?
+        .is_empty())
+}
+
 pub fn shutdown(app: &tauri::AppHandle) {
     for agent in entries(app) {
         let _ = welcome::refresh_path(app, &agent.id);

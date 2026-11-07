@@ -1,4 +1,5 @@
 fn main() {
+    println!("cargo:rerun-if-env-changed=TAURI_UPDATER_PUBLIC_KEY");
     println!("cargo:rerun-if-env-changed=AGENT_GIBBON_SENTRY_DSN");
     let git = |args: &[&str]| {
         std::process::Command::new("git")

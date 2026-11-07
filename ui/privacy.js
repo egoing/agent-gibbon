@@ -1,11 +1,12 @@
 'use strict';
 (() => {
-  const invoke = window.__TAURI__.core.invoke;
+  const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
   const el = id => document.getElementById(id);
   let state = null, busy = false;
   const api = window.gibbonPrivacy = {
     accepted: () => Boolean(state?.terms_accepted || state?.terms_skipped),
     onAccepted: null,
+    updateBusy: () => busy || !state || el("privacy-setting-share").checked !== Boolean(state.allowed ?? state.sharing),
     showWelcome: () => { el('manager-navigation').hidden=true; el('privacy-welcome').hidden=false; el('notes-page').hidden=true; el('settings-page').hidden=true; },
     refresh,
   };

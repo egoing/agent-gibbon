@@ -45,5 +45,11 @@
       "minimumSystemVersion": "10.15",
       "signingIdentity": "-"
     }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "",
+      "requireSignedVersion": true
+    }
   }
 }

@@ -427,6 +427,9 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             }
         })
         .on_menu_event(|app, event| {
+            if crate::updater::frozen(app) {
+                return;
+            }
             if event.id.as_ref() == "quit-app" {
                 app.exit(0);
                 return;

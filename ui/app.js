@@ -28,6 +28,7 @@ let wasReading = false;
 let editing = false;
 let initialEditHandled = false;
 let saving = false;
+window.gibbonUpdateBusy = () => editing || saving;
 let exporting = false;
 let editRevision;
 let needsFit = true;

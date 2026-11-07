@@ -225,6 +225,14 @@ pub async fn privacy_save(
             crate::skills::synchronize(app.clone());
             let target = app.clone();
             let _ = app.run_on_main_thread(move || {
+                match crate::update_restore::restore(&target) {
+                    Ok(true) => return,
+                    Err(error) => {
+                        eprintln!("업데이트 창 복원 실패: {error}");
+                        return;
+                    }
+                    Ok(false) => {}
+                }
                 let _ = crate::apply_direct(
                     &target,
                     crate::Request {
