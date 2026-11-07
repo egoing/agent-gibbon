@@ -244,9 +244,9 @@ fn platform() -> &'static str {
 }
 fn package_name(version: &str, target: &str) -> String {
     if target == "windows-x86_64" {
-        format!("Agent Gibbon_{version}_x64-setup.exe")
+        format!("Agent.Gibbon_{version}_x64-setup.exe")
     } else {
-        format!("Agent Gibbon_{version}_{target}.app.tar.gz")
+        format!("Agent.Gibbon_{version}_{target}.app.tar.gz")
     }
 }
 fn validate_download(update: &Update) -> Result<(), String> {
@@ -1007,6 +1007,17 @@ mod tests {
             update.download_url = url.parse().unwrap();
             assert!(validate_download(&update).is_err());
         }
+    }
+    #[test]
+    fn package_names_match_github_release_asset_normalization() {
+        assert_eq!(
+            package_name("0.2.9", "darwin-aarch64"),
+            "Agent.Gibbon_0.2.9_darwin-aarch64.app.tar.gz"
+        );
+        assert_eq!(
+            package_name("0.2.9", "windows-x86_64"),
+            "Agent.Gibbon_0.2.9_x64-setup.exe"
+        );
     }
     #[test]
     fn debug_instances_cannot_enable_updater() {

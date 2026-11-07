@@ -118,3 +118,9 @@ UI 준비 완료 이후 main thread에서 버전·ready·frozen 상태를 재검
 새 안내의 실환경 포커스·화면 크기·표시 후 지연 활성화는 미검증이며 시안 렌더와 코드/VM 검증으로 구분한다. 실제 앱 교체·새 릴리스 공개도 수행하지 않았다. 이전 SHA e6b89f1의 전체 CI 성공은 추가 변경의 실행 증거로 사용하지 않으며 새 SHA 검증은 PR #90에 기록한다.
 
 추가 변경 최종 로컬 결과: Rust 186개·Node 142개, cargo check --all-targets·Clippy -D warnings·Rustfmt·개발 바이너리 빌드 통과. `/tmp/issue87-cargo-test.log`, `/tmp/issue87-cargo-check.log`, `/tmp/issue87-clippy.log`, `/tmp/issue87-fmt.log`, `/tmp/issue87-notice-ui-full.log`, `/tmp/issue87-dev-build.log`. 독립 감사에서 기존 테스트 삭제·완화·퇴행·범위 이탈 미발동을 최종 확인했다. 추가 안내 기능은 유효한 red 원본 증거 부재로 is2 TDD 조건 충족을 주장하지 않는다.
+
+## 배포 후 자산명 정규화 결함
+
+PR #90은 main `db14e1e13c72fddcd9117788521d3579d1f5b5c1`에 병합하고 로컬 main·origin/main·원격 main 일치를 확인했다. v0.2.8 태그 [Release 검사 42347329794](https://github.com/egoing/agent-gibbon/actions/runs/42347329794)는 전체 성공했으나 공개 자산 검증에서 GitHub가 업로드 공백을 점으로 정규화해 manifest URL 세 개 모두 HTTP 404임을 확인했다. 성공 Discord는 보내지 않았다. 기존 태그·자산은 덮어쓰지 않고 0.2.8을 prerelease/비최신으로 전환했다.
+
+0.2.9 수정은 canonical `Agent.Gibbon_...`를 수집·재서명·manifest·앱 검증에 적용한다. 실제 package_name 기대값의 공백/점 불일치 red는 `/tmp/issue87-release-filenames-red.log`에 보존했다. 기존 공백 기반 fixture가 실패해 새 테스트 키로 실제 재서명하며 교차 아키텍처·변조 거부 assertion을 유지한다. 운영 서명 키는 변경하지 않는다. 0.2.8 클라이언트도 공백 경로를 강제하므로 0.2.9를 수동 설치해야 하고, 자동 복구 검증으로 보고하지 않는다.
