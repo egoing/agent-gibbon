@@ -1,0 +1,57 @@
+{
+  "id": "7da35e95-9d25-4edc-a9d6-34df7bed6843",
+  "ok": true,
+  "result": {
+    "screenshot": {
+      "scale": 2,
+      "width": 640,
+      "format": "png",
+      "height": 96,
+      "path": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/7da35e95-9d25-4edc-a9d6-34df7bed6843-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-08T03:05:23.675Z"
+    },
+    "snapshot": {
+      "focusedElementId": null,
+      "elementCount": 5,
+      "treeText": "App=agent-gibbon (pid 44722)\nWindow: \"Agent Gibbon [DEV codex/issue-54-indicator-reentry · 8bc1bbf2] — stash-indicator\", App: agent-gibbon.\n\n10 dialog Agent Gibbon [DEV codex/issue-54-indicator-reentry · 8bc1bbf2] — stash-indicator\n\t1 scroll area\n\t\t2 HTML content\n\t\t\t11 text Control Option Command 사용 중 트레이로 실행 · 다시 누르면 창 복원\n\t\t\t4 image 눈을 가린 긴팔원숭이 · 창 접어둠\n\nNo UI element is currently focused.",
+      "app": {
+        "name": "agent-gibbon",
+        "pid": 44722,
+        "bundleId": null
+      },
+      "truncation": {
+        "truncated": false,
+        "maxDepthReached": false,
+        "maxNodes": 1200,
+        "maxDepth": 64
+      },
+      "window": {
+        "width": 320,
+        "y": 37,
+        "screenIndex": 0,
+        "x": 1716,
+        "height": 48,
+        "isMinimized": false,
+        "id": 44742,
+        "isOffscreen": false,
+        "title": "Agent Gibbon [DEV codex/issue-54-indicator-reentry · 8bc1bbf2] — stash-indicator",
+        "platform": {
+          "layer": 5
+        }
+      },
+      "id": "24DC2482-384F-4FFF-AA28-6934640BE904",
+      "coordinateSpace": "window"
+    },
+    "screenshotStatus": {
+      "metadata": {
+        "windowId": 44742,
+        "engine": "screenCaptureKit"
+      },
+      "state": "captured"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  }
+}

@@ -6,6 +6,11 @@ The existing pointer helper emits mouseMoved without clicks and restores positio
 import json,subprocess,time,sys,tempfile,uuid
 from pathlib import Path
 R=Path(__file__).resolve().parents[1]; phase=sys.argv[1]; assert phase in ('before','after'); O=R/'docs/verification'/('issue36-'+phase);O.mkdir(parents=True,exist_ok=True)
+# The current regression includes first approach AND immediate later reentry.
+# Keep the legacy before mode only for historical pre-#36 reproductions.
+if phase == 'after':
+ subprocess.run([sys.executable, str(R/'scripts/stash-reentry-smoke.py'), 'after'], check=True)
+ sys.exit(0)
 tmp=tempfile.TemporaryDirectory(prefix='gibbon-first-approach-');H=Path(tmp.name); ID='issue36-first-approach-'+uuid.uuid4().hex[:8]; info=json.loads(subprocess.check_output(['node',str(R/'scripts/dev.mjs'),'info'])); events=[]; t=time.monotonic()
 def run(*a):return subprocess.check_output(list(map(str,a)),text=True)
 def helper(n,*a):return run(H/n,*a)
@@ -32,7 +37,7 @@ for src,name in [('entrance-pointer.swift','pointer'),('stash-key.swift','key'),
 original=json.loads(helper('pointer'));focus=helper('front');report={'root':str(R),'info':info,'id':ID,'phase':phase,'events':events,'focus_before':focus}
 try:
  cli('open','--markdown',ID);r=cli('inspect'); assert ID in r['note']['markdown'];pid=next(int(l.split(maxsplit=1)[0]) for l in run('ps','-axo','pid=,command=').splitlines() if len(l.strip().split(maxsplit=1))==2 and l.strip().split(maxsplit=1)[1]==info['binary']+' --serve');report['pid']=pid; report['executable']=info['binary'];title='Agent Gibbon ['+r['dev_label']+'] — stash-indicator'
- assert not r['stash']['active'];move(600,500,'away');time.sleep(1.3);helper('key')
+ assert not r['stash']['active'];assert r['stash']['shortcut']=='Ctrl+Alt+Cmd','Shortcut owned elsewhere; do not send it';move(600,500,'away');time.sleep(1.3);helper('key')
  initial=wait(lambda s:s['active'] and not s['animating'] and s['tip_visible'],'initial hidden')
  time.sleep(.12);initial=state('initial native placement settled');center(initial,'first approach during initial bubble');time.sleep(.16);first=state('first response');shot('first-response')
  if phase=='before':

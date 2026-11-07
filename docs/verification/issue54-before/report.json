@@ -1,0 +1,971 @@
+{
+  "origin": {
+    "root": "/Users/egoinglee/.codex/worktrees/6a93/agent-gibbon",
+    "id": "dev-8bc1bbf27052853a25ad4d82",
+    "name": "codex/issue-54-indicator-reentry",
+    "target": "/Users/egoinglee/.codex/worktrees/6a93/agent-gibbon/src-tauri/target",
+    "binary": "/Users/egoinglee/.codex/worktrees/6a93/agent-gibbon/src-tauri/target/debug/agent-gibbon"
+  },
+  "id": "issue54-0662a793",
+  "phase": "before",
+  "events": [
+    {
+      "at": 5.352443917072378,
+      "label": "finish memo entrance",
+      "pointer": [
+        941,
+        1037
+      ]
+    },
+    {
+      "at": 5.5866032500052825,
+      "label": "memo entrance complete",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "at": 5.803509625024162,
+      "label": "memo entrance complete",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "at": 7.270165583002381,
+      "label": "menu approach",
+      "pointer": [
+        986.0,
+        100.0
+      ]
+    },
+    {
+      "at": 7.330685166991316,
+      "label": "PID-owned tray",
+      "pointer": [
+        1104.0,
+        12.0
+      ]
+    },
+    {
+      "at": 8.625413667061366,
+      "label": "initial hint",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "at": 8.73586041701492,
+      "label": "initial hint",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "at": 8.838710333104245,
+      "label": "initial hint",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "at": 8.944957542000338,
+      "label": "initial hint",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 9.043870249995962,
+      "label": "initial hint",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 9.141317958012223,
+      "label": "initial hint",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 9.240579583100043,
+      "label": "initial hint",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 9.339394875103608,
+      "label": "initial hint",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 9.433790458017029,
+      "label": "initial hint",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 1092.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": true,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 9.43380508304108,
+      "label": "outside 96px",
+      "pointer": [
+        1756.0,
+        1116.0
+      ]
+    },
+    {
+      "at": 9.841544792056084,
+      "label": "first approach during initial hint",
+      "pointer": [
+        2012.0,
+        1116.0
+      ]
+    },
+    {
+      "at": 9.969712208025157,
+      "label": "first flight",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 1010.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 10.044961042003706,
+      "label": "first arrival",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 797.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 10.146000792039558,
+      "label": "first arrival",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 441.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 10.247258875053376,
+      "label": "first arrival",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 140.0
+        },
+        "indicator_moving": true,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 10.34534604207147,
+      "label": "first arrival",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 10.441937791998498,
+      "label": "first arrival",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": true,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 10.511879667057656,
+      "label": "capture origin",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": true,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 11.020535292103887,
+      "label": "exit during arrival hint",
+      "pointer": [
+        1756.0,
+        1116.0
+      ]
+    },
+    {
+      "at": 11.222772042034194,
+      "label": "second approach without 2s or 6s wait",
+      "pointer": [
+        2012.0,
+        61.0
+      ]
+    },
+    {
+      "at": 11.784869375056587,
+      "label": "blocked second approach",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": true,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 12.095299625070766,
+      "label": "menu approach",
+      "pointer": [
+        986.0,
+        100.0
+      ]
+    },
+    {
+      "at": 12.148106667096727,
+      "label": "PID-owned tray",
+      "pointer": [
+        1104.0,
+        12.0
+      ]
+    },
+    {
+      "at": 13.188770708045922,
+      "label": "restored",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": true,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 13.286966542014852,
+      "label": "restored",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": true,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 13.382902625016868,
+      "label": "restored",
+      "stash": {
+        "active": true,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": true,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 13.493542875046842,
+      "label": "restored",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": true,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 13.592091750004329,
+      "label": "restored",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": true,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 13.698277250048704,
+      "label": "restored",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": true,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 13.79884475003928,
+      "label": "restored",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": true,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 13.893514792085625,
+      "label": "restored",
+      "stash": {
+        "active": true,
+        "animating": true,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": true,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": [
+          "note-issue54-0662a793",
+          "note-issue54-progress-6a93"
+        ]
+      }
+    },
+    {
+      "at": 13.988067208090797,
+      "label": "restored",
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 1716.0,
+          "y": 37.0
+        },
+        "indicator_moving": false,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      }
+    },
+    {
+      "at": 14.202303750091232,
+      "label": "restore pointer",
+      "pointer": [
+        925,
+        1037
+      ]
+    }
+  ],
+  "result": "reproduced: valid reentry blocked during arrival hint",
+  "pid": 36413,
+  "executable": "/Users/egoinglee/.codex/worktrees/6a93/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "proof": {
+    "always_on_top": true,
+    "animating": true,
+    "auto_layout_excluded": false,
+    "content_height_cap": 48.0,
+    "dev_label": "DEV codex/issue-54-indicator-reentry · 8bc1bbf2",
+    "feedback_active": false,
+    "feedback_surface": null,
+    "focused": false,
+    "folded": false,
+    "global_opacity": null,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "issue54-0662a793",
+    "instance": "dev-8bc1bbf27052853a25ad4d82",
+    "layout_destination": {
+      "height": 96,
+      "width": 600,
+      "x": 3496,
+      "y": 1974
+    },
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<p>issue54-0662a793</p>\n",
+      "color": "#84fe83",
+      "completion_html": null,
+      "edit_on_open": false,
+      "html": "<p>issue54-0662a793</p>\n",
+      "markdown": "issue54-0662a793",
+      "quiet_update": false,
+      "removed": false,
+      "revision": 1,
+      "source_path": null,
+      "status": "대기",
+      "title": "Agent Gibbon",
+      "updated_at": 1794020494261
+    },
+    "ok": true,
+    "opacity": 1.0,
+    "position": {
+      "x": 1874,
+      "y": 1954
+    },
+    "size": {
+      "height": 96,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 864.0,
+        "y": 295.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-8bc1bbf27052853a25ad4d82/docs/issue54-0662a793/index.md",
+    "visible": true
+  },
+  "memo_surface": {
+    "id": "39a6e155-660d-4a7b-a2a2-1bc9ed83e27f",
+    "ok": true,
+    "result": {
+      "snapshot": {
+        "window": {
+          "x": 1748,
+          "height": 48,
+          "isOffscreen": false,
+          "platform": {
+            "layer": 5
+          },
+          "id": 44729,
+          "y": 987,
+          "width": 300,
+          "screenIndex": 0,
+          "isMinimized": false,
+          "title": "Agent Gibbon [DEV codex/issue-54-indicator-reentry · 8bc1bbf2] — issue54-0662a793"
+        },
+        "coordinateSpace": "window",
+        "treeText": "App=agent-gibbon (pid 36413)\nWindow: \"Agent Gibbon [DEV codex/issue-54-indicator-reentry · 8bc1bbf2] — issue54-0662a793\", App: agent-gibbon.\n\n0 standard window Agent Gibbon [DEV codex/issue-54-indicator-reentry · 8bc1bbf2] — issue54-0662a793\n\t1 scroll area\n\t\t2 HTML content Agent Gibbon\n\t\t\t3 container Agent Gibbon\n\t\t\t\t4 toolbar Toolbar\n\t\t\t\t\t5 button (disabled) 이전 도구\n\t\t\t\t\t6 container DEV codex/issue-54-indicator-reentry · 8bc1bbf2\n\t\t\t\t\t\t7 text DEV\n\t\t\t\t\t8 button (expanded) 메모 접기\n\t\t\t\t\t9 button 글자 크기 12px, 클릭하여 변경\n\t\t\t\t\t10 button 메모 편집\n\t\t\t\t\t11 button 파일로 저장\n\t\t\t\t\t12 button 본문 복사\n\t\t\t\t\t13 button 반대편으로 워프\n\t\t\t\t\t14 toggle button 상단 고정, Value: 1\n\t\t\t\t\t15 button 메모 창 닫기\n\t\t\t\t\t16 button (disabled) 다음 도구\n\t\t\t\t17 text issue54-0662a793\n\nNo UI element is currently focused.",
+        "truncation": {
+          "truncated": false,
+          "maxDepthReached": false,
+          "maxDepth": 64,
+          "maxNodes": 1200
+        },
+        "app": {
+          "pid": 36413,
+          "name": "agent-gibbon",
+          "bundleId": null
+        },
+        "elementCount": 18,
+        "focusedElementId": null,
+        "id": "EA5F9D06-EEE5-48A8-9B5E-D00F53587DE1"
+      },
+      "screenshotStatus": {
+        "state": "skipped",
+        "reason": "no_screenshot_flag"
+      },
+      "screenshot": null
+    },
+    "_meta": {
+      "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+    }
+  },
+  "native_origin": {
+    "screens": [
+      {
+        "frame": [
+          0,
+          0,
+          2048,
+          1152
+        ],
+        "visible": [
+          0,
+          0,
+          2048,
+          1127
+        ],
+        "scale": 2
+      },
+      {
+        "scale": 2,
+        "visible": [
+          -1728,
+          35,
+          1728,
+          1085
+        ],
+        "frame": [
+          -1728,
+          35,
+          1728,
+          1117
+        ]
+      },
+      {
+        "scale": 2,
+        "frame": [
+          0,
+          1152,
+          1920,
+          1080
+        ],
+        "visible": [
+          0,
+          1152,
+          1920,
+          1080
+        ]
+      }
+    ],
+    "windows": [
+      {
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowBounds": {
+          "X": 1087,
+          "Height": 24,
+          "Y": 0,
+          "Width": 34
+        },
+        "kCGWindowSharingState": 0,
+        "kCGWindowOwnerPID": 36413,
+        "kCGWindowStoreType": 1,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowLayer": 25,
+        "kCGWindowAlpha": 1,
+        "kCGWindowNumber": 44690
+      },
+      {
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowBounds": {
+          "X": 1748,
+          "Height": 48,
+          "Y": 987,
+          "Width": 300
+        },
+        "kCGWindowNumber": 44729,
+        "kCGWindowOwnerPID": 36413,
+        "kCGWindowSharingState": 0,
+        "kCGWindowAlpha": 1,
+        "kCGWindowStoreType": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowLayer": 5
+      },
+      {
+        "kCGWindowSharingState": 0,
+        "kCGWindowAlpha": 0.5,
+        "kCGWindowOwnerPID": 36413,
+        "kCGWindowStoreType": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowBounds": {
+          "X": 1748,
+          "Height": 117,
+          "Y": 1035,
+          "Width": 300
+        },
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowNumber": 44692
+      }
+    ]
+  },
+  "focus_before": "53662",
+  "focus_after": "53662",
+  "restored": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": false,
+    "content_height_cap": 48.0,
+    "dev_label": "DEV codex/issue-54-indicator-reentry · 8bc1bbf2",
+    "feedback_active": false,
+    "feedback_surface": null,
+    "focused": false,
+    "folded": false,
+    "global_opacity": null,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "issue54-0662a793",
+    "instance": "dev-8bc1bbf27052853a25ad4d82",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<p>issue54-0662a793</p>\n",
+      "color": "#84fe83",
+      "completion_html": null,
+      "edit_on_open": false,
+      "html": "<p>issue54-0662a793</p>\n",
+      "markdown": "issue54-0662a793",
+      "quiet_update": false,
+      "removed": false,
+      "revision": 1,
+      "source_path": null,
+      "status": "대기",
+      "title": "Agent Gibbon",
+      "updated_at": 1794020494261
+    },
+    "ok": true,
+    "opacity": 0.5,
+    "position": {
+      "x": 3496,
+      "y": 1974
+    },
+    "size": {
+      "height": 96,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 1716.0,
+        "y": 37.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-8bc1bbf27052853a25ad4d82/docs/issue54-0662a793/index.md",
+    "visible": true
+  }
+}
