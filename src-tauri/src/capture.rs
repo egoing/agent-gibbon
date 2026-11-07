@@ -112,7 +112,9 @@ async fn lifecycle(
     operation: &'static str,
     work: impl FnOnce() -> Result<(), String> + Send + 'static,
 ) -> Result<(), String> {
+    let sentry_parent = crate::telemetry::TimingContext::request("capture.request");
     tauri::async_runtime::spawn_blocking(move || {
+        let _sentry_scope = sentry_parent.enter();
         let _root = crate::telemetry::Timing::new(operation);
         let _operation = {
             let _wait = crate::telemetry::Timing::new("capture.lifecycle.wait");
@@ -134,8 +136,10 @@ pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
     }
     // Leave the native shortcut/menu callback before building WebViews. Sending
     // from another thread wakes the event loop even when the mouse stays still.
+    let sentry_parent = crate::telemetry::TimingContext::request("capture.request");
     let app = app.clone();
     std::thread::spawn(move || {
+        let _sentry_scope = sentry_parent.clone().enter();
         #[cfg(windows)]
         {
             let _root = crate::telemetry::Timing::new("capture.prepare");
@@ -153,6 +157,7 @@ pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
             let handle = app.clone();
             if app
                 .run_on_main_thread(move || {
+                    let _sentry_scope = sentry_parent.enter();
                     launch(&handle, mode);
                     LAUNCH_QUEUED.store(false, Ordering::Release);
                 })

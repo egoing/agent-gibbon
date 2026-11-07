@@ -85,8 +85,7 @@
 ### Trace 연결 계측 — #64 (2026-11-06)
 
 - 기존 메모 표시·저장·콘텐츠 측정·fit·숨김과 포커스 보존 기준에 로컬 선택형 단계 기록을 적용한다. 두 rAF는 프레임 준비로 표시하며 페인트/GPU 완료로 표시하지 않는다. UI 외형·배치·문구·설정 선택은 바꾸지 않아 연결된 SVG/PNG는 유지한다.
-- **2026-11-07 후속 기준:** snapshot 요약 transaction 전송은 제거하고 개별 `snapshot.request`와 자식을 유지한다. heartbeat·멈춤 감시와 기존 UI는 유지하며, 전송 필터에서 자식에도 루트와 동일한 OS·아키텍처·빌드 고정 정보를 넣는다. 원문·ID·명령 전송 범위를 넓히지 않는다. 후속 구현과 검증 범위는 [요약/메타정보 기록](verification/sentry-summary-metadata-20261107.md)을 따른다. 외형·배치 변화가 없어 SVG/PNG는 유지한다.
-- 이전 집계/개별 snapshot 분리 단계의 실제 출처 확인·GUI·프로파일 검증과 한계는 [#64 검증 기록](verification/issue64-trace-continuity-20261106.md)을 따른다.
+- WebView의 집계와 개별 snapshot Rust span을 구분하고 원문·ID·명령 전송 범위를 넓히지 않는다. 구현과 실제 출처 확인·GUI·프로파일 검증 및 미검증 범위는 [#64 검증 기록](verification/issue64-trace-continuity-20261106.md)을 따른다.
 
 
 

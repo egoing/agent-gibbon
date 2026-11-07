@@ -255,45 +255,27 @@ fn snapshot_request_is_sampled_and_children_use_the_same_trace() {
 // or network traffic. The callback's nested operations must share one trace.
 #[test]
 fn ipc_callback_keeps_wait_parent_across_threads() {
-    #[derive(Default)]
-    struct Capture(std::sync::Mutex<Vec<sentry::Envelope>>);
-    impl sentry::Transport for Capture {
-        fn send_envelope(&self, envelope: sentry::Envelope) {
-            self.0.lock().unwrap().push(envelope);
-        }
-    }
-    let captured = Arc::new(Capture::default());
-    let client = Arc::new(sentry::Client::from_config(sentry::ClientOptions {
-        dsn: Some("https://public@example.invalid/42".parse().unwrap()),
-        traces_sample_rate: 1.0,
-        default_integrations: false,
-        transport: Some(Arc::new(captured.clone())),
-        ..Default::default()
-    }));
-    let main = sentry::Hub::main();
-    let previous = main.client();
-    main.bind_client(Some(client));
-    transport::permit(true);
-    ENABLED.store(true, Ordering::SeqCst);
-    DETAILED.store(true, Ordering::SeqCst);
-    std::thread::spawn(|| {
-        let wait = Timing::new("ipc.wait");
-        let parent = wait.context();
-        std::thread::spawn(move || {
-            let _parent = parent.enter();
-            let _apply = Timing::new("ipc.open");
-            let _nested = Timing::new("markdown.render");
+    // An isolated gate/client prevents concurrent worker tests from writing
+    // into this capture through process-global ENABLED/main Hub state.
+    let (hub, captured, gate) = timing_harness(1.0);
+    std::thread::spawn(move || {
+        sentry::Hub::run(hub.clone(), || {
+            let wait = start_timing(&gate, "ipc.wait");
+            let parent = wait.context();
+            std::thread::spawn(move || {
+                sentry::Hub::run(hub, || {
+                    let _parent = parent.enter();
+                    let _apply = start_timing(&gate, "ipc.open");
+                    let _nested = start_timing(&gate, "markdown.render");
+                })
+            })
+            .join()
+            .unwrap();
+            drop(wait);
         })
-        .join()
-        .unwrap();
-        drop(wait);
     })
     .join()
     .unwrap();
-    ENABLED.store(false, Ordering::SeqCst);
-    DETAILED.store(false, Ordering::SeqCst);
-    main.bind_client(previous);
-    transport::permit(false);
     let envelopes = captured.0.lock().unwrap();
     let transactions: Vec<_> = envelopes
         .iter()
@@ -755,9 +737,11 @@ fn terminal_blocking_worker_keeps_request_parent() {
     let (hub, capture, gate) = timing_harness(1.0);
     sentry::Hub::run(hub.clone(), || {
         let request = start_timing(&gate, "terminal.start");
+        let parent = request.context();
         let worker_gate = gate.clone();
         let work = move || {
             sentry::Hub::run(hub, || {
+                let _parent = parent.enter();
                 let _worker = start_timing(&worker_gate, "terminal.pty.create");
             })
         };
@@ -784,10 +768,13 @@ fn capture_worker_then_ui_callback_keeps_request_parent() {
     let (hub, capture, gate) = timing_harness(1.0);
     sentry::Hub::run(hub.clone(), || {
         let request = start_timing(&gate, "capture.prepare");
+        let parent = request.context();
         std::thread::spawn(move || {
+            let _worker_scope = parent.clone().enter();
             // Represents the detached worker -> queued UI closure boundary.
             std::thread::spawn(move || {
                 sentry::Hub::run(hub, || {
+                    let _parent = parent.enter();
                     let _capture = start_timing(&gate, "capture.screen.capture");
                 })
             })
@@ -811,4 +798,96 @@ fn capture_worker_then_ui_callback_keeps_request_parent() {
     assert_eq!(t.spans.len(), 1);
     assert_eq!(t.spans[0].trace_id, root.trace_id);
     assert_eq!(t.spans[0].parent_span_id, Some(root.span_id));
+}
+
+#[test]
+fn bounded_request_lease_crosses_await_without_source_scope_or_reader_retention() {
+    fn send<T: Send>() {}
+    send::<TimingContext>();
+    let (hub, capture, gate) = timing_harness(1.0);
+    sentry::Hub::run(hub.clone(), || {
+        let parent = timing_context("terminal.request", false, true, gate.clone());
+        assert!(parent.span.is_some());
+        // Construction does not leave a guard in the async caller's TLS.
+        drop(start_timing(&gate, "terminal.output"));
+        assert_eq!(captured_transactions(&capture).len(), 1);
+        let (release, held) = std::sync::mpsc::channel();
+        let (reader_started, started) = std::sync::mpsc::channel();
+        let work = move || {
+            sentry::Hub::run(hub, || {
+                let _parent = parent.enter();
+                let _start = start_timing(&gate, "terminal.start");
+                let _pty = start_timing(&gate, "terminal.pty.create");
+                std::thread::spawn(move || {
+                    reader_started.send(()).unwrap();
+                    // A long-lived reader owns no Sentry parent lease.
+                    held.recv_timeout(Duration::from_secs(2)).unwrap();
+                })
+            })
+        };
+        let reader =
+            tauri::async_runtime::block_on(tauri::async_runtime::spawn_blocking(work)).unwrap();
+        started.recv_timeout(Duration::from_secs(2)).unwrap();
+        let transactions = captured_transactions(&capture);
+        assert_eq!(transactions.len(), 2);
+        let t = transactions
+            .iter()
+            .find(|t| t.name.as_deref() == Some("terminal.request"))
+            .unwrap();
+        assert_eq!(t.spans.len(), 2);
+        let p::Context::Trace(root) = &t.contexts["trace"] else {
+            panic!("trace")
+        };
+        let worker = t
+            .spans
+            .iter()
+            .find(|s| s.op.as_deref() == Some("terminal.start"))
+            .unwrap();
+        let pty = t
+            .spans
+            .iter()
+            .find(|s| s.op.as_deref() == Some("terminal.pty.create"))
+            .unwrap();
+        assert_eq!(worker.parent_span_id, Some(root.span_id));
+        assert_eq!(pty.parent_span_id, Some(worker.span_id));
+        assert!(t.timestamp.unwrap() >= pty.timestamp.unwrap());
+        release.send(()).unwrap();
+        reader.join().unwrap();
+    });
+}
+
+#[test]
+fn request_constructor_retains_sampling_and_epoch_barriers_with_cancellation() {
+    for rate in [0.0, 1.0] {
+        let (hub, capture, gate) = timing_harness(rate);
+        sentry::Hub::run(hub, || {
+            let old = timing_context("capture.request", false, true, gate.clone());
+            gate.change(false);
+            gate.change(true);
+            {
+                let _parent = old.enter();
+                assert!(start_timing(&gate, "capture.prepare")
+                    .context
+                    .span
+                    .is_none());
+            }
+            let off = timing_context("capture.request", false, false, gate.clone());
+            {
+                let _parent = off.enter();
+                assert!(start_timing(&gate, "capture.finish").context.span.is_none());
+            }
+            assert!(captured_transactions(&capture).is_empty());
+            {
+                let parent = timing_context("capture.request", false, true, gate.clone());
+                let _parent = parent.enter();
+                let _finish = start_timing(&gate, "capture.finish");
+                let _cleanup = start_timing(&gate, "capture.cleanup.wait");
+            }
+            let expected = if rate == 1.0 { 1 } else { 0 };
+            assert_eq!(captured_transactions(&capture).len(), expected);
+            // Queue rejection/cancellation drops the unscheduled lease too.
+            drop(timing_context("capture.request", false, true, gate.clone()));
+            assert_eq!(captured_transactions(&capture).len(), expected * 2);
+        });
+    }
 }
