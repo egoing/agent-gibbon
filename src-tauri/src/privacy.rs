@@ -228,6 +228,7 @@ pub async fn privacy_save(
                 let _ = crate::apply_direct(
                     &target,
                     crate::Request {
+                        url: None,
                         action: crate::Action::Open,
                         id: None,
                         title: None,

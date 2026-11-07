@@ -1,0 +1,16 @@
+{
+  "pids": [
+    26365,
+    28251
+  ],
+  "exception": "EXC_BREAKPOINT / SIGTRAP",
+  "thread": "tokio-rt-worker",
+  "reason": "Must only be used from the main thread",
+  "frames": [
+    "NSWindow::orderFrontRegardless",
+    "web::show",
+    "web::create",
+    "web::web_run"
+  ],
+  "resolution": "dispatch the complete create operation onto the main thread"
+}

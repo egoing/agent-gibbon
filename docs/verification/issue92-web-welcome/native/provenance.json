@@ -1,0 +1,10 @@
+{
+  "root": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/92-web-welcome",
+  "instance": "dev-70d4bfcea466ab2bbe492b65",
+  "pid": 32277,
+  "binary": "/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/92-web-welcome/src-tauri/target/debug/agent-gibbon",
+  "welcome_window": 45261,
+  "remote_window": 45292,
+  "note_id": "web-92-fixed",
+  "command": "lsof -n -a -p 32277 -d txt -Fn"
+}

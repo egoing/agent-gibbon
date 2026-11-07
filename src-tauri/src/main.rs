@@ -25,6 +25,7 @@ mod telemetry;
 mod terminal;
 mod tray;
 mod warp;
+mod web;
 #[cfg(windows)]
 mod windows_contact;
 #[cfg(windows)]
@@ -388,6 +389,9 @@ fn apply_with_presentation(
     if matches!(request.action, Action::Probe) {
         return Ok(telemetry::probe());
     }
+    if matches!(request.action, Action::Web) || web::contains(app, request.id()) {
+        return web::handle(app, &request);
+    }
     let _timing = telemetry::Timing::new(match request.action {
         Action::Open => "ipc.open",
         Action::Update => "ipc.update",
@@ -414,6 +418,7 @@ fn apply_with_presentation(
         for agent in terminal::entries(app) {
             windows.push(terminal::inspect(app, &agent.id)?);
         }
+        windows.extend(web::entries(app)?);
         return Ok(json!({"ok":true,"windows":windows}));
     }
     let id = request.id().to_string();
@@ -490,7 +495,12 @@ fn apply_with_presentation(
             win.hide().map_err(|e| e.to_string())?;
             tray::sync_visibility(app)?;
         }
-        Action::Update | Action::Inspect | Action::List | Action::Diagnostics | Action::Probe => (),
+        Action::Update
+        | Action::Inspect
+        | Action::List
+        | Action::Diagnostics
+        | Action::Probe
+        | Action::Web => (),
     }
     // Existing metadata is recollected before the next menu open. Replacing a
     // tracking native menu here would dismiss it during background updates.
@@ -520,6 +530,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(telemetry::Runtime::default())
         .manage(capture::Captures::default())
         .manage(terminal::Terminals::default())
+        .manage(web::Windows::default())
         .manage(ClosedNotes::default())
         .manage(PointerStates::default())
         .manage(initial_focus)
@@ -547,6 +558,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     local_trace::local_flow_begin,
                     local_trace::local_flow_stage,
                     snapshot,
+                    web::web_run,
                     terminal::terminal_start,
                     terminal::terminal_write,
                     terminal::terminal_resize,
@@ -591,6 +603,14 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     sizing::manual_resize
                 ]);
             move |invoke: tauri::ipc::Invoke| {
+                // Remote pages never receive application commands, even if an
+                // origin is incorrectly classified as local by the WebView runtime.
+                if invoke.message.webview_ref().label().starts_with("webpage-") {
+                    invoke
+                        .resolver
+                        .reject("External web content has no application IPC access");
+                    return true;
+                }
                 let command = invoke.message.command();
                 let exempt = matches!(
                     command,
@@ -617,6 +637,13 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             if win.label() == manager::LABEL && privacy::onboarding_required(win.app_handle()) {
                 if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
                     win.app_handle().exit(0);
+                }
+                return;
+            }
+            if win.label().starts_with("webview-") || win.label().starts_with("webpage-") {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    let _ = win.hide();
                 }
                 return;
             }
@@ -746,6 +773,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 apply_direct(
                     app.handle(),
                     Request {
+                        url: None,
                         change_mode: None,
                         highlight: None,
                         source_path: None,
@@ -847,6 +875,7 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
         apply_direct(
             app,
             Request {
+                url: None,
                 action: Action::Open,
                 id: None,
                 color: None,
@@ -863,8 +892,9 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
 }
 
 fn parse(args: &[String]) -> Result<Request, String> {
-    let action = match args.first().map(String::as_str) { Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
+    let action = match args.first().map(String::as_str) { Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("web") => Action::Web, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon web [--id web-ID] [--url URL]; agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
+        url: None,
         action,
         change_mode: None,
         highlight: None,
@@ -894,6 +924,7 @@ fn parse(args: &[String]) -> Result<Request, String> {
                     _ => return Err("highlight는 none 또는 newly-completed여야 합니다".into()),
                 })
             }
+            "--url" if request.url.is_none() => request.url = Some(value.clone()),
             "--id" if request.id.is_none() => request.id = Some(value.clone()),
             "--color" if request.color.is_none() => request.color = Some(value.clone()),
             "--title" if request.title.is_none() => request.title = Some(value.clone()),
@@ -941,7 +972,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
     ipc::directory()?;
     let stream = match ipc::connect() {
         Ok(stream) => stream,
-        Err(_) if matches!(request.action, Action::Open) => {
+        Err(_) if matches!(request.action, Action::Open | Action::Web) => {
             let mut child = Command::new(std::env::current_exe().map_err(|e| e.to_string())?);
             child
                 .arg("--serve")
@@ -985,6 +1016,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
     if matches!(request.action, Action::Open) && response["ok"] == true {
         // Wait only for initial measurement/show, never for pointer movement.
         let inspect = Request {
+            url: None,
             change_mode: None,
             highlight: None,
             source_path: None,
@@ -1032,7 +1064,7 @@ fn main() {
         )
     } else if args == ["--help"] || args == ["-h"] {
         Ok(
-            json!({"ok":true,"usage":"agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open만 앱을 시작하거나 창을 생성·복원합니다. ID 생략 시 main, close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
+            json!({"ok":true,"usage":"agent-gibbon web [--id web-ID] [--url URL]; agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open/web은 앱을 시작하거나 창을 생성·복원합니다. web의 ID 생략은 새 웹 창, open의 ID 생략은 main이며 close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
         )
     } else {
         cli(&args)

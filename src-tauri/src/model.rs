@@ -27,6 +27,7 @@ pub enum Action {
     List,
     Diagnostics,
     Probe,
+    Web,
 }
 
 // Retired dedicated-agent IDs stay reserved, so open/update cannot turn an old
@@ -39,6 +40,8 @@ pub fn retired_agent_id(id: &str) -> bool {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct Request {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
     pub change_mode: Option<ChangeMode>,
     pub highlight: Option<Highlight>,
     pub action: Action,
@@ -74,6 +77,24 @@ impl Request {
             if self.highlight.is_some() && self.change_mode != Some(ChangeMode::Replace) {
                 return Err("highlight는 change-mode replace와 함께 사용하세요".into());
             }
+        }
+        if matches!(self.action, Action::Web) {
+            if self.title.is_some()
+                || self.markdown.is_some()
+                || self.source_path.is_some()
+                || self.color.is_some()
+                || self.status.is_some()
+            {
+                return Err("web에는 메모 내용·색상·상태 옵션을 사용할 수 없습니다".into());
+            }
+            if self.id.as_deref().is_some_and(|id| !id.starts_with("web-")) {
+                return Err("웹 창 ID는 web-로 시작해야 합니다".into());
+            }
+            if let Some(url) = &self.url {
+                crate::web::validate_url(url)?;
+            }
+        } else if self.url.is_some() {
+            return Err("URL은 web 명령에만 지정할 수 있습니다".into());
         }
         let id = self.id();
         if retired_agent_id(id) {
@@ -219,6 +240,7 @@ impl Note {
         }
         let mut next = self.clone();
         next.apply(&Request {
+            url: None,
             action: Action::Update,
             id: None,
             color: None,
@@ -796,6 +818,7 @@ mod tests {
     #[test]
     fn retired_agent_ids_are_reserved_while_ordinary_note_ids_still_work() {
         let mut request = Request {
+            url: None,
             change_mode: None,
             highlight: None,
             action: Action::Open,
@@ -998,6 +1021,7 @@ mod tests {
         std::fs::write(&path, "원문").unwrap();
         let mut note = Note::default();
         note.apply(&Request {
+            url: None,
             action: Action::Open,
             id: None,
             title: None,
@@ -1101,6 +1125,7 @@ mod tests {
     fn partial_updates_preserve_unspecified_fields() {
         let mut note = Note::default();
         note.apply(&Request {
+            url: None,
             change_mode: None,
             highlight: None,
             source_path: None,
@@ -1113,6 +1138,7 @@ mod tests {
         })
         .unwrap();
         note.apply(&Request {
+            url: None,
             change_mode: None,
             highlight: None,
             source_path: None,
@@ -1133,6 +1159,7 @@ mod tests {
         let mut note = Note::default();
         assert!(note
             .apply(&Request {
+                url: None,
                 change_mode: None,
                 highlight: None,
                 source_path: None,
@@ -1233,6 +1260,7 @@ mod palette_tests {
             let mut note = Note::with_palette_color(index);
             assert_eq!(note.color, NOTE_COLORS[index % 6]);
             let mut request = Request {
+                url: None,
                 action: Action::Open,
                 id: None,
                 title: None,
