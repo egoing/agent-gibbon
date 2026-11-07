@@ -250,3 +250,383 @@ fn snapshot_request_is_sampled_and_children_use_the_same_trace() {
         assert_eq!(span.trace_id, context.trace_id);
     }
 }
+
+// Reproduces the IPC receive-thread -> UI callback boundary without native UI
+// or network traffic. The callback's nested operations must share one trace.
+#[test]
+fn ipc_callback_keeps_wait_parent_across_threads() {
+    #[derive(Default)]
+    struct Capture(std::sync::Mutex<Vec<sentry::Envelope>>);
+    impl sentry::Transport for Capture {
+        fn send_envelope(&self, envelope: sentry::Envelope) {
+            self.0.lock().unwrap().push(envelope);
+        }
+    }
+    let captured = Arc::new(Capture::default());
+    let client = Arc::new(sentry::Client::from_config(sentry::ClientOptions {
+        dsn: Some("https://public@example.invalid/42".parse().unwrap()),
+        traces_sample_rate: 1.0,
+        default_integrations: false,
+        transport: Some(Arc::new(captured.clone())),
+        ..Default::default()
+    }));
+    let main = sentry::Hub::main();
+    let previous = main.client();
+    main.bind_client(Some(client));
+    transport::permit(true);
+    ENABLED.store(true, Ordering::SeqCst);
+    DETAILED.store(true, Ordering::SeqCst);
+    std::thread::spawn(|| {
+        let wait = Timing::new("ipc.wait");
+        let parent = wait.context();
+        std::thread::spawn(move || {
+            let _parent = parent.enter();
+            let _apply = Timing::new("ipc.open");
+            let _nested = Timing::new("markdown.render");
+        })
+        .join()
+        .unwrap();
+        drop(wait);
+    })
+    .join()
+    .unwrap();
+    ENABLED.store(false, Ordering::SeqCst);
+    DETAILED.store(false, Ordering::SeqCst);
+    main.bind_client(previous);
+    transport::permit(false);
+    let envelopes = captured.0.lock().unwrap();
+    let transactions: Vec<_> = envelopes
+        .iter()
+        .flat_map(|e| e.items())
+        .filter_map(|i| {
+            if let p::EnvelopeItem::Transaction(t) = i {
+                Some(t)
+            } else {
+                None
+            }
+        })
+        .collect();
+    assert_eq!(
+        transactions.len(),
+        1,
+        "callback must remain in the wait transaction"
+    );
+    let t = transactions[0];
+    assert_eq!(t.name.as_deref(), Some("ipc.wait"));
+    let p::Context::Trace(root) = &t.contexts["trace"] else {
+        panic!("missing trace")
+    };
+    let apply = t
+        .spans
+        .iter()
+        .find(|s| s.op.as_deref() == Some("ipc.open"))
+        .unwrap();
+    let nested = t
+        .spans
+        .iter()
+        .find(|s| s.op.as_deref() == Some("markdown.render"))
+        .unwrap();
+    assert_eq!(apply.trace_id, root.trace_id);
+    assert_eq!(apply.parent_span_id, Some(root.span_id));
+    assert_eq!(nested.trace_id, root.trace_id);
+    assert_eq!(nested.parent_span_id, Some(apply.span_id));
+    assert!(t.timestamp.unwrap() >= apply.timestamp.unwrap());
+}
+
+#[derive(Default)]
+struct TimingCapture(std::sync::Mutex<Vec<sentry::Envelope>>);
+impl sentry::Transport for TimingCapture {
+    fn send_envelope(&self, envelope: sentry::Envelope) {
+        // Exercise the unchanged final egress allowlist, without any network.
+        self.0.lock().unwrap().push(privacy::envelope(envelope));
+    }
+}
+fn timing_harness(rate: f32) -> (Arc<sentry::Hub>, Arc<TimingCapture>, Arc<transport::Gate>) {
+    let capture = Arc::new(TimingCapture::default());
+    let client = Arc::new(sentry::Client::from_config(sentry::ClientOptions {
+        dsn: Some("https://public@example.invalid/42".parse().unwrap()),
+        traces_sampler: Some(Arc::new(move |_| rate)),
+        default_integrations: false,
+        transport: Some(Arc::new(capture.clone())),
+        ..Default::default()
+    }));
+    let hub = Arc::new(sentry::Hub::new(
+        Some(client),
+        Arc::new(sentry::Scope::default()),
+    ));
+    let gate = Arc::new(transport::Gate::default());
+    gate.change(true);
+    (hub, capture, gate)
+}
+fn start_timing(gate: &Arc<transport::Gate>, op: &'static str) -> Timing {
+    Timing::with_gate(op, false, true, gate.clone())
+}
+fn captured_transactions(capture: &TimingCapture) -> Vec<p::Transaction<'static>> {
+    capture
+        .0
+        .lock()
+        .unwrap()
+        .iter()
+        .flat_map(|e| e.items())
+        .filter_map(|i| {
+            if let p::EnvelopeItem::Transaction(t) = i {
+                Some(t.clone())
+            } else {
+                None
+            }
+        })
+        .collect()
+}
+
+#[test]
+fn timing_late_callback_finishes_child_before_root_and_cancellation_releases_lease() {
+    let (hub, capture, gate) = timing_harness(1.0);
+    sentry::Hub::run(hub.clone(), || {
+        let wait = start_timing(&gate, "ipc.wait");
+        let parent = wait.context();
+        drop(wait); // Models receiver timeout while UI work remains queued.
+        assert!(captured_transactions(&capture).is_empty());
+        let worker_gate = gate.clone();
+        std::thread::spawn(move || {
+            sentry::Hub::run(hub, || {
+                let _scope = parent.enter();
+                let _apply = start_timing(&worker_gate, "ipc.update");
+                let _nested = start_timing(&worker_gate, "storage.save");
+            })
+        })
+        .join()
+        .unwrap();
+        let transactions = captured_transactions(&capture);
+        assert_eq!(transactions.len(), 1);
+        assert_eq!(transactions[0].spans.len(), 2);
+        for child in &transactions[0].spans {
+            assert!(transactions[0].timestamp.unwrap() >= child.timestamp.unwrap());
+        }
+        let wait = start_timing(&gate, "ipc.wait");
+        let cancelled = wait.context();
+        drop(wait);
+        assert_eq!(captured_transactions(&capture).len(), 1);
+        drop(cancelled); // Models run_on_main_thread rejection/drop or expired callback.
+        assert_eq!(captured_transactions(&capture).len(), 2);
+    });
+}
+
+#[test]
+fn timing_concurrent_requests_restore_destination_context_including_panic() {
+    let (hub, capture, gate) = timing_harness(1.0);
+    let (send, receive) = std::sync::mpsc::channel();
+    let mut workers = Vec::new();
+    let barrier = Arc::new(std::sync::Barrier::new(3));
+    for _ in 0..2 {
+        let (hub, gate, send, barrier) = (hub.clone(), gate.clone(), send.clone(), barrier.clone());
+        workers.push(std::thread::spawn(move || {
+            sentry::Hub::run(hub, || {
+                let root = start_timing(&gate, "ipc.wait");
+                send.send(root.context()).unwrap();
+                barrier.wait();
+            })
+        }));
+    }
+    let first = receive.recv().unwrap();
+    let second = receive.recv().unwrap();
+    sentry::Hub::run(hub, || {
+        let ambient = start_timing(&gate, "terminal.start");
+        let ambient_trace = ambient
+            .context
+            .span
+            .as_ref()
+            .unwrap()
+            .span
+            .get_trace_context()
+            .trace_id;
+        for parent in [first, second] {
+            let parent_trace = parent
+                .span
+                .as_ref()
+                .unwrap()
+                .span
+                .get_trace_context()
+                .trace_id;
+            assert_ne!(parent_trace, ambient_trace);
+            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                let _scope = parent.enter();
+                let child = start_timing(&gate, "ipc.open");
+                assert_eq!(
+                    child
+                        .context
+                        .span
+                        .as_ref()
+                        .unwrap()
+                        .span
+                        .get_trace_context()
+                        .trace_id,
+                    parent_trace
+                );
+                panic!("callback panic");
+            }));
+            assert!(result.is_err());
+            let restored = start_timing(&gate, "storage.save");
+            assert_eq!(
+                restored
+                    .context
+                    .span
+                    .as_ref()
+                    .unwrap()
+                    .span
+                    .get_trace_context()
+                    .trace_id,
+                ambient_trace
+            );
+        }
+    });
+    barrier.wait();
+    for worker in workers {
+        worker.join().unwrap();
+    }
+    let transactions = captured_transactions(&capture);
+    assert_eq!(transactions.len(), 3);
+    let waits: Vec<_> = transactions
+        .iter()
+        .filter(|t| t.name.as_deref() == Some("ipc.wait"))
+        .collect();
+    assert_eq!(waits.len(), 2);
+    assert_ne!(waits[0].contexts["trace"], waits[1].contexts["trace"]);
+    for wait in waits {
+        assert_eq!(wait.spans.len(), 1);
+        assert_eq!(wait.spans[0].status, Some(p::SpanStatus::InternalError));
+        let p::Context::Trace(root) = &wait.contexts["trace"] else {
+            panic!("trace")
+        };
+        assert_eq!(wait.spans[0].parent_span_id, Some(root.span_id));
+    }
+}
+
+#[test]
+fn timing_denies_revoked_disabled_and_prior_epoch_work_after_reactivation() {
+    let (hub, capture, gate) = timing_harness(1.0);
+    sentry::Hub::run(hub, || {
+        let wait = start_timing(&gate, "ipc.wait");
+        let old = wait.context();
+        gate.change(false);
+        {
+            let _scope = old.clone().enter();
+            assert!(start_timing(&gate, "ipc.open").context.span.is_none());
+        }
+        gate.change(true);
+        {
+            let _scope = old.enter();
+            assert!(start_timing(&gate, "ipc.open").context.span.is_none());
+        }
+        drop(wait);
+        assert!(captured_transactions(&capture).is_empty());
+        gate.change(false);
+        let disabled = start_timing(&gate, "ipc.wait");
+        let old = disabled.context();
+        drop(disabled);
+        gate.change(true);
+        {
+            let _scope = old.enter();
+            assert!(start_timing(&gate, "ipc.open").context.span.is_none());
+        }
+        {
+            let disabled = Timing::with_gate("ipc.wait", false, false, gate.clone());
+            let parent = disabled.context();
+            drop(disabled);
+            let _scope = parent.enter();
+            assert!(start_timing(&gate, "ipc.open").context.span.is_none());
+        }
+        drop(start_timing(&gate, "ipc.wait"));
+        assert_eq!(captured_transactions(&capture).len(), 1);
+    });
+}
+
+#[test]
+fn timing_children_inherit_unsampled_parent_without_resampling_and_polling_is_capped() {
+    for rate in [0.0, 1.0] {
+        let (hub, capture, gate) = timing_harness(rate);
+        sentry::Hub::run(hub.clone(), || {
+            let root = start_timing(&gate, "ipc.wait");
+            let context = root.context();
+            let worker_gate = gate.clone();
+            std::thread::spawn(move || {
+                sentry::Hub::run(hub, || {
+                    let _scope = context.enter();
+                    let _child = start_timing(&worker_gate, "ipc.inspect");
+                    let _snapshot = start_timing(&worker_gate, "snapshot.request");
+                })
+            })
+            .join()
+            .unwrap();
+        });
+        assert_eq!(
+            captured_transactions(&capture).len(),
+            if rate == 0.0 { 0 } else { 1 }
+        );
+    }
+    let sampler = options("https://public@example.invalid/42".parse().unwrap(), true)
+        .traces_sampler
+        .unwrap();
+    let mut polling = sentry::TransactionContext::new("ipc.wait", "ipc.wait");
+    polling.custom_insert("ipc.polling".into(), json!(true));
+    assert!(sampler(&polling) <= 0.01);
+    // Verify the root actually supplies that flag to the SDK, not just the callback.
+    let (hub, _, gate) = timing_harness(1.0);
+    let calls = Arc::new(AtomicUsize::new(0));
+    let seen = calls.clone();
+    let client = Arc::new(sentry::Client::from_config(sentry::ClientOptions {
+        dsn: Some("https://public@example.invalid/42".parse().unwrap()),
+        traces_sampler: Some(Arc::new(move |ctx| {
+            assert_eq!(ctx.name(), "ipc.wait");
+            assert_eq!(ctx.custom().unwrap().get("ipc.polling"), Some(&json!(true)));
+            seen.fetch_add(1, Ordering::SeqCst);
+            0.0
+        })),
+        default_integrations: false,
+        transport: Some(Arc::new(Arc::new(TimingCapture::default()))),
+        ..Default::default()
+    }));
+    hub.bind_client(Some(client));
+    sentry::Hub::run(hub, || {
+        drop(Timing::with_gate("ipc.wait", true, true, gate));
+    });
+    assert_eq!(calls.load(Ordering::SeqCst), 1);
+}
+
+#[test]
+fn timing_late_finish_uses_originating_client_scope_and_restores_destination_hub() {
+    let (hub, capture, gate) = timing_harness(1.0);
+    hub.configure_scope(|s| s.set_tag("window.kind", "memo"));
+    let parent = sentry::Hub::run(hub.clone(), || {
+        let wait = start_timing(&gate, "ipc.wait");
+        wait.context()
+    });
+    let destination = Arc::new(sentry::Hub::new_from_top(hub));
+    destination.configure_scope(|s| s.set_tag("window.kind", "terminal"));
+    let original_client = parent.span.as_ref().unwrap().hub.client().unwrap();
+    // Rebinding the destination must not rebind the lease's originating client.
+    let replacement = Arc::new(sentry::Client::from_config(sentry::ClientOptions {
+        default_integrations: false,
+        ..Default::default()
+    }));
+    destination.bind_client(Some(replacement.clone()));
+    sentry::Hub::run(destination, || {
+        assert!(!Arc::ptr_eq(
+            &original_client,
+            &sentry::Hub::current().client().unwrap()
+        ));
+        let _scope = parent.enter();
+        let child = start_timing(&gate, "ipc.open");
+        assert!(Arc::ptr_eq(
+            &original_client,
+            &child.context.span.as_ref().unwrap().hub.client().unwrap()
+        ));
+        drop(child);
+    });
+    let transactions = captured_transactions(&capture);
+    assert_eq!(transactions.len(), 1);
+    assert_eq!(
+        transactions[0].tags.get("window.kind").map(String::as_str),
+        Some("memo")
+    );
+    assert_eq!(transactions[0].spans.len(), 1);
+}

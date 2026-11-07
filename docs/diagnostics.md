@@ -42,7 +42,7 @@ Windows는 `npm.cmd`를 사용한다. `gh api`를 지원하는 인증된 GitHub 
 
 ## 상세 진단 항목
 
-- **Tracing / spans:** 시작, IPC 대기·명령, 창 생성, Markdown 렌더, 저장·복원, 터미널 시작·쓰기·출력·리사이즈의 Rust 구간을 측정한다. 동기 중첩 작업은 같은 trace의 자식 span이 된다.
+- **Tracing / spans:** 시작, IPC 대기·명령, 창 생성, Markdown 렌더, 저장·복원, 터미널 시작·쓰기·출력·리사이즈의 Rust 구간을 측정한다. 동기 중첩 작업은 같은 trace의 자식 span이 된다. CLI의 `ipc.wait` 수신 스레드에서 UI callback으로는 Sentry 부모 handle을 명시적으로 전달하므로 `ipc.open/update/close/inspect/list`와 그 동기 하위 단계도 같은 trace에 포함된다.
 - **WebView 측정:** 허용된 앱 명령의 왕복 지연·성공/실패 횟수, 클릭부터 두 animation frame까지의 시간, 타이머 지연을 숫자로 집계한다. 2초 구간별 최대 지연과 횟수이며 모든 개별 호출의 분포가 아니다. `measurement.origin`의 `rust` / `webview.aggregate`로 개별 Rust 실행과 WebView 집계를 구분한다. 개별 snapshot의 Rust root는 `snapshot.request`이며 집계 transaction `snapshot`과 다른 이름이다.
 - **Long tasks / long animation frames:** 해당 WebView가 PerformanceObserver 타입을 지원할 때만 지속 시간을 기록한다. 스크립트 URL·attribution·DOM은 보내지 않는다. WebView2와 WKWebView의 지원 차이를 숨기지 않는다.
 - **오류 진단:** Rust panic 스택·네이티브 image 식별자, WebView 오류 종류와 허용된 앱 JS 파일명·행·열을 보낸다. 오류 문구·Promise reason·소스 문맥·로컬 절대 경로·frame 변수는 제거한다.
@@ -79,7 +79,7 @@ powershell -NoProfile -File scripts/windows-hang-evidence.ps1
 
 ### 단계별 trace/span 이름
 
-운영 이름과 레이블은 국제화와 쿼리 재사용을 위해 고정된 영어 이름을 사용한다. 동적 메모 제목·ID·경로·실행 명령을 이름에 붙이지 않는다. 같은 Rust 동기 호출 흐름의 하위 구간은 부모 trace의 자식 span이며, 서로 다른 UI callback·thread·WebView 집계 사이에 자동으로 trace가 이어진다고 가정하지 않는다.
+운영 이름과 레이블은 국제화와 쿼리 재사용을 위해 고정된 영어 이름을 사용한다. 동적 메모 제목·ID·경로·실행 명령을 이름에 붙이지 않는다. 같은 Rust 동기 호출 흐름의 하위 구간은 부모 trace의 자식 span이며, IPC 수신 → UI callback 경계만 명시적 부모 handle로 연결한다. 다른 UI callback·thread·WebView 집계 사이에 자동으로 trace가 이어진다고 가정하지 않는다.
 
 | 흐름 | 영어 작업 이름 | 해석 |
 | --- | --- | --- |
@@ -129,3 +129,12 @@ Actions의 `AGENT_GIBBON_SENTRY_DSN` secret/variable을 공식 release 빌드에
 Sentry 개별 Rust snapshot root `snapshot.request`는 기존 고빈도 작업과 같이 최대 1% 샘플링이다. 자식은 `note.state.notes_wait`, `notes_copy`, `opacity`, `feedback`, `position`, `size`, `visibility`, `focus`, `pin`, `response`다(각 이름의 앞에 `note.state.`). 잠금 획득 대기와 잠금 안 복사를 구분하고 네이티브 조회 전에 Notes 잠금을 해제한다. `opacity`/`feedback`은 각각 여러 관련 조회를 포함한다. `response`는 응답 Value 구성과 남은 상태 조회를 포함하며 Tauri의 최종 직렬화·IPC 전달은 포함하지 않는다. 개별 실행 자식은 같은 trace지만 WebView의 집계 transaction과 원격으로 이어지지는 않는다. 프로파일이나 샘플링 수치를 이유로 고빈도 전송을 100%로 올리지 않는다.
 
 [대표 실행·로컬 프로파일링 절차와 현재 검증](verification/issue64-trace-continuity-20261106.md)을 따른다. 원격 수신, Windows Browser Profiling, WKWebView 함수/렌더링 프로파일은 각각 별도 실행 근거가 필요하다.
+
+### IPC 스레드 부모 전달 — #64
+
+- trace ID를 복사해 transaction을 재시작하지 않고 SDK 부모 handle의 직접 자식 span을 만든다. 샘플링 결정을 그대로 상속한다. inspect/list 요청은 `ipc.wait` 루트 생성부터 최대 1%를 적용하므로 자식 연결이 폴링 전송량을 높이지 않는다. 이 분류는 내부 sampler 입력이며 외부 필드로 추가하지 않는다.
+- 부모 handle은 callback이 처리되거나 폐기될 때까지 조상을 유지한다. 수신 대기가 먼저 끝난 경우에도 자식이 끝난 뒤 transaction을 끝내며, callback 취소·큐 등록 실패 시 마지막 handle 해제로 정리한다. 영구 정지·프로세스 종료는 미완료 trace 손실 가능성이 있다.
+- UI callback은 현재 스레드의 기존 문맥을 잠시 교체하고 정상 반환·오류·panic 시 복원한다. 동시 요청은 각각의 부모를 사용한다. 로컬 recorder의 scope/parent/cause ID는 전달 handle에 포함하지 않으며 전송 필터도 유지한다.
+- handle은 기존 전송 gate의 동의 세대에 묶인다. 철회·재활성화 후 이전 handle로 span·작업 로그를 시작하거나 완료 전송하지 않는다. span 종료와 작업 로그는 시작 당시 SDK hub/client를 유지해 검사 직후 철회·재활성화가 경합해도 새 클라이언트로 갈아타지 않는다. 전송 직전의 기존 transport 세대 검사도 유지한다. 동의 전/상세 비활성 상태에서 캡처한 빈 문맥 역시 새 활성 세대의 루트로 승격하지 않는다.
+- UI의 5초 실행 기한·6초 수신 제한과 snapshot 상태 읽기, 2초 WebView 집계는 유지한다. 터미널의 장기 output worker를 부모 수명에 묶거나 WebView 개별 요청 프로토콜을 신설하지 않는다. 다른 스레드 경계는 후속 범위다.
+- 검증 근거와 미실행 범위는 [스레드 문맥 검증 기록](verification/sentry-thread-context-20261107.md)을 따른다. in-memory/loopback 테스트는 실제 Sentry 서버 수신 증거가 아니다.

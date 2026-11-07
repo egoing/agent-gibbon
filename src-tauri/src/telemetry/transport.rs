@@ -8,18 +8,18 @@ use std::{
 };
 
 #[derive(Default)]
-struct Gate {
+pub(super) struct Gate {
     allowed: AtomicBool,
     epoch: AtomicU64,
     sending: Mutex<()>,
 }
 impl Gate {
-    fn current(&self) -> Option<u64> {
+    pub(super) fn current(&self) -> Option<u64> {
         self.allowed
             .load(Ordering::SeqCst)
             .then(|| self.epoch.load(Ordering::SeqCst))
     }
-    fn change(&self, allow: bool) {
+    pub(super) fn change(&self, allow: bool) {
         // Closing admission first stops new requests while an already-started
         // upload finishes. The HTTP timeout bounds this barrier.
         self.allowed.store(false, Ordering::SeqCst);
@@ -36,7 +36,7 @@ impl Gate {
         true
     }
 }
-fn gate() -> &'static Arc<Gate> {
+pub(super) fn gate() -> &'static Arc<Gate> {
     static G: OnceLock<Arc<Gate>> = OnceLock::new();
     G.get_or_init(|| Arc::new(Gate::default()))
 }

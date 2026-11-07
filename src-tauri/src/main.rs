@@ -770,11 +770,16 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                         Err(e) => ipc::error(e),
                         Ok(request) => {
                             let (tx, rx) = mpsc::sync_channel(1);
-                            let _wait = telemetry::Timing::new("ipc.wait");
+                            let _wait = telemetry::Timing::ipc_wait(matches!(
+                                request.action,
+                                Action::Inspect | Action::List
+                            ));
+                            let sentry_parent = _wait.context();
                             let target = handle.clone();
                             let deadline = Instant::now() + Duration::from_secs(5);
                             let mut local_call = local_trace::Call::ipc();
                             match handle.run_on_main_thread(move || {
+                                let _sentry_scope = sentry_parent.enter();
                                 let _scope = local_call.scope();
                                 local_call.stage(local_trace::Stage::UiExecute);
                                 let result = if Instant::now() > deadline {
