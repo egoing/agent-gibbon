@@ -93,3 +93,11 @@ DSN이 있는 공식 빌드도 현재 정책에 대한 별도 전송 동의가 �
 ## 0.2.8 공개 후 파일명 검증과 0.2.9
 
 GitHub는 업로드 이름의 공백을 점으로 정규화했다. 0.2.8의 manifest는 공백을 인코딩한 URL을 생성해 세 플랫폼 모두 404가 발생했으며, 실제 공개 파일 다운로드 확인으로 발견했다. 기존 태그·자산을 덮어쓰지 않고 0.2.8을 사전 릴리스로 전환했다. 0.2.9부터는 `Agent.Gibbon_...` 형태를 빌드 자산·서명 trusted filename·manifest·앱 검증에 공통 적용한다. 배포할 때 GitHub에 올라간 실제 자산명과 manifest URL도 검증한다. 0.2.8을 설치한 경우에도 0.2.9를 한 번 수동 설치해야 한다.
+
+## 릴리스 CI 시간 측정
+
+태그 실행은 접근 가능한 의존성 캐시를 복원하고, 해당 태그 범위에 새 Rust 캐시를 저장하는 후처리를 생략합니다. 같은 태그의 재시도는 그 실행에서 만든 새 캐시의 혜택을 받지 못할 수 있습니다. 브랜치 수동 실행은 기본적으로 저장하며 일회성 검사에는 `gh workflow run release.yml --ref <브랜치> -f save_rust_cache=false`를 사용할 수 있습니다.
+
+Release timings는 기본 브랜치에 등록된 뒤 Release 실행의 완료 이벤트를 받습니다. 저장소 변수 `RELEASE_CI_SENTRY_DSN`이 있으면 GitHub Jobs API의 단계 시각·결과로 구조화 로그를 일괄 전송합니다. CI용 환경에서 run ID·attempt·SHA·플랫폼별로 조회할 수 있습니다. Rust 캐시의 정확한 키 적중 여부를 기록하며, 부분 복원과 미적중을 구별하려면 GitHub의 복원 단계를 확인합니다. 변수 제거로 이후 전송을 끌 수 있습니다. 실행기 원문 로그와 앱 사용자 데이터는 수집하지 않습니다. 별도 Ubuntu 작업의 실행 시간과 Sentry Logs 수집량이 발생하며 빌드와 Draft의 성공 여부는 원래 Release 워크플로에서 판정합니다.
+
+Explore의 Logs에서 `ci.run_id:<실행 ID>`로 조회하고 `ci.kind`로 workflow·job·step을 구분합니다. Jobs API는 재시도 결과에 앞선 시도의 성공 작업을 포함할 수 있으므로, 재시도 시작 전의 작업은 제외합니다. 소요시간은 정수 밀리초이며 Explore API 필드는 `tags[ci.duration_ms,integer]`입니다. 수집 시각과 실제 시작·종료 시각은 따로 기록합니다. 같은 완료 이벤트를 수동 재전송하면 로그가 중복됩니다. [Sentry Logs 전송 형식](https://github.com/getsentry/sentry-python/blob/master/sentry_sdk/_log_batcher.py) · [Explore 조회 API](https://docs.sentry.io/api/explore/query-explore-events-in-table-format/)
