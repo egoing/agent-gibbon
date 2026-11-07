@@ -630,3 +630,86 @@ fn timing_late_finish_uses_originating_client_scope_and_restores_destination_hub
     );
     assert_eq!(transactions[0].spans.len(), 1);
 }
+
+#[test]
+fn snapshot_summary_is_denied_at_egress_but_individual_request_survives() {
+    let mut input = sentry::Envelope::new();
+    input.add_item(p::Transaction {
+        name: Some("snapshot".into()),
+        ..Default::default()
+    });
+    input.add_item(p::Transaction {
+        name: Some("snapshot.request".into()),
+        ..Default::default()
+    });
+    let out = privacy::envelope(input);
+    let names: Vec<_> = out
+        .items()
+        .filter_map(|i| {
+            if let p::EnvelopeItem::Transaction(t) = i {
+                t.name.as_deref()
+            } else {
+                None
+            }
+        })
+        .collect();
+    assert_eq!(names, vec!["snapshot.request"]);
+    // A legacy UI may still send bounded snapshot samples. Accepting the input
+    // preserves heartbeat/watchdog compatibility, independently of trace egress.
+    assert!(valid_measurement(&Measurement {
+        op: "snapshot".into(),
+        duration_ms: 12.,
+        count: 2,
+        failure_count: 0
+    }));
+}
+
+#[test]
+fn every_child_span_gets_trusted_platform_build_metadata_at_final_egress() {
+    let mut input = sentry::Envelope::new();
+    let mut t = p::Transaction {
+        name: Some("ipc.open".into()),
+        ..Default::default()
+    };
+    for forged in [false, true] {
+        let mut child = p::Span {
+            op: Some("markdown.render".into()),
+            ..Default::default()
+        };
+        if forged {
+            child.tags.insert("app.os".into(), "windows".into());
+            child.tags.insert("app.arch".into(), "x86".into());
+            child.tags.insert("app.build".into(), "forged".into());
+        }
+        child.tags.insert("private".into(), "PRIVATE_NOTE".into());
+        t.spans.push(child);
+    }
+    input.add_item(t);
+    let out = privacy::envelope(input);
+    let t = out
+        .items()
+        .find_map(|i| {
+            if let p::EnvelopeItem::Transaction(t) = i {
+                Some(t)
+            } else {
+                None
+            }
+        })
+        .unwrap();
+    assert_eq!(t.spans.len(), 2);
+    for child in &t.spans {
+        assert_eq!(
+            child.tags.get("app.os").map(String::as_str),
+            Some(std::env::consts::OS)
+        );
+        assert_eq!(
+            child.tags.get("app.arch").map(String::as_str),
+            Some(std::env::consts::ARCH)
+        );
+        assert_eq!(
+            child.tags.get("app.build").map(String::as_str),
+            Some(env!("AGENT_GIBBON_BUILD_REVISION"))
+        );
+        assert!(!child.tags.contains_key("private"));
+    }
+}
