@@ -33,8 +33,10 @@ function renderUpdater(status) {
   const message = updaterEl('updater-message');
   message.textContent = updaterStatus.message || (phase === 'disabled' ? '개발용 빌드에서는 자동 업데이트가 꺼져 있습니다.' : '');
   message.setAttribute('role', phase === 'error' ? 'alert' : 'status');
+  message.hidden = !message.textContent;
   updaterEl('updater-check').disabled = updaterBusy || phase === 'disabled' || ['checking', 'downloading', 'preparing', 'installing'].includes(phase);
   updaterEl('updater-install').disabled = updaterBusy || phase !== 'ready';
+  updaterEl('updater-install').hidden = !['ready', 'preparing', 'installing'].includes(phase);
 }
 
 async function refreshUpdater() {

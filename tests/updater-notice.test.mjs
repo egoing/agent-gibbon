@@ -42,3 +42,26 @@ test('notice page is guarded and exposes only notice-scoped update controls', ()
   assert.deepEqual(capability.windows, ['updater-notice']);
   assert.deepEqual(capability.permissions, ['core:event:allow-listen', 'core:event:allow-unlisten']);
 });
+
+test('compact ready notice hides routine explanation and omits verification label', async () => {
+  const app = setup({ phase: 'ready', version: '1.3.0', message: '실행 중인 터미널이 있어 설치를 기다립니다.' });
+  await tick();
+  assert.match(app.elements.get('notice-version').textContent, /1\.3\.0/);
+  assert.doesNotMatch(app.elements.get('notice-version').textContent, /서명 검증/);
+  assert.equal(app.elements.get('notice-message').hidden, true);
+  assert.doesNotMatch(html, /class="(?:eyebrow|detail)"/);
+  assert.equal(app.elements.get('notice-message').textContent, '실행 중인 터미널이 있어 설치를 기다립니다.');
+});
+
+// Routine explanation is omitted; an unsuccessful explicit action still needs feedback.
+test('explicit installation hold and status errors remain actionable', async () => {
+  const app = setup({ phase: 'ready', version: '1.3.0', message: '편집을 저장한 뒤 다시 시도하세요.' });
+  await tick();
+  await app.elements.get('notice-install').onclick();
+  assert.equal(app.elements.get('notice-message').hidden, false);
+  assert.equal(app.elements.get('notice-message').textContent, '편집을 저장한 뒤 다시 시도하세요.');
+  const error = setup({ phase: 'error', message: '설치를 시작하지 못했습니다.' });
+  await tick();
+  assert.equal(error.elements.get('notice-message').hidden, false);
+  assert.equal(error.elements.get('notice-message').attrs.role, 'alert');
+});
