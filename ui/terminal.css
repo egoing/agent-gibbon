@@ -7,18 +7,18 @@ html,body{width:100%;height:100%;overflow:hidden}body{cursor:default}header{heig
 #welcome button,#welcome input{font:inherit;color:inherit;border-radius:4px}
 #welcome button{height:auto;min-height:32px;cursor:pointer;white-space:normal}
 #welcome .plain-row,#welcome .select-row{width:100%;display:flex;align-items:center;text-align:left;justify-content:flex-start;font-weight:400;border:0;background:transparent;padding:7px 10px;gap:10px}
-#welcome .plain-row:hover,#welcome .select-row:hover{background:#303844}
-#welcome .select-row[aria-pressed="true"]{background:#414e63}
-.folder-name{flex:1;min-width:0;overflow-wrap:anywhere}.folder-parent{font-size:11px;color:#bac3cf;max-width:55%;overflow-wrap:anywhere}
+#welcome .plain-row:hover,#welcome .select-row:hover{background:var(--panel)}
+#welcome .select-row[aria-pressed="true"]{background:var(--panel);box-shadow:inset 0 0 0 1px currentColor}
+.folder-name{flex:1;min-width:0;overflow-wrap:anywhere}.folder-parent{font-size:11px;color:var(--foreground);max-width:55%;overflow-wrap:anywhere}
 .tasks-section{margin:24px 0}
-#welcome button:focus-visible,#welcome input:focus-visible,#welcome summary:focus-visible,#command-preview:focus-visible{outline:2px solid #a8c5ff;outline-offset:2px}
-#run-task{min-width:72px;border:1px solid #667080;background:#303844;padding:6px 16px}
+#welcome button:focus-visible,#welcome input:focus-visible,#welcome summary:focus-visible,#command-preview:focus-visible{outline:2px solid var(--foreground);outline-offset:2px}
+#run-task{min-width:72px;border:1px solid var(--foreground);background:var(--panel);padding:6px 16px}
 #run-task:disabled{opacity:.5;cursor:wait}
-#command-preview{box-sizing:border-box;width:100%;font:11px/1.6 Menlo,monospace;background:#191e26;border:1px solid #667080;border-radius:4px;padding:10px;margin:12px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;max-height:100px;overflow:auto;user-select:text;-webkit-user-select:text}
-#home-hint{font-size:11px;color:#bac3cf;margin:6px 10px}
-#title-details{margin-top:14px}#title-details summary{font-size:11px;color:#bac3cf;cursor:pointer;width:fit-content}
+#command-preview{box-sizing:border-box;width:100%;font:11px/1.6 Menlo,monospace;background:var(--panel);border:1px solid var(--foreground);border-radius:4px;padding:10px;margin:12px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;max-height:100px;overflow:auto;user-select:text;-webkit-user-select:text}
+#home-hint{font-size:11px;color:var(--foreground);margin:6px 10px}
+#title-details{margin-top:14px}#title-details summary{font-size:11px;color:var(--foreground);cursor:pointer;width:fit-content}
 #rename-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
-#rename-title{flex:1;min-width:80px;max-width:100%;box-sizing:border-box;background:#303844;border:1px solid #667080;padding:6px;user-select:text;-webkit-user-select:text}
+#rename-title{flex:1;min-width:80px;max-width:100%;box-sizing:border-box;background:var(--panel);border:1px solid var(--foreground);padding:6px;user-select:text;-webkit-user-select:text}
 @media(max-width:420px),(max-height:300px){#welcome{padding:16px}.tasks-section{margin:18px 0}#welcome h1,#welcome h2{margin-bottom:8px}}
 
 /* The WebKit fallback buffers a word for replacement events. Only its last
@@ -27,3 +27,7 @@ html,body{width:100%;height:100%;overflow:hidden}body{cursor:default}header{heig
 .xterm .composition-view.gibbon-ime-fallback{background:#20252e;color:#f0f0f0}
 .xterm .gibbon-ime-fallback .gibbon-ime-current{background:#000;color:#fff}
 .xterm .gibbon-ime-fallback .gibbon-ime-cell{display:inline-block;vertical-align:top;letter-spacing:0}
+
+#rename-title::placeholder{color:var(--foreground);opacity:1}
+#welcome{scrollbar-color:var(--foreground) var(--background)}
+#rename-form button{width:auto;min-width:64px;padding:6px 12px;border:1px solid var(--foreground);background:var(--panel)}
