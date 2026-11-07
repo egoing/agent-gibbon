@@ -6,18 +6,18 @@ import { fileURLToPath } from 'node:url';
 const platforms = [
   {
     target: 'darwin-aarch64',
-    archive: version => `Agent Gibbon_${version}_darwin-aarch64.app.tar.gz`,
-    signature: version => `Agent Gibbon_${version}_darwin-aarch64.app.tar.gz.sig`,
+    archive: version => `Agent.Gibbon_${version}_darwin-aarch64.app.tar.gz`,
+    signature: version => `Agent.Gibbon_${version}_darwin-aarch64.app.tar.gz.sig`,
   },
   {
     target: 'darwin-x86_64',
-    archive: version => `Agent Gibbon_${version}_darwin-x86_64.app.tar.gz`,
-    signature: version => `Agent Gibbon_${version}_darwin-x86_64.app.tar.gz.sig`,
+    archive: version => `Agent.Gibbon_${version}_darwin-x86_64.app.tar.gz`,
+    signature: version => `Agent.Gibbon_${version}_darwin-x86_64.app.tar.gz.sig`,
   },
   {
     target: 'windows-x86_64',
-    archive: version => `Agent Gibbon_${version}_x64-setup.exe`,
-    signature: version => `Agent Gibbon_${version}_x64-setup.exe.sig`,
+    archive: version => `Agent.Gibbon_${version}_x64-setup.exe`,
+    signature: version => `Agent.Gibbon_${version}_x64-setup.exe.sig`,
   },
 ];
 
@@ -26,6 +26,14 @@ function installerNames(version) {
     `Agent Gibbon_${version}_aarch64.dmg`,
     `Agent Gibbon_${version}_x64.dmg`,
     `Agent Gibbon_${version}_x64-setup.exe`,
+  ];
+}
+
+function canonicalInstallerNames(version) {
+  return [
+    `Agent.Gibbon_${version}_aarch64.dmg`,
+    `Agent.Gibbon_${version}_x64.dmg`,
+    `Agent.Gibbon_${version}_x64-setup.exe`,
   ];
 }
 
@@ -64,7 +72,7 @@ function atomicWrite(path, contents) {
 
 export function prepareAssets(directory, version, options = {}) {
   if (!/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version)) throw new Error('Invalid release version');
-  const installers = installerNames(version);
+  const installers = options.updater ? canonicalInstallerNames(version) : installerNames(version);
   const found = readdirSync(directory).sort();
 
   if (!options.updater) {
