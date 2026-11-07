@@ -1,0 +1,30 @@
+   Compiling agent-gibbon v0.2.7 (/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/92-web-welcome/src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.82s
+     Running unittests src/main.rs (src-tauri/target/debug/deps/agent_gibbon-022cff4b145010e9)
+
+running 4 tests
+
+thread 'tests::web_cli_accepts_http_https_and_local_development_pages' (80392587) panicked at src/main.rs:1156:41:
+유효한 웹 URL https://example.com/path?q=hello#section: 사용법: agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'tests::web_cli_opens_welcome_without_a_url' (80392588) panicked at src/main.rs:1140:14:
+web 명령은 URL 없이 Welcome을 열 수 있어야 합니다: "사용법: agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list"
+
+thread 'tests::web_cli_rejects_unsafe_urls_before_connecting_or_starting_the_app' (80392590) panicked at src/main.rs:1183:13:
+URL 검증 오류여야 합니다: "": 사용법: agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list
+test tests::web_cli_rejects_note_content_and_duplicate_url_options ... ok
+test tests::web_cli_opens_welcome_without_a_url ... FAILED
+test tests::web_cli_rejects_unsafe_urls_before_connecting_or_starting_the_app ... FAILED
+test tests::web_cli_accepts_http_https_and_local_development_pages ... FAILED
+
+failures:
+
+failures:
+    tests::web_cli_accepts_http_https_and_local_development_pages
+    tests::web_cli_opens_welcome_without_a_url
+    tests::web_cli_rejects_unsafe_urls_before_connecting_or_starting_the_app
+
+test result: FAILED. 1 passed; 3 failed; 0 ignored; 0 measured; 182 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin agent-gibbon`
