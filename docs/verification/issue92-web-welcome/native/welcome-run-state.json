@@ -1,0 +1,57 @@
+{
+  "id": "290fe467-609e-4a73-9f4f-2167b91ea471",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "window": {
+        "height": 400,
+        "x": 724,
+        "width": 600,
+        "isOffscreen": false,
+        "id": 45292,
+        "platform": {
+          "layer": 5
+        },
+        "isMinimized": false,
+        "screenIndex": 0,
+        "title": "Agent Gibbon [DEV 92-web-welcome · 70d4bfce] — 웹 — web-92-fixed",
+        "y": 207
+      },
+      "truncation": {
+        "maxNodes": 1200,
+        "maxDepthReached": false,
+        "maxDepth": 64,
+        "truncated": false
+      },
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 32277)\nWindow: \"Agent Gibbon [DEV 92-web-welcome · 70d4bfce] — 웹 — web-92-fixed\", App: agent-gibbon.\n\n0 standard window Agent Gibbon [DEV 92-web-welcome · 70d4bfce] — 웹 — web-92-fixed\n\t1 scroll area\n\t\t2 HTML content Example Domain\n\t\t\t3 text This domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.\n\t\t\t4 text هذا النطاق مُخصص للاستخدام في أمثلة التوثيق دون الحاجة إلى إذن. هذه ليست خدمة، يُرجى تجنب الاعتماد عليها لأغراض الاختبار والمراقبة.\n\t\t\t5 text 该域名仅用于文档示例，无需获得许可。这并非一项服务，请勿将其用于测试和监控目的。\n\t\t\t6 text L’usage de ce domaine est réservé à des exemples de documentation, sans autorisation préalable. Il ne s’agit pas d’un service ; son utilisation à des fins de test ou de surveillance est à éviter.\n\t\t\t7 text Данный домен предназначен для использования в примерах документации без необходимости получения предварительного разрешения. Это не сервис; не рекомендуется его использование для тестирования и мониторинга.\n\t\t\t8 text Este dominio está destinado al uso en ejemplos de documentación sin necesidad de permiso. Esto no es un servicio; evitar utilizarlo para realizar pruebas o monitoreos.\n\t\t\t9 link Learn more\n\t\t\t\t10 text Learn more\n\t\t11 scroll bar 0\n\t12 close button\n\t13 zoom button\n\t14 minimize button\n\t15 text Agent Gibbon [DEV 92-web-welcome · 70d4bfce] — 웹 — web-92-fixed\n\nNo UI element is currently focused.",
+      "app": {
+        "bundleId": null,
+        "pid": 32277,
+        "name": "agent-gibbon"
+      },
+      "focusedElementId": null,
+      "elementCount": 16,
+      "id": "810E15F1-9DA9-411C-9147-5BFB64323351"
+    },
+    "screenshotStatus": {
+      "state": "captured",
+      "metadata": {
+        "engine": "screenCaptureKit",
+        "windowId": 45292
+      }
+    },
+    "screenshot": {
+      "scale": 2,
+      "format": "png",
+      "height": 800,
+      "width": 1200,
+      "path": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/290fe467-609e-4a73-9f4f-2167b91ea471-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-08T06:40:58.692Z"
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  }
+}

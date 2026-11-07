@@ -9,6 +9,7 @@ pub async fn export_note(
     window: WebviewWindow,
     markdown: Option<String>,
 ) -> Result<Option<String>, String> {
+    let _update_activity = crate::updater::activity(window.app_handle())?;
     let id = window
         .label()
         .strip_prefix("note-")

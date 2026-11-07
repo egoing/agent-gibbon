@@ -329,6 +329,9 @@ pub fn release(w: &WebviewWindow) -> Result<(), String> {
     Ok(())
 }
 pub fn trigger(app: &tauri::AppHandle) {
+    if crate::updater::frozen(app) {
+        return;
+    }
     let app = app.clone();
     std::thread::spawn(move || {
         let handle = app.clone();
@@ -392,7 +395,7 @@ fn set_tip(app: &tauri::AppHandle, w: &WebviewWindow, tip: bool) -> Result<(), S
     let text = if tip {
         format!(
             "복원: {}",
-            crate::presentation::tray_shortcut(&shortcut(app))
+            crate::presentation::shortcut(shortcut(app).split_whitespace().next().unwrap_or(""))
         )
     } else {
         String::new()
@@ -418,6 +421,7 @@ fn restore_rect(w: &WebviewWindow, s: &Saved) -> Result<Rect, String> {
     Ok(r)
 }
 pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
+    let _update_activity = crate::updater::activity(app)?;
     let previous = app.state::<Stash>().session.lock().unwrap().take();
     if let Some(mut s) = previous {
         let restoring = !s.restoring;

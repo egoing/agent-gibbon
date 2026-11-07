@@ -174,6 +174,20 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     menu.append(
         &MenuItem::with_id(
             app,
+            "capture-web",
+            format!(
+                "영역 웹 창\t{}",
+                crate::presentation::tray_shortcut("Ctrl+Shift+4")
+            ),
+            true,
+            None::<&str>,
+        )
+        .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
+    menu.append(
+        &MenuItem::with_id(
+            app,
             "stash-toggle",
             format!(
                 "숨김\t{}",
@@ -304,7 +318,11 @@ fn template_icons(app: &tauri::AppHandle, menu: &Menu<tauri::Wry>) -> Result<(),
             .map(|item| {
                 matches!(
                     item.id().as_ref(),
-                    "capture-image" | "capture-text" | "capture-terminal" | "stash-toggle"
+                    "capture-image"
+                        | "capture-text"
+                        | "capture-terminal"
+                        | "capture-web"
+                        | "stash-toggle"
                 )
             })
             .collect::<Vec<_>>();
@@ -427,6 +445,9 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             }
         })
         .on_menu_event(|app, event| {
+            if crate::updater::frozen(app) {
+                return;
+            }
             if event.id.as_ref() == "quit-app" {
                 app.exit(0);
                 return;
@@ -444,6 +465,9 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             } else if event.id.as_ref() == "capture-text" {
                 crate::capture::trigger(app, crate::capture::SelectionMode::Text);
                 Ok(())
+            } else if event.id.as_ref() == "capture-web" {
+                crate::capture::trigger(app, crate::capture::SelectionMode::Web);
+                Ok(())
             } else if event.id.as_ref() == "capture-terminal" {
                 crate::capture::trigger(app, crate::capture::SelectionMode::Terminal);
                 Ok(())
@@ -453,6 +477,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 apply_direct(
                     app,
                     Request {
+                        url: None,
                         change_mode: None,
                         highlight: None,
                         source_path: None,

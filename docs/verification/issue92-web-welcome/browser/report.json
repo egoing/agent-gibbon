@@ -1,0 +1,59 @@
+{
+  "results": [
+    {
+      "width": 720,
+      "height": 460,
+      "calls": [
+        {
+          "name": "web_run",
+          "args": {
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "name": "web_run",
+          "args": {
+            "url": "https://example.org/"
+          }
+        }
+      ]
+    },
+    {
+      "width": 320,
+      "height": 240,
+      "calls": [
+        {
+          "name": "web_run",
+          "args": {
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "name": "web_run",
+          "args": {
+            "url": "https://example.org/"
+          }
+        }
+      ]
+    },
+    {
+      "width": 240,
+      "height": 160,
+      "calls": [
+        {
+          "name": "web_run",
+          "args": {
+            "url": "https://example.com/"
+          }
+        },
+        {
+          "name": "web_run",
+          "args": {
+            "url": "https://example.org/"
+          }
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

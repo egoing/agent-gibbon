@@ -1,0 +1,10 @@
+<!doctype html><meta charset="utf-8"><title>Web IPC probe</title><h1>Web IPC probe</h1><pre id="result">RUNNING</pre><script>
+(async()=>{
+ const result=[];
+ for(const [name,command,args] of [['application','web_run',{url:'javascript:1'}],['plugin','plugin:window|set_title',{title:'IPC_UNEXPECTED'}]]) {
+  try {if(!window.__TAURI__?.core?.invoke)throw Error('No IPC');await window.__TAURI__.core.invoke(command,args);result.push(name+':FAIL');}
+  catch {result.push(name+':BLOCKED');}
+ }
+ document.getElementById('result').textContent=result.join('\n');
+})();
+</script>

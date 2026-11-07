@@ -1,0 +1,674 @@
+
+> agent-gibbon@0.2.7 test
+> cargo test --manifest-path src-tauri/Cargo.toml && node scripts/test-ui.mjs
+
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.26
+   Compiling quote v1.0.47
+   Compiling libc v0.2.190
+   Compiling cfg-if v1.0.5
+   Compiling serde_core v1.0.229
+   Compiling find-msvc-tools v0.1.14
+   Compiling shlex v2.0.1
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling siphasher v1.0.4
+   Compiling cc v1.6.0
+   Compiling litemap v0.8.3
+   Compiling writeable v0.6.4
+   Compiling utf8_iter v1.0.4
+   Compiling icu_normalizer_data v2.3.0
+   Compiling icu_properties_data v2.3.0
+   Compiling fastrand v2.5.0
+   Compiling zmij v1.0.23
+   Compiling phf_shared v0.13.1
+   Compiling objc2-encode v4.1.0
+   Compiling thiserror v2.0.21
+   Compiling phf_generator v0.13.1
+   Compiling syn v3.0.6
+   Compiling syn v2.0.119
+   Compiling objc2-exception-helper v0.1.1
+   Compiling stable_deref_trait v1.2.1
+   Compiling num-conv v0.2.2
+   Compiling objc2 v0.6.5
+   Compiling time-core v0.1.9
+   Compiling bytes v1.12.1
+   Compiling log v0.4.34
+   Compiling deranged v0.5.8
+   Compiling powerfmt v0.2.1
+   Compiling smallvec v1.16.2
+   Compiling parking_lot_core v0.9.12
+   Compiling serde v1.0.229
+   Compiling bitflags v2.13.2
+   Compiling http v1.5.0
+   Compiling new_debug_unreachable v1.0.6
+   Compiling precomputed-hash v0.1.1
+   Compiling autocfg v1.5.1
+   Compiling aho-corasick v1.1.5
+   Compiling regex-syntax v0.8.11
+   Compiling semver v1.0.28
+   Compiling phf_codegen v0.13.1
+   Compiling typeid v1.0.3
+   Compiling serde_json v1.0.151
+   Compiling ident_case v1.0.1
+   Compiling base64 v0.23.1
+   Compiling strsim v0.11.1
+   Compiling winnow v1.0.4
+   Compiling erased-serde v0.4.10
+   Compiling toml_parser v1.1.5+spec-1.1.0
+   Compiling getrandom v0.4.3
+   Compiling toml_writer v1.1.3+spec-1.1.0
+   Compiling fnv v1.0.7
+   Compiling web-time v1.1.0
+   Compiling scopeguard v1.2.0
+   Compiling lock_api v0.4.14
+   Compiling tendril v0.5.1
+   Compiling string_cache_codegen v0.6.1
+   Compiling synstructure v0.14.0
+   Compiling block2 v0.6.2
+   Compiling dispatch2 v0.3.1
+   Compiling regex-automata v0.4.18
+   Compiling darling_core v0.24.1
+   Compiling dtoa v1.0.11
+   Compiling equivalent v1.0.2
+   Compiling hashbrown v0.17.1
+   Compiling alloc-no-stdlib v3.0.0
+   Compiling anyhow v1.0.104
+   Compiling alloc-stdlib v0.3.0
+   Compiling dtoa-short v0.3.5
+   Compiling objc2-core-foundation v0.3.2
+   Compiling web_atoms v0.2.6
+   Compiling parking_lot v0.12.5
+   Compiling phf_macros v0.13.1
+   Compiling indexmap v2.14.2
+   Compiling quick-xml v0.42.0
+   Compiling string_cache v0.9.0
+   Compiling brotli-decompressor v6.0.1
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling serde_derive v1.0.229
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling thiserror-impl v2.0.21
+   Compiling regex v1.13.1
+   Compiling phf v0.13.1
+   Compiling zerofrom v0.1.8
+   Compiling toml_datetime v1.1.2+spec-1.1.0
+   Compiling serde_spanned v1.1.2
+   Compiling percent-encoding v2.3.2
+   Compiling same-file v1.0.6
+   Compiling dunce v1.0.5
+   Compiling form_urlencoded v1.2.2
+   Compiling objc2-foundation v0.3.2
+   Compiling yoke v0.8.3
+   Compiling walkdir v2.5.0
+   Compiling toml v1.1.8+spec-1.1.0
+   Compiling darling_macro v0.24.1
+   Compiling zerovec v0.11.8
+   Compiling zerotrie v0.2.5
+   Compiling darling v0.24.1
+   Compiling brotli v9.0.0
+   Compiling uuid v1.27.0
+   Compiling serde_with_macros v3.24.0
+   Compiling cssparser-macros v0.7.1
+   Compiling tinystr v0.8.4
+   Compiling potential_utf v0.1.6
+   Compiling icu_locale_core v2.3.0
+   Compiling icu_collections v2.3.0
+   Compiling derive_more-impl v2.1.1
+   Compiling indexmap v1.9.3
+   Compiling selectors v0.38.0
+   Compiling simd-adler32 v0.3.10
+   Compiling glob v0.3.4
+   Compiling ctor v1.0.13
+   Compiling camino v1.2.6
+   Compiling swift-rs v1.0.8
+   Compiling icu_provider v2.3.1
+   Compiling icu_properties v2.3.0
+   Compiling icu_normalizer v2.3.0
+   Compiling derive_more v2.1.1
+   Compiling cssparser v0.37.0
+   Compiling markup5ever v0.39.0
+   Compiling serde_derive_internals v0.29.1
+   Compiling servo_arc v0.4.3
+   Compiling rustc-hash v2.1.3
+   Compiling adler2 v2.0.1
+   Compiling schemars v0.8.22
+   Compiling bit-vec v0.8.0
+   Compiling hashbrown v0.12.3
+   Compiling html5ever v0.39.0
+   Compiling bit-set v0.8.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling schemars_derive v0.8.22
+   Compiling jsonptr v0.7.1
+   Compiling cargo-platform v0.1.9
+   Compiling url v2.5.8
+   Compiling cfb v0.14.0
+   Compiling time v0.3.55
+   Compiling foldhash v0.2.0
+   Compiling dyn-clone v1.0.20
+   Compiling base64 v0.21.7
+   Compiling json-patch v4.2.0
+   Compiling urlpattern v0.6.0
+   Compiling serde-untagged v0.1.9
+   Compiling dom_query v0.28.0
+   Compiling infer v0.22.0
+   Compiling cargo_metadata v0.19.2
+   Compiling serde_with v3.24.0
+   Compiling zerocopy v0.8.62
+   Compiling zerocopy-derive v0.8.62
+   Compiling version_check v0.9.5
+   Compiling miniz_oxide v0.8.9
+   Compiling rustc_version v0.4.1
+   Compiling crc32fast v1.5.2
+   Compiling option-ext v0.2.0
+   Compiling time-macros v0.2.32
+   Compiling plist v1.10.1
+   Compiling once_cell v1.21.4
+   Compiling miniz_oxide v0.9.1
+   Compiling objc2-core-text v0.3.2
+   Compiling getrandom v0.3.4
+   Compiling pin-project-lite v0.2.17
+   Compiling fdeflate v0.3.7
+   Compiling dirs-sys v0.5.0
+   Compiling embed-resource v3.0.12
+   Compiling tauri-utils v2.10.1
+   Compiling flate2 v1.1.10
+   Compiling heck v0.5.0
+   Compiling tauri-winres v0.3.6
+   Compiling dirs v7.0.0
+   Compiling generic-array v0.14.7
+   Compiling cargo_toml v1.0.1
+   Compiling mio v1.2.4
+   Compiling socket2 v0.6.5
+   Compiling typenum v1.20.1
+   Compiling tokio v1.53.2
+   Compiling crossbeam-utils v0.8.23
+   Compiling dpi v0.1.2
+   Compiling num-traits v0.2.19
+   Compiling phf_shared v0.14.0
+   Compiling raw-window-handle v0.6.2
+   Compiling futures-core v0.3.34
+   Compiling crossbeam-channel v0.5.17
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling png v0.18.1
+   Compiling cookie v0.18.2
+   Compiling core-foundation-sys v0.8.7
+   Compiling zune-core v0.5.3
+   Compiling zune-jpeg v0.5.15
+   Compiling core-foundation v0.10.1
+   Compiling digest v0.10.7
+   Compiling rand_core v0.9.5
+   Compiling foreign-types-macros v0.2.4
+   Compiling ring v0.17.14
+   Compiling bitflags v1.3.2
+   Compiling foreign-types-shared v0.3.1
+   Compiling weezl v0.1.12
+   Compiling quick-error v2.0.1
+   Compiling base64 v0.22.1
+   Compiling pxfm v0.1.30
+   Compiling fax v0.2.7
+   Compiling foreign-types v0.5.0
+   Compiling png v0.17.16
+   Compiling half v2.7.1
+   Compiling ppv-lite86 v0.2.21
+   Compiling rand_chacha v0.9.0
+   Compiling tiff v0.11.3
+   Compiling wry v0.57.0
+   Compiling core-graphics-types v0.2.0
+   Compiling phf_generator v0.14.0
+   Compiling moxcms v0.8.1
+   Compiling cpufeatures v0.2.17
+   Compiling bytemuck v1.25.2
+   Compiling muda v0.20.0
+   Compiling byteorder v1.5.0
+   Compiling byteorder-lite v0.1.0
+   Compiling tauri-runtime v2.12.1
+   Compiling zeroize v1.9.1
+   Compiling futures-sink v0.3.34
+   Compiling rustls-pki-types v1.15.1
+   Compiling ico v0.5.0
+   Compiling sha2 v0.10.9
+   Compiling core-graphics v0.25.0
+   Compiling rand v0.9.5
+   Compiling debugid v0.8.0
+   Compiling keyboard-types v0.8.3
+   Compiling tauri-build v2.7.1
+   Compiling tauri-plugin v2.7.1
+   Compiling http-body v1.1.0
+   Compiling getrandom v0.2.17
+   Compiling slab v0.4.12
+   Compiling hex v0.4.3
+   Compiling httparse v1.10.1
+   Compiling futures-io v0.3.34
+   Compiling futures-task v0.3.34
+   Compiling untrusted v0.9.0
+   Compiling tauri-runtime-wry v2.12.1
+   Compiling tray-icon v0.25.1
+   Compiling tauri-codegen v2.7.1
+   Compiling futures-util v0.3.34
+   Compiling sentry-types v0.42.0
+   Compiling string_cache_codegen v0.11.2
+   Compiling objc2-metal v0.3.2
+   Compiling objc2-core-image v0.3.2
+   Compiling objc2-core-graphics v0.3.2
+   Compiling objc2-quartz-core v0.3.2
+   Compiling objc2-core-data v0.3.2
+   Compiling objc2-cloud-kit v0.3.2
+   Compiling image v0.25.10
+   Compiling phf_codegen v0.14.0
+   Compiling serialize-to-javascript-impl v0.1.2
+   Compiling try-lock v0.2.5
+   Compiling tower-service v0.3.3
+   Compiling rustls v0.23.46
+   Compiling object v0.37.3
+   Compiling objc2-core-video v0.3.2
+   Compiling want v0.3.2
+   Compiling sentry-core v0.42.0
+   Compiling serialize-to-javascript v0.1.2
+   Compiling objc2-app-kit v0.3.2
+   Compiling web_atoms v0.3.0
+   Compiling rustls-webpki v0.103.16
+   Compiling tracing-core v0.1.36
+   Compiling serde_repr v0.1.21
+   Compiling subtle v2.6.1
+   Compiling mime v0.3.17
+   Compiling atomic-waker v1.1.2
+   Compiling gimli v0.32.3
+   Compiling embed_plist v1.2.2
+   Compiling hyper v1.12.0
+   Compiling tracing v0.1.44
+   Compiling tauri v2.12.2
+   Compiling tauri-macros v2.7.1
+   Compiling tauri-plugin-fs v2.7.1
+   Compiling string_cache v0.11.0
+   Compiling futures-channel v0.3.34
+   Compiling sync_wrapper v1.0.2
+   Compiling phf v0.14.0
+   Compiling findshlibs v0.10.2
+   Compiling ipnet v2.12.2
+   Compiling thiserror v1.0.69
+   Compiling cfg_aliases v0.1.1
+   Compiling tower-layer v0.3.3
+   Compiling addr2line v0.25.1
+   Compiling rustc-demangle v0.1.28
+   Compiling tower v0.5.3
+   Compiling nix v0.28.0
+   Compiling hyper-util v0.1.21
+   Compiling tauri-plugin-clipboard-manager v2.4.1
+   Compiling tauri-plugin-global-shortcut v2.4.1
+   Compiling tokio-rustls v0.26.6
+   Compiling tauri-plugin-dialog v2.8.3
+   Compiling webpki-roots v1.0.11
+   Compiling sentry-contexts v0.42.0
+   Compiling backtrace v0.3.76
+   Compiling thiserror-impl v1.0.69
+   Compiling objc2-core-audio-types v0.3.2
+   Compiling ryu v1.0.23
+   Compiling rustix v1.1.5
+   Compiling lazy_static v1.5.1
+   Compiling rfd v0.16.1
+   Compiling unicode-segmentation v1.13.3
+   Compiling sentry-backtrace v0.42.0
+   Compiling serde_urlencoded v0.7.1
+   Compiling keyboard-types v0.7.0
+   Compiling hyper-rustls v0.27.10
+   Compiling markup5ever v0.40.0
+   Compiling tower-http v0.6.11
+   Compiling objc2-avf-audio v0.3.2
+   Compiling http-body-util v0.1.5
+   Compiling objc2-image-io v0.3.2
+   Compiling objc2-core-audio v0.3.2
+   Compiling objc2-media-toolbox v0.3.2
+   Compiling errno v0.3.14
+   Compiling uname v0.1.1
+   Compiling hostname v0.4.2
+   Compiling unicode-width v0.2.2
+   Compiling pulldown-cmark v0.13.4
+   Compiling objc2-core-media v0.3.2
+   Compiling getopts v0.2.24
+   Compiling objc2-av-foundation v0.3.2
+   Compiling reqwest v0.12.28
+   Compiling filedescriptor v0.8.3
+   Compiling html5ever v0.40.1
+   Compiling sentry-panic v0.42.0
+   Compiling sentry-debug-images v0.42.0
+   Compiling agent-gibbon v0.2.7 (/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/92-web-welcome/src-tauri)
+   Compiling cssparser v0.38.0
+   Compiling serial2 v0.2.39
+   Compiling pulldown-cmark-escape v0.11.0
+   Compiling shell-words v1.1.1
+   Compiling downcast-rs v1.2.1
+   Compiling unicase v2.10.0
+   Compiling httpdate v1.0.3
+   Compiling maplit v1.0.2
+   Compiling tempfile v3.27.0
+   Compiling ammonia v4.2.1
+   Compiling portable-pty v0.9.0
+   Compiling fs2 v0.4.3
+   Compiling sentry v0.42.0
+   Compiling objc2-web-kit v0.3.2
+   Compiling tao v0.37.1
+   Compiling window-vibrancy v0.8.1
+   Compiling global-hotkey v0.8.0
+   Compiling arboard v3.6.1
+   Compiling xcap v0.7.1
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 22s
+     Running unittests src/main.rs (src-tauri/target/debug/deps/agent_gibbon-022cff4b145010e9)
+
+running 182 tests
+test capture::tests::selected_origin_keeps_desktop_coordinate_units ... ok
+test capture::tests::text_selection_creates_empty_editable_note_without_image ... ok
+test entrance::tests::corners_and_negative_monitor_origin_keep_clearance ... ok
+test entrance::tests::destination_reservation_retains_size_in_both_mixed_dpi_directions ... ok
+test capture::tests::retina_crop_and_invalid_selection ... ok
+test capture::tests::preview_preserves_dimensions_and_rgba_bytes ... ok
+test entrance::tests::clamping_never_covers_pointer_and_large_windows_fall_back ... ok
+test entrance::tests::early_pointer_movement_waits_until_one_second_even_if_pointer_returns ... ok
+test entrance::tests::every_direction_and_diagonal_starts_the_same_flight_after_hold ... ok
+test entrance::tests::mixed_dpi_positions_share_desktop_coordinates ... ok
+test entrance::tests::native_frame_conversion_handles_negative_desktop_positions ... ok
+test entrance::tests::late_frame_response_keeps_worker_alive_without_queuing_another_frame ... ok
+test entrance::tests::completed_or_disconnected_frame_stops_the_worker ... ok
+test capture::tests::transition_does_not_continue_after_missing_destroy_acknowledgment ... ok
+test entrance::tests::native_frame_conversion_preserves_top_left_while_resizing ... ok
+test entrance::tests::only_pointer_movement_starts_one_flight ... ok
+test capture::tests::clipboard_png_decode_preserves_rgba_and_dimensions ... ok
+test feedback_window::tests::placement_below_above_narrow_and_negative_monitor ... ok
+test capture::tests::transition_waits_for_every_destroyed_window ... ok
+test feedback_window::tests::stale_confirmation_is_blocked_but_edit_actions_reach_conflict_check ... ok
+test instance::tests::installed_path_is_unchanged ... ok
+test feedback::tests::deadlines_restart_and_are_isolated_without_stale_callbacks ... ok
+test feedback::tests::acknowledgement_is_revision_guarded_and_does_not_touch_opacity ... ok
+test feedback::tests::restored_pending_notes_have_highlights_without_attention_and_reverts_clear_them ... ok
+test instance::tests::namespaces_are_short_and_distinct ... ok
+test instance::tests::rejects_empty_traversal_and_malformed_ids ... ok
+test layout::tests::reverse_ids_follow_requests_even_when_measurements_finish_in_reverse ... ok
+test layout::tests::hidden_restore_moves_only_that_note_to_the_tail ... ok
+test layout::tests::request_order_continues_into_left_column ... ok
+test local_trace::tests::linked_child_keeps_parent_and_mutation_cause_after_parent_completed ... ok
+test export::tests::failed_export_preserves_destination_and_cleans_temp_file ... ok
+test local_trace::tests::concurrent_scopes_are_explicit_and_restore_even_after_unwind ... ok
+test local_trace::tests::stage_flood_is_bounded_and_expiration_removes_unfinished_flow ... ok
+test local_trace::tests::recorder_is_bounded_and_never_waits_for_its_mutex ... ok
+test local_trace::tests::flows_are_owner_scoped_bounded_expire_and_reject_late_events ... ok
+test manager::tests::first_text_ignores_markdown_and_blank_lines ... ok
+test local_trace::tests::unfinished_call_survives_history_turnover_and_records_completion ... ok
+test model::tests::color_updates_are_normalized_preserved_and_atomic ... ok
+test model::tests::cumulative_diff_keeps_unconfirmed_changes_and_omits_intermediate_versions ... ok
+test model::tests::confirmation_advances_baseline_and_reverts_remove_only_net_changes ... ok
+test export::tests::exports_utf8_and_image_bytes_and_replaces_existing_file ... ok
+test model::tests::feedback_deletion_empty_initial_same_and_metadata ... ok
+test model::tests::feedback_distinguishes_additions_replacements_and_deletions ... ok
+test model::tests::feedback_html_is_sanitized_and_editor_uses_same_diff ... ok
+test model::tests::invalid_ids_and_read_only_options_are_rejected ... ok
+test model::tests::malformed_tasks_report_line_and_preserve_all_fields ... ok
+test model::tests::markdown_validation_allows_code_links_and_real_tasks ... ok
+test model::tests::inline_update_detaches_file_and_editor_preserves_metadata ... ok
+test model::tests::old_requests_keep_default_window_and_color ... ok
+test model::tests::feedback_marks_changed_lines_without_polluting_source_or_plain_html ... ok
+test model::tests::feedback_deletion_keeps_remaining_line_unmarked_and_large_diff_is_bounded ... ok
+test local_trace::tests::blocked_operation_is_persistable_before_it_returns ... ok
+test model::tests::partial_updates_preserve_unspecified_fields ... ok
+test ipc::tests::independent_locks_and_stale_socket_recovery ... ok
+test model::tests::rejected_update_does_not_change_note ... ok
+test local_trace::tests::atomic_local_file_contains_only_fixed_fields_and_numeric_call_ids ... ok
+test model::tests::retired_agent_ids_are_reserved_while_ordinary_note_ids_still_work ... ok
+test model::tests::renders_korean_tasks_and_blocks_active_content ... ok
+test model::tests::update_options_are_strictly_validated ... ok
+test model::tests::pending_baselines_survive_metadata_same_body_and_remain_note_local ... ok
+test model::tests::task_identity_handles_reorder_duplicates_nested_and_code ... ok
+test model::tests::mixed_quiet_update_preserves_diff_and_rejects_overlap_atomically ... ok
+test model::tests::tasks_use_unindented_rows_but_normal_lists_keep_markers ... ok
+test opacity::global_tests::accumulates_fractions_and_resets_between_chords_and_idle ... ok
+test opacity::global_tests::bounds_and_first_choice_preserve_legacy_until_used ... ok
+test opacity::global_tests::global_target_excludes_auxiliary_windows ... ok
+test opacity::tests::hover_is_local_and_wheel_refresh_starts_at_the_new_saved_value ... ok
+test opacity::tests::hover_temporarily_overrides_manual_choice_and_restores_with_existing_delay ... ok
+test opacity::tests::newly_presented_memo_stays_opaque_while_idle_peers_keep_their_alpha ... ok
+test opacity::tests::waits_two_seconds_then_eases_and_interrupts_immediately ... ok
+test placement::tests::bounded_single_and_exact_remainders ... ok
+test placement::tests::fixed_ratio_images_and_folded_heights ... ok
+test placement::tests::obstacles_and_negative_origins ... ok
+test model::tests::feedback_preserves_unchanged_middle_and_handles_tasks_tables_code ... ok
+test model::tests::quiet_completion_tracks_only_latest_and_never_changes_source ... ok
+test placement::tests::full_screen_and_short_slots ... ok
+test placement::tests::ordinary_notes_fill_bottom_up_then_left ... ok
+test placement::tests::overflow_minimizes_overlap_then_prefers_bottom_right ... ok
+test placement::tests::short_content_is_never_stretched_to_fill_the_screen ... ok
+test placement::tests::zero_gap_fills_exact_horizontal_and_vertical_slots ... ok
+test presentation::tests::display_keys_follow_os_without_changing_raw_contract ... ok
+test presentation::tests::labels_hide_only_internal_wrappers_and_bound_unicode_titles ... ok
+test presentation::tests::tray_labels_show_only_keys_and_other_surfaces_keep_explanations ... ok
+test model::palette_tests::palette_cycles_and_explicit_color_survives_updates ... ok
+test privacy::tests::published_notice_enables_choice_without_granting_consent ... ok
+test privacy::tests::terms_skip_is_limited_to_debug_development_instances_and_can_be_disabled ... ok
+test privacy::tests::unfinished_notice_cannot_enable_sharing ... ok
+test sizing::contact_tests::folded_margin_handles_small_title_and_negative_coordinates ... ok
+test sizing::contact_tests::rapid_exit_and_reentry_rearms_without_bouncing_after_resize ... ok
+test opacity::global_tests::failed_save_keeps_previous_file_and_memory_choice ... ok
+test skills::tests::catalog_is_real_self_contained_resources_and_does_not_ship_example_capabilities ... ok
+test model::tests::editor_saves_source_and_rejects_stale_or_invalid_changes ... ok
+test privacy::tests::local_choice_roundtrips_and_declining_is_a_valid_choice ... ok
+test skills::tests::cross_instance_lock_refuses_parallel_changes ... ok
+test opacity::global_tests::saves_reloads_and_isolates_instances_and_rejects_corruption ... ok
+test skills::installer::tests::interrupted_first_install_is_removed_when_choice_was_not_committed ... ok
+test privacy::tests::absent_corrupt_old_and_unaccepted_records_fail_closed ... ok
+test stash::tests::bare_modifier_chord_commits_once_on_complete_release ... ok
+test stash::tests::escape_requires_exit_and_cooldown ... ok
+test stash::tests::opacity_wheel_cancels_stash_until_all_modifiers_are_released ... ok
+test stash::tests::other_shortcuts_clicks_shift_and_preheld_keys_cancel_until_release ... ok
+test stash::tests::reverse_animation_has_exact_endpoints_and_continuous_retarget ... ok
+test stash::tests::unplugged_and_oversized_rectangles_stay_in_work_area ... ok
+test stash_input::tests::captured_trackpad_tail_never_leaks_but_the_next_gesture_is_normal ... ok
+test stash_input::tests::consumes_only_owned_opacity_wheel_including_fractional_and_limit_input ... ok
+test stash_input::tests::normalizes_physical_direction_and_precise_wheels ... ok
+test skills::tests::corrupt_state_and_unowned_off_fail_without_deleting_user_data ... ok
+test storage::failure_tests::edit_persists_and_failed_store_rolls_back_source_and_memory ... ok
+test storage::tests::completion_emphasis_is_ephemeral_but_completed_markdown_is_persisted ... ok
+test storage::tests::direct_save_confirms_pending_diff_even_when_text_is_unchanged ... ok
+test skills::tests::default_is_off_and_enabling_installs_all_detected_agents_without_execution ... ok
+test storage::tests::cumulative_baseline_survives_restart_and_confirmation_is_transactional ... ok
+test storage::tests::retired_project_without_terminal_metadata_is_preserved_and_not_loaded ... ok
+test skills::installer::tests::interrupted_install_recovers_before_state_commit_and_finishes_after_commit ... ok
+test telemetry::tests::aggregate_tag_survives_but_local_correlation_never_leaves_envelope ... ok
+test skills::tests::explicit_on_overwrites_local_changes_but_ordinary_start_does_not ... ok
+test telemetry::tests::basic_release_and_opted_in_diagnostics_have_separate_features ... ok
+test telemetry::tests::capture_worker_then_ui_callback_keeps_request_parent ... ok
+test skills::tests::new_agent_receives_on_skills_on_next_reconciliation ... ok
+test telemetry::tests::bounded_request_lease_crosses_await_without_source_scope_or_reader_retention ... ok
+test telemetry::tests::foreign_breadcrumbs_and_logs_are_not_allowed ... ok
+test telemetry::tests::every_child_span_gets_trusted_platform_build_metadata_at_final_egress ... ok
+test telemetry::tests::rejects_unknown_and_nonfinite_frontend_measurements ... ok
+test telemetry::tests::legacy_snapshot_summary_never_creates_a_transaction_or_blocks_other_measurements ... ok
+test telemetry::tests::ipc_callback_keeps_wait_parent_across_threads ... ok
+test telemetry::tests::snapshot_request_is_sampled_and_children_use_the_same_trace ... ok
+test telemetry::tests::request_constructor_retains_sampling_and_epoch_barriers_with_cancellation ... ok
+test skills::tests::on_replaces_symlink_entry_without_modifying_its_shared_source ... ok
+test telemetry::tests::snapshot_summary_is_denied_at_egress_but_individual_request_survives ... ok
+test telemetry::tests::timing_denies_revoked_disabled_and_prior_epoch_work_after_reactivation ... ok
+test telemetry::tests::terminal_blocking_worker_keeps_request_parent ... ok
+test telemetry::tests::timing_concurrent_requests_restore_destination_context_including_panic ... ok
+test telemetry::tests::timing_children_inherit_unsampled_parent_without_resampling_and_polling_is_capped ... ok
+test telemetry::journal::tests::only_fixed_bounded_history_is_persisted ... ok
+test telemetry::tests::transmission_requires_embedded_dsn_and_explicit_development_opt_in ... ok
+test telemetry::tests::timing_late_finish_uses_originating_client_scope_and_restores_destination_hub ... ok
+test telemetry::tests::timing_late_callback_finishes_child_before_root_and_cancellation_releases_lease ... ok
+test telemetry::tests::whole_envelope_scrubs_error_trace_log_and_denies_sessions_and_attachments ... ok
+test telemetry::transport::tests::no_delivery_without_consent_and_old_queues_never_replay ... ok
+test telemetry::watchdog::tests::distinguishes_native_and_webview_and_reports_once ... ok
+test telemetry::watchdog::tests::hidden_and_new_views_do_not_stall ... ok
+test telemetry::transport::tests::revocation_waits_for_started_request_and_denies_following_requests ... ok
+test terminal::tests::approved_recent_folders_survive_metadata_roundtrip ... ok
+test terminal::tests::legacy_logical_and_windows_physical_origins_survive_restore ... ok
+test terminal::tests::reservation_is_per_window_and_released_on_failure ... ok
+test terminal::tests::welcome_metadata_preserves_only_last_path_title_and_geometry ... ok
+test telemetry::transport::tests::http_queue_cannot_send_without_consent_or_replay_an_old_client ... ok
+test terminal::welcome::lifecycle_tests::old_reservation_does_not_match_reopened_window ... ok
+test terminal::welcome::lifecycle_tests::queued_startup_prompt_cannot_mark_submitted_builtin_idle ... ok
+test terminal::welcome::report_tests::directory_control_sequence_survives_chunks_without_retaining_transcript ... ok
+test terminal::welcome::tests::no_history_has_no_display_path_and_home_is_execution_fallback ... ok
+test terminal::welcome::tests::preview_directory_quotes_spaces_and_metacharacters ... ok
+test terminal::welcome::tests::latest_valid_path_and_custom_title_are_independent ... ok
+test terminal::tests::metadata_does_not_claim_project_index ... ok
+test terminal::welcome::tests::recommendations_do_not_execute_candidates_and_show_exact_quoted_command ... ok
+test tests::invalid_commands_and_duplicate_content_fail ... ok
+test terminal::tests::retired_agent_records_are_ignored_without_changing_metadata_or_projects ... ok
+test skills::tests::upgrade_overwrites_only_on_skills_preserves_choices_and_retries_failures ... ok
+test tests::named_window_commands_and_list_parse ... ok
+test tests::retired_agent_cli_and_project_ids_are_rejected ... ok
+test tests::update_mode_options_parse_and_reject_unsupported_combinations ... ok
+test tests::window_labels_do_not_collide ... ok
+test storage::tests::roundtrip_and_isolation ... ok
+test tray::tests::all_kinds_have_icons_event_routing_and_visibility_alpha ... ok
+test tray::tests::content_updates_reorder_and_legacy_time_is_compatible ... ok
+test tray::tests::legacy_region_notes_with_zero_update_time_use_creation_fallback ... ok
+test warp::tests::contact_requires_entry_and_does_not_retrigger_on_key_press_inside ... ok
+test tray::tests::menu_metadata_is_owned_and_does_not_copy_memo_content ... ok
+test tray::tests::native_menu_wait_allows_ui_snapshot_to_acquire_notes ... ok
+test tray::tests::recent_boundary_zero_thirty_thirty_one_and_mixed_ties ... ok
+test warp::tests::entering_without_key_then_pressing_inside_does_not_trigger ... ok
+test warp::tests::focused_note_and_focus_loss_inside_do_not_trigger ... ok
+test warp::tests::movement_does_not_bounce_but_real_exit_rearms ... ok
+test warp::tests::native_contact_targets_only_memo_windows ... ok
+test warp::tests::paused_contact_cannot_fire_on_resume_inside ... ok
+test warp::tests::sides_initial_height_and_monitor_bounds ... ok
+test terminal::welcome::tests::recent_folders_migrate_deduplicate_bound_and_filter_missing ... ok
+test skills::tests::state_write_failure_rolls_back_every_agent_copy ... ok
+test skills::tests::off_removes_only_receipted_copies_and_never_reactivates_on_upgrade ... ok
+test storage::tests::windows_reserved_ids_roundtrip_without_case_collisions ... ok
+test terminal::welcome::tests::shell_command_exit_returns_to_same_pty_and_cwd_is_observed ... ok
+test terminal::welcome::lifecycle_tests::real_shell_prompt_builtin_busy_and_child_cleanup ... ok
+
+test result: ok. 182 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.88s
+
+✔ memo defaults to gray regardless of manager selection, old color mode or OS appearance (0.927459ms)
+✔ inaccessible memo preferences fall back to gray (0.104125ms)
+✔ independent theme roles and color mode display preserve the individual color across cycles (1.880125ms)
+✔ only the independent system memo choice follows day/night appearance (0.143125ms)
+✔ reverse drag clamps to the display and submits one selection (3.651125ms)
+✔ click without drag creates no note; Escape cancels (0.758958ms)
+✔ original RGBA pixels are painted before showing, without a load or click event (1.52825ms)
+✔ unusable preview cancels without displaying a black overlay: {"malformed":true} (0.54075ms)
+✔ unusable preview cancels without displaying a black overlay: {"noCanvas":true} (0.454958ms)
+✔ the first pointer press after paint immediately starts selection (0.68925ms)
+✔ canonical paths, not cwd or basename, determine stable instance IDs (111.100917ms)
+✔ development CLI rejects missing, old and foreign binaries without release fallback (473.65825ms)
+✔ ordinary contributor build does not fetch official DSN or silently enable transmission (52.363542ms)
+✔ invalid DSN is rejected without printing the supplied value (39.190291ms)
+✔ font sizes cycle four steps and remain selected across note updates (6.014667ms)
+✔ editing preserves drafts on polling and failed saves; cancel reveals latest note (23.952959ms)
+✔ save returns to rendered content; editor input never drags the window; Escape cancels (10.992292ms)
+✔ failed warp reports error without showing success help or losing draft (11.410667ms)
+✔ automatic acknowledgement defers during editing and preserves drafts (5.393125ms)
+✔ feedback never reappears when an expired change is saved without editing (14.261125ms)
+✔ rollover and focus acknowledge only their own current revision without a button (5.127666ms)
+✔ fold contact preserves editor drafts and restores through the unfold button (1.303708ms)
+✔ explicit button folds and unfolds without Control and updates its label (1.767291ms)
+✔ native rollover updates chrome without a DOM click or pointer event (1.632375ms)
+✔ native pointer notifications are addressed to the originating memo (0.72875ms)
+✔ clear diff button stays hidden without changes and stale clicks preserve newer revisions (1.739334ms)
+✔ external action never consumes memo height (1.355708ms)
+✔ failed confirmation keeps cumulative changes and allows retry (1.393042ms)
+✔ folded note opens from title, blank space, border and icon without starting a drag (1.655667ms)
+✔ folded click ignores secondary buttons and coalesces pending clicks (0.813917ms)
+✔ region text note opens a blank editor once, preserves drafts and saves normally (0.908167ms)
+✔ canceling the initial region editor does not reopen it on polling (1.28275ms)
+✔ direct save immediately clears existing diff controls (1.237792ms)
+✔ temporary copy notice restores acknowledgement; editing owns the action slot (2.602541ms)
+✔ save success becomes Toast; save error retains actions and outranks tips (1.190292ms)
+✔ development labels remain distinct from installed memo content (0.813625ms)
+✔ delayed surface acknowledgement cannot acknowledge a newer rendered revision (0.935417ms)
+✔ hidden memo defers companion creation until its native window is visible (0.873208ms)
+✔ foreign Feedback actions cannot save another memo draft (0.771792ms)
+✔ connected outline follows its own companion and restores after hiding (1.011583ms)
+✔ copy uses the latest rendered note without confirming or copying deleted diff text (1.133208ms)
+✔ capture copy invokes native image writing without fetching a data URL (0.901ms)
+✔ failed clipboard write reports the error without showing success feedback (0.811917ms)
+✔ Cmd+S and Ctrl+S export viewing notes and toolbar exports the current draft (0.952334ms)
+✔ cancel and export failure preserve draft and allow retry (0.773375ms)
+✔ repeated shortcuts open only one export dialog (0.762625ms)
+✔ Feedback export shortcut targets its own memo draft (1.5035ms)
+✔ toolbar shortcuts follow platform and gesture help is shown on button use (1.452458ms)
+✔ polling and hover never reset placement intent, explicit editing does (0.827042ms)
+✔ content measurement carries the current revision and pending reopen can measure in editor (0.715709ms)
+✔ window close terminates while Escape remains a hide action (0.610708ms)
+✔ rollover and focus entry preserve completion; departure clears it (0.658125ms)
+✔ unseen revision arriving on departure survives until another reading session (0.763791ms)
+✔ companion focus continues the same reading session (1.256416ms)
+✔ independent memo designs preserve editor drafts and original colors without a note revision (2.284333ms)
+✔ content drag delegates to the backend command that cancels entrance before native dragging (5.910708ms)
+✔ editor and non-primary clicks never start entrance-cancelling drag (2.335166ms)
+✔ off opt-in neither starts a flow nor augments application arguments (4.185667ms)
+✔ overlapping flows carry distinct IDs; stages never contain application content (7.417208ms)
+✔ refresh is sampled at most once per two seconds and hidden work is uninstrumented (0.894167ms)
+✔ frames do not delay application result; completion follows second callback; errors close flow (4.071291ms)
+✔ fit observation preserves application completion while frame waits for fit (1.710417ms)
+✔ system light maps to gray, dark maps to black before paint and remains unsaved (3.35325ms)
+✔ all explicit themes survive reload and ignore subsequent system changes; reset resumes tracking (1.814458ms)
+✔ corrupt or inaccessible storage follows system; write failures retain previous selection (1.304625ms)
+✔ other manager windows update or reset preference; unrelated storage is ignored (0.38875ms)
+✔ native color changes are serialized and carry only a fixed theme, without delaying the UI (3.962791ms)
+✔ native failure reports a separate status and retries without undoing the saved preference (1.058166ms)
+✔ five memo designs persist independently of manager selection and default to gray (2.432916ms)
+✔ storage changes update memo design without changing manager selection; invalid values reset only memo design (0.391167ms)
+✔ manager system is a radio selection and saved colors remain explicit choices (0.387208ms)
+✔ read-only selection, settings navigation and empty result (6.255709ms)
+✔ one common show action precedes unchanged content for every memo type (16.776542ms)
+✔ show failure stays visible across polling and supports retry without exposing raw errors (3.595958ms)
+✔ pending actions use the clicked id, prevent duplicate submission and cannot affect a new selection (2.280667ms)
+✔ visible status toggles to hide and back for every memo kind (7.484291ms)
+✔ polling external visibility changes keeps the existing controls and inline errors (1.855417ms)
+✔ a query started before a visibility change cannot roll back the confirmed result (1.931667ms)
+✔ settings sections preserve privacy drafts and selected memo across navigation (7.100542ms)
+✔ More destination returns from Settings to the full list without type prefixes or IDs (5.022083ms)
+✔ retired agent records cannot appear in the manager list (1.327416ms)
+✔ required terms do not imply optional sharing; unchecked Continue submits nothing (4.331708ms)
+✔ unfinished notice disables optional sharing but still allows terms-only use (2.016459ms)
+✔ stored decline stays declined and settings withdrawal is an explicit false (0.962625ms)
+✔ unreadable status fails closed; legal documents remain local (2.189958ms)
+✔ turning sharing off submits withdrawal without another Save click (2.121417ms)
+✔ published notice offers unchecked opt-in; settings only enable after explicit save (2.06575ms)
+✔ development terms skip opens navigation without accepting terms or sharing (0.993375ms)
+✔ first diagnostic opt-in after a development skip still requires explicit terms (1.085791ms)
+✔ explicit terms verification keeps the welcome gate for an unaccepted instance (0.775208ms)
+✔ version bump updates all manifests and both lockfiles without changing dependencies (10.240917ms)
+✔ version drift blocks release and bump without writing files (3.534584ms)
+✔ release assets require all three platforms and contain independently checkable hashes (2.627042ms)
+✔ skills are lazy and independent; immediate toggle preserves accordion state (3.579542ms)
+✔ pending install has no optimistic On and prevents duplicate changes (1.461042ms)
+✔ installation failure reloads authoritative state and reports the error (1.77175ms)
+✔ failed initial load ends loading state and navigation can retry (0.616416ms)
+✔ fixed error kinds exclude message/reason; disabled diagnostics install no timers (4.917792ms)
+✔ invoke instrumentation preserves values/rejections but never serializes arguments or errors (1.294458ms)
+✔ lag observers send only durations and skip hidden/sleep intervals; heartbeat has one in flight (1.876875ms)
+✔ captured invoke works with frozen Tauri API and source metadata is allowlisted (1.143375ms)
+✔ explicit terminal stages accept only fixed names and finite visible durations (2.897917ms)
+✔ withdrawal clears pending samples and old callbacks cannot replay after re-opt-in (10.8185ms)
+✔ snapshot calls keep values and failures but never create summary measurements; heartbeat survives (0.969541ms)
+✔ no history uses home preview and retains folder picker and shell without autostart (2.961542ms)
+✔ recent folders show three, expand, select locally and update preview (1.033667ms)
+✔ task selection updates pressed state and exact preview; Run starts only once (0.739833ms)
+✔ shell remains the only task when no recommended app is installed (1.343958ms)
+✔ picker refreshes location and preview without starting (0.912042ms)
+✔ failed Run preserves Welcome, restores Run focus and permits retry (0.751417ms)
+✔ failed launch does not move focus when window is inactive (0.70775ms)
+✔ removed agent mode cannot auto launch a PTY (0.55ms)
+✔ rename remains explicit and polling only reads metadata (0.635792ms)
+✔ long folder path and exact command remain available (0.609458ms)
+✔ cancelled delayed picker preserves local folder selection and blocks Run while pending (0.892167ms)
+✔ selecting recent folder from home clears the home location hint (0.55375ms)
+✔ approved wireframe selects a task without starting until Run (0.567042ms)
+✔ light and dark backgrounds have readable foregrounds (0.634125ms)
+✔ sampled RGB space has at least 4.5:1 text contrast (25.596458ms)
+✔ error text retains contrast on saturated memo colors (0.25525ms)
+ℹ tests 120
+ℹ suites 0
+ℹ pass 120
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 651.515375
