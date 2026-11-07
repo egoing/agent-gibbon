@@ -749,3 +749,66 @@ fn legacy_snapshot_summary_never_creates_a_transaction_or_blocks_other_measureme
         Some("webview.aggregate")
     );
 }
+
+#[test]
+fn terminal_blocking_worker_keeps_request_parent() {
+    let (hub, capture, gate) = timing_harness(1.0);
+    sentry::Hub::run(hub.clone(), || {
+        let request = start_timing(&gate, "terminal.start");
+        let worker_gate = gate.clone();
+        let work = move || {
+            sentry::Hub::run(hub, || {
+                let _worker = start_timing(&worker_gate, "terminal.pty.create");
+            })
+        };
+        tauri::async_runtime::block_on(tauri::async_runtime::spawn_blocking(work)).unwrap();
+        drop(request);
+    });
+    let transactions = captured_transactions(&capture);
+    assert_eq!(
+        transactions.len(),
+        1,
+        "request and blocking worker must share one trace"
+    );
+    let t = &transactions[0];
+    let p::Context::Trace(root) = &t.contexts["trace"] else {
+        panic!("trace")
+    };
+    assert_eq!(t.spans.len(), 1);
+    assert_eq!(t.spans[0].trace_id, root.trace_id);
+    assert_eq!(t.spans[0].parent_span_id, Some(root.span_id));
+}
+
+#[test]
+fn capture_worker_then_ui_callback_keeps_request_parent() {
+    let (hub, capture, gate) = timing_harness(1.0);
+    sentry::Hub::run(hub.clone(), || {
+        let request = start_timing(&gate, "capture.prepare");
+        std::thread::spawn(move || {
+            // Represents the detached worker -> queued UI closure boundary.
+            std::thread::spawn(move || {
+                sentry::Hub::run(hub, || {
+                    let _capture = start_timing(&gate, "capture.screen.capture");
+                })
+            })
+            .join()
+            .unwrap();
+        })
+        .join()
+        .unwrap();
+        drop(request);
+    });
+    let transactions = captured_transactions(&capture);
+    assert_eq!(
+        transactions.len(),
+        1,
+        "request, worker and UI callback must share one trace"
+    );
+    let t = &transactions[0];
+    let p::Context::Trace(root) = &t.contexts["trace"] else {
+        panic!("trace")
+    };
+    assert_eq!(t.spans.len(), 1);
+    assert_eq!(t.spans[0].trace_id, root.trace_id);
+    assert_eq!(t.spans[0].parent_span_id, Some(root.span_id));
+}
