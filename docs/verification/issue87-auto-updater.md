@@ -14,7 +14,7 @@
 
 2026-11-07: 자동 다운로드 후 재시작 또는 사용하지 않는 동안 설치하는 방향으로 결정했다. 사용자 원문: “자동 다운로드 - 재시작이나 사용자가 아무것도 안하고 있는 것 같을 때 업데이트 (재시작시복구가 불가능한 작업이 터미널일 것 같은데 복구가 가능할지 조사해줘)”.
 
-macOS ARM64·Intel 및 Windows x64 구현을 진행하기로 했다. 작업 커밋·push·PR·CI와 무료 updater 서명 키 생성·등록을 별도로 승인받았다. Keychain(service `AGENT_GIBBON_TAURI_UPDATER`) 및 GitHub Actions secret/공개 variable 등록을 확인했다. Enpass 백업은 사용자 잠금 해제 대기다. 실제 설치 앱 교체, 태그·공개 릴리스는 실행하지 않았다. 위험도는 최소 Medium이며 자동 병합 대상이 아니다.
+macOS ARM64·Intel 및 Windows x64 구현을 진행하기로 했다. 작업 커밋·push·PR·CI와 무료 updater 서명 키 생성·등록을 별도로 승인받았다. Keychain(service `AGENT_GIBBON_TAURI_UPDATER`) 및 GitHub Actions secret/공개 variable 등록을 확인했다. Enpass 백업 항목을 저장 후 다시 열어 비밀 필드 길이와 공개 키·복구 설명을 확인했다. 마스킹된 비밀 키의 원문 일치·실제 복구는 미검증이다. 실제 설치 앱 교체, 태그·공개 릴리스는 실행하지 않았다. 위험도는 최소 Medium이며 자동 병합 대상이 아니다.
 
 ## 현재 터미널 복원 범위 — 코드 조사
 
@@ -70,7 +70,7 @@ Unix에서는 자손 PID와 foreground/process group에 SIGKILL을 보내며 Win
 - updater 2.14.1, Tauri CLI 2.12.1. Rust 버전 조건은 충족했다. 공식 정식 GitHub manifest만 사용하며 `requireSignedVersion`을 적용한다. 서명이 인증한 플랫폼 파일명까지 검사하여 같은 버전의 다른 CPU 패키지 교체를 거부한다.
 - 배포 검증은 실제 Ed25519/Blake2b payload 서명과 trusted comment를 확인한다. 태그 배포는 `.pub` 파일과 저장소 공개 키 variable을 대조한다. dispatch는 runner별 일회용 키를 사용한다. 테스트용 공개 키·서명 fixture의 개인 키는 폐기했으며 운영 키와 무관하다.
 - 신규 테스트: 서명 자산 누락/기존 manifest 보존, 안정 버전 비교, 변조/잘못된 키/교차 플랫폼 교체, 실제 CLI 서명 호환, 설치 예약/새 작업 경쟁, 모든 창의 현재 epoch ack, 입력 차단/해제, 설정 UI 상태/중복 요청을 검사했다. `node --test tests/updater-release.test.mjs` 7개 통과. Rust updater 검사 5개 통과.
-- 전체 로컬 결과: Rust 178개·Node UI 138개, `cargo check --all-targets`, Clippy `-D warnings`, Rustfmt 통과. baseline 제외·skip는 0. 원본 `/tmp/issue87-rust-tests.log`, `/tmp/issue87-ui-tests.log`, `/tmp/issue87-check.log`, `/tmp/issue87-clippy.log`, `/tmp/issue87-fmt.log`.
+- 전체 로컬 결과: Rust 179개·Node UI 138개, `cargo check --all-targets`, Clippy `-D warnings`, Rustfmt 통과. baseline 제외·skip는 0. 원본 `/tmp/issue87-rust-tests.log`, `/tmp/issue87-ui-tests.log`, `/tmp/issue87-check.log`, `/tmp/issue87-clippy.log`, `/tmp/issue87-fmt.log`.
 - macOS ARM64 앱 번들 빌드 통과(`/tmp/issue87-build.log`). 설치·공개 배포와 구분한다. 최종 소스 변경 후 같은 빌드를 재실행해 통과했다.
 - 독립 검토: 구현 이력을 상속하지 않은 검토자가 전체 diff·red·로그를 읽고 테스트 완화/실제 테스트 퇴행/스코프 이탈 미발동을 확인했다. 예비 검토의 startup 재표시·stash 예약·배포 서명 검증·플랫폼 바인딩 지적을 수정하고 재검토했다.
 
@@ -94,3 +94,7 @@ Unix에서는 자손 PID와 foreground/process group에 SIGKILL을 보내며 Win
 ## is2 커버리지 대조
 
 2026-11-07 실사용 #87 / PR #90, 구현·검토 Codex GPT-6 Astra, 반복 UI·배포 작업 GPT-6 Luna. 이번 실행은 Medium 프런트엔드·백엔드, 구현 이력 없는 독립 감사와 수정 재검토, 실제 macOS 복원 실패/수정/재검증의 근거다. 자동 병합·충돌 rebase·서버/DB 마이그레이션은 실행하지 않았다. 공유 스킬 원본 유지보수는 요청 범위가 아니므로 커버리지 대조 결과를 이 프로젝트 기록에 남긴다.
+
+### 오프라인 재확인 회귀 수정
+
+독립 감사에서 다운로드 완료 상태의 수동 재확인이 오프라인으로 실패하면 설치 가능한 상태가 사라지는 문제를 발견했다. 기존 ready 상태를 복구하도록 수정했다. `/tmp/issue87-offline-red.log`에서 오류 상태와 ready 기대값의 실패를 확인한 뒤 전체 Rust 179개 및 정적 검사·앱 번들을 다시 통과했다. 이전 SHA `db5c337ed6f00133526d00195a5b2771e72f4ac1`의 CI [42324640587](https://github.com/egoing/agent-gibbon/actions/runs/42324640587)는 이 수정 반영을 위해 취소했으며 통과로 계산하지 않는다.

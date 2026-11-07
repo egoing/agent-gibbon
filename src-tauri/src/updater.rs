@@ -240,6 +240,17 @@ fn ready(app: &tauri::AppHandle, update: Update, bytes: Vec<u8>) -> Result<(), S
     *app.state::<Updates>().status.lock().map_err(err)? = s;
     Ok(())
 }
+fn check_failed(current: &mut Status, previous: Option<Status>) {
+    if let Some(mut ready) = previous {
+        ready.message =
+            "새 업데이트 확인에 실패했습니다. 이미 검증한 업데이트는 설치할 수 있습니다".into();
+        *current = ready;
+        return;
+    }
+    current.phase = "error".into();
+    current.message =
+        "업데이트를 받지 못했습니다. 네트워크 또는 서명을 확인한 뒤 다시 시도하세요".into();
+}
 async fn check(app: tauri::AppHandle, manual: bool) -> Result<(), String> {
     if !enabled() {
         return Ok(());
@@ -247,7 +258,7 @@ async fn check(app: tauri::AppHandle, manual: bool) -> Result<(), String> {
     if crate::privacy::onboarding_required(&app) {
         return Err("먼저 약관을 확인하세요".into());
     }
-    {
+    let previous = {
         let state = app.state::<Updates>();
         let mut s = state.status.lock().map_err(err)?;
         if matches!(
@@ -257,11 +268,13 @@ async fn check(app: tauri::AppHandle, manual: bool) -> Result<(), String> {
         {
             return Ok(());
         }
+        let previous = (s.phase == "ready").then(|| s.clone());
         s.phase = "checking".into();
         s.message = "업데이트를 확인하고 있습니다".into();
         s.downloaded = 0;
         s.total = None;
-    }
+        previous
+    };
     let result = async {
         let Some(mut update) = builder(&app)?.check().await.map_err(err)? else {
             set(&app, "idle", "최신 버전입니다");
@@ -294,10 +307,9 @@ async fn check(app: tauri::AppHandle, manual: bool) -> Result<(), String> {
     }
     .await;
     if result.is_err() {
-        set(
-            &app,
-            "error",
-            "업데이트를 받지 못했습니다. 네트워크 또는 서명을 확인한 뒤 다시 시도하세요",
+        check_failed(
+            &mut *app.state::<Updates>().status.lock().map_err(err)?,
+            previous,
         );
     }
     result
@@ -622,5 +634,26 @@ mod tests {
             assert_eq!(verify_package(&update, bytes).is_ok(), target == platform());
             assert!(verify_package(&update, b"tampered payload").is_err());
         }
+    }
+    #[test]
+    fn offline_manual_recheck_preserves_the_verified_download() {
+        let previous = Status {
+            phase: "ready".into(),
+            version: Some("9.0.0".into()),
+            downloaded: 123,
+            total: Some(123),
+            ..Status::default()
+        };
+        let mut current = Status {
+            phase: "checking".into(),
+            ..Status::default()
+        };
+        check_failed(&mut current, Some(previous));
+        assert_eq!(current.phase, "ready");
+        assert_eq!(current.version.as_deref(), Some("9.0.0"));
+        assert_eq!(current.downloaded, 123);
+        assert_eq!(current.total, Some(123));
+        check_failed(&mut current, None);
+        assert_eq!(current.phase, "error");
     }
 }
