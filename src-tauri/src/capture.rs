@@ -24,6 +24,7 @@ pub enum SelectionMode {
     Image,
     Text,
     Terminal,
+    Web,
 }
 struct Screen {
     mode: SelectionMode,
@@ -98,6 +99,16 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
         })
     {
         eprintln!("터미널 단축키 등록 실패 (메뉴에서 실행 가능): {error}");
+    }
+    if let Err(error) = app
+        .global_shortcut()
+        .on_shortcut("Ctrl+Shift+4", |app, _, event| {
+            if event.state() == ShortcutState::Pressed {
+                trigger(app, SelectionMode::Web);
+            }
+        })
+    {
+        eprintln!("웹 단축키 등록 실패 (메뉴에서 실행 가능): {error}");
     }
     Ok(())
 }
@@ -264,6 +275,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
             SelectionMode::Image => "영역 캡처 — Escape로 취소",
             SelectionMode::Text => "빈 메모 영역 선택 — Escape로 취소",
             SelectionMode::Terminal => "터미널 영역 선택 — Escape로 취소",
+            SelectionMode::Web => "웹 창 영역 선택 — Escape로 취소",
         })
         .decorations(false)
         .resizable(false)
@@ -596,6 +608,9 @@ fn finish_selection(
     };
     // Restore the previous app before the new editor deliberately takes focus.
     cleanup_before_create(app)?;
+    if mode == SelectionMode::Web {
+        return crate::web::create(app, Some(bounds), None, None).map(|_| ());
+    }
     if mode == SelectionMode::Terminal {
         return crate::terminal::create_terminal(app, bounds).map(|_| ());
     }

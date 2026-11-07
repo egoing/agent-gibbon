@@ -794,3 +794,14 @@ SVG 3개와 PNG 3개를 함께 갱신했다. PNG 렌더링과 배치 육안 확�
 
 - 새로 표시하는 메모의 등장 강조와 기존 창의 재배치 전환을 분리했다. 수동 투명도 설정에서도 새 메모를 선명하게 표시하며, 숨겨진 WebView 측정 중 진행된 fade는 실제 표시 전에 초기화한다. 포커스·핀·숨김·배치 기준과 변경 알림 우선순위는 유지한다.
 - [투명도 시안 SVG](design/global-opacity-wheel.svg)·[PNG](design/global-opacity-wheel.png)를 새 메모 100%, 기존 메모 저장값의 관계로 갱신했다. 구현·실행 검증과 한계는 [검증 기록](verification/new-memo-spotlight-20261106.md)을 따른다. Rust 157개·UI 95개, Rustfmt·Clippy·개발 빌드와 macOS ARM64의 자동 50%·수동 35% 실제 창 검증을 통과했다. Windows·Intel 실제 GUI는 미검증이다. 코드 SHA `f54c34e`의 macOS ARM64·Intel·Windows x64 전체 검사와 설치 파일 빌드는 [실행 42230331380](https://github.com/egoing/agent-gibbon/actions/runs/42230331380)에서 통과했고 비어 있지 않은 artifact 세 개를 확인했다. 실제 설치·GUI 검증과 구분한다.
+
+## Web Welcome — #92 (2026-11-07)
+
+- **확정 범위:** Ctrl+Shift+4 또는 트레이의 `영역 웹 창`으로 영역을 선택하고 웹 Welcome에서 주소를 입력한 뒤 `실행`한다. Escape는 영역 선택을 취소한다. 기존 Ctrl+Shift+1/2/3을 유지한다.
+- **이번 구현 기준:** Terminal Welcome의 어두운 표면·13px 본문·4px 모서리·최대 콘텐츠 폭 480px·24px 내부 여백을 재사용한다. 작은 창(너비 420px 이하 또는 높이 300px 이하)은 16px 여백과 위에서부터 스크롤을 사용한다. 웹 창은 네이티브 제목줄의 이동·크기 조절·닫기를 제공하며 최소 콘텐츠 크기는 240×160px이다. 선택 영역이 이보다 작으면 최소 크기로 보정한다. 큰 Welcome 제목이나 추천 사이트·최근 주소 목록을 추가하지 않는다.
+- 주소 레이블 → URL 입력 → 형식 안내 → `실행` → 상태/오류 순서다. URL 입력은 명시적 Enter/버튼으로 실행하며 자동 실행하지 않는다. 실행 중 중복 제출을 막고 실패하면 입력값과 초점을 보존해 재시도할 수 있다. 배경 CLI로 열 때 키보드 포커스를 가져오지 않는다.
+- 웹 콘텐츠는 별도 WebView로 전환한다. 앱 내부 Welcome과 외부 콘텐츠의 창 레이블을 분리하고 외부 창의 앱 명령 접근을 차단한다. HTTP(S)만 허용하고 자격증명·제어문자·앱 내부 origin을 거절한다. 외부 페이지의 이후 이동에도 같은 주소 정책을 적용한다. 새 창/팝업과 다운로드는 차단한다.
+- CLI `web [--id web-ID] [--url URL]`로 Welcome 또는 URL을 연다. URL 생략 시 기존 웹 창은 현재 페이지를 유지하고 복원한다. `inspect`·`list`로 조회하며 `close`와 네이티브 닫기는 숨기고 페이지를 유지한다. `open --id web-ID`도 기존 웹 창을 복원한다. 웹 창은 세션 동안만 보관하며 앱 재시작 후 복원하거나 주소 이력을 파일로 저장하지 않는다. 기존 메모/터미널의 영속 저장 범위는 유지한다.
+- 구현과 검증은 [#92 기록](verification/issue92-web-welcome.md)을 따른다. 아래 시안은 설명용이며 실앱 캡처가 아니다. macOS ARM64의 실제 Welcome 버튼 실행·CLI 숨김/복원과 3개 크기의 Chromium 검증을 통과했다. 초기 메인 스레드 충돌을 수정 후 재검증했다. 전체 플랫폼 CI·Windows/Intel GUI·정확한 영역 좌표 및 실제 외부 공격 스크립트는 미검증이며 상세 출처는 위 기록을 따른다.
+
+[SVG 시안](design/web-welcome.svg) · [PNG 시안](design/web-welcome.png)

@@ -101,3 +101,18 @@ MD
 앱 자체에는 AI 대화 모델·계정·클라우드 동기화가 없다. 에이전트가 로컬 CLI를 호출해 메모를 관리한다.
 
 앱 소스 개발·테스트를 요청받은 경우에만 [개발 문서](https://github.com/egoing/agent-gibbon#빌드와-실행)를 읽는다. 개발 테스트에는 해당 워크트리의 `scripts/agent-gibbon-dev`를 사용해 설치 앱의 메모와 분리한다.
+
+## 웹 창
+
+지원 버전에서 `web [--id web-ID] [--url URL]`로 웹 Welcome 또는 지정한 HTTP(S) 페이지를 Agent Gibbon 웹 창에 연다. 실행 파일의 `--help`로 지원 여부를 확인한다. ID 생략은 새 창 생성이고 지정 ID는 `web-`로 시작해야 한다.
+
+```sh
+"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" web --id web-reference
+"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" web --id web-reference --url 'https://example.com/'
+"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" inspect --id web-reference
+"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" close --id web-reference
+```
+
+개발 작업은 지정 워크트리의 `scripts/agent-gibbon-dev`를 사용한다. `web`은 필요하면 앱을 시작한다. URL을 생략한 기존 ID의 `web` 또는 `open`은 현재 페이지를 복원하며 `close`와 네이티브 닫기는 숨기기다. 웹 창은 `list`에도 포함되고 앱 재시작 후에는 보존하지 않는다. 다른 메모와 충돌하는 ID를 덮어쓰지 않는다. 웹 창에 메모 본문·색상·상태·제목 옵션을 보내지 않는다.
+
+Ctrl+Shift+4/트레이의 영역 웹 창은 영역 선택 뒤 URL 입력과 명시적인 실행을 제공한다. HTTP(S) 주소만 허용하고 앱 내부 주소·자격증명 포함 주소·제어문자를 거절한다. 팝업·다운로드와 외부 웹 콘텐츠의 앱 특권 IPC 접근은 차단한다. 새 서버를 실행하지 않는다. 웹페이지 자체의 로그인·정보 전송·버튼 조작을 웹 창 열기 요청만으로 대신 수행하지 않는다.

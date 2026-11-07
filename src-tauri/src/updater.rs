@@ -697,6 +697,7 @@ fn on_main<T: Send + 'static>(
     rx.recv().map_err(err)?
 }
 fn safe_native(app: &tauri::AppHandle) -> Result<(), String> {
+    crate::update_restore::check(app)?;
     if crate::terminal::update_blocked(app)? {
         return Err("터미널 세션을 종료한 뒤 설치할 수 있습니다. 숨긴 터미널도 포함됩니다".into());
     }

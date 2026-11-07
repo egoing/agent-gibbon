@@ -1,0 +1,1 @@
+{"command": "cargo check --locked --manifest-path src-tauri/Cargo.toml --all-targets", "exit": 0}

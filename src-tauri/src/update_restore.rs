@@ -54,6 +54,21 @@ fn permitted_label(label: &str) -> bool {
         })
 }
 
+fn check_live_window_kinds<'a>(labels: impl Iterator<Item = &'a str>) -> Result<(), String> {
+    for label in labels {
+        if label.starts_with("terminal-") {
+            return Err(
+                "터미널 시작 화면이 남아 있습니다. 관리 창에서 터미널을 삭제한 뒤 다시 설치하세요."
+                    .into(),
+            );
+        }
+        if label.starts_with("webview-") || label.starts_with("webpage-") {
+            return Err("웹 창 세션이 있어 업데이트를 보류했습니다. 앱을 다시 시작하면 웹 창이 종료되며, 이후 업데이트를 설치할 수 있습니다.".into());
+        }
+    }
+    Ok(())
+}
+
 fn validate(snapshot: &Snapshot) -> Result<(), String> {
     if snapshot.version != 1 {
         return Err("업데이트 창 상태의 버전을 지원하지 않습니다".into());
@@ -98,12 +113,7 @@ pub fn check(app: &AppHandle) -> Result<(), String> {
         return Err("이전 업데이트의 창 복원을 먼저 완료해야 합니다".into());
     }
     let windows = app.webview_windows();
-    if windows.keys().any(|label| label.starts_with("terminal-")) {
-        return Err(
-            "터미널 시작 화면이 남아 있습니다. 관리 창에서 터미널을 삭제한 뒤 다시 설치하세요."
-                .into(),
-        );
-    }
+    check_live_window_kinds(windows.keys().map(String::as_str))?;
     if crate::stash::active(app) || crate::stash::chord_busy(app) {
         return Err("메모 숨김·복원 동작이 끝난 뒤 다시 설치하세요.".into());
     }
@@ -257,6 +267,19 @@ mod tests {
             visible: false,
             minimized: false,
             always_on_top: true,
+        }
+    }
+
+    #[test]
+    fn update_rejects_session_windows_including_hidden_web_views() {
+        assert!(check_live_window_kinds(["main", "note-a"].into_iter()).is_ok());
+        for label in ["terminal-123", "webview-web-a", "webpage-web-b"] {
+            let error = check_live_window_kinds(["main", label].into_iter()).unwrap_err();
+            assert!(error.contains(if label.starts_with("terminal-") {
+                "터미널"
+            } else {
+                "웹 창"
+            }));
         }
     }
 

@@ -352,3 +352,19 @@ Agent Gibbon의 소스 코드는 [MIT 라이선스](LICENSE)로 공개합니다.
 Ctrl+Shift+3 또는 트레이의 **영역 터미널**에서 위치를 선택하면 Welcome이 열립니다. 마지막 폴더(기록이 없으면 홈)에서 설치된 앱 또는 셸을 시작할 수 있습니다. 앱 명령이 끝나면 같은 셸로 돌아갑니다. 닫기는 종료이며 작업 중이면 확인합니다. 핀 해제 후 포커스 이동·세 보조키·CLI `close`는 실행을 유지하는 숨김입니다.
 
 종료한 터미널은 목록에 남고 다시 열면 마지막 위치·크기·경로를 복원한 Welcome을 보여 줍니다. 전용 에이전트의 영역 생성·자동 실행·`agent` CLI 명령은 제거했습니다. 예전 에이전트 파일은 삭제하지 않으며 목록·복원 대상에서 제외합니다. [디자인 기준](docs/design-system.md#terminal-welcome--57-2026-11-05)과 [플랫폼별 검증 범위](docs/verification/issue57-terminal-welcome.md)를 참고하세요.
+
+## 웹 창
+
+`Ctrl+Shift+4` 또는 트레이 **영역 웹 창**에서 영역을 선택하면 웹 시작 화면이 열립니다. HTTP(S) 주소를 입력하고 **실행**하거나 Enter를 누르면 Agent Gibbon 웹 창에서 표시합니다. 기존 메모와 터미널 단축키는 유지합니다.
+
+```sh
+./scripts/agent-gibbon web --id web-reference
+./scripts/agent-gibbon web --id web-reference --url 'https://example.com/'
+./scripts/agent-gibbon inspect --id web-reference
+./scripts/agent-gibbon close --id web-reference
+./scripts/agent-gibbon web --id web-reference
+```
+
+개발 테스트는 위 명령의 실행기를 `./scripts/agent-gibbon-dev`로 바꿉니다. ID를 생략하면 새 웹 창을 만들며, 지정할 때는 `web-`로 시작하는 고유 ID를 사용합니다. `web`의 URL 생략과 기존 ID의 `open`은 현재 페이지를 유지하며 복원하고, `close` 및 네이티브 닫기는 숨깁니다. `list`는 웹 창도 포함합니다. 웹 창과 주소는 세션 동안만 유지하며 앱 재시작 시 복원하지 않습니다.
+
+로컬 개발 페이지의 HTTP 주소도 허용합니다. 앱 내부 주소·자격증명 포함 주소·HTTP(S) 이외의 스킴은 거절하며 이후 페이지 이동에도 적용합니다. 외부 웹 콘텐츠는 앱 특권 IPC에 접근할 수 없으며 팝업·다운로드는 차단합니다. 별도 웹 서버는 추가하지 않습니다. 화면·동작 기준은 [디자인 시스템](docs/design-system.md#web-welcome--92-2026-11-07)을 따릅니다.

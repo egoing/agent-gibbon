@@ -1,0 +1,232 @@
+[
+  {
+    "args": [
+      "inspect",
+      "--id",
+      "web-92-cli"
+    ],
+    "exit": 0,
+    "response": {
+      "always_on_top": true,
+      "current_url": "https://example.com/",
+      "focused": false,
+      "id": "web-92-cli",
+      "instance": "dev-70d4bfcea466ab2bbe492b65",
+      "kind": "web",
+      "ok": true,
+      "position": {
+        "x": 1448,
+        "y": 414
+      },
+      "size": {
+        "height": 800,
+        "width": 1200
+      },
+      "title": "Agent Gibbon [DEV 92-web-welcome · 70d4bfce] — 웹 — web-92-cli",
+      "url": "https://example.com/",
+      "visible": false,
+      "welcome": false
+    }
+  },
+  {
+    "args": [
+      "close",
+      "--id",
+      "web-92-cli"
+    ],
+    "exit": 0,
+    "response": {
+      "always_on_top": true,
+      "current_url": "https://example.com/",
+      "focused": false,
+      "id": "web-92-cli",
+      "instance": "dev-70d4bfcea466ab2bbe492b65",
+      "kind": "web",
+      "ok": true,
+      "position": {
+        "x": 1448,
+        "y": 414
+      },
+      "size": {
+        "height": 800,
+        "width": 1200
+      },
+      "title": "Agent Gibbon [DEV 92-web-welcome · 70d4bfce] — 웹 — web-92-cli",
+      "url": "https://example.com/",
+      "visible": false,
+      "welcome": false
+    }
+  },
+  {
+    "args": [
+      "web",
+      "--id",
+      "web-92-cli"
+    ],
+    "exit": 0,
+    "response": {
+      "always_on_top": true,
+      "current_url": "https://example.com/",
+      "focused": false,
+      "id": "web-92-cli",
+      "instance": "dev-70d4bfcea466ab2bbe492b65",
+      "kind": "web",
+      "ok": true,
+      "position": {
+        "x": 1448,
+        "y": 414
+      },
+      "size": {
+        "height": 800,
+        "width": 1200
+      },
+      "title": "Agent Gibbon [DEV 92-web-welcome · 70d4bfce] — 웹 — web-92-cli",
+      "url": "https://example.com/",
+      "visible": true,
+      "welcome": false
+    }
+  },
+  {
+    "args": [
+      "web",
+      "--id",
+      "web-92-cli",
+      "--url",
+      "javascript:alert(1)"
+    ],
+    "exit": 1,
+    "response": {
+      "error": "URL은 자격증명 없는 HTTP(S) 웹 주소여야 합니다",
+      "ok": false
+    }
+  },
+  {
+    "args": [
+      "web",
+      "--id",
+      "web-92-cli",
+      "--url",
+      "file:///tmp/test"
+    ],
+    "exit": 1,
+    "response": {
+      "error": "URL은 자격증명 없는 HTTP(S) 웹 주소여야 합니다",
+      "ok": false
+    }
+  },
+  {
+    "args": [
+      "web",
+      "--id",
+      "web-92-cli",
+      "--url",
+      "https://tauri.localhost/"
+    ],
+    "exit": 1,
+    "response": {
+      "error": "URL은 자격증명 없는 HTTP(S) 웹 주소여야 합니다",
+      "ok": false
+    }
+  },
+  {
+    "args": [
+      "web",
+      "--id",
+      "web-92-cli",
+      "--url",
+      "https://name:password@example.com/"
+    ],
+    "exit": 1,
+    "response": {
+      "error": "URL은 자격증명 없는 HTTP(S) 웹 주소여야 합니다",
+      "ok": false
+    }
+  },
+  {
+    "args": [
+      "inspect",
+      "--id",
+      "web-92-cli"
+    ],
+    "exit": 0,
+    "response": {
+      "always_on_top": true,
+      "current_url": "https://example.com/",
+      "focused": false,
+      "id": "web-92-cli",
+      "instance": "dev-70d4bfcea466ab2bbe492b65",
+      "kind": "web",
+      "ok": true,
+      "position": {
+        "x": 1448,
+        "y": 414
+      },
+      "size": {
+        "height": 800,
+        "width": 1200
+      },
+      "title": "Agent Gibbon [DEV 92-web-welcome · 70d4bfce] — 웹 — web-92-cli",
+      "url": "https://example.com/",
+      "visible": true,
+      "welcome": false
+    }
+  },
+  {
+    "args": [
+      "close",
+      "--id",
+      "web-92-cli"
+    ],
+    "exit": 0,
+    "response": {
+      "always_on_top": true,
+      "current_url": "https://example.com/",
+      "focused": false,
+      "id": "web-92-cli",
+      "instance": "dev-70d4bfcea466ab2bbe492b65",
+      "kind": "web",
+      "ok": true,
+      "position": {
+        "x": 1448,
+        "y": 414
+      },
+      "size": {
+        "height": 800,
+        "width": 1200
+      },
+      "title": "Agent Gibbon [DEV 92-web-welcome · 70d4bfce] — 웹 — web-92-cli",
+      "url": "https://example.com/",
+      "visible": false,
+      "welcome": false
+    }
+  },
+  {
+    "args": [
+      "close",
+      "--id",
+      "web-92-ipc-probe"
+    ],
+    "exit": 0,
+    "response": {
+      "always_on_top": true,
+      "current_url": "https://httpbin.org/base64/PCFkb2N0eXBlIGh0bWw+PG1ldGEgY2hhcnNldD0idXRmLTgiPjx0aXRsZT5XZWIgSVBDIHByb2JlPC90aXRsZT48aDE+V2ViIElQQyBwcm9iZTwvaDE+PHByZSBpZD0icmVzdWx0Ij5SVU5OSU5HPC9wcmU+PHNjcmlwdD4KKGFzeW5jKCk9PnsKIGNvbnN0IHJlc3VsdD1bXTsKIGZvcihjb25zdCBbbmFtZSxjb21tYW5kLGFyZ3NdIG9mIFtbJ2FwcGxpY2F0aW9uJywnd2ViX3J1bicse3VybDonamF2YXNjcmlwdDoxJ31dLFsncGx1Z2luJywncGx1Z2luOndpbmRvd3xzZXRfdGl0bGUnLHt0aXRsZTonSVBDX1VORVhQRUNURUQnfV1dKSB7CiAgdHJ5IHtpZighd2luZG93Ll9fVEFVUklfXz8uY29yZT8uaW52b2tlKXRocm93IEVycm9yKCdObyBJUEMnKTthd2FpdCB3aW5kb3cuX19UQVVSSV9fLmNvcmUuaW52b2tlKGNvbW1hbmQsYXJncyk7cmVzdWx0LnB1c2gobmFtZSsnOkZBSUwnKTt9CiAgY2F0Y2gge3Jlc3VsdC5wdXNoKG5hbWUrJzpCTE9DS0VEJyk7fQogfQogZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3Jlc3VsdCcpLnRleHRDb250ZW50PXJlc3VsdC5qb2luKCdcbicpOwp9KSgpOwo8L3NjcmlwdD4K",
+      "focused": false,
+      "id": "web-92-ipc-probe",
+      "instance": "dev-70d4bfcea466ab2bbe492b65",
+      "kind": "web",
+      "ok": true,
+      "position": {
+        "x": 1448,
+        "y": 414
+      },
+      "size": {
+        "height": 800,
+        "width": 1200
+      },
+      "title": "Agent Gibbon [DEV 92-web-welcome · 70d4bfce] — 웹 — web-92-ipc-probe",
+      "url": "https://httpbin.org/base64/PCFkb2N0eXBlIGh0bWw+PG1ldGEgY2hhcnNldD0idXRmLTgiPjx0aXRsZT5XZWIgSVBDIHByb2JlPC90aXRsZT48aDE+V2ViIElQQyBwcm9iZTwvaDE+PHByZSBpZD0icmVzdWx0Ij5SVU5OSU5HPC9wcmU+PHNjcmlwdD4KKGFzeW5jKCk9PnsKIGNvbnN0IHJlc3VsdD1bXTsKIGZvcihjb25zdCBbbmFtZSxjb21tYW5kLGFyZ3NdIG9mIFtbJ2FwcGxpY2F0aW9uJywnd2ViX3J1bicse3VybDonamF2YXNjcmlwdDoxJ31dLFsncGx1Z2luJywncGx1Z2luOndpbmRvd3xzZXRfdGl0bGUnLHt0aXRsZTonSVBDX1VORVhQRUNURUQnfV1dKSB7CiAgdHJ5IHtpZighd2luZG93Ll9fVEFVUklfXz8uY29yZT8uaW52b2tlKXRocm93IEVycm9yKCdObyBJUEMnKTthd2FpdCB3aW5kb3cuX19UQVVSSV9fLmNvcmUuaW52b2tlKGNvbW1hbmQsYXJncyk7cmVzdWx0LnB1c2gobmFtZSsnOkZBSUwnKTt9CiAgY2F0Y2gge3Jlc3VsdC5wdXNoKG5hbWUrJzpCTE9DS0VEJyk7fQogfQogZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3Jlc3VsdCcpLnRleHRDb250ZW50PXJlc3VsdC5qb2luKCdcbicpOwp9KSgpOwo8L3NjcmlwdD4K",
+      "visible": false,
+      "welcome": false
+    }
+  }
+]
