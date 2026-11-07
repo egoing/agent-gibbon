@@ -1,0 +1,28 @@
+name: Release timings
+
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  report:
+    if: github.event.workflow_run.head_repository.full_name == github.repository && vars.RELEASE_CI_SENTRY_DSN != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          sparse-checkout: scripts/report-release-ci.py
+          sparse-checkout-cone-mode: false
+      - name: Report release timings
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_SENTRY_DSN: ${{ vars.RELEASE_CI_SENTRY_DSN }}
+        run: python3 scripts/report-release-ci.py
