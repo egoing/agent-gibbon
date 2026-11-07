@@ -1,0 +1,1 @@
+Test-only public key and signatures created with Tauri CLI 2.12.1. The ephemeral private key was discarded. Payload is not an installable package. Version 9.0.0 and platform filenames are authenticated by each signature. No production key is used.

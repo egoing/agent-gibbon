@@ -12,7 +12,7 @@ function syncVisibility() {
   visibilityView.button.disabled = visibilityPending.has(note.id);
 }
 // Register settings destinations here; navigation preserves each panel's DOM.
-const settingsSections = ['privacy', 'skills', 'appearance'];
+const settingsSections = ['privacy', 'skills', 'appearance', ...(el('settings-updater') ? ['updater'] : [])];
 let selectedSettingsSection = 'privacy';
 function settingsSection(selectedSection) {
   selectedSettingsSection = selectedSection;
@@ -21,6 +21,7 @@ function settingsSection(selectedSection) {
     el(`settings-${section}`).hidden = !active;
     el(`settings-${section}-nav`).setAttribute('aria-current', active ? 'page' : 'false');
   }
+  if (selectedSection === 'updater') window.gibbonUpdater?.refresh();
 }
 for (const section of settingsSections) {
   el(`settings-${section}-nav`).onclick = () => {
@@ -36,6 +37,7 @@ function page(settings) {
   el('settings-nav').setAttribute('aria-pressed', String(settings));
   if (!settings) refresh();
   else if (selectedSettingsSection === 'skills') window.gibbonSkills?.refresh();
+  else if (selectedSettingsSection === 'updater') window.gibbonUpdater?.refresh();
   else window.gibbonPrivacy?.refresh().catch(()=>{});
 }
 window.gibbonShowNotes = () => page(false);
