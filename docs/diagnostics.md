@@ -79,7 +79,7 @@ powershell -NoProfile -File scripts/windows-hang-evidence.ps1
 
 ### 단계별 trace/span 이름
 
-운영 이름과 레이블은 국제화와 쿼리 재사용을 위해 고정된 영어 이름을 사용한다. 동적 메모 제목·ID·경로·실행 명령을 이름에 붙이지 않는다. 같은 Rust 동기 호출 흐름의 하위 구간은 부모 trace의 자식 span이며, IPC 수신 → UI callback 경계만 명시적 부모 handle로 연결한다. 다른 UI callback·thread·WebView 집계 사이에 자동으로 trace가 이어진다고 가정하지 않는다.
+운영 이름과 레이블은 국제화와 쿼리 재사용을 위해 고정된 영어 이름을 사용한다. 동적 메모 제목·ID·경로·실행 명령을 이름에 붙이지 않는다. 같은 Rust 동기 호출 흐름의 하위 구간은 부모 trace의 자식 span이며, IPC 수신 → UI callback과 터미널 시작/캡처 요청 → worker(및 캡처 UI callback) 경계를 명시적 부모 handle로 연결한다. 그 외 UI callback·thread·WebView 집계 사이의 자동 연결을 가정하지 않는다.
 
 | 흐름 | 영어 작업 이름 | 해석 |
 | --- | --- | --- |
@@ -136,7 +136,7 @@ Sentry 개별 Rust snapshot root `snapshot.request`는 기존 고빈도 작업�
 - 부모 handle은 callback이 처리되거나 폐기될 때까지 조상을 유지한다. 수신 대기가 먼저 끝난 경우에도 자식이 끝난 뒤 transaction을 끝내며, callback 취소·큐 등록 실패 시 마지막 handle 해제로 정리한다. 영구 정지·프로세스 종료는 미완료 trace 손실 가능성이 있다.
 - UI callback은 현재 스레드의 기존 문맥을 잠시 교체하고 정상 반환·오류·panic 시 복원한다. 동시 요청은 각각의 부모를 사용한다. 로컬 recorder의 scope/parent/cause ID는 전달 handle에 포함하지 않으며 전송 필터도 유지한다.
 - handle은 기존 전송 gate의 동의 세대에 묶인다. 철회·재활성화 후 이전 handle로 span·작업 로그를 시작하거나 완료 전송하지 않는다. span 종료와 작업 로그는 시작 당시 SDK hub/client를 유지해 검사 직후 철회·재활성화가 경합해도 새 클라이언트로 갈아타지 않는다. 전송 직전의 기존 transport 세대 검사도 유지한다. 동의 전/상세 비활성 상태에서 캡처한 빈 문맥 역시 새 활성 세대의 루트로 승격하지 않는다.
-- UI의 5초 실행 기한·6초 수신 제한과 snapshot 상태 읽기와 snapshot을 제외한 2초 WebView 집계는 유지한다. 터미널의 장기 output worker를 부모 수명에 묶거나 WebView 개별 요청 프로토콜을 신설하지 않는다. 다른 스레드 경계는 후속 범위다.
+- UI의 5초 실행 기한·6초 수신 제한과 snapshot 상태 읽기와 snapshot을 제외한 2초 WebView 집계는 유지한다. 터미널의 장기 output worker를 부모 수명에 묶거나 WebView 개별 요청 프로토콜을 신설하지 않는다. 현재 추가된 worker 경계는 아래 절을 따른다.
 - 검증 근거와 미실행 범위는 [스레드 문맥 검증 기록](verification/sentry-thread-context-20261107.md)을 따른다. in-memory/loopback 테스트는 실제 Sentry 서버 수신 증거가 아니다.
 
 ### snapshot 요약 제거와 자식 span 기기 정보 — #64 후속
@@ -144,5 +144,15 @@ Sentry 개별 Rust snapshot root `snapshot.request`는 기존 고빈도 작업�
 - 여러 snapshot 호출의 구간 최대값을 실제 요청 한 번처럼 보이게 하던 요약 `snapshot` transaction을 제거했다. 프런트의 계측 대상에서 snapshot을 제외하고, 백엔드는 구버전 화면이 보내는 유효한 snapshot 샘플을 무시한다. 최종 envelope와 작업 로그의 허용 목록에서도 snapshot 요약을 차단한다.
 - heartbeat 자체와 멈춤 감시, 실제 snapshot 앱 기능 및 `snapshot.request → note.state.*` 개별 trace는 유지한다. 개별 요청은 여전히 최대 1% 샘플링이며 WebView 요청별 프로토콜이나 대체 metrics는 도입하지 않는다. 따라서 snapshot의 프런트 왕복 최대 지연·횟수·실패 횟수 요약 관측은 사라진다. Rust 처리 span은 WebView 왕복 전체 시간의 대체물이 아니다. 다른 작업의 WebView 집계는 기존대로 남는다.
 - 최종 전송 필터에서 루트와 모든 허용된 자식 span에 현재 빌드의 `app.os`, `app.arch`, `app.build`를 같은 값으로 넣는다. 전달된 다른 값이나 비허용 태그는 신뢰하지 않는다. 메모/사용자/장치 식별자, 로컬 flow/parent/cause는 추가하지 않는다. 서버에서의 실제 기기 필터 조회 성공은 별도 수신 검증 사항이다.
-- 스레드 전달의 구현 범위는 CLI 수신 → UI callback이다. terminal_start의 spawn_blocking, 캡처 worker/UI callback, 장기 터미널 output reader, WebView 왕복 전체의 새 부모 연결은 이번 후속에서 추가하지 않는다. 특히 장기 reader를 시작 trace에 계속 붙이면 해당 trace가 터미널 종료까지 끝나지 않을 수 있어 별도 수명 설계가 필요하다.
+- 스레드 전달은 CLI 수신 → UI callback에 이어 터미널 시작 및 캡처 worker까지 확장했다(아래 절). 장기 터미널 output reader와 WebView 왕복 전체는 동일 시작 trace에 연결하지 않는다. 장기 reader를 시작 trace에 계속 붙이면 해당 trace가 터미널 종료까지 끝나지 않을 수 있고, 출력의 최대 1% 샘플링 경계도 달라지기 때문이다.
 - [후속 검증 기록](verification/sentry-summary-metadata-20261107.md)에 TDD와 검사 범위를 기록한다. 기존 동의 범주의 성능 항목을 줄이고 기존 고정 기기 정보를 자식에도 적용하는 변경으로, 수집 목적·전송 대상·보유기간·동의 방식은 유지한다.
+
+### 터미널·캡처 worker 부모 전달 — #64 추가
+
+- `terminal.request`는 Rust의 terminal_start 요청 수락 지점에서 시작하고 spawn_blocking의 `terminal.start → terminal.pty.create/process.spawn/io.attach`를 같은 trace로 연결한다. worker 큐 대기를 포함하되 WebView에서 호출하기 전 시간/프런트 왕복 전체를 측정한다고 표시하지 않는다.
+- `capture.request`는 승인된 트레이/단축키 요청을 worker에 보내기 전에 시작한다. Windows의 lifecycle worker와 비Windows의 worker → UI callback 모두 같은 부모를 설치하며, 실제 `capture.prepare` 및 화면 열거/캡처/overlay 생성 단계가 그 자식이다.
+- Windows finish/cancel/failed의 lifecycle 호출도 각각 큐 등록 전에 `capture.request`를 만들고 worker의 해당 처리 span과 잠금/정리 단계를 연결한다. 화면 선택을 기다리는 사람의 조작 시간이나 WebView 이미지 decode/paint 전체를 하나의 부모에 붙이지 않는다.
+- source thread의 TLS/로컬 recorder scope를 유지하지 않는 Send 전용 부모 lease만 큐로 전달한다. 목적 스레드에서만 RAII scope를 설치하고 복원한다. 기존 epoch·클라이언트·sampling 결정과 마지막 lease의 자식→조상 종료 규칙을 재사용한다. 실패/취소 시 미실행 closure가 drop되면 lease도 해제한다.
+- 장기 PTY reader에는 시작 부모 lease를 넘기지 않는다. 요청 trace는 reader 생존 중에도 끝나며 각 terminal.output의 별도 최대1% 샘플링과 하위 filter/dispatch span은 유지한다. 따라서 터미널의 수명 전체가 한 trace가 되는 것은 아니다.
+- 이 변경은 진단 내부 구현이므로 디자인 시스템에 상세를 추가하지 않는다. 사용자 피드백에 따라 앞서 넣었던 요약/메타정보 기술 세부도 디자인 시스템에서 제거하고 이 문서와 검증 기록으로 모았다. UI·동의·포커스·창 배치·capture lifecycle 잠금 순서는 유지한다.
+- 구현/모의 검증과 실제 worker의 native/Sentry 수신 증거는 [worker 검증 기록](verification/sentry-workers-20261107.md)에서 구분한다.

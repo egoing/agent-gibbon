@@ -70,6 +70,7 @@ pub const OPERATIONS_ALLOWED: &[&str] = &[
     "ipc.list",
     "ipc.wait",
     "window.create",
+    "capture.request",
     "capture.prepare",
     "capture.finish",
     "capture.cancel",
@@ -86,6 +87,7 @@ pub const OPERATIONS_ALLOWED: &[&str] = &[
     "storage.save",
     "storage.load",
     "markdown.render",
+    "terminal.request",
     "terminal.start",
     "terminal.window.open",
     "terminal.window.create",
@@ -337,6 +339,14 @@ pub struct TimingContext {
     epoch: Option<u64>,
 }
 impl TimingContext {
+    /// Start a bounded request before scheduling work. No thread-local guard or
+    /// local recorder scope survives an await; only the Send parent lease moves.
+    pub fn request(op: &'static str) -> Self {
+        if detailed() {
+            bind_client();
+        }
+        timing_context(op, false, detailed(), transport::gate().clone())
+    }
     /// Replace rather than append: unrelated work on the destination thread
     /// must never become the parent. Even an empty/stale context is a barrier.
     pub fn enter(self) -> TimingScope {
@@ -378,6 +388,44 @@ fn timing_span(parent: Option<&TransactionOrSpan>, op: &'static str) -> Transact
             ))
         })
 }
+fn timing_context(
+    op: &'static str,
+    polling: bool,
+    detailed: bool,
+    gate: Arc<transport::Gate>,
+) -> TimingContext {
+    let parent = PARENTS.with(|p| p.borrow().last().cloned());
+    let epoch = gate.current();
+    let valid = parent
+        .as_ref()
+        .is_none_or(|p| Arc::ptr_eq(&p.gate, &gate) && p.epoch == epoch && p.span.is_some());
+    let span = if let (true, Some(epoch)) = (detailed && allowed(op) && valid, epoch) {
+        let ancestor = parent.and_then(|p| p.span);
+        let span = if ancestor.is_none() && polling {
+            let mut ctx = sentry::TransactionContext::new(op, op);
+            ctx.custom_insert("ipc.polling".into(), json!(true));
+            TransactionOrSpan::Transaction(sentry::start_transaction(ctx))
+        } else {
+            timing_span(ancestor.as_ref().map(|p| &p.span), op)
+        };
+        span.set_tag("measurement.origin", "rust");
+        let hub = ancestor
+            .as_ref()
+            .map(|p| p.hub.clone())
+            .unwrap_or_else(|| Arc::new(sentry::Hub::new_from_top(sentry::Hub::current())));
+        Some(Arc::new(TimingSpan {
+            span,
+            hub,
+            gate: gate.clone(),
+            epoch,
+            start: Instant::now(),
+            _parent: ancestor,
+        }))
+    } else {
+        None
+    };
+    TimingContext { span, gate, epoch }
+}
 impl Timing {
     pub fn new(op: &'static str) -> Self {
         Self::start(op, false)
@@ -399,37 +447,7 @@ impl Timing {
     ) -> Self {
         let local = crate::local_trace::Call::begin(op, crate::local_trace::Stage::Dispatch);
         let scope = local.scope();
-        let parent = PARENTS.with(|p| p.borrow().last().cloned());
-        let epoch = gate.current();
-        let valid = parent
-            .as_ref()
-            .is_none_or(|p| Arc::ptr_eq(&p.gate, &gate) && p.epoch == epoch && p.span.is_some());
-        let span = if let (true, Some(epoch)) = (detailed && allowed(op) && valid, epoch) {
-            let ancestor = parent.and_then(|p| p.span);
-            let span = if ancestor.is_none() && polling {
-                let mut ctx = sentry::TransactionContext::new(op, op);
-                ctx.custom_insert("ipc.polling".into(), json!(true));
-                TransactionOrSpan::Transaction(sentry::start_transaction(ctx))
-            } else {
-                timing_span(ancestor.as_ref().map(|p| &p.span), op)
-            };
-            span.set_tag("measurement.origin", "rust");
-            let hub = ancestor
-                .as_ref()
-                .map(|p| p.hub.clone())
-                .unwrap_or_else(|| Arc::new(sentry::Hub::new_from_top(sentry::Hub::current())));
-            Some(Arc::new(TimingSpan {
-                span,
-                hub,
-                gate: gate.clone(),
-                epoch,
-                start: Instant::now(),
-                _parent: ancestor,
-            }))
-        } else {
-            None
-        };
-        let context = TimingContext { span, gate, epoch };
+        let context = timing_context(op, polling, detailed, gate);
         PARENTS.with(|p| p.borrow_mut().push(context.clone()));
         Self {
             local,

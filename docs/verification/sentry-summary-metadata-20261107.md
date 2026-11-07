@@ -18,13 +18,13 @@
 - 기존 `aggregate_tag_survives_but_local_correlation_never_leaves_envelope`의 fixture 작업명을 snapshot에서 save_note로 변경했다. 새 요구로 금지된 요약 대신 계속 허용되는 집계의 provenance/로컬 ID 제거를 검증하기 위한 정당한 fixture 변경이며 assertion을 삭제·약화하지 않았다. red의 새 assertion은 그대로 유지한다.
 - green 후 구버전 snapshot의 transaction 미생성과 다른 측정의 계속 생성을 in-memory SDK transport에서 추가 확인한다. remote 진단 전송은 하지 않는다.
 
-## 남은 연결 경계
+## 이 단계 이후의 연결 경계
 
-CLI 수신 → UI callback의 explicit 부모 전달은 기존 구현으로 유지한다. 터미널 시작 worker, 캡처 worker/UI callback, 장기 output reader, WebView 개별 왕복 부모 연결은 미구현 범위로 남긴다. 기존 local_trace 연결을 Sentry 연결로 보고하지 않는다. 장기 reader의 부모 lease를 수명 전체 유지하는 방식은 루트 종료를 무기한 늦출 수 있어 적용하지 않는다.
+이 기록 단계에서는 CLI 수신 → UI callback의 explicit 부모 전달을 유지했다. 이후 추가 사용자 요청으로 터미널·캡처 worker 연결도 구현하며 현재 상태는 [worker 기록](sentry-workers-20261107.md)을 따른다. 아래는 당시 범위다. 터미널 시작 worker, 캡처 worker/UI callback, 장기 output reader, WebView 개별 왕복 부모 연결은 미구현 범위로 남긴다. 기존 local_trace 연결을 Sentry 연결로 보고하지 않는다. 장기 reader의 부모 lease를 수명 전체 유지하는 방식은 루트 종료를 무기한 늦출 수 있어 적용하지 않는다.
 
 ## 디자인·동의
 
-[디자인 시스템](../design-system.md)에 후속 적용 상태를 반영한다. 외형/배치 변경이 없어 시안 변경 없음. docs/legal/README에 기존 수집 범주 유지와 snapshot 왕복 요약 관측 감소를 기록하고 정책 본문/해시·동의 선택은 유지한다. 원격 Sentry 수신, 기기 필터 검색, 네이티브 진단 활성화는 이번 실행 증거에 포함하지 않는다.
+당시 디자인 시스템에 추가했던 진단 기술 세부는 사용자 피드백으로 제거하고 진단 문서/검증 기록으로 모았다. 외형/배치 변경이 없어 시안 변경 없음. docs/legal/README에 기존 수집 범주 유지와 snapshot 왕복 요약 관측 감소를 기록하고 정책 본문/해시·동의 선택은 유지한다. 원격 Sentry 수신, 기기 필터 검색, 네이티브 진단 활성화는 이번 실행 증거에 포함하지 않는다.
 
 ## 로컬 게이트 결과
 
