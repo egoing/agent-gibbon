@@ -10,16 +10,37 @@ window.installTerminalIme = function (terminal, send) {
   const preview = host.querySelector('.composition-view');
   function show() {
     if (!preview) return;
-    preview.textContent = pending;
-    preview.classList.toggle('active', !!pending);
+    // xterm renders Hangul in two terminal cells. Natural browser text is
+    // narrower with the fallback font, so size each provisional glyph using
+    // the same screen grid instead of letting the browser pack the word.
     const screen = host.querySelector('.xterm-screen');
+    const cellWidth = screen.getBoundingClientRect().width / terminal.cols;
+    const cellHeight = screen.getBoundingClientRect().height / terminal.rows;
+    const characters = Array.from(pending);
+    preview.replaceChildren(...characters.map((character, index) => {
+      const cell = document.createElement('span');
+      cell.className = 'gibbon-ime-cell' + (index === characters.length - 1 ? ' gibbon-ime-current' : '');
+      cell.textContent = character;
+      // Match xterm's default Unicode 6 widths for the Hangul ranges handled
+      // by this adapter (modern syllables/compatibility jamo are two cells).
+      const columns = /[\u1100-\u115f\u3130-\u318f\uac00-\ud7a3]/.test(character) ? 2
+        : /[\u1160-\u11ff]/.test(character) ? 0 : 1;
+      cell.style.width = `${columns * cellWidth}px`;
+      return cell;
+    }));
+    preview.classList.toggle('gibbon-ime-fallback', !!pending);
+    preview.classList.toggle('active', !!pending);
     const row = terminal.buffer.active.cursorY;
     Object.assign(preview.style, {
-      left: `${terminal.buffer.active.cursorX * screen.clientWidth / terminal.cols}px`,
-      top: `${row * screen.clientHeight / terminal.rows}px`,
-      fontFamily: terminal.options.fontFamily, fontSize: `${terminal.options.fontSize}px`
+      left: `${terminal.buffer.active.cursorX * cellWidth}px`,
+      top: `${row * cellHeight}px`,
+      fontFamily: terminal.options.fontFamily, fontSize: `${terminal.options.fontSize}px`,
+      lineHeight: `${cellHeight}px`
     });
   }
+  // Font-size changes, resize and asynchronous PTY output can update the grid
+  // while a word is pending. Re-anchor without committing or moving focus.
+  terminal.onRender?.(() => { if (pending && !native) show(); });
   function finish(cancel = false) {
     if (!pending) return;
     const value = pending; pending = ''; textarea.value = ''; show();
