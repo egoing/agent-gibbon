@@ -108,7 +108,7 @@ jobs:
             TAURI_UPDATER_PUBLIC_KEY="$(cat "$ephemeral_key.pub")"
           fi
           export TAURI_SIGNING_PRIVATE_KEY TAURI_SIGNING_PRIVATE_KEY_PASSWORD TAURI_UPDATER_PUBLIC_KEY
-          printf '{"bundle":{"createUpdaterArtifacts":true}}\n' > "$RUNNER_TEMP/updater-build-config.json"
+          node scripts/updater-build-config.mjs "$RUNNER_TEMP/updater-build-config.json"
           npm exec tauri build -- --target '${{ matrix.target }}' --bundles '${{ matrix.bundles }}' --config "$RUNNER_TEMP/updater-build-config.json" -- --locked
       - name: Collect installers
         shell: bash

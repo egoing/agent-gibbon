@@ -70,7 +70,7 @@ Unix에서는 자손 PID와 foreground/process group에 SIGKILL을 보내며 Win
 - updater 2.14.1, Tauri CLI 2.12.1. Rust 버전 조건은 충족했다. 공식 정식 GitHub manifest만 사용하며 `requireSignedVersion`을 적용한다. 서명이 인증한 플랫폼 파일명까지 검사하여 같은 버전의 다른 CPU 패키지 교체를 거부한다.
 - 배포 검증은 실제 Ed25519/Blake2b payload 서명과 trusted comment를 확인한다. 태그 배포는 `.pub` 파일과 저장소 공개 키 variable을 대조한다. dispatch는 runner별 일회용 키를 사용한다. 테스트용 공개 키·서명 fixture의 개인 키는 폐기했으며 운영 키와 무관하다.
 - 신규 테스트: 서명 자산 누락/기존 manifest 보존, 안정 버전 비교, 변조/잘못된 키/교차 플랫폼 교체, 실제 CLI 서명 호환, 설치 예약/새 작업 경쟁, 모든 창의 현재 epoch ack, 입력 차단/해제, 설정 UI 상태/중복 요청을 검사했다. `node --test tests/updater-release.test.mjs` 7개 통과. Rust updater 검사 5개 통과.
-- 전체 로컬 결과: Rust 179개·Node UI 138개, `cargo check --all-targets`, Clippy `-D warnings`, Rustfmt 통과. baseline 제외·skip는 0. 원본 `/tmp/issue87-rust-tests.log`, `/tmp/issue87-ui-tests.log`, `/tmp/issue87-check.log`, `/tmp/issue87-clippy.log`, `/tmp/issue87-fmt.log`.
+- 전체 로컬 결과: Rust 179개·Node UI 140개, `cargo check --all-targets`, Clippy `-D warnings`, Rustfmt 통과. baseline 제외·skip는 0. 원본 `/tmp/issue87-rust-tests.log`, `/tmp/issue87-ui-tests.log`, `/tmp/issue87-check.log`, `/tmp/issue87-clippy.log`, `/tmp/issue87-fmt.log`.
 - macOS ARM64 앱 번들 빌드 통과(`/tmp/issue87-build.log`). 설치·공개 배포와 구분한다. 최종 소스 변경 후 같은 빌드를 재실행해 통과했다.
 - 독립 검토: 구현 이력을 상속하지 않은 검토자가 전체 diff·red·로그를 읽고 테스트 완화/실제 테스트 퇴행/스코프 이탈 미발동을 확인했다. 예비 검토의 startup 재표시·stash 예약·배포 서명 검증·플랫폼 바인딩 지적을 수정하고 재검토했다.
 
@@ -98,3 +98,11 @@ Unix에서는 자손 PID와 foreground/process group에 SIGKILL을 보내며 Win
 ### 오프라인 재확인 회귀 수정
 
 독립 감사에서 다운로드 완료 상태의 수동 재확인이 오프라인으로 실패하면 설치 가능한 상태가 사라지는 문제를 발견했다. 기존 ready 상태를 복구하도록 수정했다. `/tmp/issue87-offline-red.log`에서 오류 상태와 ready 기대값의 실패를 확인한 뒤 전체 Rust 179개 및 정적 검사·앱 번들을 다시 통과했다. 이전 SHA `db5c337ed6f00133526d00195a5b2771e72f4ac1`의 CI [42324640587](https://github.com/egoing/agent-gibbon/actions/runs/42324640587)는 이 수정 반영을 위해 취소했으며 통과로 계산하지 않는다.
+
+### 원격 서명 빌드 실패와 수정
+
+첫 최종 SHA `f8d63d5b8d3372e50b5cfebf87c72aa1e6dc7f5c`의 [CI 42325527425](https://github.com/egoing/agent-gibbon/actions/runs/42325527425)는 macOS ARM64의 테스트·Clippy·앱/DMG 생성 후 updater 서명에서 `failed to decode pubkey: Missing comment in public key`로 실패했다. `TAURI_UPDATER_PUBLIC_KEY`를 Rust 빌드에는 전달했지만 Tauri CLI 설정의 빈 공개 키를 덮어쓰지 않은 원인이다. 이 실패를 통과로 계산하지 않는다.
+
+`updater-build-config.mjs`가 환경의 공개 키를 JSON overlay의 `plugins.updater.pubkey`에 정확히 전달하도록 고쳤다. 값 보존·키 누락 거부 테스트 2개 및 전체 Node 140개, workflow YAML·11개 bash 구문 검사를 통과했다. 독립 감사자는 추가 blocker와 테스트 완화·baseline 퇴행·스코프 이탈이 없음을 확인했다. 운영 키를 교체하지 않았으며 재시도 결과와 최종 SHA는 PR에 기록한다.
+
+일회용 키를 생성해 실제 로컬 `tauri build --bundles app --config <overlay> -- --locked`를 실행했다. 앱·updater tar.gz·서명 파일 생성과 종료 코드 0을 확인했다(`/tmp/issue87-local-sign-build.log`). 테스트 개인 키는 임시 디렉터리 정리와 함께 폐기했고 설치된 앱은 교체하지 않았다. Windows 첫 CI도 동일한 공개 키 누락 오류임을 로그로 확인했다.
