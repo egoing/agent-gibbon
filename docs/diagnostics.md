@@ -43,7 +43,7 @@ Windows는 `npm.cmd`를 사용한다. `gh api`를 지원하는 인증된 GitHub 
 ## 상세 진단 항목
 
 - **Tracing / spans:** 시작, IPC 대기·명령, 창 생성, Markdown 렌더, 저장·복원, 터미널 시작·쓰기·출력·리사이즈의 Rust 구간을 측정한다. 동기 중첩 작업은 같은 trace의 자식 span이 된다. CLI의 `ipc.wait` 수신 스레드에서 UI callback으로는 Sentry 부모 handle을 명시적으로 전달하므로 `ipc.open/update/close/inspect/list`와 그 동기 하위 단계도 같은 trace에 포함된다.
-- **WebView 측정:** 허용된 앱 명령의 왕복 지연·성공/실패 횟수, 클릭부터 두 animation frame까지의 시간, 타이머 지연을 숫자로 집계한다. 2초 구간별 최대 지연과 횟수이며 모든 개별 호출의 분포가 아니다. `measurement.origin`의 `rust` / `webview.aggregate`로 개별 Rust 실행과 WebView 집계를 구분한다. 개별 snapshot의 Rust root는 `snapshot.request`이며 집계 transaction `snapshot`과 다른 이름이다.
+- **WebView 측정:** 허용된 앱 명령의 왕복 지연·성공/실패 횟수, 클릭부터 두 animation frame까지의 시간, 타이머 지연을 숫자로 집계한다. 2초 구간별 최대 지연과 횟수이며 모든 개별 호출의 분포가 아니다. `measurement.origin`의 `rust` / `webview.aggregate`로 개별 Rust 실행과 WebView 집계를 구분한다. snapshot은 이 WebView 요약 집계 대상에서 제외한다. 개별 snapshot의 Rust root `snapshot.request`와 자식 span은 유지하고, 요약 transaction `snapshot`은 생성·전송하지 않는다.
 - **Long tasks / long animation frames:** 해당 WebView가 PerformanceObserver 타입을 지원할 때만 지속 시간을 기록한다. 스크립트 URL·attribution·DOM은 보내지 않는다. WebView2와 WKWebView의 지원 차이를 숨기지 않는다.
 - **오류 진단:** Rust panic 스택·네이티브 image 식별자, WebView 오류 종류와 허용된 앱 JS 파일명·행·열을 보낸다. 오류 문구·Promise reason·소스 문맥·로컬 절대 경로·frame 변수는 제거한다.
 - **Sentry Logs / breadcrumbs:** 느린 작업 및 앱 수명의 고정 작업명·시간을 수집한다. console/stdout/셸 로그를 연결하지 않는다.
@@ -136,5 +136,13 @@ Sentry 개별 Rust snapshot root `snapshot.request`는 기존 고빈도 작업�
 - 부모 handle은 callback이 처리되거나 폐기될 때까지 조상을 유지한다. 수신 대기가 먼저 끝난 경우에도 자식이 끝난 뒤 transaction을 끝내며, callback 취소·큐 등록 실패 시 마지막 handle 해제로 정리한다. 영구 정지·프로세스 종료는 미완료 trace 손실 가능성이 있다.
 - UI callback은 현재 스레드의 기존 문맥을 잠시 교체하고 정상 반환·오류·panic 시 복원한다. 동시 요청은 각각의 부모를 사용한다. 로컬 recorder의 scope/parent/cause ID는 전달 handle에 포함하지 않으며 전송 필터도 유지한다.
 - handle은 기존 전송 gate의 동의 세대에 묶인다. 철회·재활성화 후 이전 handle로 span·작업 로그를 시작하거나 완료 전송하지 않는다. span 종료와 작업 로그는 시작 당시 SDK hub/client를 유지해 검사 직후 철회·재활성화가 경합해도 새 클라이언트로 갈아타지 않는다. 전송 직전의 기존 transport 세대 검사도 유지한다. 동의 전/상세 비활성 상태에서 캡처한 빈 문맥 역시 새 활성 세대의 루트로 승격하지 않는다.
-- UI의 5초 실행 기한·6초 수신 제한과 snapshot 상태 읽기, 2초 WebView 집계는 유지한다. 터미널의 장기 output worker를 부모 수명에 묶거나 WebView 개별 요청 프로토콜을 신설하지 않는다. 다른 스레드 경계는 후속 범위다.
+- UI의 5초 실행 기한·6초 수신 제한과 snapshot 상태 읽기와 snapshot을 제외한 2초 WebView 집계는 유지한다. 터미널의 장기 output worker를 부모 수명에 묶거나 WebView 개별 요청 프로토콜을 신설하지 않는다. 다른 스레드 경계는 후속 범위다.
 - 검증 근거와 미실행 범위는 [스레드 문맥 검증 기록](verification/sentry-thread-context-20261107.md)을 따른다. in-memory/loopback 테스트는 실제 Sentry 서버 수신 증거가 아니다.
+
+### snapshot 요약 제거와 자식 span 기기 정보 — #64 후속
+
+- 여러 snapshot 호출의 구간 최대값을 실제 요청 한 번처럼 보이게 하던 요약 `snapshot` transaction을 제거했다. 프런트의 계측 대상에서 snapshot을 제외하고, 백엔드는 구버전 화면이 보내는 유효한 snapshot 샘플을 무시한다. 최종 envelope와 작업 로그의 허용 목록에서도 snapshot 요약을 차단한다.
+- heartbeat 자체와 멈춤 감시, 실제 snapshot 앱 기능 및 `snapshot.request → note.state.*` 개별 trace는 유지한다. 개별 요청은 여전히 최대 1% 샘플링이며 WebView 요청별 프로토콜이나 대체 metrics는 도입하지 않는다. 따라서 snapshot의 프런트 왕복 최대 지연·횟수·실패 횟수 요약 관측은 사라진다. Rust 처리 span은 WebView 왕복 전체 시간의 대체물이 아니다. 다른 작업의 WebView 집계는 기존대로 남는다.
+- 최종 전송 필터에서 루트와 모든 허용된 자식 span에 현재 빌드의 `app.os`, `app.arch`, `app.build`를 같은 값으로 넣는다. 전달된 다른 값이나 비허용 태그는 신뢰하지 않는다. 메모/사용자/장치 식별자, 로컬 flow/parent/cause는 추가하지 않는다. 서버에서의 실제 기기 필터 조회 성공은 별도 수신 검증 사항이다.
+- 스레드 전달의 구현 범위는 CLI 수신 → UI callback이다. terminal_start의 spawn_blocking, 캡처 worker/UI callback, 장기 터미널 output reader, WebView 왕복 전체의 새 부모 연결은 이번 후속에서 추가하지 않는다. 특히 장기 reader를 시작 trace에 계속 붙이면 해당 trace가 터미널 종료까지 끝나지 않을 수 있어 별도 수명 설계가 필요하다.
+- [후속 검증 기록](verification/sentry-summary-metadata-20261107.md)에 TDD와 검사 범위를 기록한다. 기존 동의 범주의 성능 항목을 줄이고 기존 고정 기기 정보를 자식에도 적용하는 변경으로, 수집 목적·전송 대상·보유기간·동의 방식은 유지한다.

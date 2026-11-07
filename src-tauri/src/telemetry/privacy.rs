@@ -148,6 +148,14 @@ pub fn event(mut e: p::Event<'static>) -> Option<p::Event<'static>> {
     e.fingerprint = std::borrow::Cow::Borrowed(&[]);
     Some(e)
 }
+fn platform_tags(tags: &mut p::Map<String, String>) {
+    tags.insert("app.os".into(), std::env::consts::OS.into());
+    tags.insert("app.arch".into(), std::env::consts::ARCH.into());
+    tags.insert(
+        "app.build".into(),
+        env!("AGENT_GIBBON_BUILD_REVISION").into(),
+    );
+}
 fn transaction(mut t: p::Transaction<'static>) -> Option<p::Transaction<'static>> {
     if !t.name.as_deref().is_some_and(allowed) {
         return None;
@@ -157,18 +165,13 @@ fn transaction(mut t: p::Transaction<'static>) -> Option<p::Transaction<'static>
     t.server_name = None;
     t.extra.clear();
     safe_tags(&mut t.tags);
-    t.tags.insert("app.os".into(), std::env::consts::OS.into());
-    t.tags
-        .insert("app.arch".into(), std::env::consts::ARCH.into());
-    t.tags.insert(
-        "app.build".into(),
-        env!("AGENT_GIBBON_BUILD_REVISION").into(),
-    );
+    platform_tags(&mut t.tags);
     contexts(&mut t.contexts);
     t.spans.retain(|s| s.op.as_deref().is_some_and(allowed));
     for s in &mut t.spans {
         s.description = s.op.clone();
         safe_tags(&mut s.tags);
+        platform_tags(&mut s.tags);
         safe_data(&mut s.data);
     }
     Some(t)
