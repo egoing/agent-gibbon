@@ -92,7 +92,7 @@ try:
     report['indicator_initial']=r
     wait(a,lambda s:s['stash']['tip_visible'])
     shot('indicator-initial','stash-indicator')
-    assert '다시 누르면 창 복원' in helper('ax',PID,TITLE+'stash-indicator','dump')
+    assert '복원:' in helper('ax',PID,TITLE+'stash-indicator','dump')
     move(*target);time.sleep(6.2)
     move(r['x']+r['width']-24,r['y']+24)
     wait(a,lambda s:s['stash']['indicator_moving'])
@@ -111,9 +111,9 @@ try:
     escaped=wait(a,lambda s:not s['stash']['indicator_moving'] and s['stash']['tip_visible'])['stash']['indicator']
     move(*target);shot('indicator-tip','stash-indicator')
     text=helper('ax',PID,TITLE+'stash-indicator','dump')
-    assert 'Ctrl Opt ⌘' in text and '다시 누르면 창 복원' in text,text
+    assert 'Ctrl Opt ⌘' in text and '복원:' in text,text
     move(*target);time.sleep(6.1)
-    assert '다시 누르면 창 복원' not in helper('ax',PID,TITLE+'stash-indicator','dump')
+    assert '복원:' not in helper('ax',PID,TITLE+'stash-indicator','dump')
     move(escaped['x']+escaped['width']-24,escaped['y']+24)
     wait(a,lambda s:s['stash']['indicator_moving']);move(*target)
     wait(a,lambda s:not s['stash']['indicator_moving'] and s['stash']['tip_visible'])
