@@ -36,8 +36,8 @@ pub struct Terminal {
     pub updated_at: u64,
     #[serde(default)]
     pub title: String,
-    /// Identifier from the fixed Welcome choices only; never a shell command.
-    #[serde(default)]
+    /// Kept in memory until the confirmed update snapshot is written.
+    #[serde(skip)]
     pub last_command: Option<String>,
 }
 #[derive(Clone, Serialize, Deserialize)]
@@ -442,7 +442,15 @@ pub fn mark_restart_notice(
         .as_deref()
         .and_then(safe_choice_id)
         .map(str::to_string);
-    app.state::<Terminals>()
+    let terminals = app.state::<Terminals>();
+    terminals
+        .records
+        .lock()
+        .map_err(err)?
+        .get_mut(id)
+        .ok_or("터미널 창이 없습니다")?
+        .last_command = choice.clone();
+    terminals
         .restart_notices
         .lock()
         .map_err(err)?
@@ -567,15 +575,13 @@ pub async fn terminal_start(
                 .get(&id)
                 .cloned()
                 .ok_or("터미널 창이 없습니다")?;
-            let (session, mut reader) =
-                welcome::start(&agent, choice.as_deref().unwrap_or("shell"), dimensions)?;
             let selected = safe_choice_id(choice.as_deref().unwrap_or("shell"))
                 .ok_or("지원하지 않는 실행 항목입니다")?;
+            let (session, mut reader) = welcome::start(&agent, selected, dimensions)?;
             {
                 let mut records = state.records.lock().map_err(err)?;
                 let record = records.get_mut(&id).ok_or("터미널 창이 없습니다")?;
                 record.last_command = Some(selected.to_string());
-                save(&root(&app), record)?;
             }
             app.state::<Terminals>()
                 .restart_notices
@@ -897,6 +903,18 @@ mod tests {
         std::fs::write(&index, "user project").unwrap();
         save(dir.path(), &a).unwrap();
         assert_eq!(std::fs::read_to_string(index).unwrap(), "user project");
+    }
+    #[test]
+    fn task_selection_is_not_emitted_or_loaded_in_regular_metadata() {
+        let source = json!({"id":"terminal-123", "bounds":{"x":1,"y":2,"width":400,"height":300},
+            "last_command":"arbitrary shell text"});
+        let mut record: Terminal = serde_json::from_value(source).unwrap();
+        assert!(record.last_command.is_none());
+        record.last_command = Some("shell".into());
+        assert!(serde_json::to_value(record)
+            .unwrap()
+            .get("last_command")
+            .is_none());
     }
     #[test]
     fn restart_notice_never_claims_an_unrecorded_choice() {
