@@ -269,6 +269,39 @@ pub fn discard(app: &AppHandle) {
 mod tests {
     use super::*;
 
+    #[test]
+    fn restart_roundtrip_preserves_each_session_without_storing_raw_commands() {
+        use serde_json::{json, to_value};
+        let mut windows = Vec::new();
+        for (label, field, value) in [
+            ("webpage-web-first", "web_url", "https://example.com/first"),
+            (
+                "webpage-web-second",
+                "web_url",
+                "https://example.com/second",
+            ),
+            ("terminal-111", "terminal_last_command", "shell"),
+            ("terminal-222", "terminal_last_command", "git"),
+        ] {
+            let mut window = to_value(sample(label)).unwrap();
+            window[field] = json!(value);
+            windows.push(window);
+        }
+        let snapshot: Snapshot =
+            serde_json::from_value(json!({"version":1,"windows":windows})).unwrap();
+        assert!(validate(&snapshot).is_ok());
+        let saved = to_value(&snapshot).unwrap();
+        for (idx, expected) in windows.iter().enumerate() {
+            for field in ["label", "web_url", "terminal_last_command"] {
+                assert_eq!(saved["windows"][idx][field], expected[field]);
+            }
+        }
+        windows[2]["terminal_last_command"] = json!("printf sensitive-input");
+        let unsafe_snapshot: Snapshot =
+            serde_json::from_value(json!({"version":1,"windows":windows})).unwrap();
+        assert!(validate(&unsafe_snapshot).is_err());
+    }
+
     fn sample(label: &str) -> WindowState {
         WindowState {
             label: label.into(),
