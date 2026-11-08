@@ -306,19 +306,20 @@ mod tests {
 
     #[test]
     fn verification_store_override_is_absolute_and_never_applies_to_installed_builds() {
-        let default = PathBuf::from("/default/store");
-        let isolated = PathBuf::from("/tmp/issue102/run-1");
+        let temp = std::env::temp_dir().join("agent-gibbon-issue102-store");
+        let default = temp.join("default");
+        let isolated = temp.join("run-1");
         assert_eq!(
             root_for_run(default.clone(), true, Some(isolated.clone())).unwrap(),
             (isolated, true)
         );
         assert_eq!(
-            root_for_run(default.clone(), false, Some(PathBuf::from("/tmp/ignored"))).unwrap(),
+            root_for_run(default.clone(), false, Some(temp.join("ignored"))).unwrap(),
             (default.clone(), false)
         );
         assert!(!root_for_run(default, true, None).unwrap().1);
         assert!(root_for_run(
-            PathBuf::from("/default/store"),
+            temp.join("default"),
             true,
             Some(PathBuf::from("relative/store"))
         )

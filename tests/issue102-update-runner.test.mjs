@@ -10,6 +10,8 @@ import {
   recordMarker,
   summarizeDiagnostics,
   supportsSessionRestore,
+  validateDiagnosticsOwner,
+  validateProcessRecord,
   validateCandidate,
   verificationStorePath,
 } from '../scripts/issue102-update-runner.mjs';
@@ -140,11 +142,33 @@ test('event markers and diagnostics summaries omit note contents and unrelated f
   assert.throws(() => recordMarker(events, 'arbitrary-data', {}), /알 수 없는/);
   assert.deepEqual(summarizeDiagnostics({
     instance: 'dev-test',
-    updater: { enabled: true, status: { current_version: '0.2.11', version: '0.2.12', phase: 'ready' }, idle_threshold_seconds: 30, check_seconds: 60, retry_seconds: 5 },
+    updater: { enabled: true, status: { current_version: '0.2.11', version: '0.2.12', phase: 'ready' }, idle_threshold_seconds: 30, idle_seconds: 31.2, check_seconds: 60, retry_seconds: 5 },
     note: { markdown: 'private' },
   }), {
     instance: 'dev-test', enabled: true, current_version: '0.2.11', target_version: '0.2.12',
-    phase: 'ready', idle_threshold_seconds: 30, check_seconds: 60, retry_seconds: 5,
+    phase: 'ready', idle_threshold_seconds: 30, idle_seconds: 31.2, check_seconds: 60, retry_seconds: 5,
     last_window_reports: null,
   });
+});
+
+test('status ownership requires a live-run process record, the expected instance and this run store', t => {
+  const root = fixtureDir(t);
+  const storeRoot = join(root, 'store');
+  const record = {
+    pid: 42,
+    executable: join(root, 'Run.app', 'Contents', 'MacOS', 'agent-gibbon'),
+    store_root: storeRoot,
+    platform: 'darwin',
+  };
+  assert.equal(validateProcessRecord(record, root, storeRoot), record);
+  assert.throws(() => validateProcessRecord({ ...record, pid: 0 }, root, storeRoot), /PID/);
+  assert.throws(() => validateProcessRecord({ ...record, executable: '/Applications/Agent Gibbon.app/agent-gibbon' }, root, storeRoot), /회차 디렉터리 밖/);
+  assert.throws(() => validateProcessRecord({ ...record, store_root: join(root, 'other-store') }, root, storeRoot), /현재 회차/);
+
+  const diagnostics = {
+    ok: true, instance: 'dev-001020010200102001020010', verification_store_root: storeRoot,
+  };
+  assert.equal(validateDiagnosticsOwner(diagnostics, storeRoot), diagnostics);
+  assert.throws(() => validateDiagnosticsOwner({ ...diagnostics, instance: 'dev-unrelated' }, storeRoot), /인스턴스/);
+  assert.throws(() => validateDiagnosticsOwner({ ...diagnostics, verification_store_root: join(root, 'other-store') }, storeRoot), /Store/);
 });

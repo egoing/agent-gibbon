@@ -90,7 +90,7 @@ fn status(app: &tauri::AppHandle) -> Result<Status, String> {
 pub fn diagnostics(app: &tauri::AppHandle) -> serde_json::Value {
     let updates = app.state::<Updates>();
     let last = updates.last_handshake.lock().ok().map(|v| v.clone());
-    serde_json::json!({
+    let mut result = serde_json::json!({
         "enabled": enabled(),
         "status": status(app).ok(),
         "idle_threshold_seconds": IDLE_SECONDS,
@@ -98,7 +98,11 @@ pub fn diagnostics(app: &tauri::AppHandle) -> serde_json::Value {
         "retry_seconds": RETRY_SECONDS,
         "last_window_reports": last,
         "last_check_failure": updates.last_check_failure.lock().ok().and_then(|v| *v),
-    })
+    });
+    if VERIFICATION {
+        result["idle_seconds"] = serde_json::json!(idle_seconds());
+    }
+    result
 }
 fn set(app: &tauri::AppHandle, phase: &str, message: &str) {
     if let Ok(mut s) = app.state::<Updates>().status.lock() {

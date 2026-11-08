@@ -378,9 +378,14 @@ fn apply_with_presentation(
     request.validate()?;
     // Read-only diagnostics must remain observable during the installation handshake.
     if matches!(request.action, Action::Diagnostics) {
-        return Ok(
-            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"updater":updater::diagnostics(app),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
-        );
+        let mut result = json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"updater":updater::diagnostics(app),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}});
+        if cfg!(feature = "verification-updater") {
+            result["verification_store_root"] =
+                std::env::var_os("AGENT_GIBBON_VERIFICATION_STORE_ROOT")
+                    .map(|path| Value::String(path.to_string_lossy().into_owned()))
+                    .unwrap_or(Value::Null);
+        }
+        return Ok(result);
     }
     let _activity = updater::activity(app)?;
     if privacy::onboarding_required(app)

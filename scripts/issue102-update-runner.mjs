@@ -378,7 +378,8 @@ export function buildPair({ runDir, sourceRoot, nodeModules, cargoTargetDir, end
   writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n', { mode: 0o600 });
   const logPath = join(root, 'build.log');
   const versionsTool = join(copy, 'scripts', 'release-version.mjs');
-  const sourceVersion = runLogged(process.execPath, [versionsTool, 'check'], { cwd: copy }, logPath, 'check source version').trim().split(/\r?\n/).at(-1);
+  const versionsToolArg = relative(copy, versionsTool);
+  const sourceVersion = runLogged(process.execPath, [versionsToolArg, 'check'], { cwd: copy }, logPath, 'check source version').trim().split(/\r?\n/).at(-1);
   if (sourceVersion !== metadata.previous_version) {
     throw new Error('소스 버전 ' + sourceVersion + '가 이전 버전 ' + metadata.previous_version + '과 다릅니다');
   }
@@ -393,8 +394,8 @@ export function buildPair({ runDir, sourceRoot, nodeModules, cargoTargetDir, end
   const artifactMap = {};
   for (const profile of profiles) {
     if (profile.name === 'candidate') {
-      runLogged(process.execPath, [versionsTool, 'set', profile.version], { cwd: copy }, logPath, 'set candidate version');
-      runLogged(process.execPath, [versionsTool, 'check'], { cwd: copy }, logPath, 'check candidate version');
+      runLogged(process.execPath, [versionsToolArg, 'set', profile.version], { cwd: copy }, logPath, 'set candidate version');
+      runLogged(process.execPath, [versionsToolArg, 'check'], { cwd: copy }, logPath, 'check candidate version');
     }
     const env = {
       ...process.env,
@@ -406,7 +407,7 @@ export function buildPair({ runDir, sourceRoot, nodeModules, cargoTargetDir, end
     else delete env.GIBBON_VERIFICATION_STANDARD_TIMING;
     const bundleArg = host === 'darwin' ? 'app' : 'nsis';
     runLogged(process.execPath, [
-      tauriCli, 'build', '--features', 'verification-updater', '--config', configPath, '--bundles', bundleArg,
+      relative(copy, tauriCli), 'build', '--features', 'verification-updater', '--config', configPath, '--bundles', bundleArg,
     ], { cwd: copy, env }, logPath, 'build ' + profile.name + ' ' + profile.version);
     let built;
     let destination;
@@ -446,6 +447,37 @@ function isWithin(root, file) {
   const rel = relative(resolve(root), resolve(file));
   return rel === '' || (!rel.startsWith('..' + sep) && rel !== '..' && !isAbsolute(rel));
 }
+function canonicalPath(path) {
+  const absolute = resolve(path);
+  try {
+    return realpathSync(absolute);
+  } catch {
+    return absolute;
+  }
+}
+export function validateProcessRecord(record, root, storeRoot) {
+  if (!Number.isSafeInteger(record?.pid) || record.pid <= 0) throw new Error('process.json PID가 올바르지 않습니다');
+  if (typeof record.executable !== 'string' || !isAbsolute(record.executable) || !isWithin(root, record.executable)) {
+    throw new Error('process.json 실행 파일이 회차 디렉터리 밖입니다');
+  }
+  if (typeof record.store_root !== 'string'
+      || canonicalPath(record.store_root) !== canonicalPath(storeRoot)
+      || !isWithin(root, record.store_root)) {
+    throw new Error('process.json Store가 현재 회차와 일치하지 않습니다');
+  }
+  if (!['darwin', 'win32'].includes(record.platform)) throw new Error('process.json 플랫폼이 올바르지 않습니다');
+  return record;
+}
+export function validateDiagnosticsOwner(diagnostics, expectedStoreRoot) {
+  if (diagnostics?.ok !== true || diagnostics.instance !== VERIFICATION_INSTANCE) {
+    throw new Error('진단 응답 인스턴스가 검증 인스턴스와 일치하지 않습니다');
+  }
+  if (typeof diagnostics.verification_store_root !== 'string'
+      || canonicalPath(diagnostics.verification_store_root) !== canonicalPath(expectedStoreRoot)) {
+    throw new Error('진단 응답 Store가 현재 회차와 일치하지 않습니다');
+  }
+  return diagnostics;
+}
 function executableFor(appPath, platform) {
   if (platform === 'darwin') {
     const app = resolve(appPath);
@@ -458,7 +490,7 @@ function executableFor(appPath, platform) {
   }
   throw new Error('macOS 또는 Windows에서만 검증 앱을 실행할 수 있습니다');
 }
-export function launchVerificationApp({ runRoot, appPath, platform = process.platform }) {
+export function launchVerificationApp({ runRoot, appPath, platform = process.platform, headless = false }) {
   const { root, metadata } = loadRun(runRoot);
   if (!isWithin(root, appPath)) throw new Error('앱 경로는 전용 실행기 디렉터리 안이어야 합니다');
   const executable = executableFor(appPath, platform);
@@ -466,7 +498,7 @@ export function launchVerificationApp({ runRoot, appPath, platform = process.pla
   const pidFile = join(root, 'process.json');
   if (existsSync(pidFile)) throw new Error('이 회차의 프로세스 기록이 이미 있습니다');
   mkdirSync(metadata.store_root, { recursive: true, mode: 0o700 });
-  const child = spawn(executable, [], {
+  const child = spawn(executable, headless ? ['--serve'] : [], {
     cwd: dirname(executable), detached: true, stdio: 'ignore',
     env: { ...process.env, AGENT_GIBBON_VERIFICATION_STORE_ROOT: metadata.store_root },
   });
@@ -491,11 +523,66 @@ function processExecutable(pid, platform) {
   }
   return null;
 }
+function processIdsForExecutable(executable, platform) {
+  if (platform === 'darwin') {
+    const pattern = '^' + executable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([[:space:]].*)?$';
+    const result = spawnSync('pgrep', ['-f', pattern], { encoding: 'utf8' });
+    if (result.status === 1) return [];
+    if (result.status !== 0) throw new Error('검증 프로세스 목록을 확인하지 못했습니다');
+    return result.stdout.split(/\r?\n/).filter(Boolean).map(Number).filter(Number.isSafeInteger);
+  }
+  if (platform === 'win32') {
+    const quoted = "'" + executable.replace(/'/g, "''") + "'";
+    const script = '$expected = [System.IO.Path]::GetFullPath(' + quoted + '); Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -and [System.IO.Path]::GetFullPath($_.ExecutablePath) -eq $expected } | ForEach-Object { $_.ProcessId }';
+    const result = spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { encoding: 'utf8' });
+    if (result.status !== 0) throw new Error('검증 프로세스 목록을 확인하지 못했습니다');
+    return result.stdout.split(/\r?\n/).filter(Boolean).map(Number).filter(Number.isSafeInteger);
+  }
+  throw new Error('지원하지 않는 검증 플랫폼입니다');
+}
+function readOwnedDiagnostics(executable, storeRoot) {
+  const result = spawnSync(executable, ['diagnostics'], {
+    encoding: 'utf8', timeout: 15000,
+    env: { ...process.env, AGENT_GIBBON_VERIFICATION_STORE_ROOT: storeRoot },
+  });
+  if (result.error || result.status !== 0) throw new Error('검증 앱 diagnostics를 조회하지 못했습니다');
+  return validateDiagnosticsOwner(JSON.parse(result.stdout), storeRoot);
+}
+function resolveActiveProcess(root, metadata) {
+  const processPath = join(root, 'process.json');
+  const record = validateProcessRecord(readJson(processPath), root, metadata.store_root);
+  const pids = new Set([record.pid, ...processIdsForExecutable(canonicalPath(record.executable), record.platform)]);
+  const matches = [];
+  for (const pid of pids) {
+    const actual = processExecutable(pid, record.platform);
+    if (!actual || canonicalPath(actual) !== canonicalPath(record.executable)) continue;
+    try {
+      const diagnostics = readOwnedDiagnostics(record.executable, record.store_root);
+      matches.push({ pid, diagnostics });
+    } catch {
+      // An executable match without matching instance and Store evidence is not owned by this run.
+    }
+  }
+  if (matches.length !== 1) {
+    throw new Error('실행 중인 검증 앱을 PID·실행 파일·인스턴스·회차 Store로 유일하게 식별하지 못했습니다');
+  }
+  const [{ pid, diagnostics }] = matches;
+  if (pid !== record.pid) {
+    const updated = { ...record, pid, restarted_at: new Date().toISOString() };
+    atomicWrite(processPath, JSON.stringify(updated, null, 2) + '\n');
+    recordMarker(metadata.events, 'restart', {
+      version: diagnostics.updater?.status?.current_version || metadata.candidate_version,
+      note: 'PID가 바뀐 뒤 실행 파일·인스턴스·회차 Store를 재확인했습니다',
+    });
+    return { record: updated, diagnostics };
+  }
+  return { record, diagnostics };
+}
 export async function stopOwnedApp(runRoot, platform = process.platform) {
-  const { root } = loadRun(runRoot);
-  const record = readJson(join(root, 'process.json'));
+  const { root, metadata } = loadRun(runRoot);
+  const record = validateProcessRecord(readJson(join(root, 'process.json')), root, metadata.store_root);
   const actual = processExecutable(record.pid, platform);
-  if (!actual || resolve(actual) !== resolve(record.executable)) {
+  if (!actual || canonicalPath(actual) !== canonicalPath(record.executable)) {
     throw new Error('실행 파일 출처가 다르므로 이 PID를 종료하지 않았습니다');
   }
   if (platform === 'win32') {
@@ -517,6 +604,7 @@ export function summarizeDiagnostics(value) {
     instance: value?.instance ?? null, enabled: updater.enabled === true,
     current_version: status.current_version ?? null, target_version: status.version ?? null,
     phase: status.phase ?? null, idle_threshold_seconds: updater.idle_threshold_seconds ?? null,
+    idle_seconds: updater.idle_seconds ?? null,
     check_seconds: updater.check_seconds ?? null, retry_seconds: updater.retry_seconds ?? null,
     last_window_reports: updater.last_window_reports ?? null,
   };
@@ -627,7 +715,7 @@ function usage() {
     '  serve --run-dir PATH [--port PORT] [--fault none|offline|disconnect-download|tamper-signature|delay-download] [--delay-ms MS]',
     '  verify --run-dir PATH --public-key-file PATH [--session-restore]',
     '  archive-state --run-dir PATH --stage NAME',
-    '  launch --run-dir PATH --app PATH [--platform darwin|win32]',
+    '  launch --run-dir PATH --app PATH [--platform darwin|win32] [--headless]',
     '  status --run-dir PATH',
     '  stop --run-dir PATH [--platform darwin|win32]',
     '',
@@ -640,7 +728,7 @@ function parseArgs(argv) {
     const key = rest[i];
     if (!key.startsWith('--')) throw new Error('알 수 없는 인수: ' + key);
     const name = key.slice(2).replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-    if (name === 'sessionRestore') {
+    if (name === 'sessionRestore' || name === 'headless') {
       args[name] = true;
       continue;
     }
@@ -710,15 +798,17 @@ async function main(argv) {
   if (command === 'launch') {
     process.stdout.write(JSON.stringify(launchVerificationApp({
       runRoot: args.runDir, appPath: args.app, platform: args.platform || process.platform,
+      headless: args.headless === true,
     }), null, 2) + '\n');
     return;
   }
   if (command === 'status') {
-    const { root } = loadRun(args.runDir);
-    const record = readJson(join(root, 'process.json'));
-    const result = spawnSync(record.executable, ['diagnostics'], { encoding: 'utf8', timeout: 15000 });
-    if (result.status !== 0) throw new Error('검증 앱 diagnostics를 조회하지 못했습니다');
-    const summary = summarizeDiagnostics(JSON.parse(result.stdout));
+    const { root, metadata } = loadRun(args.runDir);
+    const { diagnostics } = resolveActiveProcess(root, metadata);
+    const summary = summarizeDiagnostics(diagnostics);
+    if (![metadata.previous_version, metadata.candidate_version].includes(summary.current_version)) {
+      throw new Error('diagnostics current_version이 현재 회차의 이전·후보 버전과 다릅니다');
+    }
     recordMarker(join(root, 'events.jsonl'), 'install-phase', {
       phase: summary.phase || 'unknown',
       version: summary.target_version || summary.current_version || undefined,
