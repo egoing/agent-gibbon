@@ -265,6 +265,9 @@ pub fn toggle_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, S
 
 #[tauri::command]
 pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, String> {
+    if !fold_contact_enabled(window.label()) {
+        return Ok(false);
+    }
     if crate::capture::active(window.app_handle())
         || crate::stash::owns(&window)
         || crate::stash::chord_busy(window.app_handle())
@@ -303,6 +306,10 @@ pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, Str
         toggle(&window, state)?;
     }
     Ok(state.expanded.is_some())
+}
+
+fn fold_contact_enabled(label: &str) -> bool {
+    label != crate::updater::NOTICE_LABEL
 }
 
 // Convert non-macOS physical values together so the folded margin stays 4 DIP.
@@ -373,6 +380,7 @@ pub fn install_contact_monitor(app: &tauri::AppHandle) {
         }
         for window in app.webview_windows().into_values() {
             if window.label() == crate::manager::LABEL
+                || !fold_contact_enabled(window.label())
                 || crate::feedback_window::is_surface(window.label())
                 || window.label().starts_with("agent-")
             {
@@ -411,6 +419,13 @@ pub fn install_contact_monitor(app: &tauri::AppHandle) {
 #[cfg(test)]
 mod contact_tests {
     use super::*;
+    #[test]
+    fn update_notice_is_excluded_while_memo_windows_keep_contact_folding() {
+        assert!(!fold_contact_enabled(crate::updater::NOTICE_LABEL));
+        assert!(fold_contact_enabled("main"));
+        assert!(fold_contact_enabled("note-work"));
+    }
+
     #[test]
     fn folded_margin_handles_small_title_and_negative_coordinates() {
         let rect = (-300., -100., 300., 12.);
