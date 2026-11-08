@@ -1,0 +1,25 @@
+--- clean/src-tauri/src/updater.rs
++++ fixture/src-tauri/src/updater.rs
+@@ -990,6 +990,22 @@
+     Ok(())
+ }
+ pub fn initialize(app: &tauri::AppHandle) {
++    // Temporary GUI fixture: status only; updater enabled()/install path unchanged.
++    if let Ok(version) = std::env::var("GIBBON117_NOTICE_FIXTURE") {
++        let app = app.clone();
++        std::thread::spawn(move || {
++            std::thread::sleep(Duration::from_secs(2));
++            {
++                let updates = app.state::<Updates>();
++                let mut state = updates.status.lock().unwrap();
++                state.phase = "ready".into();
++                state.version = Some(version);
++                state.message = "편집 또는 저장이 끝나면 설치합니다".into();
++            }
++            show_ready_notice(&app).unwrap();
++        });
++    }
++
+     if !enabled() {
+         return;
+     }

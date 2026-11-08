@@ -1,0 +1,240 @@
+   Compiling agent-gibbon v0.2.11 (/Users/egoinglee/.codex/worktrees/issue117-notice-fold/agent-gibbon/src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.87s
+     Running unittests src/main.rs (src-tauri/target/debug/deps/agent_gibbon-e0002c4d651af85b)
+
+running 208 tests
+test capture::tests::selected_origin_keeps_desktop_coordinate_units ... ok
+test capture::tests::preview_preserves_dimensions_and_rgba_bytes ... ok
+test capture::tests::retina_crop_and_invalid_selection ... ok
+test entrance::tests::destination_reservation_retains_size_in_both_mixed_dpi_directions ... ok
+test entrance::tests::corners_and_negative_monitor_origin_keep_clearance ... ok
+test entrance::tests::clamping_never_covers_pointer_and_large_windows_fall_back ... ok
+test entrance::tests::every_direction_and_diagonal_starts_the_same_flight_after_hold ... ok
+test entrance::tests::early_pointer_movement_waits_until_one_second_even_if_pointer_returns ... ok
+test entrance::tests::mixed_dpi_positions_share_desktop_coordinates ... ok
+test entrance::tests::native_frame_conversion_handles_negative_desktop_positions ... ok
+test entrance::tests::native_frame_conversion_preserves_top_left_while_resizing ... ok
+test entrance::tests::only_pointer_movement_starts_one_flight ... ok
+test capture::tests::transition_does_not_continue_after_missing_destroy_acknowledgment ... ok
+test entrance::tests::completed_or_disconnected_frame_stops_the_worker ... ok
+test entrance::tests::late_frame_response_keeps_worker_alive_without_queuing_another_frame ... ok
+test feedback_window::tests::placement_below_above_narrow_and_negative_monitor ... ok
+test feedback_window::tests::stale_confirmation_is_blocked_but_edit_actions_reach_conflict_check ... ok
+test capture::tests::transition_waits_for_every_destroyed_window ... ok
+test instance::tests::installed_path_is_unchanged ... ok
+test capture::tests::clipboard_png_decode_preserves_rgba_and_dimensions ... ok
+test feedback::tests::deadlines_restart_and_are_isolated_without_stale_callbacks ... ok
+test feedback::tests::acknowledgement_is_revision_guarded_and_does_not_touch_opacity ... ok
+test instance::tests::namespaces_are_short_and_distinct ... ok
+test capture::tests::text_selection_creates_empty_editable_note_without_image ... ok
+test feedback::tests::restored_pending_notes_have_highlights_without_attention_and_reverts_clear_them ... ok
+test instance::tests::rejects_empty_traversal_and_malformed_ids ... ok
+test layout::tests::hidden_restore_moves_only_that_note_to_the_tail ... ok
+test layout::tests::reverse_ids_follow_requests_even_when_measurements_finish_in_reverse ... ok
+test layout::tests::request_order_continues_into_left_column ... ok
+test export::tests::failed_export_preserves_destination_and_cleans_temp_file ... ok
+test local_trace::tests::linked_child_keeps_parent_and_mutation_cause_after_parent_completed ... ok
+test local_trace::tests::concurrent_scopes_are_explicit_and_restore_even_after_unwind ... ok
+test local_trace::tests::recorder_is_bounded_and_never_waits_for_its_mutex ... ok
+test local_trace::tests::flows_are_owner_scoped_bounded_expire_and_reject_late_events ... ok
+test local_trace::tests::stage_flood_is_bounded_and_expiration_removes_unfinished_flow ... ok
+test ipc::tests::independent_locks_and_stale_socket_recovery ... FAILED
+test local_trace::tests::unfinished_call_survives_history_turnover_and_records_completion ... ok
+test manager::tests::first_text_ignores_markdown_and_blank_lines ... ok
+test model::tests::color_updates_are_normalized_preserved_and_atomic ... ok
+test model::tests::cumulative_diff_keeps_unconfirmed_changes_and_omits_intermediate_versions ... ok
+test model::tests::confirmation_advances_baseline_and_reverts_remove_only_net_changes ... ok
+test model::tests::feedback_deletion_empty_initial_same_and_metadata ... ok
+test local_trace::tests::atomic_local_file_contains_only_fixed_fields_and_numeric_call_ids ... ok
+test local_trace::tests::blocked_operation_is_persistable_before_it_returns ... ok
+test model::tests::invalid_ids_and_read_only_options_are_rejected ... ok
+test model::tests::malformed_tasks_report_line_and_preserve_all_fields ... ok
+test model::tests::feedback_marks_changed_lines_without_polluting_source_or_plain_html ... ok
+test model::tests::inline_update_detaches_file_and_editor_preserves_metadata ... ok
+test model::tests::feedback_html_is_sanitized_and_editor_uses_same_diff ... ok
+test model::tests::markdown_validation_allows_code_links_and_real_tasks ... ok
+test model::tests::partial_updates_preserve_unspecified_fields ... ok
+test model::tests::feedback_distinguishes_additions_replacements_and_deletions ... ok
+test export::tests::exports_utf8_and_image_bytes_and_replaces_existing_file ... ok
+test model::tests::old_requests_keep_default_window_and_color ... ok
+test model::tests::feedback_deletion_keeps_remaining_line_unmarked_and_large_diff_is_bounded ... ok
+test model::tests::rejected_update_does_not_change_note ... ok
+test model::tests::mixed_quiet_update_preserves_diff_and_rejects_overlap_atomically ... ok
+test model::tests::pending_baselines_survive_metadata_same_body_and_remain_note_local ... ok
+test model::tests::feedback_preserves_unchanged_middle_and_handles_tasks_tables_code ... ok
+test model::tests::quiet_completion_tracks_only_latest_and_never_changes_source ... ok
+test model::palette_tests::palette_cycles_and_explicit_color_survives_updates ... ok
+test model::tests::retired_agent_ids_are_reserved_while_ordinary_note_ids_still_work ... ok
+test model::tests::update_options_are_strictly_validated ... ok
+test model::tests::task_identity_handles_reorder_duplicates_nested_and_code ... ok
+test opacity::global_tests::accumulates_fractions_and_resets_between_chords_and_idle ... ok
+test opacity::global_tests::bounds_and_first_choice_preserve_legacy_until_used ... ok
+test model::tests::renders_korean_tasks_and_blocks_active_content ... ok
+test opacity::global_tests::global_target_excludes_auxiliary_windows ... ok
+test opacity::tests::hover_is_local_and_wheel_refresh_starts_at_the_new_saved_value ... ok
+test opacity::tests::hover_temporarily_overrides_manual_choice_and_restores_with_existing_delay ... ok
+test opacity::tests::newly_presented_memo_stays_opaque_while_idle_peers_keep_their_alpha ... ok
+test opacity::tests::waits_two_seconds_then_eases_and_interrupts_immediately ... ok
+test model::tests::tasks_use_unindented_rows_but_normal_lists_keep_markers ... ok
+test placement::tests::bounded_single_and_exact_remainders ... ok
+test placement::tests::fixed_ratio_images_and_folded_heights ... ok
+test placement::tests::obstacles_and_negative_origins ... ok
+test placement::tests::ordinary_notes_fill_bottom_up_then_left ... ok
+test placement::tests::full_screen_and_short_slots ... ok
+test placement::tests::overflow_minimizes_overlap_then_prefers_bottom_right ... ok
+test placement::tests::short_content_is_never_stretched_to_fill_the_screen ... ok
+test placement::tests::zero_gap_fills_exact_horizontal_and_vertical_slots ... ok
+test presentation::tests::display_keys_follow_os_without_changing_raw_contract ... ok
+test presentation::tests::labels_hide_only_internal_wrappers_and_bound_unicode_titles ... ok
+test presentation::tests::tray_labels_show_only_keys_and_other_surfaces_keep_explanations ... ok
+test privacy::tests::published_notice_enables_choice_without_granting_consent ... ok
+test opacity::global_tests::failed_save_keeps_previous_file_and_memory_choice ... ok
+test privacy::tests::terms_skip_is_limited_to_debug_development_instances_and_can_be_disabled ... ok
+test privacy::tests::unfinished_notice_cannot_enable_sharing ... ok
+test sizing::contact_tests::folded_margin_handles_small_title_and_negative_coordinates ... ok
+test sizing::contact_tests::rapid_exit_and_reentry_rearms_without_bouncing_after_resize ... ok
+test skills::tests::catalog_is_real_self_contained_resources_and_does_not_ship_example_capabilities ... ok
+test model::tests::editor_saves_source_and_rejects_stale_or_invalid_changes ... ok
+test skills::tests::cross_instance_lock_refuses_parallel_changes ... ok
+test privacy::tests::local_choice_roundtrips_and_declining_is_a_valid_choice ... ok
+test opacity::global_tests::saves_reloads_and_isolates_instances_and_rejects_corruption ... ok
+test privacy::tests::absent_corrupt_old_and_unaccepted_records_fail_closed ... ok
+test skills::installer::tests::interrupted_first_install_is_removed_when_choice_was_not_committed ... ok
+test stash::tests::bare_modifier_chord_commits_once_on_complete_release ... ok
+test stash::tests::escape_requires_fresh_exit_and_reentry_without_pointer_chase ... ok
+test stash::tests::opacity_wheel_cancels_stash_until_all_modifiers_are_released ... ok
+test stash::tests::other_shortcuts_clicks_shift_and_preheld_keys_cancel_until_release ... ok
+test stash::tests::reentry_during_hint_does_not_wait_for_hint_or_cooldown ... ok
+test stash::tests::reverse_animation_has_exact_endpoints_and_continuous_retarget ... ok
+test stash::tests::unplugged_and_oversized_rectangles_stay_in_work_area ... ok
+test stash_input::tests::captured_trackpad_tail_never_leaks_but_the_next_gesture_is_normal ... ok
+test stash_input::tests::consumes_only_owned_opacity_wheel_including_fractional_and_limit_input ... ok
+test stash_input::tests::normalizes_physical_direction_and_precise_wheels ... ok
+test skills::tests::corrupt_state_and_unowned_off_fail_without_deleting_user_data ... ok
+test skills::tests::default_is_off_and_enabling_installs_all_detected_agents_without_execution ... ok
+test storage::tests::completion_emphasis_is_ephemeral_but_completed_markdown_is_persisted ... ok
+test storage::failure_tests::edit_persists_and_failed_store_rolls_back_source_and_memory ... ok
+test storage::tests::direct_save_confirms_pending_diff_even_when_text_is_unchanged ... ok
+test skills::tests::explicit_on_overwrites_local_changes_but_ordinary_start_does_not ... ok
+test skills::installer::tests::interrupted_install_recovers_before_state_commit_and_finishes_after_commit ... ok
+test storage::tests::cumulative_baseline_survives_restart_and_confirmation_is_transactional ... ok
+test telemetry::tests::aggregate_tag_survives_but_local_correlation_never_leaves_envelope ... ok
+test telemetry::tests::basic_release_and_opted_in_diagnostics_have_separate_features ... ok
+test skills::tests::on_replaces_symlink_entry_without_modifying_its_shared_source ... ok
+test telemetry::journal::tests::only_fixed_bounded_history_is_persisted ... ok
+test telemetry::tests::capture_worker_then_ui_callback_keeps_request_parent ... ok
+test telemetry::tests::bounded_request_lease_crosses_await_without_source_scope_or_reader_retention ... ok
+test telemetry::tests::foreign_breadcrumbs_and_logs_are_not_allowed ... ok
+test telemetry::tests::every_child_span_gets_trusted_platform_build_metadata_at_final_egress ... ok
+test telemetry::tests::rejects_unknown_and_nonfinite_frontend_measurements ... ok
+test storage::tests::retired_project_without_terminal_metadata_is_preserved_and_not_loaded ... ok
+test telemetry::tests::legacy_snapshot_summary_never_creates_a_transaction_or_blocks_other_measurements ... ok
+test telemetry::tests::ipc_callback_keeps_wait_parent_across_threads ... ok
+test telemetry::tests::snapshot_summary_is_denied_at_egress_but_individual_request_survives ... ok
+test telemetry::tests::snapshot_request_is_sampled_and_children_use_the_same_trace ... ok
+test telemetry::tests::terminal_blocking_worker_keeps_request_parent ... ok
+test telemetry::tests::request_constructor_retains_sampling_and_epoch_barriers_with_cancellation ... ok
+test telemetry::tests::timing_denies_revoked_disabled_and_prior_epoch_work_after_reactivation ... ok
+test telemetry::tests::timing_late_callback_finishes_child_before_root_and_cancellation_releases_lease ... ok
+test telemetry::tests::timing_concurrent_requests_restore_destination_context_including_panic ... ok
+test telemetry::tests::timing_children_inherit_unsampled_parent_without_resampling_and_polling_is_capped ... ok
+test skills::tests::new_agent_receives_on_skills_on_next_reconciliation ... ok
+test telemetry::tests::transmission_requires_embedded_dsn_and_explicit_development_opt_in ... ok
+test telemetry::transport::tests::no_delivery_without_consent_and_old_queues_never_replay ... ok
+test telemetry::watchdog::tests::distinguishes_native_and_webview_and_reports_once ... ok
+test telemetry::transport::tests::http_queue_cannot_send_without_consent_or_replay_an_old_client ... FAILED
+test telemetry::tests::timing_late_finish_uses_originating_client_scope_and_restores_destination_hub ... ok
+test telemetry::transport::tests::revocation_waits_for_started_request_and_denies_following_requests ... ok
+test telemetry::tests::whole_envelope_scrubs_error_trace_log_and_denies_sessions_and_attachments ... ok
+test telemetry::watchdog::tests::hidden_and_new_views_do_not_stall ... ok
+test terminal::tests::approved_recent_folders_survive_metadata_roundtrip ... ok
+test terminal::tests::reservation_is_per_window_and_released_on_failure ... ok
+test terminal::tests::legacy_logical_and_windows_physical_origins_survive_restore ... ok
+test terminal::tests::welcome_metadata_preserves_only_last_path_title_and_geometry ... ok
+test terminal::welcome::lifecycle_tests::old_reservation_does_not_match_reopened_window ... ok
+test terminal::welcome::lifecycle_tests::queued_startup_prompt_cannot_mark_submitted_builtin_idle ... ok
+test terminal::welcome::report_tests::directory_control_sequence_survives_chunks_without_retaining_transcript ... ok
+test terminal::welcome::tests::no_history_has_no_display_path_and_home_is_execution_fallback ... ok
+test terminal::welcome::tests::preview_directory_quotes_spaces_and_metacharacters ... ok
+test terminal::welcome::tests::latest_valid_path_and_custom_title_are_independent ... ok
+test terminal::tests::metadata_does_not_claim_project_index ... ok
+test skills::tests::upgrade_overwrites_only_on_skills_preserves_choices_and_retries_failures ... ok
+test tests::invalid_commands_and_duplicate_content_fail ... ok
+test tests::named_window_commands_and_list_parse ... ok
+test tests::retired_agent_cli_and_project_ids_are_rejected ... ok
+test tests::update_mode_options_parse_and_reject_unsupported_combinations ... ok
+test terminal::tests::retired_agent_records_are_ignored_without_changing_metadata_or_projects ... ok
+test tests::web_cli_opens_welcome_without_a_url ... ok
+test tests::web_cli_accepts_http_https_and_local_development_pages ... ok
+test tests::web_cli_rejects_note_content_and_duplicate_url_options ... ok
+test tests::window_labels_do_not_collide ... ok
+test tests::web_cli_rejects_unsafe_urls_before_connecting_or_starting_the_app ... ok
+test tray::tests::content_updates_reorder_and_legacy_time_is_compatible ... ok
+test terminal::welcome::tests::recommendations_do_not_execute_candidates_and_show_exact_quoted_command ... ok
+test tray::tests::all_kinds_have_icons_event_routing_and_visibility_alpha ... ok
+test tray::tests::menu_metadata_is_owned_and_does_not_copy_memo_content ... ok
+test tray::tests::native_menu_wait_allows_ui_snapshot_to_acquire_notes ... ok
+test tray::tests::legacy_region_notes_with_zero_update_time_use_creation_fallback ... ok
+test update_policy::tests::concrete_native_block_reason_precedes_the_idle_reminder ... ok
+test update_policy::tests::every_hidden_or_visible_window_must_acknowledge_current_epoch ... ok
+test update_policy::tests::idle_gate_produces_a_specific_reason_or_allows_automatic_install ... ok
+test update_policy::tests::manual_install_skips_only_the_idle_gate ... ok
+test update_policy::tests::ongoing_operation_and_duplicate_prepare_block_install ... ok
+test tray::tests::recent_boundary_zero_thirty_thirty_one_and_mixed_ties ... ok
+test update_policy::tests::ready_notice_is_deduplicated_by_exact_release_version ... ok
+test update_policy::tests::stale_installer_cannot_release_a_newer_frozen_epoch ... ok
+test update_restore::tests::rejects_duplicate_labels_and_invalid_bounds ... ok
+test update_restore::tests::update_rejects_session_windows_including_hidden_web_views ... ok
+test update_restore::tests::snapshot_roundtrips_and_allows_only_application_window_labels ... ok
+test updater::tests::closing_an_old_notice_does_not_mark_a_newer_downloading_version_as_seen ... ok
+test updater::tests::debug_instances_cannot_enable_updater ... ok
+test updater::tests::notice_sits_inside_bottom_right_work_area_with_real_outer_size ... ok
+test updater::tests::download_location_is_limited_to_official_https_version_path ... ok
+test updater::tests::cached_bytes_and_signature_must_verify_before_any_install ... ok
+test updater::tests::offline_manual_recheck_preserves_the_verified_download ... ok
+test updater::tests::package_names_match_github_release_asset_normalization ... ok
+test updater::tests::production_comparator_rejects_equal_older_and_prerelease_versions ... ok
+test warp::tests::contact_requires_entry_and_does_not_retrigger_on_key_press_inside ... ok
+test storage::tests::roundtrip_and_isolation ... ok
+test warp::tests::entering_without_key_then_pressing_inside_does_not_trigger ... ok
+test warp::tests::focused_note_and_focus_loss_inside_do_not_trigger ... ok
+test warp::tests::movement_does_not_bounce_but_real_exit_rearms ... ok
+test warp::tests::native_contact_targets_only_memo_windows ... ok
+test updater::tests::signed_platform_binding_rejects_cross_architecture_cache_swap ... ok
+test warp::tests::paused_contact_cannot_fire_on_resume_inside ... ok
+test warp::tests::sides_initial_height_and_monitor_bounds ... ok
+test web::tests::navigation_validation_rejects_internal_and_credential_urls ... ok
+test terminal::welcome::lifecycle_tests::real_shell_prompt_builtin_busy_and_child_cleanup ... FAILED
+test terminal::welcome::tests::shell_command_exit_returns_to_same_pty_and_cwd_is_observed ... ok
+test updater::tests::notice_version_is_atomically_persisted_and_deduplicated_across_reads ... ok
+test terminal::welcome::tests::recent_folders_migrate_deduplicate_bound_and_filter_missing ... ok
+test skills::tests::state_write_failure_rolls_back_every_agent_copy ... ok
+test skills::tests::off_removes_only_receipted_copies_and_never_reactivates_on_upgrade ... ok
+test storage::tests::windows_reserved_ids_roundtrip_without_case_collisions ... ok
+
+failures:
+
+---- ipc::tests::independent_locks_and_stale_socket_recovery stdout ----
+
+thread 'ipc::tests::independent_locks_and_stale_socket_recovery' (88626060) panicked at src/ipc.rs:186:50:
+called `Result::unwrap()` on an `Err` value: "Operation not permitted (os error 1)"
+
+---- telemetry::transport::tests::http_queue_cannot_send_without_consent_or_replay_an_old_client stdout ----
+
+thread 'telemetry::transport::tests::http_queue_cannot_send_without_consent_or_replay_an_old_client' (88626238) panicked at src/telemetry/transport.rs:230:57:
+called `Result::unwrap()` on an `Err` value: Os { code: 1, kind: PermissionDenied, message: "Operation not permitted" }
+
+---- terminal::welcome::lifecycle_tests::real_shell_prompt_builtin_busy_and_child_cleanup stdout ----
+
+thread 'terminal::welcome::lifecycle_tests::real_shell_prompt_builtin_busy_and_child_cleanup' (88626254) panicked at src/terminal/welcome.rs:963:9:
+assertion failed: !busy(&mut session)
+
+
+failures:
+    ipc::tests::independent_locks_and_stale_socket_recovery
+    telemetry::transport::tests::http_queue_cannot_send_without_consent_or_replay_an_old_client
+    terminal::welcome::lifecycle_tests::real_shell_prompt_builtin_busy_and_child_cleanup
+
+test result: FAILED. 205 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+
+error: test failed, to rerun pass `--bin agent-gibbon`

@@ -1,0 +1,7 @@
+{
+  "root": "/Users/egoinglee/.codex/worktrees/issue117-notice-fold/agent-gibbon",
+  "id": "dev-36ae4e7398777ce0cdab2feb",
+  "name": "codex/117-notice-fold",
+  "target": "/Users/egoinglee/.codex/worktrees/issue117-notice-fold/agent-gibbon/src-tauri/target",
+  "binary": "/Users/egoinglee/.codex/worktrees/issue117-notice-fold/agent-gibbon/src-tauri/target/debug/agent-gibbon"
+}
