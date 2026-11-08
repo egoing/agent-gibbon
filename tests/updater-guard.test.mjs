@@ -10,6 +10,7 @@ const plain = value => JSON.parse(JSON.stringify(value));
 
 function setup({ busy = () => false, failListen = null } = {}) {
   const listeners = new Map(), domListeners = new Map(), requests = [];
+  const timers = [];
   let handleInvoke = async () => ({ ok: true });
   const window = {
     gibbonUpdateBusy: busy,
@@ -28,25 +29,81 @@ function setup({ busy = () => false, failListen = null } = {}) {
   };
   const core = { invoke: async (command, args) => { requests.push({ command, args }); return handleInvoke(command, args); } };
   window.__TAURI__ = { core, event };
-  const context = vm.createContext({ window, Promise, performance: { now: () => 100 } });
+  const context = vm.createContext({ window, Promise, setTimeout: callback => { timers.push(callback); return timers.length; }, performance: { now: () => 100 } });
   vm.runInContext(source, context);
-  return { window, listeners, domListeners, requests, fire: (name, payload) => listeners.get(name)?.({ payload }), setInvoke: fn => { handleInvoke = fn; }, context };
+  return { window, listeners, domListeners, requests, fire: (name, payload) => listeners.get(name)?.({ payload }), runTimers: () => timers.splice(0).forEach(callback => callback()), setInvoke: fn => { handleInvoke = fn; }, context };
 }
 
-test('prepare acknowledges safe=false while a manager command is pending', async () => {
+test('prepare acknowledges safe=false while a write command is pending', async () => {
   const held = setup();
   let resolveCommand, started = false;
   held.setInvoke(command => {
-    if (command === 'manager_notes') return new Promise(resolve => { started = true; resolveCommand = resolve; });
+    if (command === 'save_note') return new Promise(resolve => { started = true; resolveCommand = resolve; });
     return { ok: true };
   });
-  const command = held.window.gibbonInvoke('manager_notes');
+  const command = held.window.gibbonInvoke('save_note');
   await tick();
   assert.equal(started, true);
   held.fire('updater-prepare', 'epoch-pending');
   await tick();
-  assert.deepEqual(plain(held.requests.at(-1)), { command: 'updater_ack', args: { epoch: 'epoch-pending', safe: false, report: { ...idleReport, pending: 1, requests: { manager_notes: { count: 1, oldest_ms: 0 } } } } });
+  assert.deepEqual(plain(held.requests.at(-1)), { command: 'updater_ack', args: { epoch: 'epoch-pending', safe: false, report: { ...idleReport, pending: 1, requests: { save_note: { count: 1, oldest_ms: 0 } } } } });
   resolveCommand({ ok: true }); await command;
+});
+
+test('prepare freezes input, drains a short in-flight read, then acknowledges safe', async () => {
+  const app = setup();
+  let resolveRead;
+  app.setInvoke(command => command === 'manager_notes' ? new Promise(resolve => { resolveRead = resolve; }) : {});
+  const read = app.window.gibbonInvoke('manager_notes');
+  await tick();
+  const preparing = app.fire('updater-prepare', 'drain-read');
+  await tick();
+  assert.equal(app.requests.some(request => request.command === 'updater_ack'), false);
+  resolveRead({ ok: true });
+  await Promise.all([read, preparing]);
+  assert.equal(app.requests.at(-1).args.safe, true);
+  assert.equal(app.requests.at(-1).args.report.pending, 0);
+});
+
+test('prepare drains a hidden-window snapshot and both native polling requests together', async () => {
+  const app = setup();
+  const pending = new Map();
+  app.setInvoke(command => ['snapshot', 'poll_fold', 'poll_warp'].includes(command)
+    ? new Promise(resolve => pending.set(command, resolve)) : {});
+  const calls = ['snapshot', 'poll_fold', 'poll_warp'].map(command => app.window.gibbonInvoke(command));
+  await tick();
+  const preparing = app.fire('updater-prepare', 'hidden-window-reads');
+  await tick();
+  assert.equal(app.requests.some(request => request.command === 'updater_ack'), false);
+  for (const resolve of pending.values()) resolve({ ok: true });
+  await Promise.all([...calls, preparing]);
+  assert.equal(app.requests.at(-1).args.safe, true);
+  assert.equal(app.requests.at(-1).args.report.pending, 0);
+});
+
+test('a stalled in-flight read reaches the bounded drain and refuses installation', async () => {
+  const app = setup();
+  app.setInvoke(command => command === 'snapshot' ? new Promise(() => {}) : {});
+  app.window.gibbonInvoke('snapshot');
+  await tick();
+  const preparing = app.fire('updater-prepare', 'stalled-read');
+  await tick();
+  assert.equal(app.requests.some(request => request.command === 'updater_ack'), false);
+  app.runTimers();
+  await preparing;
+  assert.equal(app.requests.at(-1).args.safe, false);
+  assert.deepEqual(plain(app.requests.at(-1).args.report.requests), { snapshot: { count: 1, oldest_ms: 0 } });
+});
+
+test('a pending write refuses immediately without waiting for the read drain', async () => {
+  const app = setup();
+  app.setInvoke(command => command === 'save_note' ? new Promise(() => {}) : {});
+  app.window.gibbonInvoke('save_note');
+  await tick();
+  const preparing = app.fire('updater-prepare', 'write-pending');
+  await preparing;
+  assert.equal(app.requests.at(-1).args.safe, false);
+  assert.equal(app.requests.at(-1).args.report.pending, 1);
 });
 
 test('prepare acknowledges safe=false while an editing callback reports busy', async () => {
@@ -105,6 +162,13 @@ test('a failed prepare listener registration sends no acknowledgement', async ()
   await tick();
   assert.equal(app.listeners.has('updater-prepare'), false);
   assert.equal(app.requests.some(request => request.command === 'updater_ack'), false);
+});
+
+test('a failed acknowledgement invocation is contained and cannot report success', async () => {
+  const app = setup();
+  app.setInvoke(command => command === 'updater_ack' ? Promise.reject(new Error('ack failed')) : {});
+  await app.fire('updater-prepare', 'ack-failure');
+  assert.equal(app.requests.at(-1).command, 'updater_ack');
 });
 
 test('unknown command names and request arguments are absent from the installation report', async () => {
