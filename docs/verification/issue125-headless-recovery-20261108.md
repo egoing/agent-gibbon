@@ -20,6 +20,6 @@ r6에서 격리 Store의 읽기 메모는 업데이트 전후 제목과 revision
 - verification-updater Rust 테스트: 210개 통과
 - 자동·수동 동시 설치 예약 Rust 테스트: 통과
 - verification-updater Clippy (`-D warnings`) 및 `cargo fmt --check`: 통과
-- GitHub Release workflow run [42455381672](https://github.com/egoing/agent-gibbon/actions/runs/42455381672), SHA `617048c9eecac88079b662d4be723d40c0cca159`: validate, Intel/ARM macOS, Windows, assemble 통과. 이후 실행기 물리 경로 정규화 커밋은 별도 workflow가 필요하다.
+- GitHub Release workflow run [42457208947](https://github.com/egoing/agent-gibbon/actions/runs/42457208947), SHA `0a6ac2582f21e19dacdbdbc7a935ebe83f89b1df`: validate, Intel/ARM macOS, Windows, assemble 모두 통과; Draft job은 skip. 중복 workflow run `42457223968`은 같은 SHA의 pending dispatch임을 확인한 뒤 취소했다.
 
 서명 검증 및 앱 실행은 로컬 전용 시험이었다. 태그, 공개 릴리스, 공개 배포는 수행하지 않았다.
