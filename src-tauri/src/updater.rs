@@ -8,9 +8,16 @@ use std::{
 };
 use tauri::{Emitter, Manager, WebviewWindow, WebviewWindowBuilder};
 use tauri_plugin_updater::{Update, UpdaterExt};
+#[cfg(feature = "verification-updater")]
+const ENDPOINT: &str = env!("GIBBON_VERIFICATION_UPDATE_URL");
+#[cfg(not(feature = "verification-updater"))]
 const ENDPOINT: &str =
     "https://github.com/egoing/agent-gibbon/releases/latest/download/latest.json";
-const IDLE_SECONDS: f64 = 300.;
+const VERIFICATION: bool = cfg!(feature = "verification-updater");
+const FAST: bool = VERIFICATION && option_env!("GIBBON_VERIFICATION_STANDARD_TIMING").is_none();
+const IDLE_SECONDS: f64 = if FAST { 30. } else { 300. };
+const CHECK_SECONDS: u64 = if FAST { 60 } else { 21600 };
+const RETRY_SECONDS: u64 = if FAST { 5 } else { 15 };
 const NOTICE_LABEL: &str = "updater-notice";
 const PUBLIC_KEY: &str = match option_env!("TAURI_UPDATER_PUBLIC_KEY") {
     Some(key) => key,
@@ -43,6 +50,9 @@ pub struct Updates {
     status: Mutex<Status>,
     pending: Mutex<Option<(Update, Vec<u8>)>>,
     safety: Arc<Mutex<Safety>>,
+    last_handshake: Mutex<serde_json::Value>,
+    last_check_failure: Mutex<Option<&'static str>>,
+    incident: Mutex<Option<(String, &'static str, Instant, bool)>>,
     notice_lock: Mutex<()>,
     notice_pending_version: Mutex<Option<String>>,
     notice_loaded: Mutex<bool>,
@@ -67,7 +77,7 @@ pub fn frozen(app: &tauri::AppHandle) -> bool {
 }
 fn enabled() -> bool {
     !cfg!(debug_assertions)
-        && crate::instance::current().id.is_none()
+        && (VERIFICATION || crate::instance::current().id.is_none())
         && !PUBLIC_KEY.trim().is_empty()
         && cfg!(any(target_os = "macos", windows))
 }
@@ -78,7 +88,17 @@ fn status(app: &tauri::AppHandle) -> Result<Status, String> {
     Ok(app.state::<Updates>().status.lock().map_err(err)?.clone())
 }
 pub fn diagnostics(app: &tauri::AppHandle) -> serde_json::Value {
-    serde_json::json!({"enabled": enabled(), "status": status(app).ok()})
+    let updates = app.state::<Updates>();
+    let last = updates.last_handshake.lock().ok().map(|v| v.clone());
+    serde_json::json!({
+        "enabled": enabled(),
+        "status": status(app).ok(),
+        "idle_threshold_seconds": IDLE_SECONDS,
+        "check_seconds": CHECK_SECONDS,
+        "retry_seconds": RETRY_SECONDS,
+        "last_window_reports": last,
+        "last_check_failure": updates.last_check_failure.lock().ok().and_then(|v| *v),
+    })
 }
 fn set(app: &tauri::AppHandle, phase: &str, message: &str) {
     if let Ok(mut s) = app.state::<Updates>().status.lock() {
@@ -171,21 +191,44 @@ pub fn updater_notice_dismiss(window: WebviewWindow) -> Result<(), String> {
     close_notice(&window)
 }
 #[tauri::command]
-pub fn updater_ack(window: tauri::WebviewWindow, epoch: u64, safe: bool) -> Result<(), String> {
-    window
-        .state::<Updates>()
-        .safety
-        .lock()
-        .map_err(err)?
-        .acknowledge(window.label(), epoch, safe);
+pub fn updater_ack(
+    window: tauri::WebviewWindow,
+    epoch: u64,
+    safe: bool,
+    report: Option<crate::update_policy::WindowReport>,
+) -> Result<(), String> {
+    let updates = window.state::<Updates>();
+    let visible = window.is_visible().ok();
+    let mut gate = updates.safety.lock().map_err(err)?;
+    if gate.frozen && gate.epoch == epoch && gate.acknowledgements.contains_key(window.label()) {
+        if let Some(mut report) = report {
+            report.visible = visible;
+            gate.reports.insert(window.label().to_owned(), report);
+        }
+    }
+    gate.acknowledge(window.label(), epoch, safe);
     Ok(())
 }
+
 fn builder(app: &tauri::AppHandle) -> Result<tauri_plugin_updater::Updater, String> {
     configured_builder(app)?.build().map_err(err)
 }
 fn configured_builder<R: tauri::Runtime>(
     app: &tauri::AppHandle<R>,
 ) -> Result<tauri_plugin_updater::UpdaterBuilder, String> {
+    if VERIFICATION {
+        let configured_key = app
+            .config()
+            .plugins
+            .0
+            .get("updater")
+            .and_then(|config| config.get("pubkey"))
+            .and_then(|value| value.as_str())
+            .unwrap_or_default();
+        if configured_key.trim() != PUBLIC_KEY.trim() {
+            return Err("검증 빌드의 업데이트 공개키가 Tauri 설정과 일치하지 않습니다".into());
+        }
+    }
     Ok(app
         .updater_builder()
         .pubkey(PUBLIC_KEY)
@@ -252,6 +295,20 @@ fn package_name(version: &str, target: &str) -> String {
 fn validate_download(update: &Update) -> Result<(), String> {
     let u = &update.download_url;
     let filename = package_name(&update.version, platform()).replace(' ', "%20");
+    #[cfg(feature = "verification-updater")]
+    if platform() != "unsupported" {
+        let feed: tauri::Url = ENDPOINT.parse().map_err(err)?;
+        if (feed.scheme() == "https"
+            || (feed.scheme() == "http" && feed.host_str() == Some("127.0.0.1")))
+            && feed
+                .join(&format!("v{}/{filename}", update.version))
+                .map_err(err)?
+                == *u
+        {
+            return Ok(());
+        }
+        return Err("검증 피드의 업데이트 파일 경로가 일치하지 않습니다".into());
+    }
     if platform() == "unsupported"
         || u.scheme() != "https"
         || u.host_str() != Some("github.com")
@@ -663,11 +720,14 @@ async fn check(app: tauri::AppHandle, manual: bool) -> Result<(), String> {
         s.total = None;
         previous
     };
+    let mut stage = "manifest";
     let result = async {
+        crate::telemetry::checkpoint("updater.check");
         let Some(mut update) = builder(&app)?.check().await.map_err(err)? else {
             set(&app, "idle", "최신 버전입니다");
             return Ok::<_, String>(());
         };
+        stage = "asset_url";
         validate_download(&update)?;
         update.timeout = Some(Duration::from_secs(300));
         {
@@ -677,6 +737,8 @@ async fn check(app: tauri::AppHandle, manual: bool) -> Result<(), String> {
             s.phase = "downloading".into();
             s.message = "업데이트를 다운로드하고 있습니다".into();
         }
+        stage = "download";
+        crate::telemetry::checkpoint("updater.download");
         let bytes = update
             .download(
                 |n, total| {
@@ -689,12 +751,21 @@ async fn check(app: tauri::AppHandle, manual: bool) -> Result<(), String> {
             )
             .await
             .map_err(err)?;
+        stage = "signature_or_platform_binding";
         verify_package(&update, &bytes)?;
+        crate::telemetry::checkpoint("updater.verified");
+        stage = "cache_write";
         write_cache(&app, &update, &bytes)?;
+        stage = "ready";
         ready(&app, update, bytes)
     }
     .await;
+    *app.state::<Updates>()
+        .last_check_failure
+        .lock()
+        .map_err(err)? = result.is_err().then_some(stage);
     if result.is_err() {
+        report_incident(&app, env!("CARGO_PKG_VERSION"), "check_failed");
         check_failed(
             &mut *app.state::<Updates>().status.lock().map_err(err)?,
             previous,
@@ -737,6 +808,59 @@ fn release(app: &tauri::AppHandle, epoch: u64) {
         let _ = app.emit("updater-release", ());
     }
 }
+fn report_incident(app: &tauri::AppHandle, version: &str, kind: &'static str) {
+    let updates = app.state::<Updates>();
+    let Ok(mut current) = updates.incident.lock() else {
+        return;
+    };
+    if kind == "protected" {
+        *current = None;
+        return;
+    }
+    if !current
+        .as_ref()
+        .is_some_and(|(v, k, _, _)| v == version && *k == kind)
+    {
+        *current = Some((version.to_owned(), kind, Instant::now(), false));
+    }
+    if let Some((_, _, start, sent)) = current.as_mut() {
+        if !*sent && (kind != "pending_request" || start.elapsed() >= Duration::from_secs(120)) {
+            *sent = true;
+            crate::telemetry::diagnostic(
+                match kind {
+                    "check_failed" => "Updater check failed",
+                    "ack_timeout" => "Updater acknowledgement timeout",
+                    "pending_request" => "Updater repeated pending request",
+                    _ => "Updater installation failed",
+                },
+                "app",
+                start.elapsed().as_secs_f64() * 1000.,
+            );
+        }
+    }
+}
+fn record_handshake(app: &tauri::AppHandle, epoch: u64, version: &str, outcome: &str) {
+    let state = app.state::<Updates>();
+    let Ok(gate) = state.safety.lock() else {
+        return;
+    };
+    if gate.epoch != epoch {
+        return;
+    }
+    let windows: Vec<_> = gate.acknowledgements.iter().enumerate().map(|(index, (label, ack))| {
+        serde_json::json!({"number": index + 1, "kind": crate::telemetry::window_kind(label), "ack": ack, "report": gate.reports.get(label)})
+    }).collect();
+    drop(gate);
+    if let Ok(mut latest) = state.last_handshake.lock() {
+        *latest = serde_json::json!({"epoch": epoch, "windows": windows, "source_version": env!("CARGO_PKG_VERSION"), "target_version": version, "outcome": outcome, "timestamp_ms": std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis()});
+        let root = &app.state::<crate::storage::Store>().0;
+        if let Ok(mut tmp) = tempfile::NamedTempFile::new_in(root) {
+            if serde_json::to_writer(&mut tmp, &*latest).is_ok() {
+                let _ = tmp.persist(root.join(".last-update-attempt.json"));
+            }
+        }
+    };
+}
 fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
     if !enabled() {
         return Ok(());
@@ -763,6 +887,7 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
         if crate::privacy::onboarding_required(app) {
             return Err("먼저 약관을 확인하세요".into());
         }
+        crate::telemetry::checkpoint("updater.prepare");
         let epoch = on_main(app, |app| {
             safe_native(&app)?;
             let labels: Vec<String> = app.webview_windows().keys().cloned().collect();
@@ -781,18 +906,19 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
         let deadline = Instant::now() + Duration::from_secs(3);
         loop {
             if app.state::<Updates>().safety.lock().map_err(err)?.refused() {
-                return Err("편집·저장 중인 창이 있어 설치를 보류했습니다".into());
+                let updates = app.state::<Updates>();
+                let gate = updates.safety.lock().map_err(err)?;
+                return Err(gate.refusal_reason().into());
             }
             if app.state::<Updates>().safety.lock().map_err(err)?.ready() {
                 break;
             }
             if Instant::now() >= deadline {
-                return Err(
-                    "편집·저장 중이거나 응답하지 않는 창이 있어 설치를 보류했습니다".into(),
-                );
+                return Err("창의 설치 준비 응답을 기다리다 시간이 초과됐습니다".into());
             }
             std::thread::sleep(Duration::from_millis(50));
         }
+        record_handshake(app, epoch, &install_version, "prepared");
         let expected_version = install_version.clone();
         on_main(app, move |app| {
             safe_native(&app)?;
@@ -827,6 +953,7 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
         let pending = pending.pending.lock().map_err(err)?;
         let (update, bytes) = pending.as_ref().ok_or("다운로드된 업데이트가 없습니다")?;
         verify_package(update, bytes)?;
+        crate::telemetry::checkpoint("updater.install");
         update.install(bytes).map_err(err)?;
         app.restart();
         #[allow(unreachable_code)]
@@ -845,6 +972,17 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
             }
         }
         if let Some(epoch) = prepared_epoch {
+            let kind = if snapshot_written {
+                "installation_failed"
+            } else if reason.contains("초과") {
+                "ack_timeout"
+            } else if reason.contains("내부 요청") {
+                "pending_request"
+            } else {
+                "protected"
+            };
+            record_handshake(app, epoch, &install_version, kind);
+            report_incident(app, &install_version, kind);
             release(app, epoch);
         }
     }
@@ -854,6 +992,17 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
 pub fn initialize(app: &tauri::AppHandle) {
     if !enabled() {
         return;
+    }
+    let path = app
+        .state::<crate::storage::Store>()
+        .0
+        .join(".last-update-attempt.json");
+    if let Ok(file) = std::fs::File::open(path) {
+        if let Ok(previous) = serde_json::from_reader(file) {
+            if let Ok(mut report) = app.state::<Updates>().last_handshake.lock() {
+                *report = previous;
+            }
+        }
     }
     set(app, "idle", "업데이트를 자동으로 확인합니다");
     let app = app.clone();
@@ -866,11 +1015,11 @@ pub fn initialize(app: &tauri::AppHandle) {
             );
         }
         let mut resumed = status(&app).is_ok_and(|s| s.phase == "ready");
-        let mut last = Instant::now() - Duration::from_secs(6 * 60 * 60);
+        let mut last = Instant::now() - Duration::from_secs(CHECK_SECONDS);
+        std::thread::sleep(Duration::from_secs(15));
         loop {
-            std::thread::sleep(Duration::from_secs(15));
             if !crate::privacy::onboarding_required(&app)
-                && last.elapsed() >= Duration::from_secs(6 * 60 * 60)
+                && last.elapsed() >= Duration::from_secs(CHECK_SECONDS)
             {
                 let _ = tauri::async_runtime::block_on(check(app.clone(), false));
                 last = Instant::now();
@@ -878,6 +1027,7 @@ pub fn initialize(app: &tauri::AppHandle) {
             let _ = install(&app, !resumed);
             resumed = false;
             evaluate_ready(&app, false);
+            std::thread::sleep(Duration::from_secs(RETRY_SECONDS));
         }
     });
 }
@@ -930,7 +1080,7 @@ mod tests {
         let mut context = mock_context(noop_assets());
         context.config_mut().plugins.0.insert(
             "updater".into(),
-            json!({"pubkey":"", "requireSignedVersion":true}),
+            json!({"pubkey":PUBLIC_KEY, "requireSignedVersion":true}),
         );
         mock_builder()
             .plugin(tauri_plugin_updater::Builder::new().build())
@@ -1046,6 +1196,14 @@ mod tests {
         )
         .parse()
         .unwrap();
+        if VERIFICATION {
+            assert!(validate_download(&update).is_err());
+            update.download_url = ENDPOINT
+                .parse::<tauri::Url>()
+                .unwrap()
+                .join(&format!("v99.0.0/{}", package_name("99.0.0", platform())))
+                .unwrap();
+        }
         assert!(validate_download(&update).is_ok());
         for url in [
             "http://github.com/egoing/agent-gibbon/releases/download/v99.0.0/a",

@@ -13,7 +13,14 @@
           "Korean",
           "English"
         ],
-        "displayLanguageSelector": true
+        "displayLanguageSelector": false
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "windows": {
+        "installMode": "quiet"
       }
     }
   }

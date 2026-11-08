@@ -505,6 +505,19 @@ fn preserve_client_rect_for_handle(handle: isize) {
     }
 }
 
+/// Update snapshots store the client size. Measure the native frame on the
+/// destination monitor instead of asking Tao to estimate a non-client margin.
+pub fn restore_client_size(
+    window: &WebviewWindow,
+    size: tauri::PhysicalSize<u32>,
+) -> Result<(), String> {
+    on_owner_thread(window, move |window| {
+        let handle = window.hwnd().map_err(|e| e.to_string())?.0 as isize;
+        let position = client_origin_for_handle(handle)?;
+        set_client_rect_for_handle(handle, position, size)
+    })
+}
+
 pub fn set_outer_size(
     window: &WebviewWindow,
     size: tauri::PhysicalSize<u32>,

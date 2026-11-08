@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 
 const source = readFileSync(new URL('../ui/updater-guard.js', import.meta.url), 'utf8');
 const tick = () => new Promise(setImmediate);
+const idleReport = { editing: false, saving: false, exporting: false, privacy: false, pending: 0, requests: {}, oldest_ms: 0 };
 const plain = value => JSON.parse(JSON.stringify(value));
 
 function setup({ busy = () => false, failListen = null } = {}) {
@@ -12,6 +13,7 @@ function setup({ busy = () => false, failListen = null } = {}) {
   let handleInvoke = async () => ({ ok: true });
   const window = {
     gibbonUpdateBusy: busy,
+    gibbonUpdateActivity: () => ({ editing: busy() }),
     addEventListener(name, callback, capture) {
       const entries = domListeners.get(name) || [];
       entries.push({ callback, capture }); domListeners.set(name, entries);
@@ -26,7 +28,7 @@ function setup({ busy = () => false, failListen = null } = {}) {
   };
   const core = { invoke: async (command, args) => { requests.push({ command, args }); return handleInvoke(command, args); } };
   window.__TAURI__ = { core, event };
-  const context = vm.createContext({ window, Promise });
+  const context = vm.createContext({ window, Promise, performance: { now: () => 100 } });
   vm.runInContext(source, context);
   return { window, listeners, domListeners, requests, fire: (name, payload) => listeners.get(name)?.({ payload }), setInvoke: fn => { handleInvoke = fn; }, context };
 }
@@ -43,20 +45,20 @@ test('prepare acknowledges safe=false while a manager command is pending', async
   assert.equal(started, true);
   held.fire('updater-prepare', 'epoch-pending');
   await tick();
-  assert.deepEqual(plain(held.requests.at(-1)), { command: 'updater_ack', args: { epoch: 'epoch-pending', safe: false } });
+  assert.deepEqual(plain(held.requests.at(-1)), { command: 'updater_ack', args: { epoch: 'epoch-pending', safe: false, report: { ...idleReport, pending: 1, requests: { manager_notes: { count: 1, oldest_ms: 0 } } } } });
   resolveCommand({ ok: true }); await command;
 });
 
 test('prepare acknowledges safe=false while an editing callback reports busy', async () => {
   const app = setup({ busy: () => true });
   app.fire('updater-prepare', 17); await tick();
-  assert.deepEqual(plain(app.requests), [{ command: 'updater_ack', args: { epoch: 17, safe: false } }]);
+  assert.deepEqual(plain(app.requests), [{ command: 'updater_ack', args: { epoch: 17, safe: false, report: { ...idleReport, editing: true } } }]);
 });
 
 test('prepare acknowledges safe=true when no command or editing work is active', async () => {
   const app = setup();
   app.fire('updater-prepare', 'idle-epoch'); await tick();
-  assert.deepEqual(plain(app.requests), [{ command: 'updater_ack', args: { epoch: 'idle-epoch', safe: true } }]);
+  assert.deepEqual(plain(app.requests), [{ command: 'updater_ack', args: { epoch: 'idle-epoch', safe: true, report: idleReport } }]);
 });
 
 test('frozen state rejects new commands and captures input until release', async () => {
@@ -89,11 +91,11 @@ test('updater status and install commands do not count as pending manager work',
   const status = app.window.gibbonInvoke('updater_status');
   await tick();
   app.fire('updater-prepare', 'status-only'); await tick();
-  assert.deepEqual(plain(app.requests.at(-1)), { command: 'updater_ack', args: { epoch: 'status-only', safe: true } });
+  assert.deepEqual(plain(app.requests.at(-1)), { command: 'updater_ack', args: { epoch: 'status-only', safe: true, report: idleReport } });
   const install = app.window.gibbonInvoke('updater_install');
   await tick();
   app.fire('updater-prepare', 'install-only'); await tick();
-  assert.deepEqual(plain(app.requests.at(-1)), { command: 'updater_ack', args: { epoch: 'install-only', safe: true } });
+  assert.deepEqual(plain(app.requests.at(-1)), { command: 'updater_ack', args: { epoch: 'install-only', safe: true, report: idleReport } });
   resolveStatus({ phase: 'idle' }); resolveInstall({ phase: 'ready' });
   await Promise.all([status, install]);
 });
@@ -103,4 +105,24 @@ test('a failed prepare listener registration sends no acknowledgement', async ()
   await tick();
   assert.equal(app.listeners.has('updater-prepare'), false);
   assert.equal(app.requests.some(request => request.command === 'updater_ack'), false);
+});
+
+test('unknown command names and request arguments are absent from the installation report', async () => {
+  const app = setup();
+  let finish;
+  app.setInvoke(command => command === 'private-title'
+    ? new Promise(resolve => { finish = resolve; }) : {});
+  const pending = app.window.gibbonInvoke('private-title', { markdown: 'private-body' });
+  await tick();
+  app.fire('updater-prepare', 2);
+  await tick();
+  const report = plain(app.requests.at(-1).args.report);
+  assert.deepEqual(report.requests, { other: { count: 1, oldest_ms: 0 } });
+  assert.doesNotMatch(JSON.stringify(report), /private-title|private-body/);
+  finish();
+  await pending;
+  app.fire('updater-release');
+  app.fire('updater-prepare', 3);
+  await tick();
+  assert.equal(app.requests.at(-1).args.safe, true);
 });

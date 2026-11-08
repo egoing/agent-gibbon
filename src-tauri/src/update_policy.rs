@@ -1,7 +1,39 @@
 //! Pure, fail-closed installation reservation shared by native entry points.
 use std::collections::BTreeMap;
+#[derive(Clone, Ord, PartialOrd, Eq, PartialEq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RequestKind {
+    Snapshot,
+    ManagerNotes,
+    FitNote,
+    SaveNote,
+    ExportNote,
+    TerminalInfo,
+    PollFold,
+    PollWarp,
+    PresentFeedback,
+    FeedbackSnapshot,
+    Other,
+}
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+pub struct RequestStats {
+    pub count: u32,
+    pub oldest_ms: u64,
+}
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+pub struct WindowReport {
+    pub editing: bool,
+    pub saving: bool,
+    pub exporting: bool,
+    pub privacy: bool,
+    pub pending: u32,
+    pub requests: BTreeMap<RequestKind, RequestStats>,
+    pub oldest_ms: u64,
+    pub visible: Option<bool>,
+}
 #[derive(Default)]
 pub struct Safety {
+    pub reports: BTreeMap<String, WindowReport>,
     pub frozen: bool,
     pub activities: usize,
     pub epoch: u64,
@@ -17,6 +49,9 @@ pub fn should_show_notice(version: &str, last_shown: Option<&str>) -> bool {
 pub fn idle_hold_reason(idle_seconds: Option<f64>, threshold: f64) -> Option<&'static str> {
     match idle_seconds {
         Some(seconds) if seconds.is_finite() && seconds >= threshold => None,
+        Some(_) if threshold == 30.0 => Some(
+            "최근 입력이 있어 자동 설치를 보류했습니다. 30초 동안 조작하지 않으면 자동 설치합니다.",
+        ),
         Some(_) => Some(
             "최근 입력이 있어 자동 설치를 보류했습니다. 5분 동안 조작하지 않으면 자동 설치합니다.",
         ),
@@ -49,6 +84,7 @@ impl Safety {
         if self.frozen || self.activities != 0 {
             return Err("진행 중인 작업이 끝나면 설치합니다".into());
         }
+        self.reports.clear();
         self.frozen = true;
         self.epoch += 1;
         self.acknowledgements = labels.into_iter().map(|s| (s, None)).collect();
@@ -59,6 +95,20 @@ impl Safety {
             if let Some(entry) = self.acknowledgements.get_mut(label) {
                 *entry = Some(safe);
             }
+        }
+    }
+    pub fn refusal_reason(&self) -> &'static str {
+        let reports = self.reports.values();
+        if reports.clone().any(|r| r.editing || r.saving) {
+            "편집·저장 중인 창이 있어 설치를 보류했습니다"
+        } else if reports.clone().any(|r| r.exporting) {
+            "내보내기가 끝나면 설치할 수 있습니다"
+        } else if reports.clone().any(|r| r.privacy) {
+            "개인정보 설정 작업이 끝나면 설치할 수 있습니다"
+        } else if reports.clone().any(|r| r.pending > 0) {
+            "내부 요청이 처리 중이어서 설치를 보류했습니다"
+        } else {
+            "창이 설치 준비를 보류했습니다"
         }
     }
     pub fn refused(&self) -> bool {

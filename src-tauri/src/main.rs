@@ -375,19 +375,20 @@ fn apply_with_presentation(
     request: Request,
     presentation: entrance::Presentation,
 ) -> Result<Value, String> {
-    let _activity = updater::activity(app)?;
     request.validate()?;
+    // Read-only diagnostics must remain observable during the installation handshake.
+    if matches!(request.action, Action::Diagnostics) {
+        return Ok(
+            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"updater":updater::diagnostics(app),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
+        );
+    }
+    let _activity = updater::activity(app)?;
     if privacy::onboarding_required(app)
         && !matches!(request.action, Action::Diagnostics | Action::Probe)
     {
         manager::open(app)?;
         return Ok(
             json!({"ok":false,"onboarding_required":true,"error":"Review the Terms of Use in the manager; sharing is optional","instance":instance::current().id}),
-        );
-    }
-    if matches!(request.action, Action::Diagnostics) {
-        return Ok(
-            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"updater":updater::diagnostics(app),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
         );
     }
     if matches!(request.action, Action::Probe) {

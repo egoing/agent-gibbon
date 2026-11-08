@@ -36,6 +36,8 @@
 
 ## 버전과 릴리스
 
+- 업데이트를 확인할 때는 [설치 보호 실기기 시험](docs/releases.md#설치-보호-실기기-시험)에 따라 검증 앱을 준비하고, [실기기 체크리스트의 판정 기준](docs/verification/issue102-live-checklist.md)에 따라 결과를 기록한다.
+
 - 상세 절차와 현재 배포 조건은 [자동 릴리스 안내](docs/releases.md), 실행 설정은 `.github/workflows/release.yml`을 따른다.
 - 버전은 `npm run version:set -- X.Y.Z`로 npm·Cargo·Tauri와 lockfile을 함께 올리고 `npm run version:check`로 확인한다. 버전 변경만으로 공개하지 않으며, 배포할 커밋에 일치하는 `vX.Y.Z` 태그를 push하면 공식 서명 빌드와 Draft 준비가 시작된다. 공개는 별도 사용자 지시 후 진행한다. 기존 태그·공개 릴리스 자산을 덮어쓰지 않는다.
 - macOS ARM64·Intel DMG와 Windows x64 NSIS EXE의 테스트·Rustfmt·Clippy·빌드가 모두 성공하고 설치 파일 세 개와 체크섬이 준비된 뒤에만 공개한다. 일반 브랜치 push는 Release 워크플로를 실행하지 않는다. `workflow_dispatch` 수동 실행은 전체 검증·빌드와 artifact 보관만 수행하며 공개하지 않는다.
