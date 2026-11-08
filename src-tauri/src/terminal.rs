@@ -36,6 +36,9 @@ pub struct Terminal {
     pub updated_at: u64,
     #[serde(default)]
     pub title: String,
+    /// Kept in memory until the confirmed update snapshot is written.
+    #[serde(skip)]
+    pub last_command: Option<String>,
 }
 #[derive(Clone, Serialize, Deserialize)]
 pub struct RecentPath {
@@ -148,6 +151,7 @@ enum Slot {
 pub struct Terminals {
     records: Mutex<BTreeMap<String, Terminal>>,
     sessions: Mutex<BTreeMap<String, Slot>>,
+    restart_notices: Mutex<BTreeMap<String, Option<String>>>,
 }
 struct Start<'a> {
     state: &'a Terminals,
@@ -267,6 +271,31 @@ pub fn contains(app: &tauri::AppHandle, id: &str) -> bool {
         .contains_key(id)
 }
 pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+    open_with_visibility(app, id, true)
+}
+
+pub fn open_hidden(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+    open_with_visibility(app, id, false)
+}
+
+pub fn open_hidden_for_restart(
+    app: &tauri::AppHandle,
+    id: &str,
+    choice: Option<String>,
+) -> Result<(), String> {
+    // Publish the one-shot notice before constructing the WebView, which can
+    // begin invoking terminal_welcome as soon as it finishes loading.
+    mark_restart_notice(app, id, choice)?;
+    if let Err(error) = open_hidden(app, id) {
+        if let Ok(mut notices) = app.state::<Terminals>().restart_notices.lock() {
+            notices.remove(id);
+        }
+        return Err(error);
+    }
+    Ok(())
+}
+
+fn open_with_visibility(app: &tauri::AppHandle, id: &str, visible: bool) -> Result<(), String> {
     let _root = crate::telemetry::Timing::new("terminal.window.open");
     let agent = app
         .state::<Terminals>()
@@ -349,17 +378,94 @@ pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
         crate::sync_opacity(win.clone())?;
     }
     // User explicitly opens a terminal, but background CLI/tray restore preserves focus.
-    #[cfg(target_os = "macos")]
-    unsafe {
-        (&*(win.ns_window().map_err(err)? as *const objc2_app_kit::NSWindow))
-            .orderFrontRegardless();
+    if visible {
+        #[cfg(target_os = "macos")]
+        unsafe {
+            (&*(win.ns_window().map_err(err)? as *const objc2_app_kit::NSWindow))
+                .orderFrontRegardless();
+        }
+        #[cfg(not(target_os = "macos"))]
+        crate::stash::release(&win)?;
+        win.show().map_err(err)?;
+        #[cfg(any(target_os = "macos", windows))]
+        crate::focus::restore(&win);
+    } else {
+        // WebView construction may activate the app even when the window stays
+        // hidden. Close the focus-preservation transaction without showing it.
+        #[cfg(any(target_os = "macos", windows))]
+        crate::focus::restore(&win);
     }
-    #[cfg(not(target_os = "macos"))]
-    crate::stash::release(&win)?;
-    win.show().map_err(err)?;
-    #[cfg(any(target_os = "macos", windows))]
-    crate::focus::restore(&win);
     Ok(())
+}
+
+fn safe_choice_id(choice: &str) -> Option<&'static str> {
+    match choice {
+        "shell" => Some("shell"),
+        "codex" => Some("codex"),
+        "claude" => Some("claude"),
+        "git" => Some("git"),
+        "htop" => Some("htop"),
+        _ => None,
+    }
+}
+
+pub fn restart_notice(app: &tauri::AppHandle, id: &str) -> Result<Option<String>, String> {
+    Ok(app
+        .state::<Terminals>()
+        .restart_notices
+        .lock()
+        .map_err(err)?
+        .remove(id)
+        .map(|choice| restart_notice_text(choice.as_deref())))
+}
+
+fn restart_notice_text(choice: Option<&str>) -> String {
+    let Some(choice) = choice else {
+        return "이전 터미널 세션은 종료됐습니다. 기록된 마지막 선택이 없으며 자동 실행되지 않았습니다.".into();
+    };
+    let label = match choice {
+        "codex" => "Codex",
+        "claude" => "Claude Code",
+        "git" => "git log",
+        "htop" => "htop",
+        _ => "셸",
+    };
+    format!("이전 터미널 세션은 종료됐습니다. 마지막 선택은 {label}이며 자동 실행되지 않았습니다.")
+}
+
+pub fn mark_restart_notice(
+    app: &tauri::AppHandle,
+    id: &str,
+    choice: Option<String>,
+) -> Result<(), String> {
+    let choice = choice
+        .as_deref()
+        .and_then(safe_choice_id)
+        .map(str::to_string);
+    let terminals = app.state::<Terminals>();
+    terminals
+        .records
+        .lock()
+        .map_err(err)?
+        .get_mut(id)
+        .ok_or("터미널 창이 없습니다")?
+        .last_command = choice.clone();
+    terminals
+        .restart_notices
+        .lock()
+        .map_err(err)?
+        .insert(id.into(), choice);
+    Ok(())
+}
+
+pub fn last_command(app: &tauri::AppHandle, id: &str) -> Option<String> {
+    app.state::<Terminals>()
+        .records
+        .lock()
+        .ok()?
+        .get(id)?
+        .last_command
+        .clone()
 }
 pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
     welcome::refresh_path(app, id)?;
@@ -469,8 +575,19 @@ pub async fn terminal_start(
                 .get(&id)
                 .cloned()
                 .ok_or("터미널 창이 없습니다")?;
-            let (session, mut reader) =
-                welcome::start(&agent, choice.as_deref().unwrap_or("shell"), dimensions)?;
+            let selected = safe_choice_id(choice.as_deref().unwrap_or("shell"))
+                .ok_or("지원하지 않는 실행 항목입니다")?;
+            let (session, mut reader) = welcome::start(&agent, selected, dimensions)?;
+            {
+                let mut records = state.records.lock().map_err(err)?;
+                let record = records.get_mut(&id).ok_or("터미널 창이 없습니다")?;
+                record.last_command = Some(selected.to_string());
+            }
+            app.state::<Terminals>()
+                .restart_notices
+                .lock()
+                .map_err(err)?
+                .remove(&id);
             let watched_session = Arc::downgrade(&reservation.finish(session)?);
             welcome::touch_path(&app, &id)?;
             let watched_app = app.clone();
@@ -623,6 +740,36 @@ pub fn update_blocked(app: &tauri::AppHandle) -> Result<bool, String> {
         .is_empty())
 }
 
+pub fn starting(app: &tauri::AppHandle) -> Result<bool, String> {
+    Ok(app
+        .state::<Terminals>()
+        .sessions
+        .lock()
+        .map_err(err)?
+        .values()
+        .any(|slot| matches!(slot, Slot::Starting(_))))
+}
+
+/// Read the actual live PTY PID without collecting terminal info or history.
+#[allow(dead_code)] // Consumed by the explicit update impact review in the dependent #116 change.
+pub fn review_pid(app: &tauri::AppHandle, id: &str) -> Result<Option<u32>, String> {
+    let session = app
+        .state::<Terminals>()
+        .sessions
+        .lock()
+        .map_err(err)?
+        .get(id)
+        .and_then(running);
+    let Some(session) = session else {
+        return Ok(None);
+    };
+    let mut session = session.lock().map_err(err)?;
+    if session.child.try_wait().map_err(err)?.is_some() {
+        return Ok(None);
+    }
+    Ok(session.child.process_id())
+}
+
 pub fn shutdown(app: &tauri::AppHandle) {
     for agent in entries(app) {
         let _ = welcome::refresh_path(app, &agent.id);
@@ -742,6 +889,7 @@ mod tests {
             path_updated: 0,
             updated_at: 0,
             title: String::new(),
+            last_command: None,
             id: "terminal-123".into(),
             bounds: crate::capture::ImageNote {
                 x: 1.,
@@ -755,5 +903,24 @@ mod tests {
         std::fs::write(&index, "user project").unwrap();
         save(dir.path(), &a).unwrap();
         assert_eq!(std::fs::read_to_string(index).unwrap(), "user project");
+    }
+    #[test]
+    fn task_selection_is_not_emitted_or_loaded_in_regular_metadata() {
+        let source = json!({"id":"terminal-123", "bounds":{"x":1,"y":2,"width":400,"height":300},
+            "last_command":"arbitrary shell text"});
+        let mut record: Terminal = serde_json::from_value(source).unwrap();
+        assert!(record.last_command.is_none());
+        record.last_command = Some("shell".into());
+        assert!(serde_json::to_value(record)
+            .unwrap()
+            .get("last_command")
+            .is_none());
+    }
+    #[test]
+    fn restart_notice_never_claims_an_unrecorded_choice() {
+        assert!(restart_notice_text(None).contains("기록된 마지막 선택이 없으며"));
+        assert!(restart_notice_text(Some("codex")).contains("Codex"));
+        assert_eq!(safe_choice_id("claude"), Some("claude"));
+        assert_eq!(safe_choice_id("echo secret"), None);
     }
 }

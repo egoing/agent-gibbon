@@ -95,6 +95,9 @@ function renderFolders(){
 }
 async function welcome(){
   const data=await invoke('terminal_welcome');setInfo(data.info);
+  const restartNotice=document.getElementById('restart-notice');
+  restartNotice.hidden=!data.restart_notice;
+  restartNotice.textContent=data.restart_notice||'';
   availableChoices=data.choices;folders=data.folders||[];selectedFolder=data.location;homePath=data.home;
   if(data.info.last_path && selectedFolder){folders=[selectedFolder,...folders.filter(f=>f.path!==selectedFolder.path)].slice(0,20);}
   document.getElementById('home-hint').hidden=Boolean(data.info.last_path);
