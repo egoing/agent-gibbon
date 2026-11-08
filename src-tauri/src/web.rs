@@ -54,6 +54,20 @@ pub fn validate_url(input: &str) -> Result<tauri::Url, String> {
 pub fn contains(app: &tauri::AppHandle, id: &str) -> bool {
     app.state::<Windows>().0.lock().unwrap().contains_key(id)
 }
+pub fn url_for_restore(app: &tauri::AppHandle, label: &str) -> Option<String> {
+    let id = web_id(label)?;
+    let record = app.state::<Windows>().0.lock().ok()?.get(id)?.clone();
+    record.url.as_ref()?;
+    let current = app
+        .get_webview_window(&record.label)?
+        .url()
+        .ok()?
+        .to_string();
+    validate_url(&current).ok().map(|url| url.to_string())
+}
+pub fn contains_label(app: &tauri::AppHandle, label: &str) -> bool {
+    web_id(label).is_some_and(|id| contains(app, id))
+}
 fn record(app: &tauri::AppHandle, id: &str) -> Result<Record, String> {
     app.state::<Windows>()
         .0
@@ -191,6 +205,20 @@ pub fn create(
     id: Option<&str>,
     url: Option<&str>,
 ) -> Result<Value, String> {
+    create_with_visibility(app, bounds, id, url, true)
+}
+
+pub fn restore_session(app: &tauri::AppHandle, id: &str, url: Option<&str>) -> Result<(), String> {
+    create_with_visibility(app, None, Some(id), url, false).map(|_| ())
+}
+
+fn create_with_visibility(
+    app: &tauri::AppHandle,
+    bounds: Option<ImageNote>,
+    id: Option<&str>,
+    url: Option<&str>,
+    visible: bool,
+) -> Result<Value, String> {
     let id = id.map(str::to_owned).unwrap_or_else(|| {
         format!(
             "web-{}",
@@ -213,7 +241,9 @@ pub fn create(
             let w = app
                 .get_webview_window(&r.label)
                 .ok_or("웹 창을 찾을 수 없습니다")?;
-            show(&w)?;
+            if visible {
+                show(&w)?;
+            }
             ensure_toolbar(app, &id, &w)?;
             return inspect(app, &id);
         }
@@ -233,7 +263,9 @@ pub fn create(
             .get_mut(&id)
             .unwrap()
             .url = url.map(str::to_owned);
-        show(w)?;
+        if visible {
+            show(w)?;
+        }
         ensure_toolbar(app, &id, w)?;
         return inspect(app, &id);
     }
@@ -295,7 +327,9 @@ pub fn create(
             url: url.map(str::to_owned),
         },
     );
-    show(&w)?;
+    if visible {
+        show(&w)?;
+    }
     if previous.is_some() {
         destroy_toolbar(app, &id)?;
         if let Some(p) = previous {
@@ -303,6 +337,11 @@ pub fn create(
         }
     }
     ensure_toolbar(app, &id, &w)?;
+    if !visible {
+        // WebView construction can activate the app on macOS. Restoring an
+        // update snapshot must not steal the user's foreground application.
+        crate::focus::restore(&w);
+    }
     inspect(app, &id)
 }
 

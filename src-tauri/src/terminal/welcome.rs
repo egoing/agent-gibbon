@@ -40,6 +40,7 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
         path_updated: 0,
         updated_at: 0,
         title: String::new(),
+        last_command: None,
     };
     save(&root(app), &agent)?;
     state.records.lock().map_err(err)?.insert(id.clone(), agent);
@@ -249,8 +250,9 @@ pub fn terminal_welcome(window: WebviewWindow) -> Result<Value, String> {
         .as_str()
         .map(PathBuf::from)
         .unwrap_or_else(|| home.clone());
+    let restart_notice = super::restart_notice(window.app_handle(), &id)?;
     Ok(
-        json!({"info":info,"choices":options,"folders":folders,"location":folder_value(&selected,&home),"home":home}),
+        json!({"info":info,"choices":options,"folders":folders,"location":folder_value(&selected,&home),"home":home,"restart_notice":restart_notice}),
     )
 }
 #[tauri::command]
@@ -566,6 +568,7 @@ mod tests {
             path_updated: updated,
             updated_at: 0,
             title: String::new(),
+            last_command: None,
         }
     }
     #[test]
