@@ -92,7 +92,7 @@
 - [x] 검증 프로필에 최초 확인 15초, 확인 주기 60초, 무입력 30초, 재시도 5초 설정
 - [x] iMac Node VM에서 WebView 설치 보호 시험 6개 통과 (설치 E2E와 별도)
 - [ ] iMac·Windows 독립 서명 검증 앱의 설치·보호·복원 시험
-- [ ] 정식 시간값으로 재시험
+- 최종 확인도 검증 프로필의 무입력 30초를 사용한다.
 - 구현 위치는 issue-102-update-verification 워크트리이며 Rust 기본/검증 설정 206개와 UI 170개가 통과했다. 알려지지 않은 요청명과 요청 인자가 진단에 포함되지 않는지 검사했다.
 - iMac Intel 및 Windows에 각각 별도 임시 소스를 전달했다. 정식 앱을 유지한 상태에서 검증 앱 빌드를 진행 중이다.
 - iMac Intel 검증 v0.2.10 및 v0.2.11 빌드 완료. loopback 피드 HTTP 200. 구버전 실행 진단에서 updater 활성, 무입력 30초 및 최초 약관 대기 확인. 사용자 확인 전 설치 시험 대기.
@@ -149,3 +149,44 @@
 - 진단 조회가 설치 준비 예약 중 간헐 보류되는 문제도 확인했다. 읽기 전용 diagnostics를 예약 이전으로 이동했으며 이 후속 변경은 로컬 검사를 수행했다. 실기기에서 사용한 이전 빌드는 재시도 조회로 근거를 확보했다.
 - 정리 완료. Windows 검증 앱·전용 피드·시험용 절전 방지 프로세스 종료. terminal-1029002 fixture만 제거, 테스트 메모와 증거 보존. 임시 개인키 폐기. 일반 앱은 종료 후 프로세스 목록에서 관찰되지 않았고 정식 설치 파일/사용자 저장소는 이번 격리 회차의 교체 대상이 아니었다.
 - 판정 범위: 이번 Windows 검증은 30초 무입력 프로필, iMac은 300초 기본값도 시험했다. 모든 보호 회차의 앱 실행 후 15초 이내 진입은 입증하지 못했다. 과거 iMac 정식판의 오탐 원인은 당시 창별 진단 부재로 미확정이다.
+
+## #123 iMac 실기기 대조
+
+[#123](https://github.com/egoing/agent-gibbon/issues/123)은 읽기 요청 진행·완료, 응답 누락, 실제 미저장 편집을 구분해 업데이트 보호 조건을 확인한다. 이전 실기기 결과와 진단 빌드 결과를 구분해 정리한다.
+
+- 읽기 전용 메모: 격리 검증 인스턴스에서 v0.2.10 표준 타이밍(무입력 300초, 확인 21600초, 재시도 15초)으로 A/B 메모를 표시한 채 자동 업데이트를 기다렸다. 16:55:23 UTC 기준과 17:00:08 UTC 설치 후 기준 모두 A 본문 `UNSAVED-EDIT-SENTINEL-102`, B 본문 `Stable test content, version 1.`를 보존했다. A는 600×96, (3240,1968), B는 600×98, (1412,762)였고 두 창 모두 표시 상태가 유지됐다. PID 36509에서 PID 54532로 전환됐으며 새 버전은 v0.2.11이었다. 기준·결과 파일은 iMac의 `/tmp/issue102-output/final-auto-baseline/`과 `/tmp/issue102-output/final-auto-after/`에 보존했다.
+- 실제 미저장 편집: v0.2.10 PID 97022에서 메모 #4에 편집 중인 테스트 문구를 입력했을 때 `editing=true`, `pending=0`, ACK 안전 여부 false로 설치가 보류됐고 저장 파일은 이전 본문을 유지했다. 사용자가 저장한 뒤 revision 5가 됐고, epoch 66에서 `editing=false`, ACK 안전 응답으로 자동 업데이트가 이어져 v0.2.11 PID 7553으로 재시작했다. 저장 문구가 재실행 후에도 남았다. 이는 저장된 변경을 편집 중으로 잘못 차단하는 현상을 이 진단 빌드에서 재현하지 못했다는 뜻이며, 당시 정식 v0.2.10에서 발생한 과거 오탐의 원인을 확정하지 않는다.
+- 실제 읽기 완료 상태: 수동 설치 회차의 보고서에서 준비 응답이 모두 ACK=true, `pending=0`, `editing=false`였고 두 테스트 메모가 표시 중인 상태로 수동 설치·재시작이 완료됐다. 표준 5분 자동 업데이트에서도 두 읽기 메모의 안정화된 전후 상태가 일치했다.
+- 실기기 한계: 설치 준비 순간의 진행 중 `manager_notes` 호출과 WebView ACK 누락은 iMac UI에서 결정적으로 붙잡아 재현하지 못했다. 이 두 경계는 `tests/updater-guard.test.mjs`의 Node VM 시험에서 각각 pending 요청 시 `safe=false`, 요청 완료 뒤 `safe=true`, 준비 리스너 등록 실패 시 ACK 미전송으로 확인했다. 모의 시험을 실기기 재현으로 간주하지 않는다.
+- 영역 터미널 캡처는 별도 화면 기록 권한 요청을 실제로 확인했으나 권한은 부여하지 않았다. 이는 #123의 읽기·편집 상태 판정과 독립된 제한이다. 시험 후 전용 검증 앱·loopback 피드와 임시키 개인키를 정리했고 원본 설치 앱은 유지했다.
+## 2026-11-08 iMac 후속 회차 (#123)
+
+- 기준 커밋 `243420570d7d3c04fc8f5f5fef4f4415ad6805c1`. Intel iMac Pro, macOS 15.8 (24H23), Node v24.21.0. 작업 루트 `/Users/egoing/.codex/worktrees/imac-102/agent-gibbon`. 개발 인스턴스 ID `dev-08207552ee001b9318f23e11`, 개발 바이너리 예정 경로 `src-tauri/target/debug/agent-gibbon`. 서명 업데이트 시험은 전용 release 인스턴스를 사용한다.
+- [x] #123 조건 조사. 이전 가드는 설치 준비 이벤트를 받은 순간에 manager_notes 한 건만 진행 중이어도 거부했다. 당시 정식판에서 어느 요청이 실행 중이었는지는 알 수 없다.
+- [x] 가드를 수정하여 입력을 동결한 뒤 이미 시작한 snapshot, manager_notes, terminal_info, feedback_snapshot 조회에 최대 250ms를 허용한다. 편집·쓰기·분류되지 않은 요청은 즉시 거부하며, 응답 없는 창은 Rust의 3초 제한으로 설치를 막는다. Node 가드 검사 11개 및 UI 검사 177개 통과.
+- [x] 읽는 중 자동 설치 및 복원 전후 비교
+- [x] 미저장 편집 및 실행 중 셸 보류 안내, 작업 종료 후 설치
+- [x] 수동 설치 및 기본 대기 시간 재시험
+
+### Codex 재시작 인계
+
+- [x] 수정 전 가드에 짧은 manager_notes 회귀 시험을 적용해 실패 확인. 수정 후 같은 시험 통과.
+- [x] 격리 인스턴스 `dev-001020010200102001020010`, 실행 파일 `/private/tmp/imac102-run/Run.app/Contents/MacOS/agent-gibbon`, PID 77237. 0.2.11에서 loopback의 서명 후보 0.2.12 다운로드 7,202,244바이트 완료. 최초 manifest 미게시 때 404, 게시 후 자동 재시도 HTTP 200.
+- [x] 메모 `imac102-check-2434205`를 CLI inspect, 동일 ID의 네이티브 창 제목 및 편집기의 실제 초안과 대조. 편집 중 디스크 revision 1, 자동 설치 epoch 2에서 보이는 메모 #3 editing=true, pending=0, ack=false. 다른 보이는/숨긴 창은 ack=true. 수동 설치 버튼에서도 편집·저장 보류 문구 확인. 사용자가 저장한 뒤 본문 ‘편집 보호 102’, revision 2 확인.
+- [x] 전용 터미널 `terminal-1794109367464210000`에서 실제 셸 PID 85197 시작. 숨긴 후에도 running=true 및 기존 앱 PID 유지. 구체 보류 안내 관찰. 셸에서 exit 후 화면의 PTY 세션 종료와 CLI running=false 확인.
+- [ ] 수동 설치 직후 실행 중인 셸을 ‘터미널 시작 화면’으로 잘못 표시했다. safe_native가 세션 보호 전에 복원 가능성을 검사한 것이 원인. 검사 순서를 수정했으며 같은 숨긴 셸 조건 재시험 대기.
+- [ ] 수동 설치 성공, 읽기 중 자동 설치, 작업 종료 후 자동 설치 및 재시작 후 저장된 메모·창 복원. 실제 무응답 창의 3초 timeout은 이번 회차 실앱 미검증.
+- 로컬 인계 폴더 `/private/tmp/imac102-run`에 수정 소스 복사본, build.sh, rebuild.log, package.sh, feed와 evidence/*.json 보존. 재개 시 rebuild.log에서 **수정 후** fast/standard/candidate 빌드 완료 확인. 재빌드 중 중단되면 현재 버전을 확인하고 소스 복사본의 버전 파일을 워크트리 0.2.11로 되돌린 뒤 재빌드한다. 기존 archive와 feed는 수정 전 후보이므로 새 디렉터리에 수정 후보를 패키징·재서명하고 해시를 확인한다. 이전 회차의 검증용 .update-cache도 옮긴 뒤 시작한다. 루프백 포트 49231. 원래 캐시 백업은 old-state에 있다.
+- evidence/saved-before.json 및 handoff.json은 본문 SHA-256 4c247125…d8240, revision 2, 위치 (3240,1968), 600×96, visible=true, pin=true. 새 회차 설치 직전 다시 측정한다. fixture는 재사용 후 앱 정지 중 /tmp/agent-gibbon-terminal-fixture.py cleanup. 모든 시험 종료 시 전용 키 폐기.
+
+### 재시작 후 실기기 재시험
+
+- [x] 숨긴 셸 안내 수정 확인. 격리 앱 Run.app PID 92611, 셸 PID 93150, 동일 터미널 ID. CLI에서 running=true·visible=false를 기록하고 업데이트 창의 수동 설치를 클릭했다. 이전의 ‘시작 화면’ 대신 ‘터미널 세션을 종료한 뒤 설치할 수 있습니다. 숨긴 터미널도 포함됩니다’가 표시됐다. 셸에 exit 입력 후 해당 창을 종료했다.
+- [x] 실제 반복 보류 조건 확보. 후속 수동 설치 두 차례 모두 편집 없는 숨긴 메모가 snapshot, poll_fold, poll_warp의 조합으로 거부했다. epoch 1, 2 및 요청 나이 0~2ms. 증거는 `/private/tmp/imac102-run/evidence/mixed-polls.json`, `repeat-result.json`. 이 회차는 2026-11-08 최초 정식판 보류와 별개의 재현이다.
+- [x] 시작한 두 입력 확인 요청도 최대 250ms 완료 대기에 포함. 창은 대기 중 새 작업을 동결하고 미완료 요청이 남으면 거부한다. 모든 ACK 후 네이티브 활동 재검사와 창 상태 저장을 거친다. 혼합 회귀 포함 가드 12/12, 전체 UI 178/178.
+- [x] 무응답 실험. 검증 앱 PID 4050에서 새 메모 imac102-ackprobe를 생성하기 전후의 WebContent PID 집합을 비교했다. 새 PID 4084가 macOS responsibility 조회에서 PID 4050 소속임을 확인했다. 그 메모를 숨긴 뒤 해당 렌더러만 SIGSTOP. 자동 설치 epoch 1에서 메모 #2 ACK 누락, 나머지 5개 창 ACK, 0.2.11 유지 및 준비 응답 시간 초과 안내. SIGCONT로 복구. 증거는 evidence/pids-before, pids-after, ack-paused.txt, ack-timeout.json.
+- [x] 수동 설치 및 복원. 진단의 최근 입력 보류 중(무입력 7.6초) 준비 안내의 ‘업데이트하고 재시작’ 클릭. PID 4050 → 10847, 실행 중 0.2.12와 후보 바이너리 byte 비교 일치, epoch 3의 9개 창 모두 ACK. manual-stable.json과 manual-after.json에서 보이는 메모 imac102-check-2434205와 숨긴 imac102-ackprobe의 본문 해시, revision 4/1, 물리 위치·크기, 고정·표시 상태 일치.
+- 최종 시험 후보는 7,202,213바이트, 로컬 및 loopback HTTP SHA-256 모두 cd68a951b6ce984094e3cecc03e494d76798c850cb2a015b96bccfbb7c93e9a0. 검증 앱만 사용하는 0.2.11 → 0.2.12 버전 쌍. Rust 테스트 208/208, rustfmt·Clippy(-D warnings)·버전 검사 통과.
+- [x] **마지막 기본 시간 회차 통과.** PID 10930에서 300초 무입력·21600초 확인 주기·15초 재시도를 확인했다. 셸 PID 11874 실행 중 설치 보류. exit 및 터미널 창 종료 후 running=false, pid=null. 읽기 메모 2개 표시·1개 숨김. 준비 안내의 ‘나중에’ 선택 후 두 번째 읽기 메모의 커서 이동 대기를 워프로 끝내고 세 창 모두 animating=false·layout_pending=false인 기준을 확보했다.
+- standard-monitor.jsonl에서 무입력 297.73초와 307.96초에 0.2.11 ready, 13:13:51 KST epoch 1 모든 창 8개 ACK, 13:13:55에 자동 재실행한 0.2.12 확인(PID 22708). 실제 바이너리와 서명한 후보 바이너리 일치. final-baseline.json과 final-after.json의 notes 전체 일치. 보이는 메모 위치는 (3240,1968)·(0,1872), 크기는 600×96. 숨긴 메모는 (1620,458), 600×480. 본문 해시·revision 5/8/1·고정·표시·크기·위치 보존.
+- 검증 앱과 loopback 피드 종료, 터미널 fixture 정리, 전용 개인키 폐기. 기존 검증 인스턴스의 업데이트 캐시/상태 파일 복원. 설치 앱 PID 18025 유지. 이번 판정은 Intel iMac 격리 서명 빌드 기준이다.
