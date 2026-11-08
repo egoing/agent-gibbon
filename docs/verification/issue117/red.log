@@ -1,0 +1,22 @@
+   Compiling agent-gibbon v0.2.11 (/Users/egoinglee/.codex/worktrees/issue117-notice-fold/agent-gibbon/src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.23s
+     Running unittests src/main.rs (src-tauri/target/debug/deps/agent_gibbon-e0002c4d651af85b)
+
+running 1 test
+test sizing::contact_tests::update_notice_is_excluded_while_memo_windows_keep_contact_folding ... FAILED
+
+failures:
+
+---- sizing::contact_tests::update_notice_is_excluded_while_memo_windows_keep_contact_folding stdout ----
+
+thread 'sizing::contact_tests::update_notice_is_excluded_while_memo_windows_keep_contact_folding' (88630207) panicked at src/sizing.rs:424:9:
+assertion failed: !fold_contact_enabled("updater-notice")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    sizing::contact_tests::update_notice_is_excluded_while_memo_windows_keep_contact_folding
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 208 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--bin agent-gibbon`

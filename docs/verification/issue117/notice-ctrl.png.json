@@ -1,0 +1,57 @@
+{
+  "id": "59a46f15-18c3-42cc-89a9-b88d64e5f39a",
+  "ok": true,
+  "result": {
+    "screenshotStatus": {
+      "metadata": {
+        "windowId": 50560,
+        "engine": "screenCaptureKit"
+      },
+      "state": "captured"
+    },
+    "screenshot": {
+      "format": "png",
+      "scale": 2,
+      "height": 280,
+      "width": 720,
+      "path": "/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/orca-computer-use/59a46f15-18c3-42cc-89a9-b88d64e5f39a-screenshot.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-09T13:41:43.870Z"
+    },
+    "snapshot": {
+      "id": "40407C4C-7D74-4EF3-81D0-83D9583503F1",
+      "app": {
+        "bundleId": null,
+        "pid": 47454,
+        "name": "agent-gibbon"
+      },
+      "truncation": {
+        "maxDepthReached": false,
+        "truncated": false,
+        "maxDepth": 64,
+        "maxNodes": 1200
+      },
+      "elementCount": 13,
+      "window": {
+        "height": 140,
+        "isMinimized": false,
+        "screenIndex": 0,
+        "title": "Agent Gibbon · 업데이트",
+        "y": 500,
+        "id": 50560,
+        "width": 360,
+        "platform": {
+          "layer": 5
+        },
+        "x": 600,
+        "isOffscreen": false
+      },
+      "coordinateSpace": "window",
+      "focusedElementId": null,
+      "treeText": "App=agent-gibbon (pid 47454)\nWindow: \"Agent Gibbon · 업데이트\", App: agent-gibbon.\n\n0 standard window Agent Gibbon · 업데이트\n\t1 scroll area\n\t\t2 HTML content 업데이트 준비 완료\n\t\t\t3 container 새 버전이 준비됐습니다\n\t\t\t\t4 heading 새 버전이 준비됐습니다\n\t\t\t\t17 text 새 버전 117.0.20261108\n\t\t\t\t18 text 편집 또는 저장이 끝나면 설치합니다\n\t\t\t\t7 button 나중에\n\t\t\t\t8 button 업데이트하고 재시작\n\t9 close button\n\t10 zoom button\n\t11 minimize button\n\t12 text Agent Gibbon · 업데이트\n\nNo UI element is currently focused."
+    }
+  },
+  "_meta": {
+    "runtimeId": "4ebceca2-5788-45d5-af2d-63ad38441460"
+  }
+}

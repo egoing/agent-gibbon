@@ -1,0 +1,6 @@
+
+> agent-gibbon@0.2.11 check
+> cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+
+   Compiling agent-gibbon v0.2.11 (/Users/egoinglee/.codex/worktrees/issue117-notice-fold/agent-gibbon/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.52s

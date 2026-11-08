@@ -1,0 +1,50 @@
+{
+  "pid": 47454,
+  "targets": [
+    {
+      "target": "편집 또는 저장이 끝나면 설치합니다",
+      "pointer": [
+        696,
+        572.0
+      ],
+      "unchanged": true
+    },
+    {
+      "target": "나중에",
+      "pointer": [
+        781.5,
+        610.0
+      ],
+      "unchanged": true
+    },
+    {
+      "target": "업데이트하고 재시작",
+      "pointer": [
+        881.0,
+        610.0
+      ],
+      "unchanged": true
+    },
+    {
+      "positive_fold": true,
+      "unfold_restored": true,
+      "before_size": {
+        "height": 136,
+        "width": 600
+      },
+      "folded_size": {
+        "height": 24,
+        "width": 600
+      },
+      "restored_size": {
+        "height": 136,
+        "width": 600
+      }
+    }
+  ],
+  "front_after": {
+    "front": 79839,
+    "x": 1519.98046875,
+    "y": 230.98046875
+  }
+}

@@ -1,0 +1,311 @@
+{
+  "children": [
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [],
+                              "description": "",
+                              "position": {
+                                "x": 616,
+                                "y": 513
+                              },
+                              "role": "AXStaticText",
+                              "size": {
+                                "height": 18,
+                                "width": 147
+                              },
+                              "title": "",
+                              "value": "새 버전이 준비됐습니다"
+                            }
+                          ],
+                          "description": "",
+                          "position": {
+                            "x": 616,
+                            "y": 511
+                          },
+                          "role": "AXHeading",
+                          "size": {
+                            "height": 22,
+                            "width": 313
+                          },
+                          "title": "새 버전이 준비됐습니다",
+                          "value": ""
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": [],
+                              "description": "",
+                              "position": {
+                                "x": 616,
+                                "y": 538
+                              },
+                              "role": "AXStaticText",
+                              "size": {
+                                "height": 15,
+                                "width": 125
+                              },
+                              "title": "",
+                              "value": "새 버전 117.0.20261108"
+                            }
+                          ],
+                          "description": "",
+                          "position": {
+                            "x": 616,
+                            "y": 537
+                          },
+                          "role": "AXGroup",
+                          "size": {
+                            "height": 18,
+                            "width": 313
+                          },
+                          "title": "",
+                          "value": ""
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": [],
+                              "description": "",
+                              "position": {
+                                "x": 616,
+                                "y": 564
+                              },
+                              "role": "AXStaticText",
+                              "size": {
+                                "height": 16,
+                                "width": 183
+                              },
+                              "title": "",
+                              "value": "편집 또는 저장이 끝나면 설치합니다"
+                            }
+                          ],
+                          "description": "",
+                          "position": {
+                            "x": 616,
+                            "y": 563
+                          },
+                          "role": "AXGroup",
+                          "size": {
+                            "height": 19,
+                            "width": 313
+                          },
+                          "title": "",
+                          "value": ""
+                        },
+                        {
+                          "children": [],
+                          "description": "",
+                          "position": {
+                            "x": 753,
+                            "y": 594
+                          },
+                          "role": "AXButton",
+                          "size": {
+                            "height": 32,
+                            "width": 57
+                          },
+                          "title": "나중에",
+                          "value": ""
+                        },
+                        {
+                          "children": [],
+                          "description": "",
+                          "position": {
+                            "x": 817,
+                            "y": 594
+                          },
+                          "role": "AXButton",
+                          "size": {
+                            "height": 32,
+                            "width": 128
+                          },
+                          "title": "업데이트하고 재시작",
+                          "value": ""
+                        }
+                      ],
+                      "description": "새 버전이 준비됐습니다",
+                      "position": {
+                        "x": 600,
+                        "y": 528
+                      },
+                      "role": "AXGroup",
+                      "size": {
+                        "height": 112,
+                        "width": 360
+                      },
+                      "title": "새 버전이 준비됐습니다",
+                      "value": ""
+                    }
+                  ],
+                  "description": "업데이트 준비 완료",
+                  "position": {
+                    "x": 600,
+                    "y": 528
+                  },
+                  "role": "AXWebArea",
+                  "size": {
+                    "height": 112,
+                    "width": 360
+                  },
+                  "title": "",
+                  "value": ""
+                }
+              ],
+              "description": "",
+              "position": {
+                "x": 600,
+                "y": 528
+              },
+              "role": "AXScrollArea",
+              "size": {
+                "height": 112,
+                "width": 360
+              },
+              "title": "",
+              "value": ""
+            }
+          ],
+          "description": "",
+          "position": {
+            "x": 600,
+            "y": 500
+          },
+          "role": "AXGroup",
+          "size": {
+            "height": 140,
+            "width": 360
+          },
+          "title": "",
+          "value": ""
+        }
+      ],
+      "description": "",
+      "position": {
+        "x": 600,
+        "y": 500
+      },
+      "role": "AXGroup",
+      "size": {
+        "height": 140,
+        "width": 360
+      },
+      "title": "",
+      "value": ""
+    },
+    {
+      "children": [],
+      "description": "",
+      "position": {
+        "x": 606,
+        "y": 506
+      },
+      "role": "AXButton",
+      "size": {
+        "height": 16,
+        "width": 16
+      },
+      "title": "",
+      "value": ""
+    },
+    {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [],
+              "description": "",
+              "position": {
+                "x": 647,
+                "y": 506
+              },
+              "role": "AXGroup",
+              "size": {
+                "height": 16,
+                "width": 14
+              },
+              "title": "",
+              "value": ""
+            }
+          ],
+          "description": "",
+          "position": {
+            "x": 647,
+            "y": 506
+          },
+          "role": "AXGroup",
+          "size": {
+            "height": 16,
+            "width": 14
+          },
+          "title": "",
+          "value": ""
+        }
+      ],
+      "description": "",
+      "position": {
+        "x": 646,
+        "y": 506
+      },
+      "role": "AXButton",
+      "size": {
+        "height": 16,
+        "width": 16
+      },
+      "title": "",
+      "value": ""
+    },
+    {
+      "children": [],
+      "description": "",
+      "position": {
+        "x": 626,
+        "y": 506
+      },
+      "role": "AXButton",
+      "size": {
+        "height": 16,
+        "width": 16
+      },
+      "title": "",
+      "value": ""
+    },
+    {
+      "children": [],
+      "description": "",
+      "position": {
+        "x": 706,
+        "y": 505
+      },
+      "role": "AXStaticText",
+      "size": {
+        "height": 16,
+        "width": 149
+      },
+      "title": "",
+      "value": "Agent Gibbon · 업데이트"
+    }
+  ],
+  "description": "",
+  "position": {
+    "x": 600,
+    "y": 500
+  },
+  "role": "AXWindow",
+  "size": {
+    "height": 140,
+    "width": 360
+  },
+  "title": "Agent Gibbon · 업데이트",
+  "value": ""
+}
