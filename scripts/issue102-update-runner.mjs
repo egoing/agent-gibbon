@@ -267,9 +267,12 @@ function makeRunDirectory(runRoot, { target, previousVersion, candidateVersion, 
   return metadata;
 }
 function loadRun(runRoot) {
-  const root = resolve(runRoot);
+  const root = canonicalPath(runRoot);
   const metadata = readJson(join(root, 'run.json'));
   if (metadata.schema !== 1) throw new Error('실행 메타데이터 스키마가 다릅니다');
+  for (const key of ['artifact_root', 'feed_root', 'store_root', 'events', 'server_log']) {
+    if (typeof metadata[key] === 'string') metadata[key] = canonicalPath(metadata[key]);
+  }
   return { root, metadata };
 }
 export function fingerprintTree(rootPath) {
@@ -444,7 +447,7 @@ function awaitSymlink(targetPath, linkPath, type) {
   symlinkSync(targetPath, linkPath, type);
 }
 function isWithin(root, file) {
-  const rel = relative(resolve(root), resolve(file));
+  const rel = relative(canonicalPath(root), canonicalPath(file));
   return rel === '' || (!rel.startsWith('..' + sep) && rel !== '..' && !isAbsolute(rel));
 }
 function canonicalPath(path) {
@@ -482,11 +485,11 @@ function executableFor(appPath, platform) {
   if (platform === 'darwin') {
     const app = resolve(appPath);
     if (!app.endsWith('.app')) throw new Error('macOS 실행 경로는 .app 번들이어야 합니다');
-    return join(app, 'Contents', 'MacOS', 'agent-gibbon');
+    return canonicalPath(join(app, 'Contents', 'MacOS', 'agent-gibbon'));
   }
   if (platform === 'win32') {
     if (extname(appPath).toLowerCase() !== '.exe') throw new Error('Windows 실행 경로는 설치된 agent-gibbon.exe여야 합니다');
-    return resolve(appPath);
+    return canonicalPath(appPath);
   }
   throw new Error('macOS 또는 Windows에서만 검증 앱을 실행할 수 있습니다');
 }
@@ -606,6 +609,7 @@ export function summarizeDiagnostics(value) {
     phase: status.phase ?? null, idle_threshold_seconds: updater.idle_threshold_seconds ?? null,
     idle_seconds: updater.idle_seconds ?? null,
     check_seconds: updater.check_seconds ?? null, retry_seconds: updater.retry_seconds ?? null,
+    last_check_failure: updater.last_check_failure ?? null,
     last_window_reports: updater.last_window_reports ?? null,
   };
 }

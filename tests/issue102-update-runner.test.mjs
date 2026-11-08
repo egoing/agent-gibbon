@@ -142,21 +142,25 @@ test('event markers and diagnostics summaries omit note contents and unrelated f
   assert.throws(() => recordMarker(events, 'arbitrary-data', {}), /알 수 없는/);
   assert.deepEqual(summarizeDiagnostics({
     instance: 'dev-test',
-    updater: { enabled: true, status: { current_version: '0.2.11', version: '0.2.12', phase: 'ready' }, idle_threshold_seconds: 30, idle_seconds: 31.2, check_seconds: 60, retry_seconds: 5 },
+    updater: { enabled: true, status: { current_version: '0.2.11', version: '0.2.12', phase: 'ready' }, idle_threshold_seconds: 30, idle_seconds: 31.2, check_seconds: 60, retry_seconds: 5, last_check_failure: 'manifest' },
     note: { markdown: 'private' },
   }), {
     instance: 'dev-test', enabled: true, current_version: '0.2.11', target_version: '0.2.12',
     phase: 'ready', idle_threshold_seconds: 30, idle_seconds: 31.2, check_seconds: 60, retry_seconds: 5,
-    last_window_reports: null,
+    last_check_failure: 'manifest', last_window_reports: null,
   });
 });
 
 test('status ownership requires a live-run process record, the expected instance and this run store', t => {
   const root = fixtureDir(t);
   const storeRoot = join(root, 'store');
+  mkdirSync(storeRoot, { recursive: true });
+  const executable = join(root, 'Run.app', 'Contents', 'MacOS', 'agent-gibbon');
+  mkdirSync(join(root, 'Run.app', 'Contents', 'MacOS'), { recursive: true });
+  writeFileSync(executable, 'fixture');
   const record = {
     pid: 42,
-    executable: join(root, 'Run.app', 'Contents', 'MacOS', 'agent-gibbon'),
+    executable,
     store_root: storeRoot,
     platform: 'darwin',
   };
