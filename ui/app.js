@@ -86,6 +86,7 @@ let restoringEditorFocus = false;
 function endEditing(flow) {
   contentAction();
   editing = false;
+  invoke('updater_editor', { editing: false }).catch(failure);
   document.body.classList.toggle('editing', false);
   $('editor').hidden = true;
   $('content').hidden = false;
@@ -103,6 +104,7 @@ function endEditing(flow) {
 function beginEditing() {
   if (!latestNote || editing) return;
   editing = true;
+  invoke('updater_editor', { editing: true }).catch(failure);
   document.body.classList.toggle('editing', true);
   editRevision = latestNote.revision;
   $('markdown').value = latestNote.markdown;

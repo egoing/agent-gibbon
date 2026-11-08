@@ -14,9 +14,17 @@ const phaseText = {
 };
 let updaterStatus = null;
 let updaterBusy = false;
+const reviewControls = window.gibbonUpdateReview(updaterEl('updater-review'), updaterInvoke, message => {
+  updaterStatus = { ...updaterStatus, message };
+  updaterEl('updater-message').textContent = message;
+  updaterEl('updater-message').hidden = false;
+});
 
 function renderUpdater(status) {
   updaterStatus = status || { phase: 'error', message: '' };
+  reviewControls.render(updaterStatus.phase === 'ready' ? updaterStatus.review : null);
+  updaterEl('updater-cancel-review').hidden = !reviewControls.confirming;
+  updaterEl('updater-install').textContent = reviewControls.confirming ? '확인하고 재시작' : '재시작하여 설치';
   const phase = Object.hasOwn(phaseText, updaterStatus.phase) ? updaterStatus.phase : 'error';
   const version = updaterStatus.version || null;
   updaterEl('updater-status').textContent = phaseText[phase];
@@ -48,7 +56,10 @@ async function runUpdaterAction(command) {
   if (updaterBusy || (command === 'updater_install' && updaterStatus?.phase !== 'ready')) return;
   updaterBusy = true;
   renderUpdater(updaterStatus);
-  try { renderUpdater(await updaterInvoke(command)); }
+  try {
+    const result = command === 'updater_install' ? await reviewControls.install(command) : await updaterInvoke(command);
+    if (result) renderUpdater(result);
+  }
   catch {
     const message = command === 'updater_check'
       ? '업데이트를 확인하지 못했습니다. 다시 시도하세요.'
@@ -60,6 +71,7 @@ async function runUpdaterAction(command) {
   }
 }
 
+updaterEl('updater-cancel-review').onclick = () => { reviewControls.cancel(); renderUpdater(updaterStatus); };
 updaterEl('updater-check').onclick = () => runUpdaterAction('updater_check');
 updaterEl('updater-install').onclick = () => runUpdaterAction('updater_install');
 window.gibbonUpdater = { refresh: refreshUpdater };

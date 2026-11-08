@@ -10,6 +10,7 @@ mod manager;
 mod update_policy;
 mod update_restore;
 mod updater;
+mod updater_review;
 
 mod layout;
 mod local_trace;
@@ -540,6 +541,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(privacy::Privacy::default())
         .manage(telemetry::Runtime::default())
         .manage(capture::Captures::default())
+        .manage(updater_review::Editors::default())
         .manage(terminal::Terminals::default())
         .manage(web::Windows::default())
         .manage(ClosedNotes::default())
@@ -562,6 +564,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .invoke_handler({
             let handler: Box<dyn Fn(tauri::ipc::Invoke) -> bool + Send + Sync> =
                 Box::new(tauri::generate_handler![
+                    updater_review::updater_editor,
+                    updater_review::updater_show_target,
                     updater::updater_status,
                     updater::updater_check,
                     updater::updater_install,

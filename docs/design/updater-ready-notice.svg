@@ -18,11 +18,12 @@
 <text x="710" y="387" font-size="10" class="muted">Agent Gibbon · 업데이트</text>
 <text x="662" y="424" font-size="16" font-weight="600">새 버전이 준비됐습니다</text>
 <text x="662" y="446" font-size="12" class="muted">새 버전 0.2.12</text>
+<text x="662" y="470" font-size="13">빌드 작업 · 터미널 실행 중</text><rect x="942" y="451" width="48" height="30" rx="4" fill="#fff" stroke="#858585"/><text x="953" y="471" font-size="13">보기</text>
 <rect x="772" y="488" width="64" height="32" rx="4" fill="#fff" stroke="#858585"/>
 <text x="787" y="509" font-size="13">나중에</text>
 <rect x="844" y="488" width="146" height="32" rx="4" fill="#2d2d2d" stroke="#2d2d2d"/>
 <text x="860" y="509" font-size="13" style="fill:#fff">업데이트하고 재시작</text>
 <path d="M1006 542H1022 M1014 534V550" stroke="#858585"/>
-<text x="78" y="589" font-size="13" class="muted">사용자 마킹 반영 · 서명 검증 문구와 기본 설명 제거 · 제목·새 버전·두 버튼만 표시합니다.</text>
+<text x="78" y="589" font-size="13" class="muted">사용자 마킹 반영 · 서명 검증 문구와 기본 설명 제거 · 열린 작업이 있으면 항목마다 보기를 제공합니다.</text>
 <text x="78" y="612" font-size="12" class="muted">디자인 제안 시안 · 실제 앱 캡처 아님 · 예시 버전 · 오른쪽·아래 여백 16px · 실패 피드백만 필요할 때 표시</text>
 </svg>

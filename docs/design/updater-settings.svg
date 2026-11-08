@@ -18,7 +18,8 @@
 <text x="326" y="165" font-size="21" font-weight="600">자동 업데이트</text>
 <text x="326" y="207" font-size="15" font-weight="600">새 버전이 준비됐습니다</text>
 <text x="326" y="233" font-size="13" class="muted">현재 버전 0.2.11 · 새 버전 0.2.12</text>
-<text x="326" y="266" font-size="13">작업을 마친 뒤 재시작하여 설치할 수 있습니다.</text>
+<text x="326" y="266" font-size="13">터미널 실행 중 · 빌드 작업</text>
+<rect x="545" y="244" width="52" height="30" rx="4" fill="#dfe2dd" stroke="#6d7084"/><text x="558" y="264" font-size="13">보기</text>
 <rect x="326" y="286" width="86" height="32" rx="4" fill="#dfe2dd" stroke="#6d7084"/>
 <text x="341" y="307" font-size="13">지금 확인</text>
 <rect x="420" y="286" width="128" height="32" rx="4" fill="#2c2f7e" stroke="#2c2f7e"/>

@@ -32,6 +32,20 @@ try {
   await page.screenshot({path:`${output}/notice-${scheme}.png`});
   assert(await page.$eval('#notice-message',e=>e.hidden),'routine explanation is hidden');
   assert(!(await page.content()).includes('서명 검증 완료'));
+  // Multiple blockers stay scrollable, and cancellation must not invoke the installer.
+  await page.evaluate(()=>{window.statusFixture.review={version:'1.3.0',restores_sessions:true,targets:[
+   {label:'webpage-web-test',kind:'web',title:'웹 창'},
+   {label:'terminal-102',kind:'terminal',title:'빌드 터미널',pid:102}
+  ]};return refreshNotice();});
+  assert.equal((await page.$$('#notice-review button')).length,2);
+  await page.click('#notice-review button');
+  assert(await page.evaluate(()=>window.requests.includes('updater_show_target')));
+  await page.click('#notice-install');
+  assert.match(await page.$eval('#notice-review',e=>e.textContent),/프로세스는 종료/);
+  assert(await page.$eval('#notice-dismiss',e=>e.textContent==='취소'&&e.getBoundingClientRect().bottom<=innerHeight));
+  await page.screenshot({path:`${output}/notice-review-${scheme}.png`});
+  await page.click('#notice-dismiss');
+  assert(!await page.evaluate(()=>window.requests.includes('updater_notice_install')));
   // Errors remain readable in the scroll area; actions stay on screen.
   await page.evaluate(()=>{window.statusFixture={...window.statusFixture,phase:'error',version:'1.3.0-'+'long'.repeat(30),message:'작업 상태를 확인한 뒤 다시 시도하세요. '.repeat(20)};return refreshNotice();});
   assert(await page.$eval('#notice-message',e=>!e.hidden&&e.textContent.length>200));

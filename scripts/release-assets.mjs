@@ -110,6 +110,7 @@ export function prepareAssets(directory, version, options = {}) {
   const manifest = {
     version,
     notes: '',
+    gibbon_session_restore: 1,
     platforms: Object.fromEntries(platforms.map(platform => {
       const filename = platform.archive(version);
       return [platform.target, {
