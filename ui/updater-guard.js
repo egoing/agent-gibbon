@@ -6,7 +6,7 @@
   const raw = (window.gibbonInvoke || tauri.core.invoke).bind(tauri.core);
   const pending = new Map();
   const known = new Set(['snapshot', 'manager_notes', 'fit_note', 'save_note', 'export_note', 'terminal_info', 'poll_fold', 'poll_warp', 'present_feedback', 'feedback_snapshot']);
-  const background = new Set(['snapshot', 'poll_warp', 'poll_fold', 'feedback_snapshot']);
+  const background = new Set(['snapshot', 'poll_warp', 'poll_fold', 'feedback_snapshot', 'manager_notes', 'terminal_info']);
   const drainMs = 500; // Native waits up to three seconds for every window.
   let latestEpoch = 0;
   let frozenEpoch = null;

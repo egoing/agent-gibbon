@@ -33,19 +33,19 @@ function setup({ busy = () => false, failListen = null } = {}) {
   return { window, listeners, domListeners, requests, fire: (name, payload) => listeners.get(name)?.({ payload }), setInvoke: fn => { handleInvoke = fn; }, context };
 }
 
-test('prepare acknowledges safe=false while a manager command is pending', async () => {
+test('prepare acknowledges safe=false while a write command is pending', async () => {
   const held = setup();
   let resolveCommand, started = false;
   held.setInvoke(command => {
-    if (command === 'manager_notes') return new Promise(resolve => { started = true; resolveCommand = resolve; });
+    if (command === 'save_note') return new Promise(resolve => { started = true; resolveCommand = resolve; });
     return { ok: true };
   });
-  const command = held.window.gibbonInvoke('manager_notes');
+  const command = held.window.gibbonInvoke('save_note');
   await tick();
   assert.equal(started, true);
   held.fire('updater-prepare', 1);
   await tick();
-  assert.deepEqual(plain(held.requests.at(-1)), { command: 'updater_ack', args: { epoch: 1, safe: false, report: { ...idleReport, pending: 1, requests: { manager_notes: { count: 1, oldest_ms: 0 } } } } });
+  assert.deepEqual(plain(held.requests.at(-1)), { command: 'updater_ack', args: { epoch: 1, safe: false, report: { ...idleReport, pending: 1, requests: { save_note: { count: 1, oldest_ms: 0 } } } } });
   resolveCommand({ ok: true }); await command;
 });
 
@@ -138,7 +138,7 @@ function heldRequests(commands) {
 }
 
 test('background polls settle before acknowledgement, with new work frozen', async () => {
-  const commands = ['poll_warp', 'poll_fold', 'snapshot', 'feedback_snapshot'];
+  const commands = ['poll_warp', 'poll_fold', 'snapshot', 'feedback_snapshot', 'manager_notes', 'terminal_info'];
   const { app, completions, work, acks } = heldRequests(commands);
   await tick();
   app.fire('updater-prepare', 1);
@@ -188,4 +188,12 @@ test('a released epoch cannot acknowledge later work or unfreeze a newer epoch',
   await Promise.all(work);
   await new Promise(resolve => setTimeout(resolve, 5));
   assert.deepEqual(plain(acks()), [{ epoch: 2, safe: false, report: { ...idleReport, exporting: true } }]);
+});
+
+test('a rejected acknowledgement does not escape the guard', async () => {
+  const app = setup();
+  app.setInvoke(() => Promise.reject(new Error('ack failed')));
+  app.fire('updater-prepare', 1);
+  await tick();
+  assert.equal(app.requests.at(-1).command, 'updater_ack');
 });
