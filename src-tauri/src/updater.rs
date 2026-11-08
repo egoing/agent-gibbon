@@ -805,7 +805,7 @@ fn release(app: &tauri::AppHandle, epoch: u64) {
         .lock()
         .is_ok_and(|mut safety| safety.release_epoch(epoch));
     if released {
-        let _ = app.emit("updater-release", ());
+        let _ = app.emit("updater-release", epoch);
     }
 }
 fn report_incident(app: &tauri::AppHandle, version: &str, kind: &'static str) {
