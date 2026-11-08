@@ -890,7 +890,15 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
         crate::telemetry::checkpoint("updater.prepare");
         let epoch = on_main(app, |app| {
             safe_native(&app)?;
-            let labels: Vec<String> = app.webview_windows().keys().cloned().collect();
+            // Remote page WebViews cannot invoke the local updater guard. Keep
+            // them outside the acknowledgement barrier; local web Welcome and
+            // companion toolbars still participate through the local guard.
+            let labels: Vec<String> = app
+                .webview_windows()
+                .keys()
+                .filter(|label| !label.starts_with("webpage-"))
+                .cloned()
+                .collect();
             let epoch = {
                 let state = app.state::<Updates>();
                 let mut safety = state.safety.lock().map_err(err)?;

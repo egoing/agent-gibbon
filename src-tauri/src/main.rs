@@ -394,7 +394,13 @@ fn apply_with_presentation(
     if matches!(request.action, Action::Probe) {
         return Ok(telemetry::probe());
     }
-    if matches!(request.action, Action::Web) || web::contains(app, request.id()) {
+    let web_namespace = request.id().starts_with("web-")
+        && !app
+            .state::<AppNotes>()
+            .lock()
+            .map_err(|e| e.to_string())?
+            .contains_key(request.id());
+    if matches!(request.action, Action::Web) || web_namespace || web::contains(app, request.id()) {
         return web::handle(app, &request);
     }
     let _timing = telemetry::Timing::new(match request.action {
@@ -574,6 +580,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     local_trace::local_flow_stage,
                     snapshot,
                     web::web_run,
+                    web::web_toolbar_info,
+                    web::web_toggle_pin,
+                    web::web_close,
                     terminal::terminal_start,
                     terminal::terminal_write,
                     terminal::terminal_resize,
@@ -662,9 +671,28 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 return;
             }
             if win.label().starts_with("webview-") || win.label().starts_with("webpage-") {
+                match event {
+                    tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_) => {
+                        if let Some(window) = win.app_handle().get_webview_window(win.label()) {
+                            web::geometry(&window);
+                        }
+                    }
+                    tauri::WindowEvent::CloseRequested { api, .. } => {
+                        api.prevent_close();
+                        if let Err(error) = web::close_window(win.app_handle(), win.label()) {
+                            eprintln!("웹 세션을 종료하지 못했습니다: {error}");
+                        }
+                    }
+                    _ => (),
+                }
+                return;
+            }
+            if win.label().starts_with("webtoolbar-") {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                     api.prevent_close();
-                    let _ = win.hide();
+                    if let Err(error) = web::close_window(win.app_handle(), win.label()) {
+                        eprintln!("웹 세션을 종료하지 못했습니다: {error}");
+                    }
                 }
                 return;
             }
@@ -1105,7 +1133,7 @@ fn main() {
         )
     } else if args == ["--help"] || args == ["-h"] {
         Ok(
-            json!({"ok":true,"usage":"agent-gibbon web [--id web-ID] [--url URL]; agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open/web은 앱을 시작하거나 창을 생성·복원합니다. web의 ID 생략은 새 웹 창, open의 ID 생략은 main이며 close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
+            json!({"ok":true,"usage":"agent-gibbon web [--id web-ID] [--url URL]; agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open/web은 앱을 시작하거나 창을 생성·복원합니다. web의 ID 생략은 새 웹 창, open의 ID 생략은 main이며 close는 텍스트 메모·터미널을 숨기고 웹 세션을 종료합니다. 색상은 #RRGGBB입니다."}),
         )
     } else {
         cli(&args)

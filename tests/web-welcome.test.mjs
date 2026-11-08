@@ -22,3 +22,21 @@ test('invalid URL or native failure keeps input and allows retry without stealin
  assert.equal(elements.run.disabled,false);assert.match(elements.status.textContent,/URL 오류/);assert.equal(elements['web-url'].value,'javascript:alert(1)');
  assert.equal(elements['web-form'].attrs['aria-busy'],'false');await elements['web-form'].onsubmit({preventDefault(){}});assert.equal(calls.length,2);
 });
+
+test('web toolbar reflects pin state and closes the session instead of hiding it',async()=>{
+ const elements=Object.fromEntries(['pin','close'].map(id=>[id,{attrs:{},handlers:{},title:'',setAttribute(k,v){this.attrs[k]=v;},addEventListener(name,fn){this.handlers[name]=fn;}}]));
+ const calls=[];let pinned=true;
+ const context={document:{getElementById:id=>elements[id]},window:{__TAURI__:{core:{invoke:async name=>{
+  calls.push(name);
+  if(name==='web_toolbar_info')return {always_on_top:true};
+  if(name==='web_toggle_pin')return pinned=!pinned;
+  if(name==='web_close')return {closed:true};
+ }}}}};
+ vm.runInNewContext(readFileSync(new URL('../ui/web-toolbar.js',import.meta.url),'utf8'),context);
+ await Promise.resolve();
+ assert.equal(elements.pin.attrs['aria-pressed'],'true');
+ await elements.pin.handlers.click();
+ assert.equal(elements.pin.attrs['aria-pressed'],'false');
+ await elements.close.handlers.click();
+ assert.deepEqual(calls,['web_toolbar_info','web_toggle_pin','web_close']);
+});

@@ -6,75 +6,78 @@
 <rect x="24" y="76" width="420" height="640" rx="4" fill="#f8f8f8" stroke="#2d2d2d"/>
 <text x="34" y="96" font-size="11" fill="#2d2d2d" font-weight="400">project</text>
 <text x="330" y="96" font-size="11" fill="#2d2d2d" font-weight="400">aA　▣　♟　×</text>
-<text x="48" y="138" font-size="13" fill="#2d2d2d" font-weight="600">작업 위치</text>
-<text x="58" y="173" font-size="13" fill="#2d2d2d" font-weight="400">📂　폴더 열기…</text>
-<rect x="48" y="188" width="372" height="32" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
-<text x="58" y="209" font-size="13" fill="#2d2d2d" font-weight="400">project</text>
-<text x="304" y="209" font-size="11" fill="#2d2d2d" font-weight="400">/Users/demo</text>
-<text x="58" y="244" font-size="11" fill="#2d2d2d" font-weight="400">홈 폴더에서 시작합니다.</text>
-<text x="48" y="287" font-size="13" fill="#2d2d2d" font-weight="600">추천 작업</text>
-<rect x="48" y="302" width="372" height="32" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
-<text x="58" y="323" font-size="13" fill="#2d2d2d" font-weight="400">Claude Code</text>
-<text x="58" y="355" font-size="13" fill="#2d2d2d" font-weight="400">Codex</text>
-<text x="58" y="387" font-size="13" fill="#2d2d2d" font-weight="400">git log</text>
-<text x="58" y="419" font-size="13" fill="#2d2d2d" font-weight="400">htop</text>
-<text x="58" y="451" font-size="13" fill="#2d2d2d" font-weight="400">셸</text>
-<rect x="48" y="482" width="72" height="32" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
-<text x="70" y="503" font-size="13" fill="#2d2d2d" font-weight="400">실행</text>
-<rect x="48" y="526" width="372" height="64" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
-<text x="58" y="549" font-size="11" fill="#2d2d2d" font-weight="400">cd -- &#x27;/Users/demo/project&#x27; &amp;&amp;</text>
-<text x="58" y="570" font-size="11" fill="#2d2d2d" font-weight="400">&#x27;/usr/local/bin/claude&#x27;</text>
-<text x="48" y="620" font-size="11" fill="#2d2d2d" font-weight="400">▸ 창 제목 변경</text>
-<text x="48" y="662" font-size="11" fill="#2d2d2d" font-weight="400">선택: 안쪽 테두리 · 초점: 바깥 테두리</text>
+<text x="48" y="182" font-size="13" fill="#2d2d2d" font-weight="600">작업 위치</text>
+<text x="58" y="217" font-size="13" fill="#2d2d2d" font-weight="400">📂　폴더 열기…</text>
+<rect x="48" y="232" width="372" height="32" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
+<text x="58" y="253" font-size="13" fill="#2d2d2d" font-weight="400">project</text>
+<text x="304" y="253" font-size="11" fill="#2d2d2d" font-weight="400">/Users/demo</text>
+<text x="58" y="288" font-size="11" fill="#2d2d2d" font-weight="400">홈 폴더에서 시작합니다.</text>
+<text x="48" y="331" font-size="13" fill="#2d2d2d" font-weight="600">추천 작업</text>
+<rect x="48" y="346" width="372" height="32" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
+<text x="58" y="367" font-size="13" fill="#2d2d2d" font-weight="400">Claude Code</text>
+<text x="58" y="399" font-size="13" fill="#2d2d2d" font-weight="400">Codex</text>
+<text x="58" y="431" font-size="13" fill="#2d2d2d" font-weight="400">git log</text>
+<text x="58" y="463" font-size="13" fill="#2d2d2d" font-weight="400">htop</text>
+<text x="58" y="495" font-size="13" fill="#2d2d2d" font-weight="400">셸</text>
+<rect x="48" y="526" width="72" height="32" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
+<text x="70" y="547" font-size="13" fill="#2d2d2d" font-weight="400">실행</text>
+<rect x="48" y="570" width="372" height="64" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
+<text x="58" y="593" font-size="11" fill="#2d2d2d" font-weight="400">cd -- &#x27;/Users/demo/project&#x27; &amp;&amp;</text>
+<text x="58" y="614" font-size="11" fill="#2d2d2d" font-weight="400">&#x27;/usr/local/bin/claude&#x27;</text>
+<text x="48" y="664" font-size="11" fill="#2d2d2d" font-weight="400">▸ 창 제목 변경</text>
+<text x="48" y="706" font-size="11" fill="#2d2d2d" font-weight="400">선택: 안쪽 테두리 · 초점: 바깥 테두리</text>
 <text x="24" y="745" font-size="12" fill="#20252e">본문·보조 문구·컨트롤: 같은 테마 전경색</text>
 <text x="476" y="60" font-size="14" font-weight="600" fill="#20252e">회색</text>
 <rect x="476" y="76" width="420" height="640" rx="4" fill="#dfe2dd" stroke="#2c2f7e"/>
 <text x="486" y="96" font-size="11" fill="#2c2f7e" font-weight="400">project</text>
 <text x="782" y="96" font-size="11" fill="#2c2f7e" font-weight="400">aA　▣　♟　×</text>
-<text x="500" y="138" font-size="13" fill="#2c2f7e" font-weight="600">작업 위치</text>
-<text x="510" y="173" font-size="13" fill="#2c2f7e" font-weight="400">📂　폴더 열기…</text>
-<rect x="500" y="188" width="372" height="32" rx="4" fill="#cdd0d3" stroke="#2c2f7e"/>
-<text x="510" y="209" font-size="13" fill="#2c2f7e" font-weight="400">project</text>
-<text x="756" y="209" font-size="11" fill="#2c2f7e" font-weight="400">/Users/demo</text>
-<text x="510" y="244" font-size="11" fill="#2c2f7e" font-weight="400">홈 폴더에서 시작합니다.</text>
-<text x="500" y="287" font-size="13" fill="#2c2f7e" font-weight="600">추천 작업</text>
-<rect x="500" y="302" width="372" height="32" rx="4" fill="#cdd0d3" stroke="#2c2f7e"/>
-<text x="510" y="323" font-size="13" fill="#2c2f7e" font-weight="400">Claude Code</text>
-<text x="510" y="355" font-size="13" fill="#2c2f7e" font-weight="400">Codex</text>
-<text x="510" y="387" font-size="13" fill="#2c2f7e" font-weight="400">git log</text>
-<text x="510" y="419" font-size="13" fill="#2c2f7e" font-weight="400">htop</text>
-<text x="510" y="451" font-size="13" fill="#2c2f7e" font-weight="400">셸</text>
-<rect x="500" y="482" width="72" height="32" rx="4" fill="#cdd0d3" stroke="#2c2f7e"/>
-<text x="522" y="503" font-size="13" fill="#2c2f7e" font-weight="400">실행</text>
-<rect x="500" y="526" width="372" height="64" rx="4" fill="#cdd0d3" stroke="#2c2f7e"/>
-<text x="510" y="549" font-size="11" fill="#2c2f7e" font-weight="400">cd -- &#x27;/Users/demo/project&#x27; &amp;&amp;</text>
-<text x="510" y="570" font-size="11" fill="#2c2f7e" font-weight="400">&#x27;/usr/local/bin/claude&#x27;</text>
-<text x="500" y="620" font-size="11" fill="#2c2f7e" font-weight="400">▸ 창 제목 변경</text>
-<text x="500" y="662" font-size="11" fill="#2c2f7e" font-weight="400">선택: 안쪽 테두리 · 초점: 바깥 테두리</text>
+<text x="500" y="182" font-size="13" fill="#2c2f7e" font-weight="600">작업 위치</text>
+<text x="510" y="217" font-size="13" fill="#2c2f7e" font-weight="400">📂　폴더 열기…</text>
+<rect x="500" y="232" width="372" height="32" rx="4" fill="#cdd0d3" stroke="#2c2f7e"/>
+<text x="510" y="253" font-size="13" fill="#2c2f7e" font-weight="400">project</text>
+<text x="756" y="253" font-size="11" fill="#2c2f7e" font-weight="400">/Users/demo</text>
+<text x="510" y="288" font-size="11" fill="#2c2f7e" font-weight="400">홈 폴더에서 시작합니다.</text>
+<text x="500" y="331" font-size="13" fill="#2c2f7e" font-weight="600">추천 작업</text>
+<rect x="500" y="346" width="372" height="32" rx="4" fill="#cdd0d3" stroke="#2c2f7e"/>
+<text x="510" y="367" font-size="13" fill="#2c2f7e" font-weight="400">Claude Code</text>
+<text x="510" y="399" font-size="13" fill="#2c2f7e" font-weight="400">Codex</text>
+<text x="510" y="431" font-size="13" fill="#2c2f7e" font-weight="400">git log</text>
+<text x="510" y="463" font-size="13" fill="#2c2f7e" font-weight="400">htop</text>
+<text x="510" y="495" font-size="13" fill="#2c2f7e" font-weight="400">셸</text>
+<rect x="500" y="526" width="72" height="32" rx="4" fill="#cdd0d3" stroke="#2c2f7e"/>
+<text x="522" y="547" font-size="13" fill="#2c2f7e" font-weight="400">실행</text>
+<rect x="500" y="570" width="372" height="64" rx="4" fill="#cdd0d3" stroke="#2c2f7e"/>
+<text x="510" y="593" font-size="11" fill="#2c2f7e" font-weight="400">cd -- &#x27;/Users/demo/project&#x27; &amp;&amp;</text>
+<text x="510" y="614" font-size="11" fill="#2c2f7e" font-weight="400">&#x27;/usr/local/bin/claude&#x27;</text>
+<text x="500" y="664" font-size="11" fill="#2c2f7e" font-weight="400">▸ 창 제목 변경</text>
+<text x="500" y="706" font-size="11" fill="#2c2f7e" font-weight="400">선택: 안쪽 테두리 · 초점: 바깥 테두리</text>
 <text x="476" y="745" font-size="12" fill="#20252e">본문·보조 문구·컨트롤: 같은 테마 전경색</text>
 <text x="928" y="60" font-size="14" font-weight="600" fill="#20252e">검정</text>
 <rect x="928" y="76" width="420" height="640" rx="4" fill="#262627" stroke="#dfe2dd"/>
 <text x="938" y="96" font-size="11" fill="#dfe2dd" font-weight="400">project</text>
 <text x="1234" y="96" font-size="11" fill="#dfe2dd" font-weight="400">aA　▣　♟　×</text>
-<text x="952" y="138" font-size="13" fill="#dfe2dd" font-weight="600">작업 위치</text>
-<text x="962" y="173" font-size="13" fill="#dfe2dd" font-weight="400">📂　폴더 열기…</text>
-<rect x="952" y="188" width="372" height="32" rx="4" fill="#393938" stroke="#dfe2dd"/>
-<text x="962" y="209" font-size="13" fill="#dfe2dd" font-weight="400">project</text>
-<text x="1208" y="209" font-size="11" fill="#dfe2dd" font-weight="400">/Users/demo</text>
-<text x="962" y="244" font-size="11" fill="#dfe2dd" font-weight="400">홈 폴더에서 시작합니다.</text>
-<text x="952" y="287" font-size="13" fill="#dfe2dd" font-weight="600">추천 작업</text>
-<rect x="952" y="302" width="372" height="32" rx="4" fill="#393938" stroke="#dfe2dd"/>
-<text x="962" y="323" font-size="13" fill="#dfe2dd" font-weight="400">Claude Code</text>
-<text x="962" y="355" font-size="13" fill="#dfe2dd" font-weight="400">Codex</text>
-<text x="962" y="387" font-size="13" fill="#dfe2dd" font-weight="400">git log</text>
-<text x="962" y="419" font-size="13" fill="#dfe2dd" font-weight="400">htop</text>
-<text x="962" y="451" font-size="13" fill="#dfe2dd" font-weight="400">셸</text>
-<rect x="952" y="482" width="72" height="32" rx="4" fill="#393938" stroke="#dfe2dd"/>
-<text x="974" y="503" font-size="13" fill="#dfe2dd" font-weight="400">실행</text>
-<rect x="952" y="526" width="372" height="64" rx="4" fill="#393938" stroke="#dfe2dd"/>
-<text x="962" y="549" font-size="11" fill="#dfe2dd" font-weight="400">cd -- &#x27;/Users/demo/project&#x27; &amp;&amp;</text>
-<text x="962" y="570" font-size="11" fill="#dfe2dd" font-weight="400">&#x27;/usr/local/bin/claude&#x27;</text>
-<text x="952" y="620" font-size="11" fill="#dfe2dd" font-weight="400">▸ 창 제목 변경</text>
-<text x="952" y="662" font-size="11" fill="#dfe2dd" font-weight="400">선택: 안쪽 테두리 · 초점: 바깥 테두리</text>
+<text x="952" y="182" font-size="13" fill="#dfe2dd" font-weight="600">작업 위치</text>
+<text x="962" y="217" font-size="13" fill="#dfe2dd" font-weight="400">📂　폴더 열기…</text>
+<rect x="952" y="232" width="372" height="32" rx="4" fill="#393938" stroke="#dfe2dd"/>
+<text x="962" y="253" font-size="13" fill="#dfe2dd" font-weight="400">project</text>
+<text x="1208" y="253" font-size="11" fill="#dfe2dd" font-weight="400">/Users/demo</text>
+<text x="962" y="288" font-size="11" fill="#dfe2dd" font-weight="400">홈 폴더에서 시작합니다.</text>
+<text x="952" y="331" font-size="13" fill="#dfe2dd" font-weight="600">추천 작업</text>
+<rect x="952" y="346" width="372" height="32" rx="4" fill="#393938" stroke="#dfe2dd"/>
+<text x="962" y="367" font-size="13" fill="#dfe2dd" font-weight="400">Claude Code</text>
+<text x="962" y="399" font-size="13" fill="#dfe2dd" font-weight="400">Codex</text>
+<text x="962" y="431" font-size="13" fill="#dfe2dd" font-weight="400">git log</text>
+<text x="962" y="463" font-size="13" fill="#dfe2dd" font-weight="400">htop</text>
+<text x="962" y="495" font-size="13" fill="#dfe2dd" font-weight="400">셸</text>
+<rect x="952" y="526" width="72" height="32" rx="4" fill="#393938" stroke="#dfe2dd"/>
+<text x="974" y="547" font-size="13" fill="#dfe2dd" font-weight="400">실행</text>
+<rect x="952" y="570" width="372" height="64" rx="4" fill="#393938" stroke="#dfe2dd"/>
+<text x="962" y="593" font-size="11" fill="#dfe2dd" font-weight="400">cd -- &#x27;/Users/demo/project&#x27; &amp;&amp;</text>
+<text x="962" y="614" font-size="11" fill="#dfe2dd" font-weight="400">&#x27;/usr/local/bin/claude&#x27;</text>
+<text x="952" y="664" font-size="11" fill="#dfe2dd" font-weight="400">▸ 창 제목 변경</text>
+<text x="952" y="706" font-size="11" fill="#dfe2dd" font-weight="400">선택: 안쪽 테두리 · 초점: 바깥 테두리</text>
 <text x="928" y="745" font-size="12" fill="#20252e">본문·보조 문구·컨트롤: 같은 테마 전경색</text>
-<text x="24" y="774" font-size="12" fill="#20252e">컬러: 기본 터미널 색 #20252e · 시스템: 주간 회색 / 야간 검정 · 실행 후 PTY 팔레트 유지 · 작은 창은 스크롤</text></g></svg>
+<text x="24" y="774" font-size="12" fill="#20252e">컬러: 기본 터미널 색 #20252e · 시스템: 주간 회색 / 야간 검정 · 실행 후 PTY 팔레트 유지 · 작은 창은 스크롤</text><rect x="48" y="108" width="372" height="38" rx="4" fill="#ffffff" stroke="#2d2d2d"/><text x="58" y="124" font-size="10" fill="#2d2d2d">이전 세션 종료 · 마지막 선택: Codex</text><text x="58" y="139" font-size="10" fill="#2d2d2d">자동 실행되지 않았습니다.</text>
+<rect x="500" y="108" width="372" height="38" rx="4" fill="#cdd0d3" stroke="#2c2f7e"/><text x="510" y="124" font-size="10" fill="#2c2f7e">이전 세션 종료 · 마지막 선택: Codex</text><text x="510" y="139" font-size="10" fill="#2c2f7e">자동 실행되지 않았습니다.</text>
+<rect x="952" y="108" width="372" height="38" rx="4" fill="#393938" stroke="#dfe2dd"/><text x="962" y="124" font-size="10" fill="#dfe2dd">이전 세션 종료 · 마지막 선택: Codex</text><text x="962" y="139" font-size="10" fill="#dfe2dd">자동 실행되지 않았습니다.</text>
+</g></svg>

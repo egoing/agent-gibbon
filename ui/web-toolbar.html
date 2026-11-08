@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>웹 도구</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="web-toolbar.css">
+  <script src="updater-guard.js"></script>
+</head>
+<body>
+  <div id="toolbar" role="toolbar" aria-label="웹 창 도구">
+    <button id="pin" aria-label="상단 고정" aria-pressed="true" title="상단 고정">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 7 4 4v2H5v-2l4-4-1-7Z"/><path d="M12 16v6"/></svg>
+    </button>
+    <button id="close" aria-label="웹 세션 닫기" title="웹 세션 닫기">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <script src="web-toolbar.js"></script>
+</body>
+</html>
