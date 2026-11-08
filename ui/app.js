@@ -28,6 +28,7 @@ let wasReading = false;
 let editing = false;
 let initialEditHandled = false;
 let saving = false;
+window.gibbonUpdateActivity = () => ({ editing, saving, exporting });
 window.gibbonUpdateBusy = () => editing || saving || exporting;
 let exporting = false;
 let editRevision;

@@ -52,7 +52,14 @@ pub fn init() -> Result<(), String> {
         Err(std::env::VarError::NotPresent) => Ok(None),
         Err(_) => Err(format!("{key}는 UTF-8이어야 합니다")),
     };
-    let value = Instance::parse(read("FLOATNOTE_INSTANCE")?, read("FLOATNOTE_DEV_NAME")?)?;
+    let value = if cfg!(feature = "verification-updater") {
+        Instance::parse(
+            Some("dev-001020010200102001020010".into()),
+            Some("Updater verification".into()),
+        )?
+    } else {
+        Instance::parse(read("FLOATNOTE_INSTANCE")?, read("FLOATNOTE_DEV_NAME")?)?
+    };
     INSTANCE
         .set(value)
         .map_err(|_| "인스턴스가 이미 초기화되었습니다".into())

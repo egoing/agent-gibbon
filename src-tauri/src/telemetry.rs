@@ -3,6 +3,7 @@ mod journal;
 mod privacy;
 mod transport;
 mod watchdog;
+pub(crate) use watchdog::kind as window_kind;
 
 use sentry::{protocol as p, TransactionOrSpan};
 use serde::Deserialize;
@@ -54,12 +55,21 @@ const MESSAGES: &[&str] = &[
     "WebView unhandled promise rejection",
     "Agent Gibbon internal error",
     "Agent Gibbon diagnostic probe",
+    "Updater check failed",
+    "Updater acknowledgement timeout",
+    "Updater repeated pending request",
+    "Updater installation failed",
     "Native UI stalled",
     "Native UI recovered",
     "WebView stalled",
     "WebView recovered",
 ];
 pub const OPERATIONS_ALLOWED: &[&str] = &[
+    "updater.check",
+    "updater.download",
+    "updater.verified",
+    "updater.prepare",
+    "updater.install",
     "app.startup",
     "app.ready",
     "app.shutdown",

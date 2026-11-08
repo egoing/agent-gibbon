@@ -185,7 +185,19 @@ pub fn save(app: &AppHandle) -> Result<(), String> {
 }
 
 fn apply(window: &WebviewWindow, saved: &WindowState) -> Result<(), String> {
+    #[cfg(windows)]
+    {
+        // Let Windows switch to the saved monitor's DPI before sizing.
+        window
+            .set_position(tauri::PhysicalPosition::new(saved.x, saved.y))
+            .map_err(|e| e.to_string())?;
+        crate::windows_window::restore_client_size(
+            window,
+            tauri::PhysicalSize::new(saved.width, saved.height),
+        )?;
+    }
     // AppKit resizing can shift the top-left origin. Restore size before position.
+    #[cfg(not(windows))]
     window
         .set_size(tauri::PhysicalSize::new(saved.width, saved.height))
         .map_err(|e| e.to_string())?;
