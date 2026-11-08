@@ -14,10 +14,34 @@ const ENDPOINT: &str = env!("GIBBON_VERIFICATION_UPDATE_URL");
 const ENDPOINT: &str =
     "https://github.com/egoing/agent-gibbon/releases/latest/download/latest.json";
 const VERIFICATION: bool = cfg!(feature = "verification-updater");
-const FAST: bool = VERIFICATION && option_env!("GIBBON_VERIFICATION_STANDARD_TIMING").is_none();
-const IDLE_SECONDS: f64 = if FAST { 30. } else { 300. };
-const CHECK_SECONDS: u64 = if FAST { 60 } else { 21600 };
-const RETRY_SECONDS: u64 = if FAST { 5 } else { 15 };
+#[derive(Clone, Copy)]
+struct TimingProfile {
+    idle_seconds: f64,
+    check_seconds: u64,
+    retry_seconds: u64,
+}
+const fn timing_profile(verification: bool, standard_timing: bool) -> TimingProfile {
+    if verification && !standard_timing {
+        TimingProfile {
+            idle_seconds: 30.,
+            check_seconds: 60,
+            retry_seconds: 5,
+        }
+    } else {
+        TimingProfile {
+            idle_seconds: 300.,
+            check_seconds: 900,
+            retry_seconds: 15,
+        }
+    }
+}
+const TIMING: TimingProfile = timing_profile(
+    VERIFICATION,
+    option_env!("GIBBON_VERIFICATION_STANDARD_TIMING").is_some(),
+);
+const IDLE_SECONDS: f64 = TIMING.idle_seconds;
+const CHECK_SECONDS: u64 = TIMING.check_seconds;
+const RETRY_SECONDS: u64 = TIMING.retry_seconds;
 const NOTICE_LABEL: &str = "updater-notice";
 const PUBLIC_KEY: &str = match option_env!("TAURI_UPDATER_PUBLIC_KEY") {
     Some(key) => key,
@@ -1076,6 +1100,24 @@ mod tests {
     use base64::Engine;
     use serde_json::json;
     use tauri::test::{mock_builder, mock_context, noop_assets};
+
+    #[test]
+    fn production_check_interval_is_fifteen_minutes_and_fast_verification_keeps_30_second_idle() {
+        let production = timing_profile(false, false);
+        assert_eq!(production.check_seconds, 15 * 60);
+        assert_eq!(production.idle_seconds, 300.);
+        assert_eq!(production.retry_seconds, 15);
+
+        let verification = timing_profile(true, false);
+        assert_eq!(verification.check_seconds, 60);
+        assert_eq!(verification.idle_seconds, 30.);
+        assert_eq!(verification.retry_seconds, 5);
+
+        let standard_verification = timing_profile(true, true);
+        assert_eq!(standard_verification.check_seconds, 15 * 60);
+        assert_eq!(standard_verification.idle_seconds, 300.);
+        assert_eq!(standard_verification.retry_seconds, 15);
+    }
     fn app() -> tauri::App<tauri::test::MockRuntime> {
         let mut context = mock_context(noop_assets());
         context.config_mut().plugins.0.insert(
