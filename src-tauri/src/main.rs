@@ -761,13 +761,26 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             }
             let instance = instance::current().id.as_deref();
             let data_dir = app.path().app_data_dir()?;
-            let root = if instance.is_some() {
+            let default_root = if instance.is_some() {
                 data_dir.clone()
             } else {
                 app.path().document_dir()?
             };
+            let verification_root = if cfg!(feature = "verification-updater") {
+                std::env::var_os("AGENT_GIBBON_VERIFICATION_STORE_ROOT")
+                    .map(std::path::PathBuf::from)
+            } else {
+                None
+            };
+            let (root, isolated_verification_store) = storage::root_for_run(
+                default_root,
+                cfg!(feature = "verification-updater"),
+                verification_root,
+            )?;
             let store = storage::Store::new(root, instance);
-            store.migrate_from(&data_dir.join("notes").join(instance.unwrap_or("default")))?;
+            if !isolated_verification_store {
+                store.migrate_from(&data_dir.join("notes").join(instance.unwrap_or("default")))?;
+            }
             let restored = store.load()?;
             app.state::<feedback::Feedbacks>().restore(&restored)?;
             let ids: Vec<_> = restored

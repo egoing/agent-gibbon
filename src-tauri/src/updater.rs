@@ -861,6 +861,15 @@ fn record_handshake(app: &tauri::AppHandle, epoch: u64, version: &str, outcome: 
         }
     };
 }
+fn reserve_install(status: &mut Status) -> Option<String> {
+    if status.phase != "ready" {
+        return None;
+    }
+    let version = status.version.clone()?;
+    status.phase = "preparing".into();
+    status.message = "작업 상태를 확인하고 있습니다".into();
+    Some(version)
+}
 fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
     if !enabled() {
         return Ok(());
@@ -871,14 +880,9 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
     let install_version = {
         let state = app.state::<Updates>();
         let mut s = state.status.lock().map_err(err)?;
-        if s.phase != "ready" {
-            return Ok(());
-        }
-        let Some(version) = s.version.clone() else {
+        let Some(version) = reserve_install(&mut s) else {
             return Ok(());
         };
-        s.phase = "preparing".into();
-        s.message = "작업 상태를 확인하고 있습니다".into();
         version
     };
     let mut snapshot_written = false;
@@ -1075,6 +1079,7 @@ mod tests {
     use super::*;
     use base64::Engine;
     use serde_json::json;
+    use std::sync::{Barrier, Mutex};
     use tauri::test::{mock_builder, mock_context, noop_assets};
     fn app() -> tauri::App<tauri::test::MockRuntime> {
         let mut context = mock_context(noop_assets());
@@ -1280,6 +1285,37 @@ mod tests {
         assert_eq!(current.total, Some(123));
         check_failed(&mut current, None);
         assert_eq!(current.phase, "error");
+    }
+
+    #[test]
+    fn simultaneous_automatic_and_manual_requests_reserve_only_one_install() {
+        let status = Arc::new(Mutex::new(Status {
+            phase: "ready".into(),
+            version: Some("0.2.12".into()),
+            ..Status::default()
+        }));
+        let barrier = Arc::new(Barrier::new(3));
+        let mut requests = Vec::new();
+        for _ in 0..2 {
+            let status = status.clone();
+            let barrier = barrier.clone();
+            requests.push(std::thread::spawn(move || {
+                barrier.wait();
+                reserve_install(&mut status.lock().unwrap())
+            }));
+        }
+        barrier.wait();
+        let reservations: Vec<_> = requests
+            .into_iter()
+            .map(|request| request.join().unwrap())
+            .collect();
+        assert_eq!(
+            reservations.iter().filter(|value| value.is_some()).count(),
+            1
+        );
+        let state = status.lock().unwrap();
+        assert_eq!(state.phase, "preparing");
+        assert_eq!(state.version.as_deref(), Some("0.2.12"));
     }
 
     #[test]

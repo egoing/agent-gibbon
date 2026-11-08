@@ -39,7 +39,7 @@ function canonicalInstallerNames(version) {
 
 // Minisign's Ed25519 prehash format, also used by Tauri's Rust verifier.
 // Validate both the payload signature and its authenticated trusted comment.
-function verifySignature(encodedSignature, encodedPublicKey, payload, version, filename) {
+export function verifyUpdaterSignature(encodedSignature, encodedPublicKey, payload, version, filename) {
   const decode = value => {
     const encoded = value.trim();
     const bytes = Buffer.from(encoded, 'base64');
@@ -102,7 +102,7 @@ export function prepareAssets(directory, version, options = {}) {
     const expectedKey = options.expectedPublicKey ?? (process.env.RELEASE_TAG ? process.env.TAURI_UPDATER_PUBLIC_KEY : undefined);
     if ((process.env.RELEASE_TAG && !expectedKey) || (expectedKey && publicKey !== expectedKey.trim())) throw new Error("Updater signature public key does not match release trust root");
     const signature = readFileSync(validateFile(directory, platform.signature(version)), 'utf8').trim();
-    verifySignature(signature, publicKey, payload, version, platform.archive(version));
+    verifyUpdaterSignature(signature, publicKey, payload, version, platform.archive(version));
     signatures.set(platform.target, signature);
   }
 
