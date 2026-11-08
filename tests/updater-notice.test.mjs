@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
 const source = readFileSync(new URL('../ui/updater-notice.js', import.meta.url), 'utf8');
 const html = readFileSync(new URL('../ui/updater-notice.html', import.meta.url), 'utf8');
 const capability = JSON.parse(readFileSync(new URL('../src-tauri/capabilities/updater-events.json', import.meta.url), 'utf8'));
+const updater = readFileSync(new URL('../src-tauri/src/updater.rs', import.meta.url), 'utf8');
 const tick = () => new Promise(setImmediate);
 
 function setup(status) {
@@ -39,7 +40,9 @@ test('notice page is guarded and exposes only notice-scoped update controls', ()
   assert.match(html, /updater-guard\.js/);
   assert.match(html, /updater-notice\.js/);
   assert.doesNotMatch(source, /invoke\(['"](?:save_note|capture_screen|open_note|terminal_start)['"]/);
-  assert.deepEqual(capability.windows, ['updater-notice']);
+  assert.deepEqual(capability.windows, ['updater-notice', 'webview-*', 'webtoolbar-*']);
+  assert.equal(capability.windows.includes('webpage-*'), false);
+  assert.match(updater, /filter\(\|label\| !label\.starts_with\("webpage-"\)\)/);
   assert.deepEqual(capability.permissions, ['core:event:allow-listen', 'core:event:allow-unlisten']);
 });
 

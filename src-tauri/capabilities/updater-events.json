@@ -1,6 +1,6 @@
 {
   "identifier": "updater-events",
   "description": "Receive only the local updater install handshake in the update notice window.",
-  "windows": ["updater-notice"],
+  "windows": ["updater-notice", "webview-*", "webtoolbar-*"],
   "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
 }

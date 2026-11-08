@@ -1,1 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="560" viewBox="0 0 1060 560"><rect width="1060" height="560" fill="#e6e8eb"/><g font-family="Arial, Apple SD Gothic Neo, sans-serif"><text x="24" y="30" font-size="16" fill="#20252e">웹 주소 입력 → 실행 · Ctrl+Shift+4 영역 선택</text><rect x="24" y="52" width="650" height="400" rx="4" fill="#20252e" stroke="#667080"/><rect x="24" y="52" width="650" height="30" rx="4" fill="#303844"/><text x="36" y="72" fill="#f0f0f0" font-size="12">● ● ●　　　 Agent Gibbon · 웹</text><text x="109" y="196" fill="#f0f0f0" font-size="13" font-weight="600">웹 주소</text><rect x="109" y="209" width="480" height="36" rx="4" fill="#303844" stroke="#a8c5ff" stroke-width="2"/><text x="120" y="232" fill="#f0f0f0" font-size="13">https://example.com</text><text x="109" y="269" fill="#bac3cf" font-size="11">HTTP 또는 HTTPS 주소를 입력하세요.</text><rect x="109" y="290" width="72" height="32" rx="4" fill="#303844" stroke="#667080"/><text x="132" y="311" fill="#f0f0f0" font-size="13">실행</text><text x="710" y="70" fill="#20252e" font-size="14">작은 창 · 위에서부터 스크롤</text><rect x="710" y="90" width="320" height="200" rx="4" fill="#20252e" stroke="#667080"/><rect x="710" y="90" width="320" height="30" rx="4" fill="#303844"/><text x="723" y="110" fill="#f0f0f0" font-size="12">● ● ●　 웹</text><text x="726" y="150" fill="#f0f0f0" font-size="13" font-weight="600">웹 주소</text><rect x="726" y="163" width="288" height="32" rx="4" fill="#303844" stroke="#667080"/><text x="736" y="184" fill="#bac3cf" font-size="13">https://example.com</text><text x="726" y="216" fill="#bac3cf" font-size="11">HTTP 또는 HTTPS 주소를 입력하세요.</text><rect x="726" y="232" width="72" height="32" rx="4" fill="#303844" stroke="#667080"/><text x="749" y="253" fill="#f0f0f0" font-size="13">실행</text><text x="710" y="332" fill="#20252e" font-size="13">실행 후 별도 웹 콘텐츠 창으로 전환</text><text x="710" y="360" fill="#20252e" font-size="13">닫기와 CLI close는 페이지를 숨김</text><text x="710" y="388" fill="#20252e" font-size="13">CLI 복원은 현재 페이지를 유지</text><text x="24" y="496" fill="#20252e" font-size="13">기본 여백 24px · 좁거나 낮은 창 16px · 콘텐츠 최대 폭 480px · 최소 크기 240×160px</text><text x="24" y="530" fill="#20252e" font-size="12">설명용 시안 · 실제 앱 캡처 및 플랫폼별 네이티브 제목줄과 구분</text></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="660" viewBox="0 0 1060 660">
+  <rect width="1060" height="660" fill="#e6e8eb"/>
+  <g font-family="Arial, Apple SD Gothic Neo, sans-serif">
+    <text x="24" y="30" font-size="16" fill="#20252e">웹 주소 입력 → 실행 · Ctrl+Shift+4 영역 선택</text>
+    <rect x="24" y="52" width="650" height="400" rx="4" fill="#20252e" stroke="#667080"/>
+    <rect x="24" y="52" width="650" height="30" rx="4" fill="#303844"/>
+    <text x="36" y="72" fill="#f0f0f0" font-size="12">● ● ●　　　 Agent Gibbon · 웹</text>
+    <text x="109" y="196" fill="#f0f0f0" font-size="13" font-weight="600">웹 주소</text>
+    <rect x="109" y="209" width="480" height="36" rx="4" fill="#303844" stroke="#a8c5ff" stroke-width="2"/>
+    <text x="120" y="232" fill="#f0f0f0" font-size="13">https://example.com</text>
+    <text x="109" y="269" fill="#bac3cf" font-size="11">HTTP 또는 HTTPS 주소를 입력하세요.</text>
+    <rect x="109" y="290" width="72" height="32" rx="4" fill="#303844" stroke="#667080"/>
+    <text x="132" y="311" fill="#f0f0f0" font-size="13">실행</text>
+
+    <text x="710" y="70" font-size="14" fill="#20252e">작은 Welcome · 위에서부터 스크롤</text>
+    <rect x="710" y="90" width="320" height="200" rx="4" fill="#20252e" stroke="#667080"/>
+    <rect x="710" y="90" width="320" height="30" rx="4" fill="#303844"/>
+    <text x="723" y="110" fill="#f0f0f0" font-size="12">● ● ●　 웹</text>
+    <text x="726" y="150" fill="#f0f0f0" font-size="13" font-weight="600">웹 주소</text>
+    <rect x="726" y="163" width="288" height="32" rx="4" fill="#303844" stroke="#667080"/>
+    <text x="736" y="184" fill="#bac3cf" font-size="13">https://example.com</text>
+    <text x="726" y="216" fill="#bac3cf" font-size="11">HTTP 또는 HTTPS 주소를 입력하세요.</text>
+    <rect x="726" y="232" width="72" height="32" rx="4" fill="#303844" stroke="#667080"/>
+    <text x="749" y="253" fill="#f0f0f0" font-size="13">실행</text>
+
+    <text x="710" y="326" font-size="14" fill="#20252e">외부 웹 페이지 · 같은 핀/닫기 도구</text>
+    <rect x="710" y="342" width="320" height="205" rx="4" fill="#fff" stroke="#667080"/>
+    <rect x="710" y="342" width="320" height="28" rx="4" fill="#f1f3f5"/>
+    <text x="722" y="361" font-size="11" fill="#303844">example.com</text>
+    <rect x="976" y="342" width="54" height="27" rx="4" fill="#20252e" stroke="#667080"/>
+    <rect x="978" y="344" width="24" height="23" rx="3" fill="#303844"/>
+    <path d="M985 348h10l-1 7 3 4v2h-14v-2l3-4-1-7Zm5 13v4" fill="none" stroke="#f0f0f0" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="m1007 349 12 12m0-12-12 12" stroke="#f0f0f0" stroke-width="1.5"/>
+    <text x="730" y="405" font-size="18" font-weight="600" fill="#20252e">Example Domain</text>
+    <text x="730" y="435" font-size="12" fill="#404854">This domain is for use in illustrative examples.</text>
+    <text x="730" y="455" font-size="12" fill="#404854">It may be used in documentation without prior</text>
+    <text x="730" y="475" font-size="12" fill="#404854">coordination or asking for permission.</text>
+    <text x="710" y="576" font-size="12" fill="#20252e">핀은 페이지에 적용 · 닫기와 CLI close는 세션 종료</text>
+    <text x="24" y="610" font-size="13" fill="#20252e">Welcome: 여백 24px · 작은 창 16px · 콘텐츠 최대 폭 480px · 최소 크기 240×160px</text>
+    <text x="24" y="640" font-size="12" fill="#20252e">설명용 시안 · companion 도구 모음은 별도 로컬 창이며 원격 페이지 DOM은 수정하지 않음</text>
+  </g>
+</svg>

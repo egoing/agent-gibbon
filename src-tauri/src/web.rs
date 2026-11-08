@@ -16,6 +16,15 @@ pub struct Windows(Mutex<BTreeMap<String, Record>>);
 fn err(e: impl std::fmt::Display) -> String {
     e.to_string()
 }
+fn toolbar_label(id: &str) -> String {
+    format!("webtoolbar-{id}")
+}
+fn web_id(label: &str) -> Option<&str> {
+    label
+        .strip_prefix("webview-")
+        .or_else(|| label.strip_prefix("webpage-"))
+        .or_else(|| label.strip_prefix("webtoolbar-"))
+}
 pub fn validate_url(input: &str) -> Result<tauri::Url, String> {
     let invalid = || "URL은 자격증명 없는 HTTP(S) 웹 주소여야 합니다".to_string();
     if input.is_empty()
@@ -86,7 +95,95 @@ fn show(w: &WebviewWindow) -> Result<(), String> {
     w.show().map_err(err)?;
     #[cfg(any(target_os = "macos", windows))]
     crate::focus::restore(w);
+    if let Some(id) = web_id(w.label()) {
+        if let Some(toolbar) = w.app_handle().get_webview_window(&toolbar_label(id)) {
+            sync_toolbar(w, &toolbar)?;
+        }
+    }
     Ok(())
+}
+
+fn sync_toolbar(parent: &WebviewWindow, toolbar: &WebviewWindow) -> Result<(), String> {
+    if !parent.is_visible().map_err(err)? || parent.is_minimized().map_err(err)? {
+        if toolbar.is_visible().map_err(err)? {
+            toolbar.hide().map_err(err)?;
+        }
+        return Ok(());
+    }
+    let parent_position = parent.inner_position().map_err(err)?;
+    let parent_size = parent.inner_size().map_err(err)?;
+    let toolbar_size = toolbar.outer_size().map_err(err)?;
+    let position = tauri::PhysicalPosition::new(
+        parent_position.x + parent_size.width as i32 - toolbar_size.width as i32,
+        parent_position.y,
+    );
+    if toolbar.outer_position().map_err(err)? != position {
+        toolbar.set_position(position).map_err(err)?;
+    }
+    let pinned = parent.is_always_on_top().map_err(err)?;
+    if toolbar.is_always_on_top().map_err(err)? != pinned {
+        toolbar.set_always_on_top(pinned).map_err(err)?;
+    }
+    if !toolbar.is_visible().map_err(err)? {
+        #[cfg(target_os = "macos")]
+        {
+            let ptr = toolbar.ns_window().map_err(err)?;
+            // SAFETY: Tauri owns the live companion window.
+            unsafe {
+                (&*(ptr as *const objc2_app_kit::NSWindow)).orderFrontRegardless();
+            }
+            crate::focus::restore(toolbar);
+        }
+        #[cfg(windows)]
+        crate::focus::show_without_focus(toolbar)?;
+        #[cfg(not(any(target_os = "macos", windows)))]
+        toolbar.show().map_err(err)?;
+    }
+    Ok(())
+}
+
+fn ensure_toolbar(app: &tauri::AppHandle, id: &str, parent: &WebviewWindow) -> Result<(), String> {
+    let label = toolbar_label(id);
+    if let Some(toolbar) = app.get_webview_window(&label) {
+        return sync_toolbar(parent, &toolbar);
+    }
+    crate::focus::remember(app, &label);
+    let toolbar =
+        tauri::WebviewWindowBuilder::new(app, &label, WebviewUrl::App("web-toolbar.html".into()))
+            .title(format!("웹 도구 — {id}"))
+            .inner_size(54.0, 27.0)
+            .decorations(false)
+            .transparent(true)
+            .resizable(false)
+            .visible(false)
+            .focused(false)
+            .skip_taskbar(true)
+            .accept_first_mouse(true)
+            .minimizable(false)
+            .maximizable(false)
+            .shadow(false)
+            .parent(parent)
+            .map_err(err)?
+            .build()
+            .map_err(err)?;
+    sync_toolbar(parent, &toolbar)
+}
+
+fn destroy_toolbar(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+    if let Some(toolbar) = app.get_webview_window(&toolbar_label(id)) {
+        toolbar.destroy().map_err(err)?;
+    }
+    Ok(())
+}
+
+pub fn geometry(window: &WebviewWindow) {
+    if let Some(id) = web_id(window.label()) {
+        if let Some(toolbar) = window.app_handle().get_webview_window(&toolbar_label(id)) {
+            if let Err(error) = sync_toolbar(window, &toolbar) {
+                eprintln!("웹 도구 모음 배치 실패: {error}");
+            }
+        }
+    }
 }
 pub fn create(
     app: &tauri::AppHandle,
@@ -117,6 +214,7 @@ pub fn create(
                 .get_webview_window(&r.label)
                 .ok_or("웹 창을 찾을 수 없습니다")?;
             show(&w)?;
+            ensure_toolbar(app, &id, &w)?;
             return inspect(app, &id);
         }
     }
@@ -136,6 +234,7 @@ pub fn create(
             .unwrap()
             .url = url.map(str::to_owned);
         show(w)?;
+        ensure_toolbar(app, &id, w)?;
         return inspect(app, &id);
     }
     crate::focus::remember(app, &label);
@@ -197,10 +296,74 @@ pub fn create(
         },
     );
     show(&w)?;
-    if let Some(p) = previous {
-        p.destroy().map_err(err)?;
+    if previous.is_some() {
+        destroy_toolbar(app, &id)?;
+        if let Some(p) = previous {
+            p.destroy().map_err(err)?;
+        }
     }
+    ensure_toolbar(app, &id, &w)?;
     inspect(app, &id)
+}
+
+pub fn close(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
+    let r = record(app, id)?;
+    let window = app
+        .get_webview_window(&r.label)
+        .ok_or("웹 창을 찾을 수 없습니다")?;
+    crate::stash::release(&window)?;
+    destroy_toolbar(app, id)?;
+    window.destroy().map_err(err)?;
+    app.state::<Windows>().0.lock().map_err(err)?.remove(id);
+    crate::tray::refresh(app)?;
+    Ok(
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":"web","visible":false,"closed":true}),
+    )
+}
+
+pub fn close_window(app: &tauri::AppHandle, label: &str) -> Result<Value, String> {
+    let id = web_id(label).ok_or("웹 창을 찾을 수 없습니다")?;
+    close(app, id)
+}
+
+#[tauri::command]
+pub fn web_toolbar_info(window: WebviewWindow) -> Result<Value, String> {
+    let id = window
+        .label()
+        .strip_prefix("webtoolbar-")
+        .ok_or("웹 도구 창이 아닙니다")?;
+    let record = record(window.app_handle(), id)?;
+    let owner = window
+        .app_handle()
+        .get_webview_window(&record.label)
+        .ok_or("웹 창을 찾을 수 없습니다")?;
+    Ok(json!({"id":id,"always_on_top":owner.is_always_on_top().map_err(err)?}))
+}
+
+#[tauri::command]
+pub fn web_toggle_pin(window: WebviewWindow) -> Result<bool, String> {
+    let id = window
+        .label()
+        .strip_prefix("webtoolbar-")
+        .ok_or("웹 도구 창이 아닙니다")?;
+    let record = record(window.app_handle(), id)?;
+    let owner = window
+        .app_handle()
+        .get_webview_window(&record.label)
+        .ok_or("웹 창을 찾을 수 없습니다")?;
+    let pinned = !owner.is_always_on_top().map_err(err)?;
+    owner.set_always_on_top(pinned).map_err(err)?;
+    window.set_always_on_top(pinned).map_err(err)?;
+    Ok(pinned)
+}
+
+#[tauri::command]
+pub fn web_close(window: WebviewWindow) -> Result<Value, String> {
+    let id = window
+        .label()
+        .strip_prefix("webtoolbar-")
+        .ok_or("웹 도구 창이 아닙니다")?;
+    close(window.app_handle(), id)
 }
 pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String> {
     if matches!(request.action, Action::Web)
@@ -222,11 +385,7 @@ pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String
         .ok_or("웹 창을 찾을 수 없습니다")?;
     match request.action {
         Action::Inspect => inspect(app, request.id()),
-        Action::Close => {
-            crate::stash::release(&w)?;
-            w.hide().map_err(err)?;
-            inspect(app, request.id())
-        }
+        Action::Close => close(app, request.id()),
         Action::Open => {
             if request.title.is_some()
                 || request.markdown.is_some()
@@ -270,6 +429,15 @@ pub async fn web_run(window: WebviewWindow, url: String) -> Result<Value, String
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn companion_toolbar_label_is_separate_from_remote_content() {
+        assert_eq!(toolbar_label("web-1"), "webtoolbar-web-1");
+        assert_eq!(web_id("webpage-web-1"), Some("web-1"));
+        assert_eq!(web_id("webview-web-1"), Some("web-1"));
+        assert_eq!(web_id("webtoolbar-web-1"), Some("web-1"));
+        assert_eq!(web_id("note-web-1"), None);
+    }
+
     #[test]
     fn navigation_validation_rejects_internal_and_credential_urls() {
         for url in [
