@@ -6,6 +6,11 @@ let noticeStatus = null;
 let noticeBusy = false;
 let readyRequestedVersion = null;
 let noticeFeedbackVersion = null;
+const noticeReview = window.gibbonUpdateReview(noticeEl('notice-review'), noticeInvoke, message => {
+  noticeFeedbackVersion = noticeStatus?.version;
+  noticeStatus = { ...noticeStatus, message };
+  renderNotice(noticeStatus);
+});
 const labels = {
   ready: '새 버전이 준비됐습니다',
   preparing: '설치를 위한 안전 검사를 진행 중입니다',
@@ -15,8 +20,12 @@ const labels = {
 
 function renderNotice(status) {
   noticeStatus = status || { phase: 'error', message: '' };
+  noticeReview.render(noticeStatus.phase === 'ready' ? noticeStatus.review : null);
+  noticeEl('notice-install').textContent = noticeReview.confirming ? '확인하고 재시작' : '업데이트하고 재시작';
+  noticeEl('notice-dismiss').textContent = noticeReview.confirming ? '취소' : '나중에';
   const phase = Object.hasOwn(labels, noticeStatus.phase) ? noticeStatus.phase : 'error';
-  noticeEl('notice-title').textContent = labels[phase];
+  noticeEl('notice-title').textContent = noticeReview.confirming ? '재시작 전에 확인하세요' : labels[phase];
+  noticeEl('notice-version').hidden = noticeReview.confirming;
   noticeEl('notice-version').textContent = noticeStatus.version ? `새 버전 ${noticeStatus.version}` : '';
   const message = noticeEl('notice-message');
   message.textContent = noticeStatus.message || '업데이트 상태를 확인하지 못했습니다.';
@@ -43,7 +52,8 @@ async function installNotice() {
   noticeBusy = true;
   renderNotice(noticeStatus);
   try {
-    const result = await noticeInvoke('updater_notice_install');
+    const result = await noticeReview.install('updater_notice_install');
+    if (!result) return;
     noticeFeedbackVersion = result.phase === 'ready' ? result.version : null;
     renderNotice(result);
   }
@@ -55,6 +65,7 @@ async function installNotice() {
 }
 
 async function dismissNotice() {
+  if (noticeReview.confirming) { noticeReview.cancel(); renderNotice(noticeStatus); return; }
   if (noticeBusy && noticeStatus?.phase === 'installing') return;
   noticeEl('notice-dismiss').disabled = true;
   try { await noticeInvoke('updater_notice_dismiss'); }

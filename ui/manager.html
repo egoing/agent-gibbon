@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko"><head><script src="telemetry.js"></script><script src="updater-guard.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>메모 관리</title><link rel="stylesheet" href="manager.css"><script src="manager-theme.js"></script><script type="module" src="memo-preview.js"></script><script src="privacy.js" defer></script><script src="skills.js" defer></script><script src="manager.js" defer></script><script src="updater.js" defer></script></head>
+<html lang="ko"><head><script src="telemetry.js"></script><script src="updater-guard.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>메모 관리</title><link rel="stylesheet" href="manager.css"><script src="manager-theme.js"></script><script type="module" src="memo-preview.js"></script><script src="privacy.js" defer></script><script src="skills.js" defer></script><script src="manager.js" defer></script><script src="updater-review.js" defer></script><script src="updater.js" defer></script></head>
 <body><header><strong>Agent Gibbon</strong><nav id="manager-navigation" aria-label="관리 탐색" hidden><button id="notes-nav" aria-pressed="true">모든 메모</button><button id="settings-nav" aria-pressed="false">설정</button></nav></header>
 <div id="error" role="alert" hidden>메모를 읽지 못했습니다. <button id="retry">다시 시도</button></div>
 <main id="notes-page" hidden><aside aria-label="메모 목록"><div class="list-heading"><h2>모든 메모</h2><button id="refresh" aria-label="메모 목록 새로고침">새로고침</button></div><div id="list"></div></aside><section id="detail" aria-label="메모 상세" tabindex="0"><p>메모를 선택하세요.</p></section></main>
@@ -53,7 +53,8 @@
 <div><p id="updater-status" role="status" aria-live="polite">업데이트 상태를 확인하는 중입니다.</p><p id="updater-version"></p></div>
 </div>
 <div class="updater-progress-row"><progress id="updater-progress" max="1" value="0" hidden></progress><p id="updater-message" role="status" aria-live="polite"></p></div>
-<div class="updater-actions"><button id="updater-check" type="button">지금 확인</button><button id="updater-install" type="button" disabled>재시작하여 설치</button></div>
+<div id="updater-review" class="update-review" hidden></div>
+<div class="updater-actions"><button id="updater-cancel-review" type="button" hidden>취소</button><button id="updater-check" type="button">지금 확인</button><button id="updater-install" type="button" disabled>재시작하여 설치</button></div>
 </article>
 </section>
 </div></section>

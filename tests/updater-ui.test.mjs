@@ -8,18 +8,19 @@ const html = readFileSync(new URL('../ui/manager.html', import.meta.url), 'utf8'
 
 function setup(initial = { phase: 'idle', version: null, current_version: '1.2.3', downloaded: 0, total: null, message: '' }) {
   const elements = new Map();
-  const make = tagName => ({ tagName, hidden: false, disabled: false, textContent: '', attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, append() {} });
-  for (const id of ['settings-page', 'settings-updater', 'updater-status', 'updater-version', 'updater-progress', 'updater-message', 'updater-check', 'updater-install']) elements.set(id, make());
+  const make = tagName => ({ tagName, hidden: false, disabled: false, replaceChildren() {}, textContent: '', attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, append() {} });
+  for (const id of ['updater-review', 'updater-cancel-review', 'settings-page', 'settings-updater', 'updater-status', 'updater-version', 'updater-progress', 'updater-message', 'updater-check', 'updater-install']) elements.set(id, make());
   const requests = [];
   let status = initial;
   let check = async () => status;
   let install = async () => status;
   let interval;
   const context = vm.createContext({
-    document: { hidden: false, getElementById: id => elements.get(id) },
+    document: { createElement: make, hidden: false, getElementById: id => elements.get(id) },
     window: { __TAURI__: { core: { invoke: async (name, args) => { requests.push({ name, args }); if (name === 'updater_status') return status; if (name === 'updater_check') return check(); if (name === 'updater_install') return install(); throw Error(`unexpected command ${name}`); } } } },
     setInterval: fn => { interval = fn; },
   });
+  vm.runInContext(readFileSync(new URL('../ui/updater-review.js', import.meta.url), 'utf8'), context);
   vm.runInContext(source, context);
   return { elements, requests, run: code => vm.runInContext(code, context), tick: () => interval(), setStatus: value => { status = value; }, setCheck: fn => { check = fn; }, setInstall: fn => { install = fn; } };
 }
@@ -116,4 +117,18 @@ test('compact settings hide unavailable installation and empty detail', async ()
   await app.run('window.gibbonUpdater.refresh()');
   assert.equal(app.elements.get('updater-install').hidden, true);
   assert.equal(app.elements.get('updater-message').attrs.role, 'alert');
+});
+
+test('manual restart confirmation is invalidated when the running process changes', async () => {
+  const ready = pid => ({ phase: 'ready', version: '1.3.0', review: { version: '1.3.0', restores_sessions: true, targets: [{ label: 'terminal-test', kind: 'terminal', title: '셸', pid }] } });
+  const app = setup(ready(11));
+  const install = () => app.elements.get('updater-install').onclick();
+  await app.run('window.gibbonUpdater.refresh()');
+  await install();
+  app.setStatus(ready(12));
+  await app.run('window.gibbonUpdater.refresh()');
+  await install();
+  assert.equal(app.requests.some(r => r.name === 'updater_install'), false);
+  await install();
+  assert.equal(app.requests.find(r => r.name === 'updater_install').args.confirmed.targets[0].pid, 12);
 });

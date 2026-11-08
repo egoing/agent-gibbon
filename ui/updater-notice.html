@@ -6,13 +6,14 @@
   <title>업데이트 준비 완료</title>
   <link rel="stylesheet" href="updater-notice.css">
   <script src="updater-guard.js"></script>
-  <script src="updater-notice.js" defer></script>
+  <script src="updater-review.js" defer></script><script src="updater-notice.js" defer></script>
 </head>
 <body>
   <main aria-labelledby="notice-title">
     <div class="notice-content">
     <h1 id="notice-title">새 버전이 준비됐습니다</h1>
     <p id="notice-version" class="version" aria-live="polite"></p>
+    <div id="notice-review" class="update-review" hidden></div>
     <p id="notice-message" role="status" aria-live="polite" hidden></p>
     </div>
     <div class="actions">

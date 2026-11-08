@@ -28,6 +28,8 @@ pub struct Status {
     phase: String,
     version: Option<String>,
     current_version: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    review: Option<crate::updater_review::Review>,
     downloaded: u64,
     total: Option<u64>,
     message: String,
@@ -36,6 +38,7 @@ impl Default for Status {
     fn default() -> Self {
         Self {
             phase: "disabled".into(),
+            review: None,
             version: None,
             current_version: env!("CARGO_PKG_VERSION").into(),
             downloaded: 0,
@@ -135,25 +138,50 @@ fn manager(window: &tauri::WebviewWindow) -> Result<(), String> {
         Ok(())
     }
 }
+// Window identities are attached only to trusted UI replies. Diagnostics uses status().
+pub(super) fn restores_sessions(app: &tauri::AppHandle, version: &str) -> Result<bool, String> {
+    Ok(app
+        .state::<Updates>()
+        .pending
+        .lock()
+        .map_err(err)?
+        .as_ref()
+        .is_some_and(|(update, _)| {
+            update.version == version
+                && update.raw_json["gibbon_session_restore"].as_u64() == Some(1)
+        }))
+}
+fn control_status(app: &tauri::AppHandle) -> Result<Status, String> {
+    let mut reply = status(app)?;
+    if reply.phase == "ready" {
+        if let Some(version) = reply.version.clone() {
+            reply.review = Some(crate::updater_review::current(app, version)?);
+        }
+    }
+    Ok(reply)
+}
 #[tauri::command]
 pub fn updater_status(window: tauri::WebviewWindow) -> Result<Status, String> {
     manager(&window)?;
-    status(window.app_handle())
+    control_status(window.app_handle())
 }
 #[tauri::command]
 pub async fn updater_check(window: tauri::WebviewWindow) -> Result<Status, String> {
     manager(&window)?;
     check(window.app_handle().clone(), true).await?;
-    status(window.app_handle())
+    control_status(window.app_handle())
 }
 #[tauri::command]
-pub async fn updater_install(window: tauri::WebviewWindow) -> Result<Status, String> {
+pub async fn updater_install(
+    window: tauri::WebviewWindow,
+    confirmed: Option<crate::updater_review::Review>,
+) -> Result<Status, String> {
     manager(&window)?;
     let app = window.app_handle().clone();
-    tauri::async_runtime::spawn_blocking(move || install(&app, false))
+    tauri::async_runtime::spawn_blocking(move || install(&app, false, confirmed))
         .await
         .map_err(err)??;
-    status(window.app_handle())
+    control_status(window.app_handle())
 }
 fn notice_window(window: &WebviewWindow) -> Result<(), String> {
     if window.label() == NOTICE_LABEL {
@@ -165,7 +193,7 @@ fn notice_window(window: &WebviewWindow) -> Result<(), String> {
 #[tauri::command]
 pub fn updater_notice_status(window: WebviewWindow) -> Result<Status, String> {
     notice_window(&window)?;
-    status(window.app_handle())
+    control_status(window.app_handle())
 }
 #[tauri::command]
 pub fn updater_notice_ready(window: WebviewWindow) -> Result<(), String> {
@@ -178,13 +206,16 @@ pub fn updater_notice_ready(window: WebviewWindow) -> Result<(), String> {
     present_pending_notice(&window)
 }
 #[tauri::command]
-pub async fn updater_notice_install(window: WebviewWindow) -> Result<Status, String> {
+pub async fn updater_notice_install(
+    window: WebviewWindow,
+    confirmed: Option<crate::updater_review::Review>,
+) -> Result<Status, String> {
     notice_window(&window)?;
     let app = window.app_handle().clone();
-    tauri::async_runtime::spawn_blocking(move || install(&app, false))
+    tauri::async_runtime::spawn_blocking(move || install(&app, false, confirmed))
         .await
         .map_err(err)??;
-    status(window.app_handle())
+    control_status(window.app_handle())
 }
 #[tauri::command]
 pub fn updater_notice_dismiss(window: WebviewWindow) -> Result<(), String> {
@@ -424,7 +455,7 @@ fn evaluate_ready_later(app: &tauri::AppHandle) {
 
 fn preflight_reason(app: &tauri::AppHandle) -> Option<String> {
     if crate::terminal::update_blocked(app).unwrap_or(true) {
-        return Some("터미널 작업이 실행 중이거나 시작되고 있습니다. 종료를 선택해 작업을 마친 뒤, 숨긴 터미널도 관리 창에서 삭제하고 다시 시도하세요.".into());
+        return Some("터미널 작업이 실행 중이거나 시작되어 자동 설치를 기다리고 있습니다.".into());
     }
     if crate::capture::update_blocked(app) {
         return Some("화면 캡처나 영역 선택이 끝난 뒤 다시 시도하세요.".into());
@@ -452,7 +483,7 @@ fn evaluate_ready(app: &tauri::AppHandle, try_automatic_install: bool) {
     if try_automatic_install && native_reason.is_none() && idle_ready {
         // Attempt immediately after verification once idle is already met.
         // install() repeats every safety check before writing state or restart.
-        let _ = install(app, true);
+        let _ = install(app, true, None);
     }
     let Ok(current) = status(app) else { return };
     if current.phase != "ready" {
@@ -785,11 +816,27 @@ fn on_main<T: Send + 'static>(
     .map_err(err)?;
     rx.recv().map_err(err)?
 }
-fn safe_native(app: &tauri::AppHandle) -> Result<(), String> {
-    if crate::terminal::update_blocked(app)? {
-        return Err("터미널 세션을 종료한 뒤 설치할 수 있습니다. 숨긴 터미널도 포함됩니다".into());
+fn safe_native(
+    app: &tauri::AppHandle,
+    confirmed: Option<&crate::updater_review::Review>,
+    version: &str,
+) -> Result<(), String> {
+    if let Some(review) = confirmed {
+        if !review.can_confirm()
+            || review.version != version
+            || crate::updater_review::current(app, version.into())? != *review
+        {
+            return Err("열린 작업이 바뀌었습니다. 다시 확인하세요.".into());
+        }
+        crate::update_restore::check_for_restart(app)?;
+    } else {
+        if crate::terminal::update_blocked(app)? {
+            return Err(
+                "터미널 세션을 종료한 뒤 설치할 수 있습니다. 숨긴 터미널도 포함됩니다".into(),
+            );
+        }
+        crate::update_restore::check(app)?;
     }
-    crate::update_restore::check(app)?;
     if crate::capture::update_blocked(app)
         || crate::stash::active(app)
         || crate::stash::chord_busy(app)
@@ -861,7 +908,11 @@ fn record_handshake(app: &tauri::AppHandle, epoch: u64, version: &str, outcome: 
         }
     };
 }
-fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
+fn install(
+    app: &tauri::AppHandle,
+    automatic: bool,
+    confirmed: Option<crate::updater_review::Review>,
+) -> Result<(), String> {
     if !enabled() {
         return Ok(());
     }
@@ -888,16 +939,24 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
             return Err("먼저 약관을 확인하세요".into());
         }
         crate::telemetry::checkpoint("updater.prepare");
-        let epoch = on_main(app, |app| {
-            safe_native(&app)?;
-            // Remote page WebViews cannot invoke the local updater guard. Keep
-            // them outside the acknowledgement barrier; local web Welcome and
-            // companion toolbars still participate through the local guard.
-            let labels: Vec<String> = app
-                .webview_windows()
+        let reviewed = confirmed.clone();
+        let version = install_version.clone();
+        let epoch = on_main(app, move |app| {
+            safe_native(&app, reviewed.as_ref(), &version)?;
+            // Remote web content cannot acknowledge local application events. Its trusted host
+            // and all local work windows must still acknowledge.
+            let windows = app.webview_windows();
+            for id in windows
                 .keys()
+                .filter_map(|label| label.strip_prefix("webpage-"))
+            {
+                if !windows.contains_key(&format!("webtoolbar-{id}")) {
+                    return Err("웹 창의 준비 상태를 확인하지 못했습니다".into());
+                }
+            }
+            let labels = windows
+                .into_keys()
                 .filter(|label| !label.starts_with("webpage-"))
-                .cloned()
                 .collect();
             let epoch = {
                 let state = app.state::<Updates>();
@@ -929,7 +988,7 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
         record_handshake(app, epoch, &install_version, "prepared");
         let expected_version = install_version.clone();
         on_main(app, move |app| {
-            safe_native(&app)?;
+            safe_native(&app, confirmed.as_ref(), &expected_version)?;
             {
                 let updates = app.state::<Updates>();
                 let current = updates.status.lock().map_err(err)?;
@@ -947,7 +1006,11 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
             if automatic && idle_seconds().is_none_or(|s| s < IDLE_SECONDS) {
                 return Err("다시 사용 중이어서 설치를 보류했습니다".into());
             }
-            crate::update_restore::save(&app)?;
+            if confirmed.is_some() {
+                crate::update_restore::save_for_restart(&app)?;
+            } else {
+                crate::update_restore::save(&app)?;
+            }
             Ok(())
         })?;
         snapshot_written = true;
@@ -1032,7 +1095,7 @@ pub fn initialize(app: &tauri::AppHandle) {
                 let _ = tauri::async_runtime::block_on(check(app.clone(), false));
                 last = Instant::now();
             }
-            let _ = install(&app, !resumed);
+            let _ = install(&app, !resumed, None);
             resumed = false;
             evaluate_ready(&app, false);
             std::thread::sleep(Duration::from_secs(RETRY_SECONDS));

@@ -107,3 +107,8 @@ input:focus-visible,a:focus-visible{outline:2px solid var(--manager-focus);outli
 .updater-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .updater-actions button{min-height:32px;padding:5px 12px;font-size:13px}
 #updater-install:not(:disabled){background:var(--manager-text);color:var(--manager-bg);border-color:var(--manager-text)}
+
+.update-review > div { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:4px 0 }
+.update-review span { overflow-wrap:anywhere }
+.update-review button { flex-shrink:0 }
+.update-review p { margin:6px 0 }

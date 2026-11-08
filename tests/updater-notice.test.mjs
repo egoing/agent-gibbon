@@ -11,14 +11,15 @@ const tick = () => new Promise(setImmediate);
 
 function setup(status) {
   const elements = new Map();
-  const make = () => ({ hidden: false, disabled: false, textContent: '', attrs: {}, setAttribute(k, v) { this.attrs[k] = v; } });
-  for (const id of ['notice-title', 'notice-version', 'notice-message', 'notice-install', 'notice-dismiss']) elements.set(id, make());
+  const make = () => ({ hidden: false, disabled: false, append() {}, replaceChildren() {}, textContent: '', attrs: {}, setAttribute(k, v) { this.attrs[k] = v; } });
+  for (const id of ['notice-review', 'notice-title', 'notice-version', 'notice-message', 'notice-install', 'notice-dismiss']) elements.set(id, make());
   const requests = [];
   const context = vm.createContext({
-    document: { getElementById: id => elements.get(id) },
+    document: { createElement: make, getElementById: id => elements.get(id) },
     window: { __TAURI__: { core: { invoke: async (command, args) => { requests.push({ command, args }); if (command === 'updater_notice_status') return status; if (command === 'updater_notice_ready') return {}; if (command === 'updater_notice_install') return status; if (command === 'updater_notice_dismiss') return { dismissed: true }; throw Error(`unexpected command ${command}`); } } } },
     setInterval: () => 1,
   });
+  vm.runInContext(readFileSync(new URL('../ui/updater-review.js', import.meta.url), 'utf8'), context);
   vm.runInContext(source, context);
   return { elements, requests };
 }
@@ -67,4 +68,34 @@ test('explicit installation hold and status errors remain actionable', async () 
   await tick();
   assert.equal(error.elements.get('notice-message').hidden, false);
   assert.equal(error.elements.get('notice-message').attrs.role, 'alert');
+});
+
+test('cancel keeps the session and an older candidate cannot promise restoration', async () => {
+  const review = { version: '1.3.0', restores_sessions: true, targets: [{ label: 'webpage-test', title: '웹', kind: 'web' }] };
+  const ready = { phase: 'ready', version: review.version, review };
+  const app = setup(ready);
+  await tick();
+  await app.elements.get('notice-install').onclick();
+  assert.equal(app.elements.get('notice-dismiss').textContent, '취소');
+  await app.elements.get('notice-dismiss').onclick();
+  assert.equal(app.elements.get('notice-dismiss').textContent, '나중에');
+  assert.equal(app.requests.some(r => ['updater_notice_install', 'updater_notice_dismiss'].includes(r.command)), false);
+  const older = setup({ ...ready, review: { ...review, restores_sessions: false } });
+  await tick();
+  await older.elements.get('notice-install').onclick();
+  assert.match(older.elements.get('notice-message').textContent, /복원할 수 없습니다/);
+  assert.equal(older.requests.some(r => r.command === 'updater_notice_install'), false);
+});
+
+test('an unsaved editor blocks a manual restart even alongside a restorable terminal', async () => {
+  const review = { version: '1.3.0', restores_sessions: true, targets: [
+    { label: 'main', title: '쓰는 중', kind: 'editor' },
+    { label: 'terminal-1', title: '셸', kind: 'terminal', pid: 42 },
+  ] };
+  const app = setup({ phase: 'ready', version: review.version, review });
+  await tick();
+  await app.elements.get('notice-install').onclick();
+  assert.match(app.elements.get('notice-message').textContent, /저장하거나 취소/);
+  assert.equal(app.elements.get('notice-dismiss').textContent, '나중에');
+  assert.equal(app.requests.some(r => r.command === 'updater_notice_install'), false);
 });

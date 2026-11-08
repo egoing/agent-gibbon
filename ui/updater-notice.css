@@ -28,3 +28,11 @@ button:focus-visible { outline:2px solid var(--focus); outline-offset:2px }
 button:disabled { cursor:default; opacity:.65 }
 button:hover:not(:disabled) { filter:brightness(.94) }
 @media (prefers-color-scheme: dark) { button:hover:not(:disabled) { filter:brightness(1.16) } }
+
+.update-review > div { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:4px 0 }
+.update-review span { overflow-wrap:anywhere }
+.update-review button { flex-shrink:0 }
+.update-review p { margin:6px 0 }
+
+main:has(#notice-review p) { gap:4px; padding-block:8px }
+#notice-review p { font-size:13px; margin:2px 0 }
