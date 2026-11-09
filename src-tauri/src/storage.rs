@@ -17,6 +17,27 @@ fn entry_type_is_directory(path: &Path) -> Result<bool, String> {
         .map_err(|e| e.to_string())
 }
 pub struct Store(pub PathBuf);
+
+/// Select the note root for a verification updater run. The override is ignored
+/// by non-verification builds and must be absolute to avoid inheriting state from
+/// the caller's working directory.
+pub fn root_for_run(
+    default_root: PathBuf,
+    verification: bool,
+    verification_root: Option<PathBuf>,
+) -> Result<(PathBuf, bool), String> {
+    if !verification {
+        return Ok((default_root, false));
+    }
+    let Some(root) = verification_root else {
+        return Ok((default_root, false));
+    };
+    if !root.is_absolute() {
+        return Err("AGENT_GIBBON_VERIFICATION_STORE_ROOT는 절대 경로여야 합니다".into());
+    }
+    Ok((root, true))
+}
+
 #[derive(Serialize, Deserialize)]
 struct Metadata {
     #[serde(default)]
@@ -282,6 +303,29 @@ impl Store {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn verification_store_override_is_absolute_and_never_applies_to_installed_builds() {
+        let temp = std::env::temp_dir().join("agent-gibbon-issue102-store");
+        let default = temp.join("default");
+        let isolated = temp.join("run-1");
+        assert_eq!(
+            root_for_run(default.clone(), true, Some(isolated.clone())).unwrap(),
+            (isolated, true)
+        );
+        assert_eq!(
+            root_for_run(default.clone(), false, Some(temp.join("ignored"))).unwrap(),
+            (default.clone(), false)
+        );
+        assert!(!root_for_run(default, true, None).unwrap().1);
+        assert!(root_for_run(
+            temp.join("default"),
+            true,
+            Some(PathBuf::from("relative/store"))
+        )
+        .is_err());
+    }
+
     #[test]
     fn completion_emphasis_is_ephemeral_but_completed_markdown_is_persisted() {
         let root = tempfile::tempdir().unwrap();

@@ -378,9 +378,14 @@ fn apply_with_presentation(
     request.validate()?;
     // Read-only diagnostics must remain observable during the installation handshake.
     if matches!(request.action, Action::Diagnostics) {
-        return Ok(
-            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"updater":updater::diagnostics(app),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
-        );
+        let mut result = json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"updater":updater::diagnostics(app),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}});
+        if cfg!(feature = "verification-updater") {
+            result["verification_store_root"] =
+                std::env::var_os("AGENT_GIBBON_VERIFICATION_STORE_ROOT")
+                    .map(|path| Value::String(path.to_string_lossy().into_owned()))
+                    .unwrap_or(Value::Null);
+        }
+        return Ok(result);
     }
     let _activity = updater::activity(app)?;
     if privacy::onboarding_required(app)
@@ -761,13 +766,26 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             }
             let instance = instance::current().id.as_deref();
             let data_dir = app.path().app_data_dir()?;
-            let root = if instance.is_some() {
+            let default_root = if instance.is_some() {
                 data_dir.clone()
             } else {
                 app.path().document_dir()?
             };
+            let verification_root = if cfg!(feature = "verification-updater") {
+                std::env::var_os("AGENT_GIBBON_VERIFICATION_STORE_ROOT")
+                    .map(std::path::PathBuf::from)
+            } else {
+                None
+            };
+            let (root, isolated_verification_store) = storage::root_for_run(
+                default_root,
+                cfg!(feature = "verification-updater"),
+                verification_root,
+            )?;
             let store = storage::Store::new(root, instance);
-            store.migrate_from(&data_dir.join("notes").join(instance.unwrap_or("default")))?;
+            if !isolated_verification_store {
+                store.migrate_from(&data_dir.join("notes").join(instance.unwrap_or("default")))?;
+            }
             let restored = store.load()?;
             app.state::<feedback::Feedbacks>().restore(&restored)?;
             let ids: Vec<_> = restored
