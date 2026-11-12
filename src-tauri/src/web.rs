@@ -9,10 +9,32 @@ use tauri::{Manager, WebviewUrl, WebviewWindow};
 #[derive(Clone)]
 struct Record {
     label: String,
+    host: WebviewWindow,
     url: Option<String>,
 }
 #[derive(Default)]
 pub struct Windows(Mutex<BTreeMap<String, Record>>);
+// Preserve app-wide window enumeration for hosts containing remote child WebViews.
+pub fn managed_windows(app: &tauri::AppHandle) -> std::collections::HashMap<String, WebviewWindow> {
+    let mut windows = app.webview_windows();
+    if let Some(state) = app.try_state::<Windows>() {
+        if let Ok(records) = state.0.lock() {
+            windows.extend(records.values().map(|r| (r.label.clone(), r.host.clone())));
+        }
+    }
+    windows
+}
+pub fn managed_window(app: &tauri::AppHandle, label: &str) -> Option<WebviewWindow> {
+    app.get_webview_window(label).or_else(|| {
+        app.try_state::<Windows>()?
+            .0
+            .lock()
+            .ok()?
+            .values()
+            .find(|r| r.label == label)
+            .map(|r| r.host.clone())
+    })
+}
 fn err(e: impl std::fmt::Display) -> String {
     e.to_string()
 }
@@ -56,11 +78,9 @@ fn record(app: &tauri::AppHandle, id: &str) -> Result<Record, String> {
 }
 pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
     let r = record(app, id)?;
-    let w = app
-        .get_webview_window(&r.label)
-        .ok_or("웹 창을 찾을 수 없습니다")?;
+    let w = r.host.clone();
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":"web","title":w.title().map_err(err)?,"url":r.url,"welcome":r.url.is_none(),"current_url":w.url().map_err(err)?.as_str(),"visible":w.is_visible().map_err(err)?,"focused":w.is_focused().map_err(err)?,"always_on_top":w.is_always_on_top().map_err(err)?,"position":w.outer_position().map_err(err)?,"size":w.inner_size().map_err(err)?}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":"web","title":w.title().map_err(err)?,"url":r.url,"welcome":r.url.is_none(),"current_url":app.get_webview(&format!("webpage-{id}")).map(|v| v.url()).transpose().map_err(err)?.unwrap_or(w.url().map_err(err)?).as_str(),"visible":w.is_visible().map_err(err)?,"focused":w.is_focused().map_err(err)?,"always_on_top":w.is_always_on_top().map_err(err)?,"position":w.outer_position().map_err(err)?,"size":w.inner_size().map_err(err)?}),
     )
 }
 pub fn entries(app: &tauri::AppHandle) -> Result<Vec<Value>, String> {
@@ -105,7 +125,7 @@ pub fn create(
     });
     let parsed = url.map(validate_url).transpose()?;
     let remote = parsed.is_some();
-    let label = format!("{}-{id}", if remote { "webpage" } else { "webview" });
+    let label = format!("webview-{id}");
     let old = if contains(app, &id) {
         Some(record(app, &id)?)
     } else {
@@ -113,21 +133,22 @@ pub fn create(
     };
     if let Some(r) = &old {
         if url.is_none() || r.url.as_deref() == url {
-            let w = app
-                .get_webview_window(&r.label)
-                .ok_or("웹 창을 찾을 수 없습니다")?;
+            let w = r.host.clone();
             show(&w)?;
             return inspect(app, &id);
         }
     }
-    let previous = old.as_ref().and_then(|r| app.get_webview_window(&r.label));
+    let previous = old.as_ref().map(|r| r.host.clone());
     // A replacement is prepared before the current window is removed.
     // Repeated remote navigation uses the same isolated WebView.
     if let Some(w) = previous
         .as_ref()
         .filter(|_| old.as_ref().is_some_and(|r| r.url.is_some()) && remote)
     {
-        w.navigate(parsed.unwrap()).map_err(err)?;
+        app.get_webview(&format!("webpage-{id}"))
+            .ok_or("웹 콘텐츠를 찾을 수 없습니다")?
+            .navigate(parsed.unwrap())
+            .map_err(err)?;
         app.state::<Windows>()
             .0
             .lock()
@@ -138,68 +159,110 @@ pub fn create(
         show(w)?;
         return inspect(app, &id);
     }
-    crate::focus::remember(app, &label);
-    let target = parsed
-        .map(WebviewUrl::External)
-        .unwrap_or_else(|| WebviewUrl::App("web.html".into()));
-    let mut builder = tauri::WebviewWindowBuilder::new(app, &label, target)
-        .title(format!(
-            "{} — 웹 — {id}",
-            crate::instance::current().title()
-        ))
-        .inner_size(600.0, 400.0)
-        .min_inner_size(240.0, 160.0)
-        .always_on_top(true)
-        .visible(false)
-        .focused(false)
+    let w = if let Some(previous) = &previous {
+        previous.clone()
+    } else {
+        crate::focus::remember(app, &label);
+        let window =
+            tauri::WebviewWindowBuilder::new(app, &label, WebviewUrl::App("web.html".into()))
+                .title(format!(
+                    "{} — 웹 — {id}",
+                    crate::instance::current().title()
+                ))
+                .inner_size(600.0, 400.0)
+                .min_inner_size(240.0, 160.0)
+                .always_on_top(true)
+                .visible(false)
+                .focused(false)
+                .on_navigation(|url| {
+                    url.path() == "/web.html"
+                        && url.port().is_none()
+                        && url.query().is_none()
+                        && ((url.scheme() == "tauri" && url.host_str() == Some("localhost"))
+                            || (matches!(url.scheme(), "http" | "https")
+                                && url.host_str() == Some("tauri.localhost")))
+                })
+                .build()
+                .map_err(err)?;
+        if let Some(b) = bounds {
+            #[cfg(windows)]
+            window
+                .set_position(tauri::PhysicalPosition::new(
+                    b.x.round() as i32,
+                    b.y.round() as i32,
+                ))
+                .map_err(err)?;
+            #[cfg(not(windows))]
+            window
+                .set_position(tauri::LogicalPosition::new(b.x, b.y))
+                .map_err(err)?;
+            window
+                .set_size(tauri::LogicalSize::new(
+                    b.width.max(240.0),
+                    b.height.max(160.0),
+                ))
+                .map_err(err)?;
+        }
+        let handle = app.clone();
+        let content_label = format!("webpage-{id}");
+        let parent_label = label.clone();
+        window.on_window_event(move |event| {
+            if matches!(
+                event,
+                tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. }
+            ) {
+                if let (Some(parent), Some(content)) = (
+                    handle.get_webview(&parent_label).map(|view| view.window()),
+                    handle.get_webview(&content_label),
+                ) {
+                    if let (Ok(size), Ok(scale)) = (parent.inner_size(), parent.scale_factor()) {
+                        let size = size.to_logical::<f64>(scale);
+                        let _ = content.set_bounds(tauri::Rect {
+                            position: tauri::LogicalPosition::new(0.0, 30.0).into(),
+                            size: tauri::LogicalSize::new(
+                                size.width,
+                                (size.height - 30.0).max(1.0),
+                            )
+                            .into(),
+                        });
+                    }
+                }
+            }
+        });
+        window
+    };
+    if let Some(target) = parsed {
+        let content = tauri::webview::WebviewBuilder::new(
+            format!("webpage-{id}"),
+            WebviewUrl::External(target),
+        )
+        .on_navigation(|url| validate_url(url.as_str()).is_ok())
         .on_new_window(|_, _| tauri::webview::NewWindowResponse::Deny)
         .on_download(|_, _| false);
-    if remote {
-        builder = builder.on_navigation(|url| validate_url(url.as_str()).is_ok());
-    } else {
-        builder = builder.on_navigation(|url| {
-            url.path() == "/web.html"
-                && url.port().is_none()
-                && url.query().is_none()
-                && ((url.scheme() == "tauri" && url.host_str() == Some("localhost"))
-                    || (matches!(url.scheme(), "http" | "https")
-                        && url.host_str() == Some("tauri.localhost")))
-        });
-    }
-    let w = builder.build().map_err(err)?;
-    if let Some(p) = &previous {
-        w.set_position(p.outer_position().map_err(err)?)
-            .map_err(err)?;
-        w.set_size(p.inner_size().map_err(err)?).map_err(err)?;
-        w.set_always_on_top(p.is_always_on_top().map_err(err)?)
-            .map_err(err)?;
-    } else if let Some(b) = bounds {
-        #[cfg(windows)]
-        w.set_position(tauri::PhysicalPosition::new(
-            b.x.round() as i32,
-            b.y.round() as i32,
-        ))
-        .map_err(err)?;
-        #[cfg(not(windows))]
-        w.set_position(tauri::LogicalPosition::new(b.x, b.y))
-            .map_err(err)?;
-        w.set_size(tauri::LogicalSize::new(
-            b.width.max(240.0),
-            b.height.max(160.0),
-        ))
-        .map_err(err)?;
+        let size = w
+            .inner_size()
+            .map_err(err)?
+            .to_logical::<f64>(w.scale_factor().map_err(err)?);
+        if let Err(error) = w.as_ref().window().add_child(
+            content,
+            tauri::LogicalPosition::new(0.0, 30.0),
+            tauri::LogicalSize::new(size.width, (size.height - 30.0).max(1.0)),
+        ) {
+            if previous.is_none() {
+                let _ = w.destroy();
+            }
+            return Err(err(error));
+        }
     }
     app.state::<Windows>().0.lock().map_err(err)?.insert(
         id.clone(),
         Record {
+            host: w.clone(),
             label,
             url: url.map(str::to_owned),
         },
     );
     show(&w)?;
-    if let Some(p) = previous {
-        p.destroy().map_err(err)?;
-    }
     inspect(app, &id)
 }
 pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String> {
@@ -217,9 +280,7 @@ pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String
         return create(app, None, request.id.as_deref(), request.url.as_deref());
     }
     let r = record(app, request.id())?;
-    let w = app
-        .get_webview_window(&r.label)
-        .ok_or("웹 창을 찾을 수 없습니다")?;
+    let w = r.host.clone();
     match request.action {
         Action::Inspect => inspect(app, request.id()),
         Action::Close => {
@@ -242,7 +303,7 @@ pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String
     }
 }
 #[tauri::command]
-pub async fn web_run(window: WebviewWindow, url: String) -> Result<Value, String> {
+pub async fn web_run(window: tauri::Webview, url: String) -> Result<Value, String> {
     let id = window
         .label()
         .strip_prefix("webview-")
@@ -266,6 +327,30 @@ pub async fn web_run(window: WebviewWindow, url: String) -> Result<Value, String
     })
     .await
     .map_err(err)?
+}
+#[tauri::command]
+pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String> {
+    let id = view
+        .label()
+        .strip_prefix("webview-")
+        .ok_or("웹 툴바에서만 실행할 수 있습니다")?;
+    let r = record(view.app_handle(), id)?;
+    let window = r.host.clone();
+    match action.as_str() {
+        "inspect" => inspect(window.app_handle(), id),
+        "pin" => {
+            window
+                .set_always_on_top(!window.is_always_on_top().map_err(err)?)
+                .map_err(err)?;
+            inspect(window.app_handle(), id)
+        }
+        "close" => {
+            // Match the current web window close contract, which preserves the session.
+            window.hide().map_err(err)?;
+            Ok(json!({"ok":true,"url":r.url}))
+        }
+        _ => Err("Unknown web toolbar action".into()),
+    }
 }
 #[cfg(test)]
 mod tests {

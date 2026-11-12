@@ -311,8 +311,7 @@ fn set_position(win: &WebviewWindow, x: f64, y: f64) -> Result<(), String> {
 fn cleanup(app: &tauri::AppHandle) {
     let _timing = crate::telemetry::Timing::new("capture.cleanup.request");
     crate::telemetry::checkpoint("capture.cleanup.request");
-    for win in app
-        .webview_windows()
+    for win in crate::web::managed_windows(app)
         .values()
         .filter(|w| w.label().starts_with("capture-"))
     {
@@ -332,8 +331,7 @@ fn cleanup(app: &tauri::AppHandle) {
 #[cfg(windows)]
 fn cleanup_before_create(app: &tauri::AppHandle) -> Result<(), String> {
     let mut pending = Vec::new();
-    for window in app
-        .webview_windows()
+    for window in crate::web::managed_windows(app)
         .into_values()
         .filter(|w| w.label().starts_with("capture-"))
     {

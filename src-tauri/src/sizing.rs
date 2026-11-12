@@ -220,6 +220,8 @@ fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
         window
             .set_min_size(Some(if state.image_size.is_some() {
                 LogicalSize::new(2.0, 2.0)
+            } else if window.label().starts_with("webview-") {
+                LogicalSize::new(240.0, 160.0)
             } else {
                 LogicalSize::new(144.0, 32.0)
             }))
@@ -239,13 +241,14 @@ fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
                 } else {
                     144.0
                 },
-                12.0,
+                32.0,
             )))
             .map_err(|e| e.to_string())?;
         window
-            .set_size(LogicalSize::new(size.width, 12.0))
+            .set_size(LogicalSize::new(size.width, 32.0))
             .map_err(|e| e.to_string())?;
         state.expanded = Some(size);
+        crate::feedback_window::hide(window);
     }
     Ok(())
 }
@@ -261,6 +264,24 @@ pub fn toggle_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, S
     state.contact.block(cursor);
     toggle(&window, state)?;
     Ok(state.expanded.is_some())
+}
+
+#[tauri::command]
+pub fn chrome_fold(view: tauri::Webview, sizes: State<Sizes>) -> Result<bool, String> {
+    let window = crate::web::managed_window(view.app_handle(), view.window().label())
+        .ok_or("메모 창을 찾을 수 없습니다")?;
+    let collapsed = toggle_fold(window, sizes)?;
+    if let Some(id) = view.label().strip_prefix("webview-") {
+        if let Some(content) = view.app_handle().get_webview(&format!("webpage-{id}")) {
+            if collapsed {
+                content.hide()
+            } else {
+                content.show()
+            }
+            .map_err(|e| e.to_string())?;
+        }
+    }
+    Ok(collapsed)
 }
 
 #[tauri::command]
@@ -378,7 +399,7 @@ pub fn install_contact_monitor(app: &tauri::AppHandle) {
         if crate::capture::active(app) {
             return;
         }
-        for window in app.webview_windows().into_values() {
+        for window in crate::web::managed_windows(app).into_values() {
             if window.label() == crate::manager::LABEL
                 || !fold_contact_enabled(window.label())
                 || crate::feedback_window::is_surface(window.label())

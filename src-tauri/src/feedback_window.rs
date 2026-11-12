@@ -18,8 +18,11 @@ pub struct View {
     error: bool,
     buttons: Vec<Button>,
     color: String,
-    #[serde(default)]
-    folded_tip: bool,
+}
+impl View {
+    fn active(&self, folded: bool) -> bool {
+        !folded && (!self.message.is_empty() || !self.buttons.is_empty())
+    }
 }
 #[derive(Default)]
 pub struct Surfaces(Mutex<BTreeMap<String, View>>);
@@ -50,7 +53,7 @@ fn memo(window: &WebviewWindow) -> Result<(), String> {
 #[tauri::command]
 pub async fn present_feedback(window: WebviewWindow, view: View) -> Result<(), String> {
     memo(&window)?;
-    let show = !view.message.is_empty() || !view.buttons.is_empty();
+    let show = view.active(crate::sizing::folded(&window));
     window
         .state::<Surfaces>()
         .0
@@ -181,10 +184,7 @@ pub fn layout_feedback(
         .lock()
         .map_err(|e| e.to_string())?
         .get(parent.label())
-        .is_some_and(|v| {
-            (!v.message.is_empty() || !v.buttons.is_empty())
-                && (!crate::sizing::folded(&parent) || v.folded_tip)
-        });
+        .is_some_and(|v| v.active(crate::sizing::folded(&parent)));
     if crate::stash::owns(&parent)
         || !active
         || !parent.is_visible().map_err(|e| e.to_string())?
@@ -408,6 +408,21 @@ pub fn inspect(parent: &WebviewWindow) -> Result<serde_json::Value, String> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn folded_feedback_is_suppressed_even_for_legacy_tips_and_errors() {
+        for error in [false, true] {
+            let view: super::View = serde_json::from_value(serde_json::json!({
+                "revision": null, "message": "안내", "error": error,
+                "buttons": [{"id":"save","label":"저장","disabled":false}],
+                "color":"#20252e", "folded_tip":true
+            }))
+            .unwrap();
+            assert!(!view.active(true));
+            assert!(view.active(false));
+        }
+        assert!(!super::View::default().active(false));
+    }
+
     use super::{accepts_action, geometry, Button, View};
     #[test]
     fn stale_confirmation_is_blocked_but_edit_actions_reach_conflict_check() {

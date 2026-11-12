@@ -1,5 +1,5 @@
-<!doctype html><html lang="ko"><head><script src="telemetry.js"></script><script src="updater-guard.js"></script><script src="local-flow.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>터미널</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="vendor/xterm.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="terminal.css"></head><body><div id="memo-surface"><header><span id="title">터미널</span></header><div id="controls" role="toolbar" aria-label="Toolbar">
-<button id="toolbar-previous" aria-label="이전 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
+<!doctype html><html lang="ko"><head><script src="telemetry.js"></script><script src="updater-guard.js"></script><script src="local-flow.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>터미널</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="vendor/xterm.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="terminal.css"></head><body><div id="memo-surface"><header><div id="controls" role="toolbar" aria-label="Toolbar">
+<span id="chrome-title"><span id="title">터미널</span></span><button id="toolbar-previous" aria-label="이전 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
 <div id="toolbar-items">
 <span id="dev-instance" hidden></span>
 
@@ -8,11 +8,11 @@
 
 <button id="copy" aria-label="선택한 텍스트 복사" title="선택한 텍스트 복사"><svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="1"/><path d="M16 8V3H3v13h5"/></svg></button>
 
-<button id="pin" aria-label="상단 고정" aria-pressed="true" title="상단 고정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 7 4 4v2H5v-2l4-4-1-7Z"/><path d="M12 16v6"/></svg></button><button id="close" aria-label="터미널 종료" title="터미널 종료"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+<button id="pin" aria-label="상단 고정" aria-pressed="true" title="상단 고정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 7 4 4v2H5v-2l4-4-1-7Z"/><path d="M12 16v6"/></svg></button>
 </div>
 <button id="toolbar-next" aria-label="다음 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
-</div>
-<section id="welcome" hidden aria-label="작업 시작" aria-busy="false"><div class="welcome-content">
+<button id="toolbar-toggle" aria-label="툴바 접기" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><button id="close" aria-label="터미널 종료" title="터미널 종료"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+</header><section id="welcome" hidden aria-label="작업 시작" aria-busy="false"><div class="welcome-content">
 <section aria-labelledby="location-heading"><h1 id="location-heading">작업 위치</h1>
 <button id="choose-folder" class="plain-row"><span aria-hidden="true">📂</span> 폴더 열기…</button>
 <div id="recent-folders" aria-label="최근 폴더"></div>

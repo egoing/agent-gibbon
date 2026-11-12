@@ -117,8 +117,7 @@ fn item(w: &WebviewWindow, area: Rect, scale: f64) -> placement::Item {
 // Only ordinary hidden/new opens enter here. Finish obsolete reservations by
 // replacing their flight from the currently displayed frame, never by snapping.
 pub fn reflow(app: &tauri::AppHandle, opened: &WebviewWindow) -> Result<Destination, String> {
-    let mut windows: Vec<_> = app
-        .webview_windows()
+    let mut windows: Vec<_> = crate::web::managed_windows(app)
         .into_values()
         .filter(|w| {
             !crate::stash::owns(w)

@@ -574,6 +574,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     local_trace::local_flow_stage,
                     snapshot,
                     web::web_run,
+                    web::web_chrome,
                     terminal::terminal_start,
                     terminal::terminal_write,
                     terminal::terminal_resize,
@@ -615,6 +616,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     sizing::fit_note,
                     sizing::poll_fold,
                     sizing::toggle_fold,
+                    sizing::chrome_fold,
                     sizing::manual_resize
                 ]);
             move |invoke: tauri::ipc::Invoke| {

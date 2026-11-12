@@ -926,7 +926,7 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
         crate::telemetry::checkpoint("updater.prepare");
         let epoch = on_main(app, |app| {
             safe_native(&app)?;
-            let labels: Vec<String> = app.webview_windows().keys().cloned().collect();
+            let labels: Vec<String> = crate::web::managed_windows(&app).keys().cloned().collect();
             let epoch = {
                 let state = app.state::<Updates>();
                 let mut safety = state.safety.lock().map_err(err)?;
