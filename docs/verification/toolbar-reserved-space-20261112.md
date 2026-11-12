@@ -95,3 +95,9 @@ native AX 조회는 같은 PID의 사용자 `main` 창을 반환했으므로 해
 최신 로컬 UI 181개·Rust 212개, Rustfmt·Clippy·개발 빌드 통과. 브라우저 검증 `/tmp/gibbon-toolbar-browser/verify-collapsed-24.cjs`의 텍스트·이미지·터미널·웹 × 세 너비 × 두 상태 24개 조합에서 제목 12px·수직 중앙·버튼 위치·본문 접힘을 확인했다. `/tmp/gibbon-toolbar-browser/verify-feedback.cjs`의 12개 조합에서 구분선 1px·opacity 0.5·왼쪽 3px·위아래 위치·오류 색상을 확인했다. 결과는 `/tmp/gibbon-feedback-browser-results.json`이다. 두 SVG·PNG 시안을 렌더링하고 확인했다.
 
 초기 구현 SHA `68aedd0`의 전체 검사 `43202459858`은 성공했다. 펼침 피드백 SHA `c5e418f`의 실행 `43203147871`은 후속 변경으로 대체하며 최신 높이·드래그 변경의 검증으로 재사용하지 않는다. 새 커밋 SHA의 전체 플랫폼 검사를 요청한다.
+
+## 피드백 여백·hover 최종 조정
+
+사용자 요청으로 구분선의 오른쪽에도 3px 여백을 추가했다. 피드백 바의 사방 패딩은 본문과 같은 3px로 통합하고 `--memo-padding` 토큰을 공유한다. 위·아래 부착 시 추가하던 6px padding override를 제거했다. 툴바 rollover의 outline을 제거하고 배경색만 바꾸며 키보드 focus-visible의 2px 표시는 유지한다. 웹 툴바에도 같은 hover 배경을 반영했다.
+
+UI 181개·개발 빌드 통과. `/tmp/gibbon-toolbar-browser/verify-feedback.cjs`의 12개 조합에서 좌우 3px·본문과 같은 사방 패딩을 확인했다. `/tmp/gibbon-toolbar-browser/verify-padding-hover.cjs`의 24개 조합에서 hover outline/border 없음·배경 존재, Tab으로 닫기에 이동했을 때 2px 포커스 표시를 확인했다. 시안 SVG·PNG를 재렌더링하고 시각 확인했다. 이 후속 변경의 최신 SHA에 전체 플랫폼 CI를 재요청한다.
