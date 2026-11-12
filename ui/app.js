@@ -163,7 +163,7 @@ async function publishFeedback() {
   if (!memoVisible) return;
   if (publishing) { publishAgain = true; return; }
   const view = feedbackView({ editing, saving, acknowledging, highlightRevision, notice, sourcePath: latestNote?.source_path, color: latestNote?.color });
-  const signature = JSON.stringify(view);
+  const signature = JSON.stringify({ folded, view });
   if (signature === feedbackSignature) return;
   publishing = true;
   try { await invoke('present_feedback', { view }); feedbackSignature = signature; }
@@ -404,6 +404,7 @@ document.addEventListener('click', (event) => {
   return toggleFold();
 }, true);
 $('fold-toggle').addEventListener('click', toggleFold);
+window.gibbonToggleNote = toggleFold;
 async function pollFold() {
   try { displayFold(await invoke('poll_fold')); }
   catch (error) { failure(error); }

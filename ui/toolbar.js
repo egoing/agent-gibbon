@@ -25,7 +25,8 @@ toggle.addEventListener('click', async () => {
   if (changingFold) return;
   changingFold = true;
   try {
-    displayFold(await window.__TAURI__.core.invoke('chrome_fold'));
+    if (window.gibbonToggleNote) await window.gibbonToggleNote();
+    else displayFold(await window.__TAURI__.core.invoke('chrome_fold'));
   } catch (error) {
     const status = document.getElementById('status');
     if (status) status.textContent = String(error);
