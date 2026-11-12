@@ -101,3 +101,9 @@ native AX 조회는 같은 PID의 사용자 `main` 창을 반환했으므로 해
 사용자 요청으로 구분선의 오른쪽에도 3px 여백을 추가했다. 피드백 바의 사방 패딩은 본문과 같은 3px로 통합하고 `--memo-padding` 토큰을 공유한다. 위·아래 부착 시 추가하던 6px padding override를 제거했다. 툴바 rollover의 outline을 제거하고 배경색만 바꾸며 키보드 focus-visible의 2px 표시는 유지한다. 웹 툴바에도 같은 hover 배경을 반영했다.
 
 UI 181개·개발 빌드 통과. `/tmp/gibbon-toolbar-browser/verify-feedback.cjs`의 12개 조합에서 좌우 3px·본문과 같은 사방 패딩을 확인했다. `/tmp/gibbon-toolbar-browser/verify-padding-hover.cjs`의 24개 조합에서 hover outline/border 없음·배경 존재, Tab으로 닫기에 이동했을 때 2px 포커스 표시를 확인했다. 시안 SVG·PNG를 재렌더링하고 시각 확인했다. 이 후속 변경의 최신 SHA에 전체 플랫폼 CI를 재요청한다.
+
+## 메모 너비와 피드백 너비 고정
+
+사용자 요청으로 피드백은 메모의 실제 너비·가로 위치를 그대로 따른다. 콘텐츠 기반 max-content 측정과 우측 정렬을 제거하고, 메시지에 따른 높이만 다시 계산한다. native 배치도 클라이언트의 오래된 측정 너비와 무관하게 부모 너비를 사용하므로 콘텐츠 변화로 가로 크기가 달라지지 않는다. 배율 때문에 논리 너비가 소수인 경우도 반올림하지 않고 유지한다. 화면 가로 경계 밖에 걸친 메모도 같은 너비·정렬로 처리한다.
+
+UI 181개·Rust 212개·Clippy·개발 빌드를 통과했고, `/tmp/gibbon-toolbar-browser/verify-feedback-width.cjs`에서 정수·소수 너비 네 개와 짧은/긴 메시지의 8개 상태를 확인했다. 기존 구분선 12개 검사도 통과했다. 콘텐츠 변화에 따른 너비 재측정·resize는 줄었지만 native 드래그 중의 모든 시각 지연이 사라졌다고 검증하지는 않았다. 사용자가 전체 작업의 커밋·병합을 승인했으며 최종 커밋의 전체 플랫폼 CI 완료 뒤 병합한다.
