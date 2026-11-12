@@ -82,16 +82,22 @@ new MutationObserver(syncTooltips).observe(controls, {
 });
 syncTooltips();
 
-// Track actual pointer entry as well as CSS hover in the focused WebView.
+// Track pointer entry regardless of keyboard focus.
 // Never activate the window to produce hover feedback; first-click policy
 // continues to belong to the native window.
 const toolbarButtons = [...controls.querySelectorAll('button')];
 for (const button of toolbarButtons) {
   button.addEventListener('pointerenter', () => {
-    if (document.hasFocus() && !button.disabled) button.setAttribute('data-pointer-over', '');
+    if (!button.disabled) button.setAttribute('data-pointer-over', '');
   });
   button.addEventListener('pointerleave', () => button.removeAttribute('data-pointer-over'));
 }
-window.addEventListener('blur', () => {
-  for (const button of toolbarButtons) button.removeAttribute('data-pointer-over');
+// macOS also samples the native pointer when the WebView is inactive. Hit-test
+// the rendered DOM so hidden/paged buttons and resize/drag regions stay intact.
+window.__TAURI__.event.listen('toolbar-pointer', ({ payload }) => {
+  const target = payload ? document.elementFromPoint(payload.x, payload.y)?.closest('button') : null;
+  for (const button of toolbarButtons) {
+    if (button === target && !button.disabled) button.setAttribute('data-pointer-over', '');
+    else button.removeAttribute('data-pointer-over');
+  }
 });
