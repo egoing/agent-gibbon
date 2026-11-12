@@ -25,8 +25,9 @@ test('toolbar waits for native fold and restores the same state on expansion', a
   const calls = [];
   const content = element('content');
   const document = {body, getElementById: id => id === 'fold-title' ? null : element(id)};
+  const env = {__TAURI__: {core: {invoke: async name => { calls.push(name); folded = !folded; return folded; }}}};
   vm.runInNewContext(readFileSync(new URL('../ui/toolbar.js', import.meta.url), 'utf8'), {
-    document, window: {__TAURI__: {core: {invoke: async name => { calls.push(name); folded = !folded; return folded; }}}}, ResizeObserver: class {observe() {}}, MutationObserver: class {observe() {}},
+    document, window: env, ResizeObserver: class {observe() {}}, MutationObserver: class {observe() {}},
   });
   const toggle = element('toolbar-toggle');
   await toggle.listeners.click();
@@ -42,5 +43,11 @@ test('toolbar waits for native fold and restores the same state on expansion', a
   assert.equal(classes.has('toolbar-collapsed'), false);
   assert.equal(toggle.attributes['aria-expanded'], 'true');
   assert.equal(toggle.title, '메모 접기');
+  let delegated = 0;
+  env.gibbonToggleNote = async () => { delegated++; env.gibbonToolbarFold(true); };
+  await toggle.listeners.click();
+  assert.equal(delegated, 1);
+  assert.equal(calls.length, 2);
+  assert.equal(classes.has('toolbar-collapsed'), true);
   assert.equal(calls.at(-1), 'chrome_fold');
 });

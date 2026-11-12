@@ -82,7 +82,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
   await new Promise(setImmediate);
   const action = async payload => { await nativeEvents['feedback-action']({ payload: { owner: 'memo-test', action: payload, revision: view().revision } }); await new Promise(setImmediate); };
   const view = () => calls.filter(([name]) => name === 'present_feedback').at(-1)?.[1].view;
-  return { exportResult: value => { exportResult = value; }, failExport: error => { exportError = error; }, failCopy: error => { copyError = error; }, element, styles, events, calls, pointers, classes, nativeEvents, nativeTargets, action, view,
+  return { toggleFromToolbar: () => context.window.gibbonToggleNote(), exportResult: value => { exportResult = value; }, failExport: error => { exportError = error; }, failCopy: error => { copyError = error; }, element, styles, events, calls, pointers, classes, nativeEvents, nativeTargets, action, view,
     expireNotice: async () => { timers.filter(fn => fn.name === 'clearNotice').at(-1)?.(); await new Promise(setImmediate); },
     fold: value => { folded = value; },
     pollFold: () => timers.find(fn => fn.name === 'pollFold')(), highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
@@ -654,4 +654,18 @@ test('independent memo designs preserve editor drafts and original colors withou
   storage.set('agent-gibbon.memo-design',design);await app.refresh();assert.equal(app.styles['--background'],bg);assert.equal(app.element('markdown').value,'보존할 초안');
  }
  assert(!app.calls.some(([name])=>name==='save_note'));
+});
+
+
+test('shared toolbar reopens note feedback through the normal note toggle', async () => {
+  const app = await setup();
+  await app.toggleFromToolbar();
+  await new Promise(setImmediate);
+  assert.equal(app.classes.has('folded'), true);
+  assert.equal(app.view().message, '');
+  await app.toggleFromToolbar();
+  await new Promise(setImmediate);
+  assert.equal(app.classes.has('folded'), false);
+  assert.match(app.view().message, /Control.*포인터/);
+  assert.equal(app.view().folded_tip, undefined);
 });
