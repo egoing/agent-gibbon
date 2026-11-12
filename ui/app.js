@@ -252,7 +252,8 @@ async function refresh(schedule = true) {
   if (schedule) setTimeout(refresh, 350);
 }
 document.addEventListener('mousedown', (event) => {
-  if (folded || event.button !== 0 || event.target.closest('button, #editor, #tooltip, .resize')) return;
+  if (event.button !== 0 || event.target.closest('button, #editor, #tooltip, .resize')) return;
+  if (folded && !event.target.closest('#controls')) return;
   event.preventDefault();
   invoke('drag_note').catch(failure);
 });

@@ -35,3 +35,5 @@ html,body{width:100%;height:100%;overflow:hidden}body{cursor:default}header{heig
 header { padding: 0; }
 header #controls { flex: 1; }
 body.toolbar-collapsed header #controls { flex: 1; }
+
+header { align-items: flex-start; }
