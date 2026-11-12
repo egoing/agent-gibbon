@@ -241,11 +241,11 @@ fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
                 } else {
                     144.0
                 },
-                32.0,
+                24.0,
             )))
             .map_err(|e| e.to_string())?;
         window
-            .set_size(LogicalSize::new(size.width, 32.0))
+            .set_size(LogicalSize::new(size.width, 24.0))
             .map_err(|e| e.to_string())?;
         state.expanded = Some(size);
         crate::feedback_window::hide(window);

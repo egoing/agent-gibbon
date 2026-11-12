@@ -593,6 +593,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     feedback_window::feedback_snapshot,
                     feedback_window::layout_feedback,
                     feedback_window::feedback_action,
+                    feedback_window::drag_feedback,
                     capture::capture_screen,
                     capture::capture_ready,
                     capture::capture_failed,

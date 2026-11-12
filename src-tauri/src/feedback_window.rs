@@ -239,7 +239,16 @@ pub fn layout_feedback(
         window.set_size(target_size).map_err(|e| e.to_string())?;
     }
     let target_position = tauri::PhysicalPosition::new(x, y);
-    if window.outer_position().map_err(|e| e.to_string())? != target_position {
+    // AppKit moves the attached child with its parent. Avoid applying a
+    // separately sampled frame while the pointer is dragging the Feedback.
+    #[cfg(target_os = "macos")]
+    let follows_native_drag = objc2_app_kit::NSEvent::pressedMouseButtons() & 1 != 0
+        && crate::pointer_over(&window).unwrap_or(false);
+    #[cfg(not(target_os = "macos"))]
+    let follows_native_drag = false;
+    if !follows_native_drag
+        && window.outer_position().map_err(|e| e.to_string())? != target_position
+    {
         window
             .set_position(target_position)
             .map_err(|e| e.to_string())?;
@@ -305,6 +314,18 @@ pub fn feedback_action(
     }
     Ok(())
 }
+#[tauri::command]
+pub fn drag_feedback(window: WebviewWindow) -> Result<(), String> {
+    let parent = owner(&window)?;
+    if !window.is_visible().map_err(|e| e.to_string())?
+        || !parent.is_visible().map_err(|e| e.to_string())?
+        || crate::sizing::folded(&parent)
+    {
+        return Ok(());
+    }
+    crate::entrance::drag_note(parent)
+}
+
 pub fn hide(parent: &WebviewWindow) {
     let _ = parent.set_shadow(true);
     let _ = parent.emit_to(

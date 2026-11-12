@@ -54,4 +54,9 @@ document.addEventListener('keydown', event => {
   if (event.key === 'Escape') invoke('feedback_action', { action: 'cancel', revision: renderedRevision }).catch(report);
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') { event.preventDefault(); invoke('feedback_action', { action: 'export', revision: renderedRevision }).catch(report); }
 });
+surface.addEventListener('mousedown', event => {
+  if (event.button !== 0 || event.target.closest('button, a, input, textarea, select, [contenteditable]')) return;
+  event.preventDefault();
+  invoke('drag_feedback').catch(report);
+});
 refresh();
