@@ -195,10 +195,6 @@ async function refresh(schedule = true) {
       memoVisible = state.visible !== false;
       if (!memoVisible) feedbackSignature = undefined;
       document.body.classList.toggle('pointer-over', !!state.hovered);
-      $('dev-instance').hidden = !state.dev_label;
-      $('dev-instance').textContent = state.dev_label ? 'DEV' : '';
-      $('dev-instance').title = state.dev_label || '';
-      $('dev-instance').setAttribute('aria-label', state.dev_label || '');
       $('fold-title').textContent = state.note.title;
       $('fold-title').title = state.note.title;
       $('edit').disabled = editing || !!state.note.capture;
@@ -232,6 +228,7 @@ async function refresh(schedule = true) {
         displayedHtml = html;
       }
       $('pin').setAttribute('aria-pressed', String(state.always_on_top));
+      $('warp').setAttribute('data-direction', state.warp_right ? 'right' : 'left');
       if (!initialEditHandled) {
         initialEditHandled = true;
         if (state.note.edit_on_open && !state.note.capture) beginEditing();

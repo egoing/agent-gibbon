@@ -37,15 +37,13 @@ try {
     }
   };
   for (const [width, height] of [[144, 32], [144, 48], [300, 80]]) {
-    for (const dev of [false, true]) {
+    for (const dev of [false]) {
       await page.setViewportSize({ width, height });
       await page.mouse.move(-1, -1);
       await page.goto('http://gibbon.test/');
       await page.evaluate(dev => {
         document.querySelector('#edit').disabled = false;
-        const badge = document.querySelector('#dev-instance');
-        badge.hidden = !dev;
-        badge.textContent = dev ? 'DEV' : '';
+        if (document.querySelector('#dev-instance')) throw new Error('Unexpected development badge');
       }, dev);
       await page.waitForTimeout(70);
       assert.equal(await page.locator('#controls').evaluate(e => getComputedStyle(e).opacity), '0');

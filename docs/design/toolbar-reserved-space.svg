@@ -5,8 +5,30 @@
 <rect x="24" y="44" width="336" height="220" rx="4" fill="#dfe2dd" stroke="#a0a3bc"/>
 <rect x="400" y="44" width="336" height="24" rx="4" fill="#dfe2dd" stroke="#a0a3bc"/>
 <path d="M25 74h334" stroke="#a0a3bc"/>
-<text x="310" y="65" font-size="16">⌄</text><text x="40" y="65" font-size="16">aA　✎　↓　▣　↔　⚑</text><text x="335" y="65" font-size="18">×</text>
-<text x="408" y="60" font-size="12">진입점과 프로젝트</text><text x="686" y="60" font-size="12">⌃</text><text x="711" y="60" font-size="12">×</text>
+<svg x="40" y="51" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v-2h13v2" />
+  <path d="M10 5v14" />
+  <path d="M12 19h-4" />
+  <path d="M15 13v-1h6v1" />
+  <path d="M18 12v7" />
+  <path d="M17 19h2" /></svg><svg x="64" y="51" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+  <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
+  <path d="M16 5l3 3" /></svg><svg x="88" y="51" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l16 0" />
+  <path d="M12 14l0 -10" />
+  <path d="M12 14l4 -4" />
+  <path d="M12 14l-4 -4" /></svg><svg x="112" y="51" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />
+  <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg><svg x="136" y="51" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v4a1 1 0 0 0 1 1h4" />
+  <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+  <path d="M15 15h-6" />
+  <path d="M11.5 17.5l-2.5 -2.5l2.5 -2.5" /></svg><svg x="160" y="51" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l-8 4l8 4l8 -4l-8 -4" fill="currentColor" />
+  <path d="M8 14l-4 2l8 4l8 -4l-4 -2" />
+  <path d="M8 10l-4 2l8 4l8 -4l-4 -2" /></svg><svg x="310" y="51" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4h-6a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h8" />
+  <path d="M18 20v-17" />
+  <path d="M15 6l3 -3l3 3" /></svg><svg x="335" y="51" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12" />
+  <path d="M6 6l12 12" /></svg>
+<text x="408" y="60" font-size="12">진입점과 프로젝트</text><g transform="rotate(180 693 56)"><svg x="686" y="49" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4h-6a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h8" />
+  <path d="M18 20v-17" />
+  <path d="M15 6l3 -3l3 3" /></svg></g><svg x="711" y="49" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6l-12 12" />
+  <path d="M6 6l12 12" /></svg>
 <g font-size="14"><text x="32" y="98">□ 진입점과 프로젝트</text><text x="32" y="120">□ 설치 및 Codex 최근 실행</text></g>
 <rect x="610" y="83" width="114" height="28" rx="5" fill="#ffffef" stroke="#aaa"/><text x="620" y="102" font-size="12" fill="#222">메모 펼치기</text><text x="400" y="139" font-size="12" fill="#555">시스템 툴팁 · 메모창 바깥 표시</text><text x="24" y="286" font-size="12" fill="#555">상단 전용 행 30px · 접으면 본문 숨김·창 높이 24px · 제목 12px 수직 중앙 · 아이콘은 배치 설명용</text>
 </g></svg>
