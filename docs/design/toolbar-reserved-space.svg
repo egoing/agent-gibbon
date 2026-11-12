@@ -3,10 +3,10 @@
 <g font-family="-apple-system, sans-serif" fill="#2c2f7e">
 <text x="24" y="28" font-size="14">툴바 펼침</text><text x="400" y="28" font-size="14">툴바 접힘</text>
 <rect x="24" y="44" width="336" height="220" rx="4" fill="#dfe2dd" stroke="#a0a3bc"/>
-<rect x="400" y="44" width="336" height="32" rx="4" fill="#dfe2dd" stroke="#a0a3bc"/>
-<path d="M25 74h334M401 74h334" stroke="#a0a3bc"/>
+<rect x="400" y="44" width="336" height="24" rx="4" fill="#dfe2dd" stroke="#a0a3bc"/>
+<path d="M25 74h334" stroke="#a0a3bc"/>
 <text x="310" y="65" font-size="16">⌄</text><text x="40" y="65" font-size="16">aA　✎　↓　▣　↔　⚑</text><text x="335" y="65" font-size="18">×</text>
-<text x="408" y="64" font-size="12">진입점과 프로젝트</text><text x="680" y="65" font-size="16">⌃</text><text x="711" y="65" font-size="18">×</text>
+<text x="408" y="60" font-size="12">진입점과 프로젝트</text><text x="686" y="60" font-size="12">⌃</text><text x="711" y="60" font-size="12">×</text>
 <g font-size="14"><text x="32" y="98">□ 진입점과 프로젝트</text><text x="32" y="120">□ 설치 및 Codex 최근 실행</text></g>
-<rect x="610" y="83" width="114" height="28" rx="5" fill="#ffffef" stroke="#aaa"/><text x="620" y="102" font-size="12" fill="#222">메모 펼치기</text><text x="400" y="139" font-size="12" fill="#555">시스템 툴팁 · 메모창 바깥 표시</text><text x="24" y="286" font-size="12" fill="#555">상단 전용 행 30px · 접으면 본문 숨김·창 높이 32px · 아이콘은 배치 설명용</text>
+<rect x="610" y="83" width="114" height="28" rx="5" fill="#ffffef" stroke="#aaa"/><text x="620" y="102" font-size="12" fill="#222">메모 펼치기</text><text x="400" y="139" font-size="12" fill="#555">시스템 툴팁 · 메모창 바깥 표시</text><text x="24" y="286" font-size="12" fill="#555">상단 전용 행 30px · 접으면 본문 숨김·창 높이 24px · 제목 12px 수직 중앙 · 아이콘은 배치 설명용</text>
 </g></svg>

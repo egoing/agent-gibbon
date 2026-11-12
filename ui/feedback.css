@@ -16,3 +16,20 @@ button:disabled { opacity: .5; cursor: default; }
 
 #feedback[data-edge="below"] { border-top: 0; border-top-left-radius: 0; border-top-right-radius: 0; padding-bottom: 6px; }
 #feedback[data-edge="above"] { border-bottom: 0; border-bottom-left-radius: 0; border-bottom-right-radius: 0; padding-top: 6px; }
+
+#feedback { position: relative; cursor: grab; user-select: none; -webkit-user-select: none; }
+#feedback:active { cursor: grabbing; }
+#feedback[data-edge="above"]::before,
+#feedback[data-edge="below"]::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  right: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: .5;
+  pointer-events: none;
+}
+#feedback[data-edge="below"]::before { top: 0; }
+#feedback[data-edge="above"]::before { bottom: 0; }
+#feedback.error::before { color: var(--error); }
