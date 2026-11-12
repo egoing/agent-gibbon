@@ -26,6 +26,8 @@ mod stash_input;
 mod storage;
 mod telemetry;
 mod terminal;
+#[cfg(target_os = "macos")]
+mod toolbar_pointer;
 mod tray;
 mod warp;
 mod web;
@@ -135,6 +137,8 @@ fn sync_pointer(window: &tauri::WebviewWindow) -> Result<bool, String> {
             .emit_to(window.label(), "note-pointer-over", hovered)
             .map_err(|e| e.to_string())?;
     }
+    #[cfg(target_os = "macos")]
+    toolbar_pointer::sync(window)?;
     Ok(hovered)
 }
 // Native alpha blends the entire window, including its background and controls.
@@ -527,7 +531,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     };
     let builder = tauri::Builder::default();
     #[cfg(target_os = "macos")]
-    let builder = builder.activate_ignoring_other_apps(false);
+    let builder = builder
+        .activate_ignoring_other_apps(false)
+        .manage(toolbar_pointer::Pointers::default());
     let app = builder
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())

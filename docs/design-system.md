@@ -1,9 +1,9 @@
-## 접힘 드래그·버튼 정렬·롤오버 — #141
+## 접힘 드래그·버튼 정렬·롤오버 — #141 · #143
 
 - 접힌 제목과 툴바 빈 공간도 native 드래그로 이동한다. 버튼 클릭과 기존 본문 클릭 펼침은 유지한다.
 - 펼침·접힘 모두 아이콘 12px, 버튼 슬롯 폭 24px·높이 22px, 상단 1px 위치를 사용한다. 펼침 전용 행 30px의 아래 여유 공간을 유지하고 오른쪽 토글·닫기 버튼 위치를 맞춘다.
-- 포커스가 있는 창에서 포인터 진입을 추적해 전경색 16% 혼합 배경으로 버튼을 강조한다. 비활성 창에 포커스를 강제로 부여하지 않으며 native 첫 클릭 정책은 유지한다. 키보드 포커스 표시는 별도로 유지한다.
-- [시안 SVG](design/toolbar-reserved-space.svg) · [PNG](design/toolbar-reserved-space.png). 구현·실행 범위는 [검증 기록](verification/issue141-toolbar.md)을 따른다.
+- 펼침·접힘과 창의 활성 여부에 관계없이 포인터가 올라간 버튼을 전경색 16% 혼합 배경으로 강조하고 이탈하면 복귀한다. 포커스가 사라져도 포인터가 남아 있으면 강조를 유지한다. macOS에서는 기존 native 접촉 감지의 창 내부 좌표로 실제 DOM 버튼을 hit-test해 비활성 WebView를 보완한다. 호버로 창을 활성화하거나 포커스를 부여하지 않으며 native 첫 클릭·드래그 정책은 유지한다. 키보드 포커스 표시는 별도로 유지한다.
+- [시안 SVG](design/toolbar-reserved-space.svg) · [PNG](design/toolbar-reserved-space.png). 기존 #141의 검증과 이번 변경의 [#143 구현·검증 기록](verification/issue143-inactive-hover.md)을 구분한다.
 
 # Agent Gibbon Design System
 
