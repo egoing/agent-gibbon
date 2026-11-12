@@ -36,15 +36,13 @@ async function refresh() {
       }
       signature = next;
     }
-    // Measure against the memo width, never against the previous narrow Toast.
-    surface.style.width = 'max-content';
-    surface.style.maxWidth = `${state.max_width}px`;
-    document.body.style.width = `${state.max_width}px`;
-    const rect = surface.getBoundingClientRect();
-    // Fill the rounded native width: max-content can leave a fractional blank edge.
-    surface.style.width = `${Math.ceil(rect.width)}px`;
-    document.body.style.width = `${Math.ceil(rect.width)}px`;
-    const layout = await invoke('layout_feedback', { width: Math.ceil(rect.width), height: Math.ceil(rect.height) });
+    // Keep the native companion width tied to its memo; only content height varies.
+    const width = Math.max(1, state.max_width);
+    surface.style.width = `${width}px`;
+    surface.style.maxWidth = `${width}px`;
+    document.body.style.width = `${width}px`;
+    const height = Math.ceil(surface.getBoundingClientRect().height);
+    const layout = await invoke('layout_feedback', { width, height });
     surface.dataset.edge = layout.edge;
   } catch (error) { report(error); }
   setTimeout(refresh, 100);

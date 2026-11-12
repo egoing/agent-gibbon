@@ -13,10 +13,11 @@ test('feedback text and blank space drag the owner while controls keep their act
   };
   const message = {setAttribute() {}};
   const actions = {children: []};
-  const invoke = async (name) => {
+  const layoutArgs = [];
+  const invoke = async (name, args) => {
     calls.push(name);
-    if (name === 'feedback_snapshot') return {max_width: 300, view: {message: '안내', buttons: [], revision: null}};
-    if (name === 'layout_feedback') return {edge: 'below'};
+    if (name === 'feedback_snapshot') return {max_width: 300.5, view: {message: '안내', buttons: [], revision: null}};
+    if (name === 'layout_feedback') {layoutArgs.push(args); return {edge: 'below'};}
   };
   vm.runInNewContext(readFileSync(new URL('../ui/feedback.js', import.meta.url), 'utf8').replace(/^import .*;$/gm, ''), {
     window: {__TAURI__: {core: {invoke}}},
@@ -28,6 +29,8 @@ test('feedback text and blank space drag the owner while controls keep their act
     setTimeout() {}, console,
   });
   await new Promise(setImmediate);
+  assert.equal(surface.style.width, '300.5px');
+  assert.equal(layoutArgs[0].width, 300.5);
   let prevented = 0;
   const event = (button, control) => ({button, target: {closest: () => control}, preventDefault() {prevented++;}});
   listeners.mousedown(event(1, null));

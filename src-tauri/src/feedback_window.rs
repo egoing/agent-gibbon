@@ -121,7 +121,7 @@ pub fn feedback_snapshot(window: WebviewWindow) -> Result<serde_json::Value, Str
         .cloned()
         .unwrap_or_default();
     let scale = parent.scale_factor().map_err(|e| e.to_string())?;
-    let width = f64::from(parent.inner_size().map_err(|e| e.to_string())?.width) / scale;
+    let width = f64::from(parent.outer_size().map_err(|e| e.to_string())?.width) / scale;
     Ok(serde_json::json!({"view": view, "max_width": width}))
 }
 
@@ -134,10 +134,9 @@ fn geometry(
     work: (i32, i32, u32, u32),
     gap: u32,
 ) -> (i32, i32, u32, u32) {
-    let (left, top, sw, sh) = work;
-    let right = i64::from(left) + i64::from(sw);
+    let (_, top, _, sh) = work;
     let bottom = i64::from(top) + i64::from(sh);
-    let w = desired.0.min(memo.0).min(sw).max(1);
+    let w = memo.0.max(1);
     let below = (bottom - i64::from(p.1) - i64::from(memo.1) - i64::from(gap)).max(0) as u32;
     let above = (i64::from(p.1) - i64::from(top) - i64::from(gap)).max(0) as u32;
     let (y, h) = if desired.1 <= below {
@@ -159,10 +158,9 @@ fn geometry(
     } else {
         (bottom - i64::from(desired.1.min(sh)), desired.1.min(sh))
     };
-    let x = (i64::from(p.0) + i64::from(memo.0) - i64::from(w))
-        .clamp(i64::from(left), right - i64::from(w));
+    let x = p.0;
     (
-        x as i32,
+        x,
         y.clamp(i64::from(top), bottom - i64::from(h)) as i32,
         w,
         h.max(1),
@@ -466,15 +464,19 @@ mod tests {
     fn placement_below_above_narrow_and_negative_monitor() {
         assert_eq!(
             geometry((100, 100), (300, 200), (90, 32), (0, 0, 800, 600), 4),
-            (310, 304, 90, 32)
+            (100, 304, 300, 32)
         );
         assert_eq!(
             geometry((100, 400), (300, 200), (90, 32), (0, 0, 800, 600), 4),
-            (310, 364, 90, 32)
+            (100, 364, 300, 32)
         );
         assert_eq!(
             geometry((-500, 100), (144, 200), (300, 60), (-800, 0, 800, 600), 4),
             (-500, 304, 144, 60)
+        );
+        assert_eq!(
+            geometry((700, 100), (1000, 200), (1, 32), (0, 0, 800, 600), 0),
+            (700, 300, 1000, 32)
         );
         let (_, y, _, h) = geometry((0, 0), (300, 600), (300, 80), (0, 0, 800, 600), 4);
         assert!(y >= 0 && y + h as i32 <= 600);
