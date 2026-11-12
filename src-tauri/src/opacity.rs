@@ -405,7 +405,7 @@ pub fn wheel(app: &tauri::AppHandle, units: f64, chord: bool) {
     }
 }
 pub fn refresh(app: &tauri::AppHandle) {
-    for window in app.webview_windows().into_values() {
+    for window in crate::web::managed_windows(app).into_values() {
         if is_memo(window.label()) {
             // A wheel adjustment applies immediately, even during an old fade.
             // Ordinary pointer exit keeps the existing delayed fade instead.

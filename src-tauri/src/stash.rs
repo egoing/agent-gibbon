@@ -427,7 +427,7 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
         let restoring = !s.restoring;
         let mut from = BTreeMap::new();
         for (label, saved) in &mut s.windows {
-            if let Some(w) = app.get_webview_window(label) {
+            if let Some(w) = crate::web::managed_window(app, label) {
                 saved.rect = restore_rect(&w, saved)?;
                 let frame = if !s.animating {
                     Saved {
@@ -466,7 +466,7 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
         let mut entries: Vec<_> = from.into_iter().collect();
         entries.sort_by_key(|(label, _)| label.starts_with("capture-"));
         for (label, frame) in entries {
-            if let Some(w) = app.get_webview_window(&label) {
+            if let Some(w) = crate::web::managed_window(app, &label) {
                 crate::feedback_window::hide(&w);
                 geometry(&w, frame.rect, frame.scale)?;
                 alpha(&w, frame.alpha)?;
@@ -513,7 +513,7 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
         *screens.first().ok_or("사용 가능한 화면 없음")?
     };
     let mut windows = BTreeMap::new();
-    for w in app.webview_windows().into_values() {
+    for w in crate::web::managed_windows(app).into_values() {
         if w.label() == ICON
             || crate::feedback_window::is_surface(w.label())
             || !w.is_visible().map_err(err)?
@@ -566,7 +566,7 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
         flight: None,
     };
     app.state::<Stash>().session.lock().unwrap().replace(s);
-    for w in app.webview_windows().into_values().filter(owns) {
+    for w in crate::web::managed_windows(app).into_values().filter(owns) {
         crate::feedback_window::hide(&w);
     }
     Ok(())
@@ -588,7 +588,7 @@ fn tick(app: &tauri::AppHandle) -> Result<(), String> {
         let restoring = s.restoring;
         drop(guard);
         for (label, saved) in &entries {
-            if let Some(w) = app.get_webview_window(label) {
+            if let Some(w) = crate::web::managed_window(app, label) {
                 let start = from.get(label).unwrap_or(saved);
                 let target = if restoring {
                     saved.rect
@@ -631,7 +631,7 @@ fn tick(app: &tauri::AppHandle) -> Result<(), String> {
                     .keys()
                     .filter(|label| !label.starts_with("capture-"))
                 {
-                    if let Some(w) = app.get_webview_window(label) {
+                    if let Some(w) = crate::web::managed_window(app, label) {
                         if crate::opacity::configured(app).is_some() {
                             crate::sync_opacity(w.clone())?;
                         }
@@ -640,7 +640,7 @@ fn tick(app: &tauri::AppHandle) -> Result<(), String> {
                 }
                 // Feedback can order above notes; keep capture overlays last.
                 for label in entries.keys().filter(|label| label.starts_with("capture-")) {
-                    if let Some(w) = app.get_webview_window(label) {
+                    if let Some(w) = crate::web::managed_window(app, label) {
                         show_frame(&w)?;
                     }
                 }

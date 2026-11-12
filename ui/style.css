@@ -98,7 +98,6 @@ body #controls:has(:focus-visible) { opacity: 1; pointer-events: auto; }
 #controls button { flex: 0 0 var(--toolbar-target); }
 body.folded #controls button { flex-basis: 12px; }
 #editor { height: calc(100% - 30px); }
-#tooltip { position: fixed; z-index: 5; max-width: calc(100vw - 8px); padding: var(--feedback-padding); border: var(--surface-border) solid var(--border); border-radius: var(--surface-radius); background: var(--background); box-shadow: var(--surface-shadow); font: var(--font-ui)/var(--line-ui) -apple-system, BlinkMacSystemFont, sans-serif; overflow-wrap: anywhere; pointer-events: none; }
 #controls button:focus { outline: none; }
 
 body.editing #viewport { display: flex; flex-direction: column; }
@@ -119,3 +118,27 @@ body.folded #toolbar-items { overflow: visible; }
 
 /* Keep keyboard focus readable even on the white theme's subtle panel. */
 #controls button:focus-visible { outline: 2px solid var(--foreground); outline-offset: -2px; }
+
+/* Persistent toolbar row, shared by text, capture and terminal windows. */
+#controls { position: relative; top: auto; right: auto; flex: 0 0 30px; width: 100%; max-width: 100%; height: 30px; padding: 2px 3px; border-radius: 0; opacity: 1; pointer-events: auto; }
+body #controls { opacity: 1; pointer-events: auto; }
+#chrome-title { display: none; min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+#toolbar-items { margin-left: auto; }
+body.toolbar-collapsed #chrome-title { display: block; }
+body.toolbar-collapsed :is(#toolbar-items, #toolbar-previous, #toolbar-next) { display: none; }
+body.toolbar-collapsed #toolbar-toggle svg { transform: rotate(180deg); }
+body.image-note:not(.folded) #viewport { position: relative; inset: auto; flex: 1; min-height: 0; }
+body.image-note:not(.folded) #controls { position: relative; top: auto; right: auto; }
+body.folded #controls { display: none; }
+
+/* Folding keeps the two rightmost controls in the same slots. */
+#toolbar-toggle, #close { flex: 0 0 var(--toolbar-target); }
+#toolbar-toggle { order: 3; }
+#close { order: 4; }
+#toolbar-items { margin-left: auto; }
+#fold-toggle { display: none !important; }
+body.toolbar-collapsed :is(#viewport, #welcome, #terminal, #status, main) { display: none !important; }
+body.folded #controls { display: flex; top: auto; right: auto; padding: 2px 3px; }
+body.folded #controls > :is(#toolbar-toggle, #close) { display: inline-flex !important; width: var(--toolbar-target); height: var(--toolbar-target); flex-basis: var(--toolbar-target); }
+body.folded #chrome-title { display: block; }
+body.folded #fold-title { display: none; }

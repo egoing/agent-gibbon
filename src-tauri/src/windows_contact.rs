@@ -59,7 +59,7 @@ pub fn install(app: &tauri::AppHandle) {
             }
             if app
                 .run_on_main_thread(move || {
-                    for window in handle.webview_windows().into_values() {
+                    for window in crate::web::managed_windows(&handle).into_values() {
                         // Manager, terminals, feedback, capture overlays and the
                         // stash indicator retain their own input and opacity.
                         if !crate::warp::is_note_label(window.label()) {

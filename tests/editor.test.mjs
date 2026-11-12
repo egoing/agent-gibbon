@@ -14,7 +14,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
       addEventListener(type, listener) { this.listeners[type] = listener; },
       setAttribute(key, value) { this.attributes[key] = value; }, removeAttribute(key) { delete this.attributes[key]; }, focus() {},
       setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; },
-      getBoundingClientRect() { return { width: 298, height: this.hidden ? 0 : 42 }; },
+      getBoundingClientRect() { return { width: 298, height: this.hidden ? 0 : (id === 'controls' ? 30 : 42) }; },
       cloneNode() { return { style: {}, querySelector: () => ({ hidden: false, innerHTML: '', remove() {} }), getBoundingClientRect: () => ({ width: 298, height: 120 }), remove() {} }; },
     });
     return elements.get(id);
@@ -243,8 +243,8 @@ test('explicit button folds and unfolds without Control and updates its label', 
   assert.equal(app.element('fold-toggle').attributes['aria-label'], '메모 펼치기');
   assert.equal(app.element('fold-toggle').attributes['aria-expanded'], 'false');
   assert.equal(app.element('fold-toggle').title, '메모 펼치기');
-  assert.match(app.view().message, /Control.*포인터/);
-  assert.equal(app.view().folded_tip, true);
+  assert.equal(app.view().message, '');
+  assert.equal(app.view().folded_tip, undefined);
   await app.element('fold-toggle').listeners.click();
   assert.equal(app.classes.has('folded'), false);
   assert.equal(app.element('fold-toggle').attributes['aria-label'], '메모 접기');
@@ -294,11 +294,11 @@ test('external action never consumes memo height', async () => {
   app.update({ revision: 2, markdown: '변경', html: '<p>변경</p>', change_html: '<p><mark>변경</mark></p>' });
   app.highlight(2); await app.refresh();
   assert.equal((app.view().revision === null), false);
-  assert.equal(app.calls.filter(([name]) => name === 'fit_note').at(-1)[1].height, 122);
+  assert.equal(app.calls.filter(([name]) => name === 'fit_note').at(-1)[1].height, 152);
   assert.equal(app.calls.some(([name]) => name === 'drag_note'), false);
   await app.leave();
   assert.equal((app.view().revision === null), true);
-  assert.equal(app.calls.filter(([name]) => name === 'fit_note').at(-1)[1].height, 122);
+  assert.equal(app.calls.filter(([name]) => name === 'fit_note').at(-1)[1].height, 152);
 });
 
 

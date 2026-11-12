@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 function welcome({fail=false}={}) {
- const elements=Object.fromEntries(['web-form','web-url','run','status'].map(id=>[id,{value:'',disabled:false,textContent:'',attrs:{},setAttribute(k,v){this.attrs[k]=v;}}]));
+ const elements=Object.fromEntries(['web-form','web-url','run','status','title'].map(id=>[id,{value:'',disabled:false,textContent:'',attrs:{},setAttribute(k,v){this.attrs[k]=v;}}]));
  const calls=[];let resolve;
- const context={document:{getElementById:id=>elements[id]},window:{__TAURI__:{core:{invoke:async(name,args)=>{calls.push({name,args});if(fail)throw Error('URL 오류');return new Promise(r=>resolve=r);}}}}};
+ const context={document:{getElementById:id=>elements[id],querySelector:()=>({hidden:false})},window:{__TAURI__:{core:{invoke:async(name,args)=>{calls.push({name,args});if(fail)throw Error('URL 오류');return new Promise(r=>resolve=r);}}}}};
  vm.runInNewContext(readFileSync(new URL('../ui/web.js',import.meta.url),'utf8'),context);
  return {elements,calls,resolve:()=>resolve?.()};
 }

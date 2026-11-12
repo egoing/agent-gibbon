@@ -57,7 +57,7 @@ async function fitContent(flow) {
     document.body.appendChild(measure);
     const rect = measure.getBoundingClientRect();
     const width = Math.ceil(rect.width + 2);
-    const height = Math.ceil(rect.height + 2);
+    const height = Math.ceil(rect.height + 2 + $('controls').getBoundingClientRect().height);
     measure.remove();
     return {width, height};
   });
@@ -163,8 +163,6 @@ async function publishFeedback() {
   if (!memoVisible) return;
   if (publishing) { publishAgain = true; return; }
   const view = feedbackView({ editing, saving, acknowledging, highlightRevision, notice, sourcePath: latestNote?.source_path, color: latestNote?.color });
-  view.folded_tip = folded && notice?.kind === 'tip';
-  if (view.folded_tip) view.buttons = [];
   const signature = JSON.stringify(view);
   if (signature === feedbackSignature) return;
   publishing = true;
@@ -201,7 +199,7 @@ async function refresh(schedule = true) {
       $('dev-instance').textContent = state.dev_label ? 'DEV' : '';
       $('dev-instance').title = state.dev_label || '';
       $('dev-instance').setAttribute('aria-label', state.dev_label || '');
-      $('fold-title').textContent = state.dev_label ? `[${state.dev_label}] ${state.note.title}` : state.note.title;
+      $('fold-title').textContent = state.note.title;
       $('fold-title').title = state.note.title;
       $('edit').disabled = editing || !!state.note.capture;
       $('font-size').disabled = !!state.note.capture;
@@ -378,6 +376,8 @@ function displayFold(value) {
   value = Boolean(value);
   if (folded === value) return;
   folded = value;
+  feedbackSignature = undefined;
+  window.gibbonToolbarFold?.(folded);
   document.body.classList.toggle('folded', folded);
   $('fold-toggle').setAttribute('aria-expanded', String(!folded));
   $('fold-toggle').setAttribute('aria-label', folded ? '메모 펼치기' : '메모 접기');
@@ -391,14 +391,14 @@ async function toggleFold() {
   changingFold = true;
   try {
     displayFold(await invoke('toggle_fold'));
-    if (isMac) notify('Control을 누른 채 메모에 포인터를 올려도 접거나 펼칠 수 있습니다', 'tip');
+    if (isMac && !folded) notify('Control을 누른 채 메모에 포인터를 올려도 접거나 펼칠 수 있습니다', 'tip');
   }
   catch (error) { failure(error); }
   finally { changingFold = false; }
 }
 // Capture folded clicks before the icon handler so one click toggles only once.
 document.addEventListener('click', (event) => {
-  if (!folded || event.button !== 0) return;
+  if (!folded || event.button !== 0 || event.target?.closest?.('#controls')) return;
   event.preventDefault();
   event.stopPropagation();
   return toggleFold();
@@ -418,29 +418,6 @@ window.__TAURI__.event.listen('feedback-action', ({ payload }) => {
   if (action === 'save') return save();
   else if (action === 'cancel' && editing && !saving) return endEditing();
 }).catch(failure);
-
-// Themed Tooltip on pointer hover and keyboard focus; native title stays in data.
-for (const button of document.querySelectorAll('#controls button')) {
-  const tooltip = $('tooltip');
-  function showTooltip() {
-    if (button.title) { button.dataset.tooltip = button.title; button.removeAttribute('title'); }
-    tooltip.textContent = button.dataset.tooltip || button.getAttribute('aria-label');
-    tooltip.hidden = false;
-    button.setAttribute('aria-describedby', 'tooltip');
-    const rect = button.getBoundingClientRect();
-    const bounds = tooltip.getBoundingClientRect();
-    tooltip.style.left = `${Math.max(4, Math.min(rect.right - bounds.width, window.innerWidth - bounds.width - 4))}px`;
-    tooltip.style.top = `${Math.max(0, Math.min(rect.bottom + 4, window.innerHeight - bounds.height))}px`;
-  }
-  function hideTooltip() { tooltip.hidden = true; button.removeAttribute('aria-describedby'); }
-  button.addEventListener('pointerenter', showTooltip);
-  button.addEventListener('focus', () => {
-    if (!restoringEditorFocus && button.matches(':focus-visible')) showTooltip();
-  });
-  button.addEventListener('pointerleave', hideTooltip);
-  button.addEventListener('blur', hideTooltip);
-  button.addEventListener('click', hideTooltip);
-}
 
 window.__TAURI__.event.listen('feedback-connection', ({ payload: c }) => {
   if (c.owner !== win.label) return;

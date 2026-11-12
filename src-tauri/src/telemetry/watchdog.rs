@@ -178,7 +178,7 @@ pub fn install(app: &tauri::AppHandle) {
                         return;
                     }
                     let now = Instant::now();
-                    let windows = target.webview_windows();
+                    let windows = crate::web::managed_windows(&target);
                     if let Ok(mut s) = state.lock() {
                         s.native = now;
                         s.views.retain(|label, _| windows.contains_key(label));
