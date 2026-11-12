@@ -444,7 +444,7 @@ Toast 한 줄 높이는 위 제안값에서 약 25px, Action Bar는 약 32px가 
 
 ![작은 DEV Badge와 편집 영역, 외부 Action Bar의 실제 macOS 화면](design/usability-macos.png)
 
-- 개발 인스턴스는 Toolbar의 작은 `DEV` Badge로 표시한다. 전체 브랜치·인스턴스 정보는 Badge의 Tooltip·접근성 이름과 창 제목에 유지하며 본문 위에 별도 행을 만들지 않는다.
+- 개발 인스턴스 식별은 창 제목·메뉴·CLI 응답으로 유지하며 Toolbar와 접힌 제목에 DEV 배지를 표시하지 않는다.
 - 편집을 시작하면 첫 줄과 시작 위치를 보여 준다. 편집 중 갱신에는 사용자의 초안·커서를 초기화하지 않는다.
 - 저장·취소 후 편집 버튼으로 복원하는 자동 포커스는 Tooltip을 띄우지 않는다. 실제 포인터 진입과 키보드 탐색 시 Tooltip을 표시한다.
 - Action Bar의 동작은 소속 Memo Window만 수신한다. 대상 창으로 이벤트를 전송하고 수신 측에서도 owner를 검사한다. 다중 메모에서 저장·취소가 다른 초안에 전파되지 않아야 한다.
@@ -507,7 +507,7 @@ Toast 한 줄 높이는 위 제안값에서 약 25px, Action Bar는 약 32px가 
 ### Toolbar 롤오버 — 확정 (2026-10-28)
 
 - #56 적용(2026-11-05): 포인터 상태의 송신·수신을 해당 Memo Window로 제한해 다른 창의 Toolbar가 순간 표시되지 않도록 보정했다. 기존 외형·배치·키보드 표시 기준과 시안을 유지한다. macOS ARM64 실제 전후 영상에서 동시 표시가 421프레임 중 42개에서 0개로 줄었으며 텍스트·편집·접힘·숨김 보존을 확인했다. 이미지·키보드는 Chromium 검사이며 Windows·Intel은 미검증이다. [출처·영상·검증 한계](verification/issue56-toolbar/README.md).
-- Toolbar 전체(DEV Badge 포함)는 기본 상태에서 보이지 않으며 클릭을 가로채지 않는다. 메모에 포인터를 올리면 표시하고 벗어나면 숨긴다. 키보드로 Toolbar 버튼을 탐색하는 동안에는 조작 가능하도록 표시한다. Editor의 입력 포커스만으로는 표시하지 않는다.
+- Toolbar 전체는 기본 상태에서 보이지 않으며 클릭을 가로채지 않는다. 메모에 포인터를 올리면 표시하고 벗어나면 숨긴다. 키보드로 Toolbar 버튼을 탐색하는 동안에는 조작 가능하도록 표시한다. Editor의 입력 포커스만으로는 표시하지 않는다.
 - 텍스트·이미지·편집 상태 모두 Memo Surface 우측 상단에 absolute로 겹쳐 표시한다. 본문에 별도 공간을 예약하거나 줄바꿈을 바꾸지 않으며, 표시 중 배경은 Memo 색상을 따른다. 좁은 창에서는 아래의 작은 창 Toolbar 기준에 따라 한 줄에서 이전·다음 도구를 탐색한다. 접힌 상태의 펼치기 버튼에도 같은 숨김 규칙을 적용한다.
 - 기본 상태와 롤오버 상태를 SVG·PNG 시안에 반영했다. 이전 실화면 이미지는 변경 전 기록이다.
 - 검증: UI 테스트 50개와 개발 빌드 통과. Headless Chromium에서 기본 숨김·클릭 비활성화·absolute 배치·포인터 표시·본문 크기 불변·Editor 포커스 시 숨김·Toolbar 키보드 포커스 시 표시를 확인했다. SVG를 PNG로 렌더링해 확인했다. macOS WebView의 실제 포인터 조작과 Windows 실화면은 미검증이다.
@@ -537,8 +537,8 @@ Toast 한 줄 높이는 위 제안값에서 약 25px, Action Bar는 약 32px가 
 
 - 지원 하한 **144×32 논리 px**와 기존 롤오버·본문 크기 보존을 유지한다. Toolbar는 **한 줄**로 표시하며 창 높이를 늘리거나 본문 공간을 예약하지 않는다. 위 롤오버 절의 기존 줄바꿈 동작을 대체한다.
 - 전체 기능이 들어가지 않는 너비에서만 24×24px의 **이전 도구·다음 도구** 버튼을 양끝에 표시한다. 가운데 기능을 가로로 넘겨 모든 버튼에 포인터로 접근한다. 끝에 도달한 탐색 버튼은 흐리게 표시하고 `aria-disabled`로 알리되 키보드 포커스는 유지한다.
-- Tab·Shift+Tab으로 기능을 탐색하면 포커스된 버튼 전체를 보이게 한다. DEV Badge는 같은 줄에 포함한다. 접힌 상태에서는 기존 펼치기 버튼만 표시하며, 이미지 메모는 기존처럼 글자 크기·편집 버튼을 제외한다.
-- 300px 기본 너비에서는 DEV Badge를 포함한 모든 기능이 들어가므로 이전·다음 버튼을 표시하지 않는다. 본문 글자 크기와 독립적인 24px 클릭 영역을 유지한다.
+- Tab·Shift+Tab으로 기능을 탐색하면 포커스된 버튼 전체를 보이게 한다. 접힌 상태에서는 기존 펼치기 버튼만 표시하며, 이미지 메모는 기존처럼 글자 크기·편집 버튼을 제외한다.
+- 300px 기본 너비에서는 모든 기능이 들어가므로 이전·다음 버튼을 표시하지 않는다. 본문 글자 크기와 독립적인 24px 클릭 영역을 유지한다.
 - [작은 창 시안 SVG](design/toolbar-compact.svg) · [PNG](design/toolbar-compact.png). 기존 Connected Feedback 시안은 그대로 유지하며 이 시안이 작은 창 Toolbar 배치 기준을 보충한다. 설명용 시안이며 실제 화면 캡처가 아니다.
 
 ![144×32·144×48·300px 너비의 한 줄 Toolbar와 탐색 버튼](design/toolbar-compact.png)
@@ -556,7 +556,7 @@ Toast 한 줄 높이는 위 제안값에서 약 25px, Action Bar는 약 32px가 
 
 ## Official Icon Library — 확정 (2026-10-30)
 
-- 공식 아이콘 라이브러리는 [Tabler Icons](https://tabler.io/icons)다. 신규·교체 아이콘은 Outline 스타일, 24×24 viewBox와 stroke 2를 기본으로 한다. 기존 Toolbar 아이콘의 전체 전환은 이번 적용 범위에 포함하지 않는다.
+- 공식 아이콘 라이브러리는 [Tabler Icons](https://tabler.io/icons)다. 신규·교체 아이콘은 Outline 스타일, 24×24 viewBox와 stroke 2를 기본으로 한다. Toolbar에 지정된 아이콘을 적용한다.
 - Memo List의 텍스트는 **file-text**, 이미지는 **photo**를 사용한다. 원본은 Tabler Icons v3.35.0이며 `src-tauri/icons/tabler`에 SVG와 MIT 라이선스를 보관한다. 네이티브 메뉴용 PNG는 원본 SVG에서 18×18로 렌더링한다.
 - 아이콘 메뉴 항목으로 변경하며 열린 메모는 제목 앞의 `✓` 문자로 표시한다. 네이티브 체크 항목을 사용한다는 이전 기준을 대체한다. `[텍스트]`·`[이미지]` 유형명도 유지해 아이콘만 해석할 필요가 없도록 한다.
 - 원본 데이터 판별, 정렬, 개별 복원 동작은 유지한다. 기존 목록 시안을 Tabler 아이콘으로 갱신한다.
@@ -874,3 +874,11 @@ SVG 3개와 PNG 3개를 함께 갱신했다. PNG 렌더링과 배치 육안 확�
 - 구현과 검증은 [#92 기록](verification/issue92-web-welcome.md)을 따른다. 아래 시안은 설명용이며 실앱 캡처가 아니다. macOS ARM64의 실제 Welcome 버튼 실행·CLI 숨김/복원과 3개 크기의 Chromium 검증을 통과했다. 초기 메인 스레드 충돌을 수정 후 재검증했다. 전체 플랫폼 CI·Windows/Intel GUI·정확한 영역 좌표 및 실제 외부 공격 스크립트는 미검증이며 상세 출처는 위 기록을 따른다.
 
 [SVG 시안](design/web-welcome.svg) · [PNG 시안](design/web-welcome.png)
+
+## Toolbar Tabler 아이콘 — 2026-11-12
+
+- 메모·이미지 메모·터미널·웹 창의 공통 기능에 같은 아이콘을 사용한다. 글자 크기 `text-size`, 편집 `edit`, 파일 저장 `arrow-bar-to-down`, 복사 `copy`, 이동 `file-arrow-left` / `file-arrow-right`, 고정 `stack-front`, 접기 `arrow-autofit-up`, 닫기 `x`다. 해당 기능이 없는 창에는 버튼을 추가하지 않는다.
+- 이동 아이콘은 현재 모니터 작업 영역의 중앙을 기준으로 목적지 방향을 표시한다. 접힌 창의 펼치기 아이콘은 접기 아이콘을 180도 회전한다. 고정 해제는 아이콘 불투명도로 구분한다. 크기는 14px, 선 두께는 2다.
+- 개발 배지는 툴바와 접힌 메모 제목에서 제거하며 인스턴스 식별은 네이티브 창 제목과 CLI에 유지한다. [Toolbar 시안 SVG](design/toolbar-compact.svg) · [PNG](design/toolbar-compact.png). 실제 앱 및 플랫폼별 검증은 아래 결과와 별도로 확인한다.
+- 최신 main 통합 전 워크트리 검증: UI 테스트 170개·Rust 테스트 206개·Clippy·Rustfmt·개발 빌드 통과, 두 SVG 시안의 PNG 렌더링을 육안 확인했다. 개발 CLI `open`·`inspect`에서 인스턴스 `dev-223bdadd57a162c936b62ece`와 메모 `toolbar-icons-20261112`를 확인했다. 실행 파일은 이 워크트리의 debug 바이너리, PID 49437이다. 실제 아이콘 화면·터미널 GUI·Intel·Windows 및 전체 플랫폼 CI는 미검증이다.
+- 최신 main의 전용 툴바 행과 통합한 뒤 UI 테스트 182개·Rust 테스트 212개·Clippy·Rustfmt·개발 빌드가 통과했다. Chromium에서 메모·터미널·웹의 144px·300px 너비별 전용 행과 접기·펼치기를 확인했다. 이는 브라우저 레이아웃 검사이며 실제 네이티브 창 검증은 아니다.

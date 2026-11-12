@@ -19,8 +19,6 @@ try {
   const menu = document.getElementById('diff-actions');
   const button = document.getElementById('clear-diff');
   const viewport = document.getElementById('viewport');
-  document.getElementById('dev-instance').hidden = false;
-  document.getElementById('dev-instance').textContent = 'DEV egoing/diff-clean-when-focus · 861e11d9';
   document.getElementById('content').innerHTML = Array.from({length: 30}, (_, i) => `<p>본문 ${i}: 마지막 줄도 메뉴 위에서 읽을 수 있습니다.</p>`).join('');
   for (const [width, height, font] of [[300, 240, 12], [144, 160, 18], [300, 80, 12]]) {
     document.body.style.width = width + 'px';

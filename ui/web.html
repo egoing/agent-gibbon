@@ -1,15 +1,20 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>웹 시작</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="web.css"></head><body><div id="controls" role="toolbar" aria-label="Toolbar">
 <span id="chrome-title"><span id="title">웹</span></span><button id="toolbar-previous" aria-label="이전 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
 <div id="toolbar-items">
-<span id="dev-instance" hidden></span>
 
 
 
 
 
 
-<button id="pin" aria-label="상단 고정" aria-pressed="true" title="상단 고정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 7 4 4v2H5v-2l4-4-1-7Z"/><path d="M12 16v6"/></svg></button>
+
+<button id="pin" aria-label="상단 고정" aria-pressed="true" title="상단 고정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 4l8 4l8 -4l-8 -4" fill="currentColor" />
+  <path d="M8 14l-4 2l8 4l8 -4l-4 -2" />
+  <path d="M8 10l-4 2l8 4l8 -4l-4 -2" /></svg></button>
 </div>
 <button id="toolbar-next" aria-label="다음 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
-<button id="toolbar-toggle" aria-label="툴바 접기" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><button id="close" aria-label="웹 창 닫기" title="웹 창 닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+<button id="toolbar-toggle" aria-label="툴바 접기" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4h-6a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h8" />
+  <path d="M18 20v-17" />
+  <path d="M15 6l3 -3l3 3" /></svg></button><button id="close" aria-label="웹 창 닫기" title="웹 창 닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6l-12 12" />
+  <path d="M6 6l12 12" /></svg></button></div>
 <main><form id="web-form"><label for="web-url">웹 주소</label><input id="web-url" type="url" placeholder="https://example.com" autocomplete="off" spellcheck="false" required aria-describedby="hint status"><p id="hint">HTTP 또는 HTTPS 주소를 입력하세요.</p><button id="run" type="submit">실행</button><p id="status" role="status" aria-live="polite"></p></form></main><script src="web.js"></script><script type="module" src="toolbar.js"></script><script src="web-chrome.js"></script></body></html>

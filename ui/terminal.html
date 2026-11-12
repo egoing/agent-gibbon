@@ -1,17 +1,28 @@
 <!doctype html><html lang="ko"><head><script src="telemetry.js"></script><script src="updater-guard.js"></script><script src="local-flow.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>터미널</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="vendor/xterm.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="terminal.css"></head><body><div id="memo-surface"><header><div id="controls" role="toolbar" aria-label="Toolbar">
 <span id="chrome-title"><span id="title">터미널</span></span><button id="toolbar-previous" aria-label="이전 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
 <div id="toolbar-items">
-<span id="dev-instance" hidden></span>
-
-<button id="font-size" aria-label="글자 크기 13px, 클릭하여 변경" title="글자 크기 13px · 클릭하여 변경"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11v9M9 13c-2-4-7-2-7 2s5 6 7 2M12 20l4.5-16L21 20M14 14h5"/></svg></button>
 
 
-<button id="copy" aria-label="선택한 텍스트 복사" title="선택한 텍스트 복사"><svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="1"/><path d="M16 8V3H3v13h5"/></svg></button>
+<button id="font-size" aria-label="글자 크기 13px, 클릭하여 변경" title="글자 크기 13px · 클릭하여 변경"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v-2h13v2" />
+  <path d="M10 5v14" />
+  <path d="M12 19h-4" />
+  <path d="M15 13v-1h6v1" />
+  <path d="M18 12v7" />
+  <path d="M17 19h2" /></svg></button>
 
-<button id="pin" aria-label="상단 고정" aria-pressed="true" title="상단 고정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8l-1 7 4 4v2H5v-2l4-4-1-7Z"/><path d="M12 16v6"/></svg></button>
+
+<button id="copy" aria-label="선택한 텍스트 복사" title="선택한 텍스트 복사"><svg class="copy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />
+  <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg></button>
+
+<button id="pin" aria-label="상단 고정" aria-pressed="true" title="상단 고정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 4l8 4l8 -4l-8 -4" fill="currentColor" />
+  <path d="M8 14l-4 2l8 4l8 -4l-4 -2" />
+  <path d="M8 10l-4 2l8 4l8 -4l-4 -2" /></svg></button>
 </div>
 <button id="toolbar-next" aria-label="다음 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
-<button id="toolbar-toggle" aria-label="툴바 접기" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><button id="close" aria-label="터미널 종료" title="터미널 종료"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+<button id="toolbar-toggle" aria-label="툴바 접기" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4h-6a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h8" />
+  <path d="M18 20v-17" />
+  <path d="M15 6l3 -3l3 3" /></svg></button><button id="close" aria-label="터미널 종료" title="터미널 종료"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6l-12 12" />
+  <path d="M6 6l12 12" /></svg></button></div>
 </header><section id="welcome" hidden aria-label="작업 시작" aria-busy="false"><div class="welcome-content">
 <section aria-labelledby="location-heading"><h1 id="location-heading">작업 위치</h1>
 <button id="choose-folder" class="plain-row"><span aria-hidden="true">📂</span> 폴더 열기…</button>

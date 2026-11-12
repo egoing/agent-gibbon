@@ -429,11 +429,17 @@ test('save success becomes Toast; save error retains actions and outranks tips',
   assert.equal(app.view().message, '');
 });
 
-test('development labels remain distinct from installed memo content', async () => {
-  const app = await setup(new Map(), { dev_label: 'DEV design-system', instance: 'dev-a' });
-  assert.equal(app.element('dev-instance').textContent, 'DEV');
-  assert.equal(app.element('dev-instance').attributes['aria-label'], 'DEV design-system');
-  assert.equal(app.element('dev-instance').hidden, false);
+test('move icon follows the destination direction returned by the current monitor', async () => {
+  const app = await setup(new Map(), { warp_right: true });
+  assert.equal(app.element('warp').attributes['data-direction'], 'right');
+  app.state({ warp_right: false });
+  await app.refresh();
+  assert.equal(app.element('warp').attributes['data-direction'], 'left');
+});
+
+test('development metadata does not alter the displayed memo title', async () => {
+  const app = await setup(new Map(), { dev_label: 'DEV design-system', instance: 'dev-a' }, { title: '검증 메모' });
+  assert.equal(app.element('fold-title').textContent, '검증 메모');
   assert.equal(app.element('content').innerHTML, '<h1>원문</h1>');
 });
 
