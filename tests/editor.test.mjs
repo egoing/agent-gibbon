@@ -11,6 +11,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
   const element = id => {
     if (!elements.has(id)) elements.set(id, {
       hidden: false, disabled: false, value: '', dataset: {}, listeners: {}, attributes: {},
+      closest(selector) { return id === 'fold-toggle' && selector.includes('button') ? this : null; },
       addEventListener(type, listener) { this.listeners[type] = listener; },
       setAttribute(key, value) { this.attributes[key] = value; }, removeAttribute(key) { delete this.attributes[key]; }, focus() {},
       setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; },
@@ -674,4 +675,20 @@ test('shared toolbar reopens note feedback through the normal note toggle', asyn
   assert.equal(app.classes.has('folded'), false);
   assert.match(app.view().message, /Control.*포인터/);
   assert.equal(app.view().folded_tip, undefined);
+});
+
+test('collapsed toolbar title starts native dragging without unfolding or stealing button clicks', async () => {
+  const app = await setup();
+  app.fold(true);
+  await app.pollFold();
+  let prevented = false;
+  app.events.mousedown({button: 0, target: {closest: selector => selector === '#controls'},
+    preventDefault() { prevented = true; }});
+  await new Promise(setImmediate);
+  assert.equal(prevented, true);
+  assert.equal(app.calls.filter(([name]) => name === 'drag_note').length, 1);
+  assert.equal(app.classes.has('folded'), true);
+  app.events.mousedown({button: 0, target: {closest: selector => selector.includes('button')},
+    preventDefault() { assert.fail('button interaction must be preserved'); }});
+  assert.equal(app.calls.filter(([name]) => name === 'drag_note').length, 1);
 });

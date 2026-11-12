@@ -5,6 +5,8 @@ import {readFileSync} from 'node:fs';
 
 test('toolbar waits for native fold and restores the same state on expansion', async () => {
   const classes = new Set();
+  let focused = true;
+  const windowEvents = {};
   const elements = new Map();
   const element = id => {
     if (!elements.has(id)) elements.set(id, {
@@ -13,6 +15,7 @@ test('toolbar waits for native fold and restores the same state on expansion', a
       addEventListener(name, callback) { this.listeners[name] = callback; },
       setAttribute(name, value) { this.attributes[name] = value; },
       getAttribute(name) { return this.attributes[name]; },
+      removeAttribute(name) { delete this.attributes[name]; },
       querySelectorAll() { return []; },
     });
     return elements.get(id);
@@ -24,11 +27,24 @@ test('toolbar waits for native fold and restores the same state on expansion', a
   let folded = false;
   const calls = [];
   const content = element('content');
-  const document = {body, getElementById: id => id === 'fold-title' ? null : element(id)};
-  const env = {__TAURI__: {core: {invoke: async name => { calls.push(name); folded = !folded; return folded; }}}};
+  element('controls').querySelectorAll = () => [element('close')];
+  const document = {body, hasFocus: () => focused, getElementById: id => id === 'fold-title' ? null : element(id)};
+  const env = {addEventListener(name, callback) { windowEvents[name] = callback; }, __TAURI__: {core: {invoke: async name => { calls.push(name); folded = !folded; return folded; }}}};
   vm.runInNewContext(readFileSync(new URL('../ui/toolbar.js', import.meta.url), 'utf8'), {
     document, window: env, ResizeObserver: class {observe() {}}, MutationObserver: class {observe() {}},
   });
+  const close = element('close');
+  close.listeners.pointerenter();
+  assert.equal(close.attributes['data-pointer-over'], '');
+  close.listeners.pointerleave();
+  assert.equal(close.attributes['data-pointer-over'], undefined);
+  focused = false;
+  close.listeners.pointerenter();
+  assert.equal(close.attributes['data-pointer-over'], undefined);
+  focused = true;
+  close.listeners.pointerenter();
+  windowEvents.blur();
+  assert.equal(close.attributes['data-pointer-over'], undefined);
   const toggle = element('toolbar-toggle');
   await toggle.listeners.click();
   assert.equal(classes.has('toolbar-collapsed'), true);

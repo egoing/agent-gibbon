@@ -81,3 +81,17 @@ new MutationObserver(syncTooltips).observe(controls, {
   subtree: true, attributes: true, attributeFilter: ['aria-label'],
 });
 syncTooltips();
+
+// Track actual pointer entry as well as CSS hover in the focused WebView.
+// Never activate the window to produce hover feedback; first-click policy
+// continues to belong to the native window.
+const toolbarButtons = [...controls.querySelectorAll('button')];
+for (const button of toolbarButtons) {
+  button.addEventListener('pointerenter', () => {
+    if (document.hasFocus() && !button.disabled) button.setAttribute('data-pointer-over', '');
+  });
+  button.addEventListener('pointerleave', () => button.removeAttribute('data-pointer-over'));
+}
+window.addEventListener('blur', () => {
+  for (const button of toolbarButtons) button.removeAttribute('data-pointer-over');
+});

@@ -170,3 +170,12 @@ body.toolbar-collapsed #controls > :is(#toolbar-toggle, #close) svg { width: 12p
 body.toolbar-collapsed header { height: 22px; min-height: 22px; }
 
 body.toolbar-collapsed > #controls { margin: 1px 0; }
+
+/* Keep the collapsed bar's icon geometry in both states. The remaining 8px
+   of the expanded row belongs to the content separator, below the buttons. */
+#controls { --icon-size: 12px; padding: 0 3px; align-items: flex-start; }
+#controls button { height: 22px; min-height: 22px; padding: 0; }
+body.toolbar-collapsed #controls { align-items: flex-start; }
+#controls button:is(:hover, [data-pointer-over]):not(:disabled) {
+  background: color-mix(in srgb, var(--foreground) 16%, var(--background));
+}
