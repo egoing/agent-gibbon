@@ -288,7 +288,7 @@ python3 scripts/macos-tray-smoke.py
 
 배포 태그를 push하면 세 플랫폼의 검사와 공식 서명 빌드를 수행하고 GitHub Draft에 파일을 준비합니다. 사용자 지시 후 동일한 파일을 공개합니다. [릴리스 절차](docs/releases.md)를 따릅니다.
 
-일반 브랜치 push는 Release 워크플로를 실행하지 않습니다. 전체 플랫폼 검사가 필요하면 `workflow_dispatch`로 요청하며, 수동 실행은 검증·빌드 결과를 Actions artifact에 보관하고 릴리스를 공개하지 않습니다. Rust 의존성 캐시는 GitHub Actions에 저장하며, 앱·설치 파일은 다시 빌드하고 테스트도 유지합니다. 캐시를 소스 저장소에 커밋하지 않습니다. 수동 검사 명령과 배포용 Sentry DSN 설정, 서명 제한, 실패 시 처리 등 상세 절차는 [자동 릴리스 안내](docs/releases.md)를 참고하세요.
+일반 브랜치 push는 Release 워크플로를 실행하지 않습니다. 전체 플랫폼 검사는 실제 배포 준비 또는 사용자의 명시적 요청 때만 실행합니다. 요청 시 `workflow_dispatch`를 사용하며, 수동 실행은 검증·빌드 결과를 Actions artifact에 보관하고 릴리스를 공개하지 않습니다. Rust 의존성 캐시는 GitHub Actions에 저장하며, 앱·설치 파일은 다시 빌드하고 테스트도 유지합니다. 캐시를 소스 저장소에 커밋하지 않습니다. 수동 검사 명령과 배포용 Sentry DSN 설정, 서명 제한, 실패 시 처리 등 상세 절차는 [자동 릴리스 안내](docs/releases.md)를 참고하세요.
 
 설치 파일은 [GitHub Releases](https://github.com/egoing/agent-gibbon/releases)에서 받습니다. 공개 저장소에서 다운로드할 수 있습니다.
 
