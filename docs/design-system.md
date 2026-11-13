@@ -923,3 +923,12 @@ SVG 3개와 PNG 3개를 함께 갱신했다. PNG 렌더링과 배치 육안 확�
 - 처음 스크롤 가능한 상태가 되거나 스크롤할 때 1초 표시 후 160ms로 숨긴다. thumb 호버·드래그·키보드 초점과 본문 키보드 초점에서는 표시한다. 평소 hit area는 3px이며 thumb에 접근한 동안 12px로 확장한다. 휠/트랙패드는 기존 본문 컨테이너를 사용한다. thumb 드래그는 메모 이동 이벤트로 전파하지 않는다.
 - 본문과 scrollbar는 Tab으로 접근한다. scrollbar에는 이름·제어 대상·범위·현재값을 제공하며 방향키·PageUp/Down·Home/End를 지원한다. 키보드 초점에는 별도 outline을 표시한다. reduced-motion에서는 fade를 없애고 prefers-contrast: more에서는 상시 표시한다. forced-colors에서는 네이티브 스크롤바로 대체한다. OS의 별도 ‘스크롤 막대 항상 표시’ 선호 감지는 아직 구현하지 않았다.
 - [승인 시안 SVG](design/proposals/overlay-scrollbar-20261113.svg) · [PNG](design/proposals/overlay-scrollbar-20261113.png) · [구현·검증 기록](verification/overlay-scrollbar-20261113.md). 시안은 승인 전 제작 표기를 보존하며 실제 적용 상태와 한계는 검증 기록을 따른다.
+
+## 앱 시작 시 창 복원 — #150
+
+- 일반 시작에도 직전 텍스트·이미지·웹·터미널 창의 위치·크기·핀·표시·최소화·접힘을 복원한다. 닫힌 텍스트/이미지 메모는 닫힌 상태로, 숨긴 창은 숨긴 상태로 유지한다. 복원은 키보드 포커스를 가져오지 않는다. 펼친 크기도 저장하여 접힌 창을 다시 펼칠 수 있다.
+- 웹 Welcome은 Welcome으로, 웹 콘텐츠는 직전 HTTP(S) URL로 다시 연다. 주소는 인스턴스별 로컬 복원 파일에만 저장한다. 이전의 웹 세션 한정 저장 기준은 이 범위에서 대체한다.
+- 터미널은 Welcome으로 복원하며 기존 상태 영역에서 이전 프로세스 종료와 마지막 명령을 안내한다. 명령을 자동 실행하지 않는다. 비밀값을 추정해서 가리는 대신 정확히 일치하는 `pwd`, `ls`, `git status`, `git diff`, `git log`, `whoami`, `date`, `clear`만 저장한다. 다른 명령·인자·편집/escape 입력·부분 입력은 저장에서 제외했다고 표시한다. 원시 입력·출력·셸 이력을 수집하거나 저장하지 않는다.
+- 기존 위치에 상단 24px·가로 48px 접근 영역이 남으면 여러 화면에 걸친 위치를 유지한다. 화면이 해제되어 접근할 수 없으면 가장 가까운 작업 영역으로 필요한 만큼만 이동한다. 창 크기를 강제로 줄이지 않는다.
+- 정상 종료 직전 및 1초 주기의 원자적 로컬 checkpoint를 사용한다. 비정상 종료 시 마지막 완료 checkpoint 이후의 배치는 손실될 수 있다. 진행 중인 등장/배치·stash 전환은 저장하지 않는다. 기존 업데이트 snapshot을 먼저 적용하며 일반 snapshot을 중복 적용하지 않는다. 손상된 파일은 덮어쓰지 않고 해당 실행의 상태 저장을 중지한다.
+- 외형·컨트롤 배치는 유지하고 터미널의 기존 status 영역만 사용한다. [터미널 복원 안내 시안](design/terminal-restore.svg) · [PNG](design/terminal-restore.png). 구현·검증 범위는 [검증 기록](verification/startup-window-restore.md)을 따른다.
