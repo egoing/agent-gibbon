@@ -18,6 +18,7 @@ mod opacity;
 mod placement;
 mod presentation;
 mod privacy;
+mod session_restore;
 mod sizing;
 mod skills;
 mod source;
@@ -815,6 +816,22 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     true
                 }
             };
+            let mut session_enabled = true;
+            let restored_session = if restored_update {
+                false
+            } else {
+                match session_restore::restore(app.handle()) {
+                    Ok(restored) => restored,
+                    Err(error) => {
+                        session_enabled = false;
+                        eprintln!(
+                            "시작 창 복원 실패 (원본 보존, 이번 실행의 상태 저장 중지): {error}"
+                        );
+                        true
+                    }
+                }
+            };
+            session_restore::start(app.handle(), session_enabled);
             updater::initialize(app.handle());
             tray::install(app.handle())?;
             capture::install(app.handle())?;
@@ -824,7 +841,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::install_contact_monitor(app.handle());
             #[cfg(windows)]
             windows_contact::install(app.handle());
-            if initial_open && !restored_update {
+            if initial_open && !restored_update && !restored_session {
                 apply_direct(
                     app.handle(),
                     Request {
@@ -892,6 +909,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .build(tauri::generate_context!())
         .map_err(|e| e.to_string())?;
     app.run(|_app, _event| {
+        if matches!(_event, tauri::RunEvent::ExitRequested { .. }) {
+            session_restore::checkpoint(_app);
+        }
         if matches!(_event, tauri::RunEvent::Exit) {
             telemetry::shutdown(_app);
             terminal::shutdown(_app);

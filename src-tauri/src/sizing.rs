@@ -212,6 +212,30 @@ pub fn folded(window: &WebviewWindow) -> bool {
         .unwrap_or(false)
 }
 
+pub(crate) fn expanded_size(window: &WebviewWindow) -> Option<LogicalSize<f64>> {
+    window
+        .state::<Sizes>()
+        .0
+        .lock()
+        .ok()?
+        .get(window.label())?
+        .expanded
+}
+pub(crate) fn restore_fold(
+    window: &WebviewWindow,
+    expanded: Option<LogicalSize<f64>>,
+) -> Result<(), String> {
+    if let Some(size) = expanded {
+        window.set_size(size).map_err(|e| e.to_string())?;
+        let sizes = window.state::<Sizes>();
+        let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
+        let state = states.entry(window.label().into()).or_default();
+        state.expanded = None;
+        toggle(window, state)?;
+    }
+    Ok(())
+}
+
 fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
     crate::entrance::cancel(window)?;
     crate::layout::mark(window, true);
