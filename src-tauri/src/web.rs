@@ -108,6 +108,40 @@ fn show(w: &WebviewWindow) -> Result<(), String> {
     crate::focus::restore(w);
     Ok(())
 }
+// Keep remote content below the trusted toolbar. A decorated macOS host has
+// a titlebar inset between Wry child coordinates and the visible content area.
+fn content_bounds(chrome: &tauri::Webview) -> Result<tauri::Rect, String> {
+    // Resize events precede WebView autoresizing. Read the current native frame
+    // on macOS instead of the previous WebView size, including its title inset.
+    #[cfg(target_os = "macos")]
+    let (size, inset) = unsafe {
+        let host = chrome.window();
+        let native = &*(host.ns_window().map_err(err)? as *const objc2_app_kit::NSWindow);
+        let frame = native.frame();
+        let content = native.contentLayoutRect();
+        (
+            tauri::LogicalSize::new(content.size.width, frame.size.height),
+            (frame.size.height - content.size.height).max(0.0),
+        )
+    };
+    #[cfg(not(target_os = "macos"))]
+    let (size, inset) = (
+        chrome
+            .window()
+            .inner_size()
+            .map_err(err)?
+            .to_logical::<f64>(chrome.window().scale_factor().map_err(err)?),
+        0.0,
+    );
+    Ok(tauri::Rect {
+        position: tauri::LogicalPosition::new(3.0, 30.0 + inset).into(),
+        size: tauri::LogicalSize::new(
+            (size.width - 6.0).max(1.0),
+            (size.height - inset - 33.0).max(1.0),
+        )
+        .into(),
+    })
+}
 pub fn create(
     app: &tauri::AppHandle,
     bounds: Option<ImageNote>,
@@ -181,6 +215,7 @@ pub(crate) fn create_presented(
                 .inner_size(600.0, 400.0)
                 .min_inner_size(240.0, 160.0)
                 .always_on_top(true)
+                .decorations(false)
                 .visible(false)
                 .focused(false)
                 .on_navigation(|url| {
@@ -220,20 +255,12 @@ pub(crate) fn create_presented(
                 event,
                 tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. }
             ) {
-                if let (Some(parent), Some(content)) = (
-                    handle.get_webview(&parent_label).map(|view| view.window()),
+                if let (Some(chrome), Some(content)) = (
+                    handle.get_webview(&parent_label),
                     handle.get_webview(&content_label),
                 ) {
-                    if let (Ok(size), Ok(scale)) = (parent.inner_size(), parent.scale_factor()) {
-                        let size = size.to_logical::<f64>(scale);
-                        let _ = content.set_bounds(tauri::Rect {
-                            position: tauri::LogicalPosition::new(0.0, 30.0).into(),
-                            size: tauri::LogicalSize::new(
-                                size.width,
-                                (size.height - 30.0).max(1.0),
-                            )
-                            .into(),
-                        });
+                    if let Ok(bounds) = content_bounds(&chrome) {
+                        let _ = content.set_bounds(bounds);
                     }
                 }
             }
@@ -252,15 +279,29 @@ pub(crate) fn create_presented(
             .inner_size()
             .map_err(err)?
             .to_logical::<f64>(w.scale_factor().map_err(err)?);
-        if let Err(error) = w.as_ref().window().add_child(
+        let content = match w.as_ref().window().add_child(
             content,
             tauri::LogicalPosition::new(0.0, 30.0),
             tauri::LogicalSize::new(size.width, (size.height - 30.0).max(1.0)),
         ) {
+            Ok(content) => content,
+            Err(error) => {
+                if previous.is_none() {
+                    let _ = w.destroy();
+                }
+                return Err(err(error));
+            }
+        };
+        // Reapply after attachment: Wry now resolves the child's actual parent.
+        if let Err(error) =
+            content_bounds(w.as_ref()).and_then(|bounds| content.set_bounds(bounds).map_err(err))
+        {
+            // Preserve an existing Welcome and remove only this attempted child.
+            let _ = content.close();
             if previous.is_none() {
                 let _ = w.destroy();
             }
-            return Err(err(error));
+            return Err(error);
         }
     }
     app.state::<Windows>().0.lock().map_err(err)?.insert(
@@ -349,6 +390,21 @@ pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String>
     let window = r.host.clone();
     match action.as_str() {
         "inspect" => inspect(window.app_handle(), id),
+        "drag" => {
+            window.start_dragging().map_err(err)?;
+            Ok(json!({"ok":true}))
+        }
+        action if action.starts_with("resize-") => {
+            let direction =
+                serde_json::from_value(json!(action.strip_prefix("resize-").unwrap_or_default()))
+                    .map_err(err)?;
+            window
+                .as_ref()
+                .window()
+                .start_resize_dragging(direction)
+                .map_err(err)?;
+            Ok(json!({"ok":true}))
+        }
         "pin" => {
             window
                 .set_always_on_top(!window.is_always_on_top().map_err(err)?)

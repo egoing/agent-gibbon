@@ -1,10 +1,6 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>웹 시작</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="web.css"></head><body><div id="controls" role="toolbar" aria-label="Toolbar">
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>웹 시작</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="web.css"></head><body><div id="controls" role="toolbar" aria-label="웹 도구">
 <span id="chrome-title"><span id="title">웹</span></span><button id="toolbar-previous" aria-label="이전 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
 <div id="toolbar-items">
-
-
-
-
 
 
 
@@ -13,8 +9,8 @@
   <path d="M8 10l-4 2l8 4l8 -4l-4 -2" /></svg></button>
 </div>
 <button id="toolbar-next" aria-label="다음 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
-<button id="toolbar-toggle" aria-label="툴바 접기" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4h-6a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h8" />
+<button id="toolbar-toggle" aria-label="메모 접기" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4h-6a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h8" />
   <path d="M18 20v-17" />
   <path d="M15 6l3 -3l3 3" /></svg></button><button id="close" aria-label="웹 창 닫기" title="웹 창 닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6l-12 12" />
   <path d="M6 6l12 12" /></svg></button></div>
-<main><form id="web-form"><label for="web-url">웹 주소</label><input id="web-url" type="url" placeholder="https://example.com" autocomplete="off" spellcheck="false" required aria-describedby="hint status"><p id="hint">HTTP 또는 HTTPS 주소를 입력하세요.</p><button id="run" type="submit">실행</button><p id="status" role="status" aria-live="polite"></p></form></main><script src="web.js"></script><script type="module" src="toolbar.js"></script><script src="web-chrome.js"></script></body></html>
+<main><form id="web-form"><label for="web-url">웹 주소</label><input id="web-url" type="url" placeholder="https://example.com" autocomplete="off" spellcheck="false" required aria-describedby="hint status"><p id="hint">HTTP 또는 HTTPS 주소를 입력하세요.</p><button id="run" type="submit">실행</button><p id="status" role="status" aria-live="polite"></p></form></main><div class="resize" data-direction="North" id="n"></div><div class="resize" data-direction="South" id="s"></div><div class="resize" data-direction="East" id="e"></div><div class="resize" data-direction="West" id="w"></div><div class="resize corner" data-direction="NorthWest" id="nw"></div><div class="resize corner" data-direction="NorthEast" id="ne"></div><div class="resize corner" data-direction="SouthWest" id="sw"></div><div class="resize corner" data-direction="SouthEast" id="se"></div><script src="web.js"></script><script type="module" src="toolbar.js"></script><script src="web-chrome.js"></script><script type="module">import {installMemoSurfaceAppearance} from './memo-surface-appearance.mjs'; installMemoSurfaceAppearance();</script></body></html>
