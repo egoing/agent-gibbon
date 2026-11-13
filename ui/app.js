@@ -7,7 +7,8 @@ const win = window.__TAURI__.window.getCurrentWindow();
 const $ = (id) => document.getElementById(id);
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
 const shortcut = key => isMac ? `Command ${key}` : `Ctrl ${key}`;
-$('export').title = `파일로 저장 · ${shortcut('S')}`;
+$('export').title = `파일 내보내기 · ${shortcut('S')}`;
+$('export').setAttribute('aria-label', '파일 내보내기');
 let revision = -1;
 let appearanceSignature;
 function applyMemoAppearance(color) {
@@ -118,7 +119,7 @@ function beginEditing() {
 $('edit').addEventListener('click', () => { contentAction(); beginEditing(); });
 
 async function save() {
-  if (!editing || saving) return;
+  if (!editing || saving || exporting) return;
   saving = true;
   publishFeedback();
   $('markdown').readOnly = true;
@@ -134,7 +135,7 @@ async function save() {
       displayedHtml = $('content').innerHTML;
       revision = latestNote.revision;
       endEditing(flow);
-      notify('저장했습니다');
+      notify('메모에 반영했습니다');
       flow.frame?.();
     });
   } catch (error) { failure(error); }
@@ -162,7 +163,7 @@ function failure(error) { notify(String(error), 'error', editing); }
 async function publishFeedback() {
   if (!memoVisible) return;
   if (publishing) { publishAgain = true; return; }
-  const view = feedbackView({ editing, saving, acknowledging, highlightRevision, notice, sourcePath: latestNote?.source_path, color: latestNote?.color });
+  const view = feedbackView({ editing, saving, exporting, acknowledging, highlightRevision, notice, sourcePath: latestNote?.source_path, color: latestNote?.color });
   const signature = JSON.stringify({ folded, view });
   if (signature === feedbackSignature) return;
   publishing = true;
@@ -174,14 +175,15 @@ async function exportNote() {
   if (!latestNote || exporting || saving) return;
   contentAction();
   exporting = true;
+  publishFeedback();
   $('export').disabled = true;
   try {
     const path = await invoke('export_note', { markdown: editing ? $('markdown').value : null });
     if (path) {
-      notify(`저장했습니다: ${path}`);
+      notify(`파일로 내보냈습니다: ${path}`);
     }
   } catch (error) { failure(error); }
-  finally { exporting = false; $('export').disabled = false; }
+  finally { exporting = false; $('export').disabled = false; publishFeedback(); }
 }
 $('export').addEventListener('click', exportNote);
 async function refresh(schedule = true) {
@@ -271,7 +273,7 @@ $('close').addEventListener('click', () => invoke('close_note').catch(failure));
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     event.preventDefault();
-    if (editing) { if (!saving) endEditing(); }
+    if (editing) { if (!saving && !exporting) endEditing(); }
     else invoke('hide_note').catch(failure);
   }
   if (!editing && latestNote && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'c') {
@@ -280,9 +282,10 @@ document.addEventListener('keydown', (event) => {
   }
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
     event.preventDefault();
-    exportNote();
+    if (!event.isComposing && !event.repeat && !event.altKey && !event.shiftKey && event.keyCode !== 229) saveShortcut();
   }
 });
+function saveShortcut() { return editing ? save() : exportNote(); }
 // Render the current sanitized HTML offscreen: innerText retains the existing
 // rendered-text format without ever touching the visible diff or its baseline.
 function currentPlainText() {
@@ -413,9 +416,10 @@ pollFold();
 window.__TAURI__.event.listen('feedback-action', ({ payload }) => {
   if (payload.owner !== win.label) return;
   const action = payload.action;
+  if (action === 'save-shortcut') return saveShortcut();
   if (action === 'export') return exportNote();
   if (action === 'save') return save();
-  else if (action === 'cancel' && editing && !saving) return endEditing();
+  else if (action === 'cancel' && editing && !saving && !exporting) return endEditing();
 }).catch(failure);
 
 window.__TAURI__.event.listen('feedback-connection', ({ payload: c }) => {

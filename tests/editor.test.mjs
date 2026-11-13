@@ -31,6 +31,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
   let feedbackActive = false;
   let highlightRevision = null;
   let saveError;
+  let saveDelay;
   let exportResult = null;
   let exportError;
   let acknowledgementError;
@@ -69,8 +70,9 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
         }
         if (command === 'export_note') { if (exportError) throw exportError; return exportResult; }
         if (command === 'save_note') {
+          if (saveDelay) await saveDelay;
           if (saveError) throw saveError;
-          assert.equal(args.expectedRevision, note.revision);
+          if (args.expectedRevision !== note.revision) throw new Error('메모 충돌');
           note = { ...note, markdown: args.markdown, html: args.markdown === note.markdown ? note.html : '<p>저장됨</p>', revision: note.revision + 1 };
           return note;
         }
@@ -93,7 +95,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
     state: patch => Object.assign(instance, patch),
     failAcknowledgement: error => { acknowledgementError = error; },
     contact: () => { contact = true; }, failWarp: error => { warpError = error; },
-    update: patch => { note = { ...note, ...patch }; }, failSave: error => { saveError = error; } };
+    update: patch => { note = { ...note, ...patch }; }, delaySave: promise => { saveDelay = promise; }, failSave: error => { saveError = error; } };
 }
 
 test('font sizes cycle four steps and remain selected across note updates', async () => {
@@ -407,7 +409,7 @@ test('temporary copy notice restores acknowledgement; editing owns the action sl
   app.element('edit').listeners.click();
   await new Promise(setImmediate);
   await app.element('warp').listeners.click();
-  assert.deepEqual(app.view().buttons.map(b => b.id), ['cancel', 'save']);
+  assert.deepEqual(app.view().buttons.map(b => b.id), ['export', 'cancel', 'save']);
   assert.match(app.view().message, /Option/);
   await app.action('cancel');
   assert.deepEqual(app.view().buttons.map(b => b.id), []);
@@ -421,10 +423,10 @@ test('save success becomes Toast; save error retains actions and outranks tips',
   await app.element('warp').listeners.click();
   assert.equal(app.view().error, true);
   assert.match(app.view().message, /원본 파일/);
-  assert.deepEqual(app.view().buttons.map(b => b.id), ['cancel', 'save']);
+  assert.deepEqual(app.view().buttons.map(b => b.id), ['export', 'cancel', 'save']);
   app.failSave(null);
   await app.action('save');
-  assert.equal(app.view().message, '저장했습니다');
+  assert.equal(app.view().message, '메모에 반영했습니다');
   assert.equal(app.view().buttons.length, 0);
   await app.expireNotice();
   assert.equal(app.view().message, '');
@@ -544,9 +546,10 @@ test('Cmd+S and Ctrl+S export viewing notes and toolbar exports the current draf
   app.element('markdown').value = '# 저장할 초안';
   app.exportResult('/tmp/note.md');
   await app.element('export').listeners.click();
+  await new Promise(setImmediate);
   assert.equal(app.calls.filter(([name]) => name === 'export_note').at(-1)[1].markdown, '# 저장할 초안');
   assert.equal(app.element('editor').hidden, false);
-  assert.equal(app.view().message, '저장했습니다: /tmp/note.md');
+  assert.equal(app.view().message, '파일로 내보냈습니다: /tmp/note.md');
   assert.equal(app.calls.some(([name]) => name === 'save_note'), false);
 });
 
@@ -555,9 +558,11 @@ test('cancel and export failure preserve draft and allow retry', async () => {
   app.element('edit').listeners.click();
   app.element('markdown').value = '초안';
   await app.element('export').listeners.click();
-  assert.notEqual(app.view().message, '저장했습니다');
+  await new Promise(setImmediate);
+  assert.notEqual(app.view().message, '메모에 반영했습니다');
   app.failExport('쓰기 실패');
   await app.element('export').listeners.click();
+  await new Promise(setImmediate);
   assert.equal(app.view().message, '쓰기 실패');
   assert.equal(app.element('markdown').value, '초안');
   assert.equal(app.element('export').disabled, false);
@@ -587,7 +592,7 @@ test('Feedback export shortcut targets its own memo draft', async () => {
 test('toolbar shortcuts follow platform and gesture help is shown on button use', async () => {
   for (const [platform, modifier] of [['MacIntel', 'Command '], ['Win32', 'Ctrl ']]) {
     const app = await setup(new Map(), {}, {}, platform);
-    assert.equal(app.element('export').title, `파일로 저장 · ${modifier}S`);
+    assert.equal(app.element('export').title, `파일 내보내기 · ${modifier}S`);
     assert.equal(app.element('copy').title, `본문 복사 · ${modifier}C`);
     await app.element('warp').listeners.click();
     if (platform === 'MacIntel') assert.match(app.view().message, /Option.*포인터/);
@@ -690,4 +695,105 @@ test('collapsed toolbar title starts native dragging without unfolding or steali
   app.events.mousedown({button: 0, target: {closest: selector => selector.includes('button')},
     preventDefault() { assert.fail('button interaction must be preserved'); }});
   assert.equal(app.calls.filter(([name]) => name === 'drag_note').length, 1);
+});
+
+
+test('editing save shortcuts share the save button path on both platforms and coalesce repeats', async () => {
+  for (const platform of ['MacIntel', 'Win32']) {
+    const app = await setup(new Map(), {}, {}, platform);
+    app.element('edit').listeners.click();
+    app.element('markdown').value = '반영할 초안';
+    const event = {key: 's', [platform === 'MacIntel' ? 'metaKey' : 'ctrlKey']: true, preventDefault() {}};
+    app.events.keydown(event);
+    app.events.keydown({...event, repeat: true});
+    await app.action('save-shortcut');
+    assert.equal(app.calls.filter(([name]) => name === 'save_note').length, 1);
+    assert.equal(app.calls.some(([name]) => name === 'export_note'), false);
+    assert.equal(app.element('editor').hidden, true);
+    assert.equal(app.view().message, '메모에 반영했습니다');
+  }
+});
+
+test('IME and modified shortcuts never commit drafts; failed save retains draft for retry', async () => {
+  const app = await setup();
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '보존할 초안';
+  for (const extra of [{isComposing: true}, {keyCode: 229}, {repeat: true}, {altKey: true}, {shiftKey: true}]) {
+    app.events.keydown({key: 's', metaKey: true, preventDefault() {}, ...extra});
+  }
+  assert.equal(app.calls.some(([name]) => name === 'save_note'), false);
+  app.failSave('원본 충돌');
+  await app.action('save-shortcut');
+  assert.equal(app.element('markdown').value, '보존할 초안');
+  assert.equal(app.element('editor').hidden, false);
+  assert.equal(app.element('markdown').readOnly, false);
+  assert.equal(app.view().message, '원본 충돌');
+  app.failSave(null);
+  await app.action('save-shortcut');
+  assert.equal(app.element('editor').hidden, true);
+});
+
+test('cancelled editor and image notes keep shortcut export behavior', async () => {
+  for (const capture of [null, {path: 'image.png'}]) {
+    const app = await setup(new Map(), {}, {capture});
+    if (!capture) { app.element('edit').listeners.click(); await app.action('cancel'); }
+    await app.action('save-shortcut');
+    assert.equal(app.calls.filter(([name]) => name === 'export_note').at(-1)[1].markdown, null);
+    assert.equal(app.calls.some(([name]) => name === 'save_note'), false);
+  }
+});
+
+test('pending draft export blocks save and cancel until its dialog completes', async () => {
+  const app = await setup();
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '대화상자 동안 보존';
+  let finish;
+  app.exportResult(new Promise(resolve => { finish = resolve; }));
+  const pending = app.element('export').listeners.click();
+  await new Promise(setImmediate);
+  assert(app.view().buttons.every(button => button.disabled));
+  await app.action('save-shortcut');
+  await app.action('save');
+  await app.action('cancel');
+  assert.equal(app.calls.some(([name]) => name === 'save_note'), false);
+  assert.equal(app.element('editor').hidden, false);
+  finish(null);
+  await pending;
+  await new Promise(setImmediate);
+  assert(app.view().buttons.every(button => !button.disabled));
+  assert.equal(app.element('markdown').value, '대화상자 동안 보존');
+});
+
+
+test('revision changed during editing keeps the old edit baseline and draft', async () => {
+  const app = await setup(new Map(), {}, {source_path: '/tmp/test-note.md'});
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '사용자 초안';
+  app.update({revision: 2, markdown: 'CLI가 변경한 본문'});
+  await app.refresh();
+  await app.action('save-shortcut');
+  assert.equal(app.calls.filter(([name]) => name === 'save_note').at(-1)[1].expectedRevision, 1);
+  assert.equal(app.element('markdown').value, '사용자 초안');
+  assert.equal(app.element('editor').hidden, false);
+  assert.match(app.view().message, /메모 충돌/);
+  assert.equal(app.calls.some(([name]) => name === 'export_note'), false);
+});
+
+test('pending save rejects duplicate save/export/cancel and locks only the editor', async () => {
+  const app = await setup();
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '느린 저장';
+  let finish;
+  app.delaySave(new Promise(resolve => { finish = resolve; }));
+  const pending = app.action('save-shortcut');
+  await new Promise(setImmediate);
+  assert.equal(app.element('markdown').readOnly, true);
+  await app.action('save-shortcut'); await app.action('save');
+  await app.action('export'); await app.action('cancel');
+  assert.equal(app.calls.filter(([name]) => name === 'save_note').length, 1);
+  assert.equal(app.calls.some(([name]) => name === 'export_note'), false);
+  assert.equal(app.element('editor').hidden, false);
+  finish(); await pending; await new Promise(setImmediate);
+  assert.equal(app.element('markdown').readOnly, false);
+  assert.equal(app.element('editor').hidden, true);
 });

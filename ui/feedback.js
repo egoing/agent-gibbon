@@ -6,6 +6,7 @@ const message = document.getElementById('message');
 const actions = document.getElementById('actions');
 let signature, appearanceSignature;
 let renderedRevision = null;
+const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
 async function refresh() {
   try {
     const state = await invoke('feedback_snapshot');
@@ -32,6 +33,8 @@ async function refresh() {
           button.addEventListener('click', () => invoke('feedback_action', { action: item.id, revision: renderedRevision }).catch(report));
           actions.appendChild(button);
         }
+        button.title = item.id === 'save' ? `메모에 반영 · ${isMac ? 'Command S' : 'Ctrl S'}` : item.label;
+        button.setAttribute('aria-label', button.title);
         button.textContent = item.label; button.disabled = item.disabled; button.classList.toggle('primary', !!item.primary);
       }
       signature = next;
@@ -52,7 +55,7 @@ async function refresh() {
 function report(error) { console.error('Feedback:', error); }
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') invoke('feedback_action', { action: 'cancel', revision: renderedRevision }).catch(report);
-  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') { event.preventDefault(); invoke('feedback_action', { action: 'export', revision: renderedRevision }).catch(report); }
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') { event.preventDefault(); if (!event.isComposing && !event.repeat && !event.altKey && !event.shiftKey && event.keyCode !== 229) invoke('feedback_action', { action: 'save-shortcut', revision: renderedRevision }).catch(report); }
 });
 surface.addEventListener('mousedown', event => {
   if (event.button !== 0 || event.target.closest('button, a, input, textarea, select, [contenteditable]')) return;
