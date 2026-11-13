@@ -130,6 +130,14 @@ pub fn warp_note(window: tauri::WebviewWindow, state: State<Warps>) -> Result<()
     move_note(&window, warp)
 }
 
+#[cfg(target_os = "macos")]
+pub(crate) fn only_modifier_macos(
+    flags: objc2_app_kit::NSEventModifierFlags,
+    expected: objc2_app_kit::NSEventModifierFlags,
+) -> bool {
+    flags.intersection(objc2_app_kit::NSEventModifierFlags::DeviceIndependentFlagsMask) == expected
+}
+
 pub(crate) fn close_shortcut_pressed() -> bool {
     #[cfg(target_os = "macos")]
     {
@@ -176,10 +184,12 @@ fn poll(window: &tauri::WebviewWindow, state: &Warps) -> Result<bool, String> {
         return Ok(false);
     }
     #[cfg(target_os = "macos")]
-    let alt = objc2_app_kit::NSEvent::modifierFlags_class()
-        .contains(objc2_app_kit::NSEventModifierFlags::Option);
+    let alt = only_modifier_macos(
+        objc2_app_kit::NSEvent::modifierFlags_class(),
+        objc2_app_kit::NSEventModifierFlags::Option,
+    );
     #[cfg(windows)]
-    let alt = crate::windows_contact::modifiers().alt;
+    let alt = crate::windows_contact::modifiers().alt_only();
     #[cfg(not(any(target_os = "macos", windows)))]
     let alt = false;
     let mut warps = state.lock().map_err(|e| e.to_string())?;
@@ -211,6 +221,49 @@ fn poll(window: &tauri::WebviewWindow, state: &Warps) -> Result<bool, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn option_contact_requires_option_without_other_modifiers() {
+        use objc2_app_kit::NSEventModifierFlags as F;
+        let others = [
+            F::Control,
+            F::Shift,
+            F::Command,
+            F::Function,
+            F::CapsLock,
+            F::Help,
+            F::NumericPad,
+        ];
+        for bits in 0..(1 << others.len()) {
+            let extra = others
+                .iter()
+                .enumerate()
+                .fold(F::empty(), |flags, (i, flag)| {
+                    if bits & (1 << i) != 0 {
+                        flags | *flag
+                    } else {
+                        flags
+                    }
+                });
+            assert!(!only_modifier_macos(extra, F::Option));
+            let eligible = only_modifier_macos(F::Option | extra, F::Option);
+            assert_eq!(eligible, bits == 0, "mask {bits}");
+            let mut contact = Contact::default();
+            assert!(!contact.trigger(eligible, false, false, (0., 0.)));
+            assert_eq!(
+                contact.trigger(eligible, true, false, (10., 10.)),
+                bits == 0
+            );
+            assert!(!contact.trigger(true, true, false, (11., 10.)));
+            assert!(!contact.trigger(true, false, false, (0., 0.)));
+            assert!(contact.trigger(true, true, false, (10., 10.)));
+        }
+        assert!(only_modifier_macos(
+            F::Option | F::from_bits_retain(1),
+            F::Option
+        ));
+    }
+
     #[test]
     fn native_contact_targets_only_memo_windows() {
         for label in ["main", "note-work", "note-agent-work", "note-manager"] {

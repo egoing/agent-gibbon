@@ -48,7 +48,7 @@
 - 설정은 기존 테마와 탐색을 유지하고 큰 외곽 카드와 중첩 여백을 제거한다. 상태·버전·상세·버튼을 최대 480px 안에 묶는다. 설치가 준비되기 전에는 설치 버튼을 숨기고, 준비·설치 진행 중에는 비활성화한다. 오류·구체적인 보류 사유는 설정에서 계속 확인할 수 있다.
 - [준비 안내 SVG](design/updater-ready-notice.svg) · [PNG](design/updater-ready-notice.png), [설정 SVG](design/updater-settings.svg) · [PNG](design/updater-settings.png)는 설명용 시안이다. 구현·검증 범위는 [#108 검증 기록](verification/issue108-compact-update-ui.md)을 따른다. 시안 확인과 실제 설치 검증은 구분한다.
 
-- `Ctrl`+포인터 접촉으로 접는 동작은 일반 메모에 유지하고, 업데이트 준비 안내 창에서는 비활성화한다. 안내 창의 크기와 버튼 클릭 영역이 포인터 위치에 따라 변하지 않게 한다. 외형·배치는 기존 시안을 유지한다. 구현·검증 범위는 [#117 검증 기록](verification/issue117-notice-fold.md)을 따른다.
+- `Ctrl` 단독+포인터 접촉으로 접는 동작은 일반 메모에 유지하고, 업데이트 준비 안내 창에서는 비활성화한다. 안내 창의 크기와 버튼 클릭 영역이 포인터 위치에 따라 변하지 않게 한다. 외형·배치는 기존 시안을 유지한다. 구현·검증 범위는 [#117 검증 기록](verification/issue117-notice-fold.md)을 따른다.
 
 ### 자동 업데이트 설정 — #87 (2026-11-07)
 
@@ -889,3 +889,15 @@ SVG 3개와 PNG 3개를 함께 갱신했다. PNG 렌더링과 배치 육안 확�
 - 개발 배지는 툴바와 접힌 메모 제목에서 제거하며 인스턴스 식별은 네이티브 창 제목과 CLI에 유지한다. [Toolbar 시안 SVG](design/toolbar-compact.svg) · [PNG](design/toolbar-compact.png). 실제 앱 및 플랫폼별 검증은 아래 결과와 별도로 확인한다.
 - 최신 main 통합 전 워크트리 검증: UI 테스트 170개·Rust 테스트 206개·Clippy·Rustfmt·개발 빌드 통과, 두 SVG 시안의 PNG 렌더링을 육안 확인했다. 개발 CLI `open`·`inspect`에서 인스턴스 `dev-223bdadd57a162c936b62ece`와 메모 `toolbar-icons-20261112`를 확인했다. 실행 파일은 이 워크트리의 debug 바이너리, PID 49437이다. 실제 아이콘 화면·터미널 GUI·Intel·Windows 및 전체 플랫폼 CI는 미검증이다.
 - 최신 main의 전용 툴바 행과 통합한 뒤 UI 테스트 182개·Rust 테스트 212개·Clippy·Rustfmt·개발 빌드가 통과했다. Chromium에서 메모·터미널·웹의 144px·300px 너비별 전용 행과 접기·펼치기를 확인했다. 이는 브라우저 레이아웃 검사이며 실제 네이티브 창 검증은 아니다.
+
+### Ctrl 단독 접촉 폴딩 — 2026-11-13
+
+- 기존 비활성 메모의 바깥→안쪽 포인터 접촉 제스처는 Ctrl만 눌린 경우에 접기·펼치기를 실행한다. Shift·Alt/Option·Meta/Command/Windows 등 다른 보조키가 하나라도 함께 눌리면 실행하지 않는다. macOS의 Function·Caps Lock 등 추가 device-independent modifier 상태도 제외한다.
+- 다른 보조키를 놓는 것만으로 창 안에서 뒤늦게 폴딩하지 않으며 다시 바깥에서 안으로 접촉해야 한다. 기존 포커스·캡처·전체 접어두기 억제, 업데이트 안내 제외, 버튼 접기·펼치기와 접힌 창 클릭 동작은 유지한다. 외형·배치 변경은 없다.
+- 구현·실행 범위와 플랫폼별 한계는 [Ctrl 단독 폴딩 검증 기록](verification/ctrl-only-fold-20261113.md)을 따른다.
+
+### 단독 보조키 접촉 제스처 — 2026-11-13 후속
+
+- Ctrl 접기·펼치기와 Option(macOS)/Alt(Windows) 이동은 각각 지정된 보조키만 누른 바깥→안쪽 접촉에서 실행한다. Option/Alt 이동에도 Ctrl·Shift·Command/Windows 등 다른 보조키가 함께 있으면 실행하지 않는다. macOS 추가 device-independent modifier 상태도 제외하며 장치별 하위 플래그는 무시한다.
+- 다른 보조키를 창 안에서 놓는 것만으로 이동하지 않으며 단독키로 다시 진입해야 한다. 기존 비활성 메모 한정·재진입·포커스·캡처·stash 억제 조건은 유지한다. 버튼 이동과 복사·저장·캡처 등 별도의 명시적 단축키, 전체 접어두기·투명도 조절의 여러 키 조합은 바꾸지 않는다.
+- macOS 이동 후 안내도 “Option만”으로 명확하게 표시한다. 외형·배치 변경은 없으며 [검증 기록](verification/single-modifier-contact-20261113.md)에 실행 범위와 한계를 남긴다.

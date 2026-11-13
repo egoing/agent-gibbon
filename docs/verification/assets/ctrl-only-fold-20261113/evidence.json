@@ -1,0 +1,257 @@
+{
+  "root": "/Users/egoinglee/.codex/worktrees/02ec/agent-gibbon",
+  "pid": 83253,
+  "binary": "/Users/egoinglee/.codex/worktrees/02ec/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "native_title": "Agent Gibbon [DEV detached@f343dbe · f3ab8dc6] — ctrl-only-02ec-proof",
+  "note_id": "ctrl-only-02ec-proof",
+  "marker": "CTRL-ONLY-02EC-20261113",
+  "results": [
+    {
+      "case": "initial",
+      "folded": false,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 2200,
+        "y": 1400
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "native_input_state": "1120.0 680.0 92046 0"
+    },
+    {
+      "case": "Ctrl+Shift entry",
+      "folded": false,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 2200,
+        "y": 1400
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "native_input_state": "1140.0 705.0 92046 393216"
+    },
+    {
+      "case": "release Shift inside",
+      "folded": false,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 2200,
+        "y": 1400
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "native_input_state": "1140.0 705.0 92046 262144"
+    },
+    {
+      "case": "Ctrl+Option entry",
+      "folded": false,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 0,
+        "y": 764
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "native_input_state": "1140.0 705.0 92046 786432"
+    },
+    {
+      "case": "release Option inside",
+      "folded": false,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 0,
+        "y": 764
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "native_input_state": "1140.0 705.0 92046 262144"
+    },
+    {
+      "case": "Ctrl+Command entry",
+      "folded": false,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 0,
+        "y": 764
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "native_input_state": "40.0 387.0 92046 1310720"
+    },
+    {
+      "case": "release Command inside",
+      "folded": false,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 0,
+        "y": 764
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "native_input_state": "40.0 387.0 92046 262144"
+    },
+    {
+      "case": "Ctrl only folds",
+      "folded": true,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 0,
+        "y": 764
+      },
+      "size": {
+        "height": 48,
+        "width": 600
+      },
+      "native_input_state": "40.0 387.0 92046 262144"
+    },
+    {
+      "case": "folded Ctrl+Shift entry",
+      "folded": true,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 0,
+        "y": 764
+      },
+      "size": {
+        "height": 48,
+        "width": 600
+      },
+      "native_input_state": "40.0 387.0 92046 393216"
+    },
+    {
+      "case": "folded release Shift inside",
+      "folded": true,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 0,
+        "y": 764
+      },
+      "size": {
+        "height": 48,
+        "width": 600
+      },
+      "native_input_state": "40.0 387.0 92046 262144"
+    },
+    {
+      "case": "folded Ctrl+Option entry",
+      "folded": true,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 3496,
+        "y": 764
+      },
+      "size": {
+        "height": 48,
+        "width": 600
+      },
+      "native_input_state": "40.0 387.0 92046 786432"
+    },
+    {
+      "case": "folded release Option inside",
+      "folded": true,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 3496,
+        "y": 764
+      },
+      "size": {
+        "height": 48,
+        "width": 600
+      },
+      "native_input_state": "40.0 387.0 92046 262144"
+    },
+    {
+      "case": "folded Ctrl+Command entry",
+      "folded": true,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 3496,
+        "y": 764
+      },
+      "size": {
+        "height": 48,
+        "width": 600
+      },
+      "native_input_state": "1788.0 387.0 92046 1310720"
+    },
+    {
+      "case": "folded release Command inside",
+      "folded": true,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 3496,
+        "y": 764
+      },
+      "size": {
+        "height": 48,
+        "width": 600
+      },
+      "native_input_state": "1788.0 387.0 92046 262144"
+    },
+    {
+      "case": "Ctrl only unfolds",
+      "folded": false,
+      "focused": false,
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "ctrl-only-02ec-proof",
+      "position": {
+        "x": 3496,
+        "y": 764
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "native_input_state": "1788.0 387.0 92046 262144"
+    }
+  ],
+  "original_windows_geometry_and_drafts_preserved": true,
+  "pointer_restored": [
+    1060,
+    475
+  ],
+  "frontmost_pid_restored": 92046,
+  "input": "CoreGraphics synthetic modifier key and pointer events; live native app"
+}

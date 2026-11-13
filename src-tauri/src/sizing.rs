@@ -300,13 +300,11 @@ pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, Str
         return Ok(state.expanded.is_some());
     }
     #[cfg(target_os = "macos")]
-    let control = objc2_app_kit::NSEvent::modifierFlags_class()
-        .contains(objc2_app_kit::NSEventModifierFlags::Control)
-        && !crate::warp::close_shortcut_pressed();
+    let control = control_only_macos(objc2_app_kit::NSEvent::modifierFlags_class());
     #[cfg(windows)]
     let control = {
         let modifiers = crate::windows_contact::modifiers();
-        modifiers.control && !modifiers.stash_chord()
+        modifiers.control_only()
     };
     #[cfg(not(any(target_os = "macos", windows)))]
     let control = false;
@@ -327,6 +325,12 @@ pub fn poll_fold(window: WebviewWindow, sizes: State<Sizes>) -> Result<bool, Str
         toggle(&window, state)?;
     }
     Ok(state.expanded.is_some())
+}
+
+#[cfg(target_os = "macos")]
+fn control_only_macos(flags: objc2_app_kit::NSEventModifierFlags) -> bool {
+    use objc2_app_kit::NSEventModifierFlags as Flags;
+    crate::warp::only_modifier_macos(flags, Flags::Control)
 }
 
 fn fold_contact_enabled(label: &str) -> bool {
@@ -440,6 +444,50 @@ pub fn install_contact_monitor(app: &tauri::AppHandle) {
 #[cfg(test)]
 mod contact_tests {
     use super::*;
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn macos_contact_folding_accepts_only_control() {
+        use objc2_app_kit::NSEventModifierFlags as Flags;
+        let others = [
+            Flags::Shift,
+            Flags::Option,
+            Flags::Command,
+            Flags::Function,
+            Flags::CapsLock,
+            Flags::Help,
+            Flags::NumericPad,
+        ];
+        for bits in 0..(1 << others.len()) {
+            let extra = others
+                .iter()
+                .enumerate()
+                .fold(Flags::empty(), |flags, (i, flag)| {
+                    if bits & (1 << i) != 0 {
+                        flags | *flag
+                    } else {
+                        flags
+                    }
+                });
+            assert!(!control_only_macos(extra));
+            let eligible = control_only_macos(Flags::Control | extra);
+            assert_eq!(eligible, bits == 0, "modifier mask {bits}");
+            let mut contact = crate::warp::Contact::default();
+            assert!(!contact.trigger(eligible, false, false, (0., 0.)));
+            assert_eq!(
+                contact.trigger(eligible, true, false, (10., 10.)),
+                bits == 0
+            );
+            // Releasing an extra key while already inside is not a new gesture.
+            assert!(!contact.trigger(true, true, false, (11., 10.)));
+            assert!(!contact.trigger(true, false, false, (0., 0.)));
+            assert!(contact.trigger(true, true, false, (10., 10.)));
+        }
+        // Device-specific low bits do not represent additional modifier keys.
+        assert!(control_only_macos(
+            Flags::Control | Flags::from_bits_retain(1)
+        ));
+    }
+
     #[test]
     fn update_notice_is_excluded_while_memo_windows_keep_contact_folding() {
         assert!(!fold_contact_enabled("updater-notice"));
