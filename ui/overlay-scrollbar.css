@@ -1,0 +1,27 @@
+/* Text reading surface only: no dedicated scrollbar column or separator strip. */
+body:not(.image-note):not(.editing):not(.toolbar-collapsed) #controls { flex-basis: 22px; height: 22px; }
+body:not(.image-note):not(.editing):not(.folded) #viewport { padding-top: 0; scrollbar-width: none; }
+body:not(.image-note):not(.editing):not(.folded) #viewport::-webkit-scrollbar { width: 0; height: 0; }
+#viewport:focus-visible { outline: 1px solid var(--foreground); outline-offset: -2px; }
+#memo-scrollbar {
+  position: absolute; right: 3px; width: 3px; z-index: 4;
+  opacity: 0; transition: opacity 160ms; cursor: default;
+  touch-action: none; user-select: none;
+}
+#memo-scrollbar::after {
+  content: ''; position: absolute; right: 0; top: var(--thumb-top);
+  width: 3px; height: var(--thumb-size); border-radius: 2px;
+  background: color-mix(in srgb, var(--foreground) 65%, var(--background));
+}
+#memo-scrollbar:is(:hover, :focus-visible, .scroll-visible, .scroll-dragging),
+#viewport:focus-visible + #memo-scrollbar { opacity: 1; }
+#memo-scrollbar:is(:hover, .scroll-dragging) { width: 12px; }
+#memo-scrollbar:focus-visible { outline: 1px solid var(--foreground); outline-offset: 0; }
+@media (prefers-reduced-motion: reduce) { #memo-scrollbar { transition: none; } }
+@media (prefers-contrast: more) { #memo-scrollbar { opacity: 1; } }
+/* Forced-colors users retain a native scrollbar and its platform affordances. */
+@media (forced-colors: active) {
+  #memo-scrollbar { display: none; }
+  body:not(.image-note):not(.editing):not(.folded) #viewport { scrollbar-width: auto; }
+  body:not(.image-note):not(.editing):not(.folded) #viewport::-webkit-scrollbar { width: auto; height: auto; }
+}
