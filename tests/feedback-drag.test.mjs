@@ -20,6 +20,7 @@ test('feedback text and blank space drag the owner while controls keep their act
     if (name === 'layout_feedback') {layoutArgs.push(args); return {edge: 'below'};}
   };
   vm.runInNewContext(readFileSync(new URL('../ui/feedback.js', import.meta.url), 'utf8').replace(/^import .*;$/gm, ''), {
+    navigator: {platform: 'MacIntel'},
     window: {__TAURI__: {core: {invoke}}},
     document: {
       getElementById: id => ({feedback: surface, message, actions})[id],

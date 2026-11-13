@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="470" viewBox="0 0 920 470">
+<rect width="920" height="470" fill="#f3f4f6"/>
+<style>text{font-family:"Apple SD Gothic Neo",sans-serif;fill:#2c2f7e;font-size:12px}.heading{font-size:20px;font-weight:700}.label{font-size:14px;font-weight:600}.hint{fill:#53606d}.primary{font-weight:700}</style>
+<text x="24" y="32" class="heading">#16 · 편집 저장과 파일 내보내기</text>
+<text x="24" y="57" class="hint">동작·버튼 배치 설명용 시안 · 실제 앱 캡처 아님 · 회색 메모 디자인</text>
+<text x="24" y="94" class="label">편집 · 300px</text>
+<rect x="24" y="110" width="300" height="205" rx="4" fill="#dfe2dd" stroke="#2c2f7e" stroke-width="2"/>
+<rect x="28" y="140" width="292" height="139" rx="2" fill="#cdd0d3"/>
+<text x="34" y="160"># 편집 중인 초안</text><text x="34" y="184">Command S / Ctrl S → 메모에 반영</text>
+<path d="M28 282H320" stroke="#2c2f7e" opacity=".25"/>
+<text x="47" y="303">파일 내보내기</text><text x="157" y="303">취소</text>
+<rect x="197" y="288" width="120" height="22" rx="3" fill="#cdd0d3"/><text x="218" y="303" class="primary">메모에 반영</text>
+<text x="24" y="340" class="hint">내보내기: 초안의 별도 파일만 생성</text><text x="24" y="360" class="hint">반영: 메모와 연결 원본 저장 · 충돌 보호 유지</text>
+<text x="356" y="94" class="label">작은 편집 창 · 144px</text>
+<rect x="356" y="110" width="144" height="205" rx="4" fill="#dfe2dd" stroke="#2c2f7e" stroke-width="2"/>
+<rect x="360" y="140" width="136" height="109" rx="2" fill="#cdd0d3"/><text x="366" y="161"># 초안</text>
+<path d="M360 252H496" stroke="#2c2f7e" opacity=".25"/>
+<text x="366" y="274">파일 내보내기</text><text x="469" y="274">취소</text>
+<rect x="400" y="288" width="96" height="22" rx="3" fill="#cdd0d3"/><text x="408" y="303" class="primary">메모에 반영</text>
+<text x="356" y="340" class="hint">오른쪽 정렬 · 버튼 줄바꿈</text>
+<text x="548" y="94" class="label">읽기 / 이미지 메모</text>
+<rect x="548" y="110" width="348" height="205" rx="4" fill="#dfe2dd" stroke="#2c2f7e" stroke-width="2"/>
+<text x="560" y="143">Command S / Ctrl S → 파일 내보내기</text><text x="560" y="176">본문과 Feedback의 초점 위치에 무관</text><text x="560" y="202">편집 취소 후에도 기존 내보내기 유지</text>
+<text x="24" y="406">메모 반영 완료: 메모에 반영했습니다</text><text x="24" y="430">내보내기 완료: 파일로 내보냈습니다: 경로</text><text x="548" y="406" class="hint">새 내보내기 단축키 없음</text><text x="548" y="430" class="hint">저장 중 중복 요청 차단 · 실패하면 초안 유지</text>
+</svg>

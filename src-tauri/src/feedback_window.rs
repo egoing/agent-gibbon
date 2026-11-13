@@ -322,7 +322,8 @@ pub fn layout_feedback(
     Ok(connection)
 }
 fn accepts_action(view: &View, action: &str, revision: Option<u64>) -> bool {
-    (action == "export" && (!view.message.is_empty() || !view.buttons.is_empty()))
+    (matches!(action, "export" | "save-shortcut")
+        && (!view.message.is_empty() || !view.buttons.is_empty()))
         || (action != "acknowledge" || view.revision == revision)
             && view
                 .buttons
@@ -506,6 +507,24 @@ mod tests {
         assert!(accepts_action(&view, "save", Some(2)));
         view.buttons[0].disabled = true;
         assert!(!accepts_action(&view, "save", Some(2)));
+    }
+    #[test]
+    fn shortcut_reaches_owner_without_trusting_stale_edit_buttons() {
+        let mut view = View {
+            message: "저장 완료".into(),
+            ..View::default()
+        };
+        assert!(accepts_action(&view, "save-shortcut", None));
+        view.message.clear();
+        assert!(!accepts_action(&view, "save-shortcut", None));
+        view.buttons.push(Button {
+            id: "save".into(),
+            disabled: true,
+            ..Button::default()
+        });
+        // The owner checks live editing/saving/exporting before acting.
+        assert!(accepts_action(&view, "save-shortcut", None));
+        assert!(!accepts_action(&view, "save", None));
     }
     #[test]
     fn placement_below_above_narrow_and_negative_monitor() {

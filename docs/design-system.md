@@ -373,7 +373,7 @@ Feedback Bar는 논의 초기 이름이며 최종 구성요소 이름으로 사�
 - Primary Button은 맨 오른쪽, Secondary Button은 그 왼쪽이다.
 - 같은 Action Bar의 Primary와 Secondary는 같은 높이를 사용한다. Primary를 크게 만들지 않고 배경이나 글자 굵기로 차이를 준다.
 - Toolbar Icon Button과 Action Bar 버튼의 높이는 역할에 맞게 별도로 정한다.
-- Icon Button에 마우스를 올리면 Tooltip에 기능 이름과 현재 운영체제의 단축키를 표시한다. 복사는 macOS에서 Command C, Windows에서 Ctrl C, 파일 저장은 각각 Command S와 Ctrl S, 메모 숨기기는 Esc다. 편집 중 Esc는 편집을 취소한다.
+- Icon Button에 마우스를 올리면 Tooltip에 기능 이름과 현재 운영체제의 단축키를 표시한다. 복사는 macOS에서 Command C, Windows에서 Ctrl C, 읽기·이미지 메모의 파일 내보내기는 각각 Command S와 Ctrl S, 메모 숨기기는 Esc다. 편집 중 Esc는 편집을 취소한다.
 - 포인터 접촉 제스처는 Tooltip에 넣지 않고 macOS에서 접기·펼치기 또는 이동 버튼을 실행한 뒤 Feedback으로 안내한다. 숨기기는 창이 즉시 사라지므로 실행 후 안내를 표시하지 않는다.
 
 ## Visual Style — 확정
@@ -498,7 +498,10 @@ Toast 한 줄 높이는 위 제안값에서 약 25px, Action Bar는 약 32px가 
 
 ### 파일 저장과 복사 통합
 
-- Toolbar의 파일 저장은 텍스트나 캡처 이미지를 별도 파일로 내보낸다. 편집 중 파일 저장은 현재 초안을 내보내며 Memo에 반영하지 않는다. ⌘S/Ctrl+S는 메모와 Feedback 모두에서 파일 저장 대화상자를 연다.
+- **#16 확정:** 편집 중 Command S / Ctrl S는 Action Bar의 `메모에 반영` 버튼과 같은 저장 경로를 사용한다. 파일 연결 메모는 연결 원본 갱신·revision 및 원본 충돌 보호를 유지한다. 본문과 Feedback 중 어느 창에 초점이 있어도 메모 창의 현재 편집 상태로 결정한다. 조합 입력·반복 키·Alt/Shift를 더한 입력은 저장하지 않는다.
+- 읽기·이미지 메모의 Command S / Ctrl S와 Toolbar의 `파일 내보내기`는 기존 파일 대화상자를 연다. 편집 중 Action Bar에는 `파일 내보내기` → `취소` → `메모에 반영`을 오른쪽에 표시하며, 작은 폭에서는 버튼을 줄바꿈한다. 별도 내보내기 단축키는 추가하지 않는다. 초안 내보내기는 메모에 반영하지 않는다.
+- 저장 버튼의 Tooltip·접근성 이름에 플랫폼별 단축키를 표시한다. 완료 안내는 `메모에 반영했습니다`와 `파일로 내보냈습니다: 경로`로 구분한다. 저장/내보내기 중 버튼과 중복 요청을 막고 실패·취소 후 초안을 보존한다.
+- [편집 동작 시안 SVG](design/editor-save-shortcut.svg) · [PNG](design/editor-save-shortcut.png). 이전 Connected Feedback 시안의 두 버튼 편집 구성은 이 범위에서 대체한다. 구현·검증과 플랫폼 한계는 [#16 검증 기록](verification/issue16-editor-save.md)을 따른다.
 - 텍스트 복사는 최신 본문을 사용하고 이미지 메모는 원본 이미지를 복사한다. 복사·파일 저장의 결과와 오류는 공통 Feedback으로 표시하며 미확인 변경이나 편집 초안을 보존한다.
 
 ### 단축키·캡처 외곽 보정 (2026-10-27)
