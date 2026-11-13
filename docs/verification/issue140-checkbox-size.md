@@ -45,3 +45,11 @@
 - Conf **5**: macOS ARM64 실제 앱의 대상 표시·복사 확인. 모든 플랫폼/보조기술 검증을 뜻하지 않는다.
 - Risk **Low**: 읽기 전용 기호의 국소적 표시 변경이며 원문·저장 단축키·입력 기능은 변경하지 않는다.
 - 2026-11-14 사용자가 최종 제품 변경의 커밋·push·병합을 명시적으로 승인했다.
+
+## 최신 main 통합 검사 — 2026-11-14
+
+- 구현 커밋 `7dd00ab`, main `74cd83a`를 통합한 검사 대상 `46c3261d70d2ae18699dd2cb28cc06ef23e5918a`.
+- 디자인 시스템 끝의 동시 추가 충돌만 해결하고 체크리스트·창 복원·브라우저 툴바 기준을 모두 보존했다. 제품 코드 충돌은 없었다.
+- `npm test`: Rust 221개·UI 190개 통과. `npm run check`, Rustfmt, `npm run dev:build`, `git diff --check` 통과.
+- `python3 scripts/checkbox-layout-smoke.py docs/verification/issue140/inspect.json`: 통합 CSS와 기존 검증 fixture의 Chromium 64조합 통과. native 캡처는 앞선 구현 검증의 증거이며 이번 통합 후 native 재실행으로 대신 표현하지 않는다.
+- 이후 검증 기록·PR 설명만 갱신한다. 전체 플랫폼 CI·배포는 실행하지 않았다. 기본 체크아웃과 이 워크트리의 기존 package-lock.json 변경을 커밋에서 제외하고 보존한다.
