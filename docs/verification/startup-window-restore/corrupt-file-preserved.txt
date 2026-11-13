@@ -1,0 +1,1 @@
+Malformed fixture remained byte-identical after startup and periodic checkpoints. State writes suspended; no default note opened.

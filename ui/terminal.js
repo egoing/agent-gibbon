@@ -121,6 +121,7 @@ document.getElementById('rename-form').onsubmit=async event=>{event.preventDefau
     const close=document.getElementById('close');close.title='터미널 종료';close.setAttribute('aria-label','터미널 종료');
     document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;
     await welcome();
+    if(info.restored) status.textContent = `이전 터미널 프로세스는 종료되었습니다. ${info.last_command ? `마지막 명령: ${info.last_command} · 자동 실행하지 않았습니다.` : '마지막 명령은 안전한 복원을 위해 저장에서 제외되었습니다.'}`;
   }
   window.gibbonMeasure?.('terminal.ui.ready',clock());
 })().catch(report);
