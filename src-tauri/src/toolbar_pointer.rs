@@ -21,15 +21,25 @@ pub fn sync(window: &WebviewWindow) -> Result<(), String> {
         let native = unsafe { &*(ptr as *const objc2_app_kit::NSWindow) };
         let rect = native.contentRectForFrameRect(native.frame());
         let cursor = objc2_app_kit::NSEvent::mouseLocation();
-        local_point(
-            (cursor.x, cursor.y),
-            (
-                rect.origin.x,
-                rect.origin.y,
-                rect.size.width,
-                rect.size.height,
-            ),
-        )
+        // A rectangle hit alone also matches covered memos. AppKit resolves
+        // the actual mouse target across windows/apps without activating it.
+        let mtm = objc2::MainThreadMarker::new().ok_or("toolbar pointer off main thread")?;
+        let front = objc2_app_kit::NSWindow::windowNumberAtPoint_belowWindowWithWindowNumber(
+            cursor, 0, mtm,
+        );
+        (front == native.windowNumber())
+            .then(|| {
+                local_point(
+                    (cursor.x, cursor.y),
+                    (
+                        rect.origin.x,
+                        rect.origin.y,
+                        rect.size.width,
+                        rect.size.height,
+                    ),
+                )
+            })
+            .flatten()
     } else {
         None
     };

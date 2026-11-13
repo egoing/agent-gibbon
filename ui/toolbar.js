@@ -94,7 +94,7 @@ for (const button of toolbarButtons) {
 }
 // macOS also samples the native pointer when the WebView is inactive. Hit-test
 // the rendered DOM so hidden/paged buttons and resize/drag regions stay intact.
-window.__TAURI__.event.listen('toolbar-pointer', ({ payload }) => {
+window.__TAURI__.webviewWindow.getCurrentWebviewWindow().listen('toolbar-pointer', ({ payload }) => {
   const target = payload ? document.elementFromPoint(payload.x, payload.y)?.closest('button') : null;
   for (const button of toolbarButtons) {
     if (button === target && !button.disabled) button.setAttribute('data-pointer-over', '');

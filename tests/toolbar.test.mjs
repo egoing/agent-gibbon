@@ -31,7 +31,8 @@ test('toolbar waits for native fold and restores the same state on expansion', a
   let hit = null;
   const nativeEvents = {};
   const document = {body, elementFromPoint: () => hit, hasFocus: () => focused, getElementById: id => id === 'fold-title' ? null : element(id)};
-  const env = {addEventListener(name, callback) { windowEvents[name] = callback; }, __TAURI__: {event: {listen(name, callback) { nativeEvents[name] = callback; }}, core: {invoke: async name => { calls.push(name); folded = !folded; return folded; }}}};
+  const listen = (name, callback) => { nativeEvents[name] = callback; };
+  const env = {addEventListener(name, callback) { windowEvents[name] = callback; }, __TAURI__: {event: {listen() { assert.fail('toolbar pointer must not use a global listener'); }}, webviewWindow: {getCurrentWebviewWindow: () => ({listen})}, core: {invoke: async name => { calls.push(name); folded = !folded; return folded; }}}};
   vm.runInNewContext(readFileSync(new URL('../ui/toolbar.js', import.meta.url), 'utf8'), {
     document, window: env, ResizeObserver: class {observe() {}}, MutationObserver: class {observe() {}},
   });
@@ -100,4 +101,55 @@ test('toolbar waits for native fold and restores the same state on expansion', a
   assert.equal(calls.length, 2);
   assert.equal(classes.has('toolbar-collapsed'), true);
   assert.equal(calls.at(-1), 'chrome_fold');
+});
+
+// Model Tauri's target routing: an Any listener receives even emit_to(label),
+// whereas WebviewWindow.listen registers a WebviewWindow target.
+test('native pointer events stay in their own toolbar across two webviews', () => {
+  const listeners = [];
+  function toolbar(label) {
+    const elements = new Map();
+    const element = id => {
+      if (!elements.has(id)) elements.set(id, {
+        offsetWidth: 24, clientWidth: 300, scrollWidth: 100, scrollLeft: 0,
+        attributes: {}, addEventListener() {},
+        setAttribute(k, v) { this.attributes[k] = v; },
+        getAttribute(k) { return this.attributes[k]; },
+        removeAttribute(k) { delete this.attributes[k]; },
+        querySelectorAll() { return []; },
+      });
+      return elements.get(id);
+    };
+    const close = element('close');
+    element('controls').querySelectorAll = () => [close, element('toolbar-toggle')];
+    const listen = target => (event, callback) => listeners.push({target, event, callback});
+    vm.runInNewContext(readFileSync(new URL('../ui/toolbar.js', import.meta.url), 'utf8'), {
+      document: {
+        getElementById: id => id === 'fold-title' ? null : element(id),
+        body: {classList: {contains: () => false}},
+        elementFromPoint: () => ({closest: () => close}),
+      },
+      window: {__TAURI__: {
+        event: {listen: listen('Any')},
+        webviewWindow: {getCurrentWebviewWindow: () => ({listen: listen(label)})},
+      }},
+      ResizeObserver: class {observe() {}}, MutationObserver: class {observe() {}},
+    });
+    return close.attributes;
+  }
+  const a = toolbar('memo-a'), b = toolbar('memo-b');
+  function emit(target, payload) {
+    for (const l of listeners) if (l.target === 'Any' || l.target === target) l.callback({payload});
+  }
+  emit('memo-a', {x: 280, y: 10});
+  assert.equal(a['data-pointer-over'], '');
+  assert.equal(b['data-pointer-over'], undefined);
+  emit('memo-b', null); // Another window's exit must not clear A.
+  assert.equal(a['data-pointer-over'], '');
+  emit('memo-a', null);
+  emit('memo-b', {x: 280, y: 10});
+  assert.equal(a['data-pointer-over'], undefined);
+  assert.equal(b['data-pointer-over'], '');
+  emit('memo-b', null);
+  assert.equal(b['data-pointer-over'], undefined);
 });
