@@ -1,0 +1,57 @@
+{
+  "id": "d9d9c23c-de19-4530-96ba-4bd4faa533c8",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "coordinateSpace": "window",
+      "id": "42FCD0A5-5D94-4192-8472-6004EEC141F8",
+      "elementCount": 19,
+      "focusedElementId": null,
+      "truncation": {
+        "maxDepthReached": false,
+        "maxNodes": 1200,
+        "truncated": false,
+        "maxDepth": 64
+      },
+      "treeText": "App=agent-gibbon (pid 15786)\nWindow: \"Agent Gibbon [DEV codex/startup-window-restore · 31e61432] — restore-image\", App: agent-gibbon.\n\n0 standard window Agent Gibbon [DEV codex/startup-window-restore · 31e61432] — restore-image\n\t1 scroll area\n\t\t2 HTML content Agent Gibbon\n\t\t\t3 toolbar Toolbar\n\t\t\t\t4 button (disabled) 이전 도구\n\t\t\t\t5 button (expanded) 메모 접기\n\t\t\t\t6 button (disabled) 글자 크기 12px, 클릭하여 변경\n\t\t\t\t7 button (disabled) 메모 편집\n\t\t\t\t8 button 파일로 저장\n\t\t\t\t9 button 이미지 복사\n\t\t\t\t10 button 반대편으로 워프\n\t\t\t\t11 toggle button 상단 고정, Value: 1\n\t\t\t\t12 button 다음 도구\n\t\t\t\t13 button (expanded) 툴바 접기\n\t\t\t\t14 button 메모 창 닫기\n\t\t\t15 container Agent Gibbon\n\t\t\t\t16 image 화면 캡처\n\t\t\t\t17 container Markdown 편집\n\t\t\t18 scroll bar 메모 세로 스크롤 0\n\nNo UI element is currently focused.",
+      "window": {
+        "screenIndex": 0,
+        "platform": {
+          "layer": 5
+        },
+        "x": 600,
+        "isMinimized": false,
+        "width": 160,
+        "y": 200,
+        "id": 68246,
+        "title": "Agent Gibbon [DEV codex/startup-window-restore · 31e61432] — restore-image",
+        "height": 100,
+        "isOffscreen": false
+      },
+      "app": {
+        "bundleId": null,
+        "pid": 15786,
+        "name": "agent-gibbon"
+      }
+    },
+    "screenshot": {
+      "height": 200,
+      "scale": 2,
+      "width": 320,
+      "format": "png",
+      "path": "docs/verification/startup-window-restore/image-native.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-14T02:20:46.078Z"
+    },
+    "screenshotStatus": {
+      "metadata": {
+        "windowId": 68246,
+        "engine": "screenCaptureKit"
+      },
+      "state": "captured"
+    }
+  },
+  "_meta": {
+    "runtimeId": "68e7b4ea-7744-478f-89eb-c31cb537c5c1"
+  }
+}

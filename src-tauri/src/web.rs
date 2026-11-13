@@ -1,4 +1,4 @@
-//! Session-only web windows. Trusted Welcome and remote pages use disjoint labels.
+//! Local-restorable web windows. Trusted Welcome and remote pages use disjoint labels.
 use crate::{
     capture::ImageNote,
     model::{Action, Request},
@@ -147,6 +147,15 @@ pub fn create(
     bounds: Option<ImageNote>,
     id: Option<&str>,
     url: Option<&str>,
+) -> Result<Value, String> {
+    create_presented(app, bounds, id, url, true)
+}
+pub(crate) fn create_presented(
+    app: &tauri::AppHandle,
+    bounds: Option<ImageNote>,
+    id: Option<&str>,
+    url: Option<&str>,
+    present: bool,
 ) -> Result<Value, String> {
     let id = id.map(str::to_owned).unwrap_or_else(|| {
         format!(
@@ -303,7 +312,9 @@ pub fn create(
             url: url.map(str::to_owned),
         },
     );
-    show(&w)?;
+    if present {
+        show(&w)?;
+    }
     inspect(app, &id)
 }
 pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String> {

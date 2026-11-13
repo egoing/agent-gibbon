@@ -75,3 +75,11 @@ Orca background synthetic drag는 입력 전송이 unverified였고 inspect 위�
 ## 사용자 요청에 따른 새 실제 캡처
 
 개발 CLI로 `web-live-e864-20261113`에 외부 페이지를 다시 열고 inspect의 instance/id/URL을 대조했다. PID24622의 정확한 e864 debug 경로와 창68659의 메모 ID 포함 제목을 확인한 뒤 Orca로 캡처했다. [새 실제 화면](assets/web-toolbar-20261113/live-request-600.png) · [창 출처](assets/web-toolbar-20261113/live-request-source.json) · [inspect](assets/web-toolbar-20261113/live-request-inspect.json). 검증창을 숨기고 이번 PID만 종료했다. 리로드·뒤로가기·주소 버튼→Welcome 입력 흐름은 사용자 요청대로 별도 [신규 이슈 #158](https://github.com/egoing/agent-gibbon/issues/158)에 등록했으며 현재 툴바 변경에 구현을 섞지 않았다.
+
+## 병합 승인과 최신 main 통합 검증
+
+사용자가 “병합 이슈 종료”를 명시 승인하여 제품 변경을 `5d051a8`로 커밋하고 origin/main `1f854b3f2ea1036da663c571b0905e259157cda7`을 병합했다. 디자인 문서에서 양쪽 추가 절을 보존했고 `create_presented`·조건부 show·session_restore와 웹 콘텐츠 배치/제목줄 제거가 병존함을 확인했다. 승인 대기·main 반영 예정이라는 위 내용은 과거 단계의 기록이다.
+
+통합된 최종 제품 코드에서 **UI190·Rust220·Clippy·Rustfmt·개발 빌드·공통 Chromium6조합/웹15조합**을 모두 통과했다. [Rust](assets/web-toolbar-20261113/main-integration-rust.log) · [UI](assets/web-toolbar-20261113/main-integration-ui.log) · [Clippy](assets/web-toolbar-20261113/main-integration-clippy.log) · [빌드](assets/web-toolbar-20261113/main-integration-build.log) · [공통 레이아웃](assets/web-toolbar-20261113/main-integration-layout.log) · [웹](assets/web-toolbar-20261113/main-integration-browser.log).
+
+새 실행 PID31087의 정확한 e864 debug 경로와 instance를 확인했고 검증메모 `web-main-integration-e864`의 inspect와 메모 ID 포함 네이티브 제목을 대조했다. [통합 실제 화면](assets/web-toolbar-20261113/main-integration.png) · [창 출처](assets/web-toolbar-20261113/main-integration-source.json) · [inspect](assets/web-toolbar-20261113/main-integration-inspect.json). 검증창은 숨기고 이번 PID만 종료했다. 물리 드래그/resize·접힌 native 캡처·비macOS 등 위 미검증 한계는 그대로이며 Conf4/RiskLow다. 전체 플랫폼 CI/배포는 실행하지 않았다. 최종 커밋/병합 SHA와 로컬main 동기화는 이슈152 종료 기록으로 연결한다. 신규 이슈158은 이 작업의 종료 대상이 아니다.

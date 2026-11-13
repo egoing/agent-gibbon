@@ -267,6 +267,13 @@ pub fn contains(app: &tauri::AppHandle, id: &str) -> bool {
         .contains_key(id)
 }
 pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+    open_presented(app, id, true)
+}
+pub(crate) fn open_presented(
+    app: &tauri::AppHandle,
+    id: &str,
+    present: bool,
+) -> Result<(), String> {
     let _root = crate::telemetry::Timing::new("terminal.window.open");
     let agent = app
         .state::<Terminals>()
@@ -344,6 +351,9 @@ pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
         }
         window
     };
+    if !present {
+        return Ok(());
+    }
     let _show = crate::telemetry::Timing::new("terminal.window.show");
     if crate::opacity::configured(app).is_some() {
         crate::sync_opacity(win.clone())?;
@@ -395,7 +405,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         (None, None, None, false)
     };
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"bounds":agent.bounds,"pid":pid,"program":program,"running":running,"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"bounds":agent.bounds,"pid":pid,"program":program,"running":running,"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
     )
 }
 pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value, String> {
@@ -471,6 +481,7 @@ pub async fn terminal_start(
                 .ok_or("터미널 창이 없습니다")?;
             let (session, mut reader) =
                 welcome::start(&agent, choice.as_deref().unwrap_or("shell"), dimensions)?;
+            crate::session_restore::terminal_started(&app, &id);
             let watched_session = Arc::downgrade(&reservation.finish(session)?);
             welcome::touch_path(&app, &id)?;
             let watched_app = app.clone();
@@ -557,6 +568,7 @@ pub fn terminal_write(window: WebviewWindow, data: String) -> Result<(), String>
         let _lock = crate::telemetry::Timing::new("terminal.session.lock");
         session.lock().map_err(err)?
     };
+    crate::session_restore::command_input(window.app_handle(), &caller(&window)?, &data);
     session.prompt.input(data.as_bytes());
     let write = crate::telemetry::Timing::new("terminal.input.write");
     session.writer.write_all(data.as_bytes()).map_err(err)?;
