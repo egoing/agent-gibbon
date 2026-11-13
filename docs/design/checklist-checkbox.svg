@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="520" viewBox="0 0 1120 520">
+<rect width="1120" height="520" fill="#f3f4f6"/>
+<style>text{font-family:"Apple SD Gothic Neo",sans-serif}</style>
+<text x="24" y="34" font-size="22" fill="#222">#140 · 읽기 전용 체크리스트 외곽 통일</text>
+<text x="24" y="60" font-size="13" fill="#555">설명용 시안 · 두 상태 0.85em 정사각형 / 기준선 -0.08em / 동일한 본문 시작 위치</text>
+<rect x="24" y="84" width="250" height="400" rx="4" fill="#f8f8f8"/>
+<text x="36" y="110" font-size="14" fill="#2d2d2d">흰색</text>
+<text x="36" y="142" font-size="11" fill="#2d2d2d">12px · 일반 / 변경 강조</text>
+<rect x="38" y="156.76000000000002" width="10.2" height="10.2" rx="1" fill="none" stroke="#2d2d2d"/>
+<text x="51.2" y="166" font-size="12" fill="#2d2d2d">동일한 본문 정렬</text>
+<rect x="36" y="178" width="213" height="16.799999999999997" rx="2" fill="#fff0c2"/>
+<rect x="38" y="180.76000000000002" width="10.2" height="10.2" rx="1" fill="none" stroke="#714600"/>
+<path d="M 40.448 185.45200000000003 l 2.2439999999999998 2.55 l 3.5699999999999994 -5.303999999999999" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="51.2" y="190" font-size="12" fill="#714600">동일한 본문 정렬</text>
+<text x="36" y="219" font-size="11" fill="#2d2d2d">14px · 일반 / 변경 강조</text>
+<rect x="38" y="232.22" width="11.9" height="11.9" rx="1" fill="none" stroke="#2d2d2d"/>
+<text x="53.4" y="243" font-size="14" fill="#2d2d2d">동일한 본문 정렬</text>
+<rect x="36" y="253" width="213" height="19.599999999999998" rx="2" fill="#fff0c2"/>
+<rect x="38" y="256.22" width="11.9" height="11.9" rx="1" fill="none" stroke="#714600"/>
+<path d="M 40.856 261.694 l 2.618 2.975 l 4.165 -6.188000000000001" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="53.4" y="267" font-size="14" fill="#714600">동일한 본문 정렬</text>
+<text x="36" y="296" font-size="11" fill="#2d2d2d">16px · 일반 / 변경 강조</text>
+<rect x="38" y="307.67999999999995" width="13.6" height="13.6" rx="1" fill="none" stroke="#2d2d2d"/>
+<text x="55.6" y="320" font-size="16" fill="#2d2d2d">동일한 본문 정렬</text>
+<rect x="36" y="328" width="213" height="22.4" rx="2" fill="#fff0c2"/>
+<rect x="38" y="331.67999999999995" width="13.6" height="13.6" rx="1" fill="none" stroke="#714600"/>
+<path d="M 41.264 337.9359999999999 l 2.992 3.4 l 4.76 -7.072" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="55.6" y="344" font-size="16" fill="#714600">동일한 본문 정렬</text>
+<text x="36" y="373" font-size="11" fill="#2d2d2d">18px · 일반 / 변경 강조</text>
+<rect x="38" y="383.14" width="15.299999999999999" height="15.299999999999999" rx="1" fill="none" stroke="#2d2d2d"/>
+<text x="57.8" y="397" font-size="18" fill="#2d2d2d">동일한 본문 정렬</text>
+<rect x="36" y="403" width="213" height="25.2" rx="2" fill="#fff0c2"/>
+<rect x="38" y="407.14" width="15.299999999999999" height="15.299999999999999" rx="1" fill="none" stroke="#714600"/>
+<path d="M 41.672 414.178 l 3.3659999999999997 3.8249999999999997 l 5.3549999999999995 -7.9559999999999995" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="57.8" y="421" font-size="18" fill="#714600">동일한 본문 정렬</text>
+<rect x="298" y="84" width="250" height="400" rx="4" fill="#dfe2dd"/>
+<text x="310" y="110" font-size="14" fill="#2c2f7e">회색</text>
+<text x="310" y="142" font-size="11" fill="#2c2f7e">12px · 일반 / 변경 강조</text>
+<rect x="312" y="156.76000000000002" width="10.2" height="10.2" rx="1" fill="none" stroke="#2c2f7e"/>
+<text x="325.2" y="166" font-size="12" fill="#2c2f7e">동일한 본문 정렬</text>
+<rect x="310" y="178" width="213" height="16.799999999999997" rx="2" fill="#fff0c2"/>
+<rect x="312" y="180.76000000000002" width="10.2" height="10.2" rx="1" fill="none" stroke="#714600"/>
+<path d="M 314.448 185.45200000000003 l 2.2439999999999998 2.55 l 3.5699999999999994 -5.303999999999999" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="325.2" y="190" font-size="12" fill="#714600">동일한 본문 정렬</text>
+<text x="310" y="219" font-size="11" fill="#2c2f7e">14px · 일반 / 변경 강조</text>
+<rect x="312" y="232.22" width="11.9" height="11.9" rx="1" fill="none" stroke="#2c2f7e"/>
+<text x="327.4" y="243" font-size="14" fill="#2c2f7e">동일한 본문 정렬</text>
+<rect x="310" y="253" width="213" height="19.599999999999998" rx="2" fill="#fff0c2"/>
+<rect x="312" y="256.22" width="11.9" height="11.9" rx="1" fill="none" stroke="#714600"/>
+<path d="M 314.856 261.694 l 2.618 2.975 l 4.165 -6.188000000000001" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="327.4" y="267" font-size="14" fill="#714600">동일한 본문 정렬</text>
+<text x="310" y="296" font-size="11" fill="#2c2f7e">16px · 일반 / 변경 강조</text>
+<rect x="312" y="307.67999999999995" width="13.6" height="13.6" rx="1" fill="none" stroke="#2c2f7e"/>
+<text x="329.6" y="320" font-size="16" fill="#2c2f7e">동일한 본문 정렬</text>
+<rect x="310" y="328" width="213" height="22.4" rx="2" fill="#fff0c2"/>
+<rect x="312" y="331.67999999999995" width="13.6" height="13.6" rx="1" fill="none" stroke="#714600"/>
+<path d="M 315.264 337.9359999999999 l 2.992 3.4 l 4.76 -7.072" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="329.6" y="344" font-size="16" fill="#714600">동일한 본문 정렬</text>
+<text x="310" y="373" font-size="11" fill="#2c2f7e">18px · 일반 / 변경 강조</text>
+<rect x="312" y="383.14" width="15.299999999999999" height="15.299999999999999" rx="1" fill="none" stroke="#2c2f7e"/>
+<text x="331.8" y="397" font-size="18" fill="#2c2f7e">동일한 본문 정렬</text>
+<rect x="310" y="403" width="213" height="25.2" rx="2" fill="#fff0c2"/>
+<rect x="312" y="407.14" width="15.299999999999999" height="15.299999999999999" rx="1" fill="none" stroke="#714600"/>
+<path d="M 315.672 414.178 l 3.3659999999999997 3.8249999999999997 l 5.3549999999999995 -7.9559999999999995" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="331.8" y="421" font-size="18" fill="#714600">동일한 본문 정렬</text>
+<rect x="572" y="84" width="250" height="400" rx="4" fill="#262627"/>
+<text x="584" y="110" font-size="14" fill="#dfe2dd">검정</text>
+<text x="584" y="142" font-size="11" fill="#dfe2dd">12px · 일반 / 변경 강조</text>
+<rect x="586" y="156.76000000000002" width="10.2" height="10.2" rx="1" fill="none" stroke="#dfe2dd"/>
+<text x="599.2" y="166" font-size="12" fill="#dfe2dd">동일한 본문 정렬</text>
+<rect x="584" y="178" width="213" height="16.799999999999997" rx="2" fill="#fff0c2"/>
+<rect x="586" y="180.76000000000002" width="10.2" height="10.2" rx="1" fill="none" stroke="#714600"/>
+<path d="M 588.448 185.45200000000003 l 2.2439999999999998 2.55 l 3.5699999999999994 -5.303999999999999" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="599.2" y="190" font-size="12" fill="#714600">동일한 본문 정렬</text>
+<text x="584" y="219" font-size="11" fill="#dfe2dd">14px · 일반 / 변경 강조</text>
+<rect x="586" y="232.22" width="11.9" height="11.9" rx="1" fill="none" stroke="#dfe2dd"/>
+<text x="601.4" y="243" font-size="14" fill="#dfe2dd">동일한 본문 정렬</text>
+<rect x="584" y="253" width="213" height="19.599999999999998" rx="2" fill="#fff0c2"/>
+<rect x="586" y="256.22" width="11.9" height="11.9" rx="1" fill="none" stroke="#714600"/>
+<path d="M 588.856 261.694 l 2.618 2.975 l 4.165 -6.188000000000001" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="601.4" y="267" font-size="14" fill="#714600">동일한 본문 정렬</text>
+<text x="584" y="296" font-size="11" fill="#dfe2dd">16px · 일반 / 변경 강조</text>
+<rect x="586" y="307.67999999999995" width="13.6" height="13.6" rx="1" fill="none" stroke="#dfe2dd"/>
+<text x="603.6" y="320" font-size="16" fill="#dfe2dd">동일한 본문 정렬</text>
+<rect x="584" y="328" width="213" height="22.4" rx="2" fill="#fff0c2"/>
+<rect x="586" y="331.67999999999995" width="13.6" height="13.6" rx="1" fill="none" stroke="#714600"/>
+<path d="M 589.264 337.9359999999999 l 2.992 3.4 l 4.76 -7.072" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="603.6" y="344" font-size="16" fill="#714600">동일한 본문 정렬</text>
+<text x="584" y="373" font-size="11" fill="#dfe2dd">18px · 일반 / 변경 강조</text>
+<rect x="586" y="383.14" width="15.299999999999999" height="15.299999999999999" rx="1" fill="none" stroke="#dfe2dd"/>
+<text x="605.8" y="397" font-size="18" fill="#dfe2dd">동일한 본문 정렬</text>
+<rect x="584" y="403" width="213" height="25.2" rx="2" fill="#fff0c2"/>
+<rect x="586" y="407.14" width="15.299999999999999" height="15.299999999999999" rx="1" fill="none" stroke="#714600"/>
+<path d="M 589.672 414.178 l 3.3659999999999997 3.8249999999999997 l 5.3549999999999995 -7.9559999999999995" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="605.8" y="421" font-size="18" fill="#714600">동일한 본문 정렬</text>
+<rect x="846" y="84" width="250" height="400" rx="4" fill="#fff5cf"/>
+<text x="858" y="110" font-size="14" fill="#27313c">컬러</text>
+<text x="858" y="142" font-size="11" fill="#27313c">12px · 일반 / 변경 강조</text>
+<rect x="860" y="156.76000000000002" width="10.2" height="10.2" rx="1" fill="none" stroke="#27313c"/>
+<text x="873.2" y="166" font-size="12" fill="#27313c">동일한 본문 정렬</text>
+<rect x="858" y="178" width="213" height="16.799999999999997" rx="2" fill="#fff0c2"/>
+<rect x="860" y="180.76000000000002" width="10.2" height="10.2" rx="1" fill="none" stroke="#714600"/>
+<path d="M 862.448 185.45200000000003 l 2.2439999999999998 2.55 l 3.5699999999999994 -5.303999999999999" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="873.2" y="190" font-size="12" fill="#714600">동일한 본문 정렬</text>
+<text x="858" y="219" font-size="11" fill="#27313c">14px · 일반 / 변경 강조</text>
+<rect x="860" y="232.22" width="11.9" height="11.9" rx="1" fill="none" stroke="#27313c"/>
+<text x="875.4" y="243" font-size="14" fill="#27313c">동일한 본문 정렬</text>
+<rect x="858" y="253" width="213" height="19.599999999999998" rx="2" fill="#fff0c2"/>
+<rect x="860" y="256.22" width="11.9" height="11.9" rx="1" fill="none" stroke="#714600"/>
+<path d="M 862.856 261.694 l 2.618 2.975 l 4.165 -6.188000000000001" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="875.4" y="267" font-size="14" fill="#714600">동일한 본문 정렬</text>
+<text x="858" y="296" font-size="11" fill="#27313c">16px · 일반 / 변경 강조</text>
+<rect x="860" y="307.67999999999995" width="13.6" height="13.6" rx="1" fill="none" stroke="#27313c"/>
+<text x="877.6" y="320" font-size="16" fill="#27313c">동일한 본문 정렬</text>
+<rect x="858" y="328" width="213" height="22.4" rx="2" fill="#fff0c2"/>
+<rect x="860" y="331.67999999999995" width="13.6" height="13.6" rx="1" fill="none" stroke="#714600"/>
+<path d="M 863.264 337.9359999999999 l 2.992 3.4 l 4.76 -7.072" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="877.6" y="344" font-size="16" fill="#714600">동일한 본문 정렬</text>
+<text x="858" y="373" font-size="11" fill="#27313c">18px · 일반 / 변경 강조</text>
+<rect x="860" y="383.14" width="15.299999999999999" height="15.299999999999999" rx="1" fill="none" stroke="#27313c"/>
+<text x="879.8" y="397" font-size="18" fill="#27313c">동일한 본문 정렬</text>
+<rect x="858" y="403" width="213" height="25.2" rx="2" fill="#fff0c2"/>
+<rect x="860" y="407.14" width="15.299999999999999" height="15.299999999999999" rx="1" fill="none" stroke="#714600"/>
+<path d="M 863.672 414.178 l 3.3659999999999997 3.8249999999999997 l 5.3549999999999995 -7.9559999999999995" fill="none" stroke="#714600" stroke-width="1.5"/>
+<text x="879.8" y="421" font-size="18" fill="#714600">동일한 본문 정렬</text>
+<text x="24" y="510" font-size="12" fill="#555">상태 전환은 체크 표시만 변경 · 클릭 입력 없음 · 복사 ☑/☐ 및 Markdown - [x]/- [ ] 유지</text></svg>

@@ -31,6 +31,12 @@ li { margin: 1px 0; }
 ul.task-list { list-style: none; padding-left: 0; }
 li.task-item { list-style: none; }
 li.task-item > p { margin: 0; }
+/* Read-only task symbols keep their text for copying and their inherited ink
+   for every theme/mark. Only the font glyph paint is hidden, not its text. */
+.task-checkbox { display: inline-block; position: relative; width: .85em; height: .85em; vertical-align: -.08em; line-height: 1; overflow: hidden; -webkit-text-fill-color: transparent; }
+.task-checkbox::before { content: ""; position: absolute; inset: 0; border: 1px solid currentColor; border-radius: 1px; }
+.task-checkbox[data-checked="true"]::after { content: ""; position: absolute; left: 24%; top: 12%; width: 32%; height: 56%; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+
 pre { overflow: auto; background: var(--panel); padding: 4px; border-radius: 3px; margin: 4px 0; }
 code { font-size: .917rem; letter-spacing: 0; background: var(--panel); padding: 0 2px; }
 pre code { padding: 0; }

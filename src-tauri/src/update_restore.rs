@@ -19,12 +19,12 @@ const MAX_WINDOWS: usize = 1000;
 const MAX_DIMENSION: u32 = 100_000;
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-struct WindowState {
-    label: String,
+pub(crate) struct WindowState {
+    pub(crate) label: String,
     x: i32,
     y: i32,
-    width: u32,
-    height: u32,
+    pub(crate) width: u32,
+    pub(crate) height: u32,
     visible: bool,
     minimized: bool,
     always_on_top: bool,
@@ -92,7 +92,7 @@ fn validate(snapshot: &Snapshot) -> Result<(), String> {
     Ok(())
 }
 
-fn state(window: &WebviewWindow) -> Result<WindowState, String> {
+pub(crate) fn state(window: &WebviewWindow) -> Result<WindowState, String> {
     let position = window.outer_position().map_err(|e| e.to_string())?;
     let size = window.inner_size().map_err(|e| e.to_string())?;
     Ok(WindowState {
@@ -184,7 +184,7 @@ pub fn save(app: &AppHandle) -> Result<(), String> {
     Ok(())
 }
 
-fn apply(window: &WebviewWindow, saved: &WindowState) -> Result<(), String> {
+pub(crate) fn apply(window: &WebviewWindow, saved: &WindowState) -> Result<(), String> {
     #[cfg(windows)]
     {
         // Let Windows switch to the saved monitor's DPI before sizing.
