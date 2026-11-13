@@ -23,7 +23,7 @@ test('feedback text and blank space drag the owner while controls keep their act
     window: {__TAURI__: {core: {invoke}}},
     document: {
       getElementById: id => ({feedback: surface, message, actions})[id],
-      documentElement: {style: {setProperty() {}}}, body: {style: {}}, addEventListener() {},
+      documentElement: {style: {setProperty() {}}}, body: {style: {}, classList: {toggle() {}}}, addEventListener() {},
     },
     memoThemeFor: () => ({background: '#fff', foreground: '#222'}), readMemoAppearance: () => 'white',
     setTimeout() {}, console,

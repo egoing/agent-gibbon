@@ -1,0 +1,23 @@
+{
+  "state": {
+    "ok": true,
+    "instance": "dev-f3ab8dc6a8d44e989b85031f",
+    "id": "frame-02ec-proof",
+    "focused": false,
+    "position": {
+      "x": 2200,
+      "y": 600
+    },
+    "size": {
+      "height": 320,
+      "width": 720
+    }
+  },
+  "feedback": null,
+  "pid": 77792,
+  "window_id": 67303,
+  "memo": {
+    "title": "Agent Gibbon [DEV detached@f343dbe · f3ab8dc6] — frame-02ec-proof",
+    "window_id": 67303
+  }
+}

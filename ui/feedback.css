@@ -2,7 +2,7 @@
 * { box-sizing: border-box; }
 html { overflow-x: hidden; overflow-y: auto; }
 body { margin: 0; cursor: default; background: transparent; }
-#feedback { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; column-gap: 12px; row-gap: 8px; width: 100%; max-width: 100%; padding: var(--feedback-padding); border: var(--surface-border) solid var(--border); border-radius: var(--surface-radius); background: var(--background); }
+#feedback { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; column-gap: 12px; row-gap: 8px; width: 100%; max-width: 100%; padding: var(--feedback-padding); border: var(--surface-border) solid transparent; border-radius: var(--frame-corners); clip-path: inset(0 round var(--frame-corners)); background: var(--background); }
 #message { flex: 1 1 auto; overflow-wrap: anywhere; min-width: 0; white-space: pre-wrap; }
 #message:empty, #actions:empty { display: none; }
 #actions { display: flex; gap: var(--button-gap); margin-left: auto; flex: 0 0 auto; }
@@ -10,7 +10,7 @@ button { height: var(--action-height); padding: 0 var(--action-padding); font: i
 button.primary { font-weight: 600; background: var(--primary); }
 button:hover { background: var(--primary); }
 button:focus-visible { outline: 2px solid var(--foreground); outline-offset: -2px; }
-button:disabled { opacity: .5; cursor: default; }
+button:disabled { opacity: .25; cursor: default; }
 #feedback.error #message { color: var(--error); }
 #feedback.error #message::before { content: '⚠ '; }
 
@@ -27,9 +27,13 @@ button:disabled { opacity: .5; cursor: default; }
   right: 3px;
   height: 1px;
   background: currentColor;
-  opacity: .5;
+  opacity: .25;
   pointer-events: none;
 }
 #feedback[data-edge="below"]::before { top: 0; }
 #feedback[data-edge="above"]::before { bottom: 0; }
 #feedback.error::before { color: var(--error); }
+
+/* The shared frame uses the opposite open edge from its owner. */
+body.feedback-below { --frame-corners: 0 0 var(--surface-radius) var(--surface-radius); --frame-widths: 0 var(--memo-focus-width) var(--memo-focus-width); }
+body.feedback-above { --frame-corners: var(--surface-radius) var(--surface-radius) 0 0; --frame-widths: var(--memo-focus-width) var(--memo-focus-width) 0; }

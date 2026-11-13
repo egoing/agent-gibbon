@@ -9,6 +9,7 @@
   --surface-radius: 4px;
   --button-radius: 3px;
   --surface-border: 1px;
+  --memo-focus-width: 2px;
   --surface-shadow: 0 2px 6px rgb(0 0 0 / 12%);
   --memo-padding: 3px;
   --feedback-padding: var(--memo-padding);

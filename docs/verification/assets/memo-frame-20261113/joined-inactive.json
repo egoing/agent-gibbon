@@ -1,0 +1,57 @@
+{
+  "state": {
+    "ok": true,
+    "instance": "dev-f3ab8dc6a8d44e989b85031f",
+    "id": "frame-02ec-proof",
+    "focused": false,
+    "position": {
+      "x": 2200,
+      "y": 600
+    },
+    "size": {
+      "height": 320,
+      "width": 720
+    }
+  },
+  "feedback": {
+    "always_on_top": true,
+    "focused": false,
+    "opacity": 1.0,
+    "position": {
+      "x": 2200,
+      "y": 920
+    },
+    "size": {
+      "height": 58,
+      "width": 720
+    },
+    "view": {
+      "buttons": [
+        {
+          "disabled": false,
+          "id": "cancel",
+          "label": "취소",
+          "primary": false
+        },
+        {
+          "disabled": false,
+          "id": "save",
+          "label": "저장",
+          "primary": true
+        }
+      ],
+      "color": "#9cb6ff",
+      "error": false,
+      "message": "",
+      "revision": null
+    },
+    "visible": true,
+    "window_id": 67313
+  },
+  "pid": 77792,
+  "window_id": 67303,
+  "memo": {
+    "title": "Agent Gibbon [DEV detached@f343dbe · f3ab8dc6] — frame-02ec-proof",
+    "window_id": 67303
+  }
+}

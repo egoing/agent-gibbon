@@ -1,0 +1,45 @@
+{
+  "active": {
+    "ok": true,
+    "instance": "dev-f3ab8dc6a8d44e989b85031f",
+    "id": "focus-02ec-proof",
+    "focused": true,
+    "position": {
+      "x": 3456,
+      "y": 1662
+    },
+    "size": {
+      "height": 114,
+      "width": 600
+    },
+    "folded": false,
+    "marker": "FOCUS-02EC-20261113 모서리 검증"
+  },
+  "inactive": {
+    "ok": true,
+    "instance": "dev-f3ab8dc6a8d44e989b85031f",
+    "id": "focus-02ec-proof",
+    "focused": false,
+    "position": {
+      "x": 3456,
+      "y": 1662
+    },
+    "size": {
+      "height": 114,
+      "width": 600
+    },
+    "folded": false,
+    "marker": "FOCUS-02EC-20261113 모서리 검증"
+  },
+  "root": "/Users/egoinglee/.codex/worktrees/02ec/agent-gibbon",
+  "pid": 60335,
+  "window_id": 67086,
+  "binary": "/Users/egoinglee/.codex/worktrees/02ec/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "native_title": "Agent Gibbon [DEV detached@f343dbe · f3ab8dc6] — focus-02ec-proof",
+  "corner_alpha": [
+    0,
+    0,
+    0,
+    0
+  ]
+}

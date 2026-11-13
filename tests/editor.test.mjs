@@ -471,20 +471,19 @@ test('hidden memo defers companion creation until its native window is visible',
   assert.equal(app.element('markdown').value, '보존할 초안');
 });
 
-test('connected outline follows its own companion and restores after hiding', async () => {
+test('frame opens only its own connected edge and restores after hiding', async () => {
   const app = await setup();
   const connection = app.nativeEvents['feedback-connection'];
   connection({ payload: { owner: 'other', edge: 'below' } });
   assert.equal(app.classes.has('feedback-below'), false);
   connection({ payload: { owner: 'memo-test', edge: 'below', width: 100, memoWidth: 300, memoHeight: 160 } });
   assert.equal(app.classes.has('feedback-below'), true);
-  assert.equal('hidden' in app.element('connected-outline').attributes, false);
-  assert.match(app.element('connected-path').attributes.d, /M 200 159.5/);
+  assert.equal(app.classes.has('feedback-above'), false);
   connection({ payload: { owner: 'memo-test', edge: 'above', width: 300, memoWidth: 300, memoHeight: 160 } });
-  assert.equal(app.classes.has('feedback-full'), true);
-  assert.equal(app.element('connected-path').attributes.transform, 'translate(0 160) scale(1 -1)');
+  assert.equal(app.classes.has('feedback-above'), true);
+  assert.equal(app.classes.has('feedback-below'), false);
   connection({ payload: { owner: 'memo-test', edge: 'none' } });
-  assert.equal('hidden' in app.element('connected-outline').attributes, true);
+  assert.equal(app.classes.has('feedback-below'), false);
   assert.equal(app.classes.has('feedback-above'), false);
 });
 
