@@ -59,3 +59,7 @@ Windows·Intel native GUI, 물리 키보드 IME 입력, Feedback native 저장 �
 ## 2026-11-14 커밋·병합 승인
 
 사용자가 저장 단축키 변경의 커밋·push·병합을 승인했다. 위 승인 대기 표기는 최초 검증 당시 상태다. 새 package-lock.json의 정렬 변경은 이번 작업에서 제외하고 보존한다. 최신 main 통합 후 관련 회귀 검사를 다시 수행한다.
+
+### 최신 main 통합 후 재검증
+
+통합 커밋 `bc40a0e`(main `3259ecf` 포함)에서 UI 196개·Rust 222개, Clippy -D warnings·Rustfmt·개발 빌드·diff 검사를 통과했다. Chromium 158의 144/300px 버튼 배치·Tab·단축키 라우팅·IME/반복 차단 검사도 통과했다. 이번 재검증은 GUI를 재실행하지 않았으며 앞선 native 증거의 출처와 한계를 그대로 구분한다. 이후 변경은 이 검증 기록뿐이다.
