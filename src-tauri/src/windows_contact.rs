@@ -17,10 +17,19 @@ extern "system" {
 pub(crate) struct Modifiers {
     pub control: bool,
     pub alt: bool,
+    pub shift: bool,
     pub windows: bool,
 }
 
 impl Modifiers {
+    pub(crate) fn control_only(self) -> bool {
+        self.control && !self.alt && !self.shift && !self.windows
+    }
+
+    pub(crate) fn alt_only(self) -> bool {
+        self.alt && !self.control && !self.shift && !self.windows
+    }
+
     pub(crate) fn stash_chord(self) -> bool {
         self.control && self.alt && self.windows
     }
@@ -33,6 +42,7 @@ pub(crate) fn modifiers() -> Modifiers {
     unsafe {
         Modifiers {
             control: GetAsyncKeyState(0x11) < 0, // Either Control key
+            shift: GetAsyncKeyState(0x10) < 0,   // Either Shift key
             alt: GetAsyncKeyState(0x12) < 0,     // Either Alt key
             windows: GetAsyncKeyState(0x5b) < 0 || GetAsyncKeyState(0x5c) < 0,
         }
@@ -99,12 +109,27 @@ mod tests {
     use super::*;
 
     #[test]
+    fn pointer_gestures_require_their_single_modifier() {
+        for bits in 0..16 {
+            let modifiers = Modifiers {
+                control: bits & 1 != 0,
+                alt: bits & 2 != 0,
+                windows: bits & 4 != 0,
+                shift: bits & 8 != 0,
+            };
+            assert_eq!(modifiers.control_only(), bits == 1, "mask {bits}");
+            assert_eq!(modifiers.alt_only(), bits == 2, "mask {bits}");
+        }
+    }
+
+    #[test]
     fn only_the_complete_three_modifier_chord_is_reserved_for_stash() {
         for bits in 0..8 {
             let modifiers = Modifiers {
                 control: bits & 1 != 0,
                 alt: bits & 2 != 0,
                 windows: bits & 4 != 0,
+                shift: false,
             };
             assert_eq!(modifiers.stash_chord(), bits == 7);
         }

@@ -1,0 +1,188 @@
+{
+  "root": "/Users/egoinglee/.codex/worktrees/02ec/agent-gibbon",
+  "pid": 96953,
+  "binary": "/Users/egoinglee/.codex/worktrees/02ec/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "native_title": "Agent Gibbon [DEV detached@f343dbe · f3ab8dc6] — single-modifier-02ec-proof",
+  "note_id": "single-modifier-02ec-proof",
+  "marker": "SINGLE-MODIFIER-02EC-20261113",
+  "results": [
+    {
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "single-modifier-02ec-proof",
+      "folded": false,
+      "focused": false,
+      "position": {
+        "x": 2200,
+        "y": 1400
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "case": "initial",
+      "native_input_state": "1130.0 660.0 92046 0"
+    },
+    {
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "single-modifier-02ec-proof",
+      "folded": false,
+      "focused": false,
+      "position": {
+        "x": 2200,
+        "y": 1400
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "case": "Option+Control entry",
+      "native_input_state": "1140.0 705.0 92046 786432"
+    },
+    {
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "single-modifier-02ec-proof",
+      "folded": false,
+      "focused": false,
+      "position": {
+        "x": 2200,
+        "y": 1400
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "case": "release Control inside",
+      "native_input_state": "1140.0 705.0 92046 524288"
+    },
+    {
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "single-modifier-02ec-proof",
+      "folded": false,
+      "focused": false,
+      "position": {
+        "x": 2200,
+        "y": 1400
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "case": "Option+Shift entry",
+      "native_input_state": "1140.0 705.0 92046 655360"
+    },
+    {
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "single-modifier-02ec-proof",
+      "folded": false,
+      "focused": false,
+      "position": {
+        "x": 2200,
+        "y": 1400
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "case": "release Shift inside",
+      "native_input_state": "1140.0 705.0 92046 524288"
+    },
+    {
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "single-modifier-02ec-proof",
+      "folded": false,
+      "focused": false,
+      "position": {
+        "x": 2200,
+        "y": 1400
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "case": "Option+Command entry",
+      "native_input_state": "1140.0 705.0 92046 1572864"
+    },
+    {
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "single-modifier-02ec-proof",
+      "folded": false,
+      "focused": false,
+      "position": {
+        "x": 2200,
+        "y": 1400
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "case": "release Command inside",
+      "native_input_state": "1140.0 705.0 92046 524288"
+    },
+    {
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "single-modifier-02ec-proof",
+      "folded": false,
+      "focused": false,
+      "position": {
+        "x": 0,
+        "y": 1250
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "case": "Option only moves",
+      "native_input_state": "1140.0 705.0 92046 524288"
+    },
+    {
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "single-modifier-02ec-proof",
+      "folded": false,
+      "focused": false,
+      "position": {
+        "x": 3496,
+        "y": 1250
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "case": "Option only moves back",
+      "native_input_state": "40.0 630.0 92046 524288"
+    },
+    {
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "single-modifier-02ec-proof",
+      "folded": true,
+      "focused": false,
+      "position": {
+        "x": 3496,
+        "y": 1250
+      },
+      "size": {
+        "height": 48,
+        "width": 600
+      },
+      "case": "Ctrl only folds regression",
+      "native_input_state": "1788.0 630.0 92046 262144"
+    },
+    {
+      "instance": "dev-f3ab8dc6a8d44e989b85031f",
+      "id": "single-modifier-02ec-proof",
+      "folded": false,
+      "focused": false,
+      "position": {
+        "x": 3496,
+        "y": 1250
+      },
+      "size": {
+        "height": 114,
+        "width": 600
+      },
+      "case": "Ctrl only unfolds regression",
+      "native_input_state": "1788.0 630.0 92046 262144"
+    }
+  ],
+  "original_windows_geometry_drafts_folding_preserved": true,
+  "input": "CoreGraphics synthetic modifier and pointer events; live macOS app"
+}

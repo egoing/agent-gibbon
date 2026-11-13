@@ -351,7 +351,7 @@ for (const event of ['tauri://focus', 'tauri://blur']) {
 }
 
 function showWarpTip() {
-  if (isMac) notify('Option을 누른 채 메모에 포인터를 올려도 이동할 수 있습니다', 'tip');
+  if (isMac) notify('Option만 누른 채 메모에 포인터를 올려도 이동할 수 있습니다', 'tip');
 }
 let warping = false;
 $('warp').addEventListener('click', async () => {
@@ -389,7 +389,7 @@ async function toggleFold() {
   changingFold = true;
   try {
     displayFold(await invoke('toggle_fold'));
-    if (isMac && !folded) notify('Control을 누른 채 메모에 포인터를 올려도 접거나 펼칠 수 있습니다', 'tip');
+    if (isMac && !folded) notify('Control만 누른 채 메모에 포인터를 올려도 접거나 펼칠 수 있습니다', 'tip');
   }
   catch (error) { failure(error); }
   finally { changingFold = false; }
