@@ -634,8 +634,7 @@ fn render_styled(markdown: &str, changes: &[std::ops::Range<usize>], kinds: &[&s
                 }
                 items.push((index, false));
             }
-            Event::TaskListMarker(checked) => {
-                let checked = *checked;
+            Event::TaskListMarker(_) => {
                 if let Some((_, task)) = items.last_mut() {
                     *task = true;
                 }
@@ -644,7 +643,7 @@ fn render_styled(markdown: &str, changes: &[std::ops::Range<usize>], kinds: &[&s
                         *flag = true;
                     }
                 }
-                events[index] = Event::Text(if checked { "☑ " } else { "☐ " }.into());
+                // Keep the marker until decoration so changed states retain their mark.
             }
             Event::End(TagEnd::Item) => {
                 if let Some((start, true)) = items.pop() {
@@ -673,6 +672,24 @@ fn render_styled(markdown: &str, changes: &[std::ops::Range<usize>], kinds: &[&s
                 .is_some_and(|c| c.start < range.end)
         };
         match event {
+            Event::TaskListMarker(checked) => {
+                if intersects(&range) {
+                    decorated.push(Event::Html(mark(&range).into()));
+                }
+                let (state, glyph, label) = if checked {
+                    ("true", "☑", "완료")
+                } else {
+                    ("false", "☐", "미완료")
+                };
+                // Preserve the rendered plain-text glyph; CSS draws a shared outer
+                // box instead of relying on two different font glyph outlines.
+                decorated.push(Event::Html(format!(
+                    "<span class=\"task-checkbox\" role=\"img\" aria-label=\"{label}\" data-checked=\"{state}\">{glyph}</span> "
+                ).into()));
+                if intersects(&range) {
+                    decorated.push(Event::Html("</mark>".into()));
+                }
+            }
             Event::Text(text) if intersects(&range) => {
                 if markdown.get(range.clone()) == Some(text.as_ref()) {
                     let mut offset = range.start;
@@ -710,6 +727,7 @@ fn render_styled(markdown: &str, changes: &[std::ops::Range<usize>], kinds: &[&s
         .add_tag_attributes("mark", &["class"])
         .add_tag_attributes("ul", &["class"])
         .add_tag_attributes("li", &["class"])
+        .add_tag_attributes("span", &["class", "role", "aria-label", "data-checked"])
         .rm_tags(&["img"])
         .rm_tag_attributes("a", &["href"])
         .clean(&output)
@@ -949,7 +967,7 @@ mod tests {
                 "- [ ] 대기\n- [x] 유지",
                 "- [x] 대기\n- [x] 유지",
                 "유지",
-                "☑ ",
+                "☑</span> ",
             ),
             (
                 "|a|b|\n|-|-|\n|유지|이전|",
@@ -1037,7 +1055,7 @@ mod tests {
         .unwrap();
         note.save_edit("# 편집\n- [x] 완료".into(), 1).unwrap();
         assert_eq!(std::fs::read_to_string(&path).unwrap(), note.markdown);
-        assert!(note.html.contains("☑ 완료"));
+        assert!(note.html.contains("☑</span> 완료"));
         let before = serde_json::to_value(&note).unwrap();
         assert!(note.save_edit("오래된 편집".into(), 1).is_err());
         assert!(note.save_edit("[ ] 잘못된 체크리스트".into(), 2).is_err());
@@ -1117,10 +1135,36 @@ mod tests {
             .contains("4행"));
     }
     #[test]
+    fn task_symbols_keep_text_state_and_change_marks_without_user_html() {
+        let markdown = "- [ ] 대기\n- [x] 완료";
+        let plain = render(markdown);
+        for (state, glyph, label) in [("false", "☐", "미완료"), ("true", "☑", "완료")] {
+            assert!(
+                plain.contains(&format!(
+                    "role=\"img\" aria-label=\"{label}\" data-checked=\"{state}\">{glyph}</span> "
+                )),
+                "{plain}"
+            );
+        }
+        let range = 0..markdown.len();
+        let marked = render_changes(markdown, std::slice::from_ref(&range));
+        assert_eq!(
+            marked
+                .matches("<mark class=\"change-modified\"><span class=\"task-checkbox\"")
+                .count(),
+            2
+        );
+        assert!(!plain.contains("<input") && !plain.contains("tabindex"));
+        let hostile = render("<span class=\"task-checkbox\" onclick=\"alert(1)\">偽</span>");
+        assert!(!hostile.contains("<span"));
+        assert!(hostile.contains("&lt;span"));
+    }
+
+    #[test]
     fn renders_korean_tasks_and_blocks_active_content() {
         let html = render("# 한글\n- [x] 완료\n- [ ] 대기\n<script>alert(1)</script>\n<img src=x onerror=alert(1)>\n[실행](javascript:alert(1))\n![외부](https://example.com/tracker)");
         assert!(html.contains("<h1>한글</h1>"));
-        assert!(html.contains("☑ 완료") && html.contains("☐ 대기"));
+        assert!(html.contains("☑</span> 완료") && html.contains("☐</span> 대기"));
         assert!(!html.contains("<script") && !html.contains("<img") && !html.contains("href="));
     }
     #[test]

@@ -924,6 +924,13 @@ SVG 3개와 PNG 3개를 함께 갱신했다. PNG 렌더링과 배치 육안 확�
 - 본문과 scrollbar는 Tab으로 접근한다. scrollbar에는 이름·제어 대상·범위·현재값을 제공하며 방향키·PageUp/Down·Home/End를 지원한다. 키보드 초점에는 별도 outline을 표시한다. reduced-motion에서는 fade를 없애고 prefers-contrast: more에서는 상시 표시한다. forced-colors에서는 네이티브 스크롤바로 대체한다. OS의 별도 ‘스크롤 막대 항상 표시’ 선호 감지는 아직 구현하지 않았다.
 - [승인 시안 SVG](design/proposals/overlay-scrollbar-20261113.svg) · [PNG](design/proposals/overlay-scrollbar-20261113.png) · [구현·검증 기록](verification/overlay-scrollbar-20261113.md). 시안은 승인 전 제작 표기를 보존하며 실제 적용 상태와 한계는 검증 기록을 따른다.
 
+## 읽기 전용 체크리스트 외곽 — #140 (2026-11-13)
+
+- 체크·미체크 모두 본문 글자 크기의 0.85em 정사각형 외곽, 1px 선과 1px 모서리 반경을 사용한다. 기존 체크된 표시의 크기를 기준으로 맞춘 수치이며, 상태 전환은 내부 체크 표시만 바꾼다. 본문 기준선에 대한 `vertical-align: -0.08em`과 뒤 공백은 두 상태에 동일하게 적용한다. 클릭·키보드 입력 기능이나 추가 Tab 정지점을 만들지 않는다.
+- Unicode 폰트 글리프 대신 CSS로 외곽과 체크를 그린다. 원래 ☑/☐ 텍스트는 DOM과 복사 결과에 보존하고, 접근성에는 읽기 전용 그림의 `완료`/`미완료` 설명을 제공한다. 원본 Markdown·파일 내보내기·저장 의미는 유지한다.
+- 외곽과 체크는 `currentColor`를 사용하므로 테마 및 추가·수정·삭제 강조의 글자색을 따른다. 변경 mark는 상태 기호와 본문 각각의 기존 변경 범위를 유지한다. 사용자 HTML은 계속 이스케이프하고 생성 표시에 필요한 span 속성만 sanitizer에서 허용한다.
+- [체크리스트 시안 SVG](design/checklist-checkbox.svg) · [PNG](design/checklist-checkbox.png)는 설명용이며 실제 앱 캡처가 아니다. [검증 기록](verification/issue140-checkbox-size.md)에 12/14/16/18px·테마·변경 강조 검사와 실제 앱 출처 및 한계를 구분한다.
+
 ## 브라우저 공통 툴바와 테마 — #152 · 2026-11-13
 
 - 브라우저의 앱 소유 상단 행은 공통 `style.css`·`toolbar.js`와 Tabler 아이콘을 사용한다. 펼침 행 30px, 버튼 24×22px·아이콘 12px·버튼 라운드 3px, 접힌 창 24px와 두 오른쪽 슬롯을 유지한다. 텍스트 읽기 화면의 22px 행 예외는 웹에 적용하지 않는다. 웹 전용 폼 스타일이 툴바의 크기·패딩·라운드·hover·키보드 초점을 덮지 않도록 폼 범위로 제한한다.
