@@ -1,0 +1,29 @@
+/* Both native viewports paint segments of one outer frame. The paint sits at
+   the window edge, outside the content box, and extends inward only. */
+body {
+  --frame-corners: var(--surface-radius);
+  --frame-widths: var(--memo-focus-width);
+}
+body.feedback-below {
+  --frame-corners: var(--surface-radius) var(--surface-radius) 0 0;
+  --frame-widths: var(--memo-focus-width) var(--memo-focus-width) 0;
+}
+body.feedback-above {
+  --frame-corners: 0 0 var(--surface-radius) var(--surface-radius);
+  --frame-widths: 0 var(--memo-focus-width) var(--memo-focus-width);
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: var(--frame-widths);
+  border-color: transparent;
+  border-radius: var(--frame-corners);
+  pointer-events: none;
+  z-index: 10;
+}
+body.memo-focused::after {
+  border-color: color-mix(in srgb, var(--foreground) 65%, var(--background));
+}

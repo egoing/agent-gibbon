@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="320" viewBox="0 0 760 320">
 <rect width="760" height="320" fill="#f4f4f4"/>
 <g font-family="-apple-system, sans-serif" fill="#2c2f7e">
-<text x="24" y="28" font-size="14">툴바 펼침</text><text x="400" y="28" font-size="14">툴바 접힘</text>
-<rect x="24" y="44" width="336" height="220" rx="4" fill="#dfe2dd" stroke="#a0a3bc"/>
-<rect x="400" y="44" width="336" height="24" rx="4" fill="#dfe2dd" stroke="#a0a3bc"/>
-<path d="M25 74h334" stroke="#a0a3bc"/>
+<text x="24" y="28" font-size="14">툴바 펼침 · 비활성</text><text x="400" y="28" font-size="14">툴바 접힘 · 활성</text>
+<rect x="24" y="44" width="336" height="220" rx="4" fill="#dfe2dd"/>
+<rect x="400" y="44" width="336" height="24" rx="4" fill="#dfe2dd"/>
+<rect x="401" y="45" width="334" height="22" rx="3" fill="none" stroke="#6b6e9f" stroke-width="2"/>
 <svg x="40" y="50" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v-2h13v2" />
   <path d="M10 5v14" />
   <path d="M12 19h-4" />

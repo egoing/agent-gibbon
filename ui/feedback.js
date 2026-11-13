@@ -44,6 +44,8 @@ async function refresh() {
     const height = Math.ceil(surface.getBoundingClientRect().height);
     const layout = await invoke('layout_feedback', { width, height });
     surface.dataset.edge = layout.edge;
+    document.body.classList.toggle('feedback-below', layout.edge === 'below');
+    document.body.classList.toggle('feedback-above', layout.edge === 'above');
   } catch (error) { report(error); }
   setTimeout(refresh, 100);
 }

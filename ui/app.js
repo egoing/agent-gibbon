@@ -52,7 +52,7 @@ async function fitContent(flow) {
       position: 'fixed', left: '-10000px', top: '0', visibility: 'hidden',
       display: 'flow-root', flex: 'none', width: '298px', minWidth: '298px',
       maxWidth: '298px', height: 'auto', minHeight: '0', maxHeight: 'none',
-      overflow: 'visible', padding: '3px', overflowWrap: 'anywhere', pointerEvents: 'none',
+      overflow: 'visible', padding: '0 3px 3px', overflowWrap: 'anywhere', pointerEvents: 'none',
     });
     document.body.appendChild(measure);
     const rect = measure.getBoundingClientRect();
@@ -421,14 +421,6 @@ window.__TAURI__.event.listen('feedback-action', ({ payload }) => {
 window.__TAURI__.event.listen('feedback-connection', ({ payload: c }) => {
   if (c.owner !== win.label) return;
   const attached = c.edge === 'below' || c.edge === 'above';
-  if (attached) $('connected-outline').removeAttribute('hidden');
-  else $('connected-outline').setAttribute('hidden', '');
   document.body.classList.toggle('feedback-below', attached && c.edge === 'below');
   document.body.classList.toggle('feedback-above', attached && c.edge === 'above');
-  document.body.classList.toggle('feedback-full', attached && c.width >= c.memoWidth);
-  if (!attached) return;
-  const w = c.memoWidth, h = c.memoHeight, join = Math.max(0, w - c.width);
-  const left = join ? `M ${join} ${h-.5} H 4 Q .5 ${h-.5} .5 ${h-4}` : `M .5 ${h}`;
-  $('connected-path').setAttribute('d', `${left} V 4 Q .5 .5 4 .5 H ${w-4} Q ${w-.5} .5 ${w-.5} 4 V ${h}`);
-  $('connected-path').setAttribute('transform', c.edge === 'above' ? `translate(0 ${h}) scale(1 -1)` : '');
 }).catch(failure);

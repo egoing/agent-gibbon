@@ -597,6 +597,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     layout::content_action,
                     feedback_window::present_feedback,
                     feedback_window::feedback_snapshot,
+                    feedback_window::memo_frame_focus,
                     feedback_window::layout_feedback,
                     feedback_window::feedback_action,
                     feedback_window::drag_feedback,
@@ -664,6 +665,11 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             }
         })
         .on_window_event(|win, event| {
+            if matches!(event, tauri::WindowEvent::Focused(_)) {
+                if let Some(window) = win.app_handle().get_webview_window(win.label()) {
+                    feedback_window::sync_frame_focus(&window);
+                }
+            }
             if win.label() == manager::LABEL && privacy::onboarding_required(win.app_handle()) {
                 if matches!(event, tauri::WindowEvent::CloseRequested { .. }) {
                     win.app_handle().exit(0);

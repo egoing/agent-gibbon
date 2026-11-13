@@ -50,6 +50,51 @@ fn memo(window: &WebviewWindow) -> Result<(), String> {
     }
 }
 
+// The memo and its visible companion form one focus frame. Never include a
+// hidden companion's stale native focus or another memo's companion.
+fn frame_focused(parent_focused: bool, companion_visible: bool, companion_focused: bool) -> bool {
+    parent_focused || (companion_visible && companion_focused)
+}
+#[tauri::command]
+pub fn memo_frame_focus(window: WebviewWindow) -> Result<bool, String> {
+    let parent = if is_surface(window.label()) {
+        owner(&window)?
+    } else {
+        window
+    };
+    let companion = parent
+        .app_handle()
+        .get_webview_window(&label(parent.label()));
+    Ok(frame_focused(
+        parent.is_focused().map_err(|e| e.to_string())?,
+        companion
+            .as_ref()
+            .is_some_and(|w| w.is_visible().unwrap_or(false)),
+        companion
+            .as_ref()
+            .is_some_and(|w| w.is_focused().unwrap_or(false)),
+    ))
+}
+pub fn sync_frame_focus(window: &WebviewWindow) {
+    let Ok(parent) = (if is_surface(window.label()) {
+        owner(window)
+    } else {
+        Ok(window.clone())
+    }) else {
+        return;
+    };
+    let Ok(focused) = memo_frame_focus(parent.clone()) else {
+        return;
+    };
+    let _ = parent.emit_to(parent.label(), "memo-frame-focus", focused);
+    if let Some(companion) = parent
+        .app_handle()
+        .get_webview_window(&label(parent.label()))
+    {
+        let _ = companion.emit_to(companion.label(), "memo-frame-focus", focused);
+    }
+}
+
 #[tauri::command]
 pub async fn present_feedback(window: WebviewWindow, view: View) -> Result<(), String> {
     memo(&window)?;
@@ -273,6 +318,7 @@ pub fn layout_feedback(
         #[cfg(not(any(target_os = "macos", windows)))]
         window.show().map_err(|e| e.to_string())?;
     }
+    sync_frame_focus(&parent);
     Ok(connection)
 }
 fn accepts_action(view: &View, action: &str, revision: Option<u64>) -> bool {
@@ -337,6 +383,7 @@ pub fn hide(parent: &WebviewWindow) {
     {
         let _ = window.hide();
     }
+    sync_frame_focus(parent);
 }
 
 // A closed memo must not leave a companion attached to a destroyed native parent.
@@ -480,5 +527,17 @@ mod tests {
         );
         let (_, y, _, h) = geometry((0, 0), (300, 600), (300, 80), (0, 0, 800, 600), 4);
         assert!(y >= 0 && y + h as i32 <= 600);
+    }
+}
+
+#[cfg(test)]
+mod frame_focus_tests {
+    use super::frame_focused;
+    #[test]
+    fn visible_companion_shares_frame_but_hidden_companion_does_not() {
+        assert!(frame_focused(true, false, false));
+        assert!(frame_focused(false, true, true));
+        assert!(!frame_focused(false, false, true));
+        assert!(!frame_focused(false, true, false));
     }
 }
