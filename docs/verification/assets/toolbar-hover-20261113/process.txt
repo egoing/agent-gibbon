@@ -1,0 +1,1 @@
+ 6291 /Users/egoinglee/.codex/worktrees/02ec/agent-gibbon/src-tauri/target/debug/agent-gibbon
