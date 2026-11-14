@@ -55,3 +55,14 @@ Conf 5: macOS 화면·저장 버튼·원본 충돌 / Conf 3~4: 나머지 자동 
 사용자 요청으로 편집 시 `원본 파일에 저장` 기본 안내를 제거했다. 연결 파일 유무에 관계없이 기본 Feedback은 취소·저장 버튼만 있으며 실제 오류·저장 결과는 유지한다. 최종 개발 빌드 통과(5.25초), UI 197개 통과(연결 메모 기본 message 빈 값 및 실제 notice 유지 검사 추가). 시안은 이미 버튼만 표시하므로 추가 형상 변경은 없고 디자인 시스템에 명시했다.
 
 위 native 캡처 두 개는 이 안내 제거 **이전**의 실행 증거다. 안내 제거 후 native 화면을 다시 캡처한 것으로 간주하지 않는다. 이번 최종 기본 안내는 UI 검사와 source 검토로 확인했다.
+
+## close 승인과 최신 main 통합
+
+사용자가 close를 직접 호출해 최종 커밋·push·병합을 승인했다. 앞선 승인 대기·미커밋 표기는 당시 기록이다. 구현 커밋 `69270c9`, main `9b4cb20` 통합 커밋 `8980a12`에서 별도 Feedback 창 제거·내부 footer 변경을 반영했다. 현재 저장 tooltip 변경은 새 createFeedback에 적용하며 기존 독립창 script 대신 현행 inline smoke를 확장했다.
+
+- 통합 코드에서 UI 198개·Rust 221개·개발 빌드·Rustfmt·Clippy -D warnings 통과. UI/Rust 개수 변화는 최신 main 통합에 따른다.
+- Chromium 158.0.8127.18 현행 실제 app.js/createFeedback 진입점 검사 통과: 144×210, 300×210, 600×420, 300×100. 기본 설명 빈 값·내보내기 숨김·취소/저장 도달·밀착 간격 0·창 크기 유지·본문 선택/테마·fold 복원·저장 오류 후 재시도·Ctrl+S, overlay 입력/커서 끝 추적/drag·짧은 글·forced-colors를 확인했다. 캡처 `/tmp/gibbon164-integrated`.
+- 최신 통합 build로 재시작 후 PID 54015의 binary·instance를 대조했다. 전용 메모 `issue164-final-21c1`, 고유 본문 `issue164-21c1 편집 스크롤 검증`, native title `Agent Gibbon [DEV codex/editor-save-layout · 04a8bd24] — issue164-final-21c1`, CG window 71780을 확인했다.
+- [현재 내부 footer 실제 캡처](assets/issue164-inline-final-native.png)를 `screencapture -x -l 71780`으로 얻고 육안 확인했다. 기본 설명 없음·취소/저장 두 버튼·상단 내보내기 없음·밀착을 확인했다. AX에 편집기 세로 스크롤도 노출된다. 저장 버튼 실행 시 revision 1→2와 연결 파일 `/tmp/gibbon164-scroll-note.md`의 `issue164 최종 내부 저장 확인`, inline 저장했습니다 안내를 확인했다.
+- 전용 메모 close 후 정확한 PID 54015만 종료해 GUI 슬롯을 반납했다. native thumb drag/물리키/IME·Intel/Windows·전체 플랫폼 CI는 여전히 미실행이다. 기존 독립창 캡처와 현재 inline 캡처를 구분한다.
+- 무관한 package-lock.json 정렬 변경은 커밋에서 제외해 보존한다. Codex 워크트리이며 Orca 워크스페이스 삭제 대상이 아니다.
