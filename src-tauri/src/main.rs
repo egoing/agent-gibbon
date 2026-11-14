@@ -183,13 +183,9 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
     let manual = opacity::configured(window.app_handle());
     #[cfg(any(target_os = "macos", windows))]
     {
-        #[cfg(target_os = "macos")]
-        let feedback_hovered = feedback_window::pointer_over(&window);
-        #[cfg(windows)]
-        let feedback_hovered = false; // Windows uses the memo's own feedback area.
         let alpha = opacity::target(
             manual,
-            hovered || feedback_hovered,
+            hovered,
             entrance::presenting(&window),
             feedback::active(&window),
             sizing::folded(&window),
@@ -202,14 +198,12 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
             .or_insert_with(|| opacity::Fade::at(manual.unwrap_or(1.0)))
             .sample(alpha, Instant::now());
         opacity::set_native(&window, alpha)?;
-        feedback_window::set_opacity(&window, alpha)?;
         Ok(alpha)
     }
     #[cfg(not(any(target_os = "macos", windows)))]
     {
         if let Some(alpha) = manual {
             opacity::set_native(&window, alpha)?;
-            feedback_window::set_opacity(&window, alpha)?;
             return Ok(alpha);
         }
         let _ = (window, hovered);
@@ -328,7 +322,6 @@ fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
     layout::mark(&window, false);
     sizing::cancel(&window);
     feedback::clear(&window);
-    feedback_window::hide(&window);
     entrance::finish(&window)?;
     window.hide().map_err(|e| e.to_string())?;
     tray::sync_visibility(window.app_handle())
@@ -506,7 +499,6 @@ fn apply_with_presentation(
             stash::release(&win)?;
             sizing::cancel(&win);
             feedback::clear(&win);
-            feedback_window::hide(&win);
             entrance::finish(&win)?;
             win.hide().map_err(|e| e.to_string())?;
             tray::sync_visibility(app)?;
@@ -604,11 +596,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     manager::manager_image,
                     layout::content_action,
                     feedback_window::present_feedback,
-                    feedback_window::feedback_snapshot,
                     feedback_window::memo_frame_focus,
-                    feedback_window::layout_feedback,
                     feedback_window::feedback_action,
-                    feedback_window::drag_feedback,
                     capture::capture_screen,
                     capture::capture_ready,
                     capture::capture_failed,
@@ -735,18 +724,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 }
                 return;
             }
-            if memo_id_from_window(win.label()).is_none()
-                || feedback_window::is_surface(win.label())
-            {
+            if memo_id_from_window(win.label()).is_none() {
                 return;
-            }
-            if matches!(
-                event,
-                tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)
-            ) {
-                if let Some(webview) = win.app_handle().get_webview_window(win.label()) {
-                    feedback_window::sync(&webview);
-                }
             }
             #[cfg(any(target_os = "macos", windows))]
             if let tauri::WindowEvent::Resized(_) = event {
