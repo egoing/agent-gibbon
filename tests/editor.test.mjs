@@ -409,7 +409,7 @@ test('temporary copy notice restores acknowledgement; editing owns the action sl
   app.element('edit').listeners.click();
   await new Promise(setImmediate);
   await app.element('warp').listeners.click();
-  assert.deepEqual(app.view().buttons.map(b => b.id), ['export', 'cancel', 'save']);
+  assert.deepEqual(app.view().buttons.map(b => b.id), ['cancel', 'save']);
   assert.match(app.view().message, /Option/);
   await app.action('cancel');
   assert.deepEqual(app.view().buttons.map(b => b.id), []);
@@ -423,10 +423,10 @@ test('save success becomes Toast; save error retains actions and outranks tips',
   await app.element('warp').listeners.click();
   assert.equal(app.view().error, true);
   assert.match(app.view().message, /원본 파일/);
-  assert.deepEqual(app.view().buttons.map(b => b.id), ['export', 'cancel', 'save']);
+  assert.deepEqual(app.view().buttons.map(b => b.id), ['cancel', 'save']);
   app.failSave(null);
   await app.action('save');
-  assert.equal(app.view().message, '메모에 반영했습니다');
+  assert.equal(app.view().message, '저장했습니다');
   assert.equal(app.view().buttons.length, 0);
   await app.expireNotice();
   assert.equal(app.view().message, '');
@@ -532,7 +532,7 @@ test('failed clipboard write reports the error without showing success feedback'
 });
 
 
-test('Cmd+S and Ctrl+S export viewing notes and toolbar exports the current draft', async () => {
+test('Cmd+S and Ctrl+S export viewing notes but editing blocks toolbar export', async () => {
   const app = await setup();
   for (const modifier of ['metaKey', 'ctrlKey']) {
     let prevented = false;
@@ -547,24 +547,19 @@ test('Cmd+S and Ctrl+S export viewing notes and toolbar exports the current draf
   app.exportResult('/tmp/note.md');
   await app.element('export').listeners.click();
   await new Promise(setImmediate);
-  assert.equal(app.calls.filter(([name]) => name === 'export_note').at(-1)[1].markdown, '# 저장할 초안');
+  assert.equal(app.calls.filter(([name]) => name === 'export_note').length, 2);
+  assert.equal(app.element('export').hidden, true);
   assert.equal(app.element('editor').hidden, false);
-  assert.equal(app.view().message, '파일로 내보냈습니다: /tmp/note.md');
+  assert.equal(app.view().buttons.map(b => b.label).join(','), '취소,저장');
   assert.equal(app.calls.some(([name]) => name === 'save_note'), false);
 });
 
-test('cancel and export failure preserve draft and allow retry', async () => {
+test('reading export failure preserves note and allows retry', async () => {
   const app = await setup();
-  app.element('edit').listeners.click();
-  app.element('markdown').value = '초안';
-  await app.element('export').listeners.click();
-  await new Promise(setImmediate);
-  assert.notEqual(app.view().message, '메모에 반영했습니다');
   app.failExport('쓰기 실패');
   await app.element('export').listeners.click();
   await new Promise(setImmediate);
   assert.equal(app.view().message, '쓰기 실패');
-  assert.equal(app.element('markdown').value, '초안');
   assert.equal(app.element('export').disabled, false);
 });
 
@@ -577,14 +572,19 @@ test('repeated shortcuts open only one export dialog', async () => {
   assert.equal(app.calls.filter(([name]) => name === 'export_note').length, 1);
 });
 
-test('Feedback export shortcut targets its own memo draft', async () => {
+test('stale Feedback export action cannot export an editing draft', async () => {
   const app = await setup();
   app.element('edit').listeners.click();
   app.element('markdown').value = '내보낼 초안';
   await app.nativeEvents['feedback-action']({ payload: { owner: 'other', action: 'export' } });
   assert.equal(app.calls.some(([name]) => name === 'export_note'), false);
   await app.nativeEvents['feedback-action']({ payload: { owner: 'memo-test', action: 'export' } });
-  assert.equal(app.calls.filter(([name]) => name === 'export_note').at(-1)[1].markdown, '내보낼 초안');
+  assert.equal(app.calls.some(([name]) => name === 'export_note'), false);
+  await app.action('cancel');
+  assert.equal(app.element('export').hidden, false);
+  await app.element('export').listeners.click();
+  assert.equal(app.calls.filter(([name]) => name === 'export_note').at(-1)[1].markdown, null);
+  app.element('edit').listeners.click();
   assert.equal(app.element('editor').hidden, false);
 });
 
@@ -710,7 +710,7 @@ test('editing save shortcuts share the save button path on both platforms and co
     assert.equal(app.calls.filter(([name]) => name === 'save_note').length, 1);
     assert.equal(app.calls.some(([name]) => name === 'export_note'), false);
     assert.equal(app.element('editor').hidden, true);
-    assert.equal(app.view().message, '메모에 반영했습니다');
+    assert.equal(app.view().message, '저장했습니다');
   }
 });
 
@@ -743,28 +743,6 @@ test('cancelled editor and image notes keep shortcut export behavior', async () 
   }
 });
 
-test('pending draft export blocks save and cancel until its dialog completes', async () => {
-  const app = await setup();
-  app.element('edit').listeners.click();
-  app.element('markdown').value = '대화상자 동안 보존';
-  let finish;
-  app.exportResult(new Promise(resolve => { finish = resolve; }));
-  const pending = app.element('export').listeners.click();
-  await new Promise(setImmediate);
-  assert(app.view().buttons.every(button => button.disabled));
-  await app.action('save-shortcut');
-  await app.action('save');
-  await app.action('cancel');
-  assert.equal(app.calls.some(([name]) => name === 'save_note'), false);
-  assert.equal(app.element('editor').hidden, false);
-  finish(null);
-  await pending;
-  await new Promise(setImmediate);
-  assert(app.view().buttons.every(button => !button.disabled));
-  assert.equal(app.element('markdown').value, '대화상자 동안 보존');
-});
-
-
 test('revision changed during editing keeps the old edit baseline and draft', async () => {
   const app = await setup(new Map(), {}, {source_path: '/tmp/test-note.md'});
   app.element('edit').listeners.click();
@@ -796,4 +774,24 @@ test('pending save rejects duplicate save/export/cancel and locks only the edito
   finish(); await pending; await new Promise(setImmediate);
   assert.equal(app.element('markdown').readOnly, false);
   assert.equal(app.element('editor').hidden, true);
+});
+
+test('editing keeps the toolbar blank area draggable and excludes editor/buttons', async () => {
+  const app = await setup();
+  app.element('edit').listeners.click();
+  const before = app.calls.filter(([name]) => name === 'drag_note').length;
+  app.events.mousedown({button: 0, target: {closest: () => null}, preventDefault() {}});
+  assert.equal(app.calls.filter(([name]) => name === 'drag_note').length, before + 1);
+  app.events.mousedown({button: 0, target: {closest: () => ({})}, preventDefault() {}});
+  assert.equal(app.calls.filter(([name]) => name === 'drag_note').length, before + 1);
+});
+
+test('linked editing shows only actions by default and retains actual notices', () => {
+  const state = {editing: true, saving: false, exporting: false, sourcePath: '/tmp/note.md'};
+  assert.equal(feedbackView(state).message, '');
+  assert.deepEqual(feedbackView(state).buttons.map(b => b.label), ['취소', '저장']);
+  const error = feedbackView({...state, notice: {text: '원본 충돌', kind: 'error'}});
+  assert.equal(error.message, '원본 충돌');
+  assert.equal(error.error, true);
+  assert.equal(feedbackView({...state, editing: false, notice: {text: '저장했습니다', kind: 'result'}}).message, '저장했습니다');
 });

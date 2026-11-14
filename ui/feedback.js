@@ -33,7 +33,7 @@ async function refresh() {
           button.addEventListener('click', () => invoke('feedback_action', { action: item.id, revision: renderedRevision }).catch(report));
           actions.appendChild(button);
         }
-        button.title = item.id === 'save' ? `메모에 반영 · ${isMac ? 'Command S' : 'Ctrl S'}` : item.label;
+        button.title = item.id === 'save' ? `저장 · ${isMac ? 'Command S' : 'Ctrl S'}` : item.label;
         button.setAttribute('aria-label', button.title);
         button.textContent = item.label; button.disabled = item.disabled; button.classList.toggle('primary', !!item.primary);
       }
