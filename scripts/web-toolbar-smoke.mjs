@@ -48,8 +48,14 @@ try {
    await page.locator('#close').hover();const hovered=await page.locator('#close').evaluate(e=>getComputedStyle(e).backgroundColor);assert.notEqual(hovered,'rgba(0, 0, 0, 0)');
    if(output&&width===240&&['gray','black'].includes(design))await page.screenshot({path:path.join(output,`${design}-collapsed.png`)});
    await page.locator('#toolbar-toggle').click();assert.equal(await page.locator('main').isVisible(),true);
-   // Remote-page chrome keeps the row while Welcome is hidden.
-   await page.evaluate(()=>{document.querySelector('main').hidden=true;});
+   // Reproduce focus in the address field followed by Welcome removal.
+   await page.locator('#web-url').fill('https://example.com/');
+   await page.locator('#web-url').focus();
+   await page.locator('#web-form').evaluate(form => form.requestSubmit());
+   await page.waitForFunction(()=>document.querySelector('main').hidden);
+   const row = await page.locator('#controls').boundingBox();
+   assert.equal(row.y,0);
+   for(const button of (await geometry()).buttons) assert.ok(button.y >= 0 && button.y < 30);
    assert.equal(await page.locator('main').isVisible(),false);assert.equal((await geometry()).height,30);
    if(output&&width===600&&['gray','black'].includes(design)) {await page.evaluate(()=>document.querySelector('main').hidden=false);await page.screenshot({path:path.join(output,`${design}-welcome.png`)});}
    console.log(`PASS ${design} ${width}: slots, fold, title, pin, focus, hover, remote chrome`);
