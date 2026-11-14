@@ -327,13 +327,19 @@ fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
     tray::sync_visibility(window.app_handle())
 }
 type ClosedNotes = std::sync::Mutex<std::collections::BTreeMap<String, Value>>;
+fn memo_id_from_window(label: &str) -> Option<&str> {
+    if label == "main" {
+        Some("main")
+    } else {
+        label.strip_prefix("note-").filter(|id| !id.is_empty())
+    }
+}
+
 #[tauri::command]
 fn close_note(window: tauri::WebviewWindow) -> Result<(), String> {
     let app = window.app_handle();
-    let id = window
-        .label()
-        .strip_prefix("note-")
-        .unwrap_or("main")
+    let id = memo_id_from_window(window.label())
+        .ok_or("메모 창이 아닙니다")?
         .to_string();
     hide_note(window.clone())?;
     let note = app
@@ -555,6 +561,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .invoke_handler({
             let handler: Box<dyn Fn(tauri::ipc::Invoke) -> bool + Send + Sync> =
                 Box::new(tauri::generate_handler![
+                    capture::permission_guide,
                     updater::updater_status,
                     updater::updater_check,
                     updater::updater_install,
@@ -717,7 +724,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 }
                 return;
             }
-            if win.label() == "stash-indicator" || win.label().starts_with("capture-") {
+            if memo_id_from_window(win.label()).is_none() {
                 return;
             }
             #[cfg(any(target_os = "macos", windows))]
@@ -1214,6 +1221,12 @@ mod tests {
         }
     }
 
+    #[test]
+    fn permission_window_never_resolves_to_main_note() {
+        assert_eq!(super::memo_id_from_window("permission-guide"), None);
+        assert_eq!(super::memo_id_from_window("main"), Some("main"));
+        assert_eq!(super::memo_id_from_window("note-example"), Some("example"));
+    }
     #[test]
     fn window_labels_do_not_collide() {
         assert_eq!(label("main"), "main");
