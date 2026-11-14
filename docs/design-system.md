@@ -1,3 +1,10 @@
+## 웹 메모 외부 탐색과 모바일 표시 — #177 · 2026-11-14
+
+- OS 제목줄 없는 기존 native 창을 유지한다. 웹 전용 앱 툴바는 viewport 상단에 고정해 Welcome 주소 입력 focus 후 본문 숨김·외부 탐색에도 30px 전용 행을 유지한다. 버튼·핀·접힘·닫기 계약은 공통 기준을 따른다.
+- 외부 WebView의 첫 요청부터 모바일 Safari UA를 사용한다. 실제 창 콘텐츠 너비가 viewport이며 사이트가 작성한 viewport meta는 보존하고 없는 경우에만 `width=device-width, initial-scale=1` 힌트를 추가한다. UA 변경은 터치·모바일 OS·기기 에뮬레이션이 아니며 서버의 모바일 판정은 사이트별로 달라 보장하지 않는다. WK `preferredContentMode`는 공식 헤더상 iOS 전용이므로 macOS 비공개 설정을 사용하지 않는다.
+- 스크롤은 고정 표시 스타일로 WebKit의 thumb 폭/높이 3px·라운드 2px·투명 track을 요청한다. 앱 IPC·외부 eval 권한·host bridge를 추가하지 않는다. 텍스트 메모의 완전한 overlay·자동 숨김·12px 확장 hit 영역을 외부 사이트에 보장하지 않으며 native/WebView 레이아웃에서 3px 공간이 남을 수 있다. macOS는 해당 외부 WebView의 공개 NSScrollView 하위에만 native Overlay를 요청한다(실제 수용은 검증 기록에서 별도 판정). 사이트 CSS·CSP·shadow DOM·프레임과 페이지 자체 커스텀 스크롤은 통일 대상 보장 밖이다. 적용 불가 시 페이지/OS native 스크롤을 유지하며 forced-colors는 native 크기로 복귀한다.
+- [웹 시안 SVG](design/web-welcome.svg) · [PNG](design/web-welcome.png). 설명 시안과 실제 native 검증은 구분하며 [검증 기록](verification/issue177-web-mobile-chrome.md)에 실행 결과와 미검증을 기록한다.
+
 ## 툴바 키보드 포커스 — #166 · 2026-11-14
 
 - 사용자 요청에 따라 공통 텍스트·이미지·터미널·웹 chrome 툴바의 Tab 포커스 테두리를 톤다운한다. 2px 안쪽 선과 기존 포커스 배경을 유지하고 선에만 전경색 28% 알파를 적용한다. 버튼·아이콘 전체 opacity와 크기·배치·Tab 순서는 바꾸지 않는다. 28%는 이번 구현 선택값이다.

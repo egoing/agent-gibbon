@@ -11,6 +11,17 @@ use std::{
     time::Duration,
 };
 use tauri::{LogicalSize, Manager};
+// During initial load WebKit has no current URL. Preserve the requested HTTP(S)
+// address for restoration without presenting it as an observed current URL.
+fn web_restore_url(value: &serde_json::Value) -> Result<String, String> {
+    let url = value["current_url"]
+        .as_str()
+        .filter(|url| crate::web::validate_url(url).is_ok())
+        .or_else(|| value["url"].as_str())
+        .ok_or("웹 주소 없음")?;
+    crate::web::validate_url(url)?;
+    Ok(url.to_owned())
+}
 const FILE: &str = ".session-windows.json";
 const MAX_BYTES: u64 = 4 * 1024 * 1024;
 #[derive(Serialize, Deserialize)]
@@ -312,12 +323,7 @@ fn save(app: &tauri::AppHandle) -> Result<(), String> {
         let url = if let Some(id) = label.strip_prefix("webview-") {
             let value = crate::web::inspect(app, id)?;
             if value["welcome"] == false {
-                Some(
-                    value["current_url"]
-                        .as_str()
-                        .ok_or("웹 주소 없음")?
-                        .to_owned(),
-                )
+                Some(web_restore_url(&value)?)
             } else {
                 None
             }
@@ -399,6 +405,21 @@ mod tests {
     use super::*;
     fn sample() -> Snapshot {
         serde_json::from_value(serde_json::json!({"version":1,"windows":[{"window":{"label":"webview-web-a","x":-100,"y":20,"width":600,"height":24,"visible":false,"minimized":false,"always_on_top":true},"expanded":[600,400],"url":"https://example.com/last"}]})).unwrap()
+    }
+    #[test]
+    fn web_url_before_load_restores_request_without_confusing_navigation() {
+        use serde_json::json;
+        assert_eq!(web_restore_url(&json!({"current_url":null,"url":"https://example.com/start","navigation_url":"https://example.com/pending"})).unwrap(), "https://example.com/start");
+        assert_eq!(web_restore_url(&json!({"current_url":"https://example.com/redirect","url":"https://example.com/start"})).unwrap(), "https://example.com/redirect");
+        assert!(web_restore_url(&json!({"current_url":null,"url":"file:///tmp/x"})).is_err());
+        assert!(web_restore_url(&json!({"current_url":null,"url":null})).is_err());
+        assert_eq!(
+            web_restore_url(
+                &json!({"current_url":"about:blank","url":"https://example.com/start"})
+            )
+            .unwrap(),
+            "https://example.com/start"
+        );
     }
     #[test]
     fn safe_command_preview_discards_secrets_and_edits() {
