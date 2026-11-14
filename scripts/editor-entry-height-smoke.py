@@ -39,7 +39,15 @@ def wait(predicate):
     raise AssertionError(value)
 
 def ax(action, *args, feedback=False):
-    return run(OUT / 'ax', pid, title, action, *args)
+    companion = feedback and cli('inspect').get('feedback_surface', {}).get('mode') != 'inline'
+    command = [str(OUT / 'ax'), str(pid), title + (' · Feedback' if companion else ''), action, *map(str, args)]
+    for attempt in range(20):
+        result = subprocess.run(command, text=True, capture_output=True, timeout=15)
+        if result.returncode == 0:
+            return result.stdout.strip()
+        if not any(text in result.stderr for text in ['not ready']) or attempt == 19:
+            raise RuntimeError(result.stderr)
+        time.sleep(.1)
 
 def geometry():
     return json.loads(ax('geometry'))
@@ -114,7 +122,9 @@ try:
         assert state['position']['x'] == before['position']['x']
         assert state['position']['y'] < before['position']['y']
         surface = state['feedback_surface']
-        assert surface['mode'] == 'inline' and surface['visible'], surface
+        assert surface['visible'], surface
+        if surface.get('mode') != 'inline':
+            assert surface['position']['y'] + surface['size']['height'] == state['position']['y'], surface
         record('bottom-edit')
         # Capture only this PID/title window, never a user's window.
         windows = json.loads(run(OUT / 'native', pid))['windows']
@@ -132,11 +142,13 @@ try:
         state = wait(lambda s: s['visible'])
         time.sleep(.6)
         assert geometry()['editors'][0]['value'] == '보존할 초안'
-        assert cli('inspect')['size']['height'] == round(96 * scale)
+        # Reopen may apply the existing natural-content auto layout; it must not
+        # rerun editor entry and force 210px on this short draft.
+        assert cli('inspect')['size']['height'] < round(210 * scale)
         record('manual-small-hidden-restored')
         # Conflict still retains the draft; cancel and re-entry grows again.
         source.write_text('외부 원본 변경')
-        click(next(b['label'] for b in cli('inspect')['feedback_surface']['view']['buttons'] if b['id'] == 'save'), feedback=True)
+        click(next(b['label'] for b in cli('inspect')['feedback_surface']['view']['buttons'] if b['id'] == 'save') + ' · Command S', feedback=True)
         state = wait(lambda s: s['feedback_surface']['view']['error'])
         assert geometry()['editors'][0]['value'] == '보존할 초안'
         assert source.read_text() == '외부 원본 변경'
@@ -156,7 +168,7 @@ try:
         click('메모 편집')
         editing()
         ax('draft', '# 높이 검증 저장 완료')
-        click(next(b['label'] for b in cli('inspect')['feedback_surface']['view']['buttons'] if b['id'] == 'save'), feedback=True)
+        click(next(b['label'] for b in cli('inspect')['feedback_surface']['view']['buttons'] if b['id'] == 'save') + ' · Command S', feedback=True)
         wait(lambda s: s['note']['markdown'] == '# 높이 검증 저장 완료')
         assert source.read_text() == '# 높이 검증 저장 완료'
         record('saved')

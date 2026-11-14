@@ -4,7 +4,39 @@
 
 작은 텍스트 메모의 편집 진입에 자동 높이 상한의 절반까지 한 번 확대하는 경로를 구현했다. 자동 상한 420 논리 px는 `sizing::AUTO_HEIGHT_MAX` 한 곳에서 측정 cap과 진입 높이 계산에 공유한다. 이미 210px 이상이면 프레임과 진행 중인 등장 애니메이션을 변경하지 않는다. 작업 영역이 목표보다 낮으면 영역 높이까지만 늘리고 기존 큰 창은 줄이지 않는다.
 
-**제품 변경은 미커밋이며 최종 커밋·push·병합 승인 대기다. 네이티브 편집 전후 크기·입력 접근 검증은 환경의 접근성 오류로 미완료다.** 계획만 HEAD `26d20612b317`에 커밋하고 Draft [PR #162](https://github.com/egoing/agent-gibbon/pull/162)을 준비했다. [이슈 #159](https://github.com/egoing/agent-gibbon/issues/159).
+사용자의 `close` 호출로 최종 커밋·push·병합·이슈 정리가 승인됐다. 제품 구현은 `f43326e`, 최신 main `d1c3e8a` 통합은 `a8bea00`이다. [PR #162](https://github.com/egoing/agent-gibbon/pull/162) · [이슈 #159](https://github.com/egoing/agent-gibbon/issues/159). 초기 접근성 실패 후 재검증 결과는 다음 절이 우선하며, 아래 초기 기록은 당시 출처와 한계를 보존한다.
+
+## 최종 main 통합과 close 검증
+
+- 최신 main `d1c3e8a`의 내부 Feedback·저장 명칭·편집 상단 여백·overlay scrollbar를 모두 보존했다. 자동 높이 상한은 그대로 420 논리 px이며 진입 목표는 **내부 Feedback을 포함한 메모 전체 210px**이다. UI/SVG/PNG·native 검증 스크립트를 이에 맞췄다. 외부 Feedback의 위/아래 부착 설명은 초기 실행 기록에만 해당한다.
+- 통합 코드 `a8bea00`: `npm run test` Rust **223개**·UI **203개**, `CARGO_INCREMENTAL=0 npm run check`, Rustfmt, `CARGO_INCREMENTAL=0 npm run dev:build`, `git diff --check` 통과. Rust 개수 감소는 최신 main의 외부 Feedback 제거 반영이다. 저장·취소·충돌·내보내기 계약의 최신 main 테스트도 함께 통과했다.
+- `scripts/editor-entry-height-browser.mjs`: Chromium 158.0.8127.18에서 144×32, 300×48/209/210/280 다섯 조합 통과. 최종 내부 Feedback에서 textarea 높이 **155px**, 큰 창은 **225px**. 너비·포커스·초안·수동 축소·숨김 복원·재진입·저장 확인, JS 오류 0개. **native 프레임 적용은 모의 처리**다. `/tmp/gibbon159-close-browser.log` 및 `/tmp/gibbon159-close-browser/`에 결과를 보존했다.
+- Clippy와 debug 링크 도중 디스크 부족으로 각각 실패했다. 이번 워크트리의 `target/debug/incremental`과 이번 패키지의 오래된 `agent_gibbon-*.rcgu.o`만 정리하고 증분을 꺼서 재실행해 통과했다. 소스·다른 워크트리·사용자 앱은 제거하지 않았다. 로그: `/tmp/gibbon159-close-test.log`, `-clippy.log`, `-build.log`.
+
+### 실제 실행 앱의 핵심 높이·저장 검증
+
+사용자가 실행 유지하도록 요청한 앱을 재시작하지 않았다. 실행 중인 **통합 전 빌드**에서 변경된 핵심 함수를 검증했으며, 최종 통합 앱 전체의 native 검증이라고 주장하지 않는다. `git diff f43326e -- src-tauri/src/sizing.rs ui/app.js`로 `AUTO_HEIGHT_MAX`·`editor_frame`·`enter_note_editor` 및 진입 호출/초기 가시화 대기 내용이 유지됨을 대조했다. 최종 main에서 추가된 내부 Feedback·저장 문구·내보내기 숨김은 별도 브라우저/자동 회귀 근거로 검증했다.
+
+- root `/Users/egoinglee/.codex/worktrees/b3f2/agent-gibbon`, instance `dev-cca5a7a82225235b7519e45c`, 실제 실행 PID **49254**, 절대 debug binary와 `--serve`를 `ps`로 대조했다. 재선택한 고유 메모 `editor-height-4d270df1`의 `inspect` ok/instance/id/본문과 native 제목 `Agent Gibbon [DEV codex/editor-entry-height · cca5a7a8] — editor-height-4d270df1`를 PID-bound AX에서 대조했다. 배율 2.0.
+- 접근성 조회가 복구되어 `GIBBON_SMOKE_OUTPUT=/tmp/gibbon159-close-native-final python3 scripts/editor-entry-height-smoke.py`가 **15개 상태 기록을 포함해 종료 코드 0으로 통과**했다.
+
+| 시작 논리 크기 | 편집 진입 뒤 논리 크기 | 실제 textarea 높이 |
+|---|---|---|
+| 144×32 | 144×210 | 172px |
+| 300×48 | 300×210 | 172px |
+| 300×209 | 300×210 | 172px |
+| 300×210 | 300×210 | 172px |
+| 300×280 | 300×280 | 242px |
+
+너비·x·경계 밖이 아닌 y·핀·포커스 보존과 입력 가능 영역을 확인했다. 화면 하단에서는 같은 x로 필요한 만큼만 위로 이동했다. 이후 수동 96px 축소를 폴링이 되돌리지 않았고, 숨김→CLI open 뒤 초안이 유지됐다. CLI 재열기는 기존 자연 콘텐츠 자동 배치로 57px가 됐으며 편집 진입을 재호출해 210px로 강제하지 않았다. 원본 파일 외부 변경 시 충돌과 초안·외부 파일 보존, 접기→펼침→다시 편집 시 210px 확보, 다시 읽은 원본의 정상 저장까지 통과했다.
+
+초기 native 스크립트 재시도 두 건은 실패했다. 첫째는 CLI 재열기가 수동 96px를 유지할 것이라는 테스트의 잘못된 가정, 둘째는 저장 버튼의 접근성 이름에서 ` · Command S`를 빠뜨린 테스트 도구 문제였다. 제품 코드는 바꾸지 않고 스크립트를 보정한 뒤 최종 전체 시나리오를 통과했다. 실패 로그 `/tmp/gibbon159-close-native.log`, `/tmp/gibbon159-close-native2.log`와 최종 `/tmp/gibbon159-close-native-final.log`, 해당 폴더 `evidence.json`을 구분해 보존했다.
+
+[실제 native 메모 캡처](assets/issue159-native-editor-height.png)는 PID·메모 제목을 대조한 CG 창을 `screencapture -l`로 캡처한 **통합 전 유지 앱**의 화면이다. 최종 내부 Feedback 화면이나 전체 플랫폼 실행 증거가 아니다. 사용자 확인창 `editor-height-user-check`의 본문·표시·위치·크기는 전후 inspect가 같음을 확인했고, 사용자 앱은 종료하지 않았다. 검증용 메모만 숨겼다.
+
+최종 통합 UI 전체의 native 실행, 초기 영역 생성의 native 자동 편집, Windows·Intel·혼합 DPI·전체 플랫폼 CI·설치·배포는 미실행이다. **Conf 4 / Risk Low**: 최신 통합의 자동·브라우저 검증과 같은 핵심 변경 함수의 실제 환경 실행을 확보했으며, 실행 빌드별 한계를 분리한다.
+
+## 초기 준비 시점의 구현·검증 기록
 
 ## 구현 범위
 
@@ -45,7 +77,7 @@ UI 테스트는 진입당 한 번 호출, 초기 자동 편집의 숨김/접힘 
 - 최종 inspect 예: 물리 위치 x672/y540, 크기600×98, instance 일치·visible true·animating false. **이는 편집 버튼 실행 전 표시/출처의 부분 근거일 뿐, 편집 확대 성공 증거가 아니다.** native 시나리오 `scripts/editor-entry-height-smoke.py`는 AX 대상 창을 찾지 못해 실패했다.
 - `/tmp/gibbon159-native.log`, `/tmp/gibbon159-native/evidence.json`, `/tmp/gibbon159-native/windows.json`, `/tmp/gibbon159-orca-permissions.json`, `/tmp/gibbon159-devruntime3.log`에 실패·부분 근거를 보존했다. 기존 타인 캡처를 사용하지 않았다.
 
-## 정리와 남은 검증
+## 초기 정리와 당시 남은 검증
 
 본 작업 메모 세 개를 숨기고 `list`로 모두 visible false를 확인했다. PID24718은 `lsof`로 자기 binary를 재확인한 뒤 종료했다. 다른 워크트리 앱·사용자 watch·설치 앱을 종료하지 않았다. 팀장에게 GUI 슬롯 해제를 보고했다. 임시 테스트 원본은 정리됐고 메모 자체는 숨김 상태로 남아 있다.
 
