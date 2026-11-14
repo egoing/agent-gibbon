@@ -232,6 +232,12 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     }
     menu.append(&PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?)
         .map_err(|e| e.to_string())?;
+    #[cfg(target_os = "macos")]
+    menu.append(
+        &MenuItem::with_id(app, "permission-guide", "권한 설정", true, None::<&str>)
+            .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())?;
     menu.append(
         &MenuItem::with_id(app, "quit-app", "Agent Gibbon 종료", true, None::<&str>)
             .map_err(|e| e.to_string())?,
@@ -446,6 +452,13 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
         })
         .on_menu_event(|app, event| {
             if crate::updater::frozen(app) {
+                return;
+            }
+            #[cfg(target_os = "macos")]
+            if event.id.as_ref() == "permission-guide" {
+                if let Err(error) = crate::capture::show_permission_guide(app) {
+                    eprintln!("권한 설정 창 열기 실패: {error}");
+                }
                 return;
             }
             if event.id.as_ref() == "quit-app" {
