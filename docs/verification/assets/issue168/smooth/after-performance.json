@@ -1,0 +1,44 @@
+{
+  "info": {
+    "root": "/Users/egoinglee/.codex/worktrees/67c9/agent-gibbon",
+    "id": "dev-f3d1fc901f372efdf5d35b62",
+    "name": "codex/relation-overlay-prototype",
+    "target": "/Users/egoinglee/.codex/worktrees/67c9/agent-gibbon/src-tauri/target",
+    "binary": "/Users/egoinglee/.codex/worktrees/67c9/agent-gibbon/src-tauri/target/debug/agent-gibbon"
+  },
+  "pid": 55569,
+  "overlay_webkit_pids": [
+    58503
+  ],
+  "memo_ids": [
+    "curve-perf-7b51fcba-a",
+    "curve-perf-2ceab22b-b"
+  ],
+  "titles": [
+    "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — curve-perf-7b51fcba-a",
+    "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — curve-perf-2ceab22b-b"
+  ],
+  "scope": "Rust app + newly created overlay WebContent; excludes memo WebContents, GPU and WindowServer",
+  "results": [
+    {
+      "case": "idle",
+      "wall_seconds": 5.004224000032991,
+      "cpu_seconds_by_pid": {
+        "55569": 0.04898692100000002,
+        "58503": 0.004054439
+      },
+      "cpu_percent_one_core": 1.0599317696340198,
+      "movement_requests": null
+    },
+    {
+      "case": "moving",
+      "wall_seconds": 5.1906632501631975,
+      "cpu_seconds_by_pid": {
+        "55569": 0.043908683999999976,
+        "58503": 0.006545853999999999
+      },
+      "cpu_percent_one_core": 0.9720248755958817,
+      "movement_requests": 300
+    }
+  ]
+}

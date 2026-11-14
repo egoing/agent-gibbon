@@ -1,0 +1,40 @@
+{
+  "pid": 92198,
+  "source": "relation-098c6c3b-a",
+  "target": "relation-17e6ae18-b",
+  "overlay_bounds": {
+    "X": -56,
+    "Height": 991,
+    "Y": 38,
+    "Width": 841
+  },
+  "image_size": [
+    1682,
+    1982
+  ],
+  "checks": [
+    {
+      "screen_point": [
+        503.0,
+        237.0
+      ],
+      "image_point": [
+        1118,
+        398
+      ],
+      "stroke_present": false
+    },
+    {
+      "screen_point": [
+        232.0,
+        650.0
+      ],
+      "image_point": [
+        576,
+        1224
+      ],
+      "stroke_present": false
+    }
+  ],
+  "attached": false
+}

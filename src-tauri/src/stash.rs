@@ -161,6 +161,9 @@ pub fn cancel_chord(app: &tauri::AppHandle) {
         chord.pending = false;
     }
 }
+fn snapshot_candidate(label: &str) -> bool {
+    label != ICON && !label.starts_with("relation-prototype-")
+}
 fn compact(r: Rect, area: Rect, top: bool) -> Rect {
     let w = (r.w * 0.18).max(144.).min(r.w);
     let h = (r.h * 0.18).max(32.).min(r.h);
@@ -422,6 +425,7 @@ fn restore_rect(w: &WebviewWindow, s: &Saved) -> Result<Rect, String> {
 }
 pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
     let _update_activity = crate::updater::activity(app)?;
+    crate::relation_prototype::transition_started(app);
     let previous = app.state::<Stash>().session.lock().unwrap().take();
     if let Some(mut s) = previous {
         let restoring = !s.restoring;
@@ -513,7 +517,10 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
     };
     let mut windows = BTreeMap::new();
     for w in crate::web::managed_windows(app).into_values() {
-        if w.label() == ICON || !w.is_visible().map_err(err)? || w.is_minimized().map_err(err)? {
+        if !snapshot_candidate(w.label())
+            || !w.is_visible().map_err(err)?
+            || w.is_minimized().map_err(err)?
+        {
             continue;
         }
         crate::entrance::cancel(&w)?;
@@ -817,6 +824,26 @@ mod tests {
         }
         assert!(!c.sample(7, false, false));
         assert!(c.sample(0, false, false));
+    }
+    #[test]
+    fn derived_connections_never_enter_the_memo_stash_snapshot() {
+        for label in [
+            "stash-indicator",
+            "relation-prototype-0",
+            "relation-prototype-7",
+        ] {
+            assert!(!snapshot_candidate(label));
+        }
+        for label in [
+            "main",
+            "note-one",
+            "capture-0",
+            "terminal-1",
+            "webview-web-one",
+            "manager",
+        ] {
+            assert!(snapshot_candidate(label));
+        }
     }
     #[test]
     fn reverse_animation_has_exact_endpoints_and_continuous_retarget() {
