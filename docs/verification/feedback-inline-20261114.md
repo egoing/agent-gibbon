@@ -41,6 +41,13 @@
 - 실제 macOS Feedback 버튼 클릭·native 가장자리 drag·비활성 첫 클릭·물리 초안/IME·복수 모니터·혼합 DPI·터미널·이미지 실환경, Intel 및 Windows는 미검증이다. 전체 플랫폼 CI·릴리스·설치 앱 교체는 수행하지 않았다.
 - 높이가 극단적으로 작은 창에서는 toolbar가 남은 공간 대부분을 차지한다. 모든 높이에서 충분한 편집 영역을 제공한다는 보장은 하지 않는다. Feedback을 나타내기 위해 창을 자동 확대하지 않으며 사용자가 resize하거나 별도 편집 진입 높이 정책을 적용한다.
 - 구형 companion 창 전용 스모크 진입점은 내부 footer 스모크로 전환하고 appearance 스모크도 내부 footer를 가진 메모 페이지를 대상으로 바꿨다. appearance 스모크 전체 matrix는 이번에 실행하지 않았다.
-- 최종 제품 커밋·push·병합은 승인 대기다. Draft PR #161에는 첫 계획만 있으며 구현 diff는 로컬에 보존했다.
+- 사용자가 2026-11-14 이 작업 채팅에서 `클로즈 스킬`을 직접 호출하여 현재 범위의 최종 커밋·push·병합·main 동기화를 승인했다. 구현 커밋은 `45838a6`, 최신 main의 캡처 권한 안내와 충돌을 해결한 통합 커밋은 `360237e4d030e3fdb5f57f3af0fd423142612d8b`다. PR #161에 최종 구현을 반영한다.
 
 Conf 4: 단위 테스트·브라우저 실자산 레이아웃 회귀 통과, native CLI 출처 확인. native GUI 완료를 뜻하지 않는다. Risk Medium: 창 구조·상태 표시 및 inspect 응답 구조를 변경한다.
+
+## close 통합 검증 — 2026-11-14
+
+- origin/main `64915018a7fbabab00d895b285538f1f73520750`을 통합했다. main.rs의 창 이벤트 대상 조건 한 곳이 충돌했으며, 새 권한 안내 창을 제외하는 `memo_id_from_window(...).is_none()`를 유지하고 폐기된 companion 조건만 제거했다.
+- 통합 제품 SHA `360237e4d030e3fdb5f57f3af0fd423142612d8b`에서 UI197, Rust221, Clippy, Rustfmt, macOS ARM64 개발 빌드와 Chromium 네 크기 회귀를 다시 수행했다. 이전 제품 커밋의 검사 결과로 대체하지 않았다. 이 절 이후 변경은 검증 기록뿐이다.
+- close 로그: /tmp/gibbon7-close-ui.log, /tmp/gibbon7-close-rust.log, /tmp/gibbon7-close-clippy.log, /tmp/gibbon7-close-build.log, /tmp/gibbon7-close-browser.json. 실제 native GUI 및 타 플랫폼의 미검증 한계는 유지한다.
+- 이번 워크트리와 기본 main 워크트리의 기존 package-lock.json 변경은 커밋에서 제외하고 보존한다. 병합 SHA와 로컬·원격 main 일치, 이슈 종료는 GitHub 이슈 #160의 최종 기록을 따른다.
