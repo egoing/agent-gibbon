@@ -1,4 +1,5 @@
 'use strict';
+import { createMemoEditor } from './generated/milkdown.js';
 import { memoThemeFor } from './theme.mjs';
 import { readMemoAppearance } from './appearance.mjs';
 import { feedbackView, durations } from './feedback-state.mjs';
@@ -29,18 +30,26 @@ let acknowledgedRevision = -1;
 let readRevision = null;
 let wasReading = false;
 let editing = false;
-let initialEditHandled = false;
+let composition = false;
+let sourceProtected = false;
+let editor;
+let editorHeightRequested = false;
+let initialInputHandled = false;
+let editorReady;
+function ensureEditor() { return editorReady ||= createMemoEditor($('editor'), editorChanged).then(value => { editor = value; return value; }); }
 let saving = false;
-window.gibbonUpdateActivity = () => ({ editing, saving, exporting });
-window.gibbonUpdateBusy = () => editing || saving || exporting;
+let savePromise;
+let autosaveTimer;
+let autosaveBlocked = false;
+window.gibbonUpdateActivity = () => ({ editing: editing || composition, saving, exporting });
+window.gibbonUpdateBusy = () => editing || composition || saving || exporting;
 let exporting = false;
-let editRevision;
 let needsFit = true;
 let fitting = false;
 let layoutPending = false;
 let folded = false;
 async function fitContent(flow) {
-  if (latestNote?.capture || !needsFit || fitting || (editing && !layoutPending) || folded) return;
+  if (latestNote?.capture || !needsFit || fitting || ((editing || composition) && !layoutPending) || folded) return;
   fitting = true;
   const {width, height} = (flow?.measure || ((_stage, work) => work()))('measure', () => {
     // Measure natural flow independently of the current window height.
@@ -70,7 +79,7 @@ async function fitContent(flow) {
   finally { fitting = false; }
 }
 function contentAction() { return invoke('content_action').catch(failure); }
-$('markdown').addEventListener('input', contentAction);
+
 for (const id of ['toolbar-previous', 'toolbar-next']) $(id).addEventListener('click', contentAction);
 document.addEventListener('wheel', contentAction, { passive: true });
 const fontSizes = [12, 14, 16, 18];
@@ -85,71 +94,94 @@ $('font-size').addEventListener('click', () => {
   $('font-size').title = `글자 크기 ${size}px · 클릭하여 변경`;
   $('font-size').setAttribute('aria-label', `글자 크기 ${size}px, 클릭하여 변경`);
 });
-let restoringEditorFocus = false;
-function endEditing(flow) {
+function editorChanged(state) {
+  const wasDirty = editing;
+  editing = state.dirty;
+  composition = state.composing;
+  sourceProtected = state.protected;
+  document.body.classList.toggle('dirty', editing);
+  $('save').disabled = !editing || saving || composition || sourceProtected;
+  if (!editing && wasDirty) displayedHtml = undefined;
+  if (editing && !wasDirty) {
+    readRevision = null;
+    clearNotice();
+    if (!editorHeightRequested && memoVisible && !folded) {
+      editorHeightRequested = true;
+      invoke('enter_note_editor', { revision: latestNote.revision }).catch(failure);
+    }
+  }
   contentAction();
-  editing = false;
-  document.body.classList.toggle('editing', false);
-  $('export').hidden = false;
-  $('editor').hidden = true;
-  $('content').hidden = false;
-  $('copy').disabled = false;
-  $('edit').disabled = false;
-  clearNotice();
-  needsFit = true;
-  const fitted = fitContent(flow);
-  flow?.follow?.(fitted);
-  restoringEditorFocus = true;
-  $('edit').focus();
-  restoringEditorFocus = false;
-  return fitted;
-}
-function beginEditing() {
-  if (!latestNote || latestNote.capture || editing || folded) return;
-  editing = true;
-  document.body.classList.toggle('editing', true);
-  editRevision = latestNote.revision;
-  $('markdown').value = latestNote.markdown;
-  $('content').hidden = true;
-  $('export').hidden = true;
-  $('editor').hidden = false;
-  $('copy').disabled = true;
-  $('edit').disabled = true;
-  clearNotice();
-  $('markdown').focus();
-  $('markdown').setSelectionRange(0, 0);
-  $('markdown').scrollTop = 0;
-  // One request per entry, never from refresh, typing, or a resize observer.
-  invoke('enter_note_editor', { revision: editRevision }).catch(failure);
-}
-$('edit').addEventListener('click', () => { contentAction(); beginEditing(); });
-
-async function save() {
-  if (!editing || saving || exporting) return;
-  saving = true;
+  scheduleAutosave();
   publishFeedback();
-  $('markdown').readOnly = true;
-  try {
-    await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('note.save', async flow => {
-      latestNote = await flow.invoke('save_note', { markdown: $('markdown').value, expectedRevision: editRevision });
-      highlightRevision = null;
-      acknowledgedRevision = latestNote.revision;
+}
+function scheduleAutosave() {
+  clearTimeout(autosaveTimer);
+  if (!editing || composition || saving || sourceProtected || autosaveBlocked) return;
+  autosaveTimer = setTimeout(function autosaveTick() { return save(true); }, 600);
+}
+function endEditing() {
+  if (!editor || saving || composition) return;
+  clearTimeout(autosaveTimer);
+  autosaveBlocked = false;
+  editor.discard(latestNote);
+  editing = false;
+  document.body.classList.toggle('dirty', false);
+  clearNotice();
+  editorChanged(editor.status());
+  displayedHtml = undefined;
+  refresh(false);
+}
 
+function save(automatic = false) {
+  clearTimeout(autosaveTimer);
+  if (saving) return savePromise;
+  if (!editing) return Promise.resolve(true);
+  if (exporting || composition || sourceProtected || editor?.status().composing || automatic && autosaveBlocked) return Promise.resolve(false);
+  savePromise = performSave();
+  return savePromise;
+}
+async function performSave() {
+  saving = true;
+  editor.pending(true);
+  publishFeedback();
+  $('save').disabled = true;
+  try {
+    const snapshot = editor.capture();
+    await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('note.save', async flow => {
+      const savedNote = await flow.invoke('save_note', { markdown: snapshot.markdown, expectedRevision: snapshot.revision });
+      if (!latestNote || savedNote.revision >= latestNote.revision) latestNote = savedNote;
+      editor.saved(savedNote, snapshot);
+      autosaveBlocked = false;
+      clearNotice();
+      editing = editor.status().dirty;
+      document.body.classList.toggle('dirty', editing);
+      highlightRevision = null;
+      acknowledgedRevision = savedNote.revision;
       flow.stage('response');
-      // Direct saves confirm the content; subsequent external revisions can highlight again.
-      (flow.measure || ((_stage, work) => work()))('dom', () => { $('content').innerHTML = latestNote.html; });
-      displayedHtml = $('content').innerHTML;
-      revision = latestNote.revision;
-      endEditing(flow);
-      notify('저장했습니다');
+      displayedHtml = undefined;
+      revision = Math.max(revision, savedNote.revision);
+      if (!editing) notify('저장됨');
       flow.frame?.();
     });
-  } catch (error) { failure(error); }
-  finally {
+    return true;
+  } catch (error) {
+    autosaveBlocked = true;
+    failure(error);
+    return false;
+  } finally {
+    editor.pending(false);
     saving = false;
+    $('save').disabled = !editing || composition || sourceProtected;
+    scheduleAutosave();
     publishFeedback();
-    $('markdown').readOnly = false;
   }
+}
+async function flushAnd(action) {
+  // Hiding keeps the editor alive, but close can destroy it: flush before both.
+  if (composition || editor?.status().composing) return;
+  if (saving && !await savePromise) return;
+  if (editing && (!await save() || editing)) return;
+  return invoke(action).catch(failure);
 }
 let notice = null;
 let noticeTimer;
@@ -169,7 +201,7 @@ function notify(text, kind = 'result', persistent = false) {
 function failure(error) { notify(String(error), 'error', editing); }
 async function publishFeedback() {
   if (publishing) { publishAgain = true; return; }
-  const view = feedbackView({ editing, saving, exporting, acknowledging, highlightRevision, notice, color: latestNote?.color });
+  const view = feedbackView({ editing, saving, exporting, composition, sourceProtected, autosaveBlocked, unified: !latestNote?.capture, acknowledging, highlightRevision, notice, color: latestNote?.color });
   renderFeedback(view, folded || !memoVisible || stashActive);
   if (!memoVisible) return;
   const signature = JSON.stringify({ folded, stashActive, view });
@@ -199,6 +231,8 @@ async function refresh(schedule = true) {
     await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('note.refresh', async flow => {
       const state = await flow.invoke('snapshot');
       flow.stage('response');
+      if (!state.note.capture) await ensureEditor();
+      if (state.note.revision < revision) return;
       latestNote = state.note;
       layoutPending = !!state.layout_pending;
       if (layoutPending) needsFit = true;
@@ -208,13 +242,25 @@ async function refresh(schedule = true) {
       document.body.classList.toggle('pointer-over', !!state.hovered);
       $('fold-title').textContent = state.note.title;
       $('fold-title').title = state.note.title;
-      $('edit').disabled = editing || !!state.note.capture;
+      $('save').hidden = true;
+      $('export').hidden = !state.note.capture;
+      $('editor').hidden = !!state.note.capture;
+      $('content').hidden = !state.note.capture;
+      if (!state.note.capture) {
+        const editorState = editor.sync(state.note);
+        composition = editorState.composing;
+        sourceProtected = editorState.protected;
+        $('save').disabled = !editing || saving || composition || sourceProtected;
+        if (editorState.conflict && editing && !notice?.text?.includes('외부')) notify('메모가 외부에서 갱신되었습니다. 초안을 복사한 뒤 취소하면 최신 내용을 확인할 수 있습니다.', 'error', true);
+        else if (sourceProtected && !notice) notify('지원하지 않는 문법의 손실을 막기 위해 원문을 보호하고 있습니다. 원문 복사를 사용할 수 있습니다.', 'error', true);
+      }
       $('font-size').disabled = !!state.note.capture;
-      $('copy').disabled = editing;
-      const copyLabel = state.note.capture ? '이미지 복사' : '본문 복사';
+      $('copy').disabled = false;
+      const copyLabel = state.note.capture ? '이미지 복사' : sourceProtected ? '원문 복사' : '본문 복사';
       $('copy').title = `${copyLabel} · ${shortcut('C')}`;
       $('copy').setAttribute('aria-label', copyLabel);
       document.body.classList.toggle('image-note', !!state.note.capture);
+      document.body.classList.toggle('text-note', !state.note.capture);
       // Refresh CSS independently of revisions; preserve drafts and local trace stages.
       applyMemoAppearance(state.note.color);
       if (revision !== state.note.revision) {
@@ -228,7 +274,7 @@ async function refresh(schedule = true) {
       publishFeedback();
       const html = highlightRevision !== null ? state.note.change_html : (state.note.completion_html ?? state.note.html);
       const changed = displayedHtml !== html;
-      if (changed) {
+      if (changed && state.note.capture) {
         (flow.measure || ((_stage, work) => work()))('dom', () => { $('content').innerHTML = html; });
         if (state.note.capture) {
           const img = document.createElement('img');
@@ -237,18 +283,19 @@ async function refresh(schedule = true) {
           $('content').replaceChildren(img);
         }
         displayedHtml = html;
+      } else if (changed && !editing && !composition) {
+        editor.highlight(html);
+        displayedHtml = html;
+      }
+      if (!initialInputHandled && state.note.edit_on_open && !state.note.capture && memoVisible && !state.folded && !folded) {
+        initialInputHandled = true;
+        editor.focus();
       }
       $('pin').setAttribute('aria-pressed', String(state.always_on_top));
       $('warp').setAttribute('data-direction', state.warp_right ? 'right' : 'left');
-      // Region creation can first snapshot while still hidden. Defer the actual
-      // editor entry until shown, rather than losing its one height request.
-      if (!initialEditHandled && ((memoVisible && !state.folded) || !state.note.edit_on_open || state.note.capture)) {
-        initialEditHandled = true;
-        if (state.note.edit_on_open && !state.note.capture) beginEditing();
-      }
       await fitContent(flow);
       const reading = memoVisible && (state.focused || state.feedback_surface?.focused);
-      if (reading && !editing) readRevision = state.note.revision;
+      if (reading && !editing && !composition && !sourceProtected) readRevision = state.note.revision;
       if (wasReading && !reading) {
         const observed = readRevision;
         readRevision = null;
@@ -265,8 +312,7 @@ async function refresh(schedule = true) {
   if (schedule) setTimeout(refresh, 350);
 }
 document.addEventListener('mousedown', (event) => {
-  if (event.button !== 0 || event.target.closest('button, #editor, #tooltip, .resize')) return;
-  if (folded && !event.target.closest('#controls')) return;
+  if (event.button !== 0 || !event.target.closest('#controls') || event.target.closest('button, .resize')) return;
   event.preventDefault();
   invoke('drag_note').catch(failure);
 });
@@ -280,14 +326,14 @@ for (const grip of document.querySelectorAll('.resize')) {
   });
 }
 $('pin').addEventListener('click', () => invoke('toggle_pin').catch(failure));
-$('close').addEventListener('click', () => invoke('close_note').catch(failure));
+$('close').addEventListener('click', () => flushAnd('close_note'));
 document.addEventListener('keydown', (event) => {
+  if (event.isComposing || event.keyCode === 229 || composition || editor?.status().composing) return;
   if (event.key === 'Escape') {
     event.preventDefault();
-    if (editing) { if (!saving && !exporting) endEditing(); }
-    else invoke('hide_note').catch(failure);
+    flushAnd('hide_note');
   }
-  if (!editing && latestNote && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'c') {
+  if (latestNote && !window.getSelection()?.toString() && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'c') {
     event.preventDefault();
     copyNote();
   }
@@ -296,7 +342,10 @@ document.addEventListener('keydown', (event) => {
     if (!event.isComposing && !event.repeat && !event.altKey && !event.shiftKey && event.keyCode !== 229) saveShortcut();
   }
 });
-function saveShortcut() { return editing ? save() : exportNote(); }
+function saveShortcut() { return latestNote?.capture ? exportNote() : save(); }
+$('save').title = `저장 · ${shortcut('S')}`;
+$('save').setAttribute('aria-label', $('save').title);
+$('save').addEventListener('click', () => save());
 // Render the current sanitized HTML offscreen: innerText retains the existing
 // rendered-text format without ever touching the visible diff or its baseline.
 function currentPlainText() {
@@ -312,13 +361,13 @@ function currentPlainText() {
   finally { source.remove(); }
 }
 async function copyNote() {
-  if (!latestNote || editing) return;
+  if (!latestNote) return;
   contentAction();
   try {
     if (latestNote.capture) {
       await invoke('copy_note_image');
     } else {
-      await window.__TAURI__.clipboardManager.writeText(currentPlainText());
+      await window.__TAURI__.clipboardManager.writeText(window.getSelection()?.toString() || (sourceProtected ? latestNote.markdown : editing ? $('editor').innerText : currentPlainText()));
     }
     notify('복사했습니다');
   } catch (error) { failure(error); }
@@ -334,7 +383,7 @@ window.__TAURI__.event.listen('layout-measure', () => { needsFit = true; refresh
 refresh();
 
 async function acknowledge(observed) {
-  if (acknowledging || editing || latestNote?.revision !== observed) return;
+  if (acknowledging || editing || composition || sourceProtected || latestNote?.revision !== observed) return;
   acknowledging = true;
   publishFeedback();
   try {
@@ -344,7 +393,8 @@ async function acknowledge(observed) {
       latestNote.completion_html = null;
       highlightRevision = null;
       displayedHtml = latestNote.html;
-      $('content').innerHTML = displayedHtml;
+      if (!latestNote.capture) editor.highlight(displayedHtml);
+      else $('content').innerHTML = displayedHtml;
 
       needsFit = true;
       await fitContent();

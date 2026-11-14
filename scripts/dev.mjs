@@ -46,6 +46,7 @@ if (mode === 'info') {
   process.exit(1);
 }
 if (mode === 'build' || mode === 'dev') {
+  await import('./build-editor.mjs');
   try { requireBuildDirSupport(); } catch (error) { console.error(error.message); process.exit(1); }
 }
 const child = spawn(command, commandArgs, { cwd: mode === 'cli' ? process.cwd() : instance.root, env, stdio: 'inherit' });

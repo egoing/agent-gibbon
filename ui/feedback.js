@@ -24,7 +24,7 @@ export function createFeedback(doc, action) {
         actions.appendChild(button);
       }
       const shortcut = /Mac|iPhone|iPad/.test(doc.defaultView.navigator.platform) ? 'Command S' : 'Ctrl S';
-      button.title = item.id === 'save' ? `저장 · ${shortcut}` : item.label;
+      button.title = item.id === 'save' ? `${item.label} · ${shortcut}` : item.label;
       button.setAttribute('aria-label', button.title);
       button.textContent = item.label;
       button.disabled = item.disabled;

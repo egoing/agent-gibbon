@@ -13,3 +13,6 @@ __pycache__/
 # The website is buildless; its dist directory contains maintained source.
 !website/dist/
 !website/dist/**
+
+# Locally bundled editor; rebuilt for development, tests and release.
+ui/generated/

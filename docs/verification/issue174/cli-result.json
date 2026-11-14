@@ -1,0 +1,64 @@
+{
+  "root": "/Users/egoinglee/.codex/worktrees/0ae9/agent-gibbon",
+  "instance": "dev-cd65829f4f3c180fea8442f4",
+  "binary": "/Users/egoinglee/.codex/worktrees/0ae9/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "note_id": "milkdown174-cli-048330c4",
+  "native_gui": "not tested",
+  "commands": [
+    {
+      "action": "open",
+      "ok": true,
+      "instance": "dev-cd65829f4f3c180fea8442f4",
+      "visible": true,
+      "revision": 1
+    },
+    {
+      "action": "inspect",
+      "ok": true,
+      "instance": "dev-cd65829f4f3c180fea8442f4",
+      "visible": true,
+      "revision": 1
+    },
+    {
+      "action": "close",
+      "ok": true,
+      "instance": "dev-cd65829f4f3c180fea8442f4",
+      "visible": false,
+      "revision": 1
+    },
+    {
+      "action": "inspect",
+      "ok": true,
+      "instance": "dev-cd65829f4f3c180fea8442f4",
+      "visible": false,
+      "revision": 1
+    },
+    {
+      "action": "update",
+      "ok": true,
+      "instance": "dev-cd65829f4f3c180fea8442f4",
+      "visible": false,
+      "revision": 2
+    },
+    {
+      "action": "inspect",
+      "ok": true,
+      "instance": "dev-cd65829f4f3c180fea8442f4",
+      "visible": false,
+      "revision": 2
+    },
+    {
+      "action": "close",
+      "ok": true,
+      "instance": "dev-cd65829f4f3c180fea8442f4",
+      "visible": false,
+      "revision": 2
+    }
+  ],
+  "source_path": "/private/var/folders/ds/zm2jvd217ss_q5jy2bjcbb9c0000gn/T/gibbon174-dev-cd65829f4f3c180fea8442f4-70cq2a2f/source.md",
+  "hidden_geometry_preserved": true,
+  "initial_background_focus_preserved": true,
+  "created_pids": [
+    4368
+  ]
+}
