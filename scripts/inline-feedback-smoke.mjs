@@ -27,6 +27,7 @@ try {
     if(name==='poll_fold')return !!window.testFolded;
     if(name==='toggle_fold'){window.testFolded=!window.testFolded;return window.testFolded;}
     if(name==='fit_note')return true;
+    if(name==='save_note' && window.testSaveError)throw new Error('원본 파일이 변경되었습니다. '.repeat(25));
     if(name==='save_note'){window.testNote={...window.testNote,markdown:args.markdown,revision:window.testNote.revision+1};return window.testNote;}
     if(name==='feedback_action')listeners['feedback-action']?.({payload:{owner:'main',...args}});
     if(name==='export_note' && window.testExportError)throw new Error('원본 파일을 내보낼 수 없습니다. '.repeat(25));
@@ -54,11 +55,44 @@ try {
   assert(bounds.editor.height>0);assert(bounds.editor.bottom<=bounds.footer.y+1);
   assert(bounds.footer.bottom<=height);assert(bounds.scrollWidth<=width);
   // Every wrapped action remains reachable in the bounded footer scroll area.
-  for(const action of ['export','cancel','save']){
+  for(const action of ['cancel','save']){
    const button=page.locator(`#actions [data-action="${action}"]`);
    await button.evaluate(e=>e.scrollIntoView({block:'nearest'}));
    const r=await button.boundingBox();assert(r.x>=0 && r.x+r.width<=width && r.y+r.height<=height);
   }
+  assert.equal(await page.locator('#message').textContent(), '');
+  assert.equal(await page.locator('#export').isVisible(), false);
+  assert.equal(await page.locator('#controls').evaluate(e=>e.getBoundingClientRect().height),22);
+  assert.equal(await page.evaluate(()=>document.querySelector('#markdown').getBoundingClientRect().top-document.querySelector('#controls').getBoundingClientRect().bottom),0);
+    const textarea = page.locator('#markdown');
+    const bar = page.locator('#memo-scrollbar');
+    await textarea.fill(Array.from({length: 120}, (_, i) => `편집 ${i}번째 줄`).join('\n'));
+    await page.waitForFunction(() => !document.querySelector('#memo-scrollbar').hidden);
+    assert.equal(await bar.getAttribute('aria-controls'), 'markdown');
+    await textarea.press('Control+End');
+    await page.waitForFunction(() => document.querySelector('#markdown').scrollTop > 0);
+    await textarea.press('End');
+    await textarea.type(' 커서 뒤 입력');
+    assert.match(await textarea.inputValue(), /커서 뒤 입력/);
+    assert.equal(await textarea.evaluate(e => e.selectionEnd), (await textarea.inputValue()).length);
+    await bar.focus();
+    await bar.press('Home');
+    await page.waitForFunction(() => document.querySelector('#markdown').scrollTop === 0);
+    const thumbBounds = await bar.boundingBox();
+    await page.mouse.move(thumbBounds.x + 1, thumbBounds.y + 2);
+    await page.mouse.down();
+    await page.mouse.move(thumbBounds.x + 1, thumbBounds.y + thumbBounds.height - 2, {steps: 8});
+    await page.mouse.up();
+    await page.waitForFunction(() => document.querySelector('#markdown').scrollTop > 0);
+    assert.equal(await page.locator('#viewport').evaluate(e => e.scrollTop), 0);
+    await page.emulateMedia({forcedColors: 'active'});
+    assert.equal(await bar.evaluate(e => getComputedStyle(e).display), 'none');
+    assert.equal(await textarea.evaluate(e => getComputedStyle(e).scrollbarWidth), 'auto');
+    await page.emulateMedia({forcedColors: 'none'});
+    await page.screenshot({path: path.join(output, `editor-scroll-${width}.png`)});
+    await textarea.fill('짧은 글');
+    await page.waitForFunction(() => document.querySelector('#memo-scrollbar').hidden);
+  await textarea.fill('수정한 초안\n보존할 문자열');
   await page.locator('#markdown').focus();
   await page.locator('#markdown').evaluate(e=>e.setSelectionRange(2,5));
   for(const design of ['white','black','gray']) {
@@ -76,13 +110,14 @@ try {
   assert.equal(await page.evaluate(()=>window.editorIdentity===document.getElementById('markdown')),true);
   assert.equal(await page.locator('#markdown').inputValue(),'수정한 초안\n보존할 문자열');
   await page.screenshot({path:path.join(output,`editing-${width}-${height}.png`)});
-  await page.evaluate(()=>window.testExportError=true);
-  await page.locator('#actions [data-action="export"]').click();
+  await page.evaluate(()=>window.testSaveError=true);
+  await page.locator('#actions [data-action="save"]').click();
   await page.waitForFunction(()=>document.querySelector('#message').getAttribute('role')==='alert');
   assert.equal(await page.locator('#markdown').inputValue(),'수정한 초안\n보존할 문자열');
   assert.deepEqual(await page.locator('#memo-surface').boundingBox(),before);
   await page.screenshot({path:path.join(output,`error-${width}-${height}.png`)});
   await page.locator('#actions [data-action="save"]').evaluate(e=>e.scrollIntoView({block:'nearest'}));
+  await page.evaluate(()=>window.testSaveError=false);
   if(width===300 && height===210){await page.locator('#markdown').focus();await page.keyboard.press('Control+s');}
   else await page.locator('#actions [data-action="save"]').click();
   await page.waitForFunction(()=>window.testCalls.some(c=>c.name==='save_note'));

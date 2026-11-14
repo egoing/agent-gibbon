@@ -178,3 +178,7 @@ body.toolbar-collapsed #controls { align-items: flex-start; }
 #controls button:is(:hover, [data-pointer-over]):not(:disabled) {
   background: color-mix(in srgb, var(--foreground) 16%, var(--background));
 }
+
+/* Editing shares the text reading row's compact edge; image chrome stays 30px. */
+body.editing:not(.image-note):not(.toolbar-collapsed) #controls { flex-basis: 22px; height: 22px; }
+body.editing:not(.image-note):not(.folded) #viewport { padding-top: 0; }
