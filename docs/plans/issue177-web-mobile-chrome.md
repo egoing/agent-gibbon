@@ -24,3 +24,5 @@ Rust223/UI204·Clippy·개발 빌드와 Chromium toolbar15조합·presentation �
 사용자 피드백에 따른 팀장의 추가 Orca 실행/재기동·native GUI 조작 중단 지시를 준수한다. 공개 NSScrollView Overlay 후보와 보안probe/resize/drag/fold/reload/권한은 아직 native 검증 전이며 완료로 표시하지 않는다. GUI 검증 방식 결정 뒤 이어간다. 최종 제품 커밋·push·병합은 하지 않았다.
 
 사용자 dev시작 패닉 제보 대응: nullable WKWebView URL을 강제로 읽던 inspect 경로를 교체하고 실제관측 URL/허용탐색/요청주소를 구분했다. session_restore의 null fallback과 회귀를 추가했으며 Rust224/UI204·Clippy·빌드·실제 dev시작·오프라인nil·온라인302후 실제URL을 확인했다. 보안 probe는 hidden 복원 페이지 자동실행으로 permission계층 거부를 확인했고 추가 GUI/Orca는 사용하지 않았다. 상세 기록은 위 검증 기록을 따른다.
+
+close 호출로 커밋·push·일반 병합 승인을 받았다. 제품e66d3d9 및 최신main470bb52 통합8b21ac3에서 Rust224/UI180·Clippy/build·browser15+presentation·실제 시작/hidden복원 CLI를 재확인했다. 웹 목록 누락은 별도 요청 #184에 기록했다. #177 원래 완료 기준의 남은 GUI 검증은 유지하며 병합으로 이슈를 닫지 않는다.

@@ -63,3 +63,11 @@ Wry의 URL getter는 초기 WKWebView.URL이 nil일 때 panic하므로 macOS ins
 외부 자동 probe의 manager_notes/save_note/terminal_start/web_chrome는 `not allowed. Plugin not found`, plugin:window|set_title은 permission 거부였다. 원문 메모 데이터나 terminal 실행 결과를 받지 않았고 title도 바뀌지 않았다. 이는 permission 계층에서 차단된 실제 증거이며 커스텀 invoke guard의 exact문구까지 도달해 시험한 것으로 보고하지 않는다. HTTP/fixture 로그는 `/tmp/gibbon-issue177/requests.jsonl`이다.
 
 최종 관련 검사: Rust224/UI204 통과, Clippy -D warnings 통과, rustfmt/diff-check 통과, 개발 빌드 및 정상 dev 시작 확인. 시작 패닉 수정은 실제환경 확인(Conf5), 전체 작업은 앞서 남긴 native 상호작용 미검증 때문에 전체Conf3/RiskMedium을 유지한다. 모든 제품 변경은 미커밋이다.
+
+## close 승인과 최신 main 통합
+
+사용자가 2026-11-14 `$close`를 직접 호출해 현재 작업의 커밋·push·일반 병합을 승인했다. 제품 커밋 `e66d3d9`를 만들고 최신 origin/main `470bb52`를 merge한 `8b21ac3`에서 관련 검사를 다시 수행했다. 디자인 시스템 충돌은 웹 규칙과 Milkdown/자동저장 규칙 양쪽을 보존했다. 다른 워크트리의 미커밋 작업은 가져오지 않았다.
+
+통합 코드에서 Rust224·UI180(최신 main의 테스트 구성)·Clippy -D warnings·개발 빌드·rustfmt·diff-check, Chromium toolbar15조합·presentation 검사 통과. `RUST_BACKTRACE=1 node scripts/dev.mjs dev` 정상 실행과 `web-issue177-fixed`의 instance 일치·hidden/focus/기하 보존·offline current_url:null inspect 성공을 확인했다. GUI/Orca를 사용하지 않았다. 전체 플랫폼 CI·Windows/Intel 실환경·공개 배포는 미실행이다.
+
+#184는 사용자가 별도로 요청한 웹 목록 누락 후속 이슈다. 코드에서 manager_notes가 웹 entry를 합치지 않는 것을 확인했으며 이번 PR에 목록 기능을 혼입하지 않는다. #177은 native resize/drag/fold/reload/권한 UI 및 세로 overlay의 실제 외형 검증이 남아 있으므로 이번 병합으로 자동 종료하지 않는다. 남은 원래 요구를 완료한 것처럼 옮기거나 숨기지 않는다. 전체 Conf3/RiskMedium을 유지한다.
