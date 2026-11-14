@@ -90,6 +90,7 @@ function endEditing(flow) {
   contentAction();
   editing = false;
   document.body.classList.toggle('editing', false);
+  $('export').hidden = false;
   $('editor').hidden = true;
   $('content').hidden = false;
   $('copy').disabled = false;
@@ -110,6 +111,7 @@ function beginEditing() {
   editRevision = latestNote.revision;
   $('markdown').value = latestNote.markdown;
   $('content').hidden = true;
+  $('export').hidden = true;
   $('editor').hidden = false;
   $('copy').disabled = true;
   $('edit').disabled = true;
@@ -139,7 +141,7 @@ async function save() {
       displayedHtml = $('content').innerHTML;
       revision = latestNote.revision;
       endEditing(flow);
-      notify('메모에 반영했습니다');
+      notify('저장했습니다');
       flow.frame?.();
     });
   } catch (error) { failure(error); }
@@ -167,7 +169,7 @@ function notify(text, kind = 'result', persistent = false) {
 function failure(error) { notify(String(error), 'error', editing); }
 async function publishFeedback() {
   if (publishing) { publishAgain = true; return; }
-  const view = feedbackView({ editing, saving, exporting, acknowledging, highlightRevision, notice, sourcePath: latestNote?.source_path, color: latestNote?.color });
+  const view = feedbackView({ editing, saving, exporting, acknowledging, highlightRevision, notice, color: latestNote?.color });
   renderFeedback(view, folded || !memoVisible || stashActive);
   if (!memoVisible) return;
   const signature = JSON.stringify({ folded, stashActive, view });
@@ -178,13 +180,13 @@ async function publishFeedback() {
   finally { publishing = false; if (publishAgain) { publishAgain = false; publishFeedback(); } }
 }
 async function exportNote() {
-  if (!latestNote || exporting || saving) return;
+  if (!latestNote || editing || exporting || saving) return;
   contentAction();
   exporting = true;
   publishFeedback();
   $('export').disabled = true;
   try {
-    const path = await invoke('export_note', { markdown: editing ? $('markdown').value : null });
+    const path = await invoke('export_note', { markdown: null });
     if (path) {
       notify(`파일로 내보냈습니다: ${path}`);
     }

@@ -1,3 +1,2 @@
-// The standalone Feedback window was replaced by the inline memo footer.
-// Keep this entry point for existing callers; exercise the current real assets.
+// Current single-window footer and editing scrollbar regression.
 await import('./inline-feedback-smoke.mjs');
