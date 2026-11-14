@@ -1,0 +1,17 @@
+{
+  "browser": "158.0.8127.18",
+  "nativeIPC": "simulated",
+  "nativeIME": "not tested",
+  "results": [
+    "direct editing, no-op source preservation, explicit save, undo/redo, task, conflict, fold/hide, toolbar drag, composition guard",
+    "selection format toolbar bold/heading/paragraph, retained selection, save, IME hiding, narrow bounds and keyboard access",
+    "600ms autosave, no save button, concurrent input during slow save, next revision, paused retry after failure, composition deferral",
+    "raw HTML inert, image/link no request/navigation, HTML paste plain-text only",
+    "unsupported reference syntax protected as literal original and copied losslessly",
+    "144/300/480px layout and actions",
+    "large 66k-character document edit/save"
+  ],
+  "output": "/tmp/gibbon174-browser",
+  "errors": [],
+  "externalRequests": []
+}

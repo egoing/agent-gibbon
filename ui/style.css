@@ -47,9 +47,6 @@ a { color: inherit; }
 hr { border: 0; border-top: 1px solid var(--border); margin: 4px 0; }
 .resize { position: fixed; z-index: 3; }
 [hidden] { display: none !important; }
-#editor { clear: both; height: calc(100% - 25px); min-height: 38px; display: flex; flex-direction: column; gap: 3px; cursor: default; }
-#markdown { flex: 1; min-height: 0; width: 100%; resize: none; padding: 3px; font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--border); user-select: text; -webkit-user-select: text; cursor: text; }
-#markdown:focus { outline: none; box-shadow: none; }
 button:disabled { opacity: .5; cursor: default; }
 #n, #s { height: 3px; left: 7px; right: 7px; cursor: ns-resize; }
 #n { top: 0; } #s { bottom: 0; }
@@ -88,7 +85,7 @@ body.image-note:not(.folded) #viewport { position: absolute; inset: 0; padding: 
 body.image-note:not(.folded) #content { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
 body.image-note #content img { display: block; width: 100%; height: 100%; object-fit: contain; }
 body.image-note:not(.folded) #controls { position: absolute; top: 3px; right: 3px; z-index: 2; margin: 0; background: var(--background); border-radius: 4px; }
-body.image-note :is(#font-size, #edit) { display: none; }
+body.image-note :is(#font-size, #save) { display: none; }
 
 /* Hidden at rest; native pointer tracking also supports inactive windows. */
 body #controls { opacity: 0; pointer-events: none; }
@@ -102,11 +99,8 @@ body #controls:has(:focus-visible) { opacity: 1; pointer-events: auto; }
 #controls { max-width: calc(100% - 6px); flex-wrap: nowrap; justify-content: flex-end; }
 #controls button { flex: 0 0 var(--toolbar-target); }
 body.folded #controls button { flex-basis: 12px; }
-#editor { height: calc(100% - 30px); }
 #controls button:focus { outline: none; }
 
-body.editing #viewport { display: flex; flex-direction: column; }
-body.editing #editor { flex: 1; height: auto; min-height: 0; }
 
 /* One row fits the 32px minimum height. Paging keeps every action reachable. */
 #toolbar-items { display: flex; gap: 1px; min-width: 0; overflow: hidden; align-items: center; }
@@ -183,5 +177,35 @@ body.toolbar-collapsed #controls { align-items: flex-start; }
 }
 
 /* Editing shares the text reading row's compact edge; image chrome stays 30px. */
-body.editing:not(.image-note):not(.toolbar-collapsed) #controls { flex-basis: 22px; height: 22px; }
-body.editing:not(.image-note):not(.folded) #viewport { padding-top: 0; }
+
+/* One permanent editable surface; dirty state never changes the layout. */
+body.text-note:not(.toolbar-collapsed) #controls { flex-basis: 22px; height: 22px; }
+body.text-note:not(.folded) #viewport { padding-top: 0; }
+#editor { display: block; height: auto; min-height: 100%; cursor: text; user-select: text; -webkit-user-select: text; }
+#editor .milkdown, #memo-editor { min-height: inherit; }
+#memo-editor { white-space: pre-wrap; overflow-wrap: anywhere; outline: none; user-select: text; -webkit-user-select: text; cursor: text; }
+#memo-editor > :first-child { margin-top: 0; }
+#memo-editor .ProseMirror-selectednode { outline: 1px solid var(--border); }
+#memo-editor .ProseMirror-trailingBreak { display: initial; }
+#memo-editor li.task-item { position: relative; list-style: none; margin-left: -17px; padding-left: 17px; }
+#memo-editor li > div > p { margin: 0; }
+#memo-editor .editor-task { position: absolute; left: 0; top: .22em; width: .85em; height: .85em; min-width: 0; padding: 0; border: 1px solid currentColor; border-radius: 1px; }
+#memo-editor .editor-task[aria-checked=true]::after { content: ''; width: .3em; height: .5em; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: translateY(-.08em) rotate(45deg); }
+#memo-editor [data-inert-link] { text-decoration: underline; }
+#memo-editor [data-inert-image] { opacity: .7; }
+#memo-editor :is(.change-added, .change-modified, .change-removed) { border-radius: 2px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+#memo-editor .change-added { background: #d7f2df; color: #14532d; }
+#memo-editor .change-modified { background: #fff0c2; color: #714600; }
+#memo-editor .change-removed { background: #fbe0e3; color: #8b2635; text-decoration: line-through; }
+body.dirty #save { background: var(--panel); }
+
+#memo-editor img.ProseMirror-separator { display: inline !important; border: none !important; margin: 0 !important; width: 1px !important; height: 1px !important; }
+
+.selection-format { position: fixed; z-index: 10; display: flex; gap: 1px; max-width: calc(100vw - 8px); padding: 2px; overflow-x: auto; background: var(--background); color: var(--foreground); border: 1px solid var(--border); border-radius: 4px; box-shadow: 0 2px 5px #0002; user-select: none; -webkit-user-select: none; cursor: default; }
+.selection-format button { flex: 0 0 24px; width: 24px; height: 22px; padding: 0; font-size: 11px; }
+.selection-format button[aria-pressed=true] { background: var(--panel); }
+.selection-format button:focus-visible { outline: 2px solid color-mix(in srgb, var(--foreground) 28%, transparent); outline-offset: -2px; }
+.selection-format button[data-format=strong] { font-weight: 700; }
+.selection-format button[data-format=emphasis] { font-style: italic; }
+.selection-format button[data-format=strike_through] { text-decoration: line-through; }
+@media (forced-colors: active) { .selection-format button:focus-visible { outline-color: Highlight; } }
