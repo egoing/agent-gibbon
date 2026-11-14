@@ -19,3 +19,7 @@
 조사 문서가 코드·공식 출처·조회일·검증 한계를 명시하고 사용자 결정에 필요한 범위와 위험을 구분하면 조사 완료다. 문서 링크와 diff 검사를 수행한다. 제품 코드·디자인 확정 규칙·시안은 변경하지 않고 전체 플랫폼 CI·배포·실제 사용자 세션 실행도 하지 않는다.
 
 첫 계획 커밋·push·Draft PR만 승인 범위다. 결과 문서는 미커밋으로 제출하고 최종 커밋·push·병합은 사용자 승인을 기다린다.
+
+## 사용자 결정에 따른 구현 전환
+
+위 내용은 최초 조사 범위다. 이후 사용자가 편집 가능한 실행 계획·복원·취소와 macOS 무인자 모니터 자동 재실행의 구현 및 close를 승인했다. 현재 결과는 [macOS 명령 조사](../research/macos-auto-restore-commands.md), [실기기 검증](../verification/terminal-monitor-restore.md), [디자인 시스템](../design-system.md#종료된-터미널의-실행-계획)에 기록한다. Windows 후속 구현은 [#185](https://github.com/egoing/agent-gibbon/issues/185)로 보류하고 에이전트 대화 재개는 후속 범위로 유지한다.

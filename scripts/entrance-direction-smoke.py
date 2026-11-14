@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Exercise entrance directions in this worktree's dev app (macOS).
-Run after npm run dev:build; do not move the pointer during the test.
+Run after pnpm run dev:build; do not move the pointer during the test.
 Restores the pointer, hides test notes, and stops only a newly started dev process.
 """
 import json

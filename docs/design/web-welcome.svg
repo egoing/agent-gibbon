@@ -1,1 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="560" viewBox="0 0 1060 560"><rect width="1060" height="560" fill="#e6e8eb"/><g font-family="Arial, Apple SD Gothic Neo, sans-serif"><text x="24" y="30" font-size="16" fill="#20252e">웹 주소 입력 → 실행 · Ctrl+Shift+4 영역 선택</text><rect x="24" y="52" width="650" height="400" rx="4" fill="#20252e" stroke="#667080"/><rect x="24" y="52" width="650" height="30" rx="4" fill="#303844"/><text x="36" y="72" fill="#f0f0f0" font-size="12">● ● ●　　　 Agent Gibbon · 웹</text><text x="109" y="196" fill="#f0f0f0" font-size="13" font-weight="600">웹 주소</text><rect x="109" y="209" width="480" height="36" rx="4" fill="#303844" stroke="#a8c5ff" stroke-width="2"/><text x="120" y="232" fill="#f0f0f0" font-size="13">https://example.com</text><text x="109" y="269" fill="#bac3cf" font-size="11">HTTP 또는 HTTPS 주소를 입력하세요.</text><rect x="109" y="290" width="72" height="32" rx="4" fill="#303844" stroke="#667080"/><text x="132" y="311" fill="#f0f0f0" font-size="13">실행</text><text x="710" y="70" fill="#20252e" font-size="14">작은 창 · 위에서부터 스크롤</text><rect x="710" y="90" width="320" height="200" rx="4" fill="#20252e" stroke="#667080"/><rect x="710" y="90" width="320" height="30" rx="4" fill="#303844"/><text x="723" y="110" fill="#f0f0f0" font-size="12">● ● ●　 웹</text><text x="726" y="150" fill="#f0f0f0" font-size="13" font-weight="600">웹 주소</text><rect x="726" y="163" width="288" height="32" rx="4" fill="#303844" stroke="#667080"/><text x="736" y="184" fill="#bac3cf" font-size="13">https://example.com</text><text x="726" y="216" fill="#bac3cf" font-size="11">HTTP 또는 HTTPS 주소를 입력하세요.</text><rect x="726" y="232" width="72" height="32" rx="4" fill="#303844" stroke="#667080"/><text x="749" y="253" fill="#f0f0f0" font-size="13">실행</text><text x="710" y="332" fill="#20252e" font-size="13">실행 후 별도 웹 콘텐츠 창으로 전환</text><text x="710" y="360" fill="#20252e" font-size="13">닫기와 CLI close는 페이지를 숨김</text><text x="710" y="388" fill="#20252e" font-size="13">CLI 복원은 현재 페이지를 유지</text><text x="24" y="496" fill="#20252e" font-size="13">기본 여백 24px · 좁거나 낮은 창 16px · 콘텐츠 최대 폭 480px · 최소 크기 240×160px</text><text x="24" y="530" fill="#20252e" font-size="12">설명용 시안 · 실제 앱 캡처 및 플랫폼별 네이티브 제목줄과 구분</text></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="560" viewBox="0 0 1060 560"><rect width="1060" height="560" fill="#f4f4f4"/><g font-family="Arial, Apple SD Gothic Neo, sans-serif">
+<text x="24" y="28" font-size="16" fill="#222">브라우저 · 공통 툴바 디자인과 메모 테마</text>
+<rect x="24" y="52" width="600" height="360" rx="4" fill="#dfe2dd"/>
+<svg x="552" y="58" width="12" height="12" fill="none" stroke="#2c2f7e" color="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 4l8 4l8 -4l-8 -4" fill="currentColor" />
+  <path d="M8 14l-4 2l8 4l8 -4l-4 -2" />
+  <path d="M8 10l-4 2l8 4l8 -4l-4 -2" /></svg>
+<svg x="577" y="58" width="12" height="12" fill="none" stroke="#2c2f7e" color="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4h-6a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h8" />
+  <path d="M18 20v-17" />
+  <path d="M15 6l3 -3l3 3" /></svg>
+<svg x="602" y="58" width="12" height="12" fill="none" stroke="#2c2f7e" color="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6l-12 12" />
+  <path d="M6 6l12 12" /></svg>
+<text x="48" y="170" fill="#2c2f7e" font-size="13" font-weight="600">웹 주소</text>
+<rect x="48" y="184" width="552" height="36" rx="4" fill="#cdd0d3" stroke="#2c2f7e"/>
+<text x="58" y="207" fill="#2c2f7e" font-size="13">https://example.com</text>
+<text x="48" y="244" fill="#2c2f7e" font-size="11">HTTP 또는 HTTPS 주소를 입력하세요.</text>
+<rect x="48" y="262" width="72" height="32" rx="4" fill="#cdd0d3" stroke="#2c2f7e"/>
+<text x="71" y="283" fill="#2c2f7e" font-size="13">실행</text>
+<text x="24" y="436" fill="#333" font-size="13">회색 · Welcome</text>
+<rect x="660" y="52" width="376" height="200" rx="4" fill="#262627"/>
+<svg x="964" y="58" width="12" height="12" fill="none" stroke="#dfe2dd" color="#dfe2dd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 4l8 4l8 -4l-8 -4" fill="currentColor" />
+  <path d="M8 14l-4 2l8 4l8 -4l-4 -2" />
+  <path d="M8 10l-4 2l8 4l8 -4l-4 -2" /></svg>
+<svg x="989" y="58" width="12" height="12" fill="none" stroke="#dfe2dd" color="#dfe2dd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4h-6a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h8" />
+  <path d="M18 20v-17" />
+  <path d="M15 6l3 -3l3 3" /></svg>
+<svg x="1014" y="58" width="12" height="12" fill="none" stroke="#dfe2dd" color="#dfe2dd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6l-12 12" />
+  <path d="M6 6l12 12" /></svg>
+<rect x="663" y="82" width="370" height="167" fill="white"/>
+<text x="676" y="118" fill="#333" font-size="13">외부 웹페이지는 자체 색상 유지</text>
+<text x="660" y="276" fill="#333" font-size="13">검정 · 외부 콘텐츠</text>
+<rect x="660" y="310" width="376" height="24" rx="4" fill="#dfe2dd"/>
+<text x="664" y="326" fill="#2c2f7e" font-size="12">https://example.com/긴 제목…</text>
+<rect x="983" y="311" width="24" height="22" rx="3" fill="#2c2f7e" fill-opacity=".16"/>
+<g transform="rotate(180 995 322)"><svg x="989" y="316" width="12" height="12" fill="none" stroke="#2c2f7e" color="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4h-6a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h8" />
+  <path d="M18 20v-17" />
+  <path d="M15 6l3 -3l3 3" /></svg></g>
+<svg x="1014" y="316" width="12" height="12" fill="none" stroke="#2c2f7e" color="#2c2f7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6l-12 12" />
+  <path d="M6 6l12 12" /></svg>
+<text x="660" y="360" fill="#333" font-size="13">접힘 · 제목 말줄임 · 펼치기 hover</text>
+<text x="24" y="482" fill="#333" font-size="13">앱 툴바 30px · 버튼 24×22px · 아이콘 12px · 접힌 창 24px · 같은 오른쪽 슬롯</text>
+<text x="24" y="510" fill="#333" font-size="13">테마·16% hover·키보드 초점은 공통 규칙 · 닫기는 숨김과 페이지 유지 (#119 별도)</text>
+<text x="24" y="538" fill="#555" font-size="12">설명용 시안 · 네이티브 제목줄 없음 · 빈 곳 드래그 · 가장자리 크기 조절 · 실앱 검증은 별도 기록</text></g></svg>

@@ -138,7 +138,7 @@ function heldRequests(commands) {
 }
 
 test('background polls settle before acknowledgement, with new work frozen', async () => {
-  const commands = ['poll_warp', 'poll_fold', 'snapshot', 'feedback_snapshot', 'manager_notes', 'terminal_info'];
+  const commands = ['poll_warp', 'poll_fold', 'snapshot', 'manager_notes', 'terminal_info'];
   const { app, completions, work, acks } = heldRequests(commands);
   await tick();
   app.fire('updater-prepare', 1);

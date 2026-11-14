@@ -24,19 +24,19 @@ SDK 초기화 전과 최종 HTTP 요청 직전에 동의를 확인한다. 전송
 자신의 Sentry 프로젝트를 쓰는 공헌자는 `AGENT_GIBBON_SENTRY_DSN`을 **빌드 프로세스의 환경변수**로 제공하고 다음 명령을 실행한다. `.env`는 자동으로 읽지 않는다.
 
 ```sh
-npm run diagnostics:build
-npm run diagnostics:open -- --id diagnostic-check --markdown '진단용 테스트'
-npm run diagnostics:status
-npm run diagnostics:probe
+pnpm run diagnostics:build
+pnpm run diagnostics:open --id diagnostic-check --markdown '진단용 테스트'
+pnpm run diagnostics:status
+pnpm run diagnostics:probe
 ```
 
 공식 저장소 쓰기 권한이 있는 유지보수자는 다음 빌드 명령을 사용할 수 있다. 실행기는 GitHub 권한을 확인한 뒤 Actions variable을 프로세스 메모리로만 읽고 DSN을 출력하지 않는다. `--official` 없이 원격 공식 DSN을 자동으로 가져오지 않는다.
 
 ```sh
-npm run diagnostics:build -- --official
+pnpm run diagnostics:build --official
 ```
 
-Windows는 `npm.cmd`를 사용한다. `gh api`를 지원하는 인증된 GitHub CLI가 필요하다. 설치 앱이나 다른 개발 앱이 이미 실행 중이면 새 진단 환경이 기존 프로세스에 소급 적용되지 않는다. 대상 앱의 PID·바이너리 경로를 확인해 해당 앱만 재실행한다. 일반 `scripts/agent-gibbon-dev`는 계속 현재 워크트리의 debug 바이너리만 사용한다.
+Windows는 `pnpm.cmd`를 사용한다. `gh api`를 지원하는 인증된 GitHub CLI가 필요하다. 설치 앱이나 다른 개발 앱이 이미 실행 중이면 새 진단 환경이 기존 프로세스에 소급 적용되지 않는다. 대상 앱의 PID·바이너리 경로를 확인해 해당 앱만 재실행한다. 일반 `scripts/agent-gibbon-dev`는 계속 현재 워크트리의 debug 바이너리만 사용한다.
 
 `diagnostics`는 현재 서버의 로컬 진단 상태를 읽는 CLI 명령이고, `diagnostics-probe`는 명시적인 확인용 고정 이벤트·span·로그를 보낸다. probe의 `queue_flushed:true`는 서버 수신 증거가 아니므로 Sentry에서 반환 event ID를 따로 조회해야 한다.
 

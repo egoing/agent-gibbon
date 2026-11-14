@@ -183,9 +183,7 @@ fn launch(app: &tauri::AppHandle, mode: SelectionMode) {
     if let Err(error) = begin(app, mode) {
         let _ = cleanup_before_create(app);
         if let Some(tray) = app.tray_by_id("agent-gibbon") {
-            let _ = tray.set_tooltip(Some(format!(
-                "화면 캡처 실패: {error}. 화면 기록 권한을 확인하세요."
-            )));
+            let _ = tray.set_tooltip(Some(format!("화면 캡처 실패: {error}")));
         }
         eprintln!("화면 캡처 실패: {error}");
     }
@@ -212,6 +210,95 @@ extern "C" {
     fn CGPreflightScreenCaptureAccess() -> bool;
     fn CGRequestScreenCaptureAccess() -> bool;
 }
+#[cfg(target_os = "macos")]
+pub(crate) fn show_permission_guide(app: &tauri::AppHandle) -> Result<(), String> {
+    if let Some(window) = app.get_webview_window("permission-guide") {
+        return window.show().map_err(err);
+    }
+    tauri::WebviewWindowBuilder::new(
+        app,
+        "permission-guide",
+        tauri::WebviewUrl::App("permission.html".into()),
+    )
+    .title("Agent Gibbon 권한 설정")
+    .inner_size(600.0, 450.0)
+    .min_inner_size(380.0, 320.0)
+    .focused(false)
+    .always_on_top(true)
+    .build()
+    .map(|_| ())
+    .map_err(err)
+}
+
+#[tauri::command]
+pub fn permission_guide(
+    window: tauri::WebviewWindow,
+    action: String,
+) -> Result<(bool, bool, String), String> {
+    if window.label() != "permission-guide" {
+        return Err("권한 안내 창에서 실행하세요".into());
+    }
+    #[cfg(target_os = "macos")]
+    {
+        #[link(name = "ApplicationServices", kind = "framework")]
+        extern "C" {
+            fn AXIsProcessTrusted() -> bool;
+        }
+        extern "C" {
+            fn gibbon_show_permission_panel(screen: bool, overview: *mut std::ffi::c_void);
+            fn gibbon_hide_permission_panel();
+        }
+        let pane = match action.as_str() {
+            "screen" => Some("Privacy_ScreenCapture"),
+            "access" => Some("Privacy_Accessibility"),
+            "status" | "observe-screen" | "observe-access" => None,
+            _ => return Err("알 수 없는 동작입니다".into()),
+        };
+        if let Some(pane) = pane {
+            let url = format!("x-apple.systempreferences:com.apple.preference.security?{pane}");
+            if !std::process::Command::new("/usr/bin/open")
+                .arg(url)
+                .status()
+                .map_err(err)?
+                .success()
+            {
+                return Err("시스템 설정을 열지 못했습니다".into());
+            }
+            let overview = window.clone();
+            let screen = action == "screen";
+            window
+                .run_on_main_thread(move || {
+                    if let Ok(pointer) = overview.ns_window() {
+                        unsafe {
+                            gibbon_show_permission_panel(screen, pointer);
+                        }
+                    }
+                })
+                .map_err(err)?;
+        }
+        let screen = unsafe { CGPreflightScreenCaptureAccess() };
+        let access = unsafe { AXIsProcessTrusted() };
+        if action == "status"
+            || (action == "observe-screen" && screen)
+            || (action == "observe-access" && access)
+        {
+            window
+                .run_on_main_thread(|| unsafe { gibbon_hide_permission_panel() })
+                .map_err(err)?;
+        }
+        Ok((
+            screen,
+            access,
+            std::env::current_exe().map_err(err)?.display().to_string(),
+        ))
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = action;
+        Err("macOS에서 지원합니다".into())
+    }
+}
+
 fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
     let _update_activity = crate::updater::activity(app)?;
     #[cfg(not(windows))]
@@ -221,7 +308,12 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
     // Called only by an explicit capture action. Never capture a wallpaper-only
     // image when macOS has denied access to other applications' windows.
     if unsafe { !CGPreflightScreenCaptureAccess() && !CGRequestScreenCaptureAccess() } {
-        return Err("시스템 설정 → 개인정보 보호 및 보안 → 화면 및 시스템 오디오 기록에서 이 앱을 허용한 뒤 다시 실행하세요".into());
+        show_permission_guide(app)?;
+        return Err("현재 앱의 화면 캡처 접근을 확인하지 못했습니다".into());
+    }
+    #[cfg(target_os = "macos")]
+    if let Some(guide) = app.get_webview_window("permission-guide") {
+        guide.close().map_err(err)?;
     }
     if !app.state::<Captures>().0.lock().map_err(err)?.is_empty() {
         return Ok(());

@@ -12,6 +12,9 @@ function updateTitle() {
 }
 if (sourceTitle) new MutationObserver(updateTitle).observe(sourceTitle, { childList: true, characterData: true, subtree: true });
 if (sourceTitle) updateTitle();
+// Web navigation updates its nested title without replacing the toolbar shell.
+new MutationObserver(() => { title.title = title.textContent; }).observe(title, { childList: true, characterData: true, subtree: true });
+title.title = title.textContent;
 let changingFold = false;
 function displayFold(collapsed) {
   document.body.classList.toggle('toolbar-collapsed', collapsed);

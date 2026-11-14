@@ -1,0 +1,27 @@
+{
+  "pid": 35993,
+  "window": {
+    "id": 68502,
+    "width": 300,
+    "height": 119,
+    "screenIndex": 0,
+    "isMinimized": false,
+    "title": "Agent Gibbon [DEV codex/140-checkbox-size · 16c8a614] — checkbox140-native-20261113",
+    "x": 903,
+    "isOffscreen": false,
+    "platform": {
+      "layer": 5
+    },
+    "y": 584
+  },
+  "screenshotStatus": {
+    "state": "captured",
+    "metadata": {
+      "windowId": 68502,
+      "engine": "screenCaptureKit"
+    }
+  },
+  "binary": "/Users/egoinglee/.codex/worktrees/1123/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "nativeClipboard": "PASS: latest body, two checked and two unchecked glyphs, original pasteboard types restored after changeCount and expected value checks",
+  "cleanup": "verification note hidden and inspected; only PID35993 stopped"
+}

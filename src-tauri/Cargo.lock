@@ -171,6 +171,7 @@ dependencies = [
  "ammonia",
  "base64 0.22.1",
  "block2",
+ "cc",
  "fs2",
  "libc",
  "objc2",

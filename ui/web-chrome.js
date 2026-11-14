@@ -9,5 +9,14 @@
   };
   document.getElementById('pin').onclick = () => invoke('web_chrome', { action: 'pin' }).then(apply).catch(report);
   document.getElementById('close').onclick = () => invoke('web_chrome', { action: 'close' }).catch(report);
+  document.getElementById('controls').addEventListener('pointerdown', event => {
+    if (event.button !== 0 || event.target.closest('button')) return;
+    invoke('web_chrome', { action: 'drag' }).catch(report);
+  });
+  document.querySelectorAll('.resize').forEach(handle => handle.addEventListener('pointerdown', event => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    invoke('web_chrome', { action: `resize-${handle.dataset.direction}` }).catch(report);
+  }));
   invoke('web_chrome', { action: 'inspect' }).then(apply).catch(report);
 })();

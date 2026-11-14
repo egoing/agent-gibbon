@@ -10,20 +10,18 @@ function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'gibbon-release-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   mkdirSync(join(root, 'src-tauri'));
-  for (const p of ['package.json', 'package-lock.json', 'src-tauri/tauri.conf.json', 'src-tauri/Cargo.toml', 'src-tauri/Cargo.lock']) {
+  for (const p of ['package.json', 'pnpm-lock.yaml', 'src-tauri/tauri.conf.json', 'src-tauri/Cargo.toml', 'src-tauri/Cargo.lock']) {
     copyFileSync(new URL('../' + p, import.meta.url), join(root, p));
   }
   return root;
 }
 
-test('version bump updates all manifests and both lockfiles without changing dependencies', t => {
+test('version bump updates all manifests and Cargo lockfile, retaining pnpm resolution without changing dependencies', t => {
   const root = fixture(t);
-  const before = JSON.parse(readFileSync(join(root, 'package-lock.json')));
+  const before = readFileSync(join(root, 'pnpm-lock.yaml'), 'utf8');
   assert.equal(setVersion('9.0.0', root), '9.0.0');
   assert.equal(checkVersion('v9.0.0', root), '9.0.0');
-  const after = JSON.parse(readFileSync(join(root, 'package-lock.json')));
-  delete before.version; delete after.version;
-  delete before.packages[''].version; delete after.packages[''].version;
+  const after = readFileSync(join(root, 'pnpm-lock.yaml'), 'utf8');
   assert.deepEqual(after, before);
   assert.throws(() => checkVersion('v9.0.1', root));
   for (const value of ['9.0.0', '8.0.0', '09.1.0', '9.1.0-beta', undefined]) assert.throws(() => setVersion(value, root));

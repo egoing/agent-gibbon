@@ -1,0 +1,26 @@
+{
+  "sha": "40b440c",
+  "baseline_product_sha": "87aedf7",
+  "roots": [
+    "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon",
+    "/Users/egoinglee/.codex/worktrees/gibbon-cache-bench-peer/agent-gibbon"
+  ],
+  "cold": "empty benchmark-only artifact directory; existing Cargo registry sources retained; OS cache not purged",
+  "network": "Cargo --offline --locked; JS cold fetch via configured registry, warm offline",
+  "repetitions": "Cargo first builds n=1; warm n=3; JS cold n=1 warm n=3; adapt after first comparison",
+  "jobs": 4,
+  "node": "24.21.0",
+  "npm": "11.19.0",
+  "pnpm": "11.25.0",
+  "cargo": "1.91.1",
+  "rustc": "1.91.1",
+  "architecture": "arm64",
+  "cpu_count": 10,
+  "ram_bytes": 34359738368,
+  "sha_full": "40b440c1a87dc26dcc8d10b7c99228fa405dd585",
+  "js_overlapped_initial_cargo": true,
+  "js_install_scripts": "default behavior; neither manager given ignore-scripts",
+  "js_optional_dependencies": "host-selected optional Tauri binary included",
+  "js_registry": "https://registry.npmjs.org/",
+  "apfs_space": "du allocated bytes are not unique physical blocks; nlink=1 sample consistent with possible CoW; no measured physical saving claim"
+}

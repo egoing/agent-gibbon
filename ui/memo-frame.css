@@ -1,16 +1,8 @@
-/* Both native viewports paint segments of one outer frame. The paint sits at
+/* The memo viewport paints its complete outer frame. The paint sits at
    the window edge, outside the content box, and extends inward only. */
 body {
   --frame-corners: var(--surface-radius);
   --frame-widths: var(--memo-focus-width);
-}
-body.feedback-below {
-  --frame-corners: var(--surface-radius) var(--surface-radius) 0 0;
-  --frame-widths: var(--memo-focus-width) var(--memo-focus-width) 0;
-}
-body.feedback-above {
-  --frame-corners: 0 0 var(--surface-radius) var(--surface-radius);
-  --frame-widths: 0 var(--memo-focus-width) var(--memo-focus-width);
 }
 body::after {
   content: "";

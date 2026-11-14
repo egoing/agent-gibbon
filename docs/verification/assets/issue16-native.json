@@ -1,0 +1,466 @@
+{
+  "root": "/Users/egoinglee/.codex/worktrees/3e31/agent-gibbon",
+  "binary": "/Users/egoinglee/.codex/worktrees/3e31/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "pid": 39599,
+  "windows": {
+    "source": 68553,
+    "source_feedback": 68564,
+    "independent": 68576,
+    "independent_feedback": 68577
+  },
+  "results": {
+    "initial": {
+      "ok": true,
+      "instance": "dev-0d8853e5e61d9b4182d09a6a",
+      "id": "issue16-3e31-source",
+      "visible": true,
+      "note": {
+        "capture": null,
+        "change_html": "<h1>issue16-3e31 원본</h1>\n",
+        "color": "#fee93e",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<h1>issue16-3e31 원본</h1>\n",
+        "markdown": "# issue16-3e31 원본\n",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 1,
+        "source_path": "/private/tmp/gibbon16-native-3e31/source.md",
+        "status": "대기",
+        "title": "issue16-3e31 저장 검증",
+        "updated_at": 1794544195062
+      },
+      "feedback_surface": null
+    },
+    "after-save": {
+      "ok": true,
+      "instance": "dev-0d8853e5e61d9b4182d09a6a",
+      "id": "issue16-3e31-source",
+      "visible": true,
+      "note": {
+        "capture": null,
+        "change_html": "<h1>issue16-3e31 반영 성공</h1>\n",
+        "color": "#fee93e",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<h1>issue16-3e31 반영 성공</h1>\n",
+        "markdown": "# issue16-3e31 반영 성공",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 2,
+        "source_path": "/private/tmp/gibbon16-native-3e31/source.md",
+        "status": "대기",
+        "title": "issue16-3e31 저장 검증",
+        "updated_at": 1794544218303
+      },
+      "feedback_surface": {
+        "always_on_top": true,
+        "focused": false,
+        "opacity": 1.0,
+        "position": {
+          "x": 1806,
+          "y": 1406
+        },
+        "size": {
+          "height": 44,
+          "width": 600
+        },
+        "view": {
+          "buttons": [],
+          "color": "#fee93e",
+          "error": false,
+          "message": "",
+          "revision": null
+        },
+        "visible": false,
+        "window_id": 68564
+      }
+    },
+    "source-conflict": {
+      "ok": true,
+      "instance": "dev-0d8853e5e61d9b4182d09a6a",
+      "id": "issue16-3e31-source",
+      "visible": true,
+      "note": {
+        "capture": null,
+        "change_html": "<h1>issue16-3e31 반영 성공</h1>\n",
+        "color": "#fee93e",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<h1>issue16-3e31 반영 성공</h1>\n",
+        "markdown": "# issue16-3e31 반영 성공",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 2,
+        "source_path": "/private/tmp/gibbon16-native-3e31/source.md",
+        "status": "대기",
+        "title": "issue16-3e31 저장 검증",
+        "updated_at": 1794544218303
+      },
+      "feedback_surface": {
+        "always_on_top": true,
+        "focused": false,
+        "opacity": 1.0,
+        "position": {
+          "x": 1806,
+          "y": 1406
+        },
+        "size": {
+          "height": 134,
+          "width": 600
+        },
+        "view": {
+          "buttons": [
+            {
+              "disabled": false,
+              "id": "export",
+              "label": "파일 내보내기",
+              "primary": false
+            },
+            {
+              "disabled": false,
+              "id": "cancel",
+              "label": "취소",
+              "primary": false
+            },
+            {
+              "disabled": false,
+              "id": "save",
+              "label": "메모에 반영",
+              "primary": true
+            }
+          ],
+          "color": "#fee93e",
+          "error": true,
+          "message": "원본 파일이 외부에서 변경되었습니다. 작성 내용을 복사한 뒤 파일을 다시 열어 주세요.",
+          "revision": null
+        },
+        "visible": true,
+        "window_id": 68564
+      }
+    },
+    "independent-save": {
+      "ok": true,
+      "instance": "dev-0d8853e5e61d9b4182d09a6a",
+      "id": "issue16-3e31-independent",
+      "visible": true,
+      "note": {
+        "capture": null,
+        "change_html": "<p>issue16-3e31 Feedback 반영</p>\n",
+        "color": "#89f0ff",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<p>issue16-3e31 Feedback 반영</p>\n",
+        "markdown": "issue16-3e31 Feedback 반영",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 2,
+        "source_path": null,
+        "status": "대기",
+        "title": "issue16-3e31 독립",
+        "updated_at": 1794544286038
+      },
+      "feedback_surface": {
+        "always_on_top": true,
+        "focused": false,
+        "opacity": 1.0,
+        "position": {
+          "x": 1806,
+          "y": 1406
+        },
+        "size": {
+          "height": 44,
+          "width": 600
+        },
+        "view": {
+          "buttons": [],
+          "color": "#89f0ff",
+          "error": false,
+          "message": "메모에 반영했습니다",
+          "revision": null
+        },
+        "visible": true,
+        "window_id": 68577
+      }
+    },
+    "revision-conflict": {
+      "ok": true,
+      "instance": "dev-0d8853e5e61d9b4182d09a6a",
+      "id": "issue16-3e31-independent",
+      "visible": true,
+      "note": {
+        "capture": null,
+        "change_html": "<p><mark class=\"change-removed\">issue16-3e31 Feedback 반영</mark>\n<mark class=\"change-modified\">issue16-3e31 CLI 변경</mark></p>\n",
+        "color": "#89f0ff",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<p>issue16-3e31 CLI 변경</p>\n",
+        "markdown": "issue16-3e31 CLI 변경",
+        "quiet_update": false,
+        "removed": true,
+        "revision": 3,
+        "source_path": null,
+        "status": "대기",
+        "title": "issue16-3e31 독립",
+        "updated_at": 1794544301346
+      },
+      "feedback_surface": {
+        "always_on_top": true,
+        "focused": false,
+        "opacity": 1.0,
+        "position": {
+          "x": 1806,
+          "y": 1406
+        },
+        "size": {
+          "height": 134,
+          "width": 600
+        },
+        "view": {
+          "buttons": [
+            {
+              "disabled": false,
+              "id": "export",
+              "label": "파일 내보내기",
+              "primary": false
+            },
+            {
+              "disabled": false,
+              "id": "cancel",
+              "label": "취소",
+              "primary": false
+            },
+            {
+              "disabled": false,
+              "id": "save",
+              "label": "메모에 반영",
+              "primary": true
+            }
+          ],
+          "color": "#89f0ff",
+          "error": true,
+          "message": "메모가 외부에서 갱신되었습니다. 작성 내용을 복사한 뒤 취소하고 다시 편집하세요.",
+          "revision": 3
+        },
+        "visible": true,
+        "window_id": 68577
+      }
+    },
+    "export-cancel": {
+      "ok": true,
+      "instance": "dev-0d8853e5e61d9b4182d09a6a",
+      "id": "issue16-3e31-independent",
+      "visible": true,
+      "note": {
+        "capture": null,
+        "change_html": "<p>issue16-3e31 CLI 변경</p>\n",
+        "color": "#89f0ff",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<p>issue16-3e31 CLI 변경</p>\n",
+        "markdown": "issue16-3e31 CLI 변경",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 3,
+        "source_path": null,
+        "status": "대기",
+        "title": "issue16-3e31 독립",
+        "updated_at": 1794544301346
+      },
+      "feedback_surface": {
+        "always_on_top": true,
+        "focused": false,
+        "opacity": 1.0,
+        "position": {
+          "x": 1806,
+          "y": 1406
+        },
+        "size": {
+          "height": 134,
+          "width": 600
+        },
+        "view": {
+          "buttons": [],
+          "color": "#89f0ff",
+          "error": false,
+          "message": "",
+          "revision": null
+        },
+        "visible": false,
+        "window_id": 68577
+      }
+    },
+    "draft-export-cancel": {
+      "ok": true,
+      "instance": "dev-0d8853e5e61d9b4182d09a6a",
+      "id": "issue16-3e31-source",
+      "visible": true,
+      "note": {
+        "capture": null,
+        "change_html": "<h1>issue16-3e31 반영 성공</h1>\n",
+        "color": "#fee93e",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<h1>issue16-3e31 반영 성공</h1>\n",
+        "markdown": "# issue16-3e31 반영 성공",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 3,
+        "source_path": "/private/tmp/gibbon16-native-3e31/source.md",
+        "status": "대기",
+        "title": "issue16-3e31 저장 검증",
+        "updated_at": 1794544338130
+      },
+      "feedback_surface": {
+        "always_on_top": true,
+        "focused": false,
+        "opacity": 1.0,
+        "position": {
+          "x": 1806,
+          "y": 1406
+        },
+        "size": {
+          "height": 134,
+          "width": 600
+        },
+        "view": {
+          "buttons": [
+            {
+              "disabled": false,
+              "id": "export",
+              "label": "파일 내보내기",
+              "primary": false
+            },
+            {
+              "disabled": false,
+              "id": "cancel",
+              "label": "취소",
+              "primary": false
+            },
+            {
+              "disabled": false,
+              "id": "save",
+              "label": "메모에 반영",
+              "primary": true
+            }
+          ],
+          "color": "#fee93e",
+          "error": true,
+          "message": "원본 파일이 외부에서 변경되었습니다. 작성 내용을 복사한 뒤 파일을 다시 열어 주세요.",
+          "revision": null
+        },
+        "visible": true,
+        "window_id": 68564
+      }
+    },
+    "source-hidden": {
+      "ok": true,
+      "instance": "dev-0d8853e5e61d9b4182d09a6a",
+      "id": "issue16-3e31-source",
+      "visible": false,
+      "note": {
+        "capture": null,
+        "change_html": "<h1>issue16-3e31 반영 성공</h1>\n",
+        "color": "#fee93e",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<h1>issue16-3e31 반영 성공</h1>\n",
+        "markdown": "# issue16-3e31 반영 성공",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 3,
+        "source_path": "/private/tmp/gibbon16-native-3e31/source.md",
+        "status": "대기",
+        "title": "issue16-3e31 저장 검증",
+        "updated_at": 1794544338130
+      },
+      "feedback_surface": {
+        "always_on_top": true,
+        "focused": false,
+        "opacity": 1.0,
+        "position": {
+          "x": 1806,
+          "y": 1406
+        },
+        "size": {
+          "height": 134,
+          "width": 600
+        },
+        "view": {
+          "buttons": [
+            {
+              "disabled": false,
+              "id": "export",
+              "label": "파일 내보내기",
+              "primary": false
+            },
+            {
+              "disabled": false,
+              "id": "cancel",
+              "label": "취소",
+              "primary": false
+            },
+            {
+              "disabled": false,
+              "id": "save",
+              "label": "메모에 반영",
+              "primary": true
+            }
+          ],
+          "color": "#fee93e",
+          "error": true,
+          "message": "원본 파일이 외부에서 변경되었습니다. 작성 내용을 복사한 뒤 파일을 다시 열어 주세요.",
+          "revision": null
+        },
+        "visible": false,
+        "window_id": 68564
+      }
+    },
+    "independent-hidden": {
+      "ok": true,
+      "instance": "dev-0d8853e5e61d9b4182d09a6a",
+      "id": "issue16-3e31-independent",
+      "visible": false,
+      "note": {
+        "capture": null,
+        "change_html": "<p>issue16-3e31 CLI 변경</p>\n",
+        "color": "#89f0ff",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<p>issue16-3e31 CLI 변경</p>\n",
+        "markdown": "issue16-3e31 CLI 변경",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 3,
+        "source_path": null,
+        "status": "대기",
+        "title": "issue16-3e31 독립",
+        "updated_at": 1794544301346
+      },
+      "feedback_surface": {
+        "always_on_top": true,
+        "focused": false,
+        "opacity": 0.5,
+        "position": {
+          "x": 1806,
+          "y": 1406
+        },
+        "size": {
+          "height": 134,
+          "width": 600
+        },
+        "view": {
+          "buttons": [],
+          "color": "#89f0ff",
+          "error": false,
+          "message": "",
+          "revision": null
+        },
+        "visible": false,
+        "window_id": 68577
+      }
+    }
+  },
+  "draft_after_export_ax": "AXWindow | Agent Gibbon [DEV codex/editor-save-shortcut · 0d8853e5] — issue16-3e31-source |  | \nAXGroup |  |  | \nAXGroup |  |  | \nAXScrollArea |  |  | \nAXWebArea |  | Agent Gibbon | \nAXToolbar | Toolbar | Toolbar | \nAXButton | 이전 도구 | 이전 도구 | \nAXButton | 메모 접기 | 메모 접기 | \nAXButton | 글자 크기 12px, 클릭하여 변경 | 글자 크기 12px, 클릭하여 변경 | \nAXButton | 메모 편집 | 메모 편집 | \nAXButton | 파일 내보내기 | 파일 내보내기 | \nAXButton | 본문 복사 | 본문 복사 | \nAXButton | 반대편으로 워프 | 반대편으로 워프 | \nAXCheckBox | 상단 고정 | 상단 고정 | \nAXButton | 다음 도구 | 다음 도구 | \nAXButton | 툴바 접기 | 툴바 접기 | \nAXButton | 메모 창 닫기 | 메모 창 닫기 | \nAXGroup | issue16-3e31 저장 검증 | issue16-3e31 저장 검증 | \nAXGroup |  |  | \nAXGroup |  |  | \nAXGroup | Markdown 편집 | Markdown 편집 | \nAXTextArea | Markdown 원문 | Markdown 원문 | issue16-3e31 충돌 초안\nAXGroup |  |  | \nAXStaticText |  |  | issue16-3e31 충돌 초안\nAXScrollBar | 메모 세로 스크롤 | 메모 세로 스크롤 | \nAXGroup |  |  | \nAXGroup |  |  | \nAXGroup |  |  | \nAXGroup |  |  | \nAXGroup |  |  | \nAXGroup |  |  | \nAXGroup |  |  | \nAXGroup |  |  | \n",
+  "revision_conflict_ax": "App=agent-gibbon (pid 39599)\nWindow: \"Agent Gibbon [DEV codex/editor-save-shortcut · 0d8853e5] — issue16-3e31-independent\", App: agent-gibbon.\n\n0 standard window Agent Gibbon [DEV codex/editor-save-shortcut · 0d8853e5] — issue16-3e31-independent\n\t1 scroll area\n\t\t2 HTML content Agent Gibbon\n\t\t\t3 toolbar Toolbar\n\t\t\t\t4 button (disabled) 이전 도구\n\t\t\t\t5 button (expanded) 메모 접기\n\t\t\t\t6 button 글자 크기 12px, 클릭하여 변경\n\t\t\t\t7 button (disabled) 메모 편집\n\t\t\t\t8 button 파일 내보내기\n\t\t\t\t9 button (disabled) 본문 복사\n\t\t\t\t10 button 반대편으로 워프\n\t\t\t\t11 toggle button 상단 고정, Value: 1\n\t\t\t\t12 button (disabled) 다음 도구\n\t\t\t\t13 button (expanded) 툴바 접기\n\t\t\t\t14 button 메모 창 닫기\n\t\t\t27 container issue16-3e31 독립\n\t\t\t\t28 container Markdown 편집\n\t\t\t\t\t29 text entry area (settable) Markdown 원문 issue16-3e31 revision 충돌 초안\n\t\t\t\t\t\t31 text issue16-3e31 revision 충돌 초안\n\t\t\t18 scroll bar 메모 세로 스크롤 0\n\nNo UI element is currently focused."
+}

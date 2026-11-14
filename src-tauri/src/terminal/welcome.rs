@@ -40,6 +40,8 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
         path_updated: 0,
         updated_at: 0,
         title: String::new(),
+        restore_plan: None,
+        auto_restore: false,
     };
     save(&root(app), &agent)?;
     state.records.lock().map_err(err)?.insert(id.clone(), agent);
@@ -350,6 +352,108 @@ fn process_cwd(pid: u32) -> Option<PathBuf> {
 fn process_cwd(_pid: u32) -> Option<PathBuf> {
     None
 }
+#[cfg(target_os = "macos")]
+pub(super) fn foreground_name(session: &Session) -> Option<String> {
+    let pid = session.master.process_group_leader()?;
+    if Some(pid as u32) == session.child.process_id() {
+        return None;
+    }
+    let mut buf = [0u8; 256];
+    let len = unsafe { libc::proc_name(pid, buf.as_mut_ptr().cast(), buf.len() as u32) };
+    if len <= 0 {
+        return None;
+    }
+    let name = std::str::from_utf8(&buf[..len as usize])
+        .ok()?
+        .trim_end_matches(char::from(0));
+    plan_preview(name)
+}
+#[cfg(not(target_os = "macos"))]
+pub(super) fn foreground_name(_: &Session) -> Option<String> {
+    None
+}
+// Resolve names only inside the installation roots associated with their source.
+fn monitor_path(name: &str) -> Option<PathBuf> {
+    let allowlist: BTreeMap<String, Vec<String>> =
+        serde_json::from_str(include_str!("auto-restore-macos.json")).ok()?;
+    for (source, names) in allowlist {
+        if !names.iter().any(|allowed| allowed == name) {
+            continue;
+        }
+        let roots: &[&str] = match source.as_str() {
+            "system" => &["/usr/bin", "/usr/sbin", "/bin", "/sbin"],
+            "homebrew" => &["/opt/homebrew/bin", "/usr/local/bin"],
+            _ => continue,
+        };
+        if let Some(path) = roots
+            .iter()
+            .map(|root| Path::new(root).join(name))
+            .find(|path| executable(path))
+        {
+            return Some(path);
+        }
+    }
+    None
+}
+
+fn require_restore_support(os: &str, restoring: bool) -> Result<(), String> {
+    if restoring && os != "macos" {
+        return Err("터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.".into());
+    }
+    Ok(())
+}
+
+#[cfg(target_os = "macos")]
+fn bare_monitor(session: &Session) -> Option<String> {
+    use std::ffi::CStr;
+    let pid = session.master.process_group_leader()?;
+    let mut path = [0u8; 4096];
+    if unsafe { libc::proc_pidpath(pid, path.as_mut_ptr().cast(), path.len() as u32) } <= 0 {
+        return None;
+    }
+    let path = Path::new(CStr::from_bytes_until_nul(&path).ok()?.to_str().ok()?);
+    let name = path.file_name()?.to_str()?;
+    if monitor_path(name)?.canonicalize().ok()? != path.canonicalize().ok()? {
+        return None;
+    }
+    // Darwin returns argc first. Discard the buffer without decoding argv or env.
+    let mut mib = [libc::CTL_KERN, libc::KERN_PROCARGS2, pid];
+    let mut length = 0;
+    unsafe {
+        if libc::sysctl(
+            mib.as_mut_ptr(),
+            3,
+            std::ptr::null_mut(),
+            &mut length,
+            std::ptr::null_mut(),
+            0,
+        ) != 0
+            || !(4..=2_097_152).contains(&length)
+        {
+            return None;
+        }
+        let mut bytes = vec![0u8; length];
+        if libc::sysctl(
+            mib.as_mut_ptr(),
+            3,
+            bytes.as_mut_ptr().cast(),
+            &mut length,
+            std::ptr::null_mut(),
+            0,
+        ) != 0
+            || length < 4
+            || i32::from_ne_bytes(bytes[..4].try_into().ok()?) != 1
+        {
+            return None;
+        }
+    }
+    Some(name.to_owned())
+}
+#[cfg(not(target_os = "macos"))]
+fn bare_monitor(_: &Session) -> Option<String> {
+    None
+}
+
 pub(super) fn refresh_path(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     let state = app.state::<Terminals>();
     if state
@@ -369,7 +473,21 @@ pub(super) fn refresh_path(app: &tauri::AppHandle, id: &str) -> Result<(), Strin
         .and_then(running);
     if let Some(session) = session {
         let mut s = session.lock().map_err(err)?;
-        if s.child.try_wait().map_err(err)?.is_none() {
+        let alive = s.child.try_wait().map_err(err)?.is_none();
+        let monitor = if alive { bare_monitor(&s) } else { None };
+        if alive && !s.observed_command {
+            if let Some(name) = foreground_name(&s) {
+                remember_plan(app, id, Some(&name));
+            }
+        }
+        if let Some(record) = state.records.lock().map_err(err)?.get_mut(id) {
+            let eligible = monitor.is_some() && monitor == record.restore_plan;
+            if record.auto_restore != eligible {
+                record.auto_restore = eligible;
+                save(&root(app), record)?;
+            }
+        }
+        if alive {
             if let Some(path) = s.child.process_id().and_then(process_cwd) {
                 drop(s);
                 set_path(app, id, path)?;
@@ -378,17 +496,84 @@ pub(super) fn refresh_path(app: &tauri::AppHandle, id: &str) -> Result<(), Strin
     }
     Ok(())
 }
+fn plan_preview(line: &str) -> Option<String> {
+    let mut words = line.split_ascii_whitespace();
+    let name = words.next()?.rsplit('/').next()?;
+    if name.len() > 80
+        || !name.starts_with(|c: char| c.is_ascii_alphabetic())
+        || !name
+            .bytes()
+            .all(|c| c.is_ascii_alphanumeric() || b"._-".contains(&c))
+    {
+        return None;
+    }
+    let allowed: &[&str] = match name {
+        "df" | "du" => &["-h", "-k"],
+        "ps" => &["-A", "-e"],
+        _ => &[],
+    };
+    let args: Vec<_> = words.collect();
+    if args.len() <= 8 && args.iter().all(|a| allowed.contains(a)) {
+        Some(
+            std::iter::once(name)
+                .chain(args)
+                .collect::<Vec<_>>()
+                .join(" "),
+        )
+    } else {
+        Some(name.into())
+    }
+}
+pub(super) fn remember_plan(app: &tauri::AppHandle, id: &str, line: Option<&str>) {
+    let state = app.state::<Terminals>();
+    let Ok(mut records) = state.records.lock() else {
+        return;
+    };
+    if let Some(record) = records.get_mut(id) {
+        let plan = line.and_then(plan_preview);
+        if record.restore_plan != plan {
+            record.restore_plan = plan;
+            let _ = save(&root(app), record);
+        }
+    }
+}
 pub(super) fn start(
     agent: &Terminal,
     choice: &str,
+    plan: Option<&str>,
     dimensions: PtySize,
 ) -> Result<(Session, Box<dyn Read + Send>), String> {
+    require_restore_support(
+        std::env::consts::OS,
+        plan.is_some() || choice == "auto-monitor",
+    )?;
     let prepare = crate::telemetry::Timing::new("terminal.command.prepare");
     let cwd = agent.last_path.clone().map(Ok).unwrap_or_else(home)?;
     if !cwd.is_dir() {
         return Err("마지막 폴더가 없습니다. 다른 폴더를 선택하세요".into());
     }
-    let line = command(&search_path(), choice)?;
+    let line = if choice == "auto-monitor" {
+        let path = agent
+            .restore_plan
+            .as_deref()
+            .filter(|_| agent.auto_restore && plan.is_none())
+            .and_then(monitor_path)
+            .ok_or("자동 복원할 프로그램을 확인할 수 없습니다")?;
+        Some(quote(&path.to_string_lossy()))
+    } else {
+        match plan {
+            Some(value)
+                if agent.restore_plan.is_some()
+                    && !value.trim().is_empty()
+                    && value.len() <= 4096
+                    && !value.chars().any(char::is_control) =>
+            {
+                Some(value.to_owned())
+            }
+            Some(_) => return Err("실행 계획을 확인하세요".into()),
+            None => command(&search_path(), choice)?,
+        }
+    };
     let shell = default_shell()?;
     drop(prepare);
     start_shell(&cwd, line, dimensions, &shell)
@@ -420,7 +605,7 @@ fn start_shell(
     #[cfg(windows)]
     {
         cmd.args(["-NoLogo", "-NoExit", "-Command"]);
-        let prompt_script = "function global:prompt { [Console]::Write(([char]27 + ']777;gibbon-cwd;' + (Get-Location).Path + [char]7)); [Console]::Write(([char]27 + ']777;gibbon-ready;TOKEN' + [char]7)); 'PS> ' }; ";
+        let prompt_script = r#"function global:prompt { $entry = Get-History -Count 1; if ($entry -and $global:gibbonLastId -ne $entry.Id) { $global:gibbonLastId = $entry.Id; $name = ''; if ($entry.CommandLine -match '^\s*([A-Za-z][A-Za-z0-9._-]{0,79})(?:\s|$)') { $name = $Matches[1] }; [Console]::Write(([char]27 + ']777;gibbon-plan;TOKEN;' + $name + [char]7)) }; [Console]::Write(([char]27 + ']777;gibbon-cwd;' + (Get-Location).Path + [char]7)); [Console]::Write(([char]27 + ']777;gibbon-ready;TOKEN' + [char]7)); 'PS> ' }; "#;
         cmd.arg(format!(
             "{}{}",
             prompt_script.replace("TOKEN", &prompt.token),
@@ -438,11 +623,26 @@ fn start_shell(
         writer: Box::new(std::io::sink()),
         child: OwnedChild(Some(child)),
         program: "shell".into(),
+        observed_command: false,
         prompt,
     };
     let _attach = crate::telemetry::Timing::new("terminal.io.attach");
     let reader = session.master.try_clone_reader().map_err(err)?;
     session.writer = session.master.take_writer().map_err(err)?;
+    #[cfg(unix)]
+    if let Some(hook) = match shell.file_name().and_then(|name| name.to_str()) {
+        Some("zsh") => Some("autoload -Uz add-zsh-hook; add-zsh-hook preexec _gibbon_record"),
+        Some("bash") => Some(
+            "if [[ -z $(trap -p DEBUG) ]]; then trap '_gibbon_record \"$BASH_COMMAND\"' DEBUG; fi",
+        ),
+        _ => None,
+    } {
+        let setup = include_str!("restore-hook.sh").replace("GIBBON_TOKEN", &session.prompt.token);
+        // One compound command keeps multiline setup out of interactive continuation prompts.
+        let setup = setup.lines().map(str::trim).collect::<Vec<_>>().join(" ");
+        let setup = format!(" eval {}; {hook}\r", quote(&setup));
+        session.writer.write_all(setup.as_bytes()).map_err(err)?;
+    }
     #[cfg(unix)]
     if let Some(line) = line {
         session.prompt.input(format!("{line}\r").as_bytes());
@@ -549,6 +749,17 @@ fn finish_close(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn restoration_is_gated_before_starting_on_unsupported_platforms() {
+        for os in ["windows", "linux"] {
+            assert!(require_restore_support(os, true)
+                .unwrap_err()
+                .contains("아직 지원하지 않습니다"));
+            assert!(require_restore_support(os, false).is_ok());
+        }
+        assert!(require_restore_support("macos", true).is_ok());
+    }
+
     #[cfg(test)]
     fn agent(path: Option<PathBuf>, updated: u64) -> Terminal {
         Terminal {
@@ -566,6 +777,8 @@ mod tests {
             path_updated: updated,
             updated_at: 0,
             title: String::new(),
+            restore_plan: None,
+            auto_restore: false,
         }
     }
     #[test]
@@ -731,12 +944,18 @@ pub(super) struct DirectoryReport {
     frame: Vec<u8>,
     escape: bool,
     prompt: Option<String>,
+    plan: Option<String>,
 }
 impl DirectoryReport {
     pub(super) fn take_prompt(&mut self, token: &str) -> bool {
         self.prompt
             .take()
             .is_some_and(|value| !token.is_empty() && value == token)
+    }
+    pub fn take_plan(&mut self, token: &str) -> Option<String> {
+        let frame = self.plan.take()?;
+        let (key, plan) = frame.split_once(';')?;
+        (key == token).then(|| plan.to_owned())
     }
     pub fn feed(&mut self, bytes: &[u8]) -> Vec<PathBuf> {
         let mut paths = Vec::new();
@@ -755,6 +974,9 @@ impl DirectoryReport {
                         paths.push(PathBuf::from(path));
                     }
                 }
+                if let Some(raw) = self.frame.strip_prefix(b"]777;gibbon-plan;") {
+                    self.plan = std::str::from_utf8(raw).ok().map(str::to_owned);
+                }
                 if let Some(raw) = self.frame.strip_prefix(b"]777;gibbon-ready;") {
                     self.prompt = std::str::from_utf8(raw).ok().map(str::to_owned);
                 }
@@ -762,7 +984,11 @@ impl DirectoryReport {
                 self.escape = false;
             } else if self.frame.len() < 32768 {
                 self.frame.push(byte);
-                let prefixes: [&[u8]; 2] = [b"]777;gibbon-cwd;", b"]777;gibbon-ready;"];
+                let prefixes: [&[u8]; 3] = [
+                    b"]777;gibbon-plan;",
+                    b"]777;gibbon-cwd;",
+                    b"]777;gibbon-ready;",
+                ];
                 if !prefixes
                     .iter()
                     .any(|prefix| prefix.starts_with(&self.frame) || self.frame.starts_with(prefix))
@@ -928,6 +1154,45 @@ mod lifecycle_tests {
             close_identity(None),
             close_identity(Some(&Slot::Starting(1)))
         );
+    }
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn restore_runs_edited_command_in_real_shell_and_reports_program() {
+        for shell in ["/bin/bash", "/bin/zsh"] {
+            let dir = tempfile::tempdir().unwrap();
+            let (session, mut reader) = start_shell(
+                dir.path(),
+                Some("touch ./restored".into()),
+                size(80, 24).unwrap(),
+                Path::new(shell),
+            )
+            .unwrap();
+            let (tx, rx) = std::sync::mpsc::channel();
+            let token = session.prompt.token.clone();
+            std::thread::spawn(move || {
+                let mut parser = DirectoryReport::default();
+                let mut buf = [0; 4096];
+                while let Ok(n) = reader.read(&mut buf) {
+                    if n == 0 {
+                        break;
+                    }
+                    parser.feed(&buf[..n]);
+                    if parser.take_plan(&token).as_deref() == Some("touch") {
+                        let _ = tx.send(());
+                        break;
+                    }
+                }
+            });
+            rx.recv_timeout(std::time::Duration::from_secs(8))
+                .expect(shell);
+            for _ in 0..100 {
+                if dir.path().join("restored").exists() {
+                    break;
+                }
+                std::thread::sleep(std::time::Duration::from_millis(10));
+            }
+            assert!(dir.path().join("restored").exists(), "{shell}");
+        }
     }
     #[cfg(unix)]
     #[test]

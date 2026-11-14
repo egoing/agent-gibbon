@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "windows": [
+    {
+      "window": {
+        "label": "main",
+        "x": 400,
+        "y": 300,
+        "width": 600,
+        "height": 480,
+        "visible": false,
+        "minimized": false,
+        "always_on_top": true
+      },
+      "expanded": null,
+      "url": null,
+      "terminal_command": null
+    },
+    {
+      "window": {
+        "label": "note-restore-folded",
+        "x": 400,
+        "y": 300,
+        "width": 600,
+        "height": 48,
+        "visible": true,
+        "minimized": false,
+        "always_on_top": true
+      },
+      "expanded": [
+        300,
+        220
+      ],
+      "url": null,
+      "terminal_command": null
+    },
+    {
+      "window": {
+        "label": "note-restore-hidden",
+        "x": 400,
+        "y": 300,
+        "width": 580,
+        "height": 300,
+        "visible": false,
+        "minimized": false,
+        "always_on_top": true
+      },
+      "expanded": null,
+      "url": null,
+      "terminal_command": null
+    },
+    {
+      "window": {
+        "label": "note-restore-visible",
+        "x": 400,
+        "y": 300,
+        "width": 620,
+        "height": 340,
+        "visible": true,
+        "minimized": false,
+        "always_on_top": true
+      },
+      "expanded": null,
+      "url": null,
+      "terminal_command": null
+    },
+    {
+      "window": {
+        "label": "webview-web-restore-a",
+        "x": 400,
+        "y": 300,
+        "width": 1200,
+        "height": 800,
+        "visible": true,
+        "minimized": false,
+        "always_on_top": true
+      },
+      "expanded": null,
+      "url": "https://example.com/",
+      "terminal_command": null
+    },
+    {
+      "window": {
+        "label": "webview-web-restore-b",
+        "x": 400,
+        "y": 300,
+        "width": 1200,
+        "height": 800,
+        "visible": false,
+        "minimized": false,
+        "always_on_top": true
+      },
+      "expanded": null,
+      "url": "https://example.org/",
+      "terminal_command": null
+    },
+    {
+      "window": {
+        "label": "terminal-15001",
+        "x": 1000,
+        "y": 200,
+        "width": 800,
+        "height": 600,
+        "visible": true,
+        "minimized": false,
+        "always_on_top": true
+      },
+      "expanded": null,
+      "url": null,
+      "terminal_command": "git status"
+    },
+    {
+      "window": {
+        "label": "terminal-15002",
+        "x": 100,
+        "y": 200,
+        "width": 800,
+        "height": 600,
+        "visible": false,
+        "minimized": false,
+        "always_on_top": true
+      },
+      "expanded": null,
+      "url": null,
+      "terminal_command": null
+    }
+  ],
+  "closed_notes": []
+}

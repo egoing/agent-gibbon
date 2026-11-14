@@ -37,3 +37,6 @@ header #controls { flex: 1; }
 body.toolbar-collapsed header #controls { flex: 1; }
 
 header { align-items: flex-start; }
+
+#restore-plan{display:block;width:100%;box-sizing:border-box;margin:8px 0 12px;padding:8px;background:var(--background);border:1px solid currentColor}
+#restore-panel button{min-width:64px;background:var(--panel);border:1px solid currentColor}

@@ -1,0 +1,6 @@
+PASS index.html 144×80: toolbar row, controls and fold
+PASS index.html 300×100: toolbar row, controls and fold
+PASS terminal.html 144×80: toolbar row, controls and fold
+PASS terminal.html 300×100: toolbar row, controls and fold
+PASS web.html 144×80: toolbar row, controls and fold
+PASS web.html 300×100: toolbar row, controls and fold

@@ -1,0 +1,57 @@
+{
+  "id": "60424aba-9e61-41a0-b563-9faa1584db41",
+  "ok": true,
+  "result": {
+    "snapshot": {
+      "app": {
+        "bundleId": null,
+        "pid": 15786,
+        "name": "agent-gibbon"
+      },
+      "window": {
+        "title": "Agent Gibbon [DEV codex/startup-window-restore · 31e61432] — terminal-15001",
+        "y": 659,
+        "width": 400,
+        "screenIndex": 0,
+        "x": 1455,
+        "id": 68248,
+        "isOffscreen": false,
+        "height": 300,
+        "isMinimized": false,
+        "platform": {
+          "layer": 5
+        }
+      },
+      "truncation": {
+        "maxNodes": 1200,
+        "maxDepthReached": false,
+        "truncated": false,
+        "maxDepth": 64
+      },
+      "focusedElementId": null,
+      "id": "2E56BA2D-728D-4AF8-BE07-78A452FE1CA2",
+      "elementCount": 32,
+      "coordinateSpace": "window",
+      "treeText": "App=agent-gibbon (pid 15786)\nWindow: \"Agent Gibbon [DEV codex/startup-window-restore · 31e61432] — terminal-15001\", App: agent-gibbon.\n\n0 standard window Agent Gibbon [DEV codex/startup-window-restore · 31e61432] — terminal-15001\n\t1 scroll area\n\t\t2 HTML content 터미널\n\t\t\t3 toolbar Toolbar\n\t\t\t\t4 button (disabled) 이전 도구\n\t\t\t\t5 button 글자 크기 13px, 클릭하여 변경\n\t\t\t\t6 button 선택한 텍스트 복사\n\t\t\t\t7 toggle button 상단 고정, Value: 1\n\t\t\t\t8 button (disabled) 다음 도구\n\t\t\t\t9 button (expanded) 툴바 접기\n\t\t\t\t10 button 터미널 종료\n\t\t\t11 container 작업 시작\n\t\t\t\t12 container 작업 위치\n\t\t\t\t\t13 heading 작업 위치\n\t\t\t\t\t14 button 폴더 열기…\n\t\t\t\t\t15 container 최근 폴더\n\t\t\t\t\t\t16 toggle button /Users/egoinglee, Value: 1\n\t\t\t\t\t17 button\n\t\t\t\t\t18 text 홈 폴더에서 시작합니다.\n\t\t\t\t19 container 추천 작업\n\t\t\t\t\t20 heading 추천 작업\n\t\t\t\t\t21 container 추천 작업\n\t\t\t\t\t\t22 toggle button Claude Code, Value: 1\n\t\t\t\t\t\t23 toggle button Codex, Value: 0\n\t\t\t\t\t\t24 toggle button git log, Value: 0\n\t\t\t\t\t\t25 toggle button htop, Value: 0\n\t\t\t\t\t\t26 toggle button 셸, Value: 0\n\t\t\t\t27 button 실행\n\t\t\t\t28 container 실행 명령 미리보기\n\t\t\t\t\t29 text cd -- '/Users/egoinglee' && '/Users/egoinglee/.local/bin/claude'\n\t\t\t\t30 summary 창 제목 변경, Value: 0\n\t\t\t31 text 이전 터미널 프로세스는 종료되었습니다. 마지막 명령: git status · 자동 실행하지 않았습니다.\n\nNo UI element is currently focused."
+    },
+    "screenshot": {
+      "height": 600,
+      "scale": 2,
+      "format": "png",
+      "width": 800,
+      "path": "docs/verification/startup-window-restore/terminal-native.png",
+      "dataOmitted": true,
+      "expiresAt": "2026-11-14T02:20:47.345Z"
+    },
+    "screenshotStatus": {
+      "metadata": {
+        "windowId": 68248,
+        "engine": "screenCaptureKit"
+      },
+      "state": "captured"
+    }
+  },
+  "_meta": {
+    "runtimeId": "68e7b4ea-7744-478f-89eb-c31cb537c5c1"
+  }
+}

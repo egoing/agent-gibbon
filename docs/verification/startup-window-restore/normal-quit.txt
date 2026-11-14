@@ -1,0 +1,4 @@
+frontmost-before 92046
+terminate-request true
+terminated true
+frontmost-after 92046

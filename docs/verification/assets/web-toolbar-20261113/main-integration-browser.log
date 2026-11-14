@@ -1,0 +1,15 @@
+PASS gray 144: slots, fold, title, pin, focus, hover, remote chrome
+PASS gray 240: slots, fold, title, pin, focus, hover, remote chrome
+PASS gray 600: slots, fold, title, pin, focus, hover, remote chrome
+PASS white 144: slots, fold, title, pin, focus, hover, remote chrome
+PASS white 240: slots, fold, title, pin, focus, hover, remote chrome
+PASS white 600: slots, fold, title, pin, focus, hover, remote chrome
+PASS black 144: slots, fold, title, pin, focus, hover, remote chrome
+PASS black 240: slots, fold, title, pin, focus, hover, remote chrome
+PASS black 600: slots, fold, title, pin, focus, hover, remote chrome
+PASS color 144: slots, fold, title, pin, focus, hover, remote chrome
+PASS color 240: slots, fold, title, pin, focus, hover, remote chrome
+PASS color 600: slots, fold, title, pin, focus, hover, remote chrome
+PASS system 144: slots, fold, title, pin, focus, hover, remote chrome
+PASS system 240: slots, fold, title, pin, focus, hover, remote chrome
+PASS system 600: slots, fold, title, pin, focus, hover, remote chrome

@@ -31,7 +31,7 @@ def processes():
     return [int(parts[0]) for line in lines if len(parts := line.strip().split(None, 1)) == 2 and parts[1] == EXPECTED]
 
 
-assert Path(INFO['binary']).is_file(), 'Run npm run dev:build first'
+assert Path(INFO['binary']).is_file(), 'Run pnpm run dev:build first'
 assert not processes(), 'Stop this worktree instance before running; existing apps are never stopped'
 OUTPUT.mkdir(parents=True, exist_ok=True)
 saved = SETTING.read_bytes() if SETTING.exists() else None

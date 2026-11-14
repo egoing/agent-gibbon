@@ -1,4 +1,4 @@
-/* Text reading surface only: no dedicated scrollbar column or separator strip. */
+/* Text surfaces: no dedicated scrollbar column or separator strip. */
 body:not(.image-note):not(.editing):not(.toolbar-collapsed) #controls { flex-basis: 22px; height: 22px; }
 body:not(.image-note):not(.editing):not(.folded) #viewport { padding-top: 0; scrollbar-width: none; }
 body:not(.image-note):not(.editing):not(.folded) #viewport::-webkit-scrollbar { width: 0; height: 0; }
@@ -24,4 +24,13 @@ body:not(.image-note):not(.editing):not(.folded) #viewport::-webkit-scrollbar { 
   #memo-scrollbar { display: none; }
   body:not(.image-note):not(.editing):not(.folded) #viewport { scrollbar-width: auto; }
   body:not(.image-note):not(.editing):not(.folded) #viewport::-webkit-scrollbar { width: auto; height: auto; }
+}
+
+/* The textarea keeps native input/caret scrolling; only its scrollbar is replaced. */
+body.editing #markdown { scrollbar-width: none; }
+body.editing #markdown::-webkit-scrollbar { width: 0; height: 0; }
+body.editing:has(#markdown:focus-visible) #memo-scrollbar { opacity: 1; }
+@media (forced-colors: active) {
+  body.editing #markdown { scrollbar-width: auto; }
+  body.editing #markdown::-webkit-scrollbar { width: auto; height: auto; }
 }

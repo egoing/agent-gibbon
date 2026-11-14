@@ -421,7 +421,7 @@ fn is_memo(label: &str) -> bool {
     label != crate::manager::LABEL
         && label != "stash-indicator"
         && !label.starts_with("capture-")
-        && !crate::feedback_window::is_surface(label)
+        && !label.starts_with("feedback-")
 }
 // Native whole-window alpha includes controls and WebView backgrounds. Main
 // thread only. No focus, z-order, geometry or visibility mutations.

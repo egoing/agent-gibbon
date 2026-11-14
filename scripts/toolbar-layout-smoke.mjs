@@ -11,7 +11,7 @@ try {
   const page = await browser.newPage();
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.addInitScript(() => { window.__TAURI__ = { core: { invoke: async () => true } }; });
+  await page.addInitScript(() => { const listen = () => Promise.resolve(() => {}); window.__TAURI__ = { event: {listen}, core: { invoke: async () => true }, webviewWindow: {getCurrentWebviewWindow: () => ({listen})}, window: {getCurrentWindow: () => ({listen, isFocused: async () => false})} }; });
   await page.route('http://gibbon.test/**', route => {
     let file = path.join(root, 'ui', new URL(route.request().url()).pathname);
     if (file.endsWith('/')) file += 'index.html';

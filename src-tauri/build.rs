@@ -24,5 +24,13 @@ fn main() {
             println!("cargo:rerun-if-changed={path}");
         }
     }
+    #[cfg(target_os = "macos")]
+    if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("macos") {
+        println!("cargo:rerun-if-changed=src/permission_panel.m");
+        cc::Build::new()
+            .file("src/permission_panel.m")
+            .flag("-fobjc-arc")
+            .compile("permission_panel");
+    }
     tauri_build::build()
 }

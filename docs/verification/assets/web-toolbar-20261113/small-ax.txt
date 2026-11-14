@@ -1,0 +1,72 @@
+Optional(<AXValue 0x12378bac0> {value = x:724.000000 y:207.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x12378bac0> {value = w:320.000000 h:240.000000 type = kAXValueCGSizeType})
+AXWindow | Agent Gibbon [DEV codex/web-toolbar-design · 4052ce61] — 웹 — web-toolbar-verified-e864 |  | 
+Optional(<AXValue 0x12377cac0> {value = x:724.000000 y:207.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x12377cac0> {value = w:320.000000 h:240.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x12377cac0> {value = x:724.000000 y:207.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124855a60> {value = w:320.000000 h:240.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x124857380> {value = x:724.000000 y:235.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124857380> {value = w:320.000000 h:212.000000 type = kAXValueCGSizeType})
+AXScrollArea |  |  | 
+Optional(<AXValue 0x1117b9200> {value = x:724.000000 y:235.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x12490d410> {value = w:320.000000 h:212.000000 type = kAXValueCGSizeType})
+AXWebArea |  | 웹 시작 | 
+Optional(<AXValue 0x12490d410> {value = x:724.000000 y:235.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x12490d410> {value = w:320.000000 h:30.000000 type = kAXValueCGSizeType})
+AXToolbar | 웹 도구 | 웹 도구 | 
+Optional(<AXValue 0x113a34ed0> {value = x:724.000000 y:235.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x113a34ed0> {value = w:320.000000 h:10.000000 type = kAXValueCGSizeType})
+AXButton | 이전 도구 | 이전 도구 | 
+Optional(<AXValue 0x111b04080> {value = x:967.000000 y:235.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x111b04080> {value = w:24.000000 h:22.000000 type = kAXValueCGSizeType})
+AXCheckBox | 상단 고정 | 상단 고정 | 
+Optional(<AXValue 0x1117c33c0> {value = x:724.000000 y:235.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x12490d3d0> {value = w:320.000000 h:10.000000 type = kAXValueCGSizeType})
+AXButton | 다음 도구 | 다음 도구 | 
+Optional(<AXValue 0x12377aab0> {value = x:992.000000 y:235.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124855a60> {value = w:24.000000 h:22.000000 type = kAXValueCGSizeType})
+AXButton | 메모 접기 | 메모 접기 | 
+Optional(<AXValue 0x124b145a0> {value = x:1017.000000 y:235.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124b145a0> {value = w:24.000000 h:22.000000 type = kAXValueCGSizeType})
+AXButton | 웹 창 닫기 | 웹 창 닫기 | 
+Optional(<AXValue 0x124b14540> {value = x:724.000000 y:265.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x12377cac0> {value = w:320.000000 h:182.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x124b08690> {value = x:724.000000 y:265.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x123718410> {value = w:320.000000 h:182.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x124b08690> {value = x:724.000000 y:265.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124855c10> {value = w:320.000000 h:182.000000 type = kAXValueCGSizeType})
+AXScrollArea |  |  | 
+Optional(<AXValue 0x124857380> {value = x:724.000000 y:265.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124857380> {value = w:305.000000 h:880.000000 type = kAXValueCGSizeType})
+AXWebArea |  | Example Domain | 
+Optional(<AXValue 0x12377aab0> {value = x:756.000000 y:326.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124857380> {value = w:241.000000 h:126.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x124857510> {value = x:756.000000 y:329.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x12377aab0> {value = w:241.000000 h:119.000000 type = kAXValueCGSizeType})
+AXStaticText |  |  | This domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.
+Optional(<AXValue 0x123718410> {value = x:756.000000 y:467.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124855a60> {value = w:241.000000 h:89.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x12377aab0> {value = x:765.000000 y:469.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124855a60> {value = w:223.000000 h:84.000000 type = kAXValueCGSizeType})
+AXStaticText |  |  | هذا النطاق مُخصص للاستخدام في أمثلة التوثيق دون الحاجة إلى إذن. هذه ليست خدمة، يُرجى تجنب الاعتماد عليها لأغراض الاختبار والمراقبة.
+Optional(<AXValue 0x124857380> {value = x:756.000000 y:569.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x12377aab0> {value = w:241.000000 h:67.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x123718410> {value = x:762.000000 y:571.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124855a60> {value = w:229.000000 h:62.000000 type = kAXValueCGSizeType})
+AXStaticText |  |  | 该域名仅用于文档示例，无需获得许可。这并非一项服务，请勿将其用于测试和监控目的。
+Optional(<AXValue 0x124857510> {value = x:756.000000 y:649.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x12377cac0> {value = w:241.000000 h:133.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x123718410> {value = x:759.000000 y:651.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124b14540> {value = w:235.000000 h:128.000000 type = kAXValueCGSizeType})
+AXStaticText |  |  | L’usage de ce domaine est réservé à des exemples de documentation, sans autorisation préalable. Il ne s’agit pas d’un service ; son utilisation à des fins de test ou de surveillance est à éviter.
+Optional(<AXValue 0x12377aab0> {value = x:756.000000 y:795.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124855a60> {value = w:241.000000 h:155.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x124857380> {value = x:758.000000 y:797.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x12377aab0> {value = w:237.000000 h:150.000000 type = kAXValueCGSizeType})
+AXStaticText |  |  | Данный домен предназначен для использования в примерах документации без необходимости получения предварительного разрешения. Это не сервис; не рекомендуется его использование для тестирования и мониторинга.
+Optional(<AXValue 0x124b14540> {value = x:756.000000 y:963.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x123718410> {value = w:241.000000 h:111.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x124855a60> {value = x:758.000000 y:965.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x123718410> {value = w:237.000000 h:106.000000 type = kAXValueCGSizeType})
+AXStaticText |  |  | Este dominio está destinado al uso en ejemplos de documentación sin necesidad de permiso. Esto no es un servicio; evitar utilizarlo para realizar pruebas o monitoreos.
+Optional(<AXValue 0x124855a60> {value = x:835.000000 y:1090.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x123718410> {value = w:83.000000 h:19.000000 type = kAXValueCGSizeType})
+AXLink | Learn more |  | 
+Optional(<AXValue 0x124b08690> {value = x:835.000000 y:1090.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124855a60> {value = w:83.000000 h:19.000000 type = kAXValueCGSizeType})
+AXStaticText |  |  | Learn more
+Optional(<AXValue 0x124b08690> {value = x:1029.000000 y:265.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124855a60> {value = w:15.000000 h:182.000000 type = kAXValueCGSizeType})
+AXScrollBar |  |  | 
+Optional(<AXValue 0x123718410> {value = x:730.000000 y:213.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124855a60> {value = w:16.000000 h:16.000000 type = kAXValueCGSizeType})
+AXButton |  |  | 
+Optional(<AXValue 0x124857380> {value = x:770.000000 y:213.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x12377aab0> {value = w:16.000000 h:16.000000 type = kAXValueCGSizeType})
+AXButton |  |  | 
+Optional(<AXValue 0x123718410> {value = x:771.000000 y:213.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124855a60> {value = w:14.000000 h:16.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x124b08690> {value = x:771.000000 y:213.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x123718410> {value = w:14.000000 h:16.000000 type = kAXValueCGSizeType})
+AXGroup |  |  | 
+Optional(<AXValue 0x123718410> {value = x:750.000000 y:213.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x123718410> {value = w:16.000000 h:16.000000 type = kAXValueCGSizeType})
+AXButton |  |  | 
+Optional(<AXValue 0x123718410> {value = x:791.000000 y:212.000000 type = kAXValueCGPointType}) Optional(<AXValue 0x124b14540> {value = w:247.000000 h:16.000000 type = kAXValueCGSizeType})
+AXStaticText |  |  | Agent Gibbon [DEV codex/web-toolbar-design · 4052ce61] — 웹 — web-toolbar-verified-e864

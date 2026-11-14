@@ -467,7 +467,6 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
         entries.sort_by_key(|(label, _)| label.starts_with("capture-"));
         for (label, frame) in entries {
             if let Some(w) = crate::web::managed_window(app, &label) {
-                crate::feedback_window::hide(&w);
                 geometry(&w, frame.rect, frame.scale)?;
                 alpha(&w, frame.alpha)?;
                 show_frame(&w)?;
@@ -514,11 +513,7 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
     };
     let mut windows = BTreeMap::new();
     for w in crate::web::managed_windows(app).into_values() {
-        if w.label() == ICON
-            || crate::feedback_window::is_surface(w.label())
-            || !w.is_visible().map_err(err)?
-            || w.is_minimized().map_err(err)?
-        {
+        if w.label() == ICON || !w.is_visible().map_err(err)? || w.is_minimized().map_err(err)? {
             continue;
         }
         crate::entrance::cancel(&w)?;
@@ -566,9 +561,6 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
         flight: None,
     };
     app.state::<Stash>().session.lock().unwrap().replace(s);
-    for w in crate::web::managed_windows(app).into_values().filter(owns) {
-        crate::feedback_window::hide(&w);
-    }
     Ok(())
 }
 fn tick(app: &tauri::AppHandle) -> Result<(), String> {
@@ -635,10 +627,9 @@ fn tick(app: &tauri::AppHandle) -> Result<(), String> {
                         if crate::opacity::configured(app).is_some() {
                             crate::sync_opacity(w.clone())?;
                         }
-                        crate::feedback_window::sync(&w);
                     }
                 }
-                // Feedback can order above notes; keep capture overlays last.
+                // Keep capture overlays above restored notes.
                 for label in entries.keys().filter(|label| label.starts_with("capture-")) {
                     if let Some(w) = crate::web::managed_window(app, label) {
                         show_frame(&w)?;

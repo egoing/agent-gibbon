@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="1160" viewBox="0 0 1240 1160"><style>text{font-family:"Apple SD Gothic Neo",sans-serif;fill:#2d2d2d;font-size:13px}.muted{fill:#626262}.heading{font-size:18px;font-weight:600}.white{fill:white}</style><rect width="1240" height="1160" fill="#eceeed"/>
+<text x="32" y="39" class="heading">화면 캡처 권한 복구 안내</text>
+<text x="32" y="65" class="muted">#137 · 승인 전 제안 · macOS 예시 · 앱·PID·경로는 설명용 가상 값 · 실제 OS 화면 아님</text>
+<text x="32" y="98" class="muted">01  접근 확인 실패 → 최초 안내</text>
+<rect x="32" y="110" width="568" height="396" rx="4" fill="#f8f8f8" stroke="#d6d6d6"/>
+<text x="56" y="139" class="muted">Agent Gibbon · 화면 캡처</text>
+<text x="56" y="177" class="heading">화면 캡처 접근을 확인할 수 없습니다</text>
+<text x="56" y="204" class="">영역 캡처를 시작하지 못했습니다. 아래 설정을 확인해 주세요.</text>
+<text x="56" y="232" class="">시스템 설정 → 개인정보 보호 및 보안 →</text>
+<text x="56" y="254" class="heading">화면 및 시스템 오디오 녹음</text>
+<text x="56" y="280" class="muted">목록에서 현재 실행 앱의 화면 기록을 허용해 주세요.</text>
+<path d="M56 298h520" stroke="#d6d6d6"/>
+<text x="56" y="323" class="">현재 실행 앱  ·  Agent Gibbon  ·  설치 앱</text>
+<text x="56" y="347" class="muted">버전 0.2.11  ·  PID 4242</text>
+<text x="56" y="371" class="muted">/Applications/Agent Gibbon.app</text>
+<text x="56" y="394" class="muted">실행 정보 펼치기 ▾  ·  전체 경로 / 인스턴스 / 서명 확인 상태</text>
+<rect x="56" y="450" width="72" height="32" rx="4" fill="#fff" stroke="#858585"/>
+<text x="68" y="471" class="">나중에</text>
+<rect x="264" y="450" width="136" height="32" rx="4" fill="#fff" stroke="#858585"/>
+<text x="276" y="471" class="">이미 허용했어요</text>
+<rect x="408" y="450" width="168" height="32" rx="4" fill="#2d2d2d" stroke="#858585"/>
+<text x="420" y="471" class="white">설정 열기</text>
+<text x="640" y="98" class="muted">02  이미 허용했어요 → 앱 일치 여부 안내</text>
+<rect x="640" y="110" width="568" height="396" rx="4" fill="#f8f8f8" stroke="#d6d6d6"/>
+<text x="664" y="139" class="muted">Agent Gibbon · 화면 캡처</text>
+<text x="664" y="177" class="heading">설정의 앱과 현재 앱을 확인해 주세요</text>
+<text x="664" y="204" class="">같은 이름의 다른 설치본이나 개발 앱을 허용했을 수 있습니다.</text>
+<text x="664" y="232" class="">개발 앱은 재빌드·서명 변경 후 다시 확인이 필요할 수 있습니다.</text>
+<text x="664" y="254" class="muted">현재 실패의 원인이 재빌드로 확정된 것은 아닙니다.</text>
+<text x="664" y="280" class="muted">OS에서 종료·재실행을 요청했다면 작업을 저장한 뒤 진행하세요.</text>
+<path d="M664 298h520" stroke="#d6d6d6"/>
+<text x="664" y="323" class="">현재 실행 앱  ·  Agent Gibbon  ·  개발 빌드</text>
+<text x="664" y="347" class="muted">버전 0.2.11  ·  PID 4242  ·  인스턴스 dev-a1b2…</text>
+<text x="664" y="371" class="muted">…/작업폴더/src-tauri/target/debug/agent-gibbon</text>
+<text x="664" y="394" class="muted">실행 정보 펼치기 ▾  ·  전체 경로 / 인스턴스 / 서명 확인 상태</text>
+<rect x="664" y="450" width="72" height="32" rx="4" fill="#fff" stroke="#858585"/>
+<text x="676" y="471" class="">나중에</text>
+<rect x="880" y="450" width="112" height="32" rx="4" fill="#fff" stroke="#858585"/>
+<text x="892" y="471" class="">설정 열기</text>
+<rect x="1000" y="450" width="184" height="32" rx="4" fill="#2d2d2d" stroke="#858585"/>
+<text x="1012" y="471" class="white">다시 확인</text>
+<text x="32" y="544" class="muted">03  다시 확인 → 진행 상태</text>
+<rect x="32" y="556" width="568" height="396" rx="4" fill="#f8f8f8" stroke="#d6d6d6"/>
+<text x="56" y="585" class="muted">Agent Gibbon · 화면 캡처</text>
+<text x="56" y="623" class="heading">화면 캡처 접근을 확인하는 중입니다</text>
+<text x="56" y="650" class="">권한 상태를 다시 읽고 있습니다. 캡처는 아직 시작하지 않습니다.</text>
+<text x="56" y="678" class="heading">확인 중…</text>
+<text x="56" y="705" class="muted">중복 확인을 막고 결과를 이 안내에 표시합니다.</text>
+<text x="56" y="735" class="muted">시간 초과나 조회 오류는 권한 거부로 표시하지 않습니다.</text>
+<path d="M56 744h520" stroke="#d6d6d6"/>
+<text x="56" y="769" class="">현재 실행 앱  ·  Agent Gibbon  ·  설치 앱</text>
+<text x="56" y="793" class="muted">버전 0.2.11  ·  PID 4242</text>
+<text x="56" y="817" class="muted">/Applications/Agent Gibbon.app</text>
+<text x="56" y="840" class="muted">실행 정보 펼치기 ▾  ·  전체 경로 / 인스턴스 / 서명 확인 상태</text>
+<rect x="56" y="896" width="72" height="32" rx="4" fill="#fff" stroke="#858585"/>
+<text x="68" y="917" class="">나중에</text>
+<rect x="392" y="896" width="184" height="32" rx="4" fill="#e6e6e6" stroke="#858585"/>
+<text x="404" y="917" class="muted">확인 중…</text>
+<text x="640" y="544" class="muted">04  권한 외 캡처 오류 → 별도 안내</text>
+<rect x="640" y="556" width="568" height="396" rx="4" fill="#f8f8f8" stroke="#d6d6d6"/>
+<text x="664" y="585" class="muted">Agent Gibbon · 화면 캡처</text>
+<text x="664" y="623" class="heading">화면 캡처를 완료하지 못했습니다</text>
+<text x="664" y="650" class="">화면 캡처 접근 확인은 통과했지만 캡처 작업이 실패했습니다.</text>
+<text x="664" y="678" class="heading">오류 정보  ▾</text>
+<text x="664" y="705" class="muted">작업 단계와 오류 코드만 표시합니다. 화면 원문은 표시하지 않습니다.</text>
+<text x="664" y="735" class="muted">권한을 다시 부여하라고 안내하지 않습니다.</text>
+<path d="M664 744h520" stroke="#d6d6d6"/>
+<text x="664" y="769" class="">현재 실행 앱  ·  Agent Gibbon  ·  설치 앱</text>
+<text x="664" y="793" class="muted">버전 0.2.11  ·  PID 4242</text>
+<text x="664" y="817" class="muted">/Applications/Agent Gibbon.app</text>
+<text x="664" y="840" class="muted">실행 정보 펼치기 ▾  ·  전체 경로 / 인스턴스 / 서명 확인 상태</text>
+<rect x="664" y="896" width="72" height="32" rx="4" fill="#fff" stroke="#858585"/>
+<text x="676" y="917" class="">나중에</text>
+<rect x="1000" y="896" width="184" height="32" rx="4" fill="#2d2d2d" stroke="#858585"/>
+<text x="1012" y="917" class="white">캡처 다시 시도</text>
+<text x="32" y="990" class="heading">재확인 결과</text>
+<text x="32" y="1018" class="">접근 확인됨 → 「캡처 시작」을 사용자가 눌러 재개     /     확인 안 됨 → 01·02 안내 유지</text>
+<text x="32" y="1045" class="">조회 실패·시간 초과 → 「확인하지 못했습니다」 + 다시 확인     /     OS 재실행 요청 → 저장 후 수동 재실행 안내</text>
+<text x="32" y="1082" class="muted">비포커스 안내  ·  나중에 / 닫기는 캡처만 취소  ·  기존 메모 위치·표시·숨김 유지  ·  자동 재시작 없음</text>
+<text x="32" y="1108" class="muted">Orca·Codex의 손쉬운 사용 권한과 Agent Gibbon의 화면 캡처 권한은 별개입니다.</text>
+<text x="32" y="1134" class="muted">버튼 동작·OS 설정 이동·권한 귀속·재실행 복원은 구현 전 실환경 검증이 필요합니다.</text>
+</svg>

@@ -38,13 +38,14 @@ Give your agent the [CLI skill](.agents/skills/agent-gibbon/SKILL.md), or ask it
 
 ## Build from source
 
-Requires macOS, Rust stable, Node.js/npm, Xcode Command Line Tools, and the macOS SDK.
+Requires macOS, Rust 1.91+ stable, Node.js 22.13+/pnpm 11.25.0, Xcode Command Line Tools, and the macOS SDK.
 
 ```sh
 git clone https://github.com/egoing/agent-gibbon.git
 cd agent-gibbon
-npm ci
-npm run build
+npm install -g pnpm@11.25.0
+pnpm install --frozen-lockfile
+pnpm run build
 ./scripts/agent-gibbon open --id sample --markdown '# Hello'
 ```
 
@@ -61,3 +62,5 @@ Official release builds may send application error diagnostics through Sentry. C
 ## Windows development
 
 See the [Windows development and build guide](docs/windows.md) for prerequisites, isolated development CLI, NSIS packaging, and platform limitations. Validation evidence is recorded in [verification](docs/verification.md).
+
+Package build/dev/check scripts share intermediate Cargo artifacts under the Git common directory (`agent-gibbon/build-cache`) while keeping final binaries in each worktree’s `src-tauri/target`. `pnpm run dev:info` reports both paths. Set `CARGO_BUILD_BUILD_DIR` for an isolated cache. Direct Cargo commands do not apply this launcher policy. Cross-worktree build scripts can recompile the application and concurrent builds can wait on the shared lock; see the [measurements and limits](docs/verification/shared-build-cache-pnpm-20261114.md).

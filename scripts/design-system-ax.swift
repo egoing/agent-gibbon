@@ -22,6 +22,23 @@ guard let window = windows.first(where: { text($0, kAXTitleAttribute) == args[2]
 }
 let nodes = descendants(window)
 switch args[3] {
+case "geometry":
+    func rect(_ node: AXUIElement) -> [String: Double] {
+        var point = CGPoint.zero
+        var size = CGSize.zero
+        if let value = attribute(node, kAXPositionAttribute) {
+            AXValueGetValue(value as! AXValue, .cgPoint, &point)
+        }
+        if let value = attribute(node, kAXSizeAttribute) {
+            AXValueGetValue(value as! AXValue, .cgSize, &size)
+        }
+        return ["x": point.x, "y": point.y, "width": size.width, "height": size.height]
+    }
+    let editors = nodes.filter { text($0, kAXRoleAttribute) == "AXTextArea" }
+    let report: [String: Any] = ["window": rect(window), "editors": editors.map { node in
+        ["rect": rect(node), "value": text(node, kAXValueAttribute)] as [String: Any]
+    }]
+    print(String(data: try! JSONSerialization.data(withJSONObject: report), encoding: .utf8)!)
 case "dump":
     for node in nodes {
         print([text(node, kAXRoleAttribute), text(node, kAXTitleAttribute), text(node, kAXDescriptionAttribute), text(node, kAXValueAttribute)].joined(separator: " | "))
