@@ -55,14 +55,22 @@ jobs:
             bundles: nsis
             asset: windows-x86_64
     runs-on: ${{ matrix.runner }}
+    env:
+      # Single-checkout CI retains the restored Rust dependency cache.
+      CARGO_BUILD_BUILD_DIR: ${{ github.workspace }}/src-tauri/target
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      # pnpm 11 requires Node 22.13+, including on Intel macOS.
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
       - name: Install Rust tools
         shell: bash
         run: |
@@ -76,10 +84,10 @@ jobs:
           workspaces: src-tauri -> target
           key: ${{ matrix.target }}
           cache-bin: false
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
       - run: cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
       - run: cargo test --locked --manifest-path src-tauri/Cargo.toml
-      - run: npm run test:ui
+      - run: pnpm run test:ui
       - run: cargo clippy --locked --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
       - name: Build installers
         shell: bash
@@ -102,14 +110,14 @@ jobs:
           else
             # Manual runs validate updater builds with a disposable per-runner key; it is never published.
             ephemeral_key="$RUNNER_TEMP/tauri-updater.key"
-            npm exec -- tauri signer generate --write-keys "$ephemeral_key" --ci >/dev/null 2>&1
+            pnpm exec tauri signer generate --write-keys "$ephemeral_key" --ci >/dev/null 2>&1
             TAURI_SIGNING_PRIVATE_KEY="$ephemeral_key"
             TAURI_SIGNING_PRIVATE_KEY_PASSWORD=''
             TAURI_UPDATER_PUBLIC_KEY="$(cat "$ephemeral_key.pub")"
           fi
           export TAURI_SIGNING_PRIVATE_KEY TAURI_SIGNING_PRIVATE_KEY_PASSWORD TAURI_UPDATER_PUBLIC_KEY
           node scripts/updater-build-config.mjs "$RUNNER_TEMP/updater-build-config.json"
-          npm exec tauri build -- --target '${{ matrix.target }}' --bundles '${{ matrix.bundles }}' --config "$RUNNER_TEMP/updater-build-config.json" -- --locked
+          pnpm exec tauri build --target '${{ matrix.target }}' --bundles '${{ matrix.bundles }}' --config "$RUNNER_TEMP/updater-build-config.json" -- --locked
       - name: Collect installers
         shell: bash
         env:
@@ -156,7 +164,7 @@ jobs:
             fi
             if [ '${{ matrix.target }}' = 'aarch64-apple-darwin' ]; then updater_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_darwin-aarch64.app.tar.gz"; else updater_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_darwin-x86_64.app.tar.gz"; fi
             cp "${bundles[0]}" "release-assets/$updater_name"
-            npm exec -- tauri signer sign --app-version "$RELEASE_VERSION" "release-assets/$updater_name" >/dev/null 2>&1
+            pnpm exec tauri signer sign --app-version "$RELEASE_VERSION" "release-assets/$updater_name" >/dev/null 2>&1
             if [ '${{ matrix.target }}' = 'aarch64-apple-darwin' ]; then public_key_name='darwin-aarch64.pub'; else public_key_name='darwin-x86_64.pub'; fi
           else
             shopt -s nullglob
@@ -168,7 +176,7 @@ jobs:
             installer_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_x64-setup.exe"
             cp "${installers[0]}" "release-assets/$installer_name"
             updater_name="$installer_name"
-            npm exec -- tauri signer sign --app-version "$RELEASE_VERSION" "release-assets/$updater_name" >/dev/null 2>&1
+            pnpm exec tauri signer sign --app-version "$RELEASE_VERSION" "release-assets/$updater_name" >/dev/null 2>&1
             public_key_name='windows-x86_64.pub'
           fi
           printf '%s' "$TAURI_UPDATER_PUBLIC_KEY" > "release-assets/$public_key_name"

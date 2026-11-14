@@ -112,11 +112,12 @@
 
 Windows 개발·빌드 절차와 플랫폼 차이는 [Windows 안내](docs/windows.md)를 참고하세요.
 
-macOS에서 Rust stable, Node.js/npm, Xcode Command Line Tools 및 macOS SDK가 필요합니다. CPU 아키텍처는 호스트 기본값을 사용합니다.
+macOS에서 Rust 1.91+ stable, Node.js 22.13+/pnpm 11.25.0, Xcode Command Line Tools 및 macOS SDK가 필요합니다. CPU 아키텍처는 호스트 기본값을 사용합니다.
 
 ```sh
-npm ci
-npm run build
+npm install -g pnpm@11.25.0
+pnpm install --frozen-lockfile
+pnpm run build
 ./scripts/agent-gibbon open --title '현재 작업' --status '진행 중' --file examples/progress.md
 ```
 
@@ -130,25 +131,31 @@ CLI 실행 파일: `src-tauri/target/release/agent-gibbon`
 
 ```sh
 # 워크트리별 개발 앱 (프론트엔드 서버 없이 Rust 변경 감시)
-npm run dev
+pnpm run dev
 # 또는 실행 파일만 빌드한 뒤 CLI open으로 해당 개발 앱 시작
-npm run dev:build
+pnpm run dev:build
 ./scripts/agent-gibbon-dev open --id sample --markdown '이 워크트리의 메모'
 ./scripts/agent-gibbon-dev inspect --id sample
-npm run dev:info
+pnpm run dev:info
 ```
 
 개발 실행과 `scripts/agent-gibbon-dev`는 실제 워크트리 절대 경로(심볼릭 링크 해소)의 SHA-256 앞 24자리로 같은 `dev-…` ID를 계산합니다. 호출한 현재 디렉터리나 브랜치 이름에는 의존하지 않습니다. 경로를 옮기면 ID도 달라집니다. 소켓과 중복 실행 잠금은 `/tmp/floatnote-{uid}-{개발ID}/`로 분리됩니다. 개발 인스턴스는 창 제목과 메뉴 및 CLI 응답으로 구분하며, 메모 툴바에는 개발 배지를 표시하지 않습니다.
 
-debug 개발 인스턴스는 기본적으로 첫 실행 약관 확인을 건너뜁니다. 약관 수락·진단 전송 동의 기록을 자동 생성하지 않으며, 진단은 별도 동의 없이는 전송하지 않습니다. 사용자가 약관 흐름 검증을 요청한 경우 `AGENT_GIBBON_REQUIRE_TERMS=1 npm run dev` 또는 `AGENT_GIBBON_REQUIRE_TERMS=1 ./scripts/agent-gibbon-dev open --id sample`로 시작합니다(Windows PowerShell: `$env:AGENT_GIBBON_REQUIRE_TERMS='1'`). 이미 실행 중인 인스턴스에는 소급 적용되지 않으며, 현재 정책을 수락한 기록이 있으면 기존 수락을 유지합니다. 설치 앱·기본 인스턴스·release 빌드는 생략 대상이 아닙니다. [동의 경계와 검증](docs/verification/dev-terms-skip-20261106.md)을 참고하세요.
+debug 개발 인스턴스는 기본적으로 첫 실행 약관 확인을 건너뜁니다. 약관 수락·진단 전송 동의 기록을 자동 생성하지 않으며, 진단은 별도 동의 없이는 전송하지 않습니다. 사용자가 약관 흐름 검증을 요청한 경우 `AGENT_GIBBON_REQUIRE_TERMS=1 pnpm run dev` 또는 `AGENT_GIBBON_REQUIRE_TERMS=1 ./scripts/agent-gibbon-dev open --id sample`로 시작합니다(Windows PowerShell: `$env:AGENT_GIBBON_REQUIRE_TERMS='1'`). 이미 실행 중인 인스턴스에는 소급 적용되지 않으며, 현재 정책을 수락한 기록이 있으면 기존 수락을 유지합니다. 설치 앱·기본 인스턴스·release 빌드는 생략 대상이 아닙니다. [동의 경계와 검증](docs/verification/dev-terms-skip-20261106.md)을 참고하세요.
 
 개발 표시의 브랜치명은 앱 시작 시 읽습니다. 브랜치를 전환하면 앱을 다시 시작해야 표시가 바뀝니다. Detached HEAD에서는 `detached@커밋해시`, Git 정보를 읽을 수 없으면 작업 폴더명을 표시합니다.
 
-개발 CLI는 해당 워크트리의 `src-tauri/target/debug/agent-gibbon`만 사용하고, 빌드 출처를 확인합니다. release·설치본으로 대체하지 않습니다. 개발 실행기는 `CARGO_TARGET_DIR`를 해당 워크트리로 고정하며 `FLOATNOTE_INSTANCE`·`FLOATNOTE_DEV_NAME`을 자동 전달합니다. 이 변수는 직접 지정할 필요가 없습니다. 로컬 통신 호환성을 위해 내부 변수 이름은 `FLOATNOTE_`를 유지하며, 이전 `scripts/floatnote-dev`는 개발 CLI의 호환 진입점입니다. 기본 호스트 debug 빌드를 지원하며 `npm run dev -- --no-watch`로 감시를 끌 수 있습니다. 다른 프로필·타깃·runner 옵션은 지원하지 않습니다.
+개발 CLI는 해당 워크트리의 `src-tauri/target/debug/agent-gibbon`만 사용하고, 빌드 출처를 확인합니다. release·설치본으로 대체하지 않습니다. 개발 실행기는 `CARGO_TARGET_DIR`를 해당 워크트리로 고정하며 `FLOATNOTE_INSTANCE`·`FLOATNOTE_DEV_NAME`을 자동 전달합니다. 이 변수는 직접 지정할 필요가 없습니다. 로컬 통신 호환성을 위해 내부 변수 이름은 `FLOATNOTE_`를 유지하며, 이전 `scripts/floatnote-dev`는 개발 CLI의 호환 진입점입니다. 기본 호스트 debug 빌드를 지원하며 `pnpm run dev --no-watch`로 감시를 끌 수 있습니다. 다른 프로필·타깃·runner 옵션은 지원하지 않습니다.
 
-기존 `scripts/agent-gibbon`과 환경변수 없이 실행한 설치 앱은 기본 `/tmp/floatnote-{uid}/` 통신 경로를 유지합니다. 개발 검증에는 반드시 `scripts/agent-gibbon-dev`를 사용하세요. `close`는 해당 메모를 숨길 뿐이며, `npm run dev`의 종료는 그 실행에서 시작한 개발 앱에만 적용됩니다. CLI가 자동 시작한 앱은 개발 바이너리 경로로 프로세스를 식별해 종료하세요. 이름만으로 모든 앱을 일괄 종료하지 마세요.
+개발·빌드·검사 package 스크립트는 중간 산출물을 `git rev-parse --path-format=absolute --git-common-dir` 아래 `agent-gibbon/build-cache`에 모읍니다. 같은 저장소의 워크트리는 이 캐시를 공유하고 최종 실행 파일은 각 `src-tauri/target`에 유지합니다. `pnpm run dev:info`의 `buildDir`·`binary`로 경로를 확인하세요. Git 정보가 없는 소스 배포본은 로컬 target을 사용합니다. 직접 실행하는 Cargo 명령에는 이 실행기 정책이 자동 적용되지 않습니다.
+
+새 워크트리의 의존성 재컴파일은 줄지만, 워크트리 전환 시 앱 build script의 경로 의존성 때문에 앱 자체를 다시 컴파일할 수 있고 동시 빌드는 공유 폴더 잠금을 기다립니다. 독립 캐시가 필요하면 `CARGO_BUILD_BUILD_DIR="$PWD/src-tauri/target/build-cache" pnpm run dev:build`처럼 지정하세요(Windows PowerShell은 `$env:CARGO_BUILD_BUILD_DIR` 사용). 기존 target·캐시는 자동 삭제하거나 옮기지 않습니다. pnpm은 표준 사용자 store를 사용하고 실행 파일의 Codex 런타임 절대 경로에는 의존하지 않습니다. [실측과 한계](docs/verification/shared-build-cache-pnpm-20261114.md)를 참고하세요.
+
+기존 `scripts/agent-gibbon`과 환경변수 없이 실행한 설치 앱은 기본 `/tmp/floatnote-{uid}/` 통신 경로를 유지합니다. 개발 검증에는 반드시 `scripts/agent-gibbon-dev`를 사용하세요. `close`는 해당 메모를 숨길 뿐이며, `pnpm run dev`의 종료는 그 실행에서 시작한 개발 앱에만 적용됩니다. CLI가 자동 시작한 앱은 개발 바이너리 경로로 프로세스를 식별해 종료하세요. 이름만으로 모든 앱을 일괄 종료하지 마세요.
 
 메모·창 상태는 프로세스별로 독립적이지만, `--file`로 같은 원본 파일을 연결하면 파일 자체는 공유됩니다. 동시에 편집할 테스트 파일도 워크트리별로 준비하세요. 두 워크트리를 각각 빌드하고 개발 앱이 실행되지 않은 상태에서 `python3 scripts/isolation-smoke.py --peer /절대경로/다른워크트리`로 동시 실행 회귀를 확인할 수 있습니다. 기존 기본 앱은 실행 중이어야 하며 검증은 기존 앱을 종료하지 않습니다.
+
+기본 설치 앱이 미실행인 환경에서 두 개발 앱만 검증하려면 `python3 scripts/isolation-smoke.py --peer /다른/워크트리 --without-default`를 명시합니다. 이 모드는 기본 앱의 미실행 상태를 보존하지만 기존 설치 앱의 메모·창 상태 보존은 검증하지 않습니다. 결과의 `installed_app_state_verified`도 false로 구분합니다.
 
 앱 아이콘은 `assets/icon.svg`를 바탕으로 Tauri CLI로 생성했습니다.
 
@@ -252,15 +259,15 @@ Rust에서 Markdown을 HTML로 변환하고 정리한 뒤 WebView에 전달합�
 ## 검증
 
 ```sh
-npm test
-npm run check
+pnpm test
+pnpm run check
 cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
 node --check ui/app.js
 python3 scripts/smoke.py
 python3 scripts/multiwindow-smoke.py
 python3 scripts/markdown-validation-smoke.py
 # 개발 앱이 종료된 상태에서, 현재 워크트리의 개발 빌드만 재시작
-npm run dev:build
+pnpm run dev:build
 python3 scripts/persistence-smoke.py
 # macOS에서 마우스를 조작하지 않은 상태로 네 방향·빈 공간 배치·드래그 회귀
 python3 scripts/entrance-direction-smoke.py
@@ -293,7 +300,7 @@ python3 scripts/macos-tray-smoke.py
 설치 파일은 [GitHub Releases](https://github.com/egoing/agent-gibbon/releases)에서 받습니다. 공개 저장소에서 다운로드할 수 있습니다.
 
 ```sh
-npm run build:release
+pnpm run build:release
 ```
 
 호스트 CPU용 앱과 DMG를 `src-tauri/target/release/bundle/`에 만듭니다. v0.2.7은 Apple Silicon용 `Agent Gibbon_0.2.7_aarch64.dmg`와 Intel용 `Agent Gibbon_0.2.7_x64.dmg`를 제공합니다.

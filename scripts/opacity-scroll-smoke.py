@@ -30,7 +30,7 @@ def processes():
     return [int(p[0]) for line in lines if len(p := line.strip().split(None, 1)) == 2 and p[1] == EXPECTED]
 
 
-assert Path(INFO['binary']).is_file(), 'Run npm run dev:build first'
+assert Path(INFO['binary']).is_file(), 'Run pnpm run dev:build first'
 assert not processes(), 'Existing worktree app must be stopped by its owner first'
 saved = SETTING.read_bytes() if SETTING.exists() else None
 evidence = {'instance': INFO, 'note_id': NOTE, 'samples': [], 'passed': False}

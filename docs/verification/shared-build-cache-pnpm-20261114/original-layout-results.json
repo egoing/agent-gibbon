@@ -1,0 +1,74 @@
+[
+  {
+    "label": "original-layout-cold",
+    "seconds": 99.967,
+    "exit": 0,
+    "command": [
+      "cargo",
+      "build",
+      "--offline",
+      "--locked",
+      "--jobs",
+      "4",
+      "--manifest-path",
+      "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon/src-tauri/Cargo.toml",
+      "--target-dir",
+      "/tmp/gibbon-bench-20261114/original-layout",
+      "--timings"
+    ]
+  },
+  {
+    "label": "original-layout-warm-1",
+    "seconds": 2.705,
+    "exit": 0,
+    "command": [
+      "cargo",
+      "build",
+      "--offline",
+      "--locked",
+      "--jobs",
+      "4",
+      "--manifest-path",
+      "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon/src-tauri/Cargo.toml",
+      "--target-dir",
+      "/tmp/gibbon-bench-20261114/original-layout",
+      "--timings"
+    ]
+  },
+  {
+    "label": "original-layout-warm-2",
+    "seconds": 0.383,
+    "exit": 0,
+    "command": [
+      "cargo",
+      "build",
+      "--offline",
+      "--locked",
+      "--jobs",
+      "4",
+      "--manifest-path",
+      "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon/src-tauri/Cargo.toml",
+      "--target-dir",
+      "/tmp/gibbon-bench-20261114/original-layout",
+      "--timings"
+    ]
+  },
+  {
+    "label": "original-layout-warm-3",
+    "seconds": 0.368,
+    "exit": 0,
+    "command": [
+      "cargo",
+      "build",
+      "--offline",
+      "--locked",
+      "--jobs",
+      "4",
+      "--manifest-path",
+      "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon/src-tauri/Cargo.toml",
+      "--target-dir",
+      "/tmp/gibbon-bench-20261114/original-layout",
+      "--timings"
+    ]
+  }
+]

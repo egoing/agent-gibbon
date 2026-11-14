@@ -1,0 +1,179 @@
+[
+  {
+    "label": "independent-a",
+    "seconds": 88.0,
+    "timing_source": "Cargo Finished wall (launch wrapper timing unavailable)",
+    "cache_bytes": 2859433984,
+    "target_bytes": 72265728,
+    "exit": 0,
+    "compiling": 369
+  },
+  {
+    "label": "independent-b",
+    "seconds": 86.083,
+    "exit": 0,
+    "cache_bytes": 2856624128,
+    "target_bytes": 72273920,
+    "compiling": 369,
+    "lock_wait": false,
+    "root": "/Users/egoinglee/.codex/worktrees/gibbon-cache-bench-peer/agent-gibbon",
+    "cache": "independent-b",
+    "target": "independent-b"
+  },
+  {
+    "label": "shared-a",
+    "seconds": 92.882,
+    "exit": 0,
+    "cache_bytes": 2859143168,
+    "target_bytes": 72257536,
+    "compiling": 369,
+    "lock_wait": false,
+    "root": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon",
+    "cache": "shared",
+    "target": "shared-a"
+  },
+  {
+    "label": "shared-b",
+    "seconds": 15.031,
+    "exit": 0,
+    "cache_bytes": 3043479552,
+    "target_bytes": 71430144,
+    "compiling": 1,
+    "lock_wait": false,
+    "root": "/Users/egoinglee/.codex/worktrees/gibbon-cache-bench-peer/agent-gibbon",
+    "cache": "shared",
+    "target": "shared-b"
+  },
+  {
+    "label": "independent-warm-1",
+    "seconds": 3.713,
+    "exit": 0,
+    "cache_bytes": 2853990400,
+    "target_bytes": 71888896,
+    "compiling": 1,
+    "lock_wait": false,
+    "root": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon",
+    "cache": "independent-a",
+    "target": "independent-a"
+  },
+  {
+    "label": "independent-warm-2",
+    "seconds": 0.413,
+    "exit": 0,
+    "cache_bytes": 2853990400,
+    "target_bytes": 71901184,
+    "compiling": 0,
+    "lock_wait": false,
+    "root": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon",
+    "cache": "independent-a",
+    "target": "independent-a"
+  },
+  {
+    "label": "independent-warm-3",
+    "seconds": 0.503,
+    "exit": 0,
+    "cache_bytes": 2853990400,
+    "target_bytes": 71929856,
+    "compiling": 0,
+    "lock_wait": false,
+    "root": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon",
+    "cache": "independent-a",
+    "target": "independent-a"
+  },
+  {
+    "label": "independent-small-edit",
+    "seconds": 2.354,
+    "exit": 0,
+    "cache_bytes": 2854772736,
+    "target_bytes": 71991296,
+    "compiling": 1,
+    "lock_wait": false,
+    "root": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon",
+    "cache": "independent-a",
+    "target": "independent-a"
+  },
+  {
+    "label": "shared-warm-1",
+    "seconds": 14.12,
+    "exit": 0,
+    "cache_bytes": 3225501696,
+    "target_bytes": 71888896,
+    "compiling": 1,
+    "lock_wait": false,
+    "root": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon",
+    "cache": "shared",
+    "target": "shared-a"
+  },
+  {
+    "label": "shared-warm-2",
+    "seconds": 0.7,
+    "exit": 0,
+    "cache_bytes": 3225501696,
+    "target_bytes": 71897088,
+    "compiling": 0,
+    "lock_wait": false,
+    "root": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon",
+    "cache": "shared",
+    "target": "shared-a"
+  },
+  {
+    "label": "shared-warm-3",
+    "seconds": 0.396,
+    "exit": 0,
+    "cache_bytes": 3225501696,
+    "target_bytes": 71925760,
+    "compiling": 0,
+    "lock_wait": false,
+    "root": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon",
+    "cache": "shared",
+    "target": "shared-a"
+  },
+  {
+    "label": "shared-small-edit",
+    "seconds": 2.532,
+    "exit": 0,
+    "cache_bytes": 3220168704,
+    "target_bytes": 71987200,
+    "compiling": 1,
+    "lock_wait": false,
+    "root": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon",
+    "cache": "shared",
+    "target": "shared-a"
+  },
+  {
+    "label": "independent-concurrent-a",
+    "seconds": 0.653,
+    "exit": 0,
+    "lock_wait": true,
+    "compiling": 0
+  },
+  {
+    "label": "independent-concurrent-b",
+    "seconds": 3.495,
+    "exit": 0,
+    "lock_wait": true,
+    "compiling": 1
+  },
+  {
+    "label": "independent-concurrent-total",
+    "seconds": 3.499
+  },
+  {
+    "label": "shared-concurrent-a",
+    "seconds": 0.569,
+    "exit": 0,
+    "lock_wait": true,
+    "compiling": 0
+  },
+  {
+    "label": "shared-concurrent-b",
+    "seconds": 15.336,
+    "exit": 0,
+    "lock_wait": true,
+    "compiling": 1
+  },
+  {
+    "label": "shared-concurrent-total",
+    "seconds": 15.34
+  }
+]

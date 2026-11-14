@@ -15,6 +15,7 @@ import uuid
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--peer', required=True, type=Path)
+parser.add_argument('--without-default', action='store_true', help='verify two dev apps only; require default instance to remain absent')
 args = parser.parse_args()
 ROOT = Path(__file__).resolve().parents[1]
 PEER = args.peer.resolve()
@@ -77,11 +78,18 @@ sa, sb = [Path(f'/tmp/floatnote-{os.getuid()}-{i["id"]}/app.sock') for i in (ia,
 # Refuse to assume ownership of any existing development process.
 assert not live(sa) and not live(sb), '개발 앱이 이미 실행 중입니다. 별도의 검증 워크트리를 사용하세요.'
 default = Path(f'/tmp/floatnote-{os.getuid()}/app.sock')
-assert live(default), '기존 설치 앱이 실행 중이어야 합니다.'
-installed = raw(default, {'action': 'list'})
-baseline = {w['id']: state_only(raw(default, {'action': 'inspect', 'id': w['id']})) for w in installed['windows']}
+if args.without_default:
+    assert not live(default), '--without-default는 기본 앱이 미실행일 때만 사용하세요.'
+    installed, baseline = None, {}
+else:
+    assert live(default), '기존 설치 앱이 실행 중이어야 합니다.'
+    installed = raw(default, {'action': 'list'})
+    baseline = {w['id']: state_only(raw(default, {'action': 'inspect', 'id': w['id']})) for w in installed['windows']}
 
 def check_installed():
+    if installed is None:
+        assert not live(default), '기본 앱 미실행 상태 변경'
+        return
     now = raw(default, {'action': 'list'})
     assert now == installed, '설치 앱 메모 목록 변경'
     for key, before in baseline.items():
@@ -102,20 +110,27 @@ try:
     owned.add(pid_for(ia['binary']))
     assert frontmost() == original_frontmost, 'CLI auto-launch changed frontmost app'
     assert a['instance'] == ia['id'] and a['dev_label'].startswith('DEV ')
-    # npm dev must own B's socket, not silently reuse A/default or a release binary.
-    log_path = Path('/tmp') / f'{note}-npm-dev.log'
+    # pnpm dev must own B's socket, not silently reuse A/default or a release binary.
+    log_path = Path('/tmp') / f'{note}-pnpm-dev.log'
     with log_path.open('w') as log:
-        runner = subprocess.Popen(['npm', 'run', 'dev', '--', '--no-watch'], cwd=PEER, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+        runner = subprocess.Popen(['pnpm', 'run', 'dev', '--no-watch'], cwd=PEER, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
     wait_for(sb)
     owned.add(pid_for(ib['binary']))
-    assert frontmost() == original_frontmost, 'npm dev changed frontmost app'
+    assert frontmost() == original_frontmost, 'pnpm dev changed frontmost app'
     b = call(PEER, 'open', '--id', note, '--markdown', 'worktree B')
     assert frontmost() == original_frontmost, 'new webview changed frontmost app'
     assert b['instance'] == ib['id'] and a['dev_label'] != b['dev_label']
     for root in (ROOT, PEER):
         assert call(root, '--serve')['already_running'] is True
-    assert call(ROOT, 'inspect', '--id', note)['note']['markdown'] == 'worktree A'
-    assert call(PEER, 'inspect', '--id', note)['note']['markdown'] == 'worktree B'
+    a_state = call(ROOT, 'inspect', '--id', note)
+    b_state = call(PEER, 'inspect', '--id', note)
+    assert a_state['instance'] == ia['id'] and b_state['instance'] == ib['id']
+    assert a_state['note']['markdown'] == 'worktree A'
+    assert b_state['note']['markdown'] == 'worktree B'
+    print(json.dumps({'phase': 'simultaneous-instance-provenance', 'note_id': note,
+      'worktrees': [{'root': i['root'], 'instance': i['id'], 'binary': i['binary'],
+                    'pid': pid_for(i['binary']), 'inspect': state}
+                   for i, state in ((ia, a_state), (ib, b_state))]}, ensure_ascii=False), flush=True)
     # Hiding cancels entrance animation; metadata changes must preserve exact geometry.
     for root in (ROOT, PEER):
         call(root, 'close', '--id', note)
@@ -150,7 +165,7 @@ try:
     assert a['note']['markdown'] == 'A restarted'
     assert call(PEER, 'inspect', '--id', note)['note']['markdown'] == 'B file'
     check_installed()
-    print(json.dumps({'ok': True, 'checks': ['CLI auto-launch', 'npm dev same namespace', 'same-ID content isolation', 'independent duplicate locks', 'hidden update preserves geometry/focus', 'separate source files', 'termination/restart isolation', 'installed app unchanged', 'native frontmost application preserved'], 'instances': [ia['id'], ib['id']], 'npm_log': str(log_path)}, ensure_ascii=False))
+    print(json.dumps({'ok': True, 'mode': 'without-default' if args.without_default else 'with-default', 'installed_app_state_verified': not args.without_default, 'checks': ['CLI auto-launch', 'pnpm dev same namespace', 'same-ID content isolation', 'independent duplicate locks', 'hidden update preserves geometry/focus', 'separate source files', 'termination/restart isolation', ('default instance remained absent' if args.without_default else 'installed app unchanged'), 'native frontmost application preserved'], 'instances': [ia['id'], ib['id']], 'pnpm_log': str(log_path)}, ensure_ascii=False))
 finally:
     for pid in owned:
         try:

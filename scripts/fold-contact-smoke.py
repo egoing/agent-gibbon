@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify short Ctrl contacts in this worktree's isolated development app.
 Requires macOS event-posting permission; restores pointer and hides the unique note.
-Run after npm run dev:build, without touching the mouse/keyboard during the test.
+Run after pnpm run dev:build, without touching the mouse/keyboard during the test.
 """
 import json
 from pathlib import Path
