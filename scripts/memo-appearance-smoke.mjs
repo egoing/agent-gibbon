@@ -1,4 +1,4 @@
-// Real manager, memo and Feedback assets in separate same-origin pages; IPC mocked.
+// Real manager and memo windows with inline Feedback; IPC mocked.
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
@@ -14,16 +14,15 @@ async function pageFor(path,width,height){
  page.on('request',r=>{const u=new URL(r.url());if(u.hostname!=='gibbon.test'){external.push(r.url());return r.abort();}const f=root+'ui'+u.pathname;if(!fs.existsSync(f))return r.respond({status:404,body:''});r.respond({status:200,contentType:/\.(m?js)$/.test(f)?'text/javascript':f.endsWith('.css')?'text/css':'text/html',body:fs.readFileSync(f)});});
  await page.evaluateOnNewDocument(()=>{
   window.calls=[];window.noteColor='#ffeeaa';
-  window.__TAURI__={window:{getCurrentWindow:()=>({label:'note-appearance-probe',startResizeDragging:async()=>{}})},event:{listen:async()=>()=>{}},clipboardManager:{writeText:async()=>{}},core:{invoke:async(name,args)=>{
+  window.__TAURI__={webviewWindow:{getCurrentWebviewWindow:()=>({listen:async()=>()=>{}})},window:{getCurrentWindow:()=>({label:'note-appearance-probe',startResizeDragging:async()=>{}})},event:{listen:async()=>()=>{}},clipboardManager:{writeText:async()=>{}},core:{invoke:async(name,args)=>{
    window.calls.push({name,args});
+   if(name==='memo_frame_focus')return true;
    if(name==='telemetry_status')return {detailed:false};
    if(name==='privacy_status')return {terms_accepted:false,terms_skipped:true,sharing:false,allowed:false,notice_ready:true};
    if(name==='manager_notes')return [];
    if(name==='manager_set_theme')return;
    if(name==='skills_list')return {skills:[],feedback:null};
-   if(name==='snapshot')return {visible:true,always_on_top:true,highlight_revision:2,note:{title:'컬러 모드 검증',color:window.noteColor,revision:2,markdown:'# 메모 디자인\n보관한 개별 색상',html:'<h1>메모 디자인</h1><p>테마와 컬러 모드</p>',change_html:'<h1>메모 디자인</h1><p>테마와 컬러 모드</p>'}};
-   if(name==='feedback_snapshot')return {max_width:300,view:{revision:2,message:'변경사항',color:window.noteColor,error:false,buttons:[{id:'acknowledge',label:'확인',primary:true,disabled:false}]}};
-   if(name==='layout_feedback')return {edge:'below'};
+   if(name==='snapshot')return {visible:true,always_on_top:true,highlight_revision:2,note:{edit_on_open:location.search.includes('inline-probe'),title:'컬러 모드 검증',color:window.noteColor,revision:2,markdown:'# 메모 디자인\n보관한 개별 색상',html:'<h1>메모 디자인</h1><p>테마와 컬러 모드</p>',change_html:'<h1>메모 디자인</h1><p>테마와 컬러 모드</p>'}};
    if(name==='fit_note')return true;
    if(name==='poll_fold'||name==='poll_warp')return false;
    if(name==='present_feedback'||name==='content_action'||name==='sync_opacity')return;
@@ -47,7 +46,7 @@ try {
  assert.equal(await manager.$eval('input[name="memo-design"]:checked',e=>e.value),'gray');
  assert.equal((await manager.$$('.memo-sample')).length,2);
  await systemAlignment(manager);
- const memo=await pageFor('index.html',300,240),feedback=await pageFor('feedback.html',300,72);
+ const memo=await pageFor('index.html',300,240),feedback=await pageFor('index.html?inline-probe',300,240);
  await color(memo,'#dfe2dd');await color(feedback,'#dfe2dd');
  const chooseDesign=async design=>{await manager.$eval(`input[name="memo-design"][value="${design}"]`,e=>e.scrollIntoView());await manager.click(`input[name="memo-design"][value="${design}"]`);};
  const chooseManager=async theme=>{await manager.$eval(`input[name="manager-theme"][value="${theme}"]`,e=>e.scrollIntoView());await manager.click(`input[name="manager-theme"][value="${theme}"]`);};
@@ -78,5 +77,5 @@ try {
  await chooseDesign('gray');await manager.close();for(const page of [memo,feedback])await page.emulateMediaFeatures([{name:'prefers-color-scheme',value:'dark'}]);await color(memo,'#dfe2dd');await color(feedback,'#dfe2dd');
  for(const page of [memo,feedback])assert.equal(await page.evaluate(()=>window.calls.some(c=>['save_note','hide_note','close_note','toggle_pin','manual_resize','privacy_save'].includes(c.name))),false);
  assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
- console.log('PASS: 5 independent memo designs × 4 manager themes, default gray, original color and reload persistence, optional system day/night tracking, OS/manager independence, separate memo/Feedback pages, 2 live fixed sample memos in all designs, 944/600px last-system order and right alignment, preview/radio keyboard/access, editor draft/focus and Feedback DOM preservation, no note/consent writes or external requests.');
+ console.log('PASS: 5 independent memo designs × 4 manager themes, default gray, original color and reload persistence, optional system day/night tracking, OS/manager independence, inline Feedback in memo windows, 2 live fixed sample memos in all designs, 944/600px last-system order and right alignment, preview/radio keyboard/access, editor draft/focus and Feedback DOM preservation, no note/consent writes or external requests.');
 }finally{await browser.close();}

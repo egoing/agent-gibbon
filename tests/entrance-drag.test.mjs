@@ -29,7 +29,7 @@ async function setup(storage = new Map()) {
   const context = vm.createContext({
     navigator: { platform: "MacIntel" },
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
-    memoThemeFor, readMemoAppearance, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
+    createFeedback: () => () => {}, memoThemeFor, readMemoAppearance, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
       body: { appendChild() {}, classList: { toggle() {} } },
       getElementById: element, querySelectorAll: () => [],
