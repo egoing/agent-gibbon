@@ -1,3 +1,9 @@
+## 툴바 키보드 포커스 — #166 · 2026-11-14
+
+- 사용자 요청에 따라 공통 텍스트·이미지·터미널·웹 chrome 툴바의 Tab 포커스 테두리를 톤다운한다. 2px 안쪽 선과 기존 포커스 배경을 유지하고 선에만 전경색 28% 알파를 적용한다. 버튼·아이콘 전체 opacity와 크기·배치·Tab 순서는 바꾸지 않는다. 28%는 이번 구현 선택값이다.
+- `forced-colors: active`에서는 알파 혼합 대신 시스템 `Highlight` 색을 사용하고 브라우저의 강제 색 조정을 유지한다.
+- [툴바 시안 SVG](design/toolbar-reserved-space.svg) · [PNG](design/toolbar-reserved-space.png), [세 테마 비교 SVG](design/toolbar-focus.svg) · [PNG](design/toolbar-focus.png). 실제 검사와 미검증 범위는 [검증 기록](verification/issue166-toolbar-focus.md)을 따른다.
+
 ## 접힘 드래그·버튼 정렬·롤오버 — #141 · #143
 
 - 접힌 제목과 툴바 빈 공간도 native 드래그로 이동한다. 버튼 클릭과 기존 본문 클릭 펼침은 유지한다.
