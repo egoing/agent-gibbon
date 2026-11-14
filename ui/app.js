@@ -2,10 +2,12 @@
 import { memoThemeFor } from './theme.mjs';
 import { readMemoAppearance } from './appearance.mjs';
 import { feedbackView, durations } from './feedback-state.mjs';
+import { createFeedback } from './feedback.js';
 const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const win = window.__TAURI__.window.getCurrentWindow();
 const $ = (id) => document.getElementById(id);
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+const renderFeedback = createFeedback(document, (action, revision) => invoke('feedback_action', { action, revision }).catch(failure));
 const shortcut = key => isMac ? `Command ${key}` : `Ctrl ${key}`;
 $('export').title = `파일 내보내기 · ${shortcut('S')}`;
 $('export').setAttribute('aria-label', '파일 내보내기');
@@ -15,7 +17,7 @@ function applyMemoAppearance(color) {
   const theme = memoThemeFor(color, readMemoAppearance(window));
   const next = JSON.stringify(theme);
   if (next === appearanceSignature) return;
-  for (const key of ['background', 'foreground', 'border', 'panel']) document.documentElement.style.setProperty(`--${key}`, theme[key]);
+  for (const key of ['background', 'foreground', 'border', 'panel', 'error']) document.documentElement.style.setProperty(`--${key}`, theme[key]);
   document.documentElement.style.colorScheme = theme.scheme;
   appearanceSignature = next;
 }
@@ -152,6 +154,7 @@ let noticeTimer;
 let feedbackSignature;
 let publishing = false;
 let memoVisible = false;
+let stashActive = false;
 let publishAgain = false;
 function clearNotice() { clearTimeout(noticeTimer); notice = null; publishFeedback(); }
 function notify(text, kind = 'result', persistent = false) {
@@ -163,14 +166,15 @@ function notify(text, kind = 'result', persistent = false) {
 }
 function failure(error) { notify(String(error), 'error', editing); }
 async function publishFeedback() {
-  if (!memoVisible) return;
   if (publishing) { publishAgain = true; return; }
   const view = feedbackView({ editing, saving, exporting, acknowledging, highlightRevision, notice, color: latestNote?.color });
-  const signature = JSON.stringify({ folded, view });
+  renderFeedback(view, folded || !memoVisible || stashActive);
+  if (!memoVisible) return;
+  const signature = JSON.stringify({ folded, stashActive, view });
   if (signature === feedbackSignature) return;
   publishing = true;
   try { await invoke('present_feedback', { view }); feedbackSignature = signature; }
-  catch (error) { console.error('Feedback 창 표시 실패:', error); }
+  catch (error) { console.error('Feedback 상태 기록 실패:', error); }
   finally { publishing = false; if (publishAgain) { publishAgain = false; publishFeedback(); } }
 }
 async function exportNote() {
@@ -197,6 +201,7 @@ async function refresh(schedule = true) {
       layoutPending = !!state.layout_pending;
       if (layoutPending) needsFit = true;
       memoVisible = state.visible !== false;
+      stashActive = !!state.stash?.active;
       if (!memoVisible) feedbackSignature = undefined;
       document.body.classList.toggle('pointer-over', !!state.hovered);
       $('fold-title').textContent = state.note.title;
@@ -422,11 +427,4 @@ window.__TAURI__.event.listen('feedback-action', ({ payload }) => {
   if (action === 'export') return exportNote();
   if (action === 'save') return save();
   else if (action === 'cancel' && editing && !saving && !exporting) return endEditing();
-}).catch(failure);
-
-window.__TAURI__.event.listen('feedback-connection', ({ payload: c }) => {
-  if (c.owner !== win.label) return;
-  const attached = c.edge === 'below' || c.edge === 'above';
-  document.body.classList.toggle('feedback-below', attached && c.edge === 'below');
-  document.body.classList.toggle('feedback-above', attached && c.edge === 'above');
 }).catch(failure);

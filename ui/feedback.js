@@ -1,65 +1,35 @@
-import { memoThemeFor } from './theme.mjs';
-import { readMemoAppearance } from './appearance.mjs';
-const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
-const surface = document.getElementById('feedback');
-const message = document.getElementById('message');
-const actions = document.getElementById('actions');
-let signature, appearanceSignature;
-let renderedRevision = null;
-const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
-async function refresh() {
-  try {
-    const state = await invoke('feedback_snapshot');
-    const next = JSON.stringify(state.view);
-    const theme = memoThemeFor(state.view.color || '#20252e', readMemoAppearance(window));
-    const nextAppearance = JSON.stringify(theme);
-    if (appearanceSignature !== nextAppearance) {
-      for (const [key, value] of Object.entries({ background: theme.background, foreground: theme.foreground, border: theme.border, primary: theme.panel, error: theme.error })) document.documentElement.style.setProperty(`--${key}`, value);
-      document.documentElement.style.colorScheme = theme.scheme;
-      appearanceSignature = nextAppearance;
-    }
-    if (signature !== next) {
-      const view = state.view;
-      renderedRevision = view.revision;
-      surface.classList.toggle('error', view.error);
-      message.setAttribute('role', view.error ? 'alert' : 'status');
-      message.textContent = view.message;
-      // Reconcile buttons so polling and notices never discard keyboard focus.
-      for (const old of [...actions.children]) if (!view.buttons.some(b => b.id === old.dataset.action)) old.remove();
-      for (const item of view.buttons) {
-        let button = [...actions.children].find(b => b.dataset.action === item.id);
-        if (!button) {
-          button = document.createElement('button'); button.dataset.action = item.id;
-          button.addEventListener('click', () => invoke('feedback_action', { action: item.id, revision: renderedRevision }).catch(report));
-          actions.appendChild(button);
-        }
-        button.title = item.id === 'save' ? `저장 · ${isMac ? 'Command S' : 'Ctrl S'}` : item.label;
-        button.setAttribute('aria-label', button.title);
-        button.textContent = item.label; button.disabled = item.disabled; button.classList.toggle('primary', !!item.primary);
+// Inline companion: rendering never changes the native window geometry.
+export function createFeedback(doc, action) {
+  const surface = doc.getElementById('feedback');
+  const message = doc.getElementById('message');
+  const actions = doc.getElementById('actions');
+  let signature;
+  let revision = null;
+  return (view, suppressed = false) => {
+    surface.hidden = suppressed || (!view.message && !view.buttons.length);
+    const next = JSON.stringify(view);
+    if (signature === next) return;
+    revision = view.revision;
+    surface.classList.toggle('error', !!view.error);
+    message.setAttribute('role', view.error ? 'alert' : 'status');
+    message.textContent = view.message;
+    // Reconcile in place so a notice update preserves keyboard focus.
+    for (const old of [...actions.children]) if (!view.buttons.some(b => b.id === old.dataset.action)) old.remove();
+    for (const item of view.buttons) {
+      let button = [...actions.children].find(b => b.dataset.action === item.id);
+      if (!button) {
+        button = doc.createElement('button');
+        button.dataset.action = item.id;
+        button.addEventListener('click', () => action(item.id, revision));
+        actions.appendChild(button);
       }
-      signature = next;
+      const shortcut = /Mac|iPhone|iPad/.test(doc.defaultView.navigator.platform) ? 'Command S' : 'Ctrl S';
+      button.title = item.id === 'save' ? `저장 · ${shortcut}` : item.label;
+      button.setAttribute('aria-label', button.title);
+      button.textContent = item.label;
+      button.disabled = item.disabled;
+      button.classList.toggle('primary', !!item.primary);
     }
-    // Keep the native companion width tied to its memo; only content height varies.
-    const width = Math.max(1, state.max_width);
-    surface.style.width = `${width}px`;
-    surface.style.maxWidth = `${width}px`;
-    document.body.style.width = `${width}px`;
-    const height = Math.ceil(surface.getBoundingClientRect().height);
-    const layout = await invoke('layout_feedback', { width, height });
-    surface.dataset.edge = layout.edge;
-    document.body.classList.toggle('feedback-below', layout.edge === 'below');
-    document.body.classList.toggle('feedback-above', layout.edge === 'above');
-  } catch (error) { report(error); }
-  setTimeout(refresh, 100);
+    signature = next;
+  };
 }
-function report(error) { console.error('Feedback:', error); }
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') invoke('feedback_action', { action: 'cancel', revision: renderedRevision }).catch(report);
-  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') { event.preventDefault(); if (!event.isComposing && !event.repeat && !event.altKey && !event.shiftKey && event.keyCode !== 229) invoke('feedback_action', { action: 'save-shortcut', revision: renderedRevision }).catch(report); }
-});
-surface.addEventListener('mousedown', event => {
-  if (event.button !== 0 || event.target.closest('button, a, input, textarea, select, [contenteditable]')) return;
-  event.preventDefault();
-  invoke('drag_feedback').catch(report);
-});
-refresh();

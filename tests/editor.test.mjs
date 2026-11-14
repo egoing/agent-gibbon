@@ -43,7 +43,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
   const context = vm.createContext({
     navigator: { platform },
     localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
-    memoThemeFor, readMemoAppearance, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
+    createFeedback: () => () => {}, memoThemeFor, readMemoAppearance, feedbackView, durations, clearTimeout() {}, setTimeout(callback) { timers.push(callback); },
     document: {
       createElement() { return { style: {}, setAttribute() {}, remove() {}, get innerText() { return this.innerHTML.replace(/<[^>]+>/g, '').trim(); } }; },
       createElement() { return { style: {}, setAttribute() {}, remove() {},
@@ -473,18 +473,9 @@ test('hidden memo defers companion creation until its native window is visible',
   assert.equal(app.element('markdown').value, '보존할 초안');
 });
 
-test('frame opens only its own connected edge and restores after hiding', async () => {
+test('inline feedback does not subscribe to native attachment geometry', async () => {
   const app = await setup();
-  const connection = app.nativeEvents['feedback-connection'];
-  connection({ payload: { owner: 'other', edge: 'below' } });
-  assert.equal(app.classes.has('feedback-below'), false);
-  connection({ payload: { owner: 'memo-test', edge: 'below', width: 100, memoWidth: 300, memoHeight: 160 } });
-  assert.equal(app.classes.has('feedback-below'), true);
-  assert.equal(app.classes.has('feedback-above'), false);
-  connection({ payload: { owner: 'memo-test', edge: 'above', width: 300, memoWidth: 300, memoHeight: 160 } });
-  assert.equal(app.classes.has('feedback-above'), true);
-  assert.equal(app.classes.has('feedback-below'), false);
-  connection({ payload: { owner: 'memo-test', edge: 'none' } });
+  assert.equal(app.nativeEvents['feedback-connection'], undefined);
   assert.equal(app.classes.has('feedback-below'), false);
   assert.equal(app.classes.has('feedback-above'), false);
 });

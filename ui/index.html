@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Gibbon</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="style.css"><script src="telemetry.js"></script><script src="updater-guard.js"></script><script src="local-flow.js"></script><script type="module" src="app.js"></script><script type="module" src="toolbar.js"></script><script type="module" src="memo-focus.js"></script><link rel="stylesheet" href="memo-frame.css"><link rel="stylesheet" href="overlay-scrollbar.css"><script type="module" src="overlay-scrollbar.js"></script></head>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Gibbon</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="feedback.css"><script src="telemetry.js"></script><script src="updater-guard.js"></script><script src="local-flow.js"></script><script type="module" src="app.js"></script><script type="module" src="toolbar.js"></script><script type="module" src="memo-focus.js"></script><link rel="stylesheet" href="memo-frame.css"><link rel="stylesheet" href="overlay-scrollbar.css"><script type="module" src="overlay-scrollbar.js"></script></head>
 <body>
 <div id="memo-surface">
 <div id="controls" role="toolbar" aria-label="Toolbar">
@@ -47,6 +47,7 @@
 <textarea id="markdown" aria-label="Markdown 원문" spellcheck="false"></textarea>
 </section>
 </main>
+<section id="feedback" hidden aria-label="Feedback"><span id="message" role="status" aria-live="polite" aria-atomic="true"></span><div id="actions" role="group" aria-label="Action Bar"></div></section>
 <div id="memo-scrollbar" role="scrollbar" tabindex="0" aria-label="메모 세로 스크롤" aria-controls="viewport" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" hidden></div>
 </div>
 <div class="resize" data-direction="North" id="n"></div><div class="resize" data-direction="South" id="s"></div><div class="resize" data-direction="East" id="e"></div><div class="resize" data-direction="West" id="w"></div><div class="resize corner" data-direction="NorthWest" id="nw"></div><div class="resize corner" data-direction="NorthEast" id="ne"></div><div class="resize corner" data-direction="SouthWest" id="sw"></div><div class="resize corner" data-direction="SouthEast" id="se"></div>
