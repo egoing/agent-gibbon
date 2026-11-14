@@ -1,6 +1,66 @@
 use std::{collections::BTreeMap, sync::Mutex};
 use tauri::{Emitter, LogicalSize, Manager, State, WebviewWindow};
 
+// Logical pixels, shared by natural-content measurement and editor entry.
+pub const AUTO_HEIGHT_MAX: f64 = 420.0;
+
+// Preserve the current top unless growing would cross the work area's bottom.
+// A display shorter than the target caps growth without shrinking a larger note.
+fn editor_frame(y: i32, height: u32, scale: f64, top: i32, work_height: u32) -> (i32, u32) {
+    let target = ((AUTO_HEIGHT_MAX / 2.0 * scale).round() as u32).min(work_height);
+    if height >= target {
+        return (y, height);
+    }
+    let bottom = i64::from(top) + i64::from(work_height);
+    let y = i64::from(y).clamp(i64::from(top), bottom - i64::from(target));
+    (y as i32, target)
+}
+
+#[tauri::command]
+pub fn enter_note_editor(window: WebviewWindow, revision: u64) -> Result<(), String> {
+    if window.label() != "main" && !window.label().starts_with("note-") {
+        return Err("텍스트 메모에서만 편집할 수 있습니다".into());
+    }
+    let id = window.label().strip_prefix("note-").unwrap_or("main");
+    let notes = window.state::<crate::AppNotes>();
+    let editable = notes
+        .lock()
+        .map_err(|e| e.to_string())?
+        .get(id)
+        .is_some_and(|note| note.revision == revision && note.capture.is_none());
+    if !editable || folded(&window) || !window.is_visible().map_err(|e| e.to_string())? {
+        return Ok(());
+    }
+    let scale = window.scale_factor().map_err(|e| e.to_string())?;
+    let position = window.outer_position().map_err(|e| e.to_string())?;
+    let size = window.outer_size().map_err(|e| e.to_string())?;
+    let monitor = window
+        .current_monitor()
+        .map_err(|e| e.to_string())?
+        .ok_or("화면을 찾지 못했습니다")?;
+    let work = monitor.work_area();
+    let (y, height) = editor_frame(
+        position.y,
+        size.height,
+        scale,
+        work.position.y,
+        work.size.height,
+    );
+    if height == size.height {
+        return Ok(());
+    }
+    // Editing owns a growing frame; queued entrance animation must not overwrite it.
+    crate::entrance::cancel(&window)?;
+    crate::entrance::place(
+        &window,
+        crate::entrance::Destination {
+            position: tauri::PhysicalPosition::new(position.x, y),
+            scale,
+            size: tauri::PhysicalSize::new(size.width, height),
+        },
+    )
+}
+
 #[derive(Default)]
 struct SizeState {
     content_height: Option<f64>,
@@ -192,7 +252,7 @@ pub fn fit_note(
         let state = window.state::<Sizes>();
         let mut states = state.0.lock().map_err(|e| e.to_string())?;
         let s = states.entry(window.label().into()).or_default();
-        s.content_height = Some(height.ceil().clamp(48.0, 420.0));
+        s.content_height = Some(height.ceil().clamp(48.0, AUTO_HEIGHT_MAX));
         s.pending.take()
     };
     // Measuring visible content only refreshes its cap for the next open.
@@ -468,6 +528,24 @@ pub fn install_contact_monitor(app: &tauri::AppHandle) {
 #[cfg(test)]
 mod contact_tests {
     use super::*;
+    #[test]
+    fn editor_grows_without_shrinking_or_moving_large_frames() {
+        for scale in [1.0, 1.25, 1.5, 2.0] {
+            let target = (AUTO_HEIGHT_MAX / 2.0 * scale).round() as u32;
+            assert_eq!(editor_frame(100, 32, scale, 0, 2000), (100, target));
+            for height in [target, target + 1, 1000] {
+                assert_eq!(editor_frame(1900, height, scale, 0, 2000), (1900, height));
+            }
+        }
+    }
+    #[test]
+    fn editor_respects_work_area_and_negative_monitor_coordinates() {
+        assert_eq!(editor_frame(950, 32, 1.0, 30, 1000), (820, 210));
+        assert_eq!(editor_frame(-50, 48, 2.0, -1000, 1000), (-420, 420));
+        assert_eq!(editor_frame(-1100, 48, 1.0, -1000, 1000), (-1000, 210));
+        assert_eq!(editor_frame(40, 32, 2.0, 20, 150), (20, 150));
+        assert_eq!(editor_frame(40, 200, 2.0, 20, 150), (40, 200));
+    }
     #[cfg(target_os = "macos")]
     #[test]
     fn macos_contact_folding_accepts_only_control() {

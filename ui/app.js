@@ -102,7 +102,7 @@ function endEditing(flow) {
   return fitted;
 }
 function beginEditing() {
-  if (!latestNote || editing) return;
+  if (!latestNote || latestNote.capture || editing || folded) return;
   editing = true;
   document.body.classList.toggle('editing', true);
   editRevision = latestNote.revision;
@@ -115,6 +115,8 @@ function beginEditing() {
   $('markdown').focus();
   $('markdown').setSelectionRange(0, 0);
   $('markdown').scrollTop = 0;
+  // One request per entry, never from refresh, typing, or a resize observer.
+  invoke('enter_note_editor', { revision: editRevision }).catch(failure);
 }
 $('edit').addEventListener('click', () => { contentAction(); beginEditing(); });
 
@@ -231,7 +233,9 @@ async function refresh(schedule = true) {
       }
       $('pin').setAttribute('aria-pressed', String(state.always_on_top));
       $('warp').setAttribute('data-direction', state.warp_right ? 'right' : 'left');
-      if (!initialEditHandled) {
+      // Region creation can first snapshot while still hidden. Defer the actual
+      // editor entry until shown, rather than losing its one height request.
+      if (!initialEditHandled && ((memoVisible && !state.folded) || !state.note.edit_on_open || state.note.capture)) {
         initialEditHandled = true;
         if (state.note.edit_on_open && !state.note.capture) beginEditing();
       }

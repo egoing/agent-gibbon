@@ -623,6 +623,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     warp::warp_note,
                     warp::poll_warp,
                     sizing::fit_note,
+                    sizing::enter_note_editor,
                     sizing::poll_fold,
                     sizing::toggle_fold,
                     sizing::chrome_fold,
