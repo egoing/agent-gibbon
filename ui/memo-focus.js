@@ -1,4 +1,4 @@
-// The native memo and its visible Feedback companion share one focus frame.
+// Inline Feedback shares the memo native focus.
 const memoWindow = window.__TAURI__.window.getCurrentWindow();
 let focusRevision = 0;
 const applyMemoFocus = focused => document.body.classList.toggle('memo-focused', focused);

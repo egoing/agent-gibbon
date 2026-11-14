@@ -332,7 +332,6 @@ fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
             .set_size(LogicalSize::new(size.width, 24.0))
             .map_err(|e| e.to_string())?;
         state.expanded = Some(size);
-        crate::feedback_window::hide(window);
     }
     Ok(())
 }
@@ -490,7 +489,6 @@ pub fn install_contact_monitor(app: &tauri::AppHandle) {
         for window in crate::web::managed_windows(app).into_values() {
             if window.label() == crate::manager::LABEL
                 || !fold_contact_enabled(window.label())
-                || crate::feedback_window::is_surface(window.label())
                 || window.label().starts_with("agent-")
             {
                 continue;

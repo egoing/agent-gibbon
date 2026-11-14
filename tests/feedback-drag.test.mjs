@@ -1,43 +1,34 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import vm from 'node:vm';
-import {readFileSync} from 'node:fs';
+import { createFeedback } from '../ui/feedback.js';
 
-test('feedback text and blank space drag the owner while controls keep their actions', async () => {
-  const calls = [];
-  const listeners = {};
-  const surface = {
-    style: {}, dataset: {}, classList: {toggle() {}},
-    addEventListener(name, callback) {listeners[name] = callback;},
-    getBoundingClientRect() {return {width: 200, height: 30};},
-  };
-  const message = {setAttribute() {}};
-  const actions = {children: []};
-  const layoutArgs = [];
-  const invoke = async (name, args) => {
-    calls.push(name);
-    if (name === 'feedback_snapshot') return {max_width: 300.5, view: {message: '안내', buttons: [], revision: null}};
-    if (name === 'layout_feedback') {layoutArgs.push(args); return {edge: 'below'};}
-  };
-  vm.runInNewContext(readFileSync(new URL('../ui/feedback.js', import.meta.url), 'utf8').replace(/^import .*;$/gm, ''), {
-    navigator: {platform: 'MacIntel'},
-    window: {__TAURI__: {core: {invoke}}},
-    document: {
-      getElementById: id => ({feedback: surface, message, actions})[id],
-      documentElement: {style: {setProperty() {}}}, body: {style: {}, classList: {toggle() {}}}, addEventListener() {},
-    },
-    memoThemeFor: () => ({background: '#fff', foreground: '#222'}), readMemoAppearance: () => 'white',
-    setTimeout() {}, console,
-  });
-  await new Promise(setImmediate);
-  assert.equal(surface.style.width, '300.5px');
-  assert.equal(layoutArgs[0].width, 300.5);
-  let prevented = 0;
-  const event = (button, control) => ({button, target: {closest: () => control}, preventDefault() {prevented++;}});
-  listeners.mousedown(event(1, null));
-  listeners.mousedown(event(0, {}));
-  assert.equal(calls.filter(name => name === 'drag_feedback').length, 0);
-  listeners.mousedown(event(0, null));
-  assert.equal(calls.filter(name => name === 'drag_feedback').length, 1);
-  assert.equal(prevented, 1);
+function fixture() {
+  const make = () => ({ hidden: false, dataset: {}, children: [], listeners: {}, attributes: {},
+    classList: {toggle() {}}, setAttribute(k,v) {this.attributes[k]=v;},
+    addEventListener(k,v) {this.listeners[k]=v;}, appendChild(b) {this.children.push(b);b.remove=()=>{this.children=this.children.filter(x=>x!==b);};} });
+  const elements = Object.fromEntries(['feedback','message','actions'].map(id=>[id,make()]));
+  const calls=[];
+  const render=createFeedback({getElementById:id=>elements[id],createElement:make,defaultView:{navigator:{platform:'MacIntel'}}},(...args)=>calls.push(args));
+  return {elements,calls,render};
+}
+test('inline footer preserves action focus identities and uses the latest revision', () => {
+  const {render,elements,calls}=fixture();
+  const view={message:'',revision:1,buttons:[{id:'save',label:'메모에 반영',disabled:false}]};
+  render(view);
+  const button=elements.actions.children[0];
+  render({...view,revision:2,message:'원본 변경',error:true});
+  assert.equal(elements.actions.children[0],button);
+  assert.equal(elements.message.attributes.role,'alert');
+  button.listeners.click();assert.deepEqual(calls,[['save',2]]);
+  assert.match(button.attributes['aria-label'],/Command S/);
+  render({...view,buttons:[]});assert.equal(elements.feedback.hidden,true);
+  assert.equal(elements.actions.children.length,0);
+});
+test('fold and hidden memo suppression do not discard the view or its buttons', () => {
+  const {render,elements}=fixture();
+  const view={message:'안내',revision:1,buttons:[{id:'cancel',label:'취소'}]};
+  render(view,true);assert.equal(elements.feedback.hidden,true);
+  const button=elements.actions.children[0];
+  render(view,false);assert.equal(elements.feedback.hidden,false);
+  assert.equal(elements.actions.children[0],button);
 });
