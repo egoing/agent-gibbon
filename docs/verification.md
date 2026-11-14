@@ -1,3 +1,7 @@
+## 2026-11-14 중앙 빌드 캐시·pnpm 전환
+
+현재 개발 명령은 pnpm 11.25.0을 사용한다. [이번 측정·검증 기록](verification/shared-build-cache-pnpm-20261114.md)과 [개발 실행 안내](../README.md)를 따른다. 아래의 과거 실행 증거에 남은 npm 명령은 당시 기록이다.
+
 # Floatnote 검증 기록
 
 ## Windows 반복 행 조사 — #66 (2026-11-06)

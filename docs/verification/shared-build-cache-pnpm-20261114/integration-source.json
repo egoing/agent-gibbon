@@ -1,0 +1,16 @@
+{
+  "head": "40b440c1a87dc26dcc8d10b7c99228fa405dd585",
+  "state": "uncommitted implementation; final commit not authorized",
+  "files": {
+    "package.json": "3220c0afd875e61405ed7abc0eed79f3f433ebff4dbb783e3eefda7176dee686",
+    "pnpm-lock.yaml": "edba05c29017960545f5155240d2f96e03972560d43acfa178b203d3be8b9fd8",
+    "scripts/build.mjs": "b48e63def6b3a567217dc1928b8d09598ec649cd313071439f0640ff7aad5f85",
+    "scripts/dev.mjs": "62e7da06cc2b43535deddb02d90f34fa0f798cd93430e4649cf0b07713639629",
+    "scripts/dev-instance.mjs": "2bf3188289977d1b0ee18329896bc2d5f44deeaa146232d55a33757a175961b2",
+    "scripts/release-version.mjs": "eb4a9bea89bbaa026b74fe04c3a4c2e40e50ba86c4f9da41d1e09f6d052db48c",
+    "scripts/isolation-smoke.py": "c03669066252bd81ad181f4b8234580476a18be42c5d480178f45eef52df928d",
+    "tests/dev-instance.test.mjs": "2b45ccd9f7c112c85daabe642a952ad5d692fff76f5f2abe97ec7663d89dd089",
+    "tests/release.test.mjs": "c178f53009e55f5fd22b7e5e7cb43e1e570aa8b06035ed926d89c708d1f87f23",
+    ".github/workflows/release.yml": "1da67fb2ea69b6b8501da76369fb769d85dd8b2542d23e3929978668a1d6da5d"
+  }
+}

@@ -1,0 +1,36 @@
+[
+  {
+    "info": {
+      "root": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon",
+      "id": "dev-f0f4ac7ca763829096124cec",
+      "name": "codex/shared-build-cache-pnpm",
+      "buildDir": "/Users/egoinglee/dev/project/agent-gibbon/.git/agent-gibbon/build-cache",
+      "target": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon/src-tauri/target",
+      "binary": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon/src-tauri/target/debug/agent-gibbon"
+    },
+    "binary_probe": {
+      "dev_label": "DEV codex/shared-build-cache-pnpm \u00b7 f0f4ac7c",
+      "instance": "dev-f0f4ac7ca763829096124cec",
+      "manifest_dir": "/Users/egoinglee/.codex/worktrees/ae2a/agent-gibbon/src-tauri",
+      "ok": true
+    },
+    "sha256": "68e21a5448c61515afe2530b24e67f09b47572a32fa440442254ed49553a438d"
+  },
+  {
+    "info": {
+      "root": "/Users/egoinglee/.codex/worktrees/gibbon-cache-bench-peer/agent-gibbon",
+      "id": "dev-f403a583b693ae5b1f09960a",
+      "name": "detached@40b440c",
+      "buildDir": "/Users/egoinglee/dev/project/agent-gibbon/.git/agent-gibbon/build-cache",
+      "target": "/Users/egoinglee/.codex/worktrees/gibbon-cache-bench-peer/agent-gibbon/src-tauri/target",
+      "binary": "/Users/egoinglee/.codex/worktrees/gibbon-cache-bench-peer/agent-gibbon/src-tauri/target/debug/agent-gibbon"
+    },
+    "binary_probe": {
+      "dev_label": "DEV detached@40b440c \u00b7 f403a583",
+      "instance": "dev-f403a583b693ae5b1f09960a",
+      "manifest_dir": "/Users/egoinglee/.codex/worktrees/gibbon-cache-bench-peer/agent-gibbon/src-tauri",
+      "ok": true
+    },
+    "sha256": "10cee2dfbb6260f5051c7dda40fb295f328c95476db3638ad6018297c753d97d"
+  }
+]

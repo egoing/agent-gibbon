@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, realpathSync } from 'node:fs';
-import { devInstance, devEnvironment } from './dev-instance.mjs';
+import { devInstance, devEnvironment, requireBuildDirSupport } from './dev-instance.mjs';
 
 const instance = devInstance(fileURLToPath(new URL('..', import.meta.url)));
 const [mode, ...args] = process.argv.slice(2);
@@ -14,7 +14,7 @@ if (mode === 'info') {
   process.exit(0);
 } else if (mode === 'cli') {
   if (!existsSync(instance.binary)) {
-    console.log(JSON.stringify({ ok: false, error: '개발 실행 파일이 없습니다. npm run dev:build를 실행하세요.' }));
+    console.log(JSON.stringify({ ok: false, error: '개발 실행 파일이 없습니다. pnpm run dev:build를 실행하세요.' }));
     process.exit(1);
   }
   const probe = spawnSync(instance.binary, ['--instance-info'], { env, encoding: 'utf8' });
@@ -25,7 +25,7 @@ if (mode === 'info') {
       && realpathSync(info.manifest_dir) === realpathSync(join(instance.root, 'src-tauri'));
   } catch { /* Old or foreign binaries must never reach the installed socket. */ }
   if (!valid) {
-    console.log(JSON.stringify({ ok: false, error: '현재 워크트리의 개발 바이너리가 아닙니다. npm run dev:build로 다시 빌드하세요.' }));
+    console.log(JSON.stringify({ ok: false, error: '현재 워크트리의 개발 바이너리가 아닙니다. pnpm run dev:build로 다시 빌드하세요.' }));
     process.exit(1);
   }
   command = instance.binary;
@@ -44,6 +44,9 @@ if (mode === 'info') {
 } else {
   console.error('사용법: node scripts/dev.mjs dev|build|cli|info');
   process.exit(1);
+}
+if (mode === 'build' || mode === 'dev') {
+  try { requireBuildDirSupport(); } catch (error) { console.error(error.message); process.exit(1); }
 }
 const child = spawn(command, commandArgs, { cwd: mode === 'cli' ? process.cwd() : instance.root, env, stdio: 'inherit' });
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => child.kill(signal));
