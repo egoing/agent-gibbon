@@ -31,6 +31,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
   let feedbackActive = false;
   let highlightRevision = null;
   let saveError;
+  let editorError;
   let saveDelay;
   let exportResult = null;
   let exportError;
@@ -58,6 +59,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
       event: { async listen(name, handler, options) { nativeEvents[name] = handler; nativeTargets[name] = options?.target; return () => {}; } },
       core: { async invoke(command, args) {
         calls.push([command, args]);
+        if (command === 'enter_note_editor' && editorError) throw editorError;
         if (command === 'poll_fold') return folded;
         if (command === 'toggle_fold') { folded = !folded; return folded; }
         if (command === 'warp_note' && warpError) throw warpError;
@@ -85,7 +87,7 @@ async function setup(storage = new Map(), instance = {}, initialNote = {}, platf
   await new Promise(setImmediate);
   const action = async payload => { await nativeEvents['feedback-action']({ payload: { owner: 'memo-test', action: payload, revision: view().revision } }); await new Promise(setImmediate); };
   const view = () => calls.filter(([name]) => name === 'present_feedback').at(-1)?.[1].view;
-  return { toggleFromToolbar: () => context.window.gibbonToggleNote(), exportResult: value => { exportResult = value; }, failExport: error => { exportError = error; }, failCopy: error => { copyError = error; }, element, styles, events, calls, pointers, classes, nativeEvents, nativeTargets, action, view,
+  return { failEditor: error => { editorError = error; }, toggleFromToolbar: () => context.window.gibbonToggleNote(), exportResult: value => { exportResult = value; }, failExport: error => { exportError = error; }, failCopy: error => { copyError = error; }, element, styles, events, calls, pointers, classes, nativeEvents, nativeTargets, action, view,
     expireNotice: async () => { timers.filter(fn => fn.name === 'clearNotice').at(-1)?.(); await new Promise(setImmediate); },
     fold: value => { folded = value; },
     pollFold: () => timers.find(fn => fn.name === 'pollFold')(), highlight: value => { highlightRevision = value; }, refresh: () => timers.find(fn => fn.name === 'refresh')(),
@@ -764,6 +766,73 @@ test('pending save rejects duplicate save/export/cancel and locks only the edito
   assert.equal(app.element('editor').hidden, false);
   finish(); await pending; await new Promise(setImmediate);
   assert.equal(app.element('markdown').readOnly, false);
+  assert.equal(app.element('editor').hidden, true);
+});
+
+
+test('editor height request belongs to entry, not polling, typing, fold or hidden draft restoration', async () => {
+  const app = await setup();
+  const entries = () => app.calls.filter(([name]) => name === 'enter_note_editor');
+  app.element('edit').listeners.click();
+  assert.equal(entries().length, 1);
+  assert.equal(entries()[0][1].revision, 1);
+  app.element('markdown').value = '보존할 초안';
+  app.element('markdown').listeners.input();
+  await app.refresh();
+  app.fold(true); await app.pollFold();
+  app.fold(false); await app.pollFold();
+  await app.refresh();
+  assert.equal(entries().length, 1);
+  assert.equal(app.element('markdown').value, '보존할 초안');
+  await app.action('cancel');
+  app.element('edit').listeners.click();
+  assert.equal(entries().length, 2);
+});
+
+test('initial region editor requests height once; images never enter text editing', async () => {
+  const app = await setup(new Map(), {}, {edit_on_open: true});
+  await app.refresh();
+  assert.equal(app.calls.filter(([name]) => name === 'enter_note_editor').length, 1);
+  const image = await setup(new Map(), {}, {capture: {width: 200, height: 100}});
+  image.element('edit').listeners.click();
+  assert.equal(image.calls.some(([name]) => name === 'enter_note_editor'), false);
+});
+
+test('initial automatic editing waits for a visible snapshot then enters only once', async () => {
+  const state = {visible: false};
+  const app = await setup(new Map(), state, {edit_on_open: true});
+  assert.equal(app.calls.some(([name]) => name === 'enter_note_editor'), false);
+  state.visible = true;
+  await app.refresh();
+  assert.equal(app.calls.filter(([name]) => name === 'enter_note_editor').length, 1);
+  state.visible = false;
+  await app.refresh();
+  state.visible = true;
+  await app.refresh();
+  assert.equal(app.calls.filter(([name]) => name === 'enter_note_editor').length, 1);
+});
+
+test('automatic editor entry waits for unfolding rather than editing a folded window', async () => {
+  const state = {visible: true, folded: true};
+  const app = await setup(new Map(), state, {edit_on_open: true});
+  assert.equal(app.calls.some(([name]) => name === 'enter_note_editor'), false);
+  state.folded = false;
+  await app.refresh();
+  assert.equal(app.calls.filter(([name]) => name === 'enter_note_editor').length, 1);
+});
+
+test('native height failure preserves editing and draft; rapid entry/cancel keeps the read view', async () => {
+  const app = await setup();
+  app.failEditor('크기 변경 실패');
+  app.element('edit').listeners.click();
+  app.element('markdown').value = '실패해도 보존';
+  await new Promise(setImmediate);
+  assert.equal(app.element('editor').hidden, false);
+  assert.equal(app.element('markdown').value, '실패해도 보존');
+  assert.equal(app.view().message, '크기 변경 실패');
+  await app.action('cancel');
+  app.element('edit').listeners.click();
+  await app.action('cancel');
   assert.equal(app.element('editor').hidden, true);
 });
 

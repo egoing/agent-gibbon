@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="540" viewBox="0 0 1040 540">
+<style>text{font-family:"Apple SD Gothic Neo",sans-serif;fill:#2c2f7e;font-size:13px}.title{font-size:22px;font-weight:700}.label{font-size:15px;font-weight:600}.hint{fill:#53606d}.surface{fill:#dfe2dd;stroke:#2c2f7e;stroke-width:2}.editor{fill:#cdd0d3}</style>
+<rect width="1040" height="540" fill="#f3f4f6"/>
+<text x="24" y="34" class="title">편집 시작 · 작은 메모의 높이 확보</text>
+<text x="24" y="60" class="hint">설명용 시안 · 실제 앱 캡처 아님 · 논리 px · 내부 Feedback을 포함한 메모 전체 높이</text>
+<text x="24" y="100" class="label">읽기 · 48px</text>
+<rect x="24" y="120" width="220" height="48" rx="4" class="surface"/>
+<text x="32" y="138">글자  편집</text><text x="32" y="159">짧은 메모</text>
+<text x="260" y="153">→</text>
+<text x="294" y="100" class="label">편집 · 210px로 확대</text>
+<path d="M298 120H510Q514 120 514 124V296H294V124Q294 120 298 120" class="surface"/>
+<text x="302" y="140">글자  편집</text>
+<rect x="298" y="142" width="212" height="150" rx="2" class="editor"/>
+<text x="305" y="173"># 입력할 초안</text>
+<path d="M294 296H514V326Q514 330 510 330H298Q294 330 294 326Z" class="surface"/>
+<path d="M298 297H510" stroke="#2c2f7e" opacity=".25"/>
+<text x="506" y="317" text-anchor="end" font-size="11">취소   저장</text>
+<text x="294" y="390" class="hint">420 ÷ 2 = 210 · 진입할 때 한 번</text>
+<text x="558" y="100" class="label">큰 메모 · 현재 높이 유지</text>
+<rect x="558" y="120" width="220" height="280" rx="4" class="surface"/>
+<text x="566" y="140">글자  편집</text>
+<rect x="562" y="150" width="212" height="246" rx="2" class="editor"/><text x="570" y="173">280px → 280px</text>
+<text x="810" y="100" class="label">화면 하단</text>
+<path d="M804 410H1016" stroke="#53606d" stroke-dasharray="4 4"/>
+<rect x="810" y="200" width="200" height="210" rx="4" class="surface"/>
+<text x="818" y="223">편집 입력 영역</text><text x="818" y="250">아래로 넘칠 때만</text><text x="818" y="273">필요한 만큼 위로 이동</text>
+<text x="24" y="450">너비·가로 위치·초안·핀을 보존 · 자동 배치 재실행 없음 · 다른 창 변경 없음</text>
+<text x="24" y="477">진입 후 수동 축소 가능 · 저장/취소는 기존 크기 정책 · 작업 영역이 210px보다 낮으면 그 높이 안에서 확대</text>
+<text x="24" y="504" class="hint">Feedback은 메모 내부 하단 배치 · 이미지·웹·터미널은 제외</text>
+</svg>
