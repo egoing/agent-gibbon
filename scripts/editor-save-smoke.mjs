@@ -1,2 +1,3 @@
-// Current single-window footer and editing scrollbar regression.
-await import('./inline-feedback-smoke.mjs');
+// #174 replaces the removed textarea/mode transition contract.
+// The current bundled editor covers footer, viewport, first input and preservation.
+await import('./milkdown-browser.mjs');
