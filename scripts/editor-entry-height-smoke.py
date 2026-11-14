@@ -39,7 +39,7 @@ def wait(predicate):
     raise AssertionError(value)
 
 def ax(action, *args, feedback=False):
-    return run(OUT / 'ax', pid, title + (' · Feedback' if feedback else ''), action, *args)
+    return run(OUT / 'ax', pid, title, action, *args)
 
 def geometry():
     return json.loads(ax('geometry'))
@@ -103,7 +103,7 @@ try:
             record(f'{width}x{height}-edit')
             cancel()
             assert cli('inspect')['size'] == state['size']
-        # Entering at the bottom grows upward only; existing Feedback attaches above.
+        # Entering at the bottom grows upward; Feedback stays inside the memo.
         ax('position', x, primary_top - work[1] - 48)
         ax('resize', 300, 48)
         time.sleep(.4)
@@ -114,7 +114,7 @@ try:
         assert state['position']['x'] == before['position']['x']
         assert state['position']['y'] < before['position']['y']
         surface = state['feedback_surface']
-        assert surface['position']['y'] + surface['size']['height'] == state['position']['y'], surface
+        assert surface['mode'] == 'inline' and surface['visible'], surface
         record('bottom-edit')
         # Capture only this PID/title window, never a user's window.
         windows = json.loads(run(OUT / 'native', pid))['windows']
@@ -136,7 +136,7 @@ try:
         record('manual-small-hidden-restored')
         # Conflict still retains the draft; cancel and re-entry grows again.
         source.write_text('외부 원본 변경')
-        click('메모에 반영', feedback=True)
+        click(next(b['label'] for b in cli('inspect')['feedback_surface']['view']['buttons'] if b['id'] == 'save'), feedback=True)
         state = wait(lambda s: s['feedback_surface']['view']['error'])
         assert geometry()['editors'][0]['value'] == '보존할 초안'
         assert source.read_text() == '외부 원본 변경'
@@ -156,7 +156,7 @@ try:
         click('메모 편집')
         editing()
         ax('draft', '# 높이 검증 저장 완료')
-        click('메모에 반영', feedback=True)
+        click(next(b['label'] for b in cli('inspect')['feedback_surface']['view']['buttons'] if b['id'] == 'save'), feedback=True)
         wait(lambda s: s['note']['markdown'] == '# 높이 검증 저장 완료')
         assert source.read_text() == '# 높이 검증 저장 완료'
         record('saved')
