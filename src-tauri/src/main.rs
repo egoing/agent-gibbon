@@ -18,6 +18,7 @@ mod opacity;
 mod placement;
 mod presentation;
 mod privacy;
+mod relation_prototype;
 mod session_restore;
 mod sizing;
 mod skills;
@@ -318,6 +319,7 @@ fn save_note(
 }
 #[tauri::command]
 fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
+    relation_prototype::changed(window.app_handle(), window.label());
     stash::release(&window)?;
     layout::mark(&window, false);
     sizing::cancel(&window);
@@ -496,6 +498,7 @@ fn apply_with_presentation(
             sizing::prepare(&win, presentation)?;
         }
         Action::Close => {
+            relation_prototype::changed(app, win.label());
             stash::release(&win)?;
             sizing::cancel(&win);
             feedback::clear(&win);
@@ -579,6 +582,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     local_trace::local_flow_begin,
                     local_trace::local_flow_stage,
                     snapshot,
+                    relation_prototype::relation_ready,
                     web::web_run,
                     web::web_chrome,
                     terminal::terminal_start,
@@ -663,6 +667,15 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             }
         })
         .on_window_event(|win, event| {
+            if matches!(
+                event,
+                tauri::WindowEvent::Moved(_)
+                    | tauri::WindowEvent::Resized(_)
+                    | tauri::WindowEvent::ScaleFactorChanged { .. }
+                    | tauri::WindowEvent::Destroyed
+            ) {
+                relation_prototype::changed(win.app_handle(), win.label());
+            }
             if matches!(event, tauri::WindowEvent::Focused(_)) {
                 if let Some(window) = win.app_handle().get_webview_window(win.label()) {
                     feedback_window::sync_frame_focus(&window);
@@ -819,6 +832,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             };
             session_restore::start(app.handle(), session_enabled);
             updater::initialize(app.handle());
+            relation_prototype::install(app.handle());
             tray::install(app.handle())?;
             capture::install(app.handle())?;
             stash::install(app.handle())?;

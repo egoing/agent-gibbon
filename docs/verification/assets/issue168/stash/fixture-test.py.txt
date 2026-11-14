@@ -1,0 +1,83 @@
+import json,subprocess,os,time,tempfile,ctypes,uuid
+from pathlib import Path
+root=Path('/tmp/gibbon168-stash-fixture').resolve();out=Path('/tmp/gibbon168-stash')
+def run(*a):return subprocess.check_output(list(map(str,a)),cwd=root,text=True,timeout=30).strip()
+info=json.loads(run('node','scripts/dev.mjs','info'));env=os.environ.copy();env['AGENT_GIBBON_RELATION_PROTOTYPE']='1'
+def cli(action,id=None,*a):
+ args=[str(root/'scripts/agent-gibbon-dev'),action]+(['--id',id] if id else [])+list(a)
+ r=json.loads(subprocess.check_output(args,cwd=root,text=True,env=env));assert r['ok'],r;return r
+ids=['fixture-stash-'+str(i) for i in range(6)];titles={}
+front=run('swift',root/'scripts/frontmost.swift')
+for i,id in enumerate(ids):
+ cli('open',id,'--markdown','격리 숨김 검증 '+id)
+ s=cli('inspect',id);assert s['instance']==info['id'] and s['note']['markdown']=='격리 숨김 검증 '+id
+ titles[id]=f"Agent Gibbon [{s['dev_label']}] — {id}"
+lib=ctypes.CDLL('/usr/lib/libproc.dylib');pids=[]
+for line in run('ps','-axo','pid=').splitlines():
+ p=int(line);b=ctypes.create_string_buffer(4096)
+ if lib.proc_pidpath(p,b,len(b))>0 and b.value.decode()==info['binary']:pids.append(p)
+assert len(pids)==1;p=pids[0]
+folder=Path('/tmp')/f"floatnote-{os.getuid()}-{info['id']}";sequence=json.loads((folder/'stash-probe-response.json').read_text()).get('sequence',0) if (folder/'stash-probe-response.json').exists() else 0
+
+def write(path,value):
+ fd,name=tempfile.mkstemp(dir=path.parent)
+ with os.fdopen(fd,'w') as f:json.dump(value,f,ensure_ascii=False)
+ os.replace(name,path)
+def probe(action='snapshot'):
+ global sequence
+ sequence+=1;write(folder/'stash-probe-command.json',{'sequence':sequence,'action':action})
+ for _ in range(500):
+  try:r=json.loads((folder/'stash-probe-response.json').read_text())
+  except (FileNotFoundError,json.JSONDecodeError):r={}
+  if r.get('sequence')==sequence:
+   assert not r.get('error'),r;return r['state']
+  time.sleep(.005)
+ raise AssertionError('probe timeout')
+def wait(hidden):
+ for _ in range(300):
+  r=probe()
+  if r['active']==hidden and not r['animating']:return r
+  time.sleep(.01)
+ raise AssertionError(r)
+result={'info':info,'manifest':json.loads(run('node','scripts/dev.mjs','cli','--instance-info')),'native_initial':json.loads(run('/tmp/gibbon168-native/native',p)),'pid':p,'test_ids':ids,'probe':'temporary fixture-local main-thread crate::stash::toggle observer','cases':[]}
+try:
+ time.sleep(1.5)
+ for mode in ['off','on']:
+  state=probe()
+  if state['active']:probe('toggle');wait(False)
+  write(folder/'relation-prototype.json',[]);time.sleep(.3)
+  for i,id in enumerate(ids):
+   run('/tmp/gibbon168-native/ax',p,titles[id],'resize',300,180)
+   run('/tmp/gibbon168-native/ax',p,titles[id],'position',100+500*(i%3),140+470*(i//3))
+  time.sleep(.7)
+  for i,id in enumerate(ids):
+   run('/tmp/gibbon168-native/ax',p,titles[id],'resize',300,180)
+   run('/tmp/gibbon168-native/ax',p,titles[id],'position',100+500*(i%3),140+470*(i//3))
+  time.sleep(.2)
+  links=[(0,1),(1,2),(0,3),(1,4),(2,5),(3,4),(4,5)]
+  write(folder/'relation-prototype.json',[] if mode=='off' else [{'from':ids[a],'to':ids[b],'label':'비교'} for a,b in links]);time.sleep(.5)
+  before=probe()
+  for w in before['actual']:assert w['w']==300 and w['h']==180,(mode,w)
+  for i in range(5):
+   started=probe('toggle');hidden=wait(True);probe('toggle');after=wait(False)
+   result['cases'].append({'mode':mode,'cycle':i+1,'before':before,'started':started,'hidden':hidden,'after':after})
+   (out/'fixture-results.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
+   print(mode,'cycle',i+1,[(w['label'],w['x'],w['y'],w['w'],w['h']) for w in after['actual']],flush=True)
+  for i in range(5):
+   for _ in range(8):probe('toggle');time.sleep(.06)
+   state=probe()
+   if state['active'] and not state['restoring']:probe('toggle')
+   after=wait(False)
+   result['cases'].append({'mode':mode,'cycle':'rapid-'+str(i+1),'before':before,'after':after})
+   (out/'fixture-results.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
+   print(mode,'rapid',i+1,[(w['label'],w['x'],w['y'],w['w'],w['h']) for w in after['actual']],flush=True)
+finally:
+ state=probe()
+ if state['active']:
+  if not state['restoring']:probe('toggle')
+  wait(False)
+ write(folder/'relation-prototype.json',[])
+ for id in ids:cli('close',id)
+ if run('swift',root/'scripts/frontmost.swift')!=front:
+  run('swift','-e','import AppKit; let pid=pid_t(CommandLine.arguments.last!)!; NSRunningApplication(processIdentifier:pid)?.activate(options:[])',front)
+ print('fixture',p,'cleaned',flush=True)

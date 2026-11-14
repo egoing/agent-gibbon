@@ -1,0 +1,1154 @@
+{
+  "info": {
+    "root": "/Users/egoinglee/.codex/worktrees/67c9/agent-gibbon",
+    "id": "dev-f3d1fc901f372efdf5d35b62",
+    "name": "codex/relation-overlay-prototype",
+    "target": "/Users/egoinglee/.codex/worktrees/67c9/agent-gibbon/src-tauri/target",
+    "binary": "/Users/egoinglee/.codex/worktrees/67c9/agent-gibbon/src-tauri/target/debug/agent-gibbon"
+  },
+  "front_before": "80374",
+  "front_after": "80374",
+  "cases": [
+    {
+      "case": "before-relation",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1320,
+            "y": 520
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 71999,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 660,
+            "Height": 180,
+            "Y": 260,
+            "Width": 300
+          }
+        },
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "screens": [
+        {
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ],
+          "scale": 2,
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ]
+        }
+      ]
+    },
+    {
+      "case": "linked",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1320,
+            "y": 520
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 72000,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-prototype-0",
+          "kCGWindowBounds": {
+            "X": 300,
+            "Height": 209,
+            "Y": 196,
+            "Width": 440
+          }
+        },
+        {
+          "kCGWindowNumber": 71999,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 660,
+            "Height": 180,
+            "Y": 260,
+            "Width": 300
+          }
+        },
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "screens": [
+        {
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ],
+          "scale": 2,
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ]
+        }
+      ]
+    },
+    {
+      "case": "moved",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1400,
+            "y": 620
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 72000,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-prototype-0",
+          "kCGWindowBounds": {
+            "X": 300,
+            "Height": 238,
+            "Y": 207,
+            "Width": 480
+          }
+        },
+        {
+          "kCGWindowNumber": 71999,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 700,
+            "Height": 180,
+            "Y": 310,
+            "Width": 300
+          }
+        },
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "screens": [
+        {
+          "scale": 2,
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ],
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ]
+        }
+      ]
+    },
+    {
+      "case": "resized",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1400,
+            "y": 620
+          },
+          "size": {
+            "height": 480,
+            "width": 660
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 72000,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-prototype-0",
+          "kCGWindowBounds": {
+            "X": 300,
+            "Height": 251,
+            "Y": 213,
+            "Width": 480
+          }
+        },
+        {
+          "kCGWindowNumber": 71999,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 700,
+            "Height": 240,
+            "Y": 310,
+            "Width": 330
+          }
+        },
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "screens": [
+        {
+          "scale": 2,
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ],
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ]
+        }
+      ]
+    },
+    {
+      "case": "native-click-through",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1400,
+            "y": 620
+          },
+          "size": {
+            "height": 480,
+            "width": 660
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        },
+        {
+          "kCGWindowNumber": 72000,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-prototype-0",
+          "kCGWindowBounds": {
+            "X": 300,
+            "Height": 251,
+            "Y": 213,
+            "Width": 480
+          }
+        },
+        {
+          "kCGWindowNumber": 71999,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 700,
+            "Height": 240,
+            "Y": 310,
+            "Width": 330
+          }
+        }
+      ],
+      "screens": [
+        {
+          "scale": 2,
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ],
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ]
+        }
+      ]
+    },
+    {
+      "case": "folded",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 48,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "folded": true
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1400,
+            "y": 620
+          },
+          "size": {
+            "height": 480,
+            "width": 660
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 24,
+            "Y": 160,
+            "Width": 300
+          }
+        },
+        {
+          "kCGWindowNumber": 72000,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-prototype-0",
+          "kCGWindowBounds": {
+            "X": 179,
+            "Height": 339,
+            "Y": 104,
+            "Width": 601
+          }
+        },
+        {
+          "kCGWindowNumber": 71999,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 700,
+            "Height": 240,
+            "Y": 310,
+            "Width": 330
+          }
+        }
+      ],
+      "screens": [
+        {
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ],
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ],
+          "scale": 2
+        }
+      ]
+    },
+    {
+      "case": "unfolded",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1400,
+            "y": 620
+          },
+          "size": {
+            "height": 480,
+            "width": 660
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        },
+        {
+          "kCGWindowNumber": 72000,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-prototype-0",
+          "kCGWindowBounds": {
+            "X": 300,
+            "Height": 251,
+            "Y": 213,
+            "Width": 480
+          }
+        },
+        {
+          "kCGWindowNumber": 71999,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 700,
+            "Height": 240,
+            "Y": 310,
+            "Width": 330
+          }
+        }
+      ],
+      "screens": [
+        {
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ],
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ],
+          "scale": 2
+        }
+      ]
+    },
+    {
+      "case": "hidden",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1400,
+            "y": 620
+          },
+          "size": {
+            "height": 480,
+            "width": 660
+          },
+          "visible": false,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "screens": [
+        {
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ],
+          "scale": 2,
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ]
+        }
+      ]
+    },
+    {
+      "case": "restored",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1400,
+            "y": 620
+          },
+          "size": {
+            "height": 96,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 72001,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-prototype-0",
+          "kCGWindowBounds": {
+            "X": 300,
+            "Height": 204,
+            "Y": 191,
+            "Width": 480
+          }
+        },
+        {
+          "kCGWindowNumber": 71999,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 700,
+            "Height": 48,
+            "Y": 310,
+            "Width": 300
+          }
+        },
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "screens": [
+        {
+          "scale": 2,
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ],
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ]
+        }
+      ]
+    },
+    {
+      "case": "overlap",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 96,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 71999,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 48,
+            "Y": 160,
+            "Width": 300
+          }
+        },
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "screens": [
+        {
+          "scale": 2,
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ],
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ]
+        }
+      ]
+    },
+    {
+      "case": "separated",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1400,
+            "y": 620
+          },
+          "size": {
+            "height": 96,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 72002,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-prototype-0",
+          "kCGWindowBounds": {
+            "X": 300,
+            "Height": 204,
+            "Y": 191,
+            "Width": 480
+          }
+        },
+        {
+          "kCGWindowNumber": 71999,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 700,
+            "Height": 48,
+            "Y": 310,
+            "Width": 300
+          }
+        },
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "screens": [
+        {
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ],
+          "scale": 2,
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ]
+        }
+      ]
+    },
+    {
+      "case": "native-closed",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1400,
+            "y": 620
+          },
+          "size": {
+            "height": 96,
+            "width": 600
+          },
+          "visible": false,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "screens": [
+        {
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ],
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ],
+          "scale": 2
+        }
+      ]
+    },
+    {
+      "case": "recreated",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1400,
+            "y": 620
+          },
+          "size": {
+            "height": 96,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 72004,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-prototype-0",
+          "kCGWindowBounds": {
+            "X": 300,
+            "Height": 204,
+            "Y": 191,
+            "Width": 480
+          }
+        },
+        {
+          "kCGWindowNumber": 72003,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 700,
+            "Height": 48,
+            "Y": 310,
+            "Width": 300
+          }
+        },
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "screens": [
+        {
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ],
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ],
+          "scale": 2
+        }
+      ]
+    },
+    {
+      "case": "cleared",
+      "notes": [
+        {
+          "id": "relation-92c17cf6-a",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 160,
+            "y": 320
+          },
+          "size": {
+            "height": 360,
+            "width": 600
+          },
+          "visible": true,
+          "focused": true,
+          "folded": false
+        },
+        {
+          "id": "relation-df7f4460-b",
+          "instance": "dev-f3d1fc901f372efdf5d35b62",
+          "position": {
+            "x": 1400,
+            "y": 620
+          },
+          "size": {
+            "height": 96,
+            "width": 600
+          },
+          "visible": true,
+          "focused": false,
+          "folded": false
+        }
+      ],
+      "windows": [
+        {
+          "kCGWindowNumber": 72003,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-df7f4460-b",
+          "kCGWindowBounds": {
+            "X": 700,
+            "Height": 48,
+            "Y": 310,
+            "Width": 300
+          }
+        },
+        {
+          "kCGWindowNumber": 71998,
+          "kCGWindowOwnerPID": 98455,
+          "kCGWindowName": "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — relation-92c17cf6-a",
+          "kCGWindowBounds": {
+            "X": 80,
+            "Height": 180,
+            "Y": 160,
+            "Width": 300
+          }
+        }
+      ],
+      "screens": [
+        {
+          "frame": [
+            0,
+            0,
+            1728,
+            1117
+          ],
+          "visible": [
+            0,
+            0,
+            1728,
+            1079
+          ],
+          "scale": 2
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,209 @@
+[
+  {
+    "id": "demo-course-audience",
+    "position": {
+      "x": 2978,
+      "y": 2002
+    },
+    "size": {
+      "height": 84,
+      "width": 306
+    },
+    "visible": false,
+    "folded": false,
+    "always_on_top": true,
+    "before_position": {
+      "x": 2978,
+      "y": 2002
+    },
+    "before_size": {
+      "height": 84,
+      "width": 306
+    },
+    "geometry_equal": true
+  },
+  {
+    "id": "demo-course-check",
+    "position": {
+      "x": 3092,
+      "y": 2106
+    },
+    "size": {
+      "height": 84,
+      "width": 306
+    },
+    "visible": false,
+    "folded": false,
+    "always_on_top": true,
+    "before_position": {
+      "x": 3092,
+      "y": 2106
+    },
+    "before_size": {
+      "height": 84,
+      "width": 306
+    },
+    "geometry_equal": true
+  },
+  {
+    "id": "demo-course-concept",
+    "position": {
+      "x": 3028,
+      "y": 2098
+    },
+    "size": {
+      "height": 80,
+      "width": 312
+    },
+    "visible": false,
+    "folded": false,
+    "always_on_top": true,
+    "before_position": {
+      "x": 3028,
+      "y": 2098
+    },
+    "before_size": {
+      "height": 80,
+      "width": 312
+    },
+    "geometry_equal": true
+  },
+  {
+    "id": "demo-course-exercise",
+    "position": {
+      "x": 3064,
+      "y": 2002
+    },
+    "size": {
+      "height": 84,
+      "width": 306
+    },
+    "visible": false,
+    "folded": false,
+    "always_on_top": true,
+    "before_position": {
+      "x": 3064,
+      "y": 2002
+    },
+    "before_size": {
+      "height": 84,
+      "width": 306
+    },
+    "geometry_equal": true
+  },
+  {
+    "id": "demo-course-goal",
+    "position": {
+      "x": 2980,
+      "y": 2050
+    },
+    "size": {
+      "height": 78,
+      "width": 312
+    },
+    "visible": false,
+    "folded": false,
+    "always_on_top": true,
+    "before_position": {
+      "x": 2980,
+      "y": 2050
+    },
+    "before_size": {
+      "height": 78,
+      "width": 312
+    },
+    "geometry_equal": true
+  },
+  {
+    "id": "demo-course-publish",
+    "position": {
+      "x": 3124,
+      "y": 2050
+    },
+    "size": {
+      "height": 84,
+      "width": 306
+    },
+    "visible": false,
+    "folded": false,
+    "always_on_top": true,
+    "before_position": {
+      "x": 3124,
+      "y": 2050
+    },
+    "before_size": {
+      "height": 84,
+      "width": 306
+    },
+    "geometry_equal": true
+  },
+  {
+    "id": "image-1794637735188534000",
+    "position": {
+      "x": 2916,
+      "y": 2004
+    },
+    "size": {
+      "height": 98,
+      "width": 108
+    },
+    "visible": false,
+    "folded": false,
+    "always_on_top": true,
+    "before_position": {
+      "x": 2916,
+      "y": 2004
+    },
+    "before_size": {
+      "height": 102,
+      "width": 312
+    },
+    "geometry_equal": false
+  },
+  {
+    "id": "relation-098c6c3b-a",
+    "position": {
+      "x": 3022,
+      "y": 2132
+    },
+    "size": {
+      "height": 68,
+      "width": 308
+    },
+    "visible": false,
+    "folded": false,
+    "always_on_top": true,
+    "before_position": {
+      "x": 3022,
+      "y": 2132
+    },
+    "before_size": {
+      "height": 68,
+      "width": 308
+    },
+    "geometry_equal": true
+  },
+  {
+    "id": "web-1794637784024966000",
+    "position": {
+      "x": 2752,
+      "y": 2036
+    },
+    "size": {
+      "height": 320,
+      "width": 480
+    },
+    "visible": false,
+    "folded": null,
+    "always_on_top": true,
+    "before_position": {
+      "x": 2752,
+      "y": 2036
+    },
+    "before_size": {
+      "height": 154,
+      "width": 380
+    },
+    "geometry_equal": false
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "src-tauri/src/relation_prototype.rs": "947f4de38729e2de412e326e97b552d41bf5e6046ae8932b958ba5cf7822039d",
+  "src-tauri/src/main.rs": "9de8e635b3c1890c5b68e979dab50db05f4fd1b0c47cb8d25c615c47dc7db6fe",
+  "src-tauri/src/stash.rs": "d314f8f062f37c6436188d2b2a0c8446a75f4101813f6a377ee2182a89648168",
+  "src-tauri/src/entrance.rs": "25d29d7c15933913a60fffb9fad0f49e83d6c99394e3821f1624a683a5c96a72",
+  "src-tauri/src/sizing.rs": "4872fc1ab73c66ac66c1a3cfd58c89dac9e90b0ebac9e77bf6f9d5f9000ff21b",
+  "ui/relation-prototype.js": "9d1f31cad3c72492f72bf1efc0146f3d45865e770cc42b148fa47e43ca92c51e",
+  "tests/relation-render.test.mjs": "a65ed9ec8532b5ef59425674e0872ecebaf441548cbfed9d9b5614d1802f4b11"
+}

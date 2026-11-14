@@ -1,0 +1,5 @@
+{
+  "src-tauri/src/relation_prototype.rs": "f7e0cc80cc5261c41ec27ece150f063bd54fff57bf53d541d016ce246098d11b",
+  "ui/relation-prototype.js": "3691e2f9fdd3581f2eb3812082910641ae2cc52413cdaf1baccd5483df65367d",
+  "tests/relation-render.test.mjs": "f1d0b8e700c15d04e657c25a32aaa337bbbdf19f25d5de5e2ec09f64d7a54086"
+}
