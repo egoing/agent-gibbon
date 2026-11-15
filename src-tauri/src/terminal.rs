@@ -327,6 +327,7 @@ pub(crate) fn open_presented(
             })
             .title(format!("{} — {id}", crate::instance::current().title()))
             .decorations(false)
+            .transparent(true)
             .resizable(true)
             .min_inner_size(2.0, 2.0)
             .inner_size(agent.bounds.width, agent.bounds.height)
