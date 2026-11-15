@@ -315,11 +315,6 @@ async function refresh(schedule = true) {
   } catch (error) { failure(error); }
   if (schedule) setTimeout(refresh, 350);
 }
-document.addEventListener('mousedown', (event) => {
-  if (event.button !== 0 || !event.target.closest('#controls') || event.target.closest('button, .resize')) return;
-  event.preventDefault();
-  invoke('drag_note').catch(failure);
-});
 for (const grip of document.querySelectorAll('.resize')) {
   grip.addEventListener('mousedown', (event) => {
     if (event.button !== 0 || folded) return;
@@ -471,6 +466,7 @@ document.addEventListener('click', (event) => {
 }, true);
 $('fold-toggle').addEventListener('click', toggleFold);
 window.gibbonToggleNote = toggleFold;
+window.gibbonApplyFold = displayFold;
 async function pollFold() {
   try { displayFold(await invoke('poll_fold')); }
   catch (error) { failure(error); }

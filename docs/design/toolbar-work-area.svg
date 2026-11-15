@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="410" viewBox="0 0 960 410">
+<rect width="960" height="410" fill="#f4f4f4"/>
+<g font-family="-apple-system, sans-serif" fill="#2c2f7e">
+<text x="24" y="28" font-size="16">공통 툴바 빈 공간 더블클릭 · 작업 영역 확대 / 이전 기하 복원</text>
+<text x="24" y="55" font-size="12">설명용 동작 시안 · 텍스트·이미지/캡처·터미널·웹에 공통 적용</text>
+<rect x="24" y="78" width="412" height="242" rx="4" fill="#e8e8e8"/>
+<rect x="24" y="78" width="412" height="20" fill="#c9c9c9"/>
+<text x="34" y="92" font-size="10">현재 모니터 · 메뉴 막대</text>
+<rect x="65" y="135" width="310" height="140" rx="4" fill="#dfe2dd"/>
+<rect x="66" y="136" width="308" height="138" rx="3" fill="none" stroke="#6b6e9f" stroke-width="2"/>
+<text x="75" y="151" font-size="12">Tₜ  ✎  ⇥  ▱  ▰</text><text x="332" y="151" font-size="12">↥  ×</text>
+<rect x="212" y="138" width="108" height="19" rx="3" fill="#2c2f7e" fill-opacity=".10"/>
+<text x="75" y="187" font-size="12">원래 위치·크기·핀·접힘 상태 저장</text>
+<text x="225" y="152" font-size="10">빈 공간 2회 클릭</text>
+<text x="445" y="181" font-size="24">⇄</text>
+<rect x="488" y="78" width="448" height="242" rx="4" fill="#e8e8e8"/>
+<rect x="488" y="78" width="448" height="20" fill="#c9c9c9"/>
+<text x="498" y="92" font-size="10">같은 모니터 · 메뉴 막대 유지</text>
+<rect x="488" y="98" width="448" height="222" rx="4" fill="#dfe2dd"/>
+<rect x="489" y="99" width="446" height="220" rx="3" fill="none" stroke="#6b6e9f" stroke-width="2"/>
+<text x="499" y="114" font-size="12">Tₜ  ✎  ⇥  ▱  ▰</text><text x="891" y="114" font-size="12">↥  ×</text>
+<text x="509" y="159" font-size="12">작업 영역까지 메모창 전체 확대</text>
+<text x="509" y="184" font-size="12">빈 공간을 다시 더블클릭하면 이전 상태 복원</text>
+<text x="509" y="210" font-size="12">별도 Space 전체화면으로 전환하지 않음</text>
+<text x="24" y="350" font-size="12">버튼·제목·편집 컨트롤은 확대 제외 · 드래그는 포인터가 실제 이동했을 때 시작</text>
+<text x="24" y="375" font-size="12">툴바 외형·기존 버튼·접기/펼치기 유지 · 실제 실행 범위와 한계는 검증 기록 참조</text>
+</g></svg>
