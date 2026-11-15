@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "instance": "dev-02fb6da00054817952960148",
+  "id": "issue178-text",
+  "position": {
+    "x": 0,
+    "y": 50
+  },
+  "size": {
+    "height": 2254,
+    "width": 4096
+  },
+  "folded": false,
+  "always_on_top": true,
+  "auto_layout_excluded": true,
+  "visible": true
+}

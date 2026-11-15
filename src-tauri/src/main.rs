@@ -623,6 +623,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     sizing::poll_fold,
                     sizing::toggle_fold,
                     sizing::chrome_fold,
+                    sizing::chrome_drag,
+                    sizing::chrome_work_area,
                     sizing::manual_resize
                 ]);
             move |invoke: tauri::ipc::Invoke| {

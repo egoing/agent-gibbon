@@ -35,7 +35,6 @@ terminal.attachCustomKeyEventHandler(e=>{
 document.getElementById('terminal').addEventListener('pointerdown', e => {
   if(e.button === 0) terminal.focus();
 });
-document.querySelector('header').addEventListener('pointerdown',e=>{if(e.button===0&&!e.target.closest('button'))win.startDragging().catch(report);});
 document.querySelectorAll('.resize').forEach(handle=>handle.addEventListener('pointerdown',e=>{if(e.button===0)win.startResizeDragging(handle.dataset.direction).catch(report);}));
 document.getElementById('close').onclick=()=>invoke('terminal_close').catch(report);
 function setInfo(info){

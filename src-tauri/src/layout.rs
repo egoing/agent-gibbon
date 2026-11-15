@@ -47,6 +47,10 @@ pub fn excluded(w: &WebviewWindow) -> bool {
         .unwrap_or(false)
 }
 pub fn mark(w: &WebviewWindow, geometric: bool) {
+    // Content edits and hidden reopens must not reflow a deliberately zoomed frame.
+    if !geometric && crate::sizing::work_area_active(w) {
+        return;
+    }
     w.state::<Exclusions>()
         .0
         .lock()

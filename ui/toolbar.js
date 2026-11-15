@@ -104,3 +104,50 @@ window.__TAURI__.webviewWindow.getCurrentWebviewWindow().listen('toolbar-pointer
     else button.removeAttribute('data-pointer-over');
   }
 });
+
+// A stationary press must stay in the WebView long enough for dblclick.
+// Native dragging starts only after an actual movement, while left is held.
+let toolbarPress = null;
+let changingWorkArea = false;
+const toolbarInteractive = target => target.closest('button, input, textarea, select, a, [contenteditable], .resize');
+function toolbarError(error) {
+  const status = document.getElementById('status');
+  if (status) status.textContent = String(error);
+}
+controls.addEventListener('pointerdown', event => {
+  toolbarPress = null;
+  if (event.button !== 0 || toolbarInteractive(event.target)) return;
+  toolbarPress = { x: event.clientX, y: event.clientY, id: event.pointerId };
+});
+// Body dragging in text/image notes must not consume toolbar clicks.
+controls.addEventListener('mousedown', event => {
+  if (!toolbarInteractive(event.target)) event.stopPropagation();
+});
+function moveToolbar(event) {
+  if (!toolbarPress || event.pointerId !== toolbarPress.id) return;
+  if (!(event.buttons & 1)) { toolbarPress = null; return; }
+  if (Math.hypot(event.clientX - toolbarPress.x, event.clientY - toolbarPress.y) < 4) return;
+  toolbarPress = null;
+  window.__TAURI__.core.invoke('chrome_drag').catch(toolbarError);
+}
+controls.addEventListener('pointermove', moveToolbar);
+// Keep fast vertical drags working after the pointer leaves the short toolbar.
+window.addEventListener?.('pointermove', moveToolbar);
+window.addEventListener?.('pointerup', () => { toolbarPress = null; });
+window.addEventListener?.('blur', () => { toolbarPress = null; });
+for (const name of ['pointerup', 'pointercancel']) {
+  controls.addEventListener(name, () => { toolbarPress = null; });
+}
+controls.addEventListener('dblclick', async event => {
+  // Title gestures remain available for title selection/editing.
+  if (event.button !== 0 || toolbarInteractive(event.target) || event.target.closest('#chrome-title') || changingWorkArea) return;
+  event.preventDefault();
+  toolbarPress = null;
+  changingWorkArea = true;
+  try {
+    const collapsed = await window.__TAURI__.core.invoke('chrome_work_area');
+    if (window.gibbonApplyFold) window.gibbonApplyFold(collapsed);
+    else displayFold(collapsed);
+  } catch (error) { toolbarError(error); }
+  finally { changingWorkArea = false; }
+});
