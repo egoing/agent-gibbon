@@ -1065,6 +1065,86 @@ fn parse(args: &[String]) -> Result<Request, String> {
     }
     Ok(request)
 }
+#[cfg(any(target_os = "macos", test))]
+fn enclosing_app(executable: &std::path::Path) -> Option<&std::path::Path> {
+    let macos = executable.parent()?;
+    let contents = macos.parent()?;
+    let bundle = contents.parent()?;
+    (macos.ends_with("MacOS") && contents.ends_with("Contents") && bundle.extension()? == "app")
+        .then_some(bundle)
+}
+
+fn launch_cli_server() -> Result<(), String> {
+    let executable = std::env::current_exe().map_err(|e| e.to_string())?;
+    #[cfg(target_os = "macos")]
+    if crate::instance::current().id.is_none() {
+        if let Some(bundle) = enclosing_app(&executable) {
+            let result = Command::new("/usr/bin/open")
+                .arg("-g")
+                .arg(bundle)
+                .output()
+                .map_err(|e| e.to_string())?;
+            return if result.status.success() {
+                Ok(())
+            } else {
+                Err(format!(
+                    "설치 앱을 열지 못했습니다: {}",
+                    String::from_utf8_lossy(&result.stderr).trim()
+                ))
+            };
+        }
+    }
+    let mut child = Command::new(executable);
+    child
+        .arg("--serve")
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
+    // Detach the GUI from short-lived agent/terminal command sessions.
+    // SAFETY: setsid is async-signal-safe and touches no Rust state after fork.
+    #[cfg(unix)]
+    unsafe {
+        child.pre_exec(|| {
+            if libc::setsid() == -1 {
+                return Err(std::io::Error::last_os_error());
+            }
+            Ok(())
+        });
+    }
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        child.creation_flags(0x08000000); // CREATE_NO_WINDOW
+    }
+    #[cfg(windows)]
+    windows_process::spawn(&mut child).map_err(|e| e.to_string())?;
+    #[cfg(not(windows))]
+    child.spawn().map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[cfg(test)]
+#[test]
+fn launcher_recognizes_only_bundle_executables() {
+    use std::path::Path;
+    assert_eq!(
+        enclosing_app(Path::new(
+            "/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon"
+        )),
+        Some(Path::new("/Applications/Agent Gibbon.app"))
+    );
+    assert_eq!(
+        enclosing_app(Path::new("/work/src-tauri/target/debug/agent-gibbon")),
+        None
+    );
+    assert_eq!(
+        enclosing_app(Path::new(
+            "/Applications/Other.app/random/MacOS/agent-gibbon"
+        )),
+        None
+    );
+}
+
 fn cli(args: &[String]) -> Result<Value, String> {
     let request = parse(args)?;
     // Preserve invalid local IPC paths instead of masking them as startup errors.
@@ -1072,32 +1152,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
     let stream = match ipc::connect() {
         Ok(stream) => stream,
         Err(_) if matches!(request.action, Action::Open | Action::Web) => {
-            let mut child = Command::new(std::env::current_exe().map_err(|e| e.to_string())?);
-            child
-                .arg("--serve")
-                .stdin(Stdio::null())
-                .stdout(Stdio::null())
-                .stderr(Stdio::null());
-            // Detach the GUI from short-lived agent/terminal command sessions.
-            // SAFETY: setsid is async-signal-safe and touches no Rust state after fork.
-            #[cfg(unix)]
-            unsafe {
-                child.pre_exec(|| {
-                    if libc::setsid() == -1 {
-                        return Err(std::io::Error::last_os_error());
-                    }
-                    Ok(())
-                });
-            }
-            #[cfg(windows)]
-            {
-                use std::os::windows::process::CommandExt;
-                child.creation_flags(0x08000000); // CREATE_NO_WINDOW
-            }
-            #[cfg(windows)]
-            windows_process::spawn(&mut child).map_err(|e| e.to_string())?;
-            #[cfg(not(windows))]
-            child.spawn().map_err(|e| e.to_string())?;
+            launch_cli_server()?;
             let start = Instant::now();
             loop {
                 if let Ok(stream) = ipc::connect() {
