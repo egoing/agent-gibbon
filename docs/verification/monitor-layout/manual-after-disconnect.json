@@ -1,0 +1,144 @@
+{
+  "stage": "after-user-disconnect",
+  "time": "2026-11-15T21:00:02.399949+09:00",
+  "processes": [
+    "53980 /Users/egoinglee/.codex/worktrees/4c75/agent-gibbon/src-tauri/target/debug/agent-gibbon"
+  ],
+  "binary": "/Users/egoinglee/.codex/worktrees/4c75/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "instance": "dev-54e35761915b899a5349d485",
+  "monitor_layout": {
+    "crowded": false,
+    "error": null,
+    "pending": false,
+    "screens": [
+      {
+        "bounds": {
+          "height": 848,
+          "width": 1312,
+          "x": -1312,
+          "y": 0
+        },
+        "name": "Monitor #41040",
+        "scale": 2.0,
+        "work": {
+          "height": 824,
+          "width": 1312,
+          "x": -1312,
+          "y": 24
+        }
+      },
+      {
+        "bounds": {
+          "height": 1440,
+          "width": 2560,
+          "x": 0,
+          "y": 0
+        },
+        "name": "Monitor #30544",
+        "scale": 2.0,
+        "work": {
+          "height": 1415,
+          "width": 2560,
+          "x": 0,
+          "y": 25
+        }
+      }
+    ],
+    "temporary_windows": [
+      "main",
+      "note-monitor20-20261115-check",
+      "note-monitor20-a-keep",
+      "note-monitor20-b-return",
+      "note-monitor20-c-manual",
+      "note-monitor20-h-hidden"
+    ]
+  },
+  "notes": [
+    {
+      "id": "monitor20-a-keep",
+      "visible": true,
+      "position": {
+        "x": 200,
+        "y": 250
+      },
+      "size": {
+        "height": 360,
+        "width": 640
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": false
+    },
+    {
+      "id": "monitor20-b-return",
+      "visible": true,
+      "position": {
+        "x": 200,
+        "y": 610
+      },
+      "size": {
+        "height": 420,
+        "width": 680
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": false
+    },
+    {
+      "id": "monitor20-c-manual",
+      "visible": true,
+      "position": {
+        "x": 1040,
+        "y": 50
+      },
+      "size": {
+        "height": 460,
+        "width": 720
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": false
+    },
+    {
+      "id": "monitor20-h-hidden",
+      "visible": false,
+      "position": {
+        "x": 1960,
+        "y": 50
+      },
+      "size": {
+        "height": 360,
+        "width": 640
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": false
+    }
+  ],
+  "comparison": [
+    {
+      "id": "monitor20-a-keep",
+      "position_unchanged": true,
+      "size_unchanged": true,
+      "visible": true
+    },
+    {
+      "id": "monitor20-b-return",
+      "position_unchanged": false,
+      "size_unchanged": true,
+      "visible": true
+    },
+    {
+      "id": "monitor20-c-manual",
+      "position_unchanged": false,
+      "size_unchanged": true,
+      "visible": true
+    },
+    {
+      "id": "monitor20-h-hidden",
+      "position_unchanged": false,
+      "size_unchanged": true,
+      "visible": false
+    }
+  ]
+}

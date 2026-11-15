@@ -265,7 +265,11 @@ pub fn reflow(app: &tauri::AppHandle, opened: &WebviewWindow) -> Result<Destinat
     result.ok_or_else(|| "열 메모의 배치를 계산하지 못했습니다".into())
 }
 
-type Frames = Vec<(WebviewWindow, Destination)>;
+type Frames = Vec<(
+    WebviewWindow,
+    Destination,
+    crate::monitor_layout::RecoveryPoint,
+)>;
 #[derive(Default)]
 pub struct Undo(Mutex<Option<(std::time::Instant, Frames)>>);
 
@@ -298,12 +302,13 @@ pub fn expire_undo(app: &tauri::AppHandle) {
     }
 }
 fn restore_frames(frames: Frames) -> Result<(), String> {
-    for (w, d) in frames {
+    for (w, d, recovery) in frames {
         if !w.is_visible().unwrap_or(false) {
             continue;
         }
         entrance::cancel(&w)?;
         entrance::place(&w, d)?;
+        crate::monitor_layout::restore_override(&w, recovery)?;
         if let Some(m) = w.current_monitor().map_err(|e| e.to_string())? {
             crate::warp::remember(
                 w.app_handle(),
@@ -460,6 +465,7 @@ pub fn arrange(app: &tauri::AppHandle, x: f64, y: f64, center: bool) -> Result<(
                 size: w.outer_size().map_err(|e| e.to_string())?,
                 scale: w.scale_factor().map_err(|e| e.to_string())?,
             },
+            crate::monitor_layout::begin_override(w)?,
         ));
     }
     let apply = (|| -> Result<(), String> {

@@ -95,13 +95,57 @@ pub fn image_toolbar_below(window: &WebviewWindow) -> bool {
         .unwrap_or(false)
 }
 
-// Session-local zoom belongs to this native window, including hidden restores.
+// Per-window zoom is checkpointed separately from temporary display recovery.
 // Store destination scale with the frame, rather than converting on another monitor.
-#[derive(Clone, Copy)]
-struct WorkAreaRestore {
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+pub(crate) struct WorkAreaRestore {
     frame: crate::entrance::Destination,
     expanded: Option<LogicalSize<f64>>,
     excluded: bool,
+    recovery: crate::monitor_layout::RecoveryPoint,
+}
+impl WorkAreaRestore {
+    pub(crate) fn valid(&self) -> bool {
+        let f = self.frame;
+        f.scale.is_finite()
+            && (0.25..=8.).contains(&f.scale)
+            && (1..=100_000).contains(&f.size.width)
+            && (1..=100_000).contains(&f.size.height)
+            && self.expanded.is_none_or(|s| {
+                s.width.is_finite()
+                    && s.height.is_finite()
+                    && s.width > 0.
+                    && s.height > 0.
+                    && s.width <= 100_000.
+                    && s.height <= 100_000.
+            })
+            && self.recovery.validate()
+    }
+}
+pub(crate) fn work_area_snapshot(w: &WebviewWindow) -> Option<WorkAreaRestore> {
+    w.state::<Sizes>()
+        .0
+        .lock()
+        .ok()?
+        .get(w.label())?
+        .work_area_restore
+        .clone()
+}
+pub(crate) fn restore_work_area(
+    w: &WebviewWindow,
+    value: Option<WorkAreaRestore>,
+) -> Result<(), String> {
+    w.state::<Sizes>()
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .entry(w.label().into())
+        .or_default()
+        .work_area_restore = value;
+    if work_area_active(w) {
+        set_image_ratio(w, None)?;
+    }
+    Ok(())
 }
 
 pub fn work_area_active(window: &WebviewWindow) -> bool {
@@ -148,7 +192,11 @@ pub fn chrome_work_area(view: tauri::Webview) -> Result<bool, String> {
     let (restore, expanded, image) = {
         let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
         let state = states.entry(window.label().into()).or_default();
-        (state.work_area_restore, state.expanded, state.image_size)
+        (
+            state.work_area_restore.clone(),
+            state.expanded,
+            state.image_size,
+        )
     };
     let current = crate::entrance::Destination {
         position: window.outer_position().map_err(|e| e.to_string())?,
@@ -156,11 +204,16 @@ pub fn chrome_work_area(view: tauri::Webview) -> Result<bool, String> {
         scale: window.scale_factor().map_err(|e| e.to_string())?,
     };
     let prior_excluded = crate::layout::excluded(&window);
-    let saved = restore.unwrap_or(WorkAreaRestore {
-        frame: current,
-        expanded,
-        excluded: prior_excluded,
-    });
+    let saved = if let Some(saved) = restore.clone() {
+        saved
+    } else {
+        WorkAreaRestore {
+            frame: current,
+            expanded,
+            excluded: prior_excluded,
+            recovery: crate::monitor_layout::begin_override(&window)?,
+        }
+    };
     let destination = if restore.is_some() {
         saved.frame
     } else {
@@ -178,12 +231,16 @@ pub fn chrome_work_area(view: tauri::Webview) -> Result<bool, String> {
         set_image_ratio(&window, None)?;
         crate::layout::mark(&window, true);
         crate::entrance::place(&window, destination)?;
+        if restore.is_some() {
+            crate::monitor_layout::restore_override(&window, saved.recovery.clone())?;
+        }
         if restore.is_some() && saved.expanded.is_none() {
             set_image_ratio(&window, image)?;
         }
         Ok::<(), String>(())
     })();
     if let Err(error) = result {
+        let _ = crate::monitor_layout::restore_override(&window, saved.recovery.clone());
         crate::layout::mark(&window, prior_excluded);
         let _ = crate::entrance::place(&window, current);
         let _ = set_image_ratio(&window, if expanded.is_none() { image } else { None });
@@ -201,7 +258,11 @@ pub fn chrome_work_area(view: tauri::Webview) -> Result<bool, String> {
         let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
         let state = states.entry(window.label().into()).or_default();
         state.expanded = if collapsed { saved.expanded } else { None };
-        state.work_area_restore = if restore.is_some() { None } else { Some(saved) };
+        state.work_area_restore = if restore.is_some() {
+            None
+        } else {
+            Some(saved.clone())
+        };
         if let Ok((cursor, _)) = contact_geometry(&window) {
             state.contact.block(cursor);
         }
@@ -339,6 +400,7 @@ pub fn native_resize(window: &WebviewWindow) -> Result<(), String> {
 
 #[tauri::command]
 pub fn manual_resize(window: WebviewWindow, sizes: State<Sizes>) -> Result<(), String> {
+    crate::monitor_layout::manual(&window);
     crate::entrance::cancel(&window)?;
     let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
     let state = states.entry(window.label().into()).or_default();
@@ -430,6 +492,16 @@ pub(crate) fn expanded_size(window: &WebviewWindow) -> Option<LogicalSize<f64>> 
         .ok()?
         .get(window.label())?
         .expanded
+}
+pub(crate) fn recover_expanded(window: &WebviewWindow, size: LogicalSize<f64>) {
+    if let Ok(mut states) = window.state::<Sizes>().0.lock() {
+        if let Some(state) = states
+            .get_mut(window.label())
+            .filter(|s| s.expanded.is_some())
+        {
+            state.expanded = Some(size);
+        }
+    };
 }
 pub(crate) fn restore_fold(
     window: &WebviewWindow,
