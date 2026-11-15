@@ -36,6 +36,10 @@ pub struct Terminal {
     pub updated_at: u64,
     #[serde(default)]
     pub title: String,
+    #[serde(default)]
+    pub restore_plan: Option<String>,
+    #[serde(default)]
+    pub auto_restore: bool,
 }
 #[derive(Clone, Serialize, Deserialize)]
 pub struct RecentPath {
@@ -99,6 +103,7 @@ struct Session {
     writer: Box<dyn Write + Send>,
     child: OwnedChild,
     program: String,
+    observed_command: bool,
     prompt: welcome::PromptState,
 }
 impl Drop for Session {
@@ -397,7 +402,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         let running = observe_exit(&mut s)?;
         (
             s.child.process_id(),
-            Some(s.program.clone()),
+            welcome::foreground_name(&s).or_else(|| Some(s.program.clone())),
             Some(s.master.get_size().map_err(err)?),
             running,
         )
@@ -405,7 +410,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         (None, None, None, false)
     };
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"bounds":agent.bounds,"pid":pid,"program":program,"running":running,"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":agent.bounds,"pid":pid,"program":program,"running":running,"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
     )
 }
 pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value, String> {
@@ -453,6 +458,7 @@ pub async fn terminal_start(
     rows: u16,
     output: Channel<Vec<u8>>,
     choice: Option<String>,
+    plan: Option<String>,
     local_flow: Option<u64>,
 ) -> Result<Value, String> {
     let _update_activity = crate::updater::activity(window.app_handle())?;
@@ -479,10 +485,22 @@ pub async fn terminal_start(
                 .get(&id)
                 .cloned()
                 .ok_or("터미널 창이 없습니다")?;
-            let (session, mut reader) =
-                welcome::start(&agent, choice.as_deref().unwrap_or("shell"), dimensions)?;
+            let (session, mut reader) = welcome::start(
+                &agent,
+                choice.as_deref().unwrap_or("shell"),
+                plan.as_deref(),
+                dimensions,
+            )?;
             crate::session_restore::terminal_started(&app, &id);
             let watched_session = Arc::downgrade(&reservation.finish(session)?);
+            let initial = if choice.as_deref() == Some("auto-monitor") {
+                agent.restore_plan.as_deref()
+            } else {
+                plan.as_deref()
+                    .or(choice.as_deref())
+                    .filter(|s| *s != "shell")
+            };
+            welcome::remember_plan(&app, &id, initial);
             welcome::touch_path(&app, &id)?;
             let watched_app = app.clone();
             let watched_id = id.clone();
@@ -518,7 +536,12 @@ pub async fn terminal_start(
                                 if directory_report.take_prompt(&s.prompt.token) {
                                     s.prompt.report();
                                 }
+                                let plan = directory_report.take_plan(&s.prompt.token);
+                                s.observed_command |= plan.is_some();
                                 drop(s);
+                                if let Some(plan) = plan {
+                                    welcome::remember_plan(&watched_app, &watched_id, Some(&plan));
+                                }
                                 for path in paths {
                                     let _ = welcome::set_path(&watched_app, &watched_id, path);
                                 }
@@ -754,6 +777,8 @@ mod tests {
             path_updated: 0,
             updated_at: 0,
             title: String::new(),
+            restore_plan: None,
+            auto_restore: false,
             id: "terminal-123".into(),
             bounds: crate::capture::ImageNote {
                 x: 1.,

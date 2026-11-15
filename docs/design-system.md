@@ -1074,3 +1074,16 @@ macOS가 설정 열기 요청을 받아들이면 현재 화면 하단에 별도 
 ### #164 최신 main 통합 검증
 
 내부 Feedback 통합 후에도 위 저장·편집 밀착·공통 scrollbar 기준을 유지한다. UI 198개·Rust 221개·개발 빌드·Rustfmt 및 Chromium 4개 크기 검사를 통과했다. 현재 inline footer의 기본 설명 제거·취소/저장 두 버튼·밀착과 연결 파일 저장은 실제 macOS에서 재확인했다. [현재 실제 캡처](verification/assets/issue164-inline-final-native.png)와 [통합 검증·한계](verification/issue164-editor-save-layout.md#close-승인과-최신-main-통합)를 따른다. 기존 독립창 캡처는 과거 증거다.
+
+### 종료된 터미널의 실행 계획
+
+창별 실행 계획이 있으면 편집 가능한 한 줄 입력란과 **복원**, **취소**를 표시한다. 복원은 현재 입력값을 해당 창의 작업 폴더에서 실행한다. 취소는 셸을 시작하지 않고 기존 Welcome을 연다. 기록이 없는 창도 Welcome으로 시작한다. 이 동작은 이전 Welcome의 읽기 전용 추천 명령 미리보기와 별개다. [복원 시안 SVG](design/terminal-restore-plan.svg) · [PNG](design/terminal-restore-plan.png)
+
+macOS에서는 앱 재시작 시 직전 전경 프로세스가 [자동 재실행 허용 목록](../src-tauri/src/terminal/auto-restore-macos.json)에 있는 실행 파일이고 실행 인자가 0개로 확인되면 같은 작업 폴더에서 자동으로 다시 시작한다. 인자가 있거나 확인할 수 없는 기록은 편집 가능한 실행 계획으로 표시한다. [서브 모니터 검증 기록](verification/terminal-monitor-restore.md)
+
+
+Windows·Linux에서 복원 실행을 요청하면 ‘터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.’를 기존 상태 영역에 표시한다. 복원 버튼과 자동 재실행 요청 모두 프론트엔드와 백엔드에서 차단한다. 취소는 Welcome으로 이동한다. Windows 후속 범위는 [#185](https://github.com/egoing/agent-gibbon/issues/185)에 기록했다.
+
+[macOS 명령 조사](research/macos-auto-restore-commands.md)에 따라 기본 명령 `nettop`과 설치 도구 `htop`·`btop`을 자동 재실행 목록에 포함한다. 목록은 프로그램 이름과 설치 출처로 관리한다. `system`은 OS 시스템 디렉터리, `homebrew`는 Apple Silicon·Intel 설치 디렉터리에서 확인하며 실제 실행은 확인된 절대 경로를 사용한다.
+
+2026-11-15 최신 main 통합 뒤 macOS에서 자동 재실행·복원 추천·편집 실행·취소를 다시 검증했다. 종료된 셸의 자동 재실행 표시를 해제하고 bash 프롬프트 내부 명령이 마지막 사용자 명령을 덮어쓰지 않도록 보강했다. 기존 화면 배치를 유지했다. 최종 Rust 227개·UI 184개 및 실제 검증 범위는 [기록](verification/terminal-monitor-restore.md#2026-11-15-close-최종-통합)에 명시한다.
