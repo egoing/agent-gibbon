@@ -421,6 +421,7 @@ pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value,
         crate::Action::Close => {
             if let Some(win) = app.get_webview_window(id) {
                 crate::stash::release(&win)?;
+                crate::relation_prototype::changed(win.app_handle(), win.label());
                 win.hide().map_err(err)?;
                 crate::tray::sync_visibility(app)?;
             }
@@ -624,6 +625,7 @@ pub fn terminal_resize(window: WebviewWindow, cols: u16, rows: u16) -> Result<()
 pub fn terminal_hide(window: WebviewWindow) -> Result<(), String> {
     caller(&window)?;
     crate::stash::release(&window)?;
+    crate::relation_prototype::changed(window.app_handle(), window.label());
     window.hide().map_err(err)
 }
 #[tauri::command]

@@ -1,0 +1,10 @@
+{
+  "identifier": "relation-picker-events",
+  "windows": [
+    "relation-pick-*"
+  ],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten"
+  ]
+}

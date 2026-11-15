@@ -77,3 +77,9 @@ test('build cache uses the Git common directory while final artifacts stay local
   const override = buildEnvironment(instance, { CARGO_BUILD_BUILD_DIR: 'private-cache' });
   assert.equal(override.CARGO_BUILD_BUILD_DIR, join(root, 'private-cache'));
 });
+
+test('development does not inject a connection feature switch',()=>{
+ const instance=devInstance(fileURLToPath(new URL('..',import.meta.url)));
+ assert.equal(Object.hasOwn(devEnvironment(instance,{}),'AGENT_GIBBON_RELATION_PROTOTYPE'),false);
+ assert.equal(Object.hasOwn(buildEnvironment(instance,{}),'AGENT_GIBBON_RELATION_PROTOTYPE'),false);
+});

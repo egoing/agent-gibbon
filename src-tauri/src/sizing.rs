@@ -400,6 +400,7 @@ pub fn native_resize(window: &WebviewWindow) -> Result<(), String> {
 
 #[tauri::command]
 pub fn manual_resize(window: WebviewWindow, sizes: State<Sizes>) -> Result<(), String> {
+    crate::relation_prototype::changed(window.app_handle(), window.label());
     crate::monitor_layout::manual(&window);
     crate::entrance::cancel(&window)?;
     let mut states = sizes.0.lock().map_err(|e| e.to_string())?;

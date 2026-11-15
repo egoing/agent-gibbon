@@ -1,0 +1,1029 @@
+//! Local memo relationships and rendering. Historical module name retained.
+use serde::{Deserialize, Serialize};
+use std::{
+    collections::BTreeMap,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        mpsc, Arc, OnceLock,
+    },
+    time::{Duration, Instant},
+};
+use tauri::{Manager, PhysicalPosition, PhysicalSize, WebviewWindow};
+
+#[derive(Clone, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct Relation {
+    from: String,
+    to: String,
+    #[serde(default)]
+    label: String,
+    #[serde(default)]
+    arrow: Arrow,
+}
+#[derive(Clone, Copy, Default, Deserialize, Serialize, Debug, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum Arrow {
+    #[default]
+    End,
+    Both,
+    None,
+}
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) struct Rect {
+    pub(crate) x: f64,
+    pub(crate) y: f64,
+    pub(crate) w: f64,
+    pub(crate) h: f64,
+}
+pub(crate) fn rect(w: &WebviewWindow) -> Option<Rect> {
+    if !w.is_visible().ok()? || w.is_minimized().ok()? || crate::stash::owns(w) {
+        return None;
+    }
+    window_rect(w).ok()
+}
+fn window_rect(w: &WebviewWindow) -> Result<Rect, String> {
+    let p = w.outer_position().map_err(|e| e.to_string())?;
+    let s = w.outer_size().map_err(|e| e.to_string())?;
+    Ok(Rect {
+        x: p.x as f64,
+        y: p.y as f64,
+        w: s.width as f64,
+        h: s.height as f64,
+    })
+}
+// Resolve IDs through their owning registries; remote webpage children are
+// never endpoints. Their registered native web host owns geometry and focus.
+fn registered_label(id: &str, note: bool, terminal: bool, web: bool) -> Option<String> {
+    if note {
+        Some(crate::label(id))
+    } else if terminal {
+        Some(id.to_owned())
+    } else if web {
+        Some(format!("webview-{id}"))
+    } else {
+        None
+    }
+}
+fn endpoint_registered_label(app: &tauri::AppHandle, id: &str) -> Option<String> {
+    let note = app
+        .state::<crate::AppNotes>()
+        .lock()
+        .is_ok_and(|notes| notes.contains_key(id));
+    registered_label(
+        id,
+        note,
+        crate::terminal::contains(app, id),
+        crate::web::contains(app, id),
+    )
+}
+fn endpoint_label(app: &tauri::AppHandle, id: &str) -> String {
+    endpoint_registered_label(app, id).unwrap_or_else(|| crate::label(id))
+}
+pub(crate) fn endpoint_window(app: &tauri::AppHandle, id: &str) -> Option<WebviewWindow> {
+    crate::web::managed_window(app, &endpoint_registered_label(app, id)?)
+}
+const MAX_RELATIONS: usize = 16;
+// Facing side centers and outward tangents produce a cubic without entering either memo.
+pub(crate) fn curve(a: Rect, b: Rect) -> Option<[[f64; 2]; 4]> {
+    let gap_x = (b.x - a.x - a.w).max(a.x - b.x - b.w);
+    let gap_y = (b.y - a.y - a.h).max(a.y - b.y - b.h);
+    if gap_x < 0. && gap_y < 0. {
+        return None;
+    }
+    let ac = [a.x + a.w / 2., a.y + a.h / 2.];
+    let bc = [b.x + b.w / 2., b.y + b.h / 2.];
+    if gap_x >= 0. && gap_x >= gap_y {
+        let sign = if bc[0] >= ac[0] { 1. } else { -1. };
+        let start = [ac[0] + sign * a.w / 2., ac[1]];
+        let end = [bc[0] - sign * b.w / 2., bc[1]];
+        let bend = (end[0] - start[0]).abs() / 2.;
+        Some([
+            start,
+            [start[0] + sign * bend, start[1]],
+            [end[0] - sign * bend, end[1]],
+            end,
+        ])
+    } else {
+        let sign = if bc[1] >= ac[1] { 1. } else { -1. };
+        let start = [ac[0], ac[1] + sign * a.h / 2.];
+        let end = [bc[0], bc[1] - sign * b.h / 2.];
+        let bend = (end[1] - start[1]).abs() / 2.;
+        Some([
+            start,
+            [start[0], start[1] + sign * bend],
+            [end[0], end[1] - sign * bend],
+            end,
+        ])
+    }
+}
+fn frame(points: &[[f64; 2]; 4], previous: Option<Rect>, padding: f64) -> Rect {
+    let min_x = points.iter().map(|p| p[0]).fold(f64::INFINITY, f64::min);
+    let min_y = points.iter().map(|p| p[1]).fold(f64::INFINITY, f64::min);
+    let max_x = points
+        .iter()
+        .map(|p| p[0])
+        .fold(f64::NEG_INFINITY, f64::max);
+    let max_y = points
+        .iter()
+        .map(|p| p[1])
+        .fold(f64::NEG_INFINITY, f64::max);
+    if let Some(r) = previous {
+        if min_x - padding >= r.x
+            && max_x + padding <= r.x + r.w
+            && min_y - padding >= r.y
+            && max_y + padding <= r.y + r.h
+        {
+            return r;
+        }
+    }
+    // Reserve travel space. Ordinary dragging changes only SVG geometry, not native bounds.
+    let reserve = padding + 512.;
+    Rect {
+        x: (min_x - reserve).floor(),
+        y: (min_y - reserve).floor(),
+        w: (max_x - min_x + 2. * reserve).ceil(),
+        h: (max_y - min_y + 2. * reserve).ceil(),
+    }
+}
+fn local_points(points: [[f64; 2]; 4], actual: Rect) -> [[f64; 2]; 4] {
+    points.map(|p| [p[0] - actual.x, p[1] - actual.y])
+}
+static WAKE: OnceLock<mpsc::SyncSender<()>> = OnceLock::new();
+static CONNECTED: OnceLock<std::sync::RwLock<std::collections::BTreeSet<String>>> = OnceLock::new();
+static SURFACE_DIRTY: OnceLock<std::sync::Mutex<std::collections::BTreeSet<String>>> =
+    OnceLock::new();
+const SETTLE: Duration = Duration::from_millis(150);
+#[derive(Default)]
+struct Motion {
+    changed: BTreeMap<String, Instant>,
+    all: Option<Instant>,
+}
+impl Motion {
+    fn paused(&self, from: &str, to: &str, now: Instant, stashed: bool) -> bool {
+        stashed
+            || [
+                self.all,
+                self.changed.get(from).copied(),
+                self.changed.get(to).copied(),
+            ]
+            .into_iter()
+            .flatten()
+            .any(|last| now.saturating_duration_since(last) < SETTLE)
+    }
+    fn dirty_since(&self, from: &str, to: &str, checked: Instant) -> bool {
+        [
+            self.all,
+            self.changed.get(from).copied(),
+            self.changed.get(to).copied(),
+        ]
+        .into_iter()
+        .flatten()
+        .any(|t| t > checked)
+    }
+    fn delay(&self, now: Instant) -> Duration {
+        self.changed
+            .values()
+            .copied()
+            .chain(self.all)
+            .filter_map(|last| SETTLE.checked_sub(now.saturating_duration_since(last)))
+            .min()
+            .unwrap_or(Duration::from_millis(250))
+            .max(Duration::from_millis(1))
+    }
+}
+fn suspend(surface: &mut Surface) {
+    surface.generation = surface.generation.wrapping_add(1);
+    surface.pending = None;
+    surface.payload = None;
+    if surface.window.is_visible().unwrap_or(false) {
+        let _ = surface.window.hide();
+    }
+}
+pub fn changed(app: &tauri::AppHandle, label: &str) {
+    if label.starts_with("relation-prototype-") {
+        if let Some(dirty) = SURFACE_DIRTY.get() {
+            if let Ok(mut dirty) = dirty.lock() {
+                dirty.insert(label.into());
+            }
+        }
+        if let Some(state) = app.try_state::<std::sync::Mutex<Prototype>>() {
+            if let Ok(mut state) = state.try_lock() {
+                if let Some(surface) = state.surfaces.get_mut(label) {
+                    suspend(surface);
+                    surface.checked = None;
+                }
+            }
+        }
+        if let Some(tx) = WAKE.get() {
+            let _ = tx.try_send(());
+        }
+        return;
+    }
+    let connected = CONNECTED.get().and_then(|labels| labels.read().ok());
+    if !connected
+        .as_ref()
+        .is_some_and(|labels| labels.contains(label))
+    {
+        return;
+    }
+    if let Some(state) = app.try_state::<std::sync::Mutex<Prototype>>() {
+        if let Ok(mut state) = state.try_lock() {
+            state.motion.changed.insert(label.into(), Instant::now());
+            let affected: Vec<_> = state
+                .relations
+                .iter()
+                .enumerate()
+                .filter_map(|(i, r)| {
+                    (endpoint_label(app, &r.from) == label || endpoint_label(app, &r.to) == label)
+                        .then_some(format!("relation-prototype-{i}"))
+                })
+                .collect();
+            for key in affected {
+                if let Some(surface) = state.surfaces.get_mut(&key) {
+                    suspend(surface);
+                }
+            }
+        }
+    }
+    if let Some(tx) = WAKE.get() {
+        let _ = tx.try_send(());
+    }
+}
+// Focus events can arrive blur-before-focus during memo A -> B. Wake the
+// coalesced main-thread check rather than hiding directly on each blur event.
+pub fn focus_changed() {
+    if let Some(tx) = WAKE.get() {
+        let _ = tx.try_send(());
+    }
+}
+#[derive(Debug, PartialEq)]
+enum MemoKind<'a> {
+    Note(&'a str),
+    Terminal(&'a str),
+    Web(&'a str),
+}
+fn memo_kind(label: &str) -> Option<MemoKind<'_>> {
+    if label == "main" {
+        return Some(MemoKind::Note("main"));
+    }
+    if let Some(id) = label.strip_prefix("note-").filter(|id| !id.is_empty()) {
+        return Some(MemoKind::Note(id));
+    }
+    if label.starts_with("terminal-") {
+        return Some(MemoKind::Terminal(label));
+    }
+    label
+        .strip_prefix("webview-")
+        .filter(|id| !id.is_empty())
+        .map(MemoKind::Web)
+}
+fn memo_focused(app: &tauri::AppHandle) -> bool {
+    // AppKit can retain a key window while a different application is active.
+    #[cfg(target_os = "macos")]
+    if objc2_app_kit::NSWorkspace::sharedWorkspace()
+        .frontmostApplication()
+        .is_none_or(|a| a.processIdentifier() != std::process::id() as i32)
+    {
+        return false;
+    }
+    crate::web::managed_windows(app).values().any(|w| {
+        let registered = match memo_kind(w.label()) {
+            Some(MemoKind::Note(id)) => app
+                .state::<crate::AppNotes>()
+                .lock()
+                .is_ok_and(|notes| notes.contains_key(id)),
+            Some(MemoKind::Terminal(id)) => crate::terminal::contains(app, id),
+            Some(MemoKind::Web(id)) => crate::web::contains(app, id),
+            None => false,
+        };
+        registered
+            && w.is_visible().unwrap_or(false)
+            && !w.is_minimized().unwrap_or(true)
+            && !crate::stash::owns(w)
+            && w.is_focused().unwrap_or(false)
+    })
+}
+pub fn transition_started(app: &tauri::AppHandle) {
+    crate::relation_editor::cancel(app, false);
+    if let Some(state) = app.try_state::<std::sync::Mutex<Prototype>>() {
+        if let Ok(mut state) = state.try_lock() {
+            state.motion.all = Some(Instant::now());
+            for surface in state.surfaces.values_mut() {
+                suspend(surface);
+            }
+        }
+    }
+    if let Some(tx) = WAKE.get() {
+        let _ = tx.try_send(());
+    }
+}
+fn acknowledged(pending: Option<u64>, generation: u64, paused: bool) -> bool {
+    !paused && pending == Some(generation)
+}
+#[tauri::command]
+pub fn relation_ready(window: WebviewWindow, generation: u64) -> Result<bool, String> {
+    let app = window.app_handle();
+    let has_focus = memo_focused(app);
+    let Some(index) = window
+        .label()
+        .strip_prefix("relation-prototype-")
+        .and_then(|s| s.parse::<usize>().ok())
+    else {
+        return Ok(false);
+    };
+    let Some(state) = window
+        .app_handle()
+        .try_state::<std::sync::Mutex<Prototype>>()
+    else {
+        return Ok(false);
+    };
+    if SURFACE_DIRTY
+        .get()
+        .and_then(|d| d.lock().ok())
+        .is_some_and(|d| d.contains(window.label()))
+    {
+        return Ok(false);
+    }
+    let mut state = state.lock().map_err(|e| e.to_string())?;
+    if !has_focus {
+        // A brief focus loss can reject this acknowledgement before tick sees
+        // the blur. Invalidate it now so refocus still gets a fresh redraw.
+        if let Some(surface) = state.surfaces.get_mut(window.label()) {
+            if surface.pending == Some(generation) {
+                suspend(surface);
+            }
+        }
+        return Ok(false);
+    }
+    let Some(r) = state.relations.get(index) else {
+        return Ok(false);
+    };
+    if state.motion.paused(
+        &endpoint_label(app, &r.from),
+        &endpoint_label(app, &r.to),
+        Instant::now(),
+        crate::stash::active(window.app_handle()),
+    ) {
+        return Ok(false);
+    };
+    let Some(surface) = state.surfaces.get_mut(window.label()) else {
+        return Ok(false);
+    };
+    if !acknowledged(surface.pending, generation, false) {
+        return Ok(false);
+    };
+    surface.pending = None;
+    #[cfg(target_os = "macos")]
+    unsafe {
+        // SAFETY: trusted own-window acknowledgement, Tauri main thread and live native window.
+        (&*(window.ns_window().map_err(|e| e.to_string())? as *const objc2_app_kit::NSWindow))
+            .orderFrontRegardless();
+    }
+    #[cfg(not(target_os = "macos"))]
+    window.show().map_err(|e| e.to_string())?;
+    Ok(true)
+}
+
+struct Surface {
+    window: WebviewWindow,
+    ready: Arc<AtomicBool>,
+    frame: Option<Rect>,
+    actual_frame: Option<Rect>,
+    payload: Option<serde_json::Value>,
+    generation: u64,
+    pending: Option<u64>,
+    checked: Option<Instant>,
+}
+#[derive(Default)]
+struct Prototype {
+    surfaces: BTreeMap<String, Surface>,
+    bytes: Vec<u8>,
+    relations: Vec<Relation>,
+    last_config: Option<Instant>,
+    motion: Motion,
+    was_stashed: bool,
+    layouts: u64,
+}
+fn valid(r: &Relation) -> bool {
+    let id = |s: &str| {
+        !s.is_empty()
+            && s.len() <= 64
+            && s.bytes()
+                .all(|b| b.is_ascii_alphanumeric() || b == b'-' || b == b'_')
+    };
+    id(&r.from)
+        && id(&r.to)
+        && r.from != r.to
+        && r.label.chars().count() <= 80
+        && !r.label.chars().any(char::is_control)
+}
+fn overlay(app: &tauri::AppHandle, key: &str) -> Result<Surface, String> {
+    crate::focus::remember(app, key);
+    let ready = Arc::new(AtomicBool::new(false));
+    let loaded = ready.clone();
+    let w = tauri::WebviewWindowBuilder::new(
+        app,
+        key,
+        tauri::WebviewUrl::App("relation-prototype.html".into()),
+    )
+    .title(format!("{} — {key}", crate::instance::current().title()))
+    .decorations(false)
+    .transparent(true)
+    .shadow(false)
+    .resizable(false)
+    .visible(false)
+    .focused(false)
+    .focusable(false)
+    .always_on_top(true)
+    .skip_taskbar(true)
+    .on_page_load(move |_, event| {
+        if event.event() == tauri::webview::PageLoadEvent::Finished {
+            loaded.store(true, Ordering::Release);
+            if let Some(tx) = WAKE.get() {
+                let _ = tx.try_send(());
+            }
+        }
+    })
+    .build()
+    .map_err(|e| e.to_string())?;
+    if let Err(e) = w.set_ignore_cursor_events(true) {
+        let _ = w.destroy();
+        return Err(e.to_string());
+    }
+    Ok(Surface {
+        window: w,
+        ready,
+        frame: None,
+        actual_frame: None,
+        payload: None,
+        generation: 0,
+        pending: None,
+        checked: None,
+    })
+}
+fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
+    crate::relation_editor::sweep(app);
+    if let Some(dirty) = SURFACE_DIRTY.get() {
+        if let Ok(mut dirty) = dirty.lock() {
+            for label in std::mem::take(&mut *dirty) {
+                if let Some(surface) = state.surfaces.get_mut(&label) {
+                    suspend(surface);
+                    surface.checked = None;
+                }
+            }
+        }
+    }
+    if state
+        .last_config
+        .is_none_or(|t| t.elapsed() >= Duration::from_millis(250))
+    {
+        use std::io::Read;
+        let bytes = std::fs::File::open(crate::ipc::directory()?.join("relation-prototype.json"))
+            .and_then(|f| {
+                let mut bytes = Vec::new();
+                f.take(16385).read_to_end(&mut bytes)?;
+                Ok(bytes)
+            })
+            .unwrap_or_default();
+        if bytes != state.bytes {
+            state.relations = if bytes.len() <= 16384 {
+                serde_json::from_slice::<Vec<Relation>>(&bytes)
+                    .unwrap_or_default()
+                    .into_iter()
+                    .filter(valid)
+                    .take(MAX_RELATIONS)
+                    .collect()
+            } else {
+                Vec::new()
+            };
+            for surface in state.surfaces.values_mut() {
+                suspend(surface);
+            }
+            state.bytes = bytes;
+        }
+        state.last_config = Some(Instant::now());
+    }
+    // Registries can change without the relation file changing (close/recreate).
+    if let Some(labels) = CONNECTED.get() {
+        if let Ok(mut labels) = labels.write() {
+            *labels = state
+                .relations
+                .iter()
+                .flat_map(|r| [endpoint_label(app, &r.from), endpoint_label(app, &r.to)])
+                .collect();
+        }
+    }
+    if !memo_focused(app) {
+        for surface in state.surfaces.values_mut() {
+            if surface.pending.is_some()
+                || surface.payload.is_some()
+                || surface.window.is_visible().unwrap_or(false)
+            {
+                suspend(surface);
+            }
+        }
+        return Ok(());
+    }
+    let stashed = crate::stash::active(app);
+    if state.was_stashed && !stashed {
+        state.motion.all = Some(Instant::now());
+    }
+    state.was_stashed = stashed;
+    for index in 0..MAX_RELATIONS {
+        let key = format!("relation-prototype-{index}");
+        let paused = state.relations.get(index).is_some_and(|r| {
+            state.motion.paused(
+                &endpoint_label(app, &r.from),
+                &endpoint_label(app, &r.to),
+                Instant::now(),
+                stashed,
+            )
+        });
+        if paused {
+            if let Some(surface) = state.surfaces.get_mut(&key) {
+                if surface.pending.is_some()
+                    || surface.payload.is_some()
+                    || surface.window.is_visible().unwrap_or(false)
+                {
+                    suspend(surface);
+                }
+            }
+            continue;
+        }
+        if let (Some(r), Some(surface)) = (state.relations.get(index), state.surfaces.get(&key)) {
+            let dirty = surface.payload.is_none()
+                || surface.checked.is_none_or(|t| {
+                    state.motion.dirty_since(
+                        &endpoint_label(app, &r.from),
+                        &endpoint_label(app, &r.to),
+                        t,
+                    )
+                });
+            if !dirty {
+                // Visibility-only fallback: stationary relations do not read positions/sizes
+                // or rebuild curves when an unrelated memo is moving.
+                let visible = [&r.from, &r.to].iter().all(|id| {
+                    endpoint_window(app, id).is_some_and(|w| {
+                        w.is_visible().unwrap_or(false) && !w.is_minimized().unwrap_or(true)
+                    })
+                });
+                if !visible {
+                    if let Some(surface) = state.surfaces.get_mut(&key) {
+                        suspend(surface);
+                    }
+                }
+                continue;
+            }
+        }
+        let geometry = state.relations.get(index).and_then(|r| {
+            let a = endpoint_window(app, &r.from)?;
+            let b = endpoint_window(app, &r.to)?;
+            state.layouts += 1;
+            Some((r, curve(rect(&a)?, rect(&b)?)?))
+        });
+        let Some((relation, points)) = geometry else {
+            if let Some(s) = state.surfaces.remove(&key) {
+                let _ = s.window.destroy();
+            }
+            continue;
+        };
+        if !state.surfaces.contains_key(&key) {
+            state.surfaces.insert(key.clone(), overlay(app, &key)?);
+        }
+        let surface = state.surfaces.get_mut(&key).expect("inserted surface");
+        if !surface.ready.load(Ordering::Acquire) {
+            continue;
+        }
+        surface.checked = Some(Instant::now());
+        let w = &surface.window;
+        crate::focus::restore(w);
+        let scale = w.scale_factor().map_err(|e| e.to_string())?;
+        let padding =
+            ((relation.label.chars().count() as f64 * 12. + 24.) * scale / 2.).max(32. * scale);
+        let bounds = frame(&points, surface.frame, padding);
+        let reposition = surface.frame != Some(bounds);
+        if reposition {
+            // AppKit resizing preserves the bottom edge. Apply size first so its
+            // asynchronous origin adjustment cannot undo the requested top edge.
+            w.set_size(PhysicalSize::new(bounds.w as u32, bounds.h as u32))
+                .map_err(|e| e.to_string())?;
+            w.set_position(PhysicalPosition::new(bounds.x as i32, bounds.y as i32))
+                .map_err(|e| e.to_string())?;
+            surface.frame = Some(bounds);
+        }
+        // macOS may clamp the native origin below its menu bar and adjust size.
+        // Keep the requested reserve for scheduling, but draw in the actual viewport.
+        let actual = window_rect(w)?;
+        let native_changed = surface.actual_frame != Some(actual);
+        surface.actual_frame = Some(actual);
+        let relative = local_points(points, actual);
+        let payload = serde_json::json!({"width":actual.w,"height":actual.h,"points":relative,"label":relation.label,"scale":scale,"relation":[relation.from,relation.to],"arrow":relation.arrow});
+        if native_changed || surface.payload.as_ref() != Some(&payload) {
+            // A fresh generation cannot be revealed by a stale pre-move acknowledgement.
+            surface.generation = surface.generation.wrapping_add(1);
+            surface.pending = Some(surface.generation);
+            let generation = surface.generation;
+            w.eval(format!("window.drawRelation({payload},{generation})"))
+                .map_err(|e| e.to_string())?;
+            surface.payload = Some(payload);
+        }
+    }
+    Ok(())
+}
+pub(crate) fn enabled(app: &tauri::AppHandle) -> bool {
+    app.try_state::<std::sync::Mutex<Prototype>>().is_some()
+}
+fn upsert(relations: &mut Vec<Relation>, relation: Relation) -> Result<(), String> {
+    if let Some(existing) = relations.iter_mut().find(|r| {
+        (r.from == relation.from && r.to == relation.to)
+            || (r.from == relation.to && r.to == relation.from)
+    }) {
+        *existing = relation;
+    } else {
+        if relations.len() >= MAX_RELATIONS {
+            return Err("연결은 최대16개까지 만들 수 있습니다".into());
+        }
+        relations.push(relation);
+    }
+    Ok(())
+}
+pub(crate) fn save_connection(
+    app: &tauri::AppHandle,
+    from: String,
+    to: String,
+    label: String,
+    arrow: Arrow,
+) -> Result<(), String> {
+    let relation = Relation {
+        from,
+        to,
+        label,
+        arrow,
+    };
+    if !valid(&relation) {
+        return Err("연결 입력값이 올바르지 않습니다".into());
+    }
+    if endpoint_window(app, &relation.from)
+        .and_then(|w| rect(&w))
+        .is_none()
+        || endpoint_window(app, &relation.to)
+            .and_then(|w| rect(&w))
+            .is_none()
+    {
+        return Err("연결할 메모를 찾을 수 없습니다".into());
+    }
+    let path = crate::ipc::directory()?.join("relation-prototype.json");
+    let bytes = match std::fs::read(&path) {
+        Ok(bytes) => bytes,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => b"[]".to_vec(),
+        Err(e) => return Err(format!("기존 연결 설정을 읽을 수 없습니다: {e}")),
+    };
+    if bytes.len() > 16384 {
+        return Err("연결 설정 파일이 너무 큽니다".into());
+    }
+    let mut relations: Vec<Relation> =
+        serde_json::from_slice(&bytes).map_err(|_| "기존 연결 설정을 읽을 수 없습니다")?;
+    if relations.iter().any(|r| !valid(r)) {
+        return Err("기존 연결 설정을 먼저 확인해 주세요".into());
+    }
+    upsert(&mut relations, relation)?;
+    let bytes = serde_json::to_vec(&relations).map_err(|e| e.to_string())?;
+    if bytes.len() > 16384 {
+        return Err("연결 설정 파일이 너무 큽니다".into());
+    }
+    for path in [
+        app.state::<crate::storage::Store>()
+            .0
+            .join(".relations.json"),
+        path,
+    ] {
+        let parent = path.parent().ok_or("저장 경로가 없습니다")?;
+        let mut file = tempfile::NamedTempFile::new_in(parent).map_err(|e| e.to_string())?;
+        use std::io::Write;
+        file.write_all(&bytes).map_err(|e| e.to_string())?;
+        file.as_file().sync_all().map_err(|e| e.to_string())?;
+        file.persist(&path).map_err(|e| e.to_string())?;
+    }
+    focus_changed();
+    Ok(())
+}
+pub fn install(app: &tauri::AppHandle) {
+    if let Ok(dir) = crate::ipc::directory() {
+        let live = dir.join("relation-prototype.json");
+        if !live.exists() {
+            let saved = app
+                .state::<crate::storage::Store>()
+                .0
+                .join(".relations.json");
+            if let Ok(bytes) = std::fs::read(saved) {
+                let _ = std::fs::write(live, bytes);
+            }
+        }
+    }
+    app.manage(crate::relation_editor::Editor::default());
+    let (wake, changes) = mpsc::sync_channel(1);
+    if WAKE.set(wake).is_err() {
+        return;
+    }
+    CONNECTED.get_or_init(Default::default);
+    SURFACE_DIRTY.get_or_init(Default::default);
+    app.manage(std::sync::Mutex::new(Prototype::default()));
+    let app = app.clone();
+    std::thread::spawn(move || {
+        loop {
+            let start = Instant::now();
+            let (tx, rx) = mpsc::sync_channel(1);
+            let target = app.clone();
+            if app
+                .run_on_main_thread(move || {
+                    let state = target.state::<std::sync::Mutex<Prototype>>();
+                    if let Ok(mut state) = state.lock() {
+                        if let Err(e) = tick(&target, &mut state) {
+                            eprintln!("관계 조사: {e}");
+                        }
+                    }
+                    let wait = if let Ok(state) = state.lock() {
+                        if state.was_stashed {
+                            Duration::from_millis(50)
+                        } else {
+                            state.motion.delay(Instant::now())
+                        }
+                    } else {
+                        Duration::from_millis(250)
+                    };
+                    let _ = tx.send(wait);
+                })
+                .is_err()
+            {
+                break;
+            }
+            let Ok(wait) = rx.recv_timeout(Duration::from_secs(5)) else {
+                break;
+            };
+            // Idle fallback detects visibility and atomic config replacement, without repainting.
+            let _ = changes.recv_timeout(wait);
+            let frame = Duration::from_micros(16667);
+            if let Some(remaining) = frame.checked_sub(start.elapsed()) {
+                std::thread::sleep(remaining);
+            }
+            while changes.try_recv().is_ok() {}
+        }
+    });
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn legacy_arrows_and_upsert_preserve_other_connections() {
+        let mut rows: Vec<Relation> = serde_json::from_str(
+            r#"[{"from":"a","to":"b","label":"old"},{"from":"b","to":"c","label":"keep"}]"#,
+        )
+        .unwrap();
+        assert_eq!(rows[0].arrow, Arrow::End);
+        upsert(
+            &mut rows,
+            Relation {
+                from: "a".into(),
+                to: "b".into(),
+                label: String::new(),
+                arrow: Arrow::Both,
+            },
+        )
+        .unwrap();
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0].arrow, Arrow::Both);
+        assert_eq!(rows[1].label, "keep");
+        let roundtrip: Vec<Relation> =
+            serde_json::from_slice(&serde_json::to_vec(&rows).unwrap()).unwrap();
+        assert_eq!(roundtrip[0].arrow, Arrow::Both);
+        upsert(
+            &mut rows,
+            Relation {
+                from: "b".into(),
+                to: "a".into(),
+                label: "reverse".into(),
+                arrow: Arrow::None,
+            },
+        )
+        .unwrap();
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0].from, "b");
+        assert_eq!(rows[0].arrow, Arrow::None);
+        assert_eq!(rows[1].label, "keep");
+        assert!(
+            serde_json::from_str::<Relation>(r#"{"from":"a","to":"b","arrow":"start"}"#).is_err()
+        );
+        rows.resize(MAX_RELATIONS, rows[1].clone());
+        assert!(upsert(
+            &mut rows,
+            Relation {
+                from: "new".into(),
+                to: "other".into(),
+                label: String::new(),
+                arrow: Arrow::None
+            }
+        )
+        .is_err());
+        assert_eq!(rows.len(), MAX_RELATIONS);
+    }
+    #[test]
+    fn endpoint_types_use_registered_hosts_and_reject_unregistered_ids() {
+        assert_eq!(
+            registered_label("image-1", true, false, false).as_deref(),
+            Some("note-image-1")
+        );
+        assert_eq!(
+            registered_label("terminal-1", false, true, false).as_deref(),
+            Some("terminal-1")
+        );
+        assert_eq!(
+            registered_label("web-1", false, false, true).as_deref(),
+            Some("webview-web-1")
+        );
+        assert_eq!(registered_label("terminal-1", false, false, false), None);
+        assert_eq!(registered_label("web-1", false, false, false), None);
+        assert_eq!(
+            registered_label("relation-prototype-0", false, false, false),
+            None
+        );
+        assert_eq!(
+            registered_label("web-1", true, false, true).as_deref(),
+            Some("note-web-1")
+        );
+    }
+    #[test]
+    fn focus_candidates_are_memos_not_management_or_child_surfaces() {
+        assert_eq!(memo_kind("main"), Some(MemoKind::Note("main")));
+        assert_eq!(
+            memo_kind("note-image-123"),
+            Some(MemoKind::Note("image-123"))
+        );
+        assert_eq!(
+            memo_kind("terminal-123"),
+            Some(MemoKind::Terminal("terminal-123"))
+        );
+        assert_eq!(memo_kind("webview-web-123"), Some(MemoKind::Web("web-123")));
+        for label in [
+            "manager",
+            "stash-indicator",
+            "relation-prototype-0",
+            "webpage-web-123",
+            "capture-overlay",
+            "note-",
+            "webview-",
+        ] {
+            assert_eq!(memo_kind(label), None, "{label}");
+        }
+    }
+    #[test]
+    fn curve_faces_boundaries_in_both_directions() {
+        let a = Rect {
+            x: -300.,
+            y: 0.,
+            w: 100.,
+            h: 100.,
+        };
+        let b = Rect {
+            x: 100.,
+            y: 200.,
+            w: 200.,
+            h: 100.,
+        };
+        let p = curve(a, b).unwrap();
+        assert_eq!(p[0], [-200., 50.]);
+        assert_eq!(p[3], [100., 250.]);
+        assert_eq!(p[0][1], p[1][1]);
+        assert_eq!(p[2][1], p[3][1]);
+        let reverse = curve(b, a).unwrap();
+        assert_eq!(reverse, [p[3], p[2], p[1], p[0]]);
+        assert!(curve(a, a).is_none());
+        let below = Rect {
+            x: -300.,
+            y: 300.,
+            w: 100.,
+            h: 100.,
+        };
+        let vertical = curve(a, below).unwrap();
+        assert_eq!(vertical[0], [-250., 100.]);
+        assert_eq!(vertical[3], [-250., 300.]);
+    }
+    #[test]
+    fn native_frame_is_stable_during_small_movements() {
+        let p = [[0., 0.], [80., 0.], [120., 100.], [200., 100.]];
+        let initial = frame(&p, None, 40.);
+        assert_eq!(
+            frame(&p.map(|p| [p[0] + 100., p[1] + 50.]), Some(initial), 40.),
+            initial
+        );
+        assert_ne!(
+            frame(&p.map(|p| [p[0] + 2000., p[1]]), Some(initial), 40.),
+            initial
+        );
+        let touching = Rect {
+            x: 0.,
+            y: 0.,
+            w: 100.,
+            h: 100.,
+        };
+        assert!(curve(
+            touching,
+            Rect {
+                x: 100.,
+                ..touching
+            }
+        )
+        .unwrap()
+        .iter()
+        .flatten()
+        .all(|n| n.is_finite()));
+    }
+    #[test]
+    fn native_clamping_uses_actual_origin_without_accumulating_offset() {
+        let points = [[1006., 474.], [1006., 887.], [464., 887.], [464., 1300.]];
+        // Requested Y=-102px is clamped by macOS to 38pt=76px at scale 2.
+        let actual = Rect {
+            x: -112.,
+            y: 76.,
+            w: 1682.,
+            h: 1982.,
+        };
+        let relative = local_points(points, actual);
+        assert_eq!(relative[0], [1118., 398.]);
+        for (global, local) in points.into_iter().zip(relative) {
+            assert_eq!([actual.x + local[0], actual.y + local[1]], global);
+        }
+        assert_eq!(relative, local_points(points, actual));
+        let resized = Rect {
+            x: -1500.,
+            y: -900.,
+            w: 3000.,
+            h: 2000.,
+        };
+        let relative = local_points(points, resized);
+        for (global, local) in points.into_iter().zip(relative) {
+            assert_eq!([resized.x + local[0], resized.y + local[1]], global);
+        }
+    }
+    #[test]
+    fn motion_quiet_period_is_per_endpoint_and_restarts_on_each_event() {
+        let start = Instant::now();
+        let mut motion = Motion::default();
+        motion.changed.insert("note-a".into(), start);
+        assert!(motion.paused(
+            "note-a",
+            "note-b",
+            start + Duration::from_millis(149),
+            false
+        ));
+        assert!(!motion.paused("note-a", "note-b", start + SETTLE, false));
+        assert!(!motion.paused("note-c", "note-d", start, false));
+        motion
+            .changed
+            .insert("note-a".into(), start + Duration::from_millis(100));
+        assert!(motion.paused(
+            "note-a",
+            "note-b",
+            start + Duration::from_millis(249),
+            false
+        ));
+        assert!(!motion.paused(
+            "note-a",
+            "note-b",
+            start + Duration::from_millis(250),
+            false
+        ));
+        assert!(motion.dirty_since("note-a", "note-b", start));
+        assert!(!motion.dirty_since("note-a", "note-b", start + Duration::from_millis(250)));
+    }
+    #[test]
+    fn stash_and_stale_reveal_never_restart_a_hidden_connection() {
+        let start = Instant::now();
+        let motion = Motion::default();
+        assert!(motion.paused("note-a", "note-b", start, true));
+        assert!(!acknowledged(Some(7), 7, true));
+        assert!(!acknowledged(None, 7, false));
+        assert!(!acknowledged(Some(8), 7, false));
+        assert!(acknowledged(Some(8), 8, false));
+        let motion = Motion {
+            all: Some(start),
+            ..Default::default()
+        };
+        assert!(motion.paused("note-a", "note-b", start, false));
+        assert!(!motion.paused("note-a", "note-b", start + SETTLE, false));
+    }
+    #[test]
+    fn relation_validation() {
+        let mut r = Relation {
+            from: "a".into(),
+            to: "b".into(),
+            arrow: Arrow::End,
+            label: "선행 작업".into(),
+        };
+        assert!(valid(&r));
+        r.to = "a".into();
+        assert!(!valid(&r));
+        r.to = "b".into();
+        r.label = "x\ny".into();
+        assert!(!valid(&r));
+    }
+}

@@ -1,0 +1,6 @@
+
+> agent-gibbon@0.2.11 dev:build
+> node scripts/dev.mjs build
+
+   Compiling agent-gibbon v0.2.11 (/Users/egoinglee/.codex/worktrees/67c9/agent-gibbon/src-tauri)
+    Finished `dev` profile [unoptimized] target(s) in 6.64s

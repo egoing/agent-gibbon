@@ -1,0 +1,24 @@
+// Temporary test harness in exported fixture only. No public API or product change.
+use std::{sync::mpsc,time::Duration};
+pub fn install(app:&tauri::AppHandle) {
+ let app=app.clone();
+ std::thread::spawn(move||{
+  let mut last=0;
+  loop {
+   std::thread::sleep(Duration::from_millis(5));
+   let Ok(dir)=crate::ipc::directory() else {break};
+   let Ok(bytes)=std::fs::read(dir.join("stash-probe-command.json")) else {continue};
+   let Ok(cmd)=serde_json::from_slice::<serde_json::Value>(&bytes) else {continue};
+   let seq=cmd["sequence"].as_u64().unwrap_or(0);if seq<=last{continue;}last=seq;
+   let target=app.clone();let(tx,rx)=mpsc::sync_channel(1);
+   if app.run_on_main_thread(move||{
+    let error=if cmd["action"]=="toggle" {crate::stash::toggle(&target).err()} else {None};
+    let value=serde_json::json!({"sequence":seq,"error":error,"state":crate::stash::probe(&target)});
+    let _=tx.send(value);
+   }).is_err(){break;}
+   let Ok(value)=rx.recv_timeout(Duration::from_secs(10)) else {continue};
+   let _=std::fs::write(dir.join("stash-probe-response.tmp"),value.to_string());
+   let _=std::fs::rename(dir.join("stash-probe-response.tmp"),dir.join("stash-probe-response.json"));
+  }
+ });
+}

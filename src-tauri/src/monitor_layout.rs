@@ -476,6 +476,9 @@ pub fn inspect(app: &tauri::AppHandle) -> serde_json::Value {
         "temporary_windows":s.saved.records.iter().filter(|(_,r)|r.home.is_some()).map(|(label,_)|label).collect::<Vec<_>>()})
 }
 pub fn manual(w: &WebviewWindow) {
+    if !supported(w.label()) {
+        return;
+    }
     let Some(state) = w.app_handle().try_state::<State>() else {
         return;
     };
@@ -485,10 +488,12 @@ pub fn manual(w: &WebviewWindow) {
 }
 // Native drags on terminal chrome and OS resize borders bypass app commands.
 pub fn native_event(w: &tauri::Window, event: &tauri::WindowEvent) {
-    if !matches!(
-        event,
-        tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)
-    ) {
+    if !supported(w.label())
+        || !matches!(
+            event,
+            tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)
+        )
+    {
         return;
     }
     if mouse_held() {
@@ -730,6 +735,27 @@ pub fn poll(app: &tauri::AppHandle) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn relation_surfaces_never_enter_monitor_recovery_or_manual_tracking() {
+        for label in [
+            "relation-prototype-0",
+            "relation-pick-4-1",
+            "relation-settings",
+            "manager",
+            "layout-undo",
+        ] {
+            assert!(!supported(label), "{label}");
+        }
+        for label in [
+            "main",
+            "note-a",
+            "note-image-1",
+            "terminal-1",
+            "webview-web-1",
+        ] {
+            assert!(supported(label), "{label}");
+        }
+    }
     fn rect(x: i64, y: i64, w: i64, h: i64) -> Frame {
         Frame {
             x,

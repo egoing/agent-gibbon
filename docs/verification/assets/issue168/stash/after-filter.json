@@ -1,0 +1,4456 @@
+{
+  "info": {
+    "root": "/private/tmp/gibbon168-stash-fixture",
+    "id": "dev-f937b703a764976ce1bac3d0",
+    "name": "gibbon168-stash-fixture",
+    "target": "/private/tmp/gibbon168-stash-fixture/src-tauri/target",
+    "binary": "/private/tmp/gibbon168-stash-fixture/src-tauri/target/debug/agent-gibbon"
+  },
+  "manifest": {
+    "dev_label": "DEV gibbon168-stash-fixture · f937b703",
+    "instance": "dev-f937b703a764976ce1bac3d0",
+    "manifest_dir": "/private/tmp/gibbon168-stash-fixture/src-tauri",
+    "ok": true
+  },
+  "native_initial": {
+    "screens": [
+      {
+        "frame": [
+          0,
+          0,
+          1728,
+          1117
+        ],
+        "visible": [
+          0,
+          0,
+          1728,
+          1079
+        ],
+        "scale": 2
+      }
+    ],
+    "windows": [
+      {
+        "kCGWindowLayer": 5,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowOwnerPID": 48273,
+        "kCGWindowBounds": {
+          "X": 1185,
+          "Height": 48,
+          "Y": 830,
+          "Width": 300
+        },
+        "kCGWindowSharingState": 1,
+        "kCGWindowNumber": 72887,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowName": "Agent Gibbon [DEV gibbon168-stash-fixture · f937b703] — fixture-stash-5",
+        "kCGWindowStoreType": 1,
+        "kCGWindowAlpha": 1,
+        "kCGWindowMemoryUsage": 2288
+      },
+      {
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowAlpha": 1,
+        "kCGWindowBounds": {
+          "X": 1416,
+          "Height": 48,
+          "Y": 875,
+          "Width": 300
+        },
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowNumber": 72886,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowName": "Agent Gibbon [DEV gibbon168-stash-fixture · f937b703] — fixture-stash-4",
+        "kCGWindowOwnerPID": 48273,
+        "kCGWindowLayer": 5,
+        "kCGWindowStoreType": 1,
+        "kCGWindowSharingState": 1
+      },
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowLayer": 5,
+        "kCGWindowOwnerPID": 48273,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowAlpha": 1,
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 1426,
+          "Height": 48,
+          "Y": 924,
+          "Width": 300
+        },
+        "kCGWindowNumber": 72885,
+        "kCGWindowName": "Agent Gibbon [DEV gibbon168-stash-fixture · f937b703] — fixture-stash-3",
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowIsOnscreen": true
+      },
+      {
+        "kCGWindowStoreType": 1,
+        "kCGWindowBounds": {
+          "X": 1428,
+          "Height": 48,
+          "Y": 973,
+          "Width": 300
+        },
+        "kCGWindowOwnerPID": 48273,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowSharingState": 1,
+        "kCGWindowName": "Agent Gibbon [DEV gibbon168-stash-fixture · f937b703] — fixture-stash-2",
+        "kCGWindowLayer": 5,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowNumber": 72884,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowAlpha": 1
+      },
+      {
+        "kCGWindowSharingState": 1,
+        "kCGWindowAlpha": 1,
+        "kCGWindowNumber": 72883,
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowLayer": 5,
+        "kCGWindowName": "Agent Gibbon [DEV gibbon168-stash-fixture · f937b703] — fixture-stash-1",
+        "kCGWindowBounds": {
+          "X": 1428,
+          "Height": 48,
+          "Y": 1021,
+          "Width": 300
+        },
+        "kCGWindowStoreType": 1,
+        "kCGWindowMemoryUsage": 2288,
+        "kCGWindowOwnerPID": 48273,
+        "kCGWindowOwnerName": "agent-gibbon"
+      },
+      {
+        "kCGWindowAlpha": 1,
+        "kCGWindowName": "Agent Gibbon [DEV gibbon168-stash-fixture · f937b703] — fixture-stash-0",
+        "kCGWindowOwnerPID": 48273,
+        "kCGWindowOwnerName": "agent-gibbon",
+        "kCGWindowIsOnscreen": true,
+        "kCGWindowStoreType": 1,
+        "kCGWindowNumber": 72882,
+        "kCGWindowSharingState": 1,
+        "kCGWindowBounds": {
+          "X": 1428,
+          "Height": 48,
+          "Y": 1069,
+          "Width": 300
+        },
+        "kCGWindowLayer": 5,
+        "kCGWindowMemoryUsage": 2288
+      }
+    ]
+  },
+  "pid": 48273,
+  "test_ids": [
+    "fixture-stash-0",
+    "fixture-stash-1",
+    "fixture-stash-2",
+    "fixture-stash-3",
+    "fixture-stash-4",
+    "fixture-stash-5"
+  ],
+  "probe": "temporary fixture-local main-thread crate::stash::toggle observer",
+  "cases": [
+    {
+      "mode": "off",
+      "cycle": 1,
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "started": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": true,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "hidden": {
+        "active": true,
+        "actual": [
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-5",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          },
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-1",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          },
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-2",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          },
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-0",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          },
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-4",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          },
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-3",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "off",
+      "cycle": 2,
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "started": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": true,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "hidden": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "off",
+      "cycle": 3,
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "started": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": true,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "hidden": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "off",
+      "cycle": 4,
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "started": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": true,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "hidden": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "off",
+      "cycle": 5,
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "started": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          }
+        ],
+        "animating": true,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "hidden": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "off",
+      "cycle": "rapid-1",
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "off",
+      "cycle": "rapid-2",
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "off",
+      "cycle": "rapid-3",
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "off",
+      "cycle": "rapid-4",
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "off",
+      "cycle": "rapid-5",
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "on",
+      "cycle": 1,
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "started": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": true,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "hidden": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "on",
+      "cycle": 2,
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "started": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          }
+        ],
+        "animating": true,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "hidden": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "on",
+      "cycle": 3,
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "started": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": true,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "hidden": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "on",
+      "cycle": 4,
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "started": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          }
+        ],
+        "animating": true,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "hidden": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": false,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": false,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": false,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "on",
+      "cycle": 5,
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "started": {
+        "active": true,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          }
+        ],
+        "animating": true,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "hidden": {
+        "active": true,
+        "actual": [
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-3",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          },
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-0",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          },
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-2",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          },
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-4",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          },
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-1",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          },
+          {
+            "h": 33.0,
+            "label": "note-fixture-stash-5",
+            "visible": false,
+            "w": 145.0,
+            "x": 1572.0,
+            "y": 1073.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ]
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "on",
+      "cycle": "rapid-1",
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "on",
+      "cycle": "rapid-2",
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "on",
+      "cycle": "rapid-3",
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "on",
+      "cycle": "rapid-4",
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    },
+    {
+      "mode": "on",
+      "cycle": "rapid-5",
+      "before": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      },
+      "after": {
+        "active": false,
+        "actual": [
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-3",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-1",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-4",
+            "visible": true,
+            "w": 300.0,
+            "x": 600.0,
+            "y": 610.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-0",
+            "visible": true,
+            "w": 300.0,
+            "x": 100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-2",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 140.0
+          },
+          {
+            "h": 180.0,
+            "label": "note-fixture-stash-5",
+            "visible": true,
+            "w": 300.0,
+            "x": 1100.0,
+            "y": 610.0
+          }
+        ],
+        "animating": false,
+        "restoring": false,
+        "saved": null
+      }
+    }
+  ]
+}
