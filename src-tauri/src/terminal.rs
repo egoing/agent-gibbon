@@ -8,7 +8,7 @@ use std::{
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
 };
-use tauri::{ipc::Channel, Manager, WebviewWindow};
+use tauri::{ipc::Channel, Emitter, Manager, WebviewWindow};
 
 pub mod welcome;
 pub use welcome::{create as create_terminal, request_close};
@@ -411,7 +411,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         (None, None, None, false)
     };
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":agent.bounds,"pid":pid,"program":program,"running":running,"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":agent.bounds,"pid":pid,"program":program,"running":running,"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
     )
 }
 pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value, String> {
@@ -424,6 +424,16 @@ pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value,
                 win.hide().map_err(err)?;
                 crate::tray::sync_visibility(app)?;
             }
+        }
+        crate::Action::Update
+            if request.color.is_some()
+                && request.title.is_none()
+                && request.markdown.is_none()
+                && request.status.is_none() =>
+        {
+            crate::memo_color::write(&root(app), id, request.color.as_deref().unwrap())?;
+            app.emit_to(id, "memo-color", crate::memo_color::read(&root(app), id)?)
+                .map_err(err)?;
         }
         crate::Action::Inspect => (),
         _ => return Err("터미널 창은 내용 갱신을 지원하지 않습니다".into()),

@@ -3,7 +3,7 @@ import {memoThemeFor} from './theme.mjs';
 // Fixed examples only: no saved memo, IPC or content lookup is involved.
 const media = window.matchMedia('(prefers-color-scheme: dark)');
 function render(design = readMemoAppearance(window).design) {
-  for (const [id, color] of [['memo-preview-first', '#fee93e'], ['memo-preview-second', '#89f0ff']]) {
+  for (const [id, color] of [['memo-preview-first', '#bdd657'], ['memo-preview-second', '#6baa92']]) {
     const theme = memoThemeFor(color, {design, systemDark: media.matches});
     const sample = document.getElementById(id);
     for (const key of ['background', 'foreground', 'border']) sample.style.setProperty(`--preview-${key}`, theme[key]);

@@ -216,3 +216,15 @@ body.image-note:not(.toolbar-collapsed):not(.folded) #controls { flex-basis:22px
 body.image-note #memo-surface { border-width:0; }
 
 body.image-note.capture-toolbar-below:not(.toolbar-collapsed):not(.folded) #controls { order:1; }
+
+/* Color designs keep app-owned text/icons opaque. State uses shape/background. */
+:root[data-memo-design="color"] #pin[aria-pressed=false] svg { opacity:1; fill:none; stroke-dasharray:2 1; }
+:root[data-memo-design="color"] :is(button:disabled, #controls button[aria-disabled="true"]) { opacity:1; color:var(--secondary); cursor:default; }
+:root[data-memo-design="color"] :is(button:hover, #controls button[data-pointer-over]) { background:var(--panel); }
+:root[data-memo-design="color"] :is(#feedback:not(.error) #message, #status, #home-hint, .folder-parent) { color:var(--secondary); }
+:root[data-memo-design="color"] input::placeholder { color:var(--secondary); opacity:1; }
+:root[data-memo-design="color"] #controls button:focus-visible { outline-color:var(--foreground); }
+:root[data-memo-design="color"] #pin[aria-pressed=false] svg [fill] { fill:none; }
+@media (forced-colors: active) {
+  :root[data-memo-design="color"] #controls button:focus-visible { outline-color:Highlight; }
+}
