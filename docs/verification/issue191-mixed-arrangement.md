@@ -21,6 +21,21 @@
 
 **과거 캡처 누락의 발생 조건 자체를 수정 전 빌드로 재현한 것은 아니다.** 현재 이미지 fixture의 포함·수동 제외·정렬·취소가 정상임을 확인한 것으로 한정한다. 실환경 확인 범위 Conf5 / Risk Medium이며 전체 미실행 분기는 위 한계로 남긴다. 사용자 시험 앱·창·PTY는 유지한다.
 
+## 원래 완료 기준 최종 대조
+
+| 기준 | 수행 근거 | 판정·한계 |
+|---|---|---|
+| 네 유형의 명시적 두 정렬 | 유형 분류·혼합 배치 Rust 회귀, native Right/Up 8개 완료 frame 대조 | 현재 수정본 포함·이동 확인. 수정 전 캡처 누락 조건은 미재현 |
+| 수동 창도 명시 정렬 포함 | 사용자 이미지 수동 이동, auto_layout_excluded=true인 채 Right 이동·취소 | 실제 환경 확인 |
+| 일반 열기의 수동 제외 정책 | 기준 main 대비 reflow 함수 전문 동일 대조, excluded는 장애물 처리 | 기존 구현 보존 확인. 별도 신규 native 일반 열기 회귀는 미실행 |
+| 숨김·닫힘을 새로 열지 않음 | 기존 수집의 !is_visible/is_minimized/stash::owns 필터 보존, managed_windows에 살아있는 host만 포함, restore_frames 전문 동일 대조 및 visible 검사 | 정책 보존 코드 검토. 전체 stash 숨김/복원 native 관측. 개별 pre-hidden/closed 정렬 native 분기는 미실행 |
+| 5초 취소·위치/크기 복원 | 사용자 직접 취소 성공 답변 + 수동 이미지 원frame 일치, undo_arrangement/expire_undo/restore_frames 전문 동일 대조, deadline from_secs(5) 보존 | 실제 취소·복원과 기존 기간 보존 확인. 5초 경계 정밀 시각 측정은 미실행 |
+| 이미지 비율·작은 화면·음수/DPI | 혼합 배치 Rust 회귀 + native600×422 이미지frame 확인 | 검사 범위 통과. 실제 혼합배율/다중모니터 변경은 미실행 |
+| 웹 child·PTYfit | host resize callback/ResizeObserver 기존 경로 검토, native 웹 host geometry·실제 PTY행26→19 확인 | 내부 원격 child bounds는 직접 수치 검사하지 않음 |
+| 문서·시안·관련 검사 | 디자인 시스템·SVG/PNG 렌더·Rust238/UI189/Clippy/빌드, 제품 소스 검사 해시와 실증20e07f0 소스 동일 대조 | 완료 |
+
+이 표는 미실행 native 분기를 통과로 바꾸지 않는다. 본 변경의 핵심 누락·명시 정렬·수동 이미지 복원은 실행으로 확인했으며 변경하지 않은 숨김·일반 열기·undo 기간 정책은 기준 main의 함수 전문/필터 대조로 보존을 확인했다. 다른 플랫폼·모든 경계 조합의 추가 실환경 검증과 원래 누락 조건의 역사적 재현은 제한으로 남긴다. 원래 요구를 별도 이슈로 옮겨 종료하는 방식은 사용하지 않는다.
+
 ## 최초 판정 이력
 
 
