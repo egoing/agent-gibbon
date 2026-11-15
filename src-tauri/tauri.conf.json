@@ -4,7 +4,9 @@
   "version": "0.2.11",
   "identifier": "org.egoing.floatnote",
   "build": {
-    "frontendDist": "../ui"
+    "frontendDist": "../ui",
+    "beforeBuildCommand": "pnpm run build:editor",
+    "beforeDevCommand": "pnpm run build:editor"
   },
   "app": {
     "withGlobalTauri": true,

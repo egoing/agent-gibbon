@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent Gibbon</title><link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="feedback.css"><script src="telemetry.js"></script><script src="updater-guard.js"></script><script src="local-flow.js"></script><script type="module" src="app.js"></script><script type="module" src="toolbar.js"></script><script type="module" src="memo-focus.js"></script><link rel="stylesheet" href="memo-frame.css"><link rel="stylesheet" href="overlay-scrollbar.css"><script type="module" src="overlay-scrollbar.js"></script></head>
-<body>
+<body class="text-note">
 <div id="memo-surface">
 <div id="controls" role="toolbar" aria-label="Toolbar">
 <span id="chrome-title"></span><button id="toolbar-previous" aria-label="이전 도구" aria-controls="toolbar-items" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
@@ -15,9 +15,7 @@
   <path d="M15 13v-1h6v1" />
   <path d="M18 12v7" />
   <path d="M17 19h2" /></svg></button>
-<button id="edit" aria-label="메모 편집" title="메모 편집" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
-  <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
-  <path d="M16 5l3 3" /></svg></button>
+<button id="save" aria-label="저장 · Command S / Ctrl S" title="저장" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h13l3 3v13H4zM8 4v6h8V4M8 20v-6h8v6"/></svg></button>
 <button id="export" aria-label="파일로 저장" title="파일로 저장"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l16 0" />
   <path d="M12 14l0 -10" />
   <path d="M12 14l4 -4" />
@@ -43,9 +41,7 @@
 <main id="viewport" aria-label="메모 내용" tabindex="0">
 <div id="fold-title" hidden></div>
 <div id="content"></div>
-<section id="editor" hidden aria-label="Markdown 편집">
-<textarea id="markdown" aria-label="Markdown 원문" spellcheck="false"></textarea>
-</section>
+<section id="editor" aria-label="메모 본문 편집"></section>
 </main>
 <section id="feedback" hidden aria-label="Feedback"><span id="message" role="status" aria-live="polite" aria-atomic="true"></span><div id="actions" role="group" aria-label="Action Bar"></div></section>
 <div id="memo-scrollbar" role="scrollbar" tabindex="0" aria-label="메모 세로 스크롤" aria-controls="viewport" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" hidden></div>

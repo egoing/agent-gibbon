@@ -90,3 +90,18 @@ Welcome에는 텍스트의 `installOverlayScrollbar`를 옵션으로 재사용�
 - 팀장이 알린 최신 main `ea0531a`와의 통합 회귀는 아직 하지 않았다. 기존 미커밋 변경을 보존하며 제품 커밋·push 승인 대기를 유지한다.
 
 [캡처 배치 시안](../design/capture-original-bounds.png) · [Welcome 시안](../design/terminal-welcome.png) · [원본 크기 fixture](assets/issue176/capture-exact-above-2x.png) · [하단 툴바 fixture](assets/issue176/capture-exact-below-2x.png) · [Welcome 실제 브라우저](assets/issue176/welcome-gray-2x.png)
+
+## close 승인과 최신 main 통합 — 2026-11-15
+
+사용자가 `close`를 호출하여 이번 범위의 커밋·push·병합과 이슈 기록/종료를 승인했다. 제품 커밋 `34c3b8a`로 변경을 보존하고 최신 main `6d1bf73`(편집기·터미널 복원 통합)을 반영했다. 공통 scrollbar는 편집기 변경 감시와 Welcome 설정을 함께 보존했고, Welcome 복원 패널/일반 패널 전환도 숨김 변경을 관찰하도록 통합했다. 원격 main의 제품 변경은 그대로 보존했다.
+
+- 통합 UI **184개**, Rust **229개** 통과. 수량 차이는 최신 main의 편집기 테스트 구성 변경에 따른 것이며 기존 204/225 결과를 새 통합 결과로 사용하지 않았다.
+- 실제 xterm 18조합, Welcome 테마 14조합, Milkdown 브라우저 전체 회귀 통과(`errors: []`, 외부 요청 없음). Milkdown은 편집·저장/자동저장·선택 서식·크기·긴 문서와 공통 스크롤바 회귀를 포함한다.
+- 추가로 복원 계획 패널의 thumb 숨김 → 취소 → 일반 Welcome의 thumb 복구를 device scale 1/2에서 확인했다.
+- Clippy·Rustfmt·macOS arm64 debug 빌드 통과. 전체 플랫폼 CI와 배포는 실행하지 않았다.
+- 검증 실행 파일: `scripts/terminal-surface-smoke.mjs`, `scripts/terminal-theme-smoke.mjs`, `scripts/milkdown-browser.mjs`. 각 로그는 `/tmp/gibbon176-close-*`에 있으며 Milkdown 실행은 공식 설치 Chrome을 선택하는 임시 Playwright wrapper를 사용했다(저장소 제품 변경 없음).
+- 이번 close에서 native GUI를 조작하거나 Orca를 실행하지 않았다. 현재 전용 개발 앱이 실행되지 않은 것을 CLI로 확인했다. 실제 사용자 창을 종료·이동하지 않았다.
+- 원본 위치의 실기기 픽셀 대조·혼합 배율 OS 보정·물리 입력·Windows/Intel은 위와 같이 미검증이다. 사용자가 이러한 한계가 고지된 상태에서 마무리를 요청했으며 이 기록은 native 통과를 의미하지 않는다.
+- `package-lock.json`은 작업/기본 체크아웃 모두에서 기존 미추적 파일로 보존하고 커밋하지 않는다. 이 체크아웃은 Codex 전용 워크트리이며 Orca 워크스페이스 삭제 대상이 아니다.
+
+Conf **4**, Risk **Medium**. 병합 SHA·main 동기화 결과는 이슈 #176의 최종 기록에 남긴다.

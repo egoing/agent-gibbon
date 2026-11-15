@@ -2,6 +2,11 @@
 """Exercise editor controls on macOS; touches only unique notes and temporary files.
 Set AGENT_GIBBON_TEST_BIN / AGENT_GIBBON_TEST_PROCESS for an isolated app instance.
 """
+# This historical textarea-only native probe must not target the new editor.
+# Native IME/manual replacement procedure: docs/verification/issue174-milkdown.md.
+if __name__ == '__main__':
+    raise SystemExit('이전 textarea 편집 모드는 제거되었습니다. docs/verification/issue174-milkdown.md의 전용 CLI/실제 IME 절차를 사용하세요. 이 스크립트는 검증을 수행하지 않았습니다.')
+
 import json
 import os
 from pathlib import Path

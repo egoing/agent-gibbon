@@ -19,3 +19,9 @@ main[hidden] { display: none; }
    content reserves matching 3px side/bottom strips in web.rs. */
 #controls { cursor: move; }
 body.toolbar-collapsed .resize { display: none; }
+
+/* The trusted toolbar stays anchored when a focused Welcome field is hidden.
+   WebKit may retain the root scroll offset after focus moves to a child view. */
+html { overflow: hidden; }
+#controls { position: fixed; inset: 0 0 auto; }
+main { margin-top: 30px; }

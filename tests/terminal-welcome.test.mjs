@@ -7,11 +7,11 @@ import {readFileSync} from 'node:fs';
 const flush=async()=>{for(let i=0;i<20;i++)await Promise.resolve();};
 const folder=path=>({path,name:path.split('/').at(-1),parent:path.slice(0,path.lastIndexOf('/')),command:`cd -- '${path}'`});
 const shell={id:'shell',label:'셸',command:"'/bin/zsh' -i"};
-function ui({kind='terminal',path=null,fail=false,focused=true,picker=null,folders=[],choices=[{id:'git',label:'git log',command:"'/usr/bin/git' log --oneline --decorate -20"},shell]}={}){
+function ui({restoreSupported=true,plan=null,restored=false,autoRestore=false,kind='terminal',path=null,fail=false,focused=true,picker=null,folders=[],choices=[{id:'git',label:'git log',command:"'/usr/bin/git' log --oneline --decorate -20"},shell]}={}){
  const elements={},calls=[],intervals=[];
  const element=id=>elements[id]??=({id,hidden:false,textContent:'',value:'',children:[],attrs:{},dataset:{},focus(){this.focused=true;},addEventListener(){},setAttribute(k,v){this.attrs[k]=v;},getAttribute(k){return this.attrs[k];},replaceChildren(){this.children=[];},append(...children){this.children.push(...children);}});
  element('rename-title');
- const info={kind,id:'terminal-123',title:'터미널',last_path:path};
+ const info={restore_supported:restoreSupported,restore_plan:plan,restored,auto_restore:autoRestore,kind,id:'terminal-123',title:'터미널',last_path:path};
  const context={innerWidth:720,innerHeight:460,navigator:{platform:'MacIntel'},setTimeout,clearTimeout,setInterval:fn=>intervals.push(fn),ResizeObserver:class{observe(){}},Terminal:class{constructor(){this.cols=80;this.rows=24;this.options={fontSize:13};}loadAddon(){}open(){}onData(){}attachCustomKeyEventHandler(){}focus(){}write(){}},FitAddon:{FitAddon:class{fit(){}}},document:{hasFocus:()=>focused,getElementById:element,createElement:()=>element('element'+Math.random()),querySelector:()=>element('header'),querySelectorAll:()=>[]},window:{installTerminalIme(){},__TAURI__:{core:{Channel:class{},invoke:async(name,args)=>{
   calls.push([name,args]);
   if(name==='terminal_folder'&&args?.path===null&&picker)return await picker();
@@ -39,3 +39,44 @@ test('cancelled delayed picker preserves local folder selection and blocks Run w
 test('selecting recent folder from home clears the home location hint',async()=>{const {elements}=ui({folders:[folder('/project/recent')]});await flush();assert.equal(elements['home-hint'].hidden,false);elements['recent-folders'].children[0].onclick();assert.equal(elements['home-hint'].hidden,true);assert.match(elements['command-preview'].textContent,/project\/recent/);});
 
 test('approved wireframe selects a task without starting until Run',async()=>{const {elements,calls}=ui();await flush();await elements.recommendations.children[0].onclick();assert.equal(calls.filter(([n])=>n==='terminal_start').length,0);assert.equal(typeof elements['run-task'].onclick,'function');await elements['run-task'].onclick();assert.equal(calls.filter(([n])=>n==='terminal_start').length,1);});
+
+test('restoration uses edited plan only after explicit restore',async()=>{
+  const {elements,calls}=ui({plan:'df -h'});await flush();
+  assert.equal(elements['restore-plan'].value,'df -h');
+  assert.equal(elements['welcome-panel'].hidden,true);
+  assert.equal(calls.some(([name])=>name==='terminal_start'),false);
+  elements['restore-plan'].value='pwd';
+  await elements['restore-run'].onclick();
+  assert.equal(calls.find(([name])=>name==='terminal_start')[1].plan,'pwd');
+});
+test('cancel opens welcome without starting a shell',async()=>{
+  const {elements,calls}=ui({plan:'codex'});await flush();
+  elements['restore-cancel'].onclick();
+  assert.equal(elements['welcome-panel'].hidden,false);
+  assert.equal(elements['restore-panel'].hidden,true);
+  assert.equal(calls.some(([name])=>name==='terminal_start'),false);
+});
+
+test('only a verified monitor in a restored window starts automatically',async()=>{
+ for(const [restored,autoRestore,expected] of [[true,true,1],[true,false,0],[false,true,0]]){
+  const {calls}=ui({plan:'htop',restored,autoRestore});
+  await flush();
+  const starts=calls.filter(([name])=>name==='terminal_start');
+  assert.equal(starts.length,expected);
+  if(expected) assert.equal(starts[0][1].choice,'auto-monitor');
+ }
+});
+
+
+test('unsupported restoration shows an explanation and blocks auto and edited execution',async()=>{
+ const {elements,calls}=ui({plan:'htop',restored:true,autoRestore:true,restoreSupported:false});
+ await flush();
+ assert.match(elements.status.textContent,/아직 지원하지 않습니다/);
+ elements['restore-plan'].value='pwd';
+ await elements['restore-run'].onclick();
+ assert.equal(calls.some(([name])=>name==='terminal_start'),false);
+ elements['restore-cancel'].onclick();
+ assert.equal(elements['welcome-panel'].hidden,false);
+ await elements['run-task'].onclick();
+ assert.equal(calls.filter(([name])=>name==='terminal_start').length,1);
+});

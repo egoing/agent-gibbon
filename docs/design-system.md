@@ -1,3 +1,30 @@
+## 웹 메모 외부 탐색과 모바일 표시 — #177 · 2026-11-14
+
+- OS 제목줄 없는 기존 native 창을 유지한다. 웹 전용 앱 툴바는 viewport 상단에 고정해 Welcome 주소 입력 focus 후 본문 숨김·외부 탐색에도 30px 전용 행을 유지한다. 버튼·핀·접힘·닫기 계약은 공통 기준을 따른다.
+- 외부 WebView의 첫 요청부터 모바일 Safari UA를 사용한다. 실제 창 콘텐츠 너비가 viewport이며 사이트가 작성한 viewport meta는 보존하고 없는 경우에만 `width=device-width, initial-scale=1` 힌트를 추가한다. UA 변경은 터치·모바일 OS·기기 에뮬레이션이 아니며 서버의 모바일 판정은 사이트별로 달라 보장하지 않는다. WK `preferredContentMode`는 공식 헤더상 iOS 전용이므로 macOS 비공개 설정을 사용하지 않는다.
+- 스크롤은 고정 표시 스타일로 WebKit의 thumb 폭/높이 3px·라운드 2px·투명 track을 요청한다. 앱 IPC·외부 eval 권한·host bridge를 추가하지 않는다. 텍스트 메모의 완전한 overlay·자동 숨김·12px 확장 hit 영역을 외부 사이트에 보장하지 않으며 native/WebView 레이아웃에서 3px 공간이 남을 수 있다. macOS는 해당 외부 WebView의 공개 NSScrollView 하위에만 native Overlay를 요청한다(실제 수용은 검증 기록에서 별도 판정). 사이트 CSS·CSP·shadow DOM·프레임과 페이지 자체 커스텀 스크롤은 통일 대상 보장 밖이다. 적용 불가 시 페이지/OS native 스크롤을 유지하며 forced-colors는 native 크기로 복귀한다.
+- [웹 시안 SVG](design/web-welcome.svg) · [PNG](design/web-welcome.png). 설명 시안과 실제 native 검증은 구분하며 [검증 기록](verification/issue177-web-mobile-chrome.md)에 실행 결과와 미검증을 기록한다.
+## 자동저장 — #174 후속 · 2026-11-14
+
+- **사용자 확정:** 텍스트 메모를 자동저장한다. 기존 명시 저장만 사용하던 아래 #174의 저장 정책을 이 절로 대체한다. 현재 구현값은 마지막 변경 후 **600ms** 대기이며 새로운 입력은 대기를 다시 시작한다. 읽기/선택만으로는 저장하지 않고, 한글 조합 중에는 대기한 뒤 확정 후 저장한다.
+- 정상 편집에는 툴바 저장과 취소/저장 Action Bar를 표시하지 않는다. 내부 Feedback으로 입력 중·자동 저장 대기·자동 저장 중·저장됨을 표시한다. Cmd/Ctrl+S는 대기를 건너뛰는 수동 저장 보조 단축키로 유지한다. 이미지 메모의 내보내기는 유지한다.
+- 저장 중에도 본문과 선택 서식 메뉴 입력을 막거나 focus를 재설정하지 않는다. 요청에 보낸 문서 snapshot만 저장 기준으로 인정하고, 대기 중 추가 입력/undo는 dirty로 남겨 최신 revision으로 다음 저장을 수행한다. 동시에 여러 저장 요청을 보내지 않는다.
+- 외부 revision/연결 파일 충돌·쓰기 실패 시 초안을 유지하고 자동 반복 저장을 중단한다. 오류와 ‘변경 취소’·‘다시 저장’을 제공한다. 초안을 복사한 뒤 변경 취소로 최신 메모를 확인하거나 원인 해결 뒤 다시 저장한다. 실패 이후 새 입력도 원문을 임의로 덮거나 자동 재시도하지 않는다.
+- Escape 숨김과 닫기 버튼은 진행 중 저장을 기다리고 남은 변경을 저장한 뒤 실행한다. 실패하면 창과 초안을 유지한다. 조합 중에는 이 동작을 보류한다. 강제 프로세스 종료/충돌은 마지막 자동저장 완료 이후 입력의 영속성을 보장하지 않으므로 저장 중 상태를 구분한다.
+- 메모 원문 보호·외부 갱신·선택/history·접힘/숨김/수동 크기·진단 경계를 유지한다. [갱신 시안 SVG](design/milkdown-editor.svg) · [PNG](design/milkdown-editor.png) · [검증·한계](verification/issue174-milkdown.md).
+
+## Milkdown 본문 통합 편집 — #174 · 2026-11-14
+
+- **사용자 승인 범위:** 텍스트 메모의 표시/편집 화면 구분과 연필 진입점을 없애고 Milkdown으로 본문을 바로 선택·입력한다. 본문 드래그는 텍스트 선택이며 메모 이동은 툴바 빈 영역·접힌 제목의 왼쪽 버튼 드래그로 제한한다. 단일 클릭 후 포인터 추종 이동은 구현하지 않는다. 버튼·체크박스·표·scrollbar·가장자리 resize는 고유 동작을 유지한다.
+- **명시 저장:** 자동저장은 도입하지 않는다. 툴바 저장 및 Command S/Ctrl S는 텍스트 초안을 메모/연결 원본에 저장한다. 수정 없으면 요청하지 않는다. 미저장 상태에서 내부 Feedback의 취소·저장을 표시하고 저장 실패 시 초안·기존 revision 기준을 유지한다. 취소/Escape는 최신 메모로 되돌리고, 수정 없을 때 Escape는 숨김이다. 이미지 메모의 파일 내보내기와 원본 복사는 유지한다. 텍스트 내보내기 진입점은 이번 통합 표면에서 제공하지 않는다.
+- **선택 서식 메뉴:** 텍스트 범위를 선택하면 선택 근처에 굵게·기울임·취소선·코드·제목 1·제목 2·본문 메뉴를 표시한다. 버튼은 기존 ProseMirror 선택에 적용하고 selection/history/dirty·명시 저장 계약을 유지한다. 메뉴 자체가 창을 이동하거나 저장하지 않는다. 선택 해제·조합 중·저장 잠금·원문 보호·접힘·비활성에서는 숨긴다. 창 내부 viewport에 위치를 제한하고 좁은 창에서는 가로 스크롤한다. Alt+F10으로 메뉴 진입, 좌우/Home/End로 버튼 탐색, Escape로 메뉴만 닫아 본문으로 복귀한다. 메뉴 높이 28px 내외·버튼 24×22px·간격/패딩 1/2px는 이번 구현값이다.
+- 저장 상태는 dirty로 표시하며 표면을 전환하거나 별도 편집 배경을 만들지 않는다. 현재 구현은 텍스트에 22px 툴바 행·상단 패딩 0·본문/내부 Feedback·공통 오버레이 scrollbar를 사용한다. 저장 아이콘은 기존 12px/24×22 슬롯을 따르며 미저장 시 panel 배경을 추가한다. 기존 #164 편집 화면 수치를 통합 텍스트 표면에 적용한 구현값이다. 이미지·터미널·웹의 chrome 배치는 변경하지 않는다.
+- 첫 실제 본문 변경 시 한 번만 기존 #159 편집 높이 정책을 요청한다. 앱 수명 중 저장/취소·폴링·접힘·숨김 복원·후속 입력으로 재요청하지 않으며 수동 크기를 보존한다. clean open에서 편집기 포커스를 요청하거나 높이를 확대하지 않는다. 저장 잠금이 DOM 포커스를 해제한 경우 이전 입력 포커스를 조건부 복원하되 다른 컨트롤/다른 앱으로 이동한 사용자를 되돌리지 않는다.
+- 원문을 수정하지 않은 읽기·선택·숨김·저장 단축키는 재직렬화/쓰기하지 않는다. 실제 편집 뒤에는 동등한 Markdown 표기 정규화가 가능하다. 초기 파싱→직렬화의 Markdown AST 구조 보존을 확인하지 못하면 원문 전체를 문자로 표시하고 편집·저장을 차단한다. 원문 복사→외부 도구에서 수정→CLI로 다시 읽기가 복구 경로다. 손실 가능 문법을 조용히 삭제·변환하지 않는다.
+- raw HTML은 문자, Markdown 링크는 탐색하지 않는 텍스트, 이미지는 외부 요청 없는 비실행 표식으로 표시한다. 붙여넣기는 plain text만 받고 파일/HTML drop은 차단한다. 기존 Rust sanitize·이미지 제거·URL 탐색 제한을 약화하지 않는다.
+- 외부 revision 수신은 dirty/IME 중 문서를 덮지 않는다. 취소 전까지 초안을 유지하고 stale 저장은 기존 백엔드가 거절한다. diff·새 완료 강조는 문서 밖 장식이며 삭제 텍스트도 비편집 위젯으로만 표시한다. 첫 로컬 변경 시 장식을 지우고 dirty 중 자동 확인을 보류한다. clean 외부 본문 교체는 undo 이력을 새로 시작한다. 업데이트 busy는 상시 편집 가능 여부가 아닌 dirty/조합/저장/내보내기 작업을 반영한다.
+- [설명 시안 SVG](design/milkdown-editor.svg) · [PNG](design/milkdown-editor.png). 시안 렌더를 육안 확인했고 실제 번들 Chromium 회귀·Rust/UI·빌드/CLI 근거는 [검증 기록](verification/issue174-milkdown.md)을 따른다. 실제 WKWebView 입력·물리 한글 IME·Intel/Windows는 미검증이다. 아래 과거 표시/편집 전환·연필·본문 이동 규칙은 텍스트 메모에서 이 절로 대체한다.
+
 ## 툴바 키보드 포커스 — #166 · 2026-11-14
 
 - 사용자 요청에 따라 공통 텍스트·이미지·터미널·웹 chrome 툴바의 Tab 포커스 테두리를 톤다운한다. 2px 안쪽 선과 기존 포커스 배경을 유지하고 선에만 전경색 28% 알파를 적용한다. 버튼·아이콘 전체 opacity와 크기·배치·Tab 순서는 바꾸지 않는다. 28%는 이번 구현 선택값이다.
@@ -1050,3 +1077,16 @@ macOS가 설정 열기 요청을 받아들이면 현재 화면 하단에 별도 
 - 터미널 Welcome도 텍스트 메모의 동일한 overlay scrollbar 구현을 사용한다. 3px 표시·12px hover hit area·최소 24px thumb·1초 표시/160ms fade·키보드/휠/드래그·forced-colors native fallback을 공유한다. 긴 명령 미리보기는 별도 scrollbar 대신 Welcome 본문과 함께 스크롤한다. PTY 실행 시 Welcome thumb를 숨긴다.
 - Welcome에서 창 제목 변경 details/form과 이벤트를 제거한다. 기존에 저장한 제목과 관리 창의 다른 기능은 변경하지 않는다.
 - [캡처 배치 SVG](design/capture-original-bounds.svg) · [PNG](design/capture-original-bounds.png), [Welcome SVG](design/terminal-welcome.svg) · [PNG](design/terminal-welcome.png). 아래 검증은 [#176 후속 검증 기록](verification/issue176-terminal-capture.md#2026-11-15-사용자-검수-후속)에서 최초 검사와 구분한다.
+
+### 종료된 터미널의 실행 계획
+
+창별 실행 계획이 있으면 편집 가능한 한 줄 입력란과 **복원**, **취소**를 표시한다. 복원은 현재 입력값을 해당 창의 작업 폴더에서 실행한다. 취소는 셸을 시작하지 않고 기존 Welcome을 연다. 기록이 없는 창도 Welcome으로 시작한다. 이 동작은 이전 Welcome의 읽기 전용 추천 명령 미리보기와 별개다. [복원 시안 SVG](design/terminal-restore-plan.svg) · [PNG](design/terminal-restore-plan.png)
+
+macOS에서는 앱 재시작 시 직전 전경 프로세스가 [자동 재실행 허용 목록](../src-tauri/src/terminal/auto-restore-macos.json)에 있는 실행 파일이고 실행 인자가 0개로 확인되면 같은 작업 폴더에서 자동으로 다시 시작한다. 인자가 있거나 확인할 수 없는 기록은 편집 가능한 실행 계획으로 표시한다. [서브 모니터 검증 기록](verification/terminal-monitor-restore.md)
+
+
+Windows·Linux에서 복원 실행을 요청하면 ‘터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.’를 기존 상태 영역에 표시한다. 복원 버튼과 자동 재실행 요청 모두 프론트엔드와 백엔드에서 차단한다. 취소는 Welcome으로 이동한다. Windows 후속 범위는 [#185](https://github.com/egoing/agent-gibbon/issues/185)에 기록했다.
+
+[macOS 명령 조사](research/macos-auto-restore-commands.md)에 따라 기본 명령 `nettop`과 설치 도구 `htop`·`btop`을 자동 재실행 목록에 포함한다. 목록은 프로그램 이름과 설치 출처로 관리한다. `system`은 OS 시스템 디렉터리, `homebrew`는 Apple Silicon·Intel 설치 디렉터리에서 확인하며 실제 실행은 확인된 절대 경로를 사용한다.
+
+2026-11-15 최신 main 통합 뒤 macOS에서 자동 재실행·복원 추천·편집 실행·취소를 다시 검증했다. 종료된 셸의 자동 재실행 표시를 해제하고 bash 프롬프트 내부 명령이 마지막 사용자 명령을 덮어쓰지 않도록 보강했다. 기존 화면 배치를 유지했다. 최종 Rust 227개·UI 184개 및 실제 검증 범위는 [기록](verification/terminal-monitor-restore.md#2026-11-15-close-최종-통합)에 명시한다.

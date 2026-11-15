@@ -20,3 +20,7 @@
 ## 현재 결과
 
 UI 204·Rust 223·Clippy·Rustfmt·debug 빌드·Chromium 18조합 통과. [검증 기록](../verification/issue176-terminal-capture.md)을 따른다. 제품 변경은 로컬 미커밋 상태이며 계획 Draft PR만 원격에 있다. 사용자 요청에 따라 Orca 추가 실행과 새 native GUI 시험을 중단하고 검증 방식 결정 및 최종 제품 커밋·push 승인을 기다린다.
+
+## close 승인
+
+2026-11-15 사용자가 close를 호출하여 최종 커밋·push·병합을 승인했다. 최신 main 6d1bf73 통합 후 UI184·Rust229·xterm18조합·Welcome14조합·Milkdown 브라우저 회귀·Clippy·Rustfmt·debug 빌드가 통과했다. 미검증 native 범위는 검증 기록에 보존하며 미실행을 완료로 바꾸지 않는다. 병합과 main 동기화의 최종 근거는 이슈 #176에 기록한다.

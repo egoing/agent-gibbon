@@ -13,7 +13,12 @@ struct Record {
     url: Option<String>,
 }
 #[derive(Default)]
-pub struct Windows(Mutex<BTreeMap<String, Record>>);
+pub struct Windows(
+    Mutex<BTreeMap<String, Record>>,
+    // Navigation callbacks can precede record insertion during native startup.
+    Mutex<BTreeMap<String, String>>,
+    Mutex<BTreeMap<String, String>>,
+);
 // Preserve app-wide window enumeration for hosts containing remote child WebViews.
 pub fn managed_windows(app: &tauri::AppHandle) -> std::collections::HashMap<String, WebviewWindow> {
     let mut windows = app.webview_windows();
@@ -35,6 +40,9 @@ pub fn managed_window(app: &tauri::AppHandle, label: &str) -> Option<WebviewWind
             .map(|r| r.host.clone())
     })
 }
+// A mobile Safari UA is applied before the first network request. It is a
+// compatibility hint, not device emulation or a guarantee of mobile content.
+const MOBILE_USER_AGENT: &str = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
 fn err(e: impl std::fmt::Display) -> String {
     e.to_string()
 }
@@ -76,11 +84,55 @@ fn record(app: &tauri::AppHandle, id: &str) -> Result<Record, String> {
         .cloned()
         .ok_or("웹 창을 찾을 수 없습니다".into())
 }
+// Wry 0.57 macOS url() unwraps WKWebView.URL even before a document exists.
+// Read the public nullable property directly and report unknown as null. Do not
+// confuse the last allowed navigation target with the committed/current URL.
+fn current_webview_url(view: &tauri::Webview, app: &tauri::AppHandle, id: &str) -> Option<String> {
+    #[cfg(target_os = "macos")]
+    {
+        let app = app.clone();
+        let id = id.to_owned();
+        let observed = app.state::<Windows>().2.lock().ok()?.get(&id).cloned();
+        view.with_webview(move |platform| unsafe {
+            let native = &*platform.inner().cast::<objc2::runtime::AnyObject>();
+            let url: Option<objc2::rc::Retained<objc2_foundation::NSURL>> =
+                objc2::msg_send![native, URL];
+            let value = url
+                .and_then(|url| url.absoluteString())
+                .map(|s| s.to_string());
+            if let Ok(mut urls) = app.state::<Windows>().2.lock() {
+                if let Some(value) = value {
+                    urls.insert(id, value);
+                } else {
+                    urls.remove(&id);
+                }
+            }
+        })
+        .ok()?;
+        // Native callbacks may be deferred. Return only an actually observed
+        // URL, never wait on the UI thread or substitute a navigation target.
+        observed
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = (app, id);
+        view.url().ok().map(|url| url.to_string())
+    }
+}
 pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
     let r = record(app, id)?;
     let w = r.host.clone();
+    let content = app.get_webview(&format!("webpage-{id}"));
+    let current_url = current_webview_url(content.as_ref().unwrap_or(w.as_ref()), app, id);
+    let navigation_url = app
+        .state::<Windows>()
+        .1
+        .lock()
+        .map_err(err)?
+        .get(id)
+        .cloned();
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":"web","title":w.title().map_err(err)?,"url":r.url,"welcome":r.url.is_none(),"current_url":app.get_webview(&format!("webpage-{id}")).map(|v| v.url()).transpose().map_err(err)?.unwrap_or(w.url().map_err(err)?).as_str(),"visible":w.is_visible().map_err(err)?,"focused":w.is_focused().map_err(err)?,"always_on_top":w.is_always_on_top().map_err(err)?,"position":w.outer_position().map_err(err)?,"size":w.inner_size().map_err(err)?}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":"web","title":w.title().map_err(err)?,"url":r.url,"welcome":r.url.is_none(),"current_url":current_url,"navigation_url":navigation_url,"visible":w.is_visible().map_err(err)?,"focused":w.is_focused().map_err(err)?,"always_on_top":w.is_always_on_top().map_err(err)?,"position":w.outer_position().map_err(err)?,"size":w.inner_size().map_err(err)?}),
     )
 }
 pub fn entries(app: &tauri::AppHandle) -> Result<Vec<Value>, String> {
@@ -106,6 +158,31 @@ fn show(w: &WebviewWindow) -> Result<(), String> {
     w.show().map_err(err)?;
     #[cfg(any(target_os = "macos", windows))]
     crate::focus::restore(w);
+    Ok(())
+}
+// Configure only public NSScrollView descendants owned by this remote view.
+// No private WK selectors or application/global scrollbar preferences are used.
+fn configure_native_scrollbars(content: &tauri::Webview) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    content
+        .with_webview(|platform| unsafe {
+            use objc2::{runtime::NSObjectProtocol, ClassType};
+            use objc2_app_kit::{NSScrollView, NSScrollerStyle, NSView};
+            fn apply(view: &NSView) {
+                if view.isKindOfClass(NSScrollView::class()) {
+                    // SAFETY: isKindOfClass above checked this public superclass.
+                    let scroll = unsafe { &*(view as *const NSView as *const NSScrollView) };
+                    scroll.setScrollerStyle(NSScrollerStyle::Overlay);
+                }
+                for child in view.subviews() {
+                    apply(&child);
+                }
+            }
+            apply(&*platform.inner().cast::<NSView>());
+        })
+        .map_err(err)?;
+    #[cfg(not(target_os = "macos"))]
+    let _ = content;
     Ok(())
 }
 // Keep remote content below the trusted toolbar. A decorated macOS host has
@@ -272,7 +349,24 @@ pub(crate) fn create_presented(
             format!("webpage-{id}"),
             WebviewUrl::External(target),
         )
-        .on_navigation(|url| validate_url(url.as_str()).is_ok())
+        .user_agent(MOBILE_USER_AGENT)
+        .initialization_script(include_str!("web_presentation.js"))
+        .on_navigation({
+            let app = app.clone();
+            let id = id.clone();
+            move |url| {
+                if validate_url(url.as_str()).is_err() {
+                    return false;
+                }
+                if let Ok(mut observed) = app.state::<Windows>().2.lock() {
+                    observed.remove(&id);
+                }
+                if let Ok(mut urls) = app.state::<Windows>().1.lock() {
+                    urls.insert(id.clone(), url.as_str().to_owned());
+                }
+                true
+            }
+        })
         .on_new_window(|_, _| tauri::webview::NewWindowResponse::Deny)
         .on_download(|_, _| false);
         let size = w
@@ -293,9 +387,9 @@ pub(crate) fn create_presented(
             }
         };
         // Reapply after attachment: Wry now resolves the child's actual parent.
-        if let Err(error) =
+        if let Err(error) = configure_native_scrollbars(&content).and_then(|_| {
             content_bounds(w.as_ref()).and_then(|bounds| content.set_bounds(bounds).map_err(err))
-        {
+        }) {
             // Preserve an existing Welcome and remove only this attempted child.
             let _ = content.close();
             if previous.is_none() {

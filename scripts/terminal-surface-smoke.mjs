@@ -14,6 +14,7 @@ try {
  await context.route('http://gibbon.test/**',r=>{const f=path.join(root,'ui',new URL(r.request().url()).pathname);return fs.existsSync(f)?r.fulfill({body:fs.readFileSync(f),contentType:/\.(m?js)$/.test(f)?'text/javascript':f.endsWith('.css')?'text/css':'text/html'}):r.fulfill({status:404,body:''});});
  await context.addInitScript(()=>{
   const info={id:'terminal-176',kind:'terminal',title:'176 surface',last_path:'/tmp'};
+  if(location.search.includes('restore'))info.restore_plan='echo restored';
   window.calls=[];
   window.__TAURI_INTERNALS__={metadata:{currentWindow:{label:'terminal-176'}}};
   window.__TAURI__={webviewWindow:{getCurrentWebviewWindow:()=>({label:'terminal-176',listen:async()=>()=>{}})},event:{listen:async()=>()=>{}},window:{getCurrentWindow:()=>({label:'terminal-176',startDragging:async()=>{},startResizeDragging:async()=>{}})},core:{Channel:class{},invoke:async(name,args)=>{
@@ -94,6 +95,14 @@ try {
  }
  reports.push({width,height,theme,scale,...g,image});
  }
+ await page.setViewportSize({width:320,height:180});
+ await page.goto('http://gibbon.test/terminal.html?restore');
+ await page.waitForSelector('#restore-panel:not([hidden])');
+ await page.waitForFunction(()=>document.querySelector('#welcome-scrollbar').hidden);
+ await page.locator('#restore-cancel').click();
+ await page.waitForSelector('#welcome-panel:not([hidden])');
+ await page.waitForFunction(()=>!document.querySelector('#welcome-scrollbar').hidden);
+ assert.equal(await page.locator('#restore-panel').isVisible(),false);
  await context.close();
  }
  assert.deepEqual(errors,[]);fs.writeFileSync(`${out}/results.json`,JSON.stringify(reports,null,2));console.log(`PASS ${reports.length} theme/size/scale combinations; normal/alternate buffer, thumb, wheel, keyboard, fit/resize, capture containment`);

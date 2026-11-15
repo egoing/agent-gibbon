@@ -89,7 +89,9 @@ export function installOverlayScrollbar(doc = document, options = {}) {
   resize.observe(viewport);
   new MutationObserver(schedule).observe(viewport, {attributes: true, attributeFilter: ['hidden']});
   if (editor) resize.observe(editor);
-  new MutationObserver(schedule).observe(doc.getElementById(options.contentId || 'content'), { childList: true, subtree: true, characterData: true });
+  for (const content of [doc.getElementById(options.contentId || 'content'), options.viewportId ? null : doc.getElementById('editor')].filter(Boolean)) {
+    new MutationObserver(schedule).observe(content, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden'] });
+  }
   new MutationObserver(schedule).observe(doc.body, { attributes: true, attributeFilter: ['class'] });
   new MutationObserver(schedule).observe(doc.documentElement, { attributes: true, attributeFilter: ['style'] });
   doc.addEventListener('load', schedule, true);
