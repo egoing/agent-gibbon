@@ -316,12 +316,20 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     // Called only by an explicit capture action. Never capture a wallpaper-only
     // image when macOS has denied access to other applications' windows.
-    if unsafe { !CGPreflightScreenCaptureAccess() && !CGRequestScreenCaptureAccess() } {
+    if unsafe { !CGPreflightScreenCaptureAccess() } {
+        // The OS request may display a dialog or require a restart before returning.
+        // Record the blocked user action before handing control to macOS.
         if let Err(error) = crate::tray::sync_permission_item(app, false, true) {
             eprintln!("권한 메뉴 갱신 실패: {error}");
         }
-        show_permission_guide(app)?;
-        return Err("현재 앱의 화면 캡처 접근을 확인하지 못했습니다".into());
+        if !unsafe { CGRequestScreenCaptureAccess() } {
+            show_permission_guide(app)?;
+            return Err("현재 앱의 화면 캡처 접근을 확인하지 못했습니다".into());
+        }
+        let (screen, access) = permission_status();
+        if let Err(error) = crate::tray::sync_permission_item(app, screen && access, false) {
+            eprintln!("권한 메뉴 갱신 실패: {error}");
+        }
     }
     #[cfg(target_os = "macos")]
     if let Some(guide) = app.get_webview_window("permission-guide") {
