@@ -297,9 +297,23 @@ pub fn modifier_event(app: &tauri::AppHandle, mask: u8, shift: bool) {
             .ok()
             .flatten()
             .map_or(1., |m| m.scale_factor());
-        if let Err(e)=position_guide(&w,p.x,p.y,scale)
-            .and_then(|_|w.eval("document.body.classList.remove('closing'); document.querySelector('img').src='direction-guide.svg?open='+performance.now()").map_err(err))
-            .and_then(|_|show_frame(&w)){eprintln!("방향 안내 표시 실패: {e}");return}
+        let restores = app
+            .state::<Stash>()
+            .session
+            .lock()
+            .unwrap()
+            .as_ref()
+            .is_some_and(|s| !s.restoring);
+        if let Err(e) = position_guide(&w, p.x, p.y, scale)
+            .and_then(|_| {
+                w.eval(format!("window.showDirectionGuide({restores})"))
+                    .map_err(err)
+            })
+            .and_then(|_| show_frame(&w))
+        {
+            eprintln!("방향 안내 표시 실패: {e}");
+            return;
+        }
         *state.gesture.lock().unwrap() = Gesture {
             origin: Some((p.x, p.y)),
             scale: if cfg!(target_os = "macos") { 1. } else { scale },
