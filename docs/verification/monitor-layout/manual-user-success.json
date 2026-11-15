@@ -1,0 +1,25 @@
+{
+  "stage": "user-reports-success",
+  "time": "2026-11-15T21:04:54.638893+09:00",
+  "user_report": "성공했어",
+  "inspect": {
+    "id": "monitor20-c-manual",
+    "instance": "dev-54e35761915b899a5349d485",
+    "position": {
+      "x": 1900,
+      "y": -1174
+    },
+    "size": {
+      "height": 460,
+      "width": 720
+    },
+    "visible": true,
+    "folded": false,
+    "always_on_top": true
+  },
+  "previous_size": {
+    "width": 720,
+    "height": 460
+  },
+  "size_changed": false
+}

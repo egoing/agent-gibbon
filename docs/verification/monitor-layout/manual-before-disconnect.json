@@ -1,0 +1,130 @@
+{
+  "stage": "before-user-disconnect",
+  "time": "2026-11-15T20:52:17.122232+09:00",
+  "root": "/Users/egoinglee/.codex/worktrees/4c75/agent-gibbon",
+  "instance": "dev-54e35761915b899a5349d485",
+  "pid": 48778,
+  "binary": "/Users/egoinglee/.codex/worktrees/4c75/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "notes": [
+    {
+      "id": "monitor20-a-keep",
+      "instance": "dev-54e35761915b899a5349d485",
+      "visible": true,
+      "position": {
+        "x": 200,
+        "y": 250
+      },
+      "size": {
+        "height": 360,
+        "width": 640
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": false
+    },
+    {
+      "id": "monitor20-b-return",
+      "instance": "dev-54e35761915b899a5349d485",
+      "visible": true,
+      "position": {
+        "x": 200,
+        "y": -1960
+      },
+      "size": {
+        "height": 420,
+        "width": 680
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": false
+    },
+    {
+      "id": "monitor20-c-manual",
+      "instance": "dev-54e35761915b899a5349d485",
+      "visible": true,
+      "position": {
+        "x": 1040,
+        "y": -1480
+      },
+      "size": {
+        "height": 460,
+        "width": 720
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": true
+    },
+    {
+      "id": "monitor20-h-hidden",
+      "instance": "dev-54e35761915b899a5349d485",
+      "visible": false,
+      "position": {
+        "x": 1960,
+        "y": -920
+      },
+      "size": {
+        "height": 360,
+        "width": 640
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": false
+    }
+  ],
+  "monitor_layout": {
+    "crowded": false,
+    "error": null,
+    "pending": false,
+    "screens": [
+      {
+        "bounds": {
+          "height": 1117,
+          "width": 1728,
+          "x": -1728,
+          "y": 0
+        },
+        "name": "Monitor #41040",
+        "scale": 2.0,
+        "work": {
+          "height": 1085,
+          "width": 1728,
+          "x": -1728,
+          "y": 32
+        }
+      },
+      {
+        "bounds": {
+          "height": 1080,
+          "width": 1920,
+          "x": 0,
+          "y": -1080
+        },
+        "name": "Monitor #10240",
+        "scale": 2.0,
+        "work": {
+          "height": 1080,
+          "width": 1920,
+          "x": 0,
+          "y": -1080
+        }
+      },
+      {
+        "bounds": {
+          "height": 1152,
+          "width": 2048,
+          "x": 0,
+          "y": 0
+        },
+        "name": "Monitor #30544",
+        "scale": 2.0,
+        "work": {
+          "height": 1127,
+          "width": 2048,
+          "x": 0,
+          "y": 25
+        }
+      }
+    ],
+    "temporary_windows": []
+  }
+}

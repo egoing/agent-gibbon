@@ -1,0 +1,160 @@
+{
+  "root": "/Users/egoinglee/.codex/worktrees/4c75/agent-gibbon",
+  "instance": "dev-54e35761915b899a5349d485",
+  "binary": "/Users/egoinglee/.codex/worktrees/4c75/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "head": "307f7fde87874763e6c5c5009fd903ae2a6949c0",
+  "test_id": "monitor20-20261115-check",
+  "test_body": "MONITOR20-NATIVE-20261115 검증 전용 메모",
+  "physical_monitor_changes": false,
+  "phases": [
+    {
+      "phase": "new-note",
+      "pid": 62723,
+      "inspect": {
+        "instance": "dev-54e35761915b899a5349d485",
+        "id": "monitor20-20261115-check",
+        "position": {
+          "x": 2886,
+          "y": 1878
+        },
+        "size": {
+          "height": 96,
+          "width": 600
+        },
+        "visible": true,
+        "focused": false,
+        "folded": false,
+        "always_on_top": true,
+        "capture_toolbar_below": false
+      }
+    },
+    {
+      "phase": "checkpoint-hidden",
+      "inspect": {
+        "instance": "dev-54e35761915b899a5349d485",
+        "id": "monitor20-20261115-check",
+        "position": {
+          "x": 3496,
+          "y": 2208
+        },
+        "size": {
+          "height": 96,
+          "width": 600
+        },
+        "visible": false,
+        "focused": false,
+        "folded": false,
+        "always_on_top": true,
+        "capture_toolbar_below": false
+      },
+      "screen_count_in_records": 1
+    },
+    {
+      "phase": "seeded-disconnected-startup",
+      "pid": 63067,
+      "inspect": {
+        "instance": "dev-54e35761915b899a5349d485",
+        "id": "monitor20-20261115-check",
+        "position": {
+          "x": 3496,
+          "y": 2208
+        },
+        "size": {
+          "height": 96,
+          "width": 600
+        },
+        "visible": false,
+        "focused": false,
+        "folded": false,
+        "always_on_top": true,
+        "capture_toolbar_below": false
+      },
+      "original_frame": {
+        "x": 51748,
+        "y": 1104,
+        "width": 300,
+        "height": 48
+      },
+      "temporary_frame": {
+        "x": 1748,
+        "y": 1104,
+        "width": 300,
+        "height": 48
+      },
+      "work_area": {
+        "x": 0,
+        "y": 25,
+        "width": 2048,
+        "height": 1127
+      },
+      "diagnostics": {
+        "crowded": false,
+        "error": null,
+        "pending": false,
+        "temporary_windows": [
+          "note-monitor20-20261115-check"
+        ]
+      }
+    },
+    {
+      "phase": "temporary-home-survives-restart",
+      "pid": 63280,
+      "inspect": {
+        "instance": "dev-54e35761915b899a5349d485",
+        "id": "monitor20-20261115-check",
+        "position": {
+          "x": 3496,
+          "y": 2208
+        },
+        "size": {
+          "height": 96,
+          "width": 600
+        },
+        "visible": false,
+        "focused": false,
+        "folded": false,
+        "always_on_top": true,
+        "capture_toolbar_below": false
+      }
+    },
+    {
+      "phase": "seeded-matching-screen-startup-return",
+      "pid": 63456,
+      "inspect": {
+        "instance": "dev-54e35761915b899a5349d485",
+        "id": "monitor20-20261115-check",
+        "position": {
+          "x": 3496,
+          "y": 2208
+        },
+        "size": {
+          "height": 96,
+          "width": 600
+        },
+        "visible": false,
+        "focused": false,
+        "folded": false,
+        "always_on_top": true,
+        "capture_toolbar_below": false
+      },
+      "returned_frame": {
+        "x": 1748,
+        "y": 1104,
+        "width": 300,
+        "height": 48
+      }
+    }
+  ],
+  "before": {
+    "error": "앱이 실행 중이지 않습니다. 먼저 open을 실행하세요",
+    "ok": false
+  },
+  "ok": true,
+  "started_pids": [
+    62723,
+    63067,
+    63280,
+    63456
+  ],
+  "remaining_instance_pids": []
+}

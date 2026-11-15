@@ -86,6 +86,7 @@ fn destination(area: Rect, current: Rect, initial_y: i64, gap: i64) -> Result<(i
 }
 
 fn move_note(window: &tauri::WebviewWindow, warp: &mut Warp) -> Result<(), String> {
+    crate::monitor_layout::manual(window);
     crate::entrance::finish(window)?;
     crate::layout::mark(window, true);
     let monitor = window

@@ -230,6 +230,15 @@ pub(crate) fn show_permission_guide(app: &tauri::AppHandle) -> Result<(), String
     .map_err(err)
 }
 
+#[cfg(target_os = "macos")]
+pub(crate) fn permission_status() -> (bool, bool) {
+    #[link(name = "ApplicationServices", kind = "framework")]
+    extern "C" {
+        fn AXIsProcessTrusted() -> bool;
+    }
+    unsafe { (CGPreflightScreenCaptureAccess(), AXIsProcessTrusted()) }
+}
+
 #[tauri::command]
 pub fn permission_guide(
     window: tauri::WebviewWindow,
@@ -240,10 +249,6 @@ pub fn permission_guide(
     }
     #[cfg(target_os = "macos")]
     {
-        #[link(name = "ApplicationServices", kind = "framework")]
-        extern "C" {
-            fn AXIsProcessTrusted() -> bool;
-        }
         extern "C" {
             fn gibbon_show_permission_panel(screen: bool, overview: *mut std::ffi::c_void);
             fn gibbon_hide_permission_panel();
@@ -276,8 +281,12 @@ pub fn permission_guide(
                 })
                 .map_err(err)?;
         }
-        let screen = unsafe { CGPreflightScreenCaptureAccess() };
-        let access = unsafe { AXIsProcessTrusted() };
+        let (screen, access) = permission_status();
+        if let Err(error) =
+            crate::tray::sync_permission_item(window.app_handle(), screen && access, false)
+        {
+            eprintln!("권한 메뉴 갱신 실패: {error}");
+        }
         if action == "status"
             || (action == "observe-screen" && screen)
             || (action == "observe-access" && access)
@@ -308,6 +317,9 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
     // Called only by an explicit capture action. Never capture a wallpaper-only
     // image when macOS has denied access to other applications' windows.
     if unsafe { !CGPreflightScreenCaptureAccess() && !CGRequestScreenCaptureAccess() } {
+        if let Err(error) = crate::tray::sync_permission_item(app, false, true) {
+            eprintln!("권한 메뉴 갱신 실패: {error}");
+        }
         show_permission_guide(app)?;
         return Err("현재 앱의 화면 캡처 접근을 확인하지 못했습니다".into());
     }

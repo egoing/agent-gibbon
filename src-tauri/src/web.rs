@@ -553,10 +553,12 @@ pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String>
     match action.as_str() {
         "inspect" => inspect(window.app_handle(), id),
         "drag" => {
+            crate::monitor_layout::manual(&window);
             window.start_dragging().map_err(err)?;
             Ok(json!({"ok":true}))
         }
         action if action.starts_with("resize-") => {
+            crate::monitor_layout::manual(&window);
             let direction =
                 serde_json::from_value(json!(action.strip_prefix("resize-").unwrap_or_default()))
                     .map_err(err)?;
