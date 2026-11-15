@@ -1,0 +1,232 @@
+{
+  "root": "/Users/egoinglee/.codex/worktrees/c9f9/agent-gibbon",
+  "head": "2747c3e509c35069ad4a7f4ecc5ac553986c8d94",
+  "dev_info": {
+    "root": "/Users/egoinglee/.codex/worktrees/c9f9/agent-gibbon",
+    "id": "dev-ef9fadde855c7e2c93cbc288",
+    "name": "codex/mixed-note-arrangement",
+    "buildDir": "/Users/egoinglee/dev/project/agent-gibbon/.git/agent-gibbon/build-cache",
+    "target": "/Users/egoinglee/.codex/worktrees/c9f9/agent-gibbon/src-tauri/target",
+    "binary": "/Users/egoinglee/.codex/worktrees/c9f9/agent-gibbon/src-tauri/target/debug/agent-gibbon"
+  },
+  "process": "32257 /Users/egoinglee/.codex/worktrees/c9f9/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "fixtures": [
+    {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": false,
+      "capture_toolbar_below": false,
+      "content_height_cap": 68.0,
+      "dev_label": "DEV codex/mixed-note-arrangement · ef9fadde",
+      "feedback_active": false,
+      "feedback_surface": {
+        "focused": false,
+        "mode": "inline",
+        "view": {
+          "buttons": [],
+          "color": "#bdd657",
+          "error": false,
+          "message": "",
+          "revision": null
+        },
+        "visible": false
+      },
+      "focused": false,
+      "folded": false,
+      "global_opacity": null,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "arrange191-text",
+      "instance": "dev-ef9fadde855c7e2c93cbc288",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "capture": null,
+        "change_html": "<h1>정렬 검증 191</h1>\n<p>본 워크트리 전용 텍스트 fixture</p>\n",
+        "color": "#bdd657",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<h1>정렬 검증 191</h1>\n<p>본 워크트리 전용 텍스트 fixture</p>\n",
+        "markdown": "# 정렬 검증 191\n본 워크트리 전용 텍스트 fixture",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 2,
+        "source_path": null,
+        "status": "",
+        "title": "정렬 검증 191 텍스트",
+        "updated_at": 1794736578442
+      },
+      "ok": true,
+      "opacity": 0.5,
+      "position": {
+        "x": 3496,
+        "y": 2168
+      },
+      "size": {
+        "height": 136,
+        "width": 600
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "last_arrangement": null,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-ef9fadde855c7e2c93cbc288/docs/arrange191-text/index.md",
+      "visible": true,
+      "warp_right": false
+    },
+    {
+      "always_on_top": true,
+      "animating": true,
+      "auto_layout_excluded": false,
+      "capture_toolbar_below": false,
+      "content_height_cap": 48.0,
+      "dev_label": "DEV codex/mixed-note-arrangement · ef9fadde",
+      "feedback_active": false,
+      "feedback_surface": {
+        "focused": false,
+        "mode": "inline",
+        "view": {
+          "buttons": [],
+          "color": "#bdd657",
+          "error": false,
+          "message": "",
+          "revision": null
+        },
+        "visible": false
+      },
+      "focused": false,
+      "folded": false,
+      "global_opacity": null,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "arrange191-image",
+      "instance": "dev-ef9fadde855c7e2c93cbc288",
+      "layout_destination": {
+        "height": 422,
+        "width": 600,
+        "x": 3496,
+        "y": 1746
+      },
+      "layout_pending": false,
+      "note": {
+        "capture": {
+          "height": 400.0,
+          "width": 600.0,
+          "x": 120.0,
+          "y": 120.0
+        },
+        "change_html": "",
+        "color": "#bdd657",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "",
+        "markdown": "",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 2,
+        "source_path": null,
+        "status": "",
+        "title": "정렬 검증 191 arrange191-image",
+        "updated_at": 1794736592152
+      },
+      "ok": true,
+      "opacity": 1.0,
+      "position": {
+        "x": 2326,
+        "y": 1080
+      },
+      "size": {
+        "height": 422,
+        "width": 600
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 48.0,
+          "width": 320.0,
+          "x": 864.0,
+          "y": 295.0
+        },
+        "indicator_moving": false,
+        "last_arrangement": null,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-ef9fadde855c7e2c93cbc288/docs/arrange191-image/index.md",
+      "visible": true,
+      "warp_right": false
+    },
+    {
+      "auto_restore": false,
+      "bounds": {
+        "height": 400.0,
+        "width": 500.0,
+        "x": 450.0,
+        "y": 120.0
+      },
+      "color": "#20252e",
+      "cwd": null,
+      "id": "terminal-1910001",
+      "instance": "dev-ef9fadde855c7e2c93cbc288",
+      "kind": "terminal",
+      "last_command": null,
+      "last_path": null,
+      "ok": true,
+      "pid": null,
+      "position": {
+        "x": 900,
+        "y": 240
+      },
+      "program": null,
+      "pty_size": null,
+      "restore_plan": null,
+      "restore_supported": true,
+      "restored": false,
+      "running": false,
+      "size": {
+        "height": 800,
+        "width": 1000
+      },
+      "title": "정렬191 Welcome",
+      "visible": true
+    },
+    {
+      "always_on_top": true,
+      "color": "#4d4d4b",
+      "current_url": "tauri://localhost/web.html",
+      "focused": false,
+      "id": "web-arrange191",
+      "instance": "dev-ef9fadde855c7e2c93cbc288",
+      "kind": "web",
+      "navigation_url": null,
+      "ok": true,
+      "position": {
+        "x": 1448,
+        "y": 414
+      },
+      "size": {
+        "height": 800,
+        "width": 1200
+      },
+      "title": "Agent Gibbon [DEV codex/mixed-note-arrangement · ef9fadde] — 웹 — web-arrange191",
+      "url": null,
+      "visible": true,
+      "welcome": true
+    }
+  ]
+}

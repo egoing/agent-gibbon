@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-16 KST",
+  "root": "/Users/egoinglee/.codex/worktrees/c9f9/agent-gibbon",
+  "base_main": "c922f7976fcece0dea3a58125d3c7c745d1e2a63",
+  "merge_commits": [
+    "870ea2f1d9f9b0847d7e6194f411e5ce35b22b7d",
+    "f7d17ce80dff517dce77274d9044acbdad56a596"
+  ],
+  "ui_commit": "uncommitted",
+  "index_clean": true,
+  "preservation": {
+    "docs/design/direction-guide-restore.png": "byte-identical to UI backup",
+    "docs/design/direction-guide-states.png": "byte-identical to UI backup",
+    "docs/design/direction-guide-states.svg": "byte-identical to UI backup",
+    "docs/verification/issue191-motion-opacity.md": "byte-identical to UI backup",
+    "src-tauri/src/opacity.rs": "byte-identical to UI backup",
+    "tests/direction-guide.test.mjs": "byte-identical to UI backup",
+    "ui/direction-guide-restore-still.png": "byte-identical to UI backup",
+    "ui/direction-guide-restore.svg": "byte-identical to UI backup",
+    "ui/direction-guide.html": "byte-identical to UI backup",
+    "ui/direction-guide.js": "byte-identical to UI backup",
+    "ui/direction-guide.svg": "byte-identical to UI backup",
+    "src-tauri/src/main.rs": "UI added/removed lines identical; upstream additions preserved",
+    "src-tauri/src/stash.rs": "UI added/removed lines identical; upstream additions preserved",
+    "docs/design-system.md": "kept both relation additions and UI section; conflict markers removed"
+  },
+  "source_sha256": {
+    "src-tauri/src/main.rs": "7e0f2aa9289fb5161387dc0bf491046d2f9179ec02028d6c7c7e8c0cc2a36f95",
+    "src-tauri/src/opacity.rs": "095acacda4dc673081106b86882dd3c26180c28a744de91a87138a444627fdd4",
+    "src-tauri/src/stash.rs": "33bce8245e8b58653a2551957be6e7e9dc8656eb90b63887b6ff07482cfd5925",
+    "src-tauri/src/layout.rs": "c1562214efa641d72114aebf308f5ef9f803a3ec5a079cf53f79c5d14c2a814d",
+    "src-tauri/src/monitor_layout.rs": "836b0eaf06c9a7eab67a7953090a37297d1273f5c5f69cf29f38088b0a8e6781",
+    "src-tauri/src/relation_prototype.rs": "a9d7b272cf9388f0eab65b79151073d0901d19ab54054f5c2cc546f16b87a5d6",
+    "ui/direction-guide.js": "2e143874fc951935de55fc5a47c7d0021d56c6de5a34142a777b6a0d659eec9f"
+  },
+  "native_execution": "not performed; existing apps and PTYs untouched",
+  "checks": {
+    "rust_tests": 266,
+    "ui_tests": 198,
+    "clippy": "passed all-targets -D warnings",
+    "dev_build": "passed",
+    "rustfmt": "passed",
+    "diff_check": "passed",
+    "native": "not run"
+  }
+}

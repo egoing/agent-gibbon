@@ -19,6 +19,7 @@ pub struct Fade {
     target: f64,
     from: f64,
     started: Option<Instant>,
+    suppress_hover: bool,
 }
 #[cfg(any(target_os = "macos", windows, test))]
 impl Default for Fade {
@@ -28,6 +29,7 @@ impl Default for Fade {
             target: 1.,
             from: 1.,
             started: None,
+            suppress_hover: false,
         }
     }
 }
@@ -39,7 +41,36 @@ impl Fade {
             target: value,
             from: value,
             started: None,
+            suppress_hover: false,
         }
+    }
+
+    pub fn sample_memo(
+        &mut self,
+        manual: Option<f64>,
+        hovered: bool,
+        moving: bool,
+        attention: bool,
+        folded: bool,
+        now: Instant,
+    ) -> f64 {
+        // A moving window can cross a stationary pointer. Require a fresh
+        // outside-to-inside contact before restoring its local hover emphasis.
+        if moving {
+            self.suppress_hover = true;
+        } else if !hovered {
+            self.suppress_hover = false;
+        }
+        self.sample(
+            target(
+                manual,
+                hovered && !self.suppress_hover,
+                moving,
+                attention,
+                folded,
+            ),
+            now,
+        )
     }
 
     pub fn sample(&mut self, target: f64, now: Instant) -> f64 {
@@ -146,6 +177,54 @@ pub fn start(app: tauri::AppHandle) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn arranging_is_opaque_and_crossed_pointer_does_not_keep_one_memo_emphasized() {
+        for manual in [None, Some(0.1), Some(0.35), Some(0.8), Some(1.0)] {
+            for folded in [false, true] {
+                let now = Instant::now();
+                let idle = target(manual, false, false, false, folded);
+                let mut crossed = Fade::at(idle);
+                let mut peer = Fade::at(idle);
+                for (elapsed, hovered) in [(0, false), (100, true), (300, false), (420, true)] {
+                    let at = now + Duration::from_millis(elapsed);
+                    assert_eq!(
+                        crossed.sample_memo(manual, hovered, true, false, folded, at),
+                        1.0
+                    );
+                    assert_eq!(
+                        peer.sample_memo(manual, false, true, false, folded, at),
+                        1.0
+                    );
+                }
+                let end = now + Duration::from_millis(421);
+                for elapsed in [0, 1999, 2300, 2600] {
+                    let at = end + Duration::from_millis(elapsed);
+                    assert_eq!(
+                        crossed.sample_memo(manual, true, false, false, folded, at),
+                        peer.sample_memo(manual, false, false, false, folded, at)
+                    );
+                }
+                assert_eq!(crossed.current, idle);
+                let at = end + Duration::from_secs(3);
+                crossed.sample_memo(manual, false, false, false, folded, at);
+                assert_eq!(
+                    crossed.sample_memo(manual, true, false, false, folded, at),
+                    1.0
+                );
+                assert_eq!(peer.current, idle);
+            }
+        }
+    }
+
+    #[test]
+    fn ordinary_hover_and_new_presentation_still_override_saved_opacity() {
+        let mut fade = Fade::at(0.1);
+        assert_eq!(
+            fade.sample_memo(Some(0.1), true, false, false, false, Instant::now()),
+            1.0
+        );
+    }
+
     #[test]
     fn newly_presented_memo_stays_opaque_while_idle_peers_keep_their_alpha() {
         let now = Instant::now();

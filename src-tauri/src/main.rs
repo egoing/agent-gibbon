@@ -187,20 +187,24 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
     let manual = opacity::configured(window.app_handle());
     #[cfg(any(target_os = "macos", windows))]
     {
-        let alpha = opacity::target(
-            manual,
-            hovered,
-            entrance::presenting(&window),
-            feedback::active(&window),
-            sizing::folded(&window),
-        );
+        let presenting = entrance::presenting(&window);
+        let moving = entrance::active(&window) && !presenting;
+        let attention = feedback::active(&window);
+        let folded = sizing::folded(&window);
         let alpha = window
             .state::<opacity::Fades>()
             .lock()
             .map_err(|e| e.to_string())?
             .entry(window.label().into())
             .or_insert_with(|| opacity::Fade::at(manual.unwrap_or(1.0)))
-            .sample(alpha, Instant::now());
+            .sample_memo(
+                manual,
+                hovered || presenting,
+                moving,
+                attention,
+                folded,
+                Instant::now(),
+            );
         opacity::set_native(&window, alpha)?;
         Ok(alpha)
     }

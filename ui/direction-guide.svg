@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="232" height="232" viewBox="0 0 240 240" role="img" aria-labelledby="title">
-<title id="title">위 바둑판 정렬, 오른쪽 정렬, 아래 숨기기 또는 복원, 왼쪽 또는 Esc 취소</title>
+<title id="title">위 바둑판 정렬, 오른쪽 정렬, 아래 숨기기, 왼쪽 또는 Esc 취소</title>
 <g>
 <animateTransform attributeName="transform" type="translate" from="0 77" to="0 0" dur=".16s" fill="freeze"/>
 <animate attributeName="opacity" from="0" to="1" dur=".16s" fill="freeze"/>
