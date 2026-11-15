@@ -12,11 +12,12 @@ try {
  page.on('pageerror',e=>errors.push(e.message));
  await page.addInitScript(()=>{
    window.testCalls=[];
-   window.__TAURI__={core:{invoke:async name=>{window.testCalls.push(name);if(name==='web_chrome')return {url:null,welcome:true,always_on_top:true};return false;}},webviewWindow:{getCurrentWebviewWindow:()=>({listen(){}})}};
+   window.__TAURI__={core:{invoke:async name=>{window.testCalls.push(name);if(name==='web_recent')return [];if(name==='web_chrome')return {url:null,welcome:true,always_on_top:true};return false;}},webviewWindow:{getCurrentWebviewWindow:()=>({listen(){}})}};
  });
  await page.route('http://gibbon.test/**',route=>{
    const file=path.join(root,'ui',new URL(route.request().url()).pathname);
-   if(/\.js$/.test(file)&&!file.endsWith('/toolbar.js')&&!file.endsWith('/overlay-scrollbar.js')&&!(fullWeb&&/\/web(?:-chrome)?\.js$/.test(file))) return route.fulfill({body:'',contentType:'text/javascript'});
+   if(file.endsWith('/terminal-scrollbar.mjs')) return route.fulfill({body:'export function installTerminalScrollbar() {}',contentType:'text/javascript'});
+   if(/\.js$/.test(file)&&!file.endsWith('/toolbar.js')&&!file.endsWith('/overlay-scrollbar.js')&&!(fullWeb&&/\/web(?:-chrome|-recent)?\.js$/.test(file))) return route.fulfill({body:'',contentType:'text/javascript'});
    return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.css')?'text/css':/\.m?js$/.test(file)?'text/javascript':'text/html'});
  });
  for(const kind of ['text','image','terminal','web']) {
