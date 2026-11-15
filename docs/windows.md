@@ -4,7 +4,7 @@ Windows 10/11 x64용 개발 경로입니다. Windows 실제 검증 결과는 `do
 
 ## 개발 도구
 
-[Tauri Windows 사전 요구 사항](https://v2.tauri.app/start/prerequisites/#windows)에 따라 Node.js/npm, Rust MSVC stable, Visual Studio Build Tools의 Desktop development with C++ 및 Windows SDK, WebView2 Runtime이 필요합니다.
+[Tauri Windows 사전 요구 사항](https://v2.tauri.app/start/prerequisites/#windows)에 따라 Node.js 22.13+/pnpm 11.25.0, Rust 1.91+ MSVC stable, Visual Studio Build Tools의 Desktop development with C++ 및 Windows SDK, WebView2 Runtime이 필요합니다.
 
 ```powershell
 winget install --id Microsoft.VisualStudio.2022.BuildTools --exact --source winget --override "--wait --passive --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
@@ -16,9 +16,10 @@ winget install --id Rustlang.Rustup --exact --source winget
 ## 격리 개발 앱
 
 ```powershell
-npm.cmd ci
-npm.cmd run dev:info
-npm.cmd run dev:build
+npm.cmd install -g pnpm@11.25.0
+pnpm.cmd install --frozen-lockfile
+pnpm.cmd run dev:info
+pnpm.cmd run dev:build
 .\scripts\agent-gibbon-dev.cmd open --id windows-test --markdown '# Windows 메모'
 .\scripts\agent-gibbon-dev.cmd inspect --id windows-test
 .\scripts\agent-gibbon-dev.cmd close --id windows-test
@@ -27,9 +28,9 @@ npm.cmd run dev:build
 개발 실행기는 현재 워크트리에서 빌드한 debug 실행 파일만 사용합니다. 개발 인스턴스의 소켓과 저장소는 설치 앱과 분리됩니다. 숨긴 메모를 변경할 때는 `open` 대신 `update`를 사용합니다.
 
 ```powershell
-npm.cmd test
-npm.cmd run check
-npm.cmd run build:windows
+pnpm.cmd test
+pnpm.cmd run check
+pnpm.cmd run build:windows
 ```
 
 설치 파일은 `src-tauri\target\release\bundle\nsis\`에 생성합니다. NSIS는 현재 사용자 설치를 사용하며 한글·영문 설치 화면을 제공합니다. [Tauri Windows 설치 파일 안내](https://v2.tauri.app/distribute/windows-installer/)를 따릅니다.

@@ -5,5 +5,5 @@ root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 for binary in "$root/src-tauri/target/release/agent-gibbon" "$root/src-tauri/target/debug/agent-gibbon"; do
   if [ -x "$binary" ]; then exec "$binary" "$@"; fi
 done
-printf '%s\n' '{"ok":false,"error":"먼저 npm install && npm run build를 실행하세요"}'
+printf '%s\n' '{"ok":false,"error":"먼저 pnpm install --frozen-lockfile && pnpm run build를 실행하세요"}'
 exit 1

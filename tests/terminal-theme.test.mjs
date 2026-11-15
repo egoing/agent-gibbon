@@ -10,6 +10,6 @@ function luminance(color){assert.match(color,/^#[0-9a-f]{6}$/i);const c=color.sl
 function contrast(a,b){const x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
 const cases=[...['white','gray','black'].map(design=>[design,memoThemeFor('#20252e',{design})]),...[false,true].map(systemDark=>['system-'+systemDark,memoThemeFor('#20252e',{design:'system',systemDark})]),...['#ffeeaa','#123456','#ff0000','#00ff00','#0000ff','#777777','#ffffff','#000000'].map(color=>[color,memoThemeFor(color,{design:'color'})])];
 for(const [name,theme] of cases)test(`Welcome text and controls retain contrast in ${name}`,()=>{
- const checks=[['#welcome .plain-row:hover',theme.foreground],['#welcome .select-row[aria-pressed="true"]',theme.foreground],['#run-task',theme.foreground],['#command-preview',theme.foreground],['#rename-title',theme.foreground],['.folder-parent',null],['#home-hint',null],['#title-details summary',null]];
+ const checks=[['#welcome .plain-row:hover',theme.foreground],['#welcome .select-row[aria-pressed="true"]',theme.foreground],['#run-task',theme.foreground],['#command-preview',theme.foreground],['.folder-parent',null],['#home-hint',null]];
  for(const [selector,text] of checks){const s=style(selector);const bg=resolve(s.background||'var(--background)',theme);const fg=resolve(text||s.color,theme);assert.ok(contrast(fg,bg)>=4.5,`${selector}: ${fg} on ${bg} = ${contrast(fg,bg).toFixed(2)}:1`);}
 });

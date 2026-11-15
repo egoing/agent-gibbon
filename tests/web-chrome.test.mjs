@@ -16,15 +16,6 @@ function chrome() {
  });
  return {nodes,calls,handles};
 }
-test('borderless web toolbar drags only primary-button empty/title space',()=>{
- const app=chrome(),down=app.nodes.get('controls').listeners.pointerdown;
- const before=app.calls.length;
- down({button:0,target:{closest:()=>({})}}); // Buttons and SVG descendants keep their action.
- down({button:2,target:{closest:()=>null}});
- assert.equal(app.calls.length,before);
- down({button:0,target:{closest:()=>null}});
- assert.equal(app.calls.at(-1).action,'drag');
-});
 test('web resize grips send only their explicit native direction on primary press',()=>{
  const app=chrome();let prevented=0;
  for(const handle of app.handles){

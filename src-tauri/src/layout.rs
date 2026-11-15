@@ -47,6 +47,10 @@ pub fn excluded(w: &WebviewWindow) -> bool {
         .unwrap_or(false)
 }
 pub fn mark(w: &WebviewWindow, geometric: bool) {
+    // Content edits and hidden reopens must not reflow a deliberately zoomed frame.
+    if !geometric && crate::sizing::work_area_active(w) {
+        return;
+    }
     w.state::<Exclusions>()
         .0
         .lock()
@@ -259,6 +263,244 @@ pub fn reflow(app: &tauri::AppHandle, opened: &WebviewWindow) -> Result<Destinat
         }
     }
     result.ok_or_else(|| "열 메모의 배치를 계산하지 못했습니다".into())
+}
+
+type Frames = Vec<(WebviewWindow, Destination)>;
+#[derive(Default)]
+pub struct Undo(Mutex<Option<(std::time::Instant, Frames)>>);
+
+pub fn pointer_monitor(
+    app: &tauri::AppHandle,
+    x: f64,
+    y: f64,
+) -> tauri::Result<Option<tauri::Monitor>> {
+    Ok(app.available_monitors()?.into_iter().find(|m| {
+        let u = unit(m.scale_factor());
+        let left = m.position().x as f64 / u;
+        let top = m.position().y as f64 / u;
+        x >= left
+            && y >= top
+            && x < left + m.size().width as f64 / u
+            && y < top + m.size().height as f64 / u
+    }))
+}
+pub fn expire_undo(app: &tauri::AppHandle) {
+    let state = app.state::<Undo>();
+    let mut slot = state.0.lock().unwrap();
+    if slot
+        .as_ref()
+        .is_some_and(|(until, _)| std::time::Instant::now() >= *until)
+    {
+        slot.take();
+        if let Some(w) = app.get_webview_window("layout-undo") {
+            let _ = w.hide();
+        }
+    }
+}
+fn restore_frames(frames: Frames) -> Result<(), String> {
+    for (w, d) in frames {
+        if !w.is_visible().unwrap_or(false) {
+            continue;
+        }
+        entrance::cancel(&w)?;
+        entrance::place(&w, d)?;
+        if let Some(m) = w.current_monitor().map_err(|e| e.to_string())? {
+            crate::warp::remember(
+                w.app_handle(),
+                &w,
+                d.position.y.into(),
+                m.work_area().position.y,
+                d.scale,
+            )?;
+        }
+    }
+    Ok(())
+}
+#[cfg(target_os = "macos")]
+pub fn click_undo_if_hovered(app: &tauri::AppHandle) {
+    if app.state::<Undo>().0.lock().unwrap().is_none() {
+        return;
+    }
+    let Some(w) = app.get_webview_window("layout-undo") else {
+        return;
+    };
+    if let Ok(ptr) = w.ns_window() {
+        let native = unsafe { &*(ptr as *const objc2_app_kit::NSWindow) };
+        let p = objc2_app_kit::NSEvent::mouseLocation();
+        let r = native.frame();
+        if p.x >= r.origin.x
+            && p.x < r.origin.x + r.size.width
+            && p.y >= r.origin.y
+            && p.y < r.origin.y + r.size.height
+        {
+            let _ = undo_arrangement(w);
+        }
+    }
+}
+#[tauri::command]
+pub fn undo_arrangement(window: WebviewWindow) -> Result<(), String> {
+    if window.label() != "layout-undo" {
+        return Err("정렬 취소 창 전용입니다".into());
+    }
+    let snapshot = window.state::<Undo>().0.lock().unwrap().take();
+    window.hide().map_err(|e| e.to_string())?;
+    if let Some((until, frames)) = snapshot {
+        if std::time::Instant::now() < until {
+            return restore_frames(frames);
+        }
+    }
+    Ok(())
+}
+
+pub fn arrange(app: &tauri::AppHandle, x: f64, y: f64, center: bool) -> Result<(), String> {
+    let _activity = crate::updater::activity(app)?;
+    let monitor = pointer_monitor(app, x, y)
+        .map_err(|e| e.to_string())?
+        .or_else(|| {
+            app.get_webview_window("direction-guide")
+                .and_then(|w| w.current_monitor().ok().flatten())
+        })
+        .ok_or("포인터 화면 없음")?;
+    let work = monitor.work_area();
+    let scale = monitor.scale_factor();
+    let area = native_rect(work.position, work.size, scale);
+    let mut windows = Vec::new();
+    for w in crate::web::managed_windows(app).into_values() {
+        let Some(id) = crate::memo_id_from_window(w.label()) else {
+            continue;
+        };
+        if crate::stash::owns(&w)
+            || !w.is_visible().map_err(|e| e.to_string())?
+            || w.is_minimized().map_err(|e| e.to_string())?
+        {
+            continue;
+        }
+        let created = app
+            .state::<crate::storage::Store>()
+            .path(id)
+            .parent()
+            .and_then(|p| p.metadata().ok())
+            .and_then(|m| m.created().ok());
+        windows.push((created, w));
+    }
+    windows.sort_by(|a, b| a.0.cmp(&b.0).then_with(|| a.1.label().cmp(b.1.label())));
+    if windows.is_empty() {
+        return Ok(());
+    }
+    let specs: Vec<_> = windows
+        .iter()
+        .map(|(_, w)| {
+            let mut s = item(w, area, scale);
+            if crate::sizing::folded(w) {
+                s.min = (24.0 * scale / unit(scale)).round() as i64;
+                s.max = s.min;
+            }
+            s
+        })
+        .collect();
+    let width = specs.iter().map(|s| s.width).max().unwrap();
+    let rects = if center {
+        let gap = (12.0 * scale / unit(scale)).round() as i64;
+        let n = windows.len();
+        let cols = ((n as f64 * area.width as f64 / area.height as f64)
+            .sqrt()
+            .round() as usize)
+            .clamp(1, n);
+        let rows = n.div_ceil(cols);
+        let cw = (area.width - gap * (cols as i64 + 1)) / cols as i64;
+        let ch = (area.height - gap * (rows as i64 + 1)) / rows as i64;
+        if cw < (144.0 * scale / unit(scale)) as i64
+            || ch
+                < specs
+                    .iter()
+                    .map(|s| s.min.min((48.0 * scale / unit(scale)) as i64))
+                    .max()
+                    .unwrap()
+        {
+            return Err("메모를 배치할 공간이 부족합니다".into());
+        }
+        let mut frames = Vec::new();
+        for (i, (_, w)) in windows.iter().enumerate() {
+            let max_width = cw.min(specs[i].width);
+            let max_height = ch.min(specs[i].max);
+            let (width, height) = if let Some(img) =
+                crate::sizing::image_size(w).filter(|_| !crate::sizing::folded(w))
+            {
+                let fit = (max_width as f64 / img.width).min(max_height as f64 / img.height);
+                (
+                    (img.width * fit).round().max(1.) as i64,
+                    (img.height * fit).round().max(1.) as i64,
+                )
+            } else {
+                (max_width, max_height)
+            };
+            frames.push(Rect {
+                x: area.x + gap + (i % cols) as i64 * (cw + gap) + (cw - width) / 2,
+                y: area.y + gap + (i / cols) as i64 * (ch + gap) + (ch - height) / 2,
+                width,
+                height,
+            });
+        }
+        frames
+    } else {
+        placement::stack(area, width, &specs, &[])
+    };
+    if rects.len() != windows.len() {
+        return Err("메모를 배치할 공간이 부족합니다".into());
+    }
+    let panel = app
+        .get_webview_window("layout-undo")
+        .ok_or("정렬 취소 창 없음")?;
+    let mut frames = Vec::new();
+    for (_, w) in &windows {
+        frames.push((
+            w.clone(),
+            Destination {
+                position: w.outer_position().map_err(|e| e.to_string())?,
+                size: w.outer_size().map_err(|e| e.to_string())?,
+                scale: w.scale_factor().map_err(|e| e.to_string())?,
+            },
+        ));
+    }
+    let apply = (|| -> Result<(), String> {
+        for ((_, w), r) in windows.into_iter().zip(rects) {
+            let u = unit(scale);
+            let dest = Destination {
+                position: tauri::PhysicalPosition::new(
+                    (r.x as f64 * u).round() as i32,
+                    (r.y as f64 * u).round() as i32,
+                ),
+                size: tauri::PhysicalSize::new(
+                    (r.width as f64 * u).round() as u32,
+                    (r.height as f64 * u).round() as u32,
+                ),
+                scale,
+            };
+            crate::warp::remember(app, &w, dest.position.y.into(), work.position.y, scale)?;
+            entrance::transition(&w, dest)?;
+        }
+        let x = work.position.x as f64 + work.size.width as f64 / 2. - 72. * scale;
+        let y = work.position.y as f64 + work.size.height as f64 - 56. * scale;
+        panel
+            .set_position(tauri::PhysicalPosition::new(
+                x.round() as i32,
+                y.round() as i32,
+            ))
+            .map_err(|e| e.to_string())?;
+        panel
+            .eval("window.startCountdown()")
+            .map_err(|e| e.to_string())?;
+        crate::stash::show_frame(&panel)
+    })();
+    if let Err(e) = apply {
+        restore_frames(frames)?;
+        return Err(e);
+    }
+    *app.state::<Undo>().0.lock().unwrap() = Some((
+        std::time::Instant::now() + std::time::Duration::from_secs(5),
+        frames,
+    ));
+    Ok(())
 }
 
 #[cfg(test)]

@@ -1,0 +1,446 @@
+{
+  "palette19-lime": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": true,
+    "capture_toolbar_below": false,
+    "content_height_cap": 104.0,
+    "dev_label": "DEV codex/color-palette-memo-types · cee63ced",
+    "feedback_active": false,
+    "feedback_surface": {
+      "focused": false,
+      "mode": "inline",
+      "view": {
+        "buttons": [],
+        "color": "#bdd657",
+        "error": false,
+        "message": "",
+        "revision": null
+      },
+      "visible": false
+    },
+    "focused": false,
+    "folded": false,
+    "global_opacity": null,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "palette19-lime",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<h1>라임</h1>\n<p>배경 #bdd657 · 배경에 맞춘 글자색</p>\n<ul class=\"task-list\"><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"완료\" data-checked=\"true\">☑</span> 본문과 아이콘 가독성</li><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"미완료\" data-checked=\"false\">☐</span> 보조 안내와 피드백 확인</li></ul>",
+      "color": "#bdd657",
+      "completion_html": null,
+      "edit_on_open": false,
+      "html": "<h1>라임</h1>\n<p>배경 #bdd657 · 배경에 맞춘 글자색</p>\n<ul class=\"task-list\"><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"완료\" data-checked=\"true\">☑</span> 본문과 아이콘 가독성</li><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"미완료\" data-checked=\"false\">☐</span> 보조 안내와 피드백 확인</li></ul>",
+      "markdown": "# 라임\n\n배경 #bdd657 · 배경에 맞춘 글자색\n\n* [x] 본문과 아이콘 가독성\n* [ ] 보조 안내와 피드백 확인\n",
+      "quiet_update": false,
+      "removed": false,
+      "revision": 3,
+      "source_path": null,
+      "status": "대기",
+      "title": "라임 · 컬러 예제",
+      "updated_at": 1794718641564
+    },
+    "ok": true,
+    "opacity": 0.5915616845262126,
+    "position": {
+      "x": 2214,
+      "y": 1470
+    },
+    "size": {
+      "height": 420,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 704.0,
+        "y": 296.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-cee63ced4725619c6df21545/docs/palette19-lime/index.md",
+    "visible": true,
+    "warp_right": false
+  },
+  "palette19-yellow": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": true,
+    "capture_toolbar_below": false,
+    "content_height_cap": 84.0,
+    "dev_label": "DEV codex/color-palette-memo-types · cee63ced",
+    "feedback_active": false,
+    "feedback_surface": {
+      "focused": false,
+      "mode": "inline",
+      "view": {
+        "buttons": [],
+        "color": "#dec755",
+        "error": false,
+        "message": "",
+        "revision": null
+      },
+      "visible": false
+    },
+    "focused": false,
+    "folded": false,
+    "global_opacity": null,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "palette19-yellow",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<h1>노랑 · 비교용 제외색</h1>\n<p>라임과 가까워 자동 후보에서 제외합니다.\n기존 명시색은 그대로 보존합니다.</p>\n",
+      "color": "#dec755",
+      "completion_html": null,
+      "edit_on_open": false,
+      "html": "<h1>노랑 · 비교용 제외색</h1>\n<p>라임과 가까워 자동 후보에서 제외합니다.\n기존 명시색은 그대로 보존합니다.</p>\n",
+      "markdown": "# 노랑 · 비교용 제외색\n라임과 가까워 자동 후보에서 제외합니다.\n기존 명시색은 그대로 보존합니다.\n",
+      "quiet_update": false,
+      "removed": false,
+      "revision": 2,
+      "source_path": null,
+      "status": "대기",
+      "title": "노랑 · 비교용 제외색",
+      "updated_at": 1794718194132
+    },
+    "ok": true,
+    "opacity": 0.5,
+    "position": {
+      "x": 2286,
+      "y": 1870
+    },
+    "size": {
+      "height": 208,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 704.0,
+        "y": 296.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-cee63ced4725619c6df21545/docs/palette19-yellow/index.md",
+    "visible": true,
+    "warp_right": false
+  },
+  "palette19-coral": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": true,
+    "capture_toolbar_below": false,
+    "content_height_cap": 104.0,
+    "dev_label": "DEV codex/color-palette-memo-types · cee63ced",
+    "feedback_active": false,
+    "feedback_surface": {
+      "focused": false,
+      "mode": "inline",
+      "view": {
+        "buttons": [],
+        "color": "#db704f",
+        "error": false,
+        "message": "",
+        "revision": null
+      },
+      "visible": false
+    },
+    "focused": false,
+    "folded": false,
+    "global_opacity": null,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "palette19-coral",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<h1>코랄</h1>\n<p>배경 #db704f · 배경에 맞춘 글자색</p>\n<ul class=\"task-list\"><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"완료\" data-checked=\"true\">☑</span> 본문과 아이콘 가독성</li><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"미완료\" data-checked=\"false\">☐</span> 보조 안내와 피드백 확인</li></ul>",
+      "color": "#db704f",
+      "completion_html": null,
+      "edit_on_open": false,
+      "html": "<h1>코랄</h1>\n<p>배경 #db704f · 배경에 맞춘 글자색</p>\n<ul class=\"task-list\"><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"완료\" data-checked=\"true\">☑</span> 본문과 아이콘 가독성</li><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"미완료\" data-checked=\"false\">☐</span> 보조 안내와 피드백 확인</li></ul>",
+      "markdown": "# 코랄\n배경 #db704f · 배경에 맞춘 글자색\n\n- [x] 본문과 아이콘 가독성\n- [ ] 보조 안내와 피드백 확인",
+      "quiet_update": false,
+      "removed": false,
+      "revision": 1,
+      "source_path": null,
+      "status": "대기",
+      "title": "코랄 · 컬러 예제",
+      "updated_at": 1794718143789
+    },
+    "ok": true,
+    "opacity": 0.5,
+    "position": {
+      "x": 1200,
+      "y": 1224
+    },
+    "size": {
+      "height": 208,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 704.0,
+        "y": 296.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-cee63ced4725619c6df21545/docs/palette19-coral/index.md",
+    "visible": true,
+    "warp_right": true
+  },
+  "palette19-mint": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": true,
+    "capture_toolbar_below": false,
+    "content_height_cap": 104.0,
+    "dev_label": "DEV codex/color-palette-memo-types · cee63ced",
+    "feedback_active": false,
+    "feedback_surface": {
+      "focused": false,
+      "mode": "inline",
+      "view": {
+        "buttons": [],
+        "color": "#6baa92",
+        "error": false,
+        "message": "",
+        "revision": null
+      },
+      "visible": false
+    },
+    "focused": false,
+    "folded": false,
+    "global_opacity": null,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "palette19-mint",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<h1>민트</h1>\n<p>배경 #6baa92 · 배경에 맞춘 글자색</p>\n<ul class=\"task-list\"><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"완료\" data-checked=\"true\">☑</span> 본문과 아이콘 가독성</li><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"미완료\" data-checked=\"false\">☐</span> 보조 안내와 피드백 확인</li></ul>",
+      "color": "#6baa92",
+      "completion_html": null,
+      "edit_on_open": false,
+      "html": "<h1>민트</h1>\n<p>배경 #6baa92 · 배경에 맞춘 글자색</p>\n<ul class=\"task-list\"><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"완료\" data-checked=\"true\">☑</span> 본문과 아이콘 가독성</li><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"미완료\" data-checked=\"false\">☐</span> 보조 안내와 피드백 확인</li></ul>",
+      "markdown": "# 민트\n배경 #6baa92 · 배경에 맞춘 글자색\n\n- [x] 본문과 아이콘 가독성\n- [ ] 보조 안내와 피드백 확인",
+      "quiet_update": false,
+      "removed": false,
+      "revision": 1,
+      "source_path": null,
+      "status": "대기",
+      "title": "민트 · 컬러 예제",
+      "updated_at": 1794718144132
+    },
+    "ok": true,
+    "opacity": 0.5,
+    "position": {
+      "x": 1286,
+      "y": 1542
+    },
+    "size": {
+      "height": 208,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 704.0,
+        "y": 296.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-cee63ced4725619c6df21545/docs/palette19-mint/index.md",
+    "visible": true,
+    "warp_right": true
+  },
+  "palette19-ivory": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": true,
+    "capture_toolbar_below": false,
+    "content_height_cap": 104.0,
+    "dev_label": "DEV codex/color-palette-memo-types · cee63ced",
+    "feedback_active": false,
+    "feedback_surface": {
+      "focused": false,
+      "mode": "inline",
+      "view": {
+        "buttons": [],
+        "color": "#e5e4d2",
+        "error": false,
+        "message": "",
+        "revision": null
+      },
+      "visible": false
+    },
+    "focused": false,
+    "folded": false,
+    "global_opacity": null,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "palette19-ivory",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<h1>아이보리</h1>\n<p>배경 #e5e4d2 · 배경에 맞춘 글자색</p>\n<ul class=\"task-list\"><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"완료\" data-checked=\"true\">☑</span> 본문과 아이콘 가독성</li><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"미완료\" data-checked=\"false\">☐</span> 보조 안내와 피드백 확인</li></ul>",
+      "color": "#e5e4d2",
+      "completion_html": null,
+      "edit_on_open": false,
+      "html": "<h1>아이보리</h1>\n<p>배경 #e5e4d2 · 배경에 맞춘 글자색</p>\n<ul class=\"task-list\"><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"완료\" data-checked=\"true\">☑</span> 본문과 아이콘 가독성</li><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"미완료\" data-checked=\"false\">☐</span> 보조 안내와 피드백 확인</li></ul>",
+      "markdown": "# 아이보리\n배경 #e5e4d2 · 배경에 맞춘 글자색\n\n- [x] 본문과 아이콘 가독성\n- [ ] 보조 안내와 피드백 확인",
+      "quiet_update": false,
+      "removed": false,
+      "revision": 1,
+      "source_path": null,
+      "status": "대기",
+      "title": "아이보리 · 컬러 예제",
+      "updated_at": 1794718144475
+    },
+    "ok": true,
+    "opacity": 0.5,
+    "position": {
+      "x": 2216,
+      "y": 1194
+    },
+    "size": {
+      "height": 208,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 704.0,
+        "y": 296.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-cee63ced4725619c6df21545/docs/palette19-ivory/index.md",
+    "visible": true,
+    "warp_right": false
+  },
+  "palette19-charcoal": {
+    "always_on_top": true,
+    "animating": false,
+    "auto_layout_excluded": true,
+    "capture_toolbar_below": false,
+    "content_height_cap": 104.0,
+    "dev_label": "DEV codex/color-palette-memo-types · cee63ced",
+    "feedback_active": false,
+    "feedback_surface": {
+      "focused": false,
+      "mode": "inline",
+      "view": {
+        "buttons": [],
+        "color": "#4d4d4b",
+        "error": false,
+        "message": "",
+        "revision": null
+      },
+      "visible": false
+    },
+    "focused": false,
+    "folded": false,
+    "global_opacity": null,
+    "highlight_revision": null,
+    "hovered": false,
+    "id": "palette19-charcoal",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "layout_destination": null,
+    "layout_pending": false,
+    "note": {
+      "capture": null,
+      "change_html": "<h1>차콜</h1>\n<p>배경 #4d4d4b · 배경에 맞춘 글자색</p>\n<ul class=\"task-list\"><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"완료\" data-checked=\"true\">☑</span> 본문과 아이콘 가독성</li><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"미완료\" data-checked=\"false\">☐</span> 보조 안내와 피드백 확인</li></ul>",
+      "color": "#4d4d4b",
+      "completion_html": null,
+      "edit_on_open": false,
+      "html": "<h1>차콜</h1>\n<p>배경 #4d4d4b · 배경에 맞춘 글자색</p>\n<ul class=\"task-list\"><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"완료\" data-checked=\"true\">☑</span> 본문과 아이콘 가독성</li><li class=\"task-item\"><span class=\"task-checkbox\" role=\"img\" aria-label=\"미완료\" data-checked=\"false\">☐</span> 보조 안내와 피드백 확인</li></ul>",
+      "markdown": "# 차콜\n배경 #4d4d4b · 배경에 맞춘 글자색\n\n- [x] 본문과 아이콘 가독성\n- [ ] 보조 안내와 피드백 확인",
+      "quiet_update": false,
+      "removed": false,
+      "revision": 1,
+      "source_path": null,
+      "status": "대기",
+      "title": "차콜 · 컬러 예제",
+      "updated_at": 1794718144815
+    },
+    "ok": true,
+    "opacity": 0.5,
+    "position": {
+      "x": 2216,
+      "y": 986
+    },
+    "size": {
+      "height": 208,
+      "width": 600
+    },
+    "stash": {
+      "active": false,
+      "animating": false,
+      "indicator": {
+        "height": 48.0,
+        "width": 320.0,
+        "x": 704.0,
+        "y": 296.0
+      },
+      "indicator_moving": false,
+      "restoring": false,
+      "shortcut": "Ctrl+Alt+Cmd 사용 중 · 트레이로 실행",
+      "tip_visible": false,
+      "windows": null
+    },
+    "storage_path": "/Users/egoinglee/Library/Application Support/org.egoing.floatnote/notes/dev-cee63ced4725619c6df21545/docs/palette19-charcoal/index.md",
+    "visible": true,
+    "warp_right": false
+  }
+}

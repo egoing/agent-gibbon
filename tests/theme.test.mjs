@@ -38,3 +38,21 @@ test('error text retains contrast on saturated memo colors', () => {
     assert.ok((Math.max(text, surface) + .05) / (Math.min(text, surface) + .05) >= 4.5);
   }
 });
+
+test('palette and arbitrary colors keep opaque secondary and panel text readable', async () => {
+  const {colorPalette, contrastRatio} = await import('../ui/theme.mjs');
+  for (const bg of [...colorPalette.map(p=>p.background), ...Array.from({length:256},(_,i)=>'#'+[i,(i*73)%256,(i*149)%256].map(c=>c.toString(16).padStart(2,'0')).join(''))]) {
+    const theme=themeFor(bg);
+    for(const surface of [bg,theme.panel]) assert(contrastRatio(theme.border,surface)>=3);
+    for(const text of [theme.foreground, theme.secondary]) for(const surface of [bg,theme.panel])
+      assert(contrastRatio(text,surface)>=4.5,`${text} on ${surface}`);
+  }
+});
+
+test('frontend palette matches colors assigned by the native backend', async()=>{
+ const {readFileSync}=await import('node:fs');
+ const {colorPalette}=await import('../ui/theme.mjs');
+ const rust=readFileSync(new URL('../src-tauri/src/memo_color.rs',import.meta.url),'utf8');
+ const declaration=rust.match(/pub const PALETTE[^=]+=\s*\[([^\]]+)\]/s)[1];
+ assert.deepEqual([...declaration.matchAll(/"(#[0-9a-f]{6})"/g)].map(m=>m[1]),colorPalette.map(p=>p.background));
+});

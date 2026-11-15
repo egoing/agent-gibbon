@@ -31,11 +31,11 @@ gh run view <실행-ID> --json url,headSha,status,conclusion,jobs
 Windows 지원 및 릴리스 워크플로를 기본 브랜치에 병합한 뒤, 새 버전을 준비합니다.
 
 ```sh
-npm run version:set -- 0.2.8
-npm run version:check
+pnpm run version:set 0.2.8
+pnpm run version:check
 ```
 
-스크립트는 `package.json`, `package-lock.json`의 루트·앱 항목, `src-tauri/Cargo.toml`, `src-tauri/Cargo.lock`의 앱 항목, `src-tauri/tauri.conf.json`을 함께 변경합니다. 현재보다 높은 안정 버전만 허용합니다. 변경을 검토하고 테스트한 뒤 버전 커밋을 push하고 그 커밋에 태그를 붙입니다.
+스크립트는 `package.json`, `src-tauri/Cargo.toml`, `src-tauri/Cargo.lock`의 앱 항목, `src-tauri/tauri.conf.json`을 함께 변경합니다. pnpm lockfile에는 앱 자체의 버전 필드가 없어 의존성 해석을 그대로 유지합니다. 현재보다 높은 안정 버전만 허용합니다. 변경을 검토하고 테스트한 뒤 버전 커밋을 push하고 그 커밋에 태그를 붙입니다.
 
 ```sh
 git tag -a v0.2.8 -m 'Agent Gibbon 0.2.8 배포'
@@ -78,7 +78,7 @@ macOS 배포판은 기존 애드혹 코드 서명을 유지하며 Developer ID �
 
 ## 빌드 캐시
 
-npm 캐시와 별도로 `Swatinem/rust-cache`를 Rust 도구 설치 뒤에 실행합니다. Cargo 다운로드와 `src-tauri/target`의 의존성 컴파일 결과를 GitHub Actions 캐시 저장 공간에 보관합니다. 캐시는 Git 소스나 릴리스 자산에 포함되지 않습니다.
+`packageManager`의 pnpm 11.25.0과 `pnpm-lock.yaml`을 사용하고, setup-node의 pnpm 저장소 캐시를 복원합니다. 별도로 `Swatinem/rust-cache`를 Rust 도구 설치 뒤에 실행합니다. Cargo 다운로드와 `src-tauri/target`의 의존성 컴파일 결과를 GitHub Actions 캐시 저장 공간에 보관합니다. 캐시는 Git 소스나 릴리스 자산에 포함되지 않습니다.
 
 OS·CPU·대상 triple·Rust 도구 버전·Cargo 매니페스트와 lockfile 등에 따라 캐시를 구분합니다. 앱 자체와 설치 파일은 매번 다시 빌드하며, 테스트·Clippy도 생략하지 않습니다. 캐시가 없거나 호환되지 않으면 전체 빌드를 수행하므로 첫 실행은 캐시를 채우는 시간이 추가될 수 있습니다.
 
@@ -103,3 +103,5 @@ GitHub는 업로드 이름의 공백을 점으로 정규화했다. 0.2.8의 mani
 기본 검증 간격은 최초 확인 15초, 이후 확인 60초, OS 무입력 30초, 설치 재시도 5초다. 최종 확인에도 무입력 30초를 사용한다. 배포판의 5분 대기 자체를 별도로 시험하려면 빌드 시 `GIBBON_VERIFICATION_STANDARD_TIMING=1`을 지정한다. 앱의 `diagnostics`에서 실제 시간값, 실행 버전과 설치 준비 응답을 확인한다. 이전 버전의 안정화된 메모 상태를 기록한 다음 피드에 후보 버전을 노출한다.
 
 정식 빌드는 시작 15초 뒤 최초 확인을 시도하고, 성공·실패 여부와 관계없이 각 자동 확인 완료 후 15분 주기로 다시 확인한다. 설치 준비 재검사는 15초 간격이고 무입력 기준은 5분이다. 검증 프로필은 60초 확인·5초 재검사·30초 무입력을 사용한다.
+
+로컬 package 스크립트는 [README의 중앙 캐시 정책](../README.md)을 사용합니다. 단일 체크아웃 CI는 `CARGO_BUILD_BUILD_DIR`를 `src-tauri/target`으로 지정해 Rust 캐시 action의 기존 복원 경로와 맞춥니다.

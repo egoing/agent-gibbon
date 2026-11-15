@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, symlinkSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
-import { devInstance, devEnvironment } from '../scripts/dev-instance.mjs';
+import { devInstance, devEnvironment, buildEnvironment } from '../scripts/dev-instance.mjs';
 
 test('canonical paths, not cwd or basename, determine stable instance IDs', () => {
   const temp = mkdtempSync(join(tmpdir(), 'floatnote-test-'));
@@ -58,4 +60,20 @@ console.log(JSON.stringify(process.argv[2] === '--instance-info' ? info : {...in
     assert.equal(response.cwd, '/');
     assert.deepEqual(response.args, ['open', '--markdown', '한글 $literal']);
   } finally { rmSync(temp, { recursive: true, force: true }); }
+});
+
+test('build cache uses the Git common directory while final artifacts stay local', t => {
+  const root = fileURLToPath(new URL('..', import.meta.url));
+  const common = spawnSync('git', ['-C', root, 'rev-parse', '--path-format=absolute', '--git-common-dir'], { encoding: 'utf8' });
+  if (common.status !== 0 || process.env.CARGO_BUILD_BUILD_DIR) return t.skip('requires Git checkout and default cache policy');
+  const instance = devInstance(root);
+  assert.equal(instance.buildDir, join(common.stdout.trim(), 'agent-gibbon/build-cache'));
+  assert.equal(instance.target, join(root, 'src-tauri/target'));
+  const env = buildEnvironment(instance, { CARGO_TARGET_DIR: '/foreign', KEEP: 'yes' });
+  assert.equal(env.CARGO_TARGET_DIR, instance.target);
+  assert.equal(env.CARGO_BUILD_BUILD_DIR, instance.buildDir);
+  assert.equal(env.FLOATNOTE_INSTANCE, undefined);
+  assert.equal(env.KEEP, 'yes');
+  const override = buildEnvironment(instance, { CARGO_BUILD_BUILD_DIR: 'private-cache' });
+  assert.equal(override.CARGO_BUILD_BUILD_DIR, join(root, 'private-cache'));
 });

@@ -7,6 +7,14 @@ pub fn used() -> bool {
     let event = USED.swap(false, Ordering::AcqRel);
     event || held_input()
 }
+#[cfg(target_os = "macos")]
+pub fn escape_down() -> bool {
+    #[link(name = "CoreGraphics", kind = "framework")]
+    extern "C" {
+        fn CGEventSourceKeyState(state: i32, key: u16) -> bool;
+    }
+    unsafe { CGEventSourceKeyState(1, 53) }
+}
 fn held_input() -> bool {
     #[cfg(target_os = "macos")]
     {
@@ -65,6 +73,9 @@ pub fn install(app: &tauri::AppHandle) -> bool {
         // Event flags preserve fast press/release order even if the run loop is
         // drawing an animation. Sampling current flags here would lose edges.
         let event = unsafe { event.as_ref() };
+        if event.r#type() == objc2_app_kit::NSEventType::LeftMouseDown {
+            crate::layout::click_undo_if_hovered(app);
+        }
         if event.r#type() == objc2_app_kit::NSEventType::FlagsChanged {
             use objc2_app_kit::NSEventModifierFlags as F;
             let f = event.modifierFlags();
@@ -211,6 +222,12 @@ mod windows {
             // vkCode is the first DWORD of KBDLLHOOKSTRUCT; no text is decoded.
             let key = *(l as *const u32);
             if !matches!(key,0x11..=0x12 | 0x5b..=0x5c | 0xa2..=0xa5) {
+                if key == 0x1b {
+                    if let Some(app) = APP.get() {
+                        let handle = app.clone();
+                        let _ = app.run_on_main_thread(move || crate::stash::cancel_chord(&handle));
+                    }
+                }
                 USED.store(true, Ordering::Release);
             }
         }

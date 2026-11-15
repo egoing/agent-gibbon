@@ -9,6 +9,7 @@ use std::{
 #[cfg(target_os = "macos")]
 use tauri::{LogicalPosition, LogicalSize};
 use tauri::{Manager, WebviewWindow};
+const GUIDE: &str = "direction-guide";
 const ICON: &str = "stash-indicator";
 const DURATION: f64 = 0.420;
 #[derive(Clone, Copy, Debug)]
@@ -40,6 +41,7 @@ struct Saved {
     alpha: f64,
 }
 struct Session {
+    after_restore: Option<(Direction, f64, f64)>,
     windows: BTreeMap<String, Saved>,
     started: Instant,
     animating: bool,
@@ -55,10 +57,144 @@ struct Session {
 #[derive(Default)]
 pub struct Stash {
     session: Mutex<Option<Session>>,
+    gesture: Mutex<Gesture>,
+    last_arrangement: Mutex<Option<String>>,
+    restored_arrangement: Mutex<Option<(Direction, f64, f64)>>,
     shortcut: Mutex<String>,
     chord: Mutex<Chord>,
     lease: Mutex<Option<std::fs::File>>,
 }
+#[derive(Default)]
+struct Gesture {
+    hide_at: Option<Instant>,
+    origin: Option<(f64, f64)>,
+    scale: f64,
+    moved: bool,
+    direction: Option<Direction>,
+}
+#[derive(Clone, Copy, PartialEq, Debug)]
+enum Direction {
+    Cancel,
+    Down,
+    Right,
+    Up,
+}
+impl Gesture {
+    fn track(&mut self, x: f64, y: f64) {
+        let Some((a, b)) = self.origin else { return };
+        let (dx, dy) = (x - a, y - b);
+        if self.direction.is_some() || dx.hypot(dy) < 40.0 * self.scale {
+            return;
+        }
+        self.moved = true;
+        self.direction = if dx.abs() >= 1.5 * dy.abs() {
+            Some(if dx > 0.0 {
+                Direction::Right
+            } else {
+                Direction::Cancel
+            })
+        } else if dy.abs() >= 1.5 * dx.abs() {
+            Some(if dy > 0.0 {
+                Direction::Down
+            } else {
+                Direction::Up
+            })
+        } else {
+            None
+        };
+    }
+}
+// Quartz display bounds and event locations share the same global point space.
+fn gesture_pointer(app: &tauri::AppHandle) -> Result<tauri::PhysicalPosition<f64>, String> {
+    #[cfg(target_os = "macos")]
+    {
+        let _ = app;
+        #[repr(C)]
+        struct QuartzPoint {
+            x: f64,
+            y: f64,
+        }
+        #[link(name = "CoreGraphics", kind = "framework")]
+        extern "C" {
+            fn CGEventCreate(source: *const std::ffi::c_void) -> *const std::ffi::c_void;
+            fn CGEventGetLocation(event: *const std::ffi::c_void) -> QuartzPoint;
+        }
+        #[link(name = "CoreFoundation", kind = "framework")]
+        extern "C" {
+            fn CFRelease(object: *mut std::ffi::c_void);
+        }
+        unsafe {
+            let event = CGEventCreate(std::ptr::null());
+            if event.is_null() {
+                return Err("포인터 위치 없음".into());
+            }
+            let p = CGEventGetLocation(event);
+            CFRelease(event.cast_mut());
+            Ok(tauri::PhysicalPosition::new(p.x, p.y))
+        }
+    }
+    #[cfg(not(target_os = "macos"))]
+    app.cursor_position().map_err(err)
+}
+fn sample_pointer(app: &tauri::AppHandle) {
+    let state = app.state::<Stash>();
+    let mut g = state.gesture.lock().unwrap();
+    if g.hide_at.is_some_and(|deadline| Instant::now() >= deadline) {
+        g.hide_at = None;
+        drop(g);
+        hide_guide(app);
+        return;
+    }
+    let Some((x, y)) = g.origin else { return };
+    #[cfg(target_os = "macos")]
+    if crate::stash_input::escape_down() {
+        drop(g);
+        dismiss_guide(app);
+        return;
+    }
+    if let Ok(p) = gesture_pointer(app) {
+        g.track(p.x, p.y);
+    }
+    let Some(direction) = g.direction else { return };
+    g.origin = None;
+    g.hide_at = Some(Instant::now() + Duration::from_millis(180));
+    drop(g);
+    if let Some(w) = app.get_webview_window(GUIDE) {
+        let _ = w.eval("document.body.classList.add('closing')");
+    }
+    if crate::updater::frozen(app) {
+        return;
+    }
+    match direction {
+        Direction::Cancel => {}
+        Direction::Down => trigger(app),
+        Direction::Right | Direction::Up => {
+            let mut session = state.session.lock().unwrap();
+            if let Some(s) = session.as_mut() {
+                s.after_restore = Some((direction, x, y));
+                let restoring = s.restoring;
+                drop(session);
+                if !restoring {
+                    if let Err(error) = toggle(app) {
+                        *state.last_arrangement.lock().unwrap() = Some(error);
+                    }
+                }
+            } else {
+                drop(session);
+                arrange_direction(app, direction, x, y);
+            }
+        }
+    }
+}
+fn arrange_direction(app: &tauri::AppHandle, direction: Direction, x: f64, y: f64) {
+    let result = crate::layout::arrange(app, x, y, direction == Direction::Up);
+    *app.state::<Stash>().last_arrangement.lock().unwrap() = Some(
+        result
+            .map(|_| format!("{direction:?}"))
+            .unwrap_or_else(|e| e),
+    );
+}
+
 // Commit only a bare chord on complete release. Other input cancels the chord.
 // Partial release/repress and key repeat cannot trigger a second toggle.
 #[derive(Default)]
@@ -144,25 +280,84 @@ pub fn modifier_event(app: &tauri::AppHandle, mask: u8, shift: bool) {
         crate::opacity::reset_wheel(app);
     }
     let state = app.state::<Stash>();
+    let old = state.chord.lock().unwrap().mask;
+    if old == 0 && mask != 0 {
+        dismiss_guide(app);
+    }
     let fire = state
         .chord
         .lock()
         .unwrap()
         .sample(mask, shift, crate::stash_input::used());
-    if fire && state.lease.lock().unwrap().is_some() {
-        trigger(app);
+    if !fire || !input_owned(app) || crate::updater::frozen(app) {
+        return;
+    }
+    if let (Ok(p), Some(w)) = (gesture_pointer(app), app.get_webview_window(GUIDE)) {
+        let scale = crate::layout::pointer_monitor(app, p.x, p.y)
+            .ok()
+            .flatten()
+            .map_or(1., |m| m.scale_factor());
+        if let Err(e)=position_guide(&w,p.x,p.y,scale)
+            .and_then(|_|w.eval("document.body.classList.remove('closing'); document.querySelector('img').src='direction-guide.svg?open='+performance.now()").map_err(err))
+            .and_then(|_|show_frame(&w)){eprintln!("방향 안내 표시 실패: {e}");return}
+        *state.gesture.lock().unwrap() = Gesture {
+            origin: Some((p.x, p.y)),
+            scale: if cfg!(target_os = "macos") { 1. } else { scale },
+            ..Default::default()
+        };
+    }
+}
+fn position_guide(w: &WebviewWindow, x: f64, y: f64, scale: f64) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        let _ = (x, y, scale);
+        let mut point = objc2_app_kit::NSEvent::mouseLocation();
+        unsafe {
+            let native = &*(w.ns_window().map_err(err)? as *const objc2_app_kit::NSWindow);
+            let size = native.frame().size;
+            point.x -= size.width / 2.;
+            point.y -= size.height / 2.;
+            native.setFrameOrigin(point);
+        }
+        Ok(())
+    }
+    #[cfg(not(target_os = "macos"))]
+    w.set_position(tauri::PhysicalPosition::new(
+        (x - 116. * scale).round() as i32,
+        (y - 116. * scale).round() as i32,
+    ))
+    .map_err(err)
+}
+fn hide_guide(app: &tauri::AppHandle) {
+    if let Some(w) = app.get_webview_window(GUIDE) {
+        let _ = w.hide();
+    }
+}
+fn dismiss_guide(app: &tauri::AppHandle) {
+    if app
+        .state::<Stash>()
+        .gesture
+        .lock()
+        .unwrap()
+        .origin
+        .take()
+        .is_some()
+    {
+        hide_guide(app);
     }
 }
 pub fn cancel_chord(app: &tauri::AppHandle) {
     let state = app.state::<Stash>();
+    dismiss_guide(app);
     let mut chord = state.chord.lock().unwrap();
     if chord.mask != 0 {
+        hide_guide(app);
         chord.cancelled = true;
         chord.pending = false;
     }
 }
 fn snapshot_candidate(label: &str) -> bool {
-    label != ICON && !label.starts_with("relation-prototype-")
+    !matches!(label, ICON | GUIDE | "layout-undo") && !label.starts_with("relation-prototype-")
 }
 fn compact(r: Rect, area: Rect, top: bool) -> Rect {
     let w = (r.w * 0.18).max(144.).min(r.w);
@@ -186,7 +381,7 @@ fn interpolate(a: Rect, b: Rect, t: f64) -> Rect {
         h: a.h + (b.h - a.h) * t,
     }
 }
-fn show_frame(w: &WebviewWindow) -> Result<(), String> {
+pub(crate) fn show_frame(w: &WebviewWindow) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     unsafe {
         (&*(w.ns_window().map_err(err)? as *const objc2_app_kit::NSWindow)).orderFrontRegardless();
@@ -313,7 +508,7 @@ pub fn shortcut(app: &tauri::AppHandle) -> String {
 pub fn inspect(app: &tauri::AppHandle) -> serde_json::Value {
     let state = app.state::<Stash>();
     let s = state.session.lock().unwrap();
-    serde_json::json!({"active":s.is_some(),"animating":s.as_ref().is_some_and(|s|s.animating),"restoring":s.as_ref().is_some_and(|s|s.restoring),"indicator_moving":s.as_ref().is_some_and(|s|s.flight.is_some()),"tip_visible":s.as_ref().is_some_and(|s|s.flight.is_none() && s.displayed.is_some_and(|d|d.1)),"windows":s.as_ref().map(|s|s.windows.keys().collect::<Vec<_>>()),"shortcut":shortcut(app),"indicator":app.get_webview_window(ICON).and_then(|w|rect(&w).ok()).map(|r|serde_json::json!({"x":r.x,"y":r.y,"width":r.w,"height":r.h}))})
+    serde_json::json!({"last_arrangement":state.last_arrangement.lock().unwrap().clone(),"active":s.is_some(),"animating":s.as_ref().is_some_and(|s|s.animating),"restoring":s.as_ref().is_some_and(|s|s.restoring),"indicator_moving":s.as_ref().is_some_and(|s|s.flight.is_some()),"tip_visible":s.as_ref().is_some_and(|s|s.flight.is_none() && s.displayed.is_some_and(|d|d.1)),"windows":s.as_ref().map(|s|s.windows.keys().collect::<Vec<_>>()),"shortcut":shortcut(app),"indicator":app.get_webview_window(ICON).and_then(|w|rect(&w).ok()).map(|r|serde_json::json!({"x":r.x,"y":r.y,"width":r.w,"height":r.h}))})
 }
 // Explicit individual open/close takes ownership away from the transaction.
 pub fn release(w: &WebviewWindow) -> Result<(), String> {
@@ -397,7 +592,7 @@ fn place_indicator(app: &tauri::AppHandle, area: Rect, top: bool, tip: bool) -> 
 fn set_tip(app: &tauri::AppHandle, w: &WebviewWindow, tip: bool) -> Result<(), String> {
     let text = if tip {
         format!(
-            "복원: {}",
+            "복원: {} 놓고 ↓",
             crate::presentation::shortcut(shortcut(app).split_whitespace().next().unwrap_or(""))
         )
     } else {
@@ -429,6 +624,9 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
     let previous = app.state::<Stash>().session.lock().unwrap().take();
     if let Some(mut s) = previous {
         let restoring = !s.restoring;
+        if !restoring {
+            s.after_restore = None;
+        }
         let mut from = BTreeMap::new();
         for (label, saved) in &mut s.windows {
             if let Some(w) = crate::web::managed_window(app, label) {
@@ -555,6 +753,7 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
     }
     let now = Instant::now();
     let s = Session {
+        after_restore: None,
         from: windows.clone(),
         windows,
         restoring: false,
@@ -618,8 +817,9 @@ fn tick(app: &tauri::AppHandle) -> Result<(), String> {
         }
         if t >= 1. {
             let mut guard = state.session.lock().unwrap();
+            let mut arrangement = None;
             if restoring {
-                guard.take();
+                arrangement = guard.take().and_then(|s| s.after_restore);
             } else if let Some(s) = guard.as_mut() {
                 s.animating = false;
                 s.tip_until = Instant::now() + Duration::from_secs(6);
@@ -643,6 +843,8 @@ fn tick(app: &tauri::AppHandle) -> Result<(), String> {
                     }
                 }
             }
+            // Let the native event loop apply the final restore frame before placing windows.
+            *state.restored_arrangement.lock().unwrap() = arrangement;
             crate::tray::sync_visibility(app)?;
         }
         return Ok(());
@@ -733,6 +935,47 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
     let observed = available && crate::stash_input::install(app);
     let owned = available && observed;
     if owned {
+        tauri::WebviewWindowBuilder::new(
+            app,
+            "layout-undo",
+            tauri::WebviewUrl::App("layout-undo.html".into()),
+        )
+        .title("정렬 취소하기")
+        .accept_first_mouse(true)
+        .inner_size(144., 40.)
+        .decorations(false)
+        .transparent(true)
+        .shadow(false)
+        .resizable(false)
+        .visible(false)
+        .focused(false)
+        .focusable(false)
+        .always_on_top(true)
+        .skip_taskbar(true)
+        .build()
+        .map_err(err)?;
+        let guide = tauri::WebviewWindowBuilder::new(
+            app,
+            GUIDE,
+            tauri::WebviewUrl::App("direction-guide.html".into()),
+        )
+        .title(format!(
+            "{} — 방향 안내",
+            crate::instance::current().title()
+        ))
+        .inner_size(232., 232.)
+        .decorations(false)
+        .transparent(true)
+        .shadow(false)
+        .resizable(false)
+        .visible(false)
+        .focused(false)
+        .focusable(false)
+        .always_on_top(true)
+        .skip_taskbar(true)
+        .build()
+        .map_err(err)?;
+        guide.set_ignore_cursor_events(true).map_err(err)?;
         *app.state::<Stash>().lease.lock().unwrap() = Some(lease);
     }
     *app.state::<Stash>().shortcut.lock().unwrap() = if owned {
@@ -758,6 +1001,19 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             .run_on_main_thread(move || {
                 #[cfg(not(target_os = "macos"))]
                 poll_shortcut(&handle);
+                crate::layout::expire_undo(&handle);
+                let pending = handle
+                    .state::<Stash>()
+                    .restored_arrangement
+                    .lock()
+                    .unwrap()
+                    .take();
+                if let Some((direction, x, y)) = pending {
+                    if !active(&handle) {
+                        arrange_direction(&handle, direction, x, y);
+                    }
+                }
+                sample_pointer(&handle);
                 if let Err(e) = tick(&handle) {
                     eprintln!("접어두기 전환 실패: {e}");
                     let _ = toggle(&handle);
@@ -778,6 +1034,33 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn left_cancels_even_if_pointer_later_crosses_right() {
+        let mut gesture = Gesture {
+            origin: Some((100., 100.)),
+            scale: 1.,
+            ..Default::default()
+        };
+        gesture.track(40., 105.);
+        gesture.track(180., 100.);
+        assert_eq!(gesture.direction, Some(Direction::Cancel));
+    }
+    #[test]
+    fn direction_uses_screen_scale_and_locks_the_first_valid_axis() {
+        let mut g = Gesture {
+            origin: Some((-60., 100.)),
+            scale: 2.,
+            ..Default::default()
+        };
+        g.track(0., 100.);
+        assert!(!g.moved);
+        g.track(20., 180.);
+        assert!(g.moved && g.direction.is_none());
+        g.track(20., 100.);
+        assert_eq!(g.direction, Some(Direction::Right));
+        g.track(-60., 0.);
+        assert_eq!(g.direction, Some(Direction::Right));
+    }
     #[test]
     fn bare_modifier_chord_commits_once_on_complete_release() {
         for masks in [[1, 3, 7], [2, 6, 7], [4, 5, 7]] {
@@ -829,6 +1112,8 @@ mod tests {
     fn derived_connections_never_enter_the_memo_stash_snapshot() {
         for label in [
             "stash-indicator",
+            GUIDE,
+            "layout-undo",
             "relation-prototype-0",
             "relation-prototype-7",
         ] {

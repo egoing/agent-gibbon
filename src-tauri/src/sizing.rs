@@ -66,11 +66,161 @@ struct SizeState {
     content_height: Option<f64>,
     pending: Option<crate::entrance::Presentation>,
     image_size: Option<LogicalSize<f64>>,
+    image_toolbar_below: bool,
     expanded: Option<LogicalSize<f64>>,
     contact: crate::warp::Contact,
+    work_area_restore: Option<WorkAreaRestore>,
 }
 #[derive(Default)]
 pub struct Sizes(Mutex<BTreeMap<String, SizeState>>);
+
+pub fn set_image_toolbar_below(window: &WebviewWindow, below: bool) -> Result<(), String> {
+    window
+        .state::<Sizes>()
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .entry(window.label().into())
+        .or_default()
+        .image_toolbar_below = below;
+    Ok(())
+}
+pub fn image_toolbar_below(window: &WebviewWindow) -> bool {
+    window
+        .state::<Sizes>()
+        .0
+        .lock()
+        .ok()
+        .and_then(|states| states.get(window.label()).map(|s| s.image_toolbar_below))
+        .unwrap_or(false)
+}
+
+// Session-local zoom belongs to this native window, including hidden restores.
+// Store destination scale with the frame, rather than converting on another monitor.
+#[derive(Clone, Copy)]
+struct WorkAreaRestore {
+    frame: crate::entrance::Destination,
+    expanded: Option<LogicalSize<f64>>,
+    excluded: bool,
+}
+
+pub fn work_area_active(window: &WebviewWindow) -> bool {
+    window
+        .state::<Sizes>()
+        .0
+        .lock()
+        .ok()
+        .and_then(|states| {
+            states
+                .get(window.label())
+                .map(|s| s.work_area_restore.is_some())
+        })
+        .unwrap_or(false)
+}
+
+fn chrome_window(view: &tauri::Webview) -> Result<WebviewWindow, String> {
+    let label = view.label();
+    if label != "main"
+        && !["note-", "terminal-", "webview-"]
+            .iter()
+            .any(|prefix| label.starts_with(prefix))
+    {
+        return Err("메모 툴바에서만 실행할 수 있습니다".into());
+    }
+    crate::web::managed_window(view.app_handle(), view.window().label())
+        .ok_or("메모 창을 찾을 수 없습니다".into())
+}
+
+#[tauri::command]
+pub fn chrome_drag(view: tauri::Webview) -> Result<(), String> {
+    crate::entrance::drag_note(chrome_window(&view)?)
+}
+
+#[tauri::command]
+pub fn chrome_work_area(view: tauri::Webview) -> Result<bool, String> {
+    let window = chrome_window(&view)?;
+    if crate::stash::owns(&window) || !window.is_visible().map_err(|e| e.to_string())? {
+        return Ok(folded(&window));
+    }
+    crate::entrance::cancel(&window)?;
+    let sizes = window.state::<Sizes>();
+    // Copy state and release the lock before native geometry calls can reenter events.
+    let (restore, expanded, image) = {
+        let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
+        let state = states.entry(window.label().into()).or_default();
+        (state.work_area_restore, state.expanded, state.image_size)
+    };
+    let current = crate::entrance::Destination {
+        position: window.outer_position().map_err(|e| e.to_string())?,
+        size: window.outer_size().map_err(|e| e.to_string())?,
+        scale: window.scale_factor().map_err(|e| e.to_string())?,
+    };
+    let prior_excluded = crate::layout::excluded(&window);
+    let saved = restore.unwrap_or(WorkAreaRestore {
+        frame: current,
+        expanded,
+        excluded: prior_excluded,
+    });
+    let destination = if restore.is_some() {
+        saved.frame
+    } else {
+        let monitor = window
+            .current_monitor()
+            .map_err(|e| e.to_string())?
+            .ok_or("화면을 찾을 수 없습니다")?;
+        crate::entrance::Destination {
+            position: monitor.work_area().position,
+            size: monitor.work_area().size,
+            scale: monitor.scale_factor(),
+        }
+    };
+    let result = (|| {
+        set_image_ratio(&window, None)?;
+        crate::layout::mark(&window, true);
+        crate::entrance::place(&window, destination)?;
+        if restore.is_some() && saved.expanded.is_none() {
+            set_image_ratio(&window, image)?;
+        }
+        Ok::<(), String>(())
+    })();
+    if let Err(error) = result {
+        crate::layout::mark(&window, prior_excluded);
+        let _ = crate::entrance::place(&window, current);
+        let _ = set_image_ratio(&window, if expanded.is_none() { image } else { None });
+        sizes
+            .0
+            .lock()
+            .map_err(|e| e.to_string())?
+            .entry(window.label().into())
+            .or_default()
+            .work_area_restore = restore;
+        return Err(error);
+    }
+    let collapsed = restore.is_some() && saved.expanded.is_some();
+    {
+        let mut states = sizes.0.lock().map_err(|e| e.to_string())?;
+        let state = states.entry(window.label().into()).or_default();
+        state.expanded = if collapsed { saved.expanded } else { None };
+        state.work_area_restore = if restore.is_some() { None } else { Some(saved) };
+        if let Ok((cursor, _)) = contact_geometry(&window) {
+            state.contact.block(cursor);
+        }
+    }
+    if restore.is_some() {
+        crate::layout::mark(&window, saved.excluded);
+    }
+    if let Some(id) = window.label().strip_prefix("webview-") {
+        if let Some(content) = view.app_handle().get_webview(&format!("webpage-{id}")) {
+            if collapsed {
+                content.hide()
+            } else {
+                content.show()
+            }
+            .map_err(|e| e.to_string())?;
+        }
+    }
+    Ok(collapsed)
+}
 
 // The native constraint applies during live dragging, without resize-event corrections.
 pub fn constrain_image(window: &WebviewWindow, width: f64, height: f64) -> Result<(), String> {
@@ -311,7 +461,14 @@ fn toggle(window: &WebviewWindow, state: &mut SizeState) -> Result<(), String> {
                 LogicalSize::new(144.0, 32.0)
             }))
             .map_err(|e| e.to_string())?;
-        set_image_ratio(window, state.image_size)?;
+        set_image_ratio(
+            window,
+            if state.work_area_restore.is_some() {
+                None
+            } else {
+                state.image_size
+            },
+        )?;
         state.expanded = None;
     } else {
         let size = window

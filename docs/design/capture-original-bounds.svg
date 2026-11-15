@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="480" viewBox="0 0 1000 480">
+<rect width="1000" height="480" fill="#181818"/>
+<g font-family="sans-serif" fill="#ddd"><text x="24" y="32" font-size="20">캡처 원본의 위치 · 크기 유지</text><text x="24" y="60" font-size="13">원본 360×240: (x, y) 유지 / 창만 툴바 22px만큼 확장 / 이미지 외부 border 공간 0</text>
+<text x="40" y="100" font-size="16">이전: 원본 영역 안에 툴바 포함</text><text x="540" y="100" font-size="16">변경: 툴바를 원본 영역 밖에 배치</text></g>
+<g fill="#20252e"><rect x="40" y="150" width="360" height="240" rx="4"/><rect x="540" y="128" width="360" height="262" rx="4"/></g>
+<g fill="#dfe2dd"><rect x="40" y="150" width="360" height="22"/><rect x="540" y="128" width="360" height="22"/></g>
+<g fill="#2c2f7e" font-family="sans-serif" font-size="12"><text x="262" y="166">▣　◈　↥　×</text><text x="762" y="144">▣　◈　↥　×</text></g>
+<rect x="56.5" y="172" width="327" height="218" fill="#437b70"/><path d="M57 390L160 260L220 330L300 230L383 390" fill="#214c45"/>
+<rect x="540" y="150" width="360" height="240" fill="#437b70"/><path d="M540 390L654 247L720 324L808 214L900 390" fill="#214c45"/>
+<g fill="none" stroke="#e4be60" stroke-width="2" stroke-dasharray="6 4"><rect x="40" y="150" width="360" height="240"/><rect x="540" y="150" width="360" height="240"/></g>
+<g font-family="sans-serif" fill="#ddd" font-size="13"><text x="40" y="420">점선: 원본 캡처 영역 · 축소되며 좌우에 여백 발생</text><text x="540" y="420">이미지: 원본 영역과 일치 · 축소/이동 없음</text><text x="24" y="456">상단 작업 영역에 공간이 없으면 툴바를 이미지 아래에 배치 · 활성 2px 선은 레이아웃 밖 overlay로 유지</text></g>
+</svg>
