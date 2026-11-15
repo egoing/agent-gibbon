@@ -1,0 +1,20 @@
+{
+  "root": "/Users/egoinglee/.codex/worktrees/4c75/agent-gibbon",
+  "instance": "dev-54e35761915b899a5349d485",
+  "binary": "/Users/egoinglee/.codex/worktrees/4c75/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "head": "307f7fde87874763e6c5c5009fd903ae2a6949c0",
+  "test_id": "monitor20-20261115-check",
+  "test_body": "MONITOR20-NATIVE-20261115 검증 전용 메모",
+  "physical_monitor_changes": false,
+  "phases": [],
+  "before": {
+    "error": "앱이 실행 중이지 않습니다. 먼저 open을 실행하세요",
+    "ok": false
+  },
+  "started_pids": [
+    62251
+  ],
+  "remaining_instance_pids": [],
+  "ok": false,
+  "failure": "검증 스크립트가 컬러 대문자 입력의 소문자 정규화를 예상하지 못함. 제품 변경 없이 기대값을 소문자로 고쳐 재실행."
+}
