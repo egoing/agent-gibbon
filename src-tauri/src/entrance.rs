@@ -46,7 +46,7 @@ pub enum Presentation {
     Direct,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub struct Destination {
     pub position: PhysicalPosition<i32>,
     pub scale: f64,
@@ -327,6 +327,7 @@ pub fn drag_note(window: WebviewWindow) -> Result<(), String> {
     }
     cancel(&window)?;
     crate::layout::mark(&window, true);
+    crate::monitor_layout::manual(&window);
     window.start_dragging().map_err(|e| e.to_string())
 }
 fn near(a: Point, b: Point) -> bool {

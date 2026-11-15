@@ -15,6 +15,7 @@ mod layout;
 mod local_trace;
 mod memo_color;
 mod model;
+mod monitor_layout;
 mod opacity;
 mod placement;
 mod presentation;
@@ -386,7 +387,7 @@ fn apply_with_presentation(
     // Read-only diagnostics must remain observable during the installation handshake.
     if matches!(request.action, Action::Diagnostics) {
         return Ok(
-            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"updater":updater::diagnostics(app),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
+            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"updater":updater::diagnostics(app),"monitor_layout":monitor_layout::inspect(app),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
         );
     }
     let _activity = updater::activity(app)?;
@@ -519,11 +520,9 @@ fn apply_with_presentation(
     response
 }
 fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
-    let initial_focus = if initial_open {
-        focus::Targets::initial()
-    } else {
-        focus::Targets::default()
-    };
+    // CLI starts with --serve too: restored visible windows still need the
+    // foreground target captured before Tao/Wry can activate this process.
+    let initial_focus = focus::Targets::initial();
     let builder = tauri::Builder::default();
     #[cfg(target_os = "macos")]
     let builder = builder
@@ -665,6 +664,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             }
         })
         .on_window_event(|win, event| {
+            monitor_layout::native_event(win, event);
             if matches!(
                 event,
                 tauri::WindowEvent::Moved(_)
@@ -793,6 +793,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 .map_err(|e| e.to_string())?
                 .extend(restored);
             app.manage(store);
+            monitor_layout::initialize(app.handle());
             terminal::restore(app.handle())?;
             for id in ids {
                 let win = create_window(app.handle(), &id)?;
@@ -907,6 +908,13 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .build(tauri::generate_context!())
         .map_err(|e| e.to_string())?;
     app.run(|_app, _event| {
+        // Complete the launch transaction after Tao activation and Tauri setup.
+        #[cfg(any(target_os = "macos", windows))]
+        if matches!(_event, tauri::RunEvent::Ready) {
+            if let Some(main) = _app.get_webview_window("main") {
+                focus::restore(&main);
+            }
+        }
         if matches!(_event, tauri::RunEvent::ExitRequested { .. }) {
             session_restore::checkpoint(_app);
         }

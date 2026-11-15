@@ -1,0 +1,248 @@
+{
+  "ok": true,
+  "root": "/Users/egoinglee/.codex/worktrees/4c75/agent-gibbon",
+  "head": "307f7fde87874763e6c5c5009fd903ae2a6949c0",
+  "source_sha256": "4e0e569a791a97172c74adb77b359e5a8da0a6ef4ba7b50efb442352ffa46653",
+  "binary": "/Users/egoinglee/.codex/worktrees/4c75/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "binary_sha256": "faf4518a7188891eebe5993141ad986af98ccad70226cbfbd5df798a6e08687e",
+  "instance": "dev-54e35761915b899a5349d485",
+  "pid": 86848,
+  "preparation_pid": 85945,
+  "target_monitor": {
+    "bounds": {
+      "height": 1080,
+      "width": 1920,
+      "x": 0,
+      "y": -1080
+    },
+    "name": "Monitor #10240",
+    "scale": 2.0,
+    "work": {
+      "height": 1080,
+      "width": 1920,
+      "x": 0,
+      "y": -1080
+    }
+  },
+  "stationary_monitor": {
+    "bounds": {
+      "height": 1152,
+      "width": 2048,
+      "x": 0,
+      "y": 0
+    },
+    "name": "Monitor #30544",
+    "scale": 2.0,
+    "work": {
+      "height": 1127,
+      "width": 2048,
+      "x": 0,
+      "y": 25
+    }
+  },
+  "screens": [
+    {
+      "bounds": {
+        "height": 1117,
+        "width": 1728,
+        "x": -1728,
+        "y": 0
+      },
+      "name": "Monitor #41040",
+      "scale": 2.0,
+      "work": {
+        "height": 1085,
+        "width": 1728,
+        "x": -1728,
+        "y": 32
+      }
+    },
+    {
+      "bounds": {
+        "height": 1080,
+        "width": 1920,
+        "x": 0,
+        "y": -1080
+      },
+      "name": "Monitor #10240",
+      "scale": 2.0,
+      "work": {
+        "height": 1080,
+        "width": 1920,
+        "x": 0,
+        "y": -1080
+      }
+    },
+    {
+      "bounds": {
+        "height": 1152,
+        "width": 2048,
+        "x": 0,
+        "y": 0
+      },
+      "name": "Monitor #30544",
+      "scale": 2.0,
+      "work": {
+        "height": 1127,
+        "width": 2048,
+        "x": 0,
+        "y": 25
+      }
+    }
+  ],
+  "before_placement": [
+    {
+      "id": "monitor20-a-keep",
+      "instance": "dev-54e35761915b899a5349d485",
+      "position": {
+        "x": 200,
+        "y": 250
+      },
+      "size": {
+        "height": 360,
+        "width": 640
+      },
+      "visible": false,
+      "focused": false
+    },
+    {
+      "id": "monitor20-b-return",
+      "instance": "dev-54e35761915b899a5349d485",
+      "position": {
+        "x": 200,
+        "y": -1960
+      },
+      "size": {
+        "height": 420,
+        "width": 680
+      },
+      "visible": false,
+      "focused": false
+    },
+    {
+      "id": "monitor20-c-manual",
+      "instance": "dev-54e35761915b899a5349d485",
+      "position": {
+        "x": 1040,
+        "y": -1480
+      },
+      "size": {
+        "height": 460,
+        "width": 720
+      },
+      "visible": false,
+      "focused": false
+    },
+    {
+      "id": "monitor20-h-hidden",
+      "instance": "dev-54e35761915b899a5349d485",
+      "position": {
+        "x": 1960,
+        "y": -920
+      },
+      "size": {
+        "height": 360,
+        "width": 640
+      },
+      "visible": false,
+      "focused": false
+    }
+  ],
+  "prepared": [
+    {
+      "id": "monitor20-a-keep",
+      "instance": "dev-54e35761915b899a5349d485",
+      "position": {
+        "x": 200,
+        "y": 250
+      },
+      "size": {
+        "height": 360,
+        "width": 640
+      },
+      "visible": true,
+      "focused": false,
+      "folded": false,
+      "always_on_top": true,
+      "auto_layout_excluded": true,
+      "title": "A · 정상 위치 유지",
+      "body": "# A · 정상 위치 유지\n\n이 메모는 건드리지 마세요.\n\n외부 모니터를 분리해도 이 위치와 크기가 유지되어야 합니다.",
+      "color": "#d4d2ce"
+    },
+    {
+      "id": "monitor20-b-return",
+      "instance": "dev-54e35761915b899a5349d485",
+      "position": {
+        "x": 200,
+        "y": -1960
+      },
+      "size": {
+        "height": 420,
+        "width": 680
+      },
+      "visible": true,
+      "focused": false,
+      "folded": false,
+      "always_on_top": true,
+      "auto_layout_excluded": true,
+      "title": "B · 자동 원위치 복귀",
+      "body": "# B · 자동 원위치 복귀\n\n분리하면 남은 화면으로 피난합니다.\n\n분리 중 직접 옮기지 마세요. 다시 연결하면 원래 위치와 크기로 돌아와야 합니다.",
+      "color": "#b8cfb8"
+    },
+    {
+      "id": "monitor20-c-manual",
+      "instance": "dev-54e35761915b899a5349d485",
+      "position": {
+        "x": 1040,
+        "y": -1480
+      },
+      "size": {
+        "height": 460,
+        "width": 720
+      },
+      "visible": true,
+      "focused": true,
+      "folded": false,
+      "always_on_top": true,
+      "auto_layout_excluded": true,
+      "title": "C · 직접 이동 우선",
+      "body": "# C · 직접 이동 우선\n\n모니터를 분리한 뒤 이 메모만 직접 옮기고 크기를 조금 바꾸세요.\n\n다시 연결해도 사용자가 정한 새 위치와 크기를 유지해야 합니다.",
+      "color": "#a8c9ce"
+    },
+    {
+      "id": "monitor20-h-hidden",
+      "instance": "dev-54e35761915b899a5349d485",
+      "position": {
+        "x": 1960,
+        "y": -920
+      },
+      "size": {
+        "height": 360,
+        "width": 640
+      },
+      "visible": false,
+      "focused": false,
+      "folded": false,
+      "always_on_top": true,
+      "auto_layout_excluded": true,
+      "title": "H · 숨김 유지",
+      "body": "# H · 숨김 유지\n\n이 메모는 숨김 시험용입니다.\n\n모니터 연결 변경만으로 화면에 나타나면 실패입니다.",
+      "color": "#d4d2ce"
+    }
+  ],
+  "physical_monitor_changes": false,
+  "keep_running_for_user": true,
+  "frontmost_before": {
+    "name": "ChatGPT",
+    "pid": 20087
+  },
+  "frontmost_after_start": {
+    "pid": 86848,
+    "name": "agent-gibbon"
+  },
+  "frontmost_after": {
+    "pid": 20087,
+    "name": "ChatGPT"
+  },
+  "next_step": "사용자가 V28UE-M만 분리한 뒤 C를 이동/resize하고 같은 모니터 재연결. 사용자 수동 조작 이후 초기 배치를 덮어쓰지 않음."
+}

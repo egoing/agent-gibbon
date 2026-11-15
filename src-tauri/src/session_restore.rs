@@ -32,6 +32,12 @@ struct Entry {
     url: Option<String>,
     #[serde(default)]
     terminal_command: Option<String>,
+    #[serde(default)]
+    work_area_restore: Option<crate::sizing::WorkAreaRestore>,
+    #[serde(default)]
+    image_toolbar_below: bool,
+    #[serde(default)]
+    auto_layout_excluded: Option<bool>,
 }
 #[derive(Serialize, Deserialize)]
 struct Snapshot {
@@ -39,6 +45,8 @@ struct Snapshot {
     windows: Vec<Entry>,
     #[serde(default)]
     closed_notes: Vec<String>,
+    #[serde(default)]
+    monitor_layout: crate::monitor_layout::Saved,
 }
 #[derive(Default)]
 struct Journal {
@@ -126,6 +134,7 @@ fn supported(label: &str) -> bool {
         })
 }
 fn validate(snapshot: &Snapshot) -> Result<(), String> {
+    snapshot.monitor_layout.validate()?;
     if snapshot.version != 1 || snapshot.windows.len() > 1000 {
         return Err("시작 상태의 형식이 유효하지 않습니다".into());
     }
@@ -147,6 +156,9 @@ fn validate(snapshot: &Snapshot) -> Result<(), String> {
     }
     let mut labels = BTreeSet::new();
     for entry in &snapshot.windows {
+        if entry.work_area_restore.as_ref().is_some_and(|r| !r.valid()) {
+            return Err("잘못된 작업 영역 확대 복원 상태".into());
+        }
         if !supported(&entry.window.label)
             || closed.contains(&entry.window.label)
             || !labels.insert(&entry.window.label)
@@ -206,6 +218,7 @@ pub fn restore(app: &tauri::AppHandle) -> Result<bool, String> {
     let snapshot: Snapshot = serde_json::from_slice(&bytes)
         .map_err(|_| "시작 상태 파일을 해석할 수 없습니다".to_string())?;
     validate(&snapshot)?;
+    crate::monitor_layout::restore(app, snapshot.monitor_layout)?;
     app.manage(Journal::default());
     for id in &snapshot.closed_notes {
         if let Some(window) = app.get_webview_window(&crate::label(id)) {
@@ -243,61 +256,12 @@ pub fn restore(app: &tauri::AppHandle) -> Result<bool, String> {
             continue;
         };
         crate::sizing::restore_fold(&window, entry.expanded.map(|(w, h)| LogicalSize::new(w, h)))?;
+        crate::sizing::set_image_toolbar_below(&window, entry.image_toolbar_below)?;
+        crate::sizing::restore_work_area(&window, entry.work_area_restore)?;
         crate::update_restore::apply(&window, &entry.window)?;
-        keep_reachable(&window)?;
-        crate::layout::mark(&window, true);
+        crate::layout::mark(&window, entry.auto_layout_excluded.unwrap_or(true));
     }
     Ok(true)
-}
-fn keep_reachable(window: &tauri::WebviewWindow) -> Result<(), String> {
-    let p = window.outer_position().map_err(|e| e.to_string())?;
-    let size = window.outer_size().map_err(|e| e.to_string())?;
-    let monitors = window.available_monitors().map_err(|e| e.to_string())?;
-    let areas: Vec<_> = monitors
-        .iter()
-        .map(|m| {
-            let a = m.work_area();
-            (
-                i64::from(a.position.x),
-                i64::from(a.position.y),
-                i64::from(a.size.width),
-                i64::from(a.size.height),
-            )
-        })
-        .collect();
-    let (x, y) = reachable_position(
-        (i64::from(p.x), i64::from(p.y)),
-        (i64::from(size.width), i64::from(size.height)),
-        &areas,
-    );
-    if (x, y) != (i64::from(p.x), i64::from(p.y)) {
-        window
-            .set_position(tauri::PhysicalPosition::new(x as i32, y as i32))
-            .map_err(|e| e.to_string())?;
-    }
-    Ok(())
-}
-fn reachable_position(
-    p: (i64, i64),
-    size: (i64, i64),
-    areas: &[(i64, i64, i64, i64)],
-) -> (i64, i64) {
-    let visible_width = size.0.min(48);
-    let visible_height = size.1.min(24);
-    let candidate = |&(x, y, w, h): &(i64, i64, i64, i64)| {
-        (
-            p.0.clamp(
-                x - size.0 + visible_width,
-                (x + w - visible_width).max(x - size.0 + visible_width),
-            ),
-            p.1.clamp(y, (y + h - visible_height).max(y)),
-        )
-    };
-    areas
-        .iter()
-        .map(candidate)
-        .min_by_key(|&(x, y)| (i128::from(x - p.0)).pow(2) + (i128::from(y - p.1)).pow(2))
-        .unwrap_or(p)
 }
 // Keep invalid snapshots intact for diagnosis rather than silently replacing them.
 fn save(app: &tauri::AppHandle) -> Result<(), String> {
@@ -305,6 +269,7 @@ fn save(app: &tauri::AppHandle) -> Result<(), String> {
         return Ok(());
     };
     if !journal.ready.load(Ordering::Acquire)
+        || !crate::monitor_layout::ready(app)
         || crate::privacy::onboarding_required(app)
         || crate::stash::active(app)
         || crate::stash::chord_busy(app)
@@ -335,11 +300,15 @@ fn save(app: &tauri::AppHandle) -> Result<(), String> {
             expanded: crate::sizing::expanded_size(&window).map(|s| (s.width, s.height)),
             url,
             terminal_command: last_command(app, &label),
+            work_area_restore: crate::sizing::work_area_snapshot(&window),
+            image_toolbar_below: crate::sizing::image_toolbar_below(&window),
+            auto_layout_excluded: Some(crate::layout::excluded(&window)),
         });
     }
     windows.sort_by(|a, b| a.window.label.cmp(&b.window.label));
     let snapshot = Snapshot {
         version: 1,
+        monitor_layout: crate::monitor_layout::snapshot(app),
         windows,
         closed_notes: app
             .state::<crate::ClosedNotes>()
@@ -368,6 +337,8 @@ fn save(app: &tauri::AppHandle) -> Result<(), String> {
     Ok(())
 }
 pub fn checkpoint(app: &tauri::AppHandle) {
+    // Flush explicit geometry ownership before serializing the matching frame.
+    crate::monitor_layout::poll(app);
     if let Err(error) = save(app) {
         eprintln!("시작 창 상태 저장 실패: {error}");
     }
@@ -380,23 +351,33 @@ pub fn start(app: &tauri::AppHandle, enabled: bool) {
         .ready
         .store(enabled, Ordering::Release);
     let app = app.clone();
-    std::thread::spawn(move || loop {
-        std::thread::sleep(Duration::from_secs(1));
-        if app.state::<Journal>().queued.swap(true, Ordering::AcqRel) {
-            continue;
-        }
-        let handle = app.clone();
-        if app
-            .run_on_main_thread(move || {
-                checkpoint(&handle);
-                handle
-                    .state::<Journal>()
-                    .queued
-                    .store(false, Ordering::Release);
-            })
-            .is_err()
-        {
-            break;
+    std::thread::spawn(move || {
+        let mut checkpoint_at = std::time::Instant::now();
+        loop {
+            std::thread::sleep(Duration::from_millis(250));
+            if app.state::<Journal>().queued.swap(true, Ordering::AcqRel) {
+                continue;
+            }
+            let handle = app.clone();
+            let save = checkpoint_at.elapsed() >= Duration::from_secs(1);
+            if save {
+                checkpoint_at = std::time::Instant::now();
+            }
+            if app
+                .run_on_main_thread(move || {
+                    crate::monitor_layout::poll(&handle);
+                    if save {
+                        checkpoint(&handle);
+                    }
+                    handle
+                        .state::<Journal>()
+                        .queued
+                        .store(false, Ordering::Release);
+                })
+                .is_err()
+            {
+                break;
+            }
         }
     });
 }
@@ -439,23 +420,22 @@ mod tests {
         assert!(preview.prefix.is_empty());
     }
     #[test]
-    fn disconnected_monitor_uses_nearest_area_and_keeps_spanning_windows() {
-        let areas = [(0, 0, 1000, 800), (1000, 0, 1000, 800)];
-        assert_eq!(reachable_position((900, 20), (600, 400), &areas), (900, 20));
-        assert_eq!(
-            reachable_position((2500, 40), (600, 400), &areas),
-            (1952, 40)
-        );
-        assert_eq!(
-            reachable_position((-800, -500), (600, 400), &areas),
-            (-552, 0)
-        );
-    }
-    #[test]
     fn roundtrip_hidden_folded_web() {
         let s = sample();
         validate(&s).unwrap();
         validate(&serde_json::from_slice(&serde_json::to_vec(&s).unwrap()).unwrap()).unwrap();
+    }
+    #[test]
+    fn old_journal_defaults_new_recovery_fields_without_losing_fold_or_url() {
+        let s = sample();
+        assert!(s.windows[0].work_area_restore.is_none());
+        assert!(!s.windows[0].image_toolbar_below);
+        let value = serde_json::to_value(s).unwrap();
+        assert_eq!(
+            value["windows"][0]["expanded"],
+            serde_json::json!([600., 400.])
+        );
+        assert_eq!(value["windows"][0]["url"], "https://example.com/last");
     }
     #[test]
     fn invalid_records_are_rejected() {
