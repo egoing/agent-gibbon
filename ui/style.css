@@ -182,6 +182,14 @@ body.toolbar-collapsed #controls { align-items: flex-start; }
   background: color-mix(in srgb, var(--foreground) 16%, var(--background));
 }
 
-/* Editing shares the text reading row's compact edge; image chrome stays 30px. */
+/* Editing shares the text reading row's compact edge. */
 body.editing:not(.image-note):not(.toolbar-collapsed) #controls { flex-basis: 22px; height: 22px; }
 body.editing:not(.image-note):not(.folded) #viewport { padding-top: 0; }
+
+/* Capture chrome follows the text reading row; contain preserves image aspect. */
+body.image-note:not(.toolbar-collapsed):not(.folded) #controls { flex-basis:22px; height:22px; }
+
+/* The native capture window adds toolbar space outside the original image. */
+body.image-note #memo-surface { border-width:0; }
+
+body.image-note.capture-toolbar-below:not(.toolbar-collapsed):not(.folded) #controls { order:1; }

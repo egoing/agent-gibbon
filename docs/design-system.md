@@ -1033,3 +1033,20 @@ macOS가 설정 열기 요청을 받아들이면 현재 화면 하단에 별도 
 ### #164 최신 main 통합 검증
 
 내부 Feedback 통합 후에도 위 저장·편집 밀착·공통 scrollbar 기준을 유지한다. UI 198개·Rust 221개·개발 빌드·Rustfmt 및 Chromium 4개 크기 검사를 통과했다. 현재 inline footer의 기본 설명 제거·취소/저장 두 버튼·밀착과 연결 파일 저장은 실제 macOS에서 재확인했다. [현재 실제 캡처](verification/assets/issue164-inline-final-native.png)와 [통합 검증·한계](verification/issue164-editor-save-layout.md#close-승인과-최신-main-통합)를 따른다. 기존 독립창 캡처는 과거 증거다.
+
+
+## 터미널·캡처 본문 통일 — #176 (2026-11-14)
+
+- 사용자 요청에 따라 터미널과 캡처의 펼침 툴바도 텍스트 읽기 기준인 22px 행·본문 상단 추가 여백 0을 사용한다. 버튼 24×22px·아이콘 12px와 접힘 24px 정책은 유지한다. 웹 chrome은 별도 작업이며 이 기준을 적용하지 않는다. 이 범위에서는 종전 터미널·이미지 30px 예외를 대체한다.
+- 터미널은 좌우·하단에 공통 `--memo-padding` 3px만 두고 나머지 영역을 PTY의 기존 배경으로 채운다. xterm의 정수 셀을 완전히 담는 열·행 수를 계산하며 남은 한 셀 미만의 공간은 배경으로 채운다. native 창도 투명하게 만들어 기존 4px 라운드 밖을 노출하지 않도록 한다. 활성 선은 기존 viewport의 안쪽 2px overlay를 유지한다.
+- 터미널 출력 기록 scrollbar는 텍스트와 같은 우측 3px·트랙 없음·최소 24px thumb·1초 표시/160ms fade·호버/드래그 시 12px hit area를 사용한다. 공통 표시 CSS와 geometry를 재사용하며 실제 이동은 xterm의 공개 buffer/scrollToLine API를 사용한다. normal buffer에만 표시하며 alternate screen에서는 숨긴다. 본문 휠·키·TUI mouse reporting은 xterm에 맡긴다. thumb의 방향키·PageUp/Down·Home/End와 접근성 현재값은 출력 기록의 행 단위다. forced-colors는 xterm 기본 scrollbar로 돌아간다.
+- 캡처는 기존 본문 외부 패딩 0과 `object-fit: contain`을 유지한다. 이미지 비율과 창 비율의 차이로 생기는 letterbox는 원본을 자르지 않기 위해 유지한다. 확대·메모 드래그·원본 이미지 복사 경로는 변경하지 않는다.
+- [설명용 SVG](design/terminal-capture-surface.svg) · [PNG](design/terminal-capture-surface.png). Chromium의 실제 xterm/스타일 비교와 native 검증의 범위·한계는 [#176 검증 기록](verification/issue176-terminal-capture.md)을 따른다. 시안은 실행 증거가 아니다.
+
+### #176 사용자 검수 반영 — 2026-11-15
+
+- 캡처 시 선택한 영역은 이미지 자체의 원본 표시 영역이다. 최초 배치에서 이미지의 위치·크기를 유지하고, native 창만 툴바 높이 22 논리 px만큼 확장한다. 위쪽 공간이 있으면 창을 위로 확장하고 작업 영역 상단에 가까우면 툴바를 이미지 아래에 둔다. Windows에서는 물리 원점과 논리 크기를 구분해 위치 오프셋에 모니터 배율을 적용한다. 크기 설정 뒤 위치를 다시 지정해 OS 크기 보정으로 생기는 이동을 줄인다. 실제 OS 보정과 혼합 배율 모니터의 최종 좌표는 native 미검증이다.
+- 이미지 표면의 투명 1px border는 제거하여 이미지 외부의 레이아웃 여백을 없앤다. 활성 상태의 2px 선은 기존 viewport overlay로 유지하고 레이아웃에 참여하지 않는다. 원본 파일·복사 바이트는 변경하지 않는다. 이미지 비율을 강제로 늘리거나 자르지 않으며, 사용자가 이후 창 크기를 바꿨을 때의 contain 동작은 유지한다. 전체 화면을 채운 캡처처럼 위아래 모두 추가 공간이 없는 경우 툴바까지 화면 안에 들어감을 보장하지 않는다.
+- 터미널 Welcome도 텍스트 메모의 동일한 overlay scrollbar 구현을 사용한다. 3px 표시·12px hover hit area·최소 24px thumb·1초 표시/160ms fade·키보드/휠/드래그·forced-colors native fallback을 공유한다. 긴 명령 미리보기는 별도 scrollbar 대신 Welcome 본문과 함께 스크롤한다. PTY 실행 시 Welcome thumb를 숨긴다.
+- Welcome에서 창 제목 변경 details/form과 이벤트를 제거한다. 기존에 저장한 제목과 관리 창의 다른 기능은 변경하지 않는다.
+- [캡처 배치 SVG](design/capture-original-bounds.svg) · [PNG](design/capture-original-bounds.png), [Welcome SVG](design/terminal-welcome.svg) · [PNG](design/terminal-welcome.png). 아래 검증은 [#176 후속 검증 기록](verification/issue176-terminal-capture.md#2026-11-15-사용자-검수-후속)에서 최초 검사와 구분한다.
