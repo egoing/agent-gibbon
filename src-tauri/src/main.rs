@@ -13,6 +13,7 @@ mod updater;
 
 mod layout;
 mod local_trace;
+mod memo_color;
 mod model;
 mod opacity;
 mod placement;
@@ -441,15 +442,7 @@ fn apply_with_presentation(
     let mut next = if existing.as_ref().is_none_or(|note| note.revision == 0)
         && matches!(request.action, Action::Open)
     {
-        // The startup main placeholder is not a created note. Persisted notes,
-        // including hidden and explicitly colored notes, continue the cycle.
-        let created_count = state
-            .lock()
-            .map_err(|e| e.to_string())?
-            .values()
-            .filter(|note| note.revision > 0)
-            .count();
-        Note::with_palette_color(created_count)
+        Note::with_random_color()
     } else {
         existing.clone().unwrap_or_default()
     };

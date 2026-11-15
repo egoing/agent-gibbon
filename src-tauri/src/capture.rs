@@ -778,7 +778,7 @@ fn empty_text_note() -> crate::Note {
         change_html: String::new(),
         edit_on_open: true,
         revision: 1,
-        ..crate::Note::default()
+        ..crate::Note::with_random_color()
     }
 }
 fn create_text_note(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), String> {
@@ -829,7 +829,7 @@ fn create_note(app: &tauri::AppHandle, bytes: Vec<u8>, bounds: ImageNote) -> Res
         html: String::new(),
         change_html: String::new(),
         revision: 1,
-        ..crate::Note::default()
+        ..crate::Note::with_random_color()
     };
     let store = app.state::<crate::storage::Store>();
     let path = store.path(&id).with_file_name("capture.png");

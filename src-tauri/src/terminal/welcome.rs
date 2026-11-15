@@ -43,6 +43,7 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
         restore_plan: None,
         auto_restore: false,
     };
+    crate::memo_color::create(&root(app), &id)?;
     save(&root(app), &agent)?;
     state.records.lock().map_err(err)?.insert(id.clone(), agent);
     open(app, &id)?;

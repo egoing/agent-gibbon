@@ -6,7 +6,7 @@ use crate::{
 use serde_json::{json, Value};
 mod recent;
 use std::{collections::BTreeMap, sync::Mutex};
-use tauri::{Manager, WebviewUrl, WebviewWindow};
+use tauri::{Emitter, Manager, WebviewUrl, WebviewWindow};
 #[derive(Clone)]
 struct Record {
     label: String,
@@ -133,7 +133,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         .get(id)
         .cloned();
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":"web","title":w.title().map_err(err)?,"url":r.url,"welcome":r.url.is_none(),"current_url":current_url,"navigation_url":navigation_url,"visible":w.is_visible().map_err(err)?,"focused":w.is_focused().map_err(err)?,"always_on_top":w.is_always_on_top().map_err(err)?,"position":w.outer_position().map_err(err)?,"size":w.inner_size().map_err(err)?}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":"web","color":crate::memo_color::read(&app.state::<crate::storage::Store>().0, id)?,"title":w.title().map_err(err)?,"url":r.url,"welcome":r.url.is_none(),"current_url":current_url,"navigation_url":navigation_url,"visible":w.is_visible().map_err(err)?,"focused":w.is_focused().map_err(err)?,"always_on_top":w.is_always_on_top().map_err(err)?,"position":w.outer_position().map_err(err)?,"size":w.inner_size().map_err(err)?}),
     )
 }
 pub fn entries(app: &tauri::AppHandle) -> Result<Vec<Value>, String> {
@@ -252,6 +252,11 @@ pub(crate) fn create_presented(
         )
     });
     let parsed = url.map(validate_url).transpose()?;
+    // Restored pre-palette windows retain their legacy color. New windows get
+    // a color once; navigation and recreation reuse their persistent sidecar.
+    if present && !contains(app, &id) {
+        crate::memo_color::create(&app.state::<crate::storage::Store>().0, &id)?;
+    }
     let remote = parsed.is_some();
     let label = format!("webview-{id}");
     let old = if contains(app, &id) {
@@ -436,6 +441,25 @@ pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String
     let r = record(app, request.id())?;
     let w = r.host.clone();
     match request.action {
+        Action::Update
+            if request.color.is_some()
+                && request.title.is_none()
+                && request.markdown.is_none()
+                && request.status.is_none() =>
+        {
+            crate::memo_color::write(
+                &app.state::<crate::storage::Store>().0,
+                request.id(),
+                request.color.as_deref().unwrap(),
+            )?;
+            app.emit_to(
+                r.label.as_str(),
+                "memo-color",
+                crate::memo_color::read(&app.state::<crate::storage::Store>().0, request.id())?,
+            )
+            .map_err(err)?;
+            inspect(app, request.id())
+        }
         Action::Inspect => inspect(app, request.id()),
         Action::Close => {
             crate::stash::release(&w)?;
@@ -453,7 +477,7 @@ pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String
             show(&w)?;
             inspect(app, request.id())
         }
-        _ => Err("웹 창에는 web/open/inspect/close를 사용하세요".into()),
+        _ => Err("웹 창에는 web/open/inspect/close 또는 색상만 지정한 update를 사용하세요".into()),
     }
 }
 #[tauri::command]

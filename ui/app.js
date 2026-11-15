@@ -19,6 +19,8 @@ function applyMemoAppearance(color) {
   const next = JSON.stringify(theme);
   if (next === appearanceSignature) return;
   for (const key of ['background', 'foreground', 'border', 'panel', 'error']) document.documentElement.style.setProperty(`--${key}`, theme[key]);
+  document.documentElement.style.setProperty('--secondary', theme.secondary || theme.foreground);
+  if (document.documentElement.dataset) document.documentElement.dataset.memoDesign = readMemoAppearance(window).design;
   document.documentElement.style.colorScheme = theme.scheme;
   appearanceSignature = next;
 }

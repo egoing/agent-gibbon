@@ -1,0 +1,144 @@
+{
+  "method": "100 × Euclidean OKLab (D65 sRGB)",
+  "minimum": {
+    "pair": [
+      "라임",
+      "아이보리"
+    ],
+    "deltaOK": 15.506181831365145
+  },
+  "rows": [
+    {
+      "name": "라임",
+      "background": "#bdd657",
+      "foreground": "#20271b",
+      "secondary": "#4f5b2d",
+      "border": "#687737",
+      "panel": "#c4da68",
+      "error": "#9c2424",
+      "scheme": "light",
+      "primaryContrast": 9.448259014675767,
+      "secondaryContrast": 4.506804443459107
+    },
+    {
+      "name": "코랄",
+      "background": "#db704f",
+      "foreground": "#291b16",
+      "secondary": "#39231b",
+      "border": "#643729",
+      "panel": "#df7e61",
+      "error": "#291b16",
+      "scheme": "light",
+      "primaryContrast": 5.10246330431861,
+      "secondaryContrast": 4.504640863296631
+    },
+    {
+      "name": "민트",
+      "background": "#6baa92",
+      "foreground": "#172a23",
+      "secondary": "#213930",
+      "border": "#345649",
+      "panel": "#7ab39d",
+      "error": "#172a23",
+      "scheme": "light",
+      "primaryContrast": 5.596799995588914,
+      "secondaryContrast": 4.602461001302865
+    },
+    {
+      "name": "아이보리",
+      "background": "#e5e4d2",
+      "foreground": "#27291f",
+      "secondary": "#646558",
+      "border": "#828375",
+      "panel": "#e8e7d7",
+      "error": "#9c2424",
+      "scheme": "light",
+      "primaryContrast": 11.494709253109827,
+      "secondaryContrast": 4.615807882384916
+    },
+    {
+      "name": "차콜",
+      "background": "#4d4d4b",
+      "foreground": "#e5e4d2",
+      "secondary": "#bfbeb0",
+      "border": "#9c9c91",
+      "panel": "#454544",
+      "error": "#ffb9b9",
+      "scheme": "dark",
+      "primaryContrast": 6.600051022986302,
+      "secondaryContrast": 4.521540273111199
+    }
+  ],
+  "distances": [
+    {
+      "pair": [
+        "라임",
+        "아이보리"
+      ],
+      "deltaOK": 15.506181831365145
+    },
+    {
+      "pair": [
+        "라임",
+        "민트"
+      ],
+      "deltaOK": 18.728685255426715
+    },
+    {
+      "pair": [
+        "코랄",
+        "민트"
+      ],
+      "deltaOK": 20.038370996782486
+    },
+    {
+      "pair": [
+        "민트",
+        "아이보리"
+      ],
+      "deltaOK": 23.637546610953773
+    },
+    {
+      "pair": [
+        "라임",
+        "코랄"
+      ],
+      "deltaOK": 25.764629046985004
+    },
+    {
+      "pair": [
+        "민트",
+        "차콜"
+      ],
+      "deltaOK": 27.84560255762272
+    },
+    {
+      "pair": [
+        "코랄",
+        "차콜"
+      ],
+      "deltaOK": 28.12263315321894
+    },
+    {
+      "pair": [
+        "코랄",
+        "아이보리"
+      ],
+      "deltaOK": 28.56233611486763
+    },
+    {
+      "pair": [
+        "라임",
+        "차콜"
+      ],
+      "deltaOK": 43.98681172048157
+    },
+    {
+      "pair": [
+        "아이보리",
+        "차콜"
+      ],
+      "deltaOK": 49.56594515129601
+    }
+  ]
+}

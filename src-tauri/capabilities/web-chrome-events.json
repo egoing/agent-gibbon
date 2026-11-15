@@ -1,0 +1,6 @@
+{
+  "identifier": "web-chrome-events",
+  "description": "Local trusted web chrome receives memo color updates; remote webpage-* WebViews are excluded.",
+  "webviews": ["webview-*"],
+  "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
+}

@@ -61,3 +61,5 @@ header #controls { height:22px; flex-basis:22px; }
 
 #restore-plan{display:block;width:100%;box-sizing:border-box;margin:8px 0 12px;padding:8px;background:var(--background);border:1px solid currentColor}
 #restore-panel button{min-width:64px;background:var(--panel);border:1px solid currentColor}
+
+:root[data-memo-design="color"] button:disabled { opacity:1; color:var(--secondary); }

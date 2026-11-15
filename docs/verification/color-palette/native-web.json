@@ -1,0 +1,146 @@
+{
+  "0": {
+    "action": "inspect",
+    "always_on_top": true,
+    "color": "#bdd657",
+    "current_url": "https://m.naver.com/",
+    "focused": false,
+    "id": "web-palette19",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "kind": "web",
+    "navigation_url": "https://m.naver.com/",
+    "ok": true,
+    "position": {
+      "x": 852,
+      "y": 408
+    },
+    "size": {
+      "height": 800,
+      "width": 1200
+    },
+    "title": "Agent Gibbon [DEV codex/color-palette-memo-types · cee63ced] — 웹 — web-palette19",
+    "url": "https://naver.com",
+    "visible": false,
+    "welcome": false
+  },
+  "1": {
+    "action": "update",
+    "always_on_top": true,
+    "color": "#123456",
+    "current_url": "https://m.naver.com/",
+    "focused": false,
+    "id": "web-palette19",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "kind": "web",
+    "navigation_url": "https://m.naver.com/",
+    "ok": true,
+    "position": {
+      "x": 852,
+      "y": 408
+    },
+    "size": {
+      "height": 800,
+      "width": 1200
+    },
+    "title": "Agent Gibbon [DEV codex/color-palette-memo-types · cee63ced] — 웹 — web-palette19",
+    "url": "https://naver.com",
+    "visible": false,
+    "welcome": false
+  },
+  "2": {
+    "action": "close",
+    "always_on_top": true,
+    "color": "#123456",
+    "current_url": "https://m.naver.com/",
+    "focused": false,
+    "id": "web-palette19",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "kind": "web",
+    "navigation_url": "https://m.naver.com/",
+    "ok": true,
+    "position": {
+      "x": 852,
+      "y": 408
+    },
+    "size": {
+      "height": 800,
+      "width": 1200
+    },
+    "title": "Agent Gibbon [DEV codex/color-palette-memo-types · cee63ced] — 웹 — web-palette19",
+    "url": "https://naver.com",
+    "visible": false,
+    "welcome": false
+  },
+  "3": {
+    "action": "inspect",
+    "always_on_top": true,
+    "color": "#123456",
+    "current_url": "https://m.naver.com/",
+    "focused": false,
+    "id": "web-palette19",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "kind": "web",
+    "navigation_url": "https://m.naver.com/",
+    "ok": true,
+    "position": {
+      "x": 852,
+      "y": 408
+    },
+    "size": {
+      "height": 800,
+      "width": 1200
+    },
+    "title": "Agent Gibbon [DEV codex/color-palette-memo-types · cee63ced] — 웹 — web-palette19",
+    "url": "https://naver.com",
+    "visible": false,
+    "welcome": false
+  },
+  "4": {
+    "action": "web",
+    "always_on_top": true,
+    "color": "#123456",
+    "current_url": "https://m.naver.com/",
+    "focused": false,
+    "id": "web-palette19",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "kind": "web",
+    "navigation_url": "https://m.naver.com/",
+    "ok": true,
+    "position": {
+      "x": 852,
+      "y": 408
+    },
+    "size": {
+      "height": 800,
+      "width": 1200
+    },
+    "title": "Agent Gibbon [DEV codex/color-palette-memo-types · cee63ced] — 웹 — web-palette19",
+    "url": "https://naver.com",
+    "visible": true,
+    "welcome": false
+  },
+  "5": {
+    "action": "inspect",
+    "always_on_top": true,
+    "color": "#123456",
+    "current_url": "https://m.naver.com/",
+    "focused": false,
+    "id": "web-palette19",
+    "instance": "dev-cee63ced4725619c6df21545",
+    "kind": "web",
+    "navigation_url": "https://m.naver.com/",
+    "ok": true,
+    "position": {
+      "x": 852,
+      "y": 408
+    },
+    "size": {
+      "height": 800,
+      "width": 1200
+    },
+    "title": "Agent Gibbon [DEV codex/color-palette-memo-types · cee63ced] — 웹 — web-palette19",
+    "url": "https://naver.com",
+    "visible": true,
+    "welcome": false
+  }
+}
