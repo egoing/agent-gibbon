@@ -6,8 +6,8 @@
 
 - 루트: `/Users/egoinglee/.codex/worktrees/67c9/agent-gibbon`.
 - 브랜치: `codex/relation-overlay-prototype`.
-- 통합 HEAD: `269eaea`(부모 `0eb4c12`, `f6a08ca`). 모니터 복구 main과 권한 메뉴 main이 모두 포함된다.
-- 연결 UI와 추가 통합 방어 코드는 미커밋·미스테이징이다. 기존 [Draft PR169](https://github.com/egoing/agent-gibbon/pull/169)에 최신 로컬 UI가 모두 올라갔다고 보지 않는다. 제품 최종 커밋·push·병합은 승인 전이다.
+- 최종 코드 검사 기준: `f2345b1f7e50346fefb0e7318102053af2fa67f2`. 제품 커밋 `8560768`에 최신 main `eac081c`의 macOS 앱 시작·권한 안내를 통합했다. 이후 추가 변경은 문서와 검사 manifest다.
+- 사용자 close 호출로 현재 범위의 커밋·push·PR169 병합·로컬 main 동기화가 승인됐다. 제품 코드는 커밋됐으며 [PR169](https://github.com/egoing/agent-gibbon/pull/169)에 제출한다. 설치 앱 교체·공식 릴리스·태그는 수행하지 않는다.
 
 ## 사용자 동작과 현재 지원
 
@@ -57,3 +57,12 @@ Conf3 / RiskMedium: 자동·headless 검증을 마쳤으나 포인터 입력 표
 
 
 사용자 후속 요청으로 제품 기본 기능 전환을 준비 중이다. 환경변수 및 개발 전용 활성화 gate를 제거한 최신 소스는 Rust259·UI197·Clippy와 macOS release 앱 번들 빌드를 통과했다. 이전 통합 검증과 구분하며 아직 설치 앱 교체·main 병합·공식 공개는 수행하지 않았다. 실제 배포 대상 확인이 필요하다. 후속3항목은 #198/#199/#200에 기록됐고 이번 구현에 포함되지 않는다.
+
+
+## close 최종 검증
+
+최신 코드 기준 Rust260개·UI197개, Clippy all-targets·Rustfmt·개발 빌드·현재 Mac release.app 번들 생성이 통과했다. [영속 검사·소스 해시 manifest](assets/issue168/editor-final-checks.json)에 검사 SHA와 파일 해시를 기록했다. 정규 브랜치/PR용 CI workflow는 없고 release workflow는 태그 또는 명시 수동 실행용이므로 전체 플랫폼 CI를 자동 실행하지 않았다.
+
+[설정창 light](assets/issue168/editor-settings-light.png)·[dark](assets/issue168/editor-settings-dark.png)·[picker](assets/issue168/editor-picker.png)·[텍스트 툴바](assets/issue168/editor-text-toolbar.png)·[캡처 툴바](assets/issue168/editor-capture-toolbar.png)는 독립 headless 렌더 근거다. 실제 native 클릭 확인을 대신하지 않는다.
+
+환경변수 gate 제거·DOM 초기화 수정까지 현재 구현 범위로 제출하며 새 서브 이슈198/199/200은 구현하지 않았다. 부모168도 남은 사용자 요구 및 native 확인 조건 때문에 열린 상태로 유지한다. 실행 앱·현재 사용자 관계·PTY·기하는 close에서 조작하지 않는다. 일반 Codex 워크트리는 삭제하지 않고 무관한 package-lock.json을 보존한다. 최종 원격 병합 SHA와 local main 동기화 결과는 PR/이슈 기록으로 남긴다.
