@@ -11,21 +11,32 @@
     "dev:build": "node scripts/dev.mjs build",
     "dev:info": "node scripts/dev.mjs info",
     "build:windows": "node scripts/build.mjs tauri build --bundles nsis",
-    "test:ui": "node scripts/test-ui.mjs",
+    "test:ui": "node scripts/build-editor.mjs && node scripts/test-ui.mjs",
     "version:check": "node scripts/release-version.mjs check",
     "version:set": "node scripts/release-version.mjs set",
     "diagnostics:build": "node scripts/diagnostics.mjs build",
     "diagnostics:open": "node scripts/diagnostics.mjs open",
     "diagnostics:status": "node scripts/diagnostics.mjs status",
-    "diagnostics:probe": "node scripts/diagnostics.mjs probe"
+    "diagnostics:probe": "node scripts/diagnostics.mjs probe",
+    "build:editor": "node scripts/build-editor.mjs"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.0.0"
+    "@tauri-apps/cli": "^2.0.0",
+    "esbuild": "0.28.2"
   },
   "license": "MIT",
   "dependencies": {
+    "@milkdown/core": "7.23.0",
+    "@milkdown/plugin-history": "7.23.0",
+    "@milkdown/preset-commonmark": "7.23.0",
+    "@milkdown/preset-gfm": "7.23.0",
+    "@milkdown/prose": "7.23.0",
+    "@milkdown/utils": "7.23.0",
     "@xterm/addon-fit": "^0.11.0",
-    "@xterm/xterm": "^6.0.0"
+    "@xterm/xterm": "^6.0.0",
+    "remark-gfm": "4.0.1",
+    "remark-parse": "11.0.0",
+    "unified": "11.0.5"
   },
   "packageManager": "pnpm@11.25.0",
   "engines": {

@@ -4,21 +4,18 @@ html,body{width:100%;height:100%;overflow:hidden}body{cursor:default}header{heig
 #welcome{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;padding:24px;box-sizing:border-box}
 .welcome-content{width:100%;max-width:480px;margin:auto;flex-shrink:0}
 #welcome h1,#welcome h2{font-size:13px;line-height:20px;font-weight:600;margin:0 0 12px}
-#welcome button,#welcome input{font:inherit;color:inherit;border-radius:4px}
+#welcome button{font:inherit;color:inherit;border-radius:4px}
 #welcome button{height:auto;min-height:32px;cursor:pointer;white-space:normal}
 #welcome .plain-row,#welcome .select-row{width:100%;display:flex;align-items:center;text-align:left;justify-content:flex-start;font-weight:400;border:0;background:transparent;padding:7px 10px;gap:10px}
 #welcome .plain-row:hover,#welcome .select-row:hover{background:var(--panel)}
 #welcome .select-row[aria-pressed="true"]{background:var(--panel);box-shadow:inset 0 0 0 1px currentColor}
 .folder-name{flex:1;min-width:0;overflow-wrap:anywhere}.folder-parent{font-size:11px;color:var(--foreground);max-width:55%;overflow-wrap:anywhere}
 .tasks-section{margin:24px 0}
-#welcome button:focus-visible,#welcome input:focus-visible,#welcome summary:focus-visible,#command-preview:focus-visible{outline:2px solid var(--foreground);outline-offset:2px}
+#welcome button:focus-visible,#command-preview:focus-visible{outline:2px solid var(--foreground);outline-offset:2px}
 #run-task{min-width:72px;border:1px solid var(--foreground);background:var(--panel);padding:6px 16px}
 #run-task:disabled{opacity:.5;cursor:wait}
 #command-preview{box-sizing:border-box;width:100%;font:11px/1.6 Menlo,monospace;background:var(--panel);border:1px solid var(--foreground);border-radius:4px;padding:10px;margin:12px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;max-height:100px;overflow:auto;user-select:text;-webkit-user-select:text}
 #home-hint{font-size:11px;color:var(--foreground);margin:6px 10px}
-#title-details{margin-top:14px}#title-details summary{font-size:11px;color:var(--foreground);cursor:pointer;width:fit-content}
-#rename-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
-#rename-title{flex:1;min-width:80px;max-width:100%;box-sizing:border-box;background:var(--panel);border:1px solid var(--foreground);padding:6px;user-select:text;-webkit-user-select:text}
 @media(max-width:420px),(max-height:300px){#welcome{padding:16px}.tasks-section{margin:18px 0}#welcome h1,#welcome h2{margin-bottom:8px}}
 
 /* The WebKit fallback buffers a word for replacement events. Only its last
@@ -28,12 +25,41 @@ html,body{width:100%;height:100%;overflow:hidden}body{cursor:default}header{heig
 .xterm .gibbon-ime-fallback .gibbon-ime-current{background:#000;color:#fff}
 .xterm .gibbon-ime-fallback .gibbon-ime-cell{display:inline-block;vertical-align:top;letter-spacing:0}
 
-#rename-title::placeholder{color:var(--foreground);opacity:1}
 #welcome{scrollbar-color:var(--foreground) var(--background)}
-#rename-form button{width:auto;min-width:64px;padding:6px 12px;border:1px solid var(--foreground);background:var(--panel)}
 
 header { padding: 0; }
 header #controls { flex: 1; }
 body.toolbar-collapsed header #controls { flex: 1; }
 
 header { align-items: flex-start; }
+
+/* Match the text reading edge without changing shared web chrome. */
+header { height:22px; min-height:22px; }
+header #controls { height:22px; flex-basis:22px; }
+#terminal { position:relative; padding:0 var(--memo-padding) var(--memo-padding); --terminal-background:#20252e; background:var(--terminal-background); }
+#terminal .xterm-viewport { background:var(--terminal-background); scrollbar-width:none; }
+#terminal .xterm-viewport::-webkit-scrollbar { width:0; height:0; }
+#terminal .xterm-scrollable-element > .scrollbar { display:none; }
+@media (forced-colors: active) {
+  #terminal .xterm-scrollable-element > .scrollbar { display:block; }
+  #terminal .xterm-viewport { scrollbar-width:auto; }
+  #terminal .xterm-viewport::-webkit-scrollbar { width:auto; height:auto; }
+}
+
+#terminal:has(.xterm-helper-textarea:focus-visible) ~ #memo-scrollbar { opacity:1; }
+
+#welcome { scrollbar-width:none; }
+#welcome::-webkit-scrollbar { width:0; height:0; }
+#welcome:has(:focus-visible) ~ #welcome-scrollbar { opacity:1; }
+@media (forced-colors: active) {
+  #welcome { scrollbar-width:auto; }
+  #welcome::-webkit-scrollbar { width:auto; height:auto; }
+}
+
+/* One Welcome scroller, including long command previews. */
+#command-preview { max-height:none; overflow:visible; }
+
+#restore-plan{display:block;width:100%;box-sizing:border-box;margin:8px 0 12px;padding:8px;background:var(--background);border:1px solid currentColor}
+#restore-panel button{min-width:64px;background:var(--panel);border:1px solid currentColor}
+
+:root[data-memo-design="color"] button:disabled { opacity:1; color:var(--secondary); }

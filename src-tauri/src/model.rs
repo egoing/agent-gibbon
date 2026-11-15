@@ -195,15 +195,10 @@ impl Default for Note {
         }
     }
 }
-// Swatches sampled from the supplied Apple Stickies menu screenshot.
-const NOTE_COLORS: [&str; 6] = [
-    "#fee93e", "#89f0ff", "#84fe83", "#ffb2b1", "#9cb6ff", "#dadada",
-];
-
 impl Note {
-    pub fn with_palette_color(created_count: usize) -> Self {
+    pub fn with_random_color() -> Self {
         Self {
-            color: NOTE_COLORS[created_count % NOTE_COLORS.len()].into(),
+            color: crate::memo_color::random(),
             ..Self::default()
         }
     }
@@ -1301,10 +1296,10 @@ mod palette_tests {
     use super::*;
 
     #[test]
-    fn palette_cycles_and_explicit_color_survives_updates() {
-        for index in 0..18 {
-            let mut note = Note::with_palette_color(index);
-            assert_eq!(note.color, NOTE_COLORS[index % 6]);
+    fn random_palette_and_explicit_color_survives_updates() {
+        for _ in 0..18 {
+            let mut note = Note::with_random_color();
+            assert!(crate::memo_color::PALETTE.contains(&note.color.as_str()));
             let mut request = Request {
                 url: None,
                 action: Action::Open,
@@ -1318,7 +1313,7 @@ mod palette_tests {
                 color: None,
             };
             note.apply(&request).unwrap();
-            assert_eq!(note.color, NOTE_COLORS[index % 6]);
+            assert!(crate::memo_color::PALETTE.contains(&note.color.as_str()));
             request.color = Some("#ABCDEF".into());
             note.apply(&request).unwrap();
             request.action = Action::Update;

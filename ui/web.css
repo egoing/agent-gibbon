@@ -4,13 +4,11 @@ body { color: var(--foreground); background: var(--background); cursor: default;
 main { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; padding: 24px; font-size: 13px; line-height: 1.6; }
 main[hidden] { display: none; }
 #web-form { width: 100%; max-width: 480px; margin: auto; flex-shrink: 0; }
-#web-form label { display: block; font-weight: 600; margin-bottom: 12px; }
 #web-form :is(input, button) { font: inherit; color: inherit; border: 1px solid var(--border); border-radius: 4px; background: var(--panel); min-height: 32px; padding: 6px 10px; }
 #web-url { width: 100%; user-select: text; -webkit-user-select: text; }
-#run { width: auto; height: auto; min-width: 72px; cursor: pointer; }
+#run { margin-top: 12px; width: auto; height: auto; min-width: 72px; cursor: pointer; }
 #run:disabled { opacity: .5; cursor: wait; }
 #web-form :is(input, button):focus-visible { outline: 2px solid var(--foreground); outline-offset: 2px; }
-#hint { color: var(--foreground); font-size: 11px; margin: 8px 0 20px; }
 #status { white-space: pre-wrap; overflow-wrap: anywhere; }
 #status:empty { display: none; }
 @media (max-width: 420px), (max-height: 300px) { main { padding: 16px; } }
@@ -19,3 +17,21 @@ main[hidden] { display: none; }
    content reserves matching 3px side/bottom strips in web.rs. */
 #controls { cursor: move; }
 body.toolbar-collapsed .resize { display: none; }
+
+/* The trusted toolbar stays anchored when a focused Welcome field is hidden.
+   WebKit may retain the root scroll offset after focus moves to a child view. */
+html { overflow: hidden; }
+#controls { position: fixed; inset: 0 0 auto; }
+main { margin-top: 30px; }
+
+#web-recent { margin-top: 20px; }
+#web-recent[hidden] { display: none; }
+#web-recent h2 { margin: 0 0 6px; font-size: 12px; font-weight: 600; }
+#web-recent-list { margin: 0; padding: 0; list-style: none; }
+#web-recent-list li { display: flex; align-items: center; gap: 6px; min-width: 0; }
+#web-form .recent-open { flex: 1; min-width: 0; width: auto; justify-content: flex-start; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: transparent; border-color: transparent; }
+#web-form .recent-remove { flex: 0 0 auto; width: auto; font-size: 11px; background: transparent; border-color: transparent; }
+#web-form :is(.recent-open, .recent-remove):hover { background: var(--panel); }
+#web-form :is(.recent-open, .recent-remove):disabled { opacity: .5; cursor: wait; }
+
+:root[data-memo-design="color"] button:disabled { opacity:1; color:var(--secondary); }
