@@ -1,0 +1,21 @@
+{
+  "base": "307f7fde87874763e6c5c5009fd903ae2a6949c0",
+  "plan_head": "2747c3e",
+  "product_changes": "uncommitted",
+  "checks": {
+    "rust_tests": 238,
+    "ui_tests": 189,
+    "clippy": "passed --all-targets -- -D warnings",
+    "dev_build": "passed",
+    "rustfmt": "passed",
+    "diff_check": "passed"
+  },
+  "sha256": {
+    "src-tauri/src/layout.rs": "27ecfca359572eed427cb676b2bfb34c7bd6fb87c2e8919f046b4667cdacff99",
+    "src-tauri/src/web.rs": "b46b0e78d207ad22c3e18f2e7c4aa3719fad36612c52de7030eb2e4dff5ed03b",
+    "docs/design-system.md": "3b06741021cba463077a83e220d7c5cfd9bda4644da24dd9c5019e34054d4c9c",
+    "docs/design/directional-arrangement.svg": "d2f517b69050b6475bdf7b4939383c2236f46560414323b8d61eb6b17bcbceab",
+    "docs/design/directional-arrangement.png": "a5ce158807881032e994e4b1d89c921e895c6f878758934b7eb5c73594eb339b"
+  },
+  "native_arrangement": "unverified"
+}

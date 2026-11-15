@@ -118,6 +118,66 @@ fn item(w: &WebviewWindow, area: Rect, scale: f64) -> placement::Item {
     }
 }
 
+// Explicit arrangement has a wider scope than ordinary note-open reflow.
+// Child WebViews and utility windows must never become separate targets.
+fn arrangement_id(label: &str) -> Option<&str> {
+    crate::memo_id_from_window(label).or_else(|| {
+        ["terminal-", "webview-"]
+            .iter()
+            .find_map(|prefix| label.strip_prefix(prefix).filter(|id| !id.is_empty()))
+            .map(|id| {
+                if label.starts_with("terminal-") {
+                    label
+                } else {
+                    id
+                }
+            })
+    })
+}
+
+fn arrangement_spec(
+    mut spec: placement::Item,
+    label: &str,
+    folded: bool,
+    area: Rect,
+    u: f64,
+) -> placement::Item {
+    if folded {
+        spec.min = (24.0 * u).round() as i64;
+        spec.max = spec.min;
+    } else if label.starts_with("terminal-") || label.starts_with("webview-") {
+        // These surfaces do not report Markdown content height. A 48px default
+        // would leave only a toolbar and an unusable terminal/page viewport.
+        spec.min = ((144.0 * u).round() as i64).min(area.height);
+        spec.max = ((420.0 * u).round() as i64).min(area.height);
+    }
+    spec
+}
+fn arrangement_item(w: &WebviewWindow, area: Rect, scale: f64) -> placement::Item {
+    arrangement_spec(
+        item(w, area, scale),
+        w.label(),
+        crate::sizing::folded(w),
+        area,
+        scale / unit(scale),
+    )
+}
+
+fn created_at(app: &tauri::AppHandle, label: &str, id: &str) -> Option<std::time::SystemTime> {
+    let store = app.state::<crate::storage::Store>();
+    if label.starts_with("webview-") {
+        return crate::web::created_at(app, id);
+    }
+    if label.starts_with("terminal-") {
+        // Terminal metadata is atomically replaced on geometry changes, so its
+        // file birth time is not the terminal's creation time.
+        let nanos = id.strip_prefix("terminal-")?.parse::<u64>().ok()?;
+        return std::time::UNIX_EPOCH.checked_add(std::time::Duration::from_nanos(nanos));
+    }
+    let path = store.path(id).parent()?.to_path_buf();
+    path.metadata().ok()?.created().ok()
+}
+
 // Only ordinary hidden/new opens enter here. Finish obsolete reservations by
 // replacing their flight from the currently displayed frame, never by snapping.
 pub fn reflow(app: &tauri::AppHandle, opened: &WebviewWindow) -> Result<Destination, String> {
@@ -352,56 +412,24 @@ pub fn undo_arrangement(window: WebviewWindow) -> Result<(), String> {
     Ok(())
 }
 
-pub fn arrange(app: &tauri::AppHandle, x: f64, y: f64, center: bool) -> Result<(), String> {
-    let _activity = crate::updater::activity(app)?;
-    let monitor = pointer_monitor(app, x, y)
-        .map_err(|e| e.to_string())?
-        .or_else(|| {
-            app.get_webview_window("direction-guide")
-                .and_then(|w| w.current_monitor().ok().flatten())
-        })
-        .ok_or("포인터 화면 없음")?;
-    let work = monitor.work_area();
-    let scale = monitor.scale_factor();
-    let area = native_rect(work.position, work.size, scale);
-    let mut windows = Vec::new();
-    for w in crate::web::managed_windows(app).into_values() {
-        let Some(id) = crate::memo_id_from_window(w.label()) else {
-            continue;
-        };
-        if crate::stash::owns(&w)
-            || !w.is_visible().map_err(|e| e.to_string())?
-            || w.is_minimized().map_err(|e| e.to_string())?
-        {
-            continue;
-        }
-        let created = app
-            .state::<crate::storage::Store>()
-            .path(id)
-            .parent()
-            .and_then(|p| p.metadata().ok())
-            .and_then(|m| m.created().ok());
-        windows.push((created, w));
+fn arrangement_rects(
+    area: Rect,
+    scale: f64,
+    center: bool,
+    specs: &[placement::Item],
+    images: &[Option<tauri::LogicalSize<f64>>],
+    viewports: &[bool],
+) -> Result<Vec<Rect>, String> {
+    if specs.is_empty() {
+        return Ok(Vec::new());
     }
-    windows.sort_by(|a, b| a.0.cmp(&b.0).then_with(|| a.1.label().cmp(b.1.label())));
-    if windows.is_empty() {
-        return Ok(());
+    if area.width <= 0 || area.height <= 0 {
+        return Err("메모를 배치할 공간이 부족합니다".into());
     }
-    let specs: Vec<_> = windows
-        .iter()
-        .map(|(_, w)| {
-            let mut s = item(w, area, scale);
-            if crate::sizing::folded(w) {
-                s.min = (24.0 * scale / unit(scale)).round() as i64;
-                s.max = s.min;
-            }
-            s
-        })
-        .collect();
     let width = specs.iter().map(|s| s.width).max().unwrap();
     let rects = if center {
         let gap = (12.0 * scale / unit(scale)).round() as i64;
-        let n = windows.len();
+        let n = specs.len();
         let cols = ((n as f64 * area.width as f64 / area.height as f64)
             .sqrt()
             .round() as usize)
@@ -413,19 +441,24 @@ pub fn arrange(app: &tauri::AppHandle, x: f64, y: f64, center: bool) -> Result<(
             || ch
                 < specs
                     .iter()
-                    .map(|s| s.min.min((48.0 * scale / unit(scale)) as i64))
+                    .enumerate()
+                    .map(|(i, s)| {
+                        if viewports[i] {
+                            s.min
+                        } else {
+                            s.min.min((48.0 * scale / unit(scale)) as i64)
+                        }
+                    })
                     .max()
                     .unwrap()
         {
             return Err("메모를 배치할 공간이 부족합니다".into());
         }
         let mut frames = Vec::new();
-        for (i, (_, w)) in windows.iter().enumerate() {
+        for i in 0..specs.len() {
             let max_width = cw.min(specs[i].width);
             let max_height = ch.min(specs[i].max);
-            let (width, height) = if let Some(img) =
-                crate::sizing::image_size(w).filter(|_| !crate::sizing::folded(w))
-            {
+            let (width, height) = if let Some(img) = images[i] {
                 let fit = (max_width as f64 / img.width).min(max_height as f64 / img.height);
                 (
                     (img.width * fit).round().max(1.) as i64,
@@ -443,11 +476,57 @@ pub fn arrange(app: &tauri::AppHandle, x: f64, y: f64, center: bool) -> Result<(
         }
         frames
     } else {
-        placement::stack(area, width, &specs, &[])
+        placement::stack(area, width, specs, &[])
     };
-    if rects.len() != windows.len() {
+    if rects.len() != specs.len() {
         return Err("메모를 배치할 공간이 부족합니다".into());
     }
+    Ok(rects)
+}
+
+pub fn arrange(app: &tauri::AppHandle, x: f64, y: f64, center: bool) -> Result<(), String> {
+    let _activity = crate::updater::activity(app)?;
+    let monitor = pointer_monitor(app, x, y)
+        .map_err(|e| e.to_string())?
+        .or_else(|| {
+            app.get_webview_window("direction-guide")
+                .and_then(|w| w.current_monitor().ok().flatten())
+        })
+        .ok_or("포인터 화면 없음")?;
+    let work = monitor.work_area();
+    let scale = monitor.scale_factor();
+    let area = native_rect(work.position, work.size, scale);
+    let mut windows = Vec::new();
+    for w in crate::web::managed_windows(app).into_values() {
+        let Some(id) = arrangement_id(w.label()) else {
+            continue;
+        };
+        if crate::stash::owns(&w)
+            || !w.is_visible().map_err(|e| e.to_string())?
+            || w.is_minimized().map_err(|e| e.to_string())?
+        {
+            continue;
+        }
+        let created = created_at(app, w.label(), id);
+        windows.push((created, w));
+    }
+    windows.sort_by(|a, b| a.0.cmp(&b.0).then_with(|| a.1.label().cmp(b.1.label())));
+    if windows.is_empty() {
+        return Ok(());
+    }
+    let specs: Vec<_> = windows
+        .iter()
+        .map(|(_, w)| arrangement_item(w, area, scale))
+        .collect();
+    let images: Vec<_> = windows
+        .iter()
+        .map(|(_, w)| crate::sizing::image_size(w).filter(|_| !crate::sizing::folded(w)))
+        .collect();
+    let viewports: Vec<_> = windows
+        .iter()
+        .map(|(_, w)| w.label().starts_with("terminal-") || w.label().starts_with("webview-"))
+        .collect();
+    let rects = arrangement_rects(area, scale, center, &specs, &images, &viewports)?;
     let panel = app
         .get_webview_window("layout-undo")
         .ok_or("정렬 취소 창 없음")?;
@@ -476,6 +555,7 @@ pub fn arrange(app: &tauri::AppHandle, x: f64, y: f64, center: bool) -> Result<(
                 ),
                 scale,
             };
+            crate::sizing::cancel(&w);
             crate::warp::remember(app, &w, dest.position.y.into(), work.position.y, scale)?;
             entrance::transition(&w, dest)?;
         }
@@ -506,6 +586,142 @@ pub fn arrange(app: &tauri::AppHandle, x: f64, y: f64, center: bool) -> Result<(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn explicit_arrangement_includes_all_memo_hosts_but_no_children_or_tools() {
+        for (label, id) in [
+            ("main", "main"),
+            ("note-text", "text"),
+            ("note-image-123", "image-123"),
+            ("terminal-123", "terminal-123"),
+            ("webview-web-123", "web-123"),
+        ] {
+            assert_eq!(arrangement_id(label), Some(id));
+        }
+        for label in [
+            "note-",
+            "terminal-",
+            "webview-",
+            "webpage-web-123",
+            "capture-123-0",
+            "direction-guide",
+            "layout-undo",
+            "manager",
+            "stash-indicator",
+        ] {
+            assert_eq!(arrangement_id(label), None, "{label}");
+        }
+    }
+
+    #[test]
+    fn mixed_surface_fixtures_fit_both_arrangements_at_each_scale_and_negative_origin() {
+        for scale in [1.0, 1.25, 1.5, 2.0] {
+            let u = scale / unit(scale);
+            let area = Rect {
+                x: (-1600.0 * u) as i64,
+                y: (-200.0 * u) as i64,
+                width: (1440.0 * u) as i64,
+                height: (900.0 * u) as i64,
+            };
+            let labels = ["note-text", "note-image-1", "terminal-1", "webview-web-1"];
+            let specs: Vec<_> = labels
+                .iter()
+                .enumerate()
+                .map(|(i, label)| {
+                    arrangement_spec(
+                        placement::Item {
+                            width: (300.0 * u).round() as i64,
+                            min: (if i == 1 { 200.0 } else { 48.0 } * u).round() as i64,
+                            max: (if i == 1 { 200.0 } else { 48.0 } * u).round() as i64,
+                        },
+                        label,
+                        false,
+                        area,
+                        u,
+                    )
+                })
+                .collect();
+            assert_eq!(specs[2].min, (144.0 * u).round() as i64);
+            assert_eq!(specs[3].max, (420.0 * u).round() as i64);
+            let images = [
+                None,
+                Some(tauri::LogicalSize::new(600.0, 400.0)),
+                None,
+                None,
+            ];
+            for center in [false, true] {
+                let rects = arrangement_rects(
+                    area,
+                    scale,
+                    center,
+                    &specs,
+                    &images,
+                    &[false, false, true, true],
+                )
+                .unwrap();
+                assert_eq!(rects.len(), 4);
+                for (i, r) in rects.iter().enumerate() {
+                    assert!(r.x >= area.x && r.y >= area.y);
+                    assert!(
+                        r.x + r.width <= area.x + area.width
+                            && r.y + r.height <= area.y + area.height
+                    );
+                    assert!(r.width > 0 && r.height > 0);
+                    if i >= 2 {
+                        assert!(r.height >= specs[i].min);
+                    }
+                    for other in &rects[..i] {
+                        assert!(
+                            r.x + r.width <= other.x
+                                || other.x + other.width <= r.x
+                                || r.y + r.height <= other.y
+                                || other.y + other.height <= r.y
+                        );
+                    }
+                }
+                let image = rects[1];
+                assert!((image.width as f64 / image.height as f64 - 1.5).abs() < 0.02);
+            }
+        }
+    }
+
+    #[test]
+    fn insufficient_viewport_space_fails_before_any_frames_are_applied() {
+        let specs = [placement::Item {
+            width: 300,
+            min: 144,
+            max: 420,
+        }; 4];
+        for center in [false, true] {
+            assert!(arrangement_rects(
+                Rect {
+                    x: -100,
+                    y: 0,
+                    width: 300,
+                    height: 100
+                },
+                1.0,
+                center,
+                &specs,
+                &[None; 4],
+                &[true; 4]
+            )
+            .is_err());
+        }
+        let folded = arrangement_spec(
+            specs[0],
+            "webview-web-1",
+            true,
+            Rect {
+                x: 0,
+                y: 0,
+                width: 500,
+                height: 500,
+            },
+            1.0,
+        );
+        assert_eq!((folded.min, folded.max), (24, 24));
+    }
 
     fn sorted(order: &Order, labels: &[&str]) -> Vec<String> {
         let mut labels: Vec<_> = labels.iter().map(|s| s.to_string()).collect();

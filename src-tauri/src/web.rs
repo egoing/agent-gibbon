@@ -12,6 +12,7 @@ struct Record {
     label: String,
     host: WebviewWindow,
     url: Option<String>,
+    created_at: std::time::SystemTime,
 }
 #[derive(Default)]
 pub struct Windows(
@@ -41,6 +42,21 @@ pub fn managed_window(app: &tauri::AppHandle, label: &str) -> Option<WebviewWind
             .map(|r| r.host.clone())
     })
 }
+pub(crate) fn created_at(app: &tauri::AppHandle, id: &str) -> Option<std::time::SystemTime> {
+    app.state::<Windows>()
+        .0
+        .lock()
+        .ok()?
+        .get(id)
+        .map(|r| r.created_at)
+}
+fn creation_time(id: &str) -> std::time::SystemTime {
+    id.strip_prefix("web-")
+        .and_then(|value| value.parse::<u64>().ok())
+        .and_then(|value| std::time::UNIX_EPOCH.checked_add(std::time::Duration::from_nanos(value)))
+        .unwrap_or_else(std::time::SystemTime::now)
+}
+
 // A mobile Safari UA is applied before the first network request. It is a
 // compatibility hint, not device emulation or a guarantee of mobile content.
 const MOBILE_USER_AGENT: &str = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
@@ -414,6 +430,10 @@ pub(crate) fn create_presented(
     app.state::<Windows>().0.lock().map_err(err)?.insert(
         id.clone(),
         Record {
+            created_at: old
+                .as_ref()
+                .map(|r| r.created_at)
+                .unwrap_or_else(|| creation_time(&id)),
             host: w.clone(),
             label,
             url: url.map(str::to_owned),
@@ -563,6 +583,18 @@ pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String>
 }
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn generated_web_creation_order_is_not_navigation_or_color_update_time() {
+        assert_eq!(
+            super::creation_time("web-100"),
+            std::time::UNIX_EPOCH + std::time::Duration::from_nanos(100)
+        );
+        assert!(super::creation_time("web-100") < super::creation_time("web-200"));
+        let before = std::time::SystemTime::now();
+        let custom = super::creation_time("web-custom");
+        assert!(custom >= before && custom <= std::time::SystemTime::now());
+    }
+
     use super::*;
     #[test]
     fn navigation_validation_rejects_internal_and_credential_urls() {

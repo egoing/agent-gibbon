@@ -1,0 +1,96 @@
+{
+  "source": "cli-fixtures.json",
+  "reanalysis_only": true,
+  "rows": [
+    {
+      "id": "arrange191-text",
+      "type": "text",
+      "ok": true,
+      "instance": "dev-ef9fadde855c7e2c93cbc288",
+      "visible": true,
+      "auto_layout_excluded": false,
+      "entrance_active": false,
+      "measurement_pending": false,
+      "frame_physical": {
+        "x": 3496,
+        "y": 2168,
+        "width": 600,
+        "height": 136
+      },
+      "reserved_destination": null,
+      "already_at_reserved_destination": null,
+      "last_explicit_arrangement": null,
+      "scale": "not directly captured by inspect",
+      "evidence_scope": "existing CLI snapshot; no new native execution"
+    },
+    {
+      "id": "arrange191-image",
+      "type": "image/capture fixture",
+      "ok": true,
+      "instance": "dev-ef9fadde855c7e2c93cbc288",
+      "visible": true,
+      "auto_layout_excluded": false,
+      "entrance_active": true,
+      "measurement_pending": false,
+      "frame_physical": {
+        "x": 2326,
+        "y": 1080,
+        "width": 600,
+        "height": 422
+      },
+      "reserved_destination": {
+        "height": 422,
+        "width": 600,
+        "x": 3496,
+        "y": 1746
+      },
+      "already_at_reserved_destination": false,
+      "last_explicit_arrangement": null,
+      "scale": "not directly captured by inspect",
+      "evidence_scope": "existing CLI snapshot; no new native execution"
+    },
+    {
+      "id": "terminal-1910001",
+      "type": "terminal",
+      "ok": true,
+      "instance": "dev-ef9fadde855c7e2c93cbc288",
+      "visible": true,
+      "auto_layout_excluded": "not exposed for this type",
+      "entrance_active": "not exposed for this type",
+      "measurement_pending": "not exposed for this type",
+      "frame_physical": {
+        "x": 900,
+        "y": 240,
+        "width": 1000,
+        "height": 800
+      },
+      "reserved_destination": null,
+      "already_at_reserved_destination": null,
+      "last_explicit_arrangement": "not exposed for this type",
+      "scale": "not directly captured by inspect",
+      "evidence_scope": "existing CLI snapshot; no new native execution"
+    },
+    {
+      "id": "web-arrange191",
+      "type": "web",
+      "ok": true,
+      "instance": "dev-ef9fadde855c7e2c93cbc288",
+      "visible": true,
+      "auto_layout_excluded": "not exposed for this type",
+      "entrance_active": "not exposed for this type",
+      "measurement_pending": "not exposed for this type",
+      "frame_physical": {
+        "x": 1448,
+        "y": 414,
+        "width": 1200,
+        "height": 800
+      },
+      "reserved_destination": null,
+      "already_at_reserved_destination": null,
+      "last_explicit_arrangement": "not exposed for this type",
+      "scale": "not directly captured by inspect",
+      "evidence_scope": "existing CLI snapshot; no new native execution"
+    }
+  ],
+  "capture_conclusion": "visible and classified as note capture; entrance active, measurement not pending, auto exclusion false. Current origin differs from the ordinary-open reservation. No explicit Right/Up has executed in this evidence, so inclusion/completion of explicit arrangement is unverified."
+}
