@@ -12,7 +12,21 @@ let homePath=null, selectedFolder=null, selectedChoice=null, availableChoices=[]
 let restoreSupported=true;
 let started=false, starting=false, input=Promise.resolve(), resizeTimer;
 function report(e){status.textContent=String(e);}
-function measure(){if(innerWidth<20||innerHeight<60)return;fit.fit();if(started)invoke('terminal_resize',{cols:terminal.cols,rows:terminal.rows}).catch(report);}
+function measure(){
+  const host=document.getElementById('terminal');
+  if(!host.clientWidth||!host.clientHeight)return;
+  // FitAddon reserves a native scrollbar column. Our thumb overlays the content.
+  // Use the rendered public screen geometry to fit complete cells only.
+  const screen=host.querySelector('.xterm-screen');
+  const cellWidth=parseFloat(getComputedStyle(screen).width)/terminal.cols, cellHeight=parseFloat(getComputedStyle(screen).height)/terminal.rows;
+  const css=getComputedStyle(host);
+  const width=host.clientWidth-parseFloat(css.paddingLeft)-parseFloat(css.paddingRight);
+  const height=host.clientHeight-parseFloat(css.paddingTop)-parseFloat(css.paddingBottom);
+  const forced=matchMedia('(forced-colors: active)').matches;
+  if(forced)fit.fit();
+  else if(cellWidth>0&&cellHeight>0)terminal.resize(Math.max(2,Math.floor(width/cellWidth)),Math.max(1,Math.floor(height/cellHeight)));
+  if(started)invoke('terminal_resize',{cols:terminal.cols,rows:terminal.rows}).catch(report);
+}
 new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(measure,60);}).observe(document.getElementById('terminal'));
 function sendInput(data){input=input.then(()=>invoke('terminal_write',{data})).catch(report);}
 terminal.onData(sendInput);
@@ -128,7 +142,6 @@ document.getElementById('choose-folder').onclick=async()=>{
   if(selectingFolder)return;selectingFolder=true;selectionChanged();
   try{const result=await invoke('terminal_folder',{path:null});if(result.folder_selected!==false)await welcome();status.textContent='';}catch(e){report(e);}finally{selectingFolder=false;selectionChanged();}
 };
-document.getElementById('rename-form').onsubmit=async event=>{event.preventDefault();try{setInfo(await invoke('terminal_rename',{title:document.getElementById('rename-title').value}));status.textContent='창 제목을 변경했습니다.';}catch(e){report(e);}};
 (async()=>{
   const info=await invoke('terminal_info');
   if(info.kind!=='terminal')throw Error('전용 에이전트 기능은 지원하지 않습니다.');

@@ -709,7 +709,48 @@ fn finish_selection(
         None => create_text_note(app, bounds),
     }
 }
+// Capture coordinates describe the image, not the enclosing toolbar window.
+pub const IMAGE_TOOLBAR_HEIGHT: f64 = 22.0;
+fn image_toolbar_below(image_y: i32, work_top: i32, scale: f64) -> bool {
+    f64::from(image_y) - f64::from(work_top) < IMAGE_TOOLBAR_HEIGHT * scale
+}
+pub fn image_window_bounds(bounds: &ImageNote, position_scale: f64, below: bool) -> ImageNote {
+    ImageNote {
+        x: bounds.x,
+        y: bounds.y
+            - if below {
+                0.0
+            } else {
+                IMAGE_TOOLBAR_HEIGHT * position_scale
+            },
+        width: bounds.width,
+        height: bounds.height + IMAGE_TOOLBAR_HEIGHT,
+    }
+}
 pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
+    #[cfg(windows)]
+    let position_scale = win.scale_factor().map_err(err)?;
+    #[cfg(not(windows))]
+    let position_scale = 1.0;
+    // Work-area coordinates are physical; macOS capture origins are logical.
+    let below = win
+        .available_monitors()
+        .map_err(err)?
+        .iter()
+        .any(|monitor| {
+            let point =
+                selection_position(bounds.x, bounds.y).to_physical::<i32>(monitor.scale_factor());
+            let area = monitor.work_area();
+            let display = monitor.position();
+            let size = monitor.size();
+            point.x >= display.x
+                && point.y >= display.y
+                && i64::from(point.x) < i64::from(display.x) + i64::from(size.width)
+                && i64::from(point.y) < i64::from(display.y) + i64::from(size.height)
+                && image_toolbar_below(point.y, area.position.y, monitor.scale_factor())
+        });
+    crate::sizing::set_image_toolbar_below(win, below)?;
+    let bounds = image_window_bounds(bounds, position_scale, below);
     crate::sizing::manual_resize(win.clone(), win.state::<crate::sizing::Sizes>())?;
     win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
         .map_err(err)?;
@@ -722,11 +763,12 @@ pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
             win,
             tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
             tauri::LogicalSize::new(bounds.width, bounds.height).to_physical::<u32>(scale),
-        )
+        )?;
     }
     #[cfg(not(windows))]
     win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
-        .map_err(err)
+        .map_err(err)?;
+    set_position(win, bounds.x, bounds.y)
 }
 fn empty_text_note() -> crate::Note {
     crate::Note {
@@ -970,6 +1012,42 @@ mod tests {
             [0.0, 0.0, 1.0, 2.0],
         ] {
             assert!(crop_rect(&b, (200, 160), r).is_err());
+        }
+    }
+    #[test]
+    fn capture_toolbar_expands_window_without_shrinking_or_moving_image() {
+        for (x, y, width, height) in [(50.0, 80.0, 1600.0, 900.0), (-1200.0, -30.0, 320.0, 700.0)] {
+            let image = ImageNote {
+                x,
+                y,
+                width,
+                height,
+            };
+            let frame = image_window_bounds(&image, 2.0, false);
+            assert_eq!(frame.x, image.x);
+            assert_eq!(frame.y + IMAGE_TOOLBAR_HEIGHT * 2.0, image.y);
+            assert_eq!(frame.width, image.width);
+            assert_eq!(frame.height - IMAGE_TOOLBAR_HEIGHT, image.height);
+            let below = image_window_bounds(&image, 2.0, true);
+            assert_eq!(below.y, image.y);
+            assert_eq!(below.width, image.width);
+            assert_eq!(below.height - IMAGE_TOOLBAR_HEIGHT, image.height);
+        }
+    }
+    #[test]
+    fn toolbar_uses_bottom_at_work_area_top_including_negative_and_scaled_monitors() {
+        for (top, scale) in [(24, 1.0), (-900, 2.0), (0, 1.5)] {
+            assert!(image_toolbar_below(top, top, scale));
+            assert!(image_toolbar_below(
+                top + (22.0 * scale) as i32 - 1,
+                top,
+                scale
+            ));
+            assert!(!image_toolbar_below(
+                top + (22.0 * scale) as i32,
+                top,
+                scale
+            ));
         }
     }
 }

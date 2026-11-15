@@ -6,14 +6,14 @@ export function scrollGeometry(view, total, offset) {
   return { range, size, travel: track - size, top: range ? Math.max(0, Math.min(range, offset)) / range * (track - size) : 0 };
 }
 
-export function installOverlayScrollbar(doc = document) {
-  const viewport = doc.getElementById('viewport');
-  const bar = doc.getElementById('memo-scrollbar');
-  const editor = doc.getElementById('markdown');
+export function installOverlayScrollbar(doc = document, options = {}) {
+  const viewport = doc.getElementById(options.viewportId || 'viewport');
+  const bar = doc.getElementById(options.barId || 'memo-scrollbar');
+  const editor = options.viewportId ? null : doc.getElementById('markdown');
   const scrollTarget = () => doc.body.classList.contains('editing') && editor ? editor : viewport;
   if (!viewport || !bar) return;
   let geometry, timer, frame, drag;
-  const enabled = () => !['image-note', 'folded', 'toolbar-collapsed'].some(name => doc.body.classList.contains(name));
+  const enabled = () => !viewport.hidden && !['image-note', 'folded', 'toolbar-collapsed'].some(name => doc.body.classList.contains(name));
   function reveal() {
     bar.classList.add('scroll-visible');
     clearTimeout(timer);
@@ -33,7 +33,7 @@ export function installOverlayScrollbar(doc = document) {
     bar.setAttribute('aria-valuemax', String(Math.round(geometry.range)));
     bar.setAttribute('aria-valuenow', String(Math.round(target.scrollTop)));
     bar.setAttribute('aria-controls', target.id);
-    bar.setAttribute('aria-label', target === editor ? '편집기 세로 스크롤' : '메모 세로 스크롤');
+    bar.setAttribute('aria-label', target === editor ? '편집기 세로 스크롤' : (options.label || '메모 세로 스크롤'));
     if (wasHidden && !bar.hidden) reveal();
   }
   function schedule() { if (frame == null) frame = requestAnimationFrame(update); }
@@ -87,9 +87,10 @@ export function installOverlayScrollbar(doc = document) {
   }, { passive: false });
   const resize = new ResizeObserver(schedule);
   resize.observe(viewport);
+  new MutationObserver(schedule).observe(viewport, {attributes: true, attributeFilter: ['hidden']});
   if (editor) resize.observe(editor);
-  for (const content of [doc.getElementById('content'), doc.getElementById('editor')].filter(Boolean)) {
-    new MutationObserver(schedule).observe(content, { childList: true, subtree: true, characterData: true });
+  for (const content of [doc.getElementById(options.contentId || 'content'), options.viewportId ? null : doc.getElementById('editor')].filter(Boolean)) {
+    new MutationObserver(schedule).observe(content, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['hidden'] });
   }
   new MutationObserver(schedule).observe(doc.body, { attributes: true, attributeFilter: ['class'] });
   new MutationObserver(schedule).observe(doc.documentElement, { attributes: true, attributeFilter: ['style'] });

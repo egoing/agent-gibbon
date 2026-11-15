@@ -260,6 +260,8 @@ async function refresh(schedule = true) {
       $('copy').title = `${copyLabel} · ${shortcut('C')}`;
       $('copy').setAttribute('aria-label', copyLabel);
       document.body.classList.toggle('image-note', !!state.note.capture);
+      document.body.classList.toggle('capture-toolbar-below', !!state.capture_toolbar_below);
+
       document.body.classList.toggle('text-note', !state.note.capture);
       // Refresh CSS independently of revisions; preserve drafts and local trace stages.
       applyMemoAppearance(state.note.color);
