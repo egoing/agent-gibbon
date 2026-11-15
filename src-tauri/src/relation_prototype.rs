@@ -1,4 +1,4 @@
-//! Opt-in, development-only relation experiment. No saved memo/API schema changes.
+//! Local memo relationships and rendering. Historical module name retained.
 use serde::{Deserialize, Serialize};
 use std::{
     collections::BTreeMap,
@@ -15,16 +15,27 @@ use tauri::{Manager, PhysicalPosition, PhysicalSize, WebviewWindow};
 struct Relation {
     from: String,
     to: String,
+    #[serde(default)]
     label: String,
+    #[serde(default)]
+    arrow: Arrow,
+}
+#[derive(Clone, Copy, Default, Deserialize, Serialize, Debug, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum Arrow {
+    #[default]
+    End,
+    Both,
+    None,
 }
 #[derive(Clone, Copy, Debug, PartialEq)]
-struct Rect {
-    x: f64,
-    y: f64,
-    w: f64,
-    h: f64,
+pub(crate) struct Rect {
+    pub(crate) x: f64,
+    pub(crate) y: f64,
+    pub(crate) w: f64,
+    pub(crate) h: f64,
 }
-fn rect(w: &WebviewWindow) -> Option<Rect> {
+pub(crate) fn rect(w: &WebviewWindow) -> Option<Rect> {
     if !w.is_visible().ok()? || w.is_minimized().ok()? || crate::stash::owns(w) {
         return None;
     }
@@ -40,8 +51,40 @@ fn window_rect(w: &WebviewWindow) -> Result<Rect, String> {
         h: s.height as f64,
     })
 }
+// Resolve IDs through their owning registries; remote webpage children are
+// never endpoints. Their registered native web host owns geometry and focus.
+fn registered_label(id: &str, note: bool, terminal: bool, web: bool) -> Option<String> {
+    if note {
+        Some(crate::label(id))
+    } else if terminal {
+        Some(id.to_owned())
+    } else if web {
+        Some(format!("webview-{id}"))
+    } else {
+        None
+    }
+}
+fn endpoint_registered_label(app: &tauri::AppHandle, id: &str) -> Option<String> {
+    let note = app
+        .state::<crate::AppNotes>()
+        .lock()
+        .is_ok_and(|notes| notes.contains_key(id));
+    registered_label(
+        id,
+        note,
+        crate::terminal::contains(app, id),
+        crate::web::contains(app, id),
+    )
+}
+fn endpoint_label(app: &tauri::AppHandle, id: &str) -> String {
+    endpoint_registered_label(app, id).unwrap_or_else(|| crate::label(id))
+}
+pub(crate) fn endpoint_window(app: &tauri::AppHandle, id: &str) -> Option<WebviewWindow> {
+    crate::web::managed_window(app, &endpoint_registered_label(app, id)?)
+}
+const MAX_RELATIONS: usize = 16;
 // Facing side centers and outward tangents produce a cubic without entering either memo.
-fn curve(a: Rect, b: Rect) -> Option<[[f64; 2]; 4]> {
+pub(crate) fn curve(a: Rect, b: Rect) -> Option<[[f64; 2]; 4]> {
     let gap_x = (b.x - a.x - a.w).max(a.x - b.x - b.w);
     let gap_y = (b.y - a.y - a.h).max(a.y - b.y - b.h);
     if gap_x < 0. && gap_y < 0. {
@@ -191,7 +234,7 @@ pub fn changed(app: &tauri::AppHandle, label: &str) {
                 .iter()
                 .enumerate()
                 .filter_map(|(i, r)| {
-                    (crate::label(&r.from) == label || crate::label(&r.to) == label)
+                    (endpoint_label(app, &r.from) == label || endpoint_label(app, &r.to) == label)
                         .then_some(format!("relation-prototype-{i}"))
                 })
                 .collect();
@@ -206,7 +249,62 @@ pub fn changed(app: &tauri::AppHandle, label: &str) {
         let _ = tx.try_send(());
     }
 }
+// Focus events can arrive blur-before-focus during memo A -> B. Wake the
+// coalesced main-thread check rather than hiding directly on each blur event.
+pub fn focus_changed() {
+    if let Some(tx) = WAKE.get() {
+        let _ = tx.try_send(());
+    }
+}
+#[derive(Debug, PartialEq)]
+enum MemoKind<'a> {
+    Note(&'a str),
+    Terminal(&'a str),
+    Web(&'a str),
+}
+fn memo_kind(label: &str) -> Option<MemoKind<'_>> {
+    if label == "main" {
+        return Some(MemoKind::Note("main"));
+    }
+    if let Some(id) = label.strip_prefix("note-").filter(|id| !id.is_empty()) {
+        return Some(MemoKind::Note(id));
+    }
+    if label.starts_with("terminal-") {
+        return Some(MemoKind::Terminal(label));
+    }
+    label
+        .strip_prefix("webview-")
+        .filter(|id| !id.is_empty())
+        .map(MemoKind::Web)
+}
+fn memo_focused(app: &tauri::AppHandle) -> bool {
+    // AppKit can retain a key window while a different application is active.
+    #[cfg(target_os = "macos")]
+    if objc2_app_kit::NSWorkspace::sharedWorkspace()
+        .frontmostApplication()
+        .is_none_or(|a| a.processIdentifier() != std::process::id() as i32)
+    {
+        return false;
+    }
+    crate::web::managed_windows(app).values().any(|w| {
+        let registered = match memo_kind(w.label()) {
+            Some(MemoKind::Note(id)) => app
+                .state::<crate::AppNotes>()
+                .lock()
+                .is_ok_and(|notes| notes.contains_key(id)),
+            Some(MemoKind::Terminal(id)) => crate::terminal::contains(app, id),
+            Some(MemoKind::Web(id)) => crate::web::contains(app, id),
+            None => false,
+        };
+        registered
+            && w.is_visible().unwrap_or(false)
+            && !w.is_minimized().unwrap_or(true)
+            && !crate::stash::owns(w)
+            && w.is_focused().unwrap_or(false)
+    })
+}
 pub fn transition_started(app: &tauri::AppHandle) {
+    crate::relation_editor::cancel(app, false);
     if let Some(state) = app.try_state::<std::sync::Mutex<Prototype>>() {
         if let Ok(mut state) = state.try_lock() {
             state.motion.all = Some(Instant::now());
@@ -224,6 +322,8 @@ fn acknowledged(pending: Option<u64>, generation: u64, paused: bool) -> bool {
 }
 #[tauri::command]
 pub fn relation_ready(window: WebviewWindow, generation: u64) -> Result<bool, String> {
+    let app = window.app_handle();
+    let has_focus = memo_focused(app);
     let Some(index) = window
         .label()
         .strip_prefix("relation-prototype-")
@@ -245,12 +345,22 @@ pub fn relation_ready(window: WebviewWindow, generation: u64) -> Result<bool, St
         return Ok(false);
     }
     let mut state = state.lock().map_err(|e| e.to_string())?;
+    if !has_focus {
+        // A brief focus loss can reject this acknowledgement before tick sees
+        // the blur. Invalidate it now so refocus still gets a fresh redraw.
+        if let Some(surface) = state.surfaces.get_mut(window.label()) {
+            if surface.pending == Some(generation) {
+                suspend(surface);
+            }
+        }
+        return Ok(false);
+    }
     let Some(r) = state.relations.get(index) else {
         return Ok(false);
     };
     if state.motion.paused(
-        &crate::label(&r.from),
-        &crate::label(&r.to),
+        &endpoint_label(app, &r.from),
+        &endpoint_label(app, &r.to),
         Instant::now(),
         crate::stash::active(window.app_handle()),
     ) {
@@ -352,6 +462,7 @@ fn overlay(app: &tauri::AppHandle, key: &str) -> Result<Surface, String> {
     })
 }
 fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
+    crate::relation_editor::sweep(app);
     if let Some(dirty) = SURFACE_DIRTY.get() {
         if let Ok(mut dirty) = dirty.lock() {
             for label in std::mem::take(&mut *dirty) {
@@ -380,20 +491,11 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
                     .unwrap_or_default()
                     .into_iter()
                     .filter(valid)
-                    .take(8)
+                    .take(MAX_RELATIONS)
                     .collect()
             } else {
                 Vec::new()
             };
-            if let Some(labels) = CONNECTED.get() {
-                if let Ok(mut labels) = labels.write() {
-                    *labels = state
-                        .relations
-                        .iter()
-                        .flat_map(|r| [crate::label(&r.from), crate::label(&r.to)])
-                        .collect();
-                }
-            }
             for surface in state.surfaces.values_mut() {
                 suspend(surface);
             }
@@ -401,17 +503,38 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
         }
         state.last_config = Some(Instant::now());
     }
+    // Registries can change without the relation file changing (close/recreate).
+    if let Some(labels) = CONNECTED.get() {
+        if let Ok(mut labels) = labels.write() {
+            *labels = state
+                .relations
+                .iter()
+                .flat_map(|r| [endpoint_label(app, &r.from), endpoint_label(app, &r.to)])
+                .collect();
+        }
+    }
+    if !memo_focused(app) {
+        for surface in state.surfaces.values_mut() {
+            if surface.pending.is_some()
+                || surface.payload.is_some()
+                || surface.window.is_visible().unwrap_or(false)
+            {
+                suspend(surface);
+            }
+        }
+        return Ok(());
+    }
     let stashed = crate::stash::active(app);
     if state.was_stashed && !stashed {
         state.motion.all = Some(Instant::now());
     }
     state.was_stashed = stashed;
-    for index in 0..8 {
+    for index in 0..MAX_RELATIONS {
         let key = format!("relation-prototype-{index}");
         let paused = state.relations.get(index).is_some_and(|r| {
             state.motion.paused(
-                &crate::label(&r.from),
-                &crate::label(&r.to),
+                &endpoint_label(app, &r.from),
+                &endpoint_label(app, &r.to),
                 Instant::now(),
                 stashed,
             )
@@ -430,15 +553,17 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
         if let (Some(r), Some(surface)) = (state.relations.get(index), state.surfaces.get(&key)) {
             let dirty = surface.payload.is_none()
                 || surface.checked.is_none_or(|t| {
-                    state
-                        .motion
-                        .dirty_since(&crate::label(&r.from), &crate::label(&r.to), t)
+                    state.motion.dirty_since(
+                        &endpoint_label(app, &r.from),
+                        &endpoint_label(app, &r.to),
+                        t,
+                    )
                 });
             if !dirty {
                 // Visibility-only fallback: stationary relations do not read positions/sizes
                 // or rebuild curves when an unrelated memo is moving.
                 let visible = [&r.from, &r.to].iter().all(|id| {
-                    app.get_webview_window(&crate::label(id)).is_some_and(|w| {
+                    endpoint_window(app, id).is_some_and(|w| {
                         w.is_visible().unwrap_or(false) && !w.is_minimized().unwrap_or(true)
                     })
                 });
@@ -451,14 +576,8 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
             }
         }
         let geometry = state.relations.get(index).and_then(|r| {
-            let notes = app.state::<crate::AppNotes>();
-            let notes = notes.lock().ok()?;
-            if !notes.contains_key(&r.from) || !notes.contains_key(&r.to) {
-                return None;
-            }
-            drop(notes);
-            let a = app.get_webview_window(&crate::label(&r.from))?;
-            let b = app.get_webview_window(&crate::label(&r.to))?;
+            let a = endpoint_window(app, &r.from)?;
+            let b = endpoint_window(app, &r.to)?;
             state.layouts += 1;
             Some((r, curve(rect(&a)?, rect(&b)?)?))
         });
@@ -484,9 +603,11 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
         let bounds = frame(&points, surface.frame, padding);
         let reposition = surface.frame != Some(bounds);
         if reposition {
-            w.set_position(PhysicalPosition::new(bounds.x as i32, bounds.y as i32))
-                .map_err(|e| e.to_string())?;
+            // AppKit resizing preserves the bottom edge. Apply size first so its
+            // asynchronous origin adjustment cannot undo the requested top edge.
             w.set_size(PhysicalSize::new(bounds.w as u32, bounds.h as u32))
+                .map_err(|e| e.to_string())?;
+            w.set_position(PhysicalPosition::new(bounds.x as i32, bounds.y as i32))
                 .map_err(|e| e.to_string())?;
             surface.frame = Some(bounds);
         }
@@ -496,7 +617,7 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
         let native_changed = surface.actual_frame != Some(actual);
         surface.actual_frame = Some(actual);
         let relative = local_points(points, actual);
-        let payload = serde_json::json!({"width":actual.w,"height":actual.h,"points":relative,"label":relation.label,"scale":scale,"relation":[relation.from,relation.to]});
+        let payload = serde_json::json!({"width":actual.w,"height":actual.h,"points":relative,"label":relation.label,"scale":scale,"relation":[relation.from,relation.to],"arrow":relation.arrow});
         if native_changed || surface.payload.as_ref() != Some(&payload) {
             // A fresh generation cannot be revealed by a stale pre-move acknowledgement.
             surface.generation = surface.generation.wrapping_add(1);
@@ -509,16 +630,97 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
     }
     Ok(())
 }
-pub fn install(app: &tauri::AppHandle) {
-    if !cfg!(debug_assertions)
-        || crate::instance::current().id.is_none()
-        || std::env::var("AGENT_GIBBON_RELATION_PROTOTYPE").as_deref() != Ok("1")
+pub(crate) fn enabled(app: &tauri::AppHandle) -> bool {
+    app.try_state::<std::sync::Mutex<Prototype>>().is_some()
+}
+fn upsert(relations: &mut Vec<Relation>, relation: Relation) -> Result<(), String> {
+    if let Some(existing) = relations.iter_mut().find(|r| {
+        (r.from == relation.from && r.to == relation.to)
+            || (r.from == relation.to && r.to == relation.from)
+    }) {
+        *existing = relation;
+    } else {
+        if relations.len() >= MAX_RELATIONS {
+            return Err("연결은 최대16개까지 만들 수 있습니다".into());
+        }
+        relations.push(relation);
+    }
+    Ok(())
+}
+pub(crate) fn save_connection(
+    app: &tauri::AppHandle,
+    from: String,
+    to: String,
+    label: String,
+    arrow: Arrow,
+) -> Result<(), String> {
+    let relation = Relation {
+        from,
+        to,
+        label,
+        arrow,
+    };
+    if !valid(&relation) {
+        return Err("연결 입력값이 올바르지 않습니다".into());
+    }
+    if endpoint_window(app, &relation.from)
+        .and_then(|w| rect(&w))
+        .is_none()
+        || endpoint_window(app, &relation.to)
+            .and_then(|w| rect(&w))
+            .is_none()
     {
-        return;
+        return Err("연결할 메모를 찾을 수 없습니다".into());
     }
+    let path = crate::ipc::directory()?.join("relation-prototype.json");
+    let bytes = match std::fs::read(&path) {
+        Ok(bytes) => bytes,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => b"[]".to_vec(),
+        Err(e) => return Err(format!("기존 연결 설정을 읽을 수 없습니다: {e}")),
+    };
+    if bytes.len() > 16384 {
+        return Err("연결 설정 파일이 너무 큽니다".into());
+    }
+    let mut relations: Vec<Relation> =
+        serde_json::from_slice(&bytes).map_err(|_| "기존 연결 설정을 읽을 수 없습니다")?;
+    if relations.iter().any(|r| !valid(r)) {
+        return Err("기존 연결 설정을 먼저 확인해 주세요".into());
+    }
+    upsert(&mut relations, relation)?;
+    let bytes = serde_json::to_vec(&relations).map_err(|e| e.to_string())?;
+    if bytes.len() > 16384 {
+        return Err("연결 설정 파일이 너무 큽니다".into());
+    }
+    for path in [
+        app.state::<crate::storage::Store>()
+            .0
+            .join(".relations.json"),
+        path,
+    ] {
+        let parent = path.parent().ok_or("저장 경로가 없습니다")?;
+        let mut file = tempfile::NamedTempFile::new_in(parent).map_err(|e| e.to_string())?;
+        use std::io::Write;
+        file.write_all(&bytes).map_err(|e| e.to_string())?;
+        file.as_file().sync_all().map_err(|e| e.to_string())?;
+        file.persist(&path).map_err(|e| e.to_string())?;
+    }
+    focus_changed();
+    Ok(())
+}
+pub fn install(app: &tauri::AppHandle) {
     if let Ok(dir) = crate::ipc::directory() {
-        let _ = std::fs::remove_file(dir.join("relation-prototype.json"));
+        let live = dir.join("relation-prototype.json");
+        if !live.exists() {
+            let saved = app
+                .state::<crate::storage::Store>()
+                .0
+                .join(".relations.json");
+            if let Ok(bytes) = std::fs::read(saved) {
+                let _ = std::fs::write(live, bytes);
+            }
+        }
     }
+    app.manage(crate::relation_editor::Editor::default());
     let (wake, changes) = mpsc::sync_channel(1);
     if WAKE.set(wake).is_err() {
         return;
@@ -571,6 +773,108 @@ pub fn install(app: &tauri::AppHandle) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn legacy_arrows_and_upsert_preserve_other_connections() {
+        let mut rows: Vec<Relation> = serde_json::from_str(
+            r#"[{"from":"a","to":"b","label":"old"},{"from":"b","to":"c","label":"keep"}]"#,
+        )
+        .unwrap();
+        assert_eq!(rows[0].arrow, Arrow::End);
+        upsert(
+            &mut rows,
+            Relation {
+                from: "a".into(),
+                to: "b".into(),
+                label: String::new(),
+                arrow: Arrow::Both,
+            },
+        )
+        .unwrap();
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0].arrow, Arrow::Both);
+        assert_eq!(rows[1].label, "keep");
+        let roundtrip: Vec<Relation> =
+            serde_json::from_slice(&serde_json::to_vec(&rows).unwrap()).unwrap();
+        assert_eq!(roundtrip[0].arrow, Arrow::Both);
+        upsert(
+            &mut rows,
+            Relation {
+                from: "b".into(),
+                to: "a".into(),
+                label: "reverse".into(),
+                arrow: Arrow::None,
+            },
+        )
+        .unwrap();
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0].from, "b");
+        assert_eq!(rows[0].arrow, Arrow::None);
+        assert_eq!(rows[1].label, "keep");
+        assert!(
+            serde_json::from_str::<Relation>(r#"{"from":"a","to":"b","arrow":"start"}"#).is_err()
+        );
+        rows.resize(MAX_RELATIONS, rows[1].clone());
+        assert!(upsert(
+            &mut rows,
+            Relation {
+                from: "new".into(),
+                to: "other".into(),
+                label: String::new(),
+                arrow: Arrow::None
+            }
+        )
+        .is_err());
+        assert_eq!(rows.len(), MAX_RELATIONS);
+    }
+    #[test]
+    fn endpoint_types_use_registered_hosts_and_reject_unregistered_ids() {
+        assert_eq!(
+            registered_label("image-1", true, false, false).as_deref(),
+            Some("note-image-1")
+        );
+        assert_eq!(
+            registered_label("terminal-1", false, true, false).as_deref(),
+            Some("terminal-1")
+        );
+        assert_eq!(
+            registered_label("web-1", false, false, true).as_deref(),
+            Some("webview-web-1")
+        );
+        assert_eq!(registered_label("terminal-1", false, false, false), None);
+        assert_eq!(registered_label("web-1", false, false, false), None);
+        assert_eq!(
+            registered_label("relation-prototype-0", false, false, false),
+            None
+        );
+        assert_eq!(
+            registered_label("web-1", true, false, true).as_deref(),
+            Some("note-web-1")
+        );
+    }
+    #[test]
+    fn focus_candidates_are_memos_not_management_or_child_surfaces() {
+        assert_eq!(memo_kind("main"), Some(MemoKind::Note("main")));
+        assert_eq!(
+            memo_kind("note-image-123"),
+            Some(MemoKind::Note("image-123"))
+        );
+        assert_eq!(
+            memo_kind("terminal-123"),
+            Some(MemoKind::Terminal("terminal-123"))
+        );
+        assert_eq!(memo_kind("webview-web-123"), Some(MemoKind::Web("web-123")));
+        for label in [
+            "manager",
+            "stash-indicator",
+            "relation-prototype-0",
+            "webpage-web-123",
+            "capture-overlay",
+            "note-",
+            "webview-",
+        ] {
+            assert_eq!(memo_kind(label), None, "{label}");
+        }
+    }
     #[test]
     fn curve_faces_boundaries_in_both_directions() {
         let a = Rect {
@@ -712,6 +1016,7 @@ mod tests {
         let mut r = Relation {
             from: "a".into(),
             to: "b".into(),
+            arrow: Arrow::End,
             label: "선행 작업".into(),
         };
         assert!(valid(&r));

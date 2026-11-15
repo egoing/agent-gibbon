@@ -20,6 +20,7 @@ mod opacity;
 mod placement;
 mod presentation;
 mod privacy;
+mod relation_editor;
 mod relation_prototype;
 mod session_restore;
 mod sizing;
@@ -577,6 +578,13 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     local_trace::local_flow_stage,
                     snapshot,
                     relation_prototype::relation_ready,
+                    relation_editor::relation_status,
+                    relation_editor::relation_begin,
+                    relation_editor::relation_picker_info,
+                    relation_editor::relation_pick,
+                    relation_editor::relation_editor_state,
+                    relation_editor::relation_save,
+                    relation_editor::relation_cancel,
                     web::web_run,
                     web::web_recent,
                     web::web_chrome,
@@ -665,6 +673,13 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         })
         .on_window_event(|win, event| {
             monitor_layout::native_event(win, event);
+            if win.label() == "relation-settings" {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    relation_editor::cancel(win.app_handle(), true);
+                    return;
+                }
+            }
             if matches!(
                 event,
                 tauri::WindowEvent::Moved(_)
@@ -675,6 +690,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 relation_prototype::changed(win.app_handle(), win.label());
             }
             if matches!(event, tauri::WindowEvent::Focused(_)) {
+                relation_prototype::focus_changed();
                 if let Some(window) = win.app_handle().get_webview_window(win.label()) {
                     feedback_window::sync_frame_focus(&window);
                 }
@@ -688,6 +704,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             if win.label().starts_with("webview-") || win.label().starts_with("webpage-") {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                     api.prevent_close();
+                    relation_prototype::changed(win.app_handle(), win.label());
                     let _ = win.hide();
                 }
                 return;

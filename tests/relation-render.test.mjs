@@ -37,3 +37,12 @@ test('direction, identity and coordinate changes have no residual animation or r
  await flush();assert.equal(r.window.relationRenderStats.frames,frames);assert.equal(r.measured(),2);
  assert.equal(r.acks.at(-1).generation,3);
 });
+test('arrow choice supports target-only, both ends and no arrow without stale markers',async()=>{
+ const r=renderer();
+ for(const [arrow,start,end] of [['both','url(#arrow)','url(#arrow)'],['none','none','none'],['end','none','url(#arrow)']]){
+  r.window.drawRelation({...payload,arrow},1);
+  assert.equal(r.path.attributes['marker-start'],start);
+  assert.equal(r.path.attributes['marker-end'],end);
+ }
+ await flush();
+});

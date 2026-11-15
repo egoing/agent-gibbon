@@ -463,6 +463,7 @@ pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String
         Action::Inspect => inspect(app, request.id()),
         Action::Close => {
             crate::stash::release(&w)?;
+            crate::relation_prototype::changed(w.app_handle(), w.label());
             w.hide().map_err(err)?;
             inspect(app, request.id())
         }
@@ -534,11 +535,13 @@ pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String>
         "inspect" => inspect(window.app_handle(), id),
         "drag" => {
             crate::monitor_layout::manual(&window);
+            crate::relation_prototype::changed(window.app_handle(), window.label());
             window.start_dragging().map_err(err)?;
             Ok(json!({"ok":true}))
         }
         action if action.starts_with("resize-") => {
             crate::monitor_layout::manual(&window);
+            crate::relation_prototype::changed(window.app_handle(), window.label());
             let direction =
                 serde_json::from_value(json!(action.strip_prefix("resize-").unwrap_or_default()))
                     .map_err(err)?;
@@ -557,6 +560,7 @@ pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String>
         }
         "close" => {
             // Match the current web window close contract, which preserves the session.
+            crate::relation_prototype::changed(window.app_handle(), window.label());
             window.hide().map_err(err)?;
             Ok(json!({"ok":true,"url":r.url}))
         }

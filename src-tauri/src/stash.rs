@@ -357,7 +357,10 @@ pub fn cancel_chord(app: &tauri::AppHandle) {
     }
 }
 fn snapshot_candidate(label: &str) -> bool {
-    !matches!(label, ICON | GUIDE | "layout-undo") && !label.starts_with("relation-prototype-")
+    !matches!(label, ICON | GUIDE | "layout-undo")
+        && !label.starts_with("relation-prototype-")
+        && !label.starts_with("relation-pick-")
+        && label != "relation-settings"
 }
 fn compact(r: Rect, area: Rect, top: bool) -> Rect {
     let w = (r.w * 0.18).max(144.).min(r.w);
