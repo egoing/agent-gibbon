@@ -60,3 +60,9 @@ Conf 5 (macOS 텍스트 메모 native 확대·복원·이동 실제 확인; 나�
 브라우저 회귀를 보강해 실제 web.js·web-chrome.js·toolbar.js 및 appearance 모듈을 함께 로드한 Welcome 초기화와 URL 제출 뒤 외부 콘텐츠 iframe fixture가 공존하는 경우 모두 빈 공간 double-click이 chrome_work_area를 1회 전달함을 확인했다. 총 기본4종+full-web2경로 통과, pageerror 없음. iframe은 OS native child WebView가 아니며 native 크기 변경과 IPC는 mock이므로 이번 사용자 실패의 원인 해결 또는 실제 웹 확대 통과로 기록하지 않는다. 제품 동작은 아직 변경하지 않았다.
 
 후속 사용자 확인: 전용 웹 Welcome은 더블클릭으로 확대됨을 확인했다. 최초 실패 창의 소속과 실패 원인은 여전히 미확정이며 다른 인스턴스 사용으로 단정하지 않는다. 이번 후속에서는 제품 코드 변경 없이 회귀 검사와 실행 범위 기록을 보강했다.
+
+## close 승인과 최신 main 통합 — 2026-11-15
+
+사용자의 명시적인 close 호출로 최종 제품 커밋/push/병합을 승인받았다. 기존 승인 대기·미커밋 표기는 당시 상태의 기록이다. main `93f027f`를 통합하며 디자인 문서는 양쪽 기준을 보존하고 이미지 툴바 상태 필드와 이번 확대 snapshot을 함께 유지했다. 본문 선택을 위해 main에서 제한한 document mousedown handler는 제거하고 공통 toolbar의 실제 포인터 이동 처리로 일원화했다. 관련 회귀는 공통 toolbar 검사 및 메모 본문에 즉시 mousedown drag를 등록하지 않는 검사로 확인했다.
+
+최신 통합에서 Rust234/UI189, Clippy, Rustfmt, debug 개발 빌드를 수행했다. Chromium 기본4종 및 웹 전체 스크립트2경로를 다시 확인했다. 이전 native 텍스트 실증과 웹 Welcome 사용자 확인은 이전 코드 버전의 증거이며 최신 통합 뒤 native 실환경 재검증은 하지 않았다. 다른 앱·사용자 창을 재시작하거나 조작하지 않았고 전체 플랫폼 CI·릴리스는 실행하지 않았다. 최신 통합의 Conf는3, Chromium 이벤트 처리 범위는4, 과거 native 실증은 해당 버전·유형에 한정한5이며 Risk는Medium이다.

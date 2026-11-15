@@ -27,3 +27,16 @@ test('only system Welcome follows OS light/dark; explicit gray remains fixed',()
  app.change('gray');app.media.matches=false;app.media.change();assert.equal(app.styles.get('--background'),'#dfe2dd');
  app.media.matches=true;app.media.change();assert.equal(app.styles.get('--background'),'#dfe2dd');
 });
+
+test('trusted chrome loads stored color and receives updates while preserving other designs', async()=>{
+ const styles=new Map(),events={},storage={getItem:()=> 'color'};
+ let listener;
+ const env={localStorage:storage,location:{pathname:'/web.html'},matchMedia:()=>({addEventListener(){}}),addEventListener:(key,fn)=>events[key]=fn,__TAURI__:{event:{listen:async(key,fn)=>{listener=fn;}},core:{invoke:async(name,args)=>{assert.equal(name,'web_chrome');assert.equal(args.action,'inspect');return {color:'#db704f'};}}}};
+ const root={dataset:{},style:{setProperty:(k,v)=>styles.set(k,v)}};
+ installTerminalAppearance(env,root);await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(styles.get('--background'),'#db704f');assert.equal(styles.get('--foreground'),'#291b16');
+ listener({payload:'#4d4d4b'});assert.equal(styles.get('--background'),'#4d4d4b');
+ env.localStorage.getItem=()=> 'gray';events.storage({key:memoDesignKey,storageArea:storage});
+ listener({payload:'#6baa92'});assert.equal(styles.get('--background'),'#dfe2dd');
+ env.localStorage.getItem=()=> 'color';events.storage({key:memoDesignKey,storageArea:storage});assert.equal(styles.get('--background'),'#6baa92');
+});

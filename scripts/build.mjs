@@ -13,6 +13,7 @@ if (!['cargo', 'tauri'].includes(tool)) {
 try { requireBuildDirSupport(); } catch (error) { console.error(error.message); process.exit(1); }
 const command = tool === 'cargo' ? 'cargo' : process.execPath;
 const commandArgs = tool === 'cargo' ? args : [join(instance.root, 'node_modules/@tauri-apps/cli/tauri.js'), ...args];
+await import('./build-editor.mjs');
 const child = spawn(command, commandArgs, { cwd: instance.root, env: buildEnvironment(instance), stdio: 'inherit' });
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => child.kill(signal));
 child.on('error', error => { console.error(error.message); process.exitCode = 1; });

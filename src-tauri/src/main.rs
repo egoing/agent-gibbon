@@ -13,6 +13,7 @@ mod updater;
 
 mod layout;
 mod local_trace;
+mod memo_color;
 mod model;
 mod opacity;
 mod placement;
@@ -262,7 +263,7 @@ fn inspect_window_traced(
         trace,
         Stage::Response,
         "note.state.response",
-        || json!({"ok":true,"stash":stash::inspect(win.app_handle()),"feedback_surface":surface,"hovered":hovered,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"global_opacity":opacity::configured(win.app_handle()),"animating":entrance::active(win),"auto_layout_excluded":layout::excluded(win),"layout_pending":sizing::pending(win),"content_height_cap":sizing::content_height(win),"layout_destination":entrance::destination(win).map(|d|json!({"x":d.position.x,"y":d.position.y,"width":d.size.width,"height":d.size.height})),"visible":visible,"focused":focused,"folded": sizing::folded(win), "always_on_top":pinned,"warp_right":win.current_monitor().ok().flatten().map(|m| i64::from(position.x) * 2 + i64::from(size.width) < i64::from(m.work_area().position.x) * 2 + i64::from(m.work_area().size.width)),"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
+        || json!({"ok":true,"stash":stash::inspect(win.app_handle()),"feedback_surface":surface,"hovered":hovered,"instance":instance::current().id,"dev_label":instance::current().label,"id":id,"note":note,"storage_path":win.app_handle().state::<storage::Store>().path(id),"feedback_active":feedback_active,"capture_toolbar_below":sizing::image_toolbar_below(win),"highlight_revision":feedback::highlight_revision(win),"opacity":opacity,"global_opacity":opacity::configured(win.app_handle()),"animating":entrance::active(win),"auto_layout_excluded":layout::excluded(win),"layout_pending":sizing::pending(win),"content_height_cap":sizing::content_height(win),"layout_destination":entrance::destination(win).map(|d|json!({"x":d.position.x,"y":d.position.y,"width":d.size.width,"height":d.size.height})),"visible":visible,"focused":focused,"folded": sizing::folded(win), "always_on_top":pinned,"warp_right":win.current_monitor().ok().flatten().map(|m| i64::from(position.x) * 2 + i64::from(size.width) < i64::from(m.work_area().position.x) * 2 + i64::from(m.work_area().size.width)),"position":{"x":position.x,"y":position.y},"size":{"width":size.width,"height":size.height}}),
     );
     trace.complete();
     Ok(result)
@@ -441,15 +442,7 @@ fn apply_with_presentation(
     let mut next = if existing.as_ref().is_none_or(|note| note.revision == 0)
         && matches!(request.action, Action::Open)
     {
-        // The startup main placeholder is not a created note. Persisted notes,
-        // including hidden and explicitly colored notes, continue the cycle.
-        let created_count = state
-            .lock()
-            .map_err(|e| e.to_string())?
-            .values()
-            .filter(|note| note.revision > 0)
-            .count();
-        Note::with_palette_color(created_count)
+        Note::with_random_color()
     } else {
         existing.clone().unwrap_or_default()
     };
@@ -553,6 +546,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(layout::Exclusions::default())
         .manage(layout::OpenOrder::default())
         .manage(sizing::Sizes::default())
+        .manage(layout::Undo::default())
         .manage(stash::Stash::default())
         .manage(Mutex::new(BTreeMap::from([(
             "main".to_string(),
@@ -561,6 +555,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .invoke_handler({
             let handler: Box<dyn Fn(tauri::ipc::Invoke) -> bool + Send + Sync> =
                 Box::new(tauri::generate_handler![
+                    layout::undo_arrangement,
                     capture::permission_guide,
                     updater::updater_status,
                     updater::updater_check,
@@ -580,6 +575,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     local_trace::local_flow_stage,
                     snapshot,
                     web::web_run,
+                    web::web_recent,
                     web::web_chrome,
                     terminal::terminal_start,
                     terminal::terminal_write,

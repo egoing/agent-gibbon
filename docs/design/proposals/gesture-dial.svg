@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="264" height="264" viewBox="0 0 264 264" role="img" aria-labelledby="title">
+  <title id="title">위 바둑판 정렬, 오른쪽 정렬, 아래 숨기기, 왼쪽 또는 Esc 취소</title>
+  <circle cx="132" cy="132" r="125" fill="#171816"/>
+  <path d="M198.1 65.9 A93.5 93.5 0 0 1 65.9 198.1" fill="none" stroke="#deded6" stroke-width="59" stroke-linecap="round"/>
+  <circle cx="132" cy="132" r="62" fill="#d2d3ca"/>
+  <g fill="#f4f4ec" transform="translate(132 38)">
+    <rect x="-10" y="-10" width="8" height="8" rx="1.8"/><rect x="2" y="-10" width="8" height="8" rx="1.8"/>
+    <rect x="-10" y="2" width="8" height="8" rx="1.8"/><rect x="2" y="2" width="8" height="8" rx="1.8"/>
+  </g>
+  <path transform="translate(38 132)" d="m-7-7 14 14m0-14L-7 7" fill="none" stroke="#f4f4ec" stroke-width="3.2" stroke-linecap="round"/>
+  <g fill="#20221d" transform="translate(226 132)">
+    <rect x="-6" y="-10" width="16" height="4" rx="1.8"/><rect x="-12" y="-2" width="22" height="4" rx="1.8"/><rect x="-3" y="6" width="13" height="4" rx="1.8"/>
+  </g>
+  <path transform="translate(132 226)" d="M-12-5q12 13 24 0M-8 0l-3 4m9-2-1 5m7-5 2 5m4-7 3 4" fill="none" stroke="#20221d" stroke-width="2.6" stroke-linecap="round"/>
+</svg>

@@ -35,7 +35,8 @@ custom-protocol = ["tauri/custom-protocol"]
 [target.'cfg(target_os = "macos")'.dependencies]
 block2 = "0.6"
 objc2 = "0.6"
-objc2-app-kit = { version = "0.3", default-features = false, features = ["block2", "NSWindow", "NSEvent", "NSWorkspace", "NSRunningApplication", "libc", "objc2-core-foundation"] }
+objc2-foundation = { version = "0.3", default-features = false, features = ["NSURL", "NSString"] }
+objc2-app-kit = { version = "0.3", default-features = false, features = ["block2", "NSWindow", "NSEvent", "NSWorkspace", "NSRunningApplication", "NSScrollView", "NSScroller", "NSView", "libc", "objc2-core-foundation"] }
 
 [target.'cfg(windows)'.dependencies]
 uds_windows = "1.2.1"

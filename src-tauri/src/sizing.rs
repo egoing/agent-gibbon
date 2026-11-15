@@ -66,12 +66,34 @@ struct SizeState {
     content_height: Option<f64>,
     pending: Option<crate::entrance::Presentation>,
     image_size: Option<LogicalSize<f64>>,
+    image_toolbar_below: bool,
     expanded: Option<LogicalSize<f64>>,
     contact: crate::warp::Contact,
     work_area_restore: Option<WorkAreaRestore>,
 }
 #[derive(Default)]
 pub struct Sizes(Mutex<BTreeMap<String, SizeState>>);
+
+pub fn set_image_toolbar_below(window: &WebviewWindow, below: bool) -> Result<(), String> {
+    window
+        .state::<Sizes>()
+        .0
+        .lock()
+        .map_err(|e| e.to_string())?
+        .entry(window.label().into())
+        .or_default()
+        .image_toolbar_below = below;
+    Ok(())
+}
+pub fn image_toolbar_below(window: &WebviewWindow) -> bool {
+    window
+        .state::<Sizes>()
+        .0
+        .lock()
+        .ok()
+        .and_then(|states| states.get(window.label()).map(|s| s.image_toolbar_below))
+        .unwrap_or(false)
+}
 
 // Session-local zoom belongs to this native window, including hidden restores.
 // Store destination scale with the frame, rather than converting on another monitor.

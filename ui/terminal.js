@@ -9,9 +9,24 @@ const fit = new FitAddon.FitAddon();
 terminal.loadAddon(fit);
 terminal.open(document.getElementById('terminal'));
 let homePath=null, selectedFolder=null, selectedChoice=null, availableChoices=[], folders=[], expandedFolders=false, selectingFolder=false;
+let restoreSupported=true;
 let started=false, starting=false, input=Promise.resolve(), resizeTimer;
 function report(e){status.textContent=String(e);}
-function measure(){if(innerWidth<20||innerHeight<60)return;fit.fit();if(started)invoke('terminal_resize',{cols:terminal.cols,rows:terminal.rows}).catch(report);}
+function measure(){
+  const host=document.getElementById('terminal');
+  if(!host.clientWidth||!host.clientHeight)return;
+  // FitAddon reserves a native scrollbar column. Our thumb overlays the content.
+  // Use the rendered public screen geometry to fit complete cells only.
+  const screen=host.querySelector('.xterm-screen');
+  const cellWidth=parseFloat(getComputedStyle(screen).width)/terminal.cols, cellHeight=parseFloat(getComputedStyle(screen).height)/terminal.rows;
+  const css=getComputedStyle(host);
+  const width=host.clientWidth-parseFloat(css.paddingLeft)-parseFloat(css.paddingRight);
+  const height=host.clientHeight-parseFloat(css.paddingTop)-parseFloat(css.paddingBottom);
+  const forced=matchMedia('(forced-colors: active)').matches;
+  if(forced)fit.fit();
+  else if(cellWidth>0&&cellHeight>0)terminal.resize(Math.max(2,Math.floor(width/cellWidth)),Math.max(1,Math.floor(height/cellHeight)));
+  if(started)invoke('terminal_resize',{cols:terminal.cols,rows:terminal.rows}).catch(report);
+}
 new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(measure,60);}).observe(document.getElementById('terminal'));
 function sendInput(data){input=input.then(()=>invoke('terminal_write',{data})).catch(report);}
 terminal.onData(sendInput);
@@ -38,11 +53,15 @@ document.getElementById('terminal').addEventListener('pointerdown', e => {
 document.querySelectorAll('.resize').forEach(handle=>handle.addEventListener('pointerdown',e=>{if(e.button===0)win.startResizeDragging(handle.dataset.direction).catch(report);}));
 document.getElementById('close').onclick=()=>invoke('terminal_close').catch(report);
 function setInfo(info){
-  document.getElementById('title').textContent=info.title;
+  document.getElementById('title').textContent=info.running && info.program && info.program !== 'shell' ? info.program : info.title;
 
 }
-async function start(choice, trigger){
+async function start(choice, trigger, plan){
   if(started||starting)return;
+  if(!restoreSupported && (plan !== undefined || choice === 'auto-monitor')){
+    report('터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.');
+    return;
+  }
   starting=true;
   status.textContent=`${trigger?.dataset?.label||'터미널'} 시작 중…`;
   document.getElementById('welcome').setAttribute('aria-busy','true');
@@ -60,7 +79,7 @@ async function start(choice, trigger){
   try{
     if(selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
     await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('terminal.start', async flow => {
-      await flow.invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output,choice});
+      await flow.invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output,choice,...(plan === undefined ? {} : {plan})});
       flow.stage('response');
       flow.frame?.();
     });
@@ -105,22 +124,37 @@ async function welcome(){
   }
   renderFolders();
 }
+const restorePanel=document.getElementById('restore-panel');
+const welcomePanel=document.getElementById('welcome-panel');
+const planInput=document.getElementById('restore-plan');
+const restoreRun=document.getElementById('restore-run');
+restoreRun.onclick=()=>start('shell',restoreRun,planInput.value);
+planInput.oninput=()=>{restoreRun.disabled=!planInput.value.trim();};
+document.getElementById('restore-cancel').onclick=()=>{
+  restorePanel.hidden=true;
+  welcomePanel.hidden=false;
+  document.getElementById('choose-folder').focus();
+};
 document.getElementById('more-folders').onclick=()=>{expandedFolders=!expandedFolders;renderFolders();};
 document.getElementById('run-task').onclick=()=>{if(!selectingFolder) return start(selectedChoice,document.getElementById('run-task'));};
 document.getElementById('choose-folder').onclick=async()=>{
   if(selectingFolder)return;selectingFolder=true;selectionChanged();
   try{const result=await invoke('terminal_folder',{path:null});if(result.folder_selected!==false)await welcome();status.textContent='';}catch(e){report(e);}finally{selectingFolder=false;selectionChanged();}
 };
-document.getElementById('rename-form').onsubmit=async event=>{event.preventDefault();try{setInfo(await invoke('terminal_rename',{title:document.getElementById('rename-title').value}));status.textContent='창 제목을 변경했습니다.';}catch(e){report(e);}};
 (async()=>{
   const info=await invoke('terminal_info');
   if(info.kind!=='terminal')throw Error('전용 에이전트 기능은 지원하지 않습니다.');
+  restoreSupported=info.restore_supported !== false;
   setInfo(info);
   {
     const close=document.getElementById('close');close.title='터미널 종료';close.setAttribute('aria-label','터미널 종료');
     document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;
     await welcome();
-    if(info.restored) status.textContent = `이전 터미널 프로세스는 종료되었습니다. ${info.last_command ? `마지막 명령: ${info.last_command} · 자동 실행하지 않았습니다.` : '마지막 명령은 안전한 복원을 위해 저장에서 제외되었습니다.'}`;
+    if(info.restore_plan && !info.running){planInput.value=info.restore_plan;restorePanel.hidden=false;welcomePanel.hidden=true;
+      if(!restoreSupported)report('터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.');
+      else if(info.restored && info.auto_restore) await start('auto-monitor', null);
+    }
+    else if(info.restored) status.textContent = `이전 터미널 프로세스는 종료되었습니다. ${info.last_command ? `마지막 명령: ${info.last_command} · 자동 실행하지 않았습니다.` : '마지막 명령은 안전한 복원을 위해 저장에서 제외되었습니다.'}`;
   }
   window.gibbonMeasure?.('terminal.ui.ready',clock());
 })().catch(report);

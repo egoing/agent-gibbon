@@ -53,7 +53,7 @@ try {
  for(const [design,bg] of [['white','#f8f8f8'],['gray','#dfe2dd'],['black','#262627'],['system','#dfe2dd'],['color','#ffeeaa']]){
   await chooseDesign(design);await color(memo,bg);await color(feedback,bg);
   const sampleColors=await manager.$$eval('.memo-sample',elements=>elements.map(e=>getComputedStyle(e).backgroundColor));
-  const expectedSamples=design==='color'?['rgb(254, 233, 62)','rgb(137, 240, 255)']:Array(2).fill({white:'rgb(248, 248, 248)',gray:'rgb(223, 226, 221)',black:'rgb(38, 38, 39)',system:'rgb(223, 226, 221)'}[design]);
+  const expectedSamples=design==='color'?['rgb(189, 214, 87)','rgb(107, 170, 146)']:Array(2).fill({white:'rgb(248, 248, 248)',gray:'rgb(223, 226, 221)',black:'rgb(38, 38, 39)',system:'rgb(223, 226, 221)'}[design]);
   assert.deepEqual(sampleColors,expectedSamples);
   await manager.$eval('.memo-preview',e=>e.scrollIntoView());await manager.screenshot({path:`${out}/preview-${design}.png`});
   for(const theme of ['white','gray','black','system']){await chooseManager(theme);await color(memo,bg);await color(feedback,bg);}
