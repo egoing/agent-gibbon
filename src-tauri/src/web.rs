@@ -4,6 +4,7 @@ use crate::{
     model::{Action, Request},
 };
 use serde_json::{json, Value};
+mod recent;
 use std::{collections::BTreeMap, sync::Mutex};
 use tauri::{Manager, WebviewUrl, WebviewWindow};
 #[derive(Clone)]
@@ -225,7 +226,14 @@ pub fn create(
     id: Option<&str>,
     url: Option<&str>,
 ) -> Result<Value, String> {
-    create_presented(app, bounds, id, url, true)
+    let mut result = create_presented(app, bounds, id, url, true)?;
+    if let Some(url) = url {
+        // History failure must not turn an already-opened page into a failed
+        // navigation. Keep it explicit in the response instead.
+        result["recent_saved"] =
+            json!(recent::remember(&app.state::<crate::storage::Store>().0, url).is_ok());
+    }
+    Ok(result)
 }
 pub(crate) fn create_presented(
     app: &tauri::AppHandle,
@@ -446,6 +454,22 @@ pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String
             inspect(app, request.id())
         }
         _ => Err("웹 창에는 web/open/inspect/close를 사용하세요".into()),
+    }
+}
+#[tauri::command]
+pub fn web_recent(view: tauri::Webview, remove: Option<String>) -> Result<Vec<String>, String> {
+    let id = view
+        .label()
+        .strip_prefix("webview-")
+        .ok_or("웹 시작 화면에서만 사용할 수 있습니다")?;
+    let r = record(view.app_handle(), id)?;
+    if r.label != view.label() || r.url.is_some() {
+        return Err("웹 시작 화면에서만 사용할 수 있습니다".into());
+    }
+    let root = &view.state::<crate::storage::Store>().0;
+    match remove {
+        Some(url) => recent::remove(root, &url),
+        None => recent::list(root),
     }
 }
 #[tauri::command]

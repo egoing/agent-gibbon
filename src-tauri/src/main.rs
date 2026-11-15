@@ -580,6 +580,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     local_trace::local_flow_stage,
                     snapshot,
                     web::web_run,
+                    web::web_recent,
                     web::web_chrome,
                     terminal::terminal_start,
                     terminal::terminal_write,
