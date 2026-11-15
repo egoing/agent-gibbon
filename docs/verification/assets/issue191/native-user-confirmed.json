@@ -1,0 +1,573 @@
+{
+  "root": "/Users/egoinglee/.codex/worktrees/c9f9/agent-gibbon",
+  "source_commit": "20e07f0dbae1e196ee67d4276c7d4c51d9f485c3",
+  "instance": "dev-ef9fadde855c7e2c93cbc288",
+  "pid": 71822,
+  "binary": "/Users/egoinglee/.codex/worktrees/c9f9/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+  "user_confirmation": [
+    "실행했고 잘 취소 됩니다.",
+    "제가 직접 조작했어요"
+  ],
+  "scope": "User performed native actions; agent collected CLI and existing entrance trace. Six windows were present, including user-operated main and another web host. No claim of a four-window-only controlled run.",
+  "samples": [
+    {
+      "batch": "Right after manual image move",
+      "transition": {
+        "data": {
+          "destination": {
+            "x": 3496,
+            "y": 1674
+          },
+          "generation": "Instant { tv_sec: 1580319, tv_nsec: 931201166 }",
+          "size": {
+            "height": 630,
+            "width": 600
+          },
+          "start": {
+            "x": 1748.0,
+            "y": 837.0
+          }
+        },
+        "event": "transition",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742645599351,
+        "window": "terminal-1910001"
+      },
+      "final_frame": {
+        "data": {
+          "actual_after": {
+            "x": 1748.0,
+            "y": 837.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 3496,
+                "y": 1674
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 630,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 1748.0,
+              "y": 837.0
+            },
+            "generation": "Instant { tv_sec: 1580319, tv_nsec: 931201166 }"
+          },
+          "next": {
+            "x": 1748.0,
+            "y": 837.0
+          },
+          "size_after": {
+            "height": 630,
+            "width": 600
+          },
+          "t": 1.0
+        },
+        "event": "frame",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742646028087,
+        "window": "terminal-1910001"
+      }
+    },
+    {
+      "batch": "Right after manual image move",
+      "transition": {
+        "data": {
+          "destination": {
+            "x": 3496,
+            "y": 1538
+          },
+          "generation": "Instant { tv_sec: 1580319, tv_nsec: 931665416 }",
+          "size": {
+            "height": 136,
+            "width": 600
+          },
+          "start": {
+            "x": 1748.0,
+            "y": 769.0
+          }
+        },
+        "event": "transition",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742645599810,
+        "window": "note-arrange191-text"
+      },
+      "final_frame": {
+        "data": {
+          "actual_after": {
+            "x": 1748.0,
+            "y": 769.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 3496,
+                "y": 1538
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 136,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 1748.0,
+              "y": 769.0
+            },
+            "generation": "Instant { tv_sec: 1580319, tv_nsec: 931665416 }"
+          },
+          "next": {
+            "x": 1748.0,
+            "y": 769.0
+          },
+          "size_after": {
+            "height": 136,
+            "width": 600
+          },
+          "t": 1.0
+        },
+        "event": "frame",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742646021163,
+        "window": "note-arrange191-text"
+      }
+    },
+    {
+      "batch": "Right after manual image move",
+      "transition": {
+        "data": {
+          "destination": {
+            "x": 3496,
+            "y": 1116
+          },
+          "generation": "Instant { tv_sec: 1580319, tv_nsec: 931943750 }",
+          "size": {
+            "height": 422,
+            "width": 600
+          },
+          "start": {
+            "x": 1415.0,
+            "y": 475.0
+          }
+        },
+        "event": "transition",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742645600088,
+        "window": "note-arrange191-image"
+      },
+      "final_frame": {
+        "data": {
+          "actual_after": {
+            "x": 1748.0,
+            "y": 558.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 3496,
+                "y": 1116
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 422,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 1747.9994950674022,
+              "y": 557.9998741459291
+            },
+            "generation": "Instant { tv_sec: 1580319, tv_nsec: 931943750 }"
+          },
+          "next": {
+            "x": 1748.0,
+            "y": 558.0
+          },
+          "size_after": {
+            "height": 422,
+            "width": 600
+          },
+          "t": 1.0
+        },
+        "event": "frame",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742646036187,
+        "window": "note-arrange191-image"
+      }
+    },
+    {
+      "batch": "Right after manual image move",
+      "transition": {
+        "data": {
+          "destination": {
+            "x": 2896,
+            "y": 1464
+          },
+          "generation": "Instant { tv_sec: 1580319, tv_nsec: 932585000 }",
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "start": {
+            "x": 1448.0,
+            "y": 732.0
+          }
+        },
+        "event": "transition",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742645600728,
+        "window": "webview-web-arrange191"
+      },
+      "final_frame": {
+        "data": {
+          "actual_after": {
+            "x": 1448.0,
+            "y": 732.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 2896,
+                "y": 1464
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 840,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 1448.0,
+              "y": 732.0
+            },
+            "generation": "Instant { tv_sec: 1580319, tv_nsec: 932585000 }"
+          },
+          "next": {
+            "x": 1448.0,
+            "y": 732.0
+          },
+          "size_after": {
+            "height": 840,
+            "width": 600
+          },
+          "t": 1.0
+        },
+        "event": "frame",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742646026938,
+        "window": "webview-web-arrange191"
+      }
+    },
+    {
+      "batch": "Up after stash restore",
+      "transition": {
+        "data": {
+          "destination": {
+            "x": 390,
+            "y": 198
+          },
+          "generation": "Instant { tv_sec: 1579729, tv_nsec: 602434916 }",
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "start": {
+            "x": 1748.0,
+            "y": 837.0
+          }
+        },
+        "event": "transition",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742055266154,
+        "window": "terminal-1910001"
+      },
+      "final_frame": {
+        "data": {
+          "actual_after": {
+            "x": 195.0,
+            "y": 99.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 390,
+                "y": 198
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 840,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 195.12113822306446,
+              "y": 99.05756600683935
+            },
+            "generation": "Instant { tv_sec: 1579729, tv_nsec: 602434916 }"
+          },
+          "next": {
+            "x": 195.0,
+            "y": 99.0
+          },
+          "size_after": {
+            "height": 840,
+            "width": 600
+          },
+          "t": 1.0
+        },
+        "event": "frame",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742055692250,
+        "window": "terminal-1910001"
+      }
+    },
+    {
+      "batch": "Up after stash restore",
+      "transition": {
+        "data": {
+          "destination": {
+            "x": 1746,
+            "y": 550
+          },
+          "generation": "Instant { tv_sec: 1579729, tv_nsec: 602848916 }",
+          "size": {
+            "height": 136,
+            "width": 600
+          },
+          "start": {
+            "x": 1748.0,
+            "y": 769.0
+          }
+        },
+        "event": "transition",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742055266563,
+        "window": "note-arrange191-text"
+      },
+      "final_frame": {
+        "data": {
+          "actual_after": {
+            "x": 873.0,
+            "y": 275.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 1746,
+                "y": 550
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 136,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 873.000006067658,
+              "y": 275.0000034256263
+            },
+            "generation": "Instant { tv_sec: 1579729, tv_nsec: 602848916 }"
+          },
+          "next": {
+            "x": 873.0,
+            "y": 275.0
+          },
+          "size_after": {
+            "height": 136,
+            "width": 600
+          },
+          "t": 1.0
+        },
+        "event": "frame",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742055702844,
+        "window": "note-arrange191-text"
+      }
+    },
+    {
+      "batch": "Up after stash restore",
+      "transition": {
+        "data": {
+          "destination": {
+            "x": 3102,
+            "y": 408
+          },
+          "generation": "Instant { tv_sec: 1579729, tv_nsec: 603077833 }",
+          "size": {
+            "height": 422,
+            "width": 600
+          },
+          "start": {
+            "x": 1748.0,
+            "y": 558.0
+          }
+        },
+        "event": "transition",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742055266793,
+        "window": "note-arrange191-image"
+      },
+      "final_frame": {
+        "data": {
+          "actual_after": {
+            "x": 1551.0,
+            "y": 204.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 3102,
+                "y": 408
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 422,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 1551.000006442092,
+              "y": 204.0000115761447
+            },
+            "generation": "Instant { tv_sec: 1579729, tv_nsec: 603077833 }"
+          },
+          "next": {
+            "x": 1551.0,
+            "y": 204.0
+          },
+          "size_after": {
+            "height": 422,
+            "width": 600
+          },
+          "t": 1.0
+        },
+        "event": "frame",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742055702377,
+        "window": "note-arrange191-image"
+      }
+    },
+    {
+      "batch": "Up after stash restore",
+      "transition": {
+        "data": {
+          "destination": {
+            "x": 3102,
+            "y": 1312
+          },
+          "generation": "Instant { tv_sec: 1579729, tv_nsec: 603724208 }",
+          "size": {
+            "height": 840,
+            "width": 600
+          },
+          "start": {
+            "x": 1448.0,
+            "y": 732.0
+          }
+        },
+        "event": "transition",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742055267438,
+        "window": "webview-web-arrange191"
+      },
+      "final_frame": {
+        "data": {
+          "actual_after": {
+            "x": 1551.0,
+            "y": 656.0
+          },
+          "flight": {
+            "destination": {
+              "position": {
+                "x": 3102,
+                "y": 1312
+              },
+              "scale": 2.0,
+              "size": {
+                "height": 840,
+                "width": 600
+              }
+            },
+            "expected": {
+              "x": 1550.9999952659857,
+              "y": 656.000003493059
+            },
+            "generation": "Instant { tv_sec: 1579729, tv_nsec: 603724208 }"
+          },
+          "next": {
+            "x": 1551.0,
+            "y": 656.0
+          },
+          "size_after": {
+            "height": 840,
+            "width": 600
+          },
+          "t": 1.0
+        },
+        "event": "frame",
+        "instance": "dev-ef9fadde855c7e2c93cbc288",
+        "pid": 71822,
+        "time_us": 1794742055703156,
+        "window": "webview-web-arrange191"
+      }
+    }
+  ],
+  "image_undo": {
+    "before_physical_position": {
+      "x": 2830,
+      "y": 950
+    },
+    "right_destination": {
+      "position": {
+        "x": 3496,
+        "y": 1116
+      },
+      "scale": 2.0,
+      "size": {
+        "height": 422,
+        "width": 600
+      }
+    },
+    "after": {
+      "position": {
+        "x": 2830,
+        "y": 950
+      },
+      "size": {
+        "height": 422,
+        "width": 600
+      },
+      "auto_layout_excluded": true,
+      "visible": true,
+      "animating": false,
+      "layout_pending": false
+    },
+    "restored": true
+  },
+  "limitations": [
+    "Historical capture omission conditions not reproduced",
+    "Individual pre-hidden memo exclusion not exercised",
+    "Remote child bounds not directly inspected",
+    "Undo expiry timing not directly measured",
+    "Windows/Intel/mixed-DPI native not run"
+  ]
+}
