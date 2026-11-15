@@ -14,6 +14,7 @@ try {
  await page.addInitScript(()=>{
   let folded=false, pinned=true;
   window.__TAURI__={core:{invoke:async(name,args)=>{
+   if(name==='web_recent') return [];
    if(name==='chrome_fold') return folded=!folded;
    if(name==='web_chrome') {if(args.action==='pin') pinned=!pinned;return {url:null,welcome:true,always_on_top:pinned};}
    if(name==='web_run') return {};
