@@ -1,0 +1,90 @@
+{
+  "info": {
+    "root": "/Users/egoinglee/.codex/worktrees/67c9/agent-gibbon",
+    "id": "dev-f3d1fc901f372efdf5d35b62",
+    "name": "codex/relation-overlay-prototype",
+    "target": "/Users/egoinglee/.codex/worktrees/67c9/agent-gibbon/src-tauri/target",
+    "binary": "/Users/egoinglee/.codex/worktrees/67c9/agent-gibbon/src-tauri/target/debug/agent-gibbon"
+  },
+  "pid": 70081,
+  "overlay_webkit_pids": [
+    70985
+  ],
+  "memo_ids": [
+    "curve-perf-bed7273c-a",
+    "curve-perf-9fca2530-b"
+  ],
+  "titles": [
+    "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — curve-perf-bed7273c-a",
+    "Agent Gibbon [DEV codex/relation-overlay-prototype · f3d1fc90] — curve-perf-9fca2530-b"
+  ],
+  "scope": "Rust app + newly created overlay WebContent; excludes memo WebContents, GPU and WindowServer",
+  "results": [
+    {
+      "sample": 1,
+      "case": "idle",
+      "wall_seconds": 5.0050515830516815,
+      "cpu_seconds_by_pid": {
+        "70081": 0.012155712999999999,
+        "70985": 8.355000000000038e-06
+      },
+      "cpu_percent_one_core": 0.24303581687730216,
+      "movement_requests": null
+    },
+    {
+      "sample": 1,
+      "case": "moving",
+      "wall_seconds": 5.2558311249595135,
+      "cpu_seconds_by_pid": {
+        "70081": 0.022236486000000014,
+        "70985": 0.006504332999999999
+      },
+      "cpu_percent_one_core": 0.5468368050014433,
+      "movement_requests": 300
+    },
+    {
+      "sample": 2,
+      "case": "idle",
+      "wall_seconds": 5.005047915969044,
+      "cpu_seconds_by_pid": {
+        "70081": 0.012103210999999975,
+        "70985": 0.0001821630000000008
+      },
+      "cpu_percent_one_core": 0.24545966804438402,
+      "movement_requests": null
+    },
+    {
+      "sample": 2,
+      "case": "moving",
+      "wall_seconds": 5.035497250035405,
+      "cpu_seconds_by_pid": {
+        "70081": 0.023116315000000026,
+        "70985": 0.006475837999999999
+      },
+      "cpu_percent_one_core": 0.5876709196850809,
+      "movement_requests": 300
+    },
+    {
+      "sample": 3,
+      "case": "idle",
+      "wall_seconds": 5.005094541003928,
+      "cpu_seconds_by_pid": {
+        "70081": 0.011400353999999974,
+        "70985": 0.0001676170000000001
+      },
+      "cpu_percent_one_core": 0.23112392593646505,
+      "movement_requests": null
+    },
+    {
+      "sample": 3,
+      "case": "moving",
+      "wall_seconds": 5.040223542135209,
+      "cpu_seconds_by_pid": {
+        "70081": 0.02206398100000001,
+        "70985": 0.006342393
+      },
+      "cpu_percent_one_core": 0.5635935343448301,
+      "movement_requests": 300
+    }
+  ]
+}

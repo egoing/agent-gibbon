@@ -1,0 +1,5 @@
+{
+  "src-tauri/src/stash.rs": "d591637bb9efe9d5559702a1b86793ef8e995ff316bc71156d3a91d585da71a0",
+  "src-tauri/src/entrance.rs": "50496f1b60334626e98d27e529eb100aa523d5c334df1c079d0f3c33cfb4c576",
+  "src-tauri/src/relation_prototype.rs": "50259d423867a3bfc99a9114dd9e28c8b3f170ba89526f168ac68ee82fde4fee"
+}

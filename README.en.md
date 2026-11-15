@@ -36,6 +36,12 @@ Give your agent the [CLI skill](.agents/skills/agent-gibbon/SKILL.md), or ask it
 - Published v0.2.7 assets cover macOS. Source now supports Windows x64 packaging; future version tags build macOS ARM64/Intel DMGs and a Windows installer together. Linux packaging is not provided.
 - See the [automated release guide](docs/releases.md) for version bumps, tag-triggered releases, and build-only manual runs.
 
+## Memo connections
+
+Use the plug button in a text, capture/image, terminal, or web memo, move onto another memo, and click. Enter an optional label and choose arrows toward the clicked memo, at both ends, or none. Escape or Cancel exits without saving. No feature activation environment variable is required.
+
+Connections are stored locally. Lines appear while any memo has focus and hide during related movement or hiding. Reconnecting the same pair updates its settings. Clicking existing lines to edit and displaying on drag release are tracked as follow-up work. See the [design system](docs/design-system.md) for implementation and verification limits.
+
 ## Build from source
 
 Requires macOS, Rust 1.91+ stable, Node.js 22.13+/pnpm 11.25.0, Xcode Command Line Tools, and the macOS SDK.

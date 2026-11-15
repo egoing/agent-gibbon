@@ -1,0 +1,5 @@
+{
+  "src-tauri/src/relation_prototype.rs": "50259d423867a3bfc99a9114dd9e28c8b3f170ba89526f168ac68ee82fde4fee",
+  "ui/relation-prototype.js": "3691e2f9fdd3581f2eb3812082910641ae2cc52413cdaf1baccd5483df65367d",
+  "scripts/relation-endpoint-pixels.py": "d226b66a401f161e9cbe563ceedc09289e3089a857a71f4e89e6e7b1b1c7e217"
+}

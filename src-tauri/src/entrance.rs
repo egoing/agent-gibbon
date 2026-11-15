@@ -321,6 +321,7 @@ pub fn cancel(window: &WebviewWindow) -> Result<(), String> {
 }
 #[tauri::command]
 pub fn drag_note(window: WebviewWindow) -> Result<(), String> {
+    crate::relation_prototype::changed(window.app_handle(), window.label());
     if crate::stash::owns(&window) {
         return Ok(());
     }

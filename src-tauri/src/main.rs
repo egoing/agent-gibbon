@@ -20,6 +20,8 @@ mod opacity;
 mod placement;
 mod presentation;
 mod privacy;
+mod relation_editor;
+mod relation_prototype;
 mod session_restore;
 mod sizing;
 mod skills;
@@ -320,6 +322,7 @@ fn save_note(
 }
 #[tauri::command]
 fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
+    relation_prototype::changed(window.app_handle(), window.label());
     stash::release(&window)?;
     layout::mark(&window, false);
     sizing::cancel(&window);
@@ -490,6 +493,7 @@ fn apply_with_presentation(
             sizing::prepare(&win, presentation)?;
         }
         Action::Close => {
+            relation_prototype::changed(app, win.label());
             stash::release(&win)?;
             sizing::cancel(&win);
             feedback::clear(&win);
@@ -573,6 +577,14 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     local_trace::local_flow_begin,
                     local_trace::local_flow_stage,
                     snapshot,
+                    relation_prototype::relation_ready,
+                    relation_editor::relation_status,
+                    relation_editor::relation_begin,
+                    relation_editor::relation_picker_info,
+                    relation_editor::relation_pick,
+                    relation_editor::relation_editor_state,
+                    relation_editor::relation_save,
+                    relation_editor::relation_cancel,
                     web::web_run,
                     web::web_recent,
                     web::web_chrome,
@@ -661,7 +673,24 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         })
         .on_window_event(|win, event| {
             monitor_layout::native_event(win, event);
+            if win.label() == "relation-settings" {
+                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                    api.prevent_close();
+                    relation_editor::cancel(win.app_handle(), true);
+                    return;
+                }
+            }
+            if matches!(
+                event,
+                tauri::WindowEvent::Moved(_)
+                    | tauri::WindowEvent::Resized(_)
+                    | tauri::WindowEvent::ScaleFactorChanged { .. }
+                    | tauri::WindowEvent::Destroyed
+            ) {
+                relation_prototype::changed(win.app_handle(), win.label());
+            }
             if matches!(event, tauri::WindowEvent::Focused(_)) {
+                relation_prototype::focus_changed();
                 if let Some(window) = win.app_handle().get_webview_window(win.label()) {
                     feedback_window::sync_frame_focus(&window);
                 }
@@ -675,6 +704,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             if win.label().starts_with("webview-") || win.label().starts_with("webpage-") {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                     api.prevent_close();
+                    relation_prototype::changed(win.app_handle(), win.label());
                     let _ = win.hide();
                 }
                 return;
@@ -818,6 +848,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             };
             session_restore::start(app.handle(), session_enabled);
             updater::initialize(app.handle());
+            relation_prototype::install(app.handle());
             tray::install(app.handle())?;
             capture::install(app.handle())?;
             stash::install(app.handle())?;
