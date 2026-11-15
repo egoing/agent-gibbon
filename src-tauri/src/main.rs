@@ -553,6 +553,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(layout::Exclusions::default())
         .manage(layout::OpenOrder::default())
         .manage(sizing::Sizes::default())
+        .manage(layout::Undo::default())
         .manage(stash::Stash::default())
         .manage(Mutex::new(BTreeMap::from([(
             "main".to_string(),
@@ -561,6 +562,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .invoke_handler({
             let handler: Box<dyn Fn(tauri::ipc::Invoke) -> bool + Send + Sync> =
                 Box::new(tauri::generate_handler![
+                    layout::undo_arrangement,
                     capture::permission_guide,
                     updater::updater_status,
                     updater::updater_check,
