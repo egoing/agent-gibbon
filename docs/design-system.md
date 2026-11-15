@@ -1,3 +1,9 @@
+## 웹 메모 외부 탐색과 모바일 표시 — #177 · 2026-11-14
+
+- OS 제목줄 없는 기존 native 창을 유지한다. 웹 전용 앱 툴바는 viewport 상단에 고정해 Welcome 주소 입력 focus 후 본문 숨김·외부 탐색에도 30px 전용 행을 유지한다. 버튼·핀·접힘·닫기 계약은 공통 기준을 따른다.
+- 외부 WebView의 첫 요청부터 모바일 Safari UA를 사용한다. 실제 창 콘텐츠 너비가 viewport이며 사이트가 작성한 viewport meta는 보존하고 없는 경우에만 `width=device-width, initial-scale=1` 힌트를 추가한다. UA 변경은 터치·모바일 OS·기기 에뮬레이션이 아니며 서버의 모바일 판정은 사이트별로 달라 보장하지 않는다. WK `preferredContentMode`는 공식 헤더상 iOS 전용이므로 macOS 비공개 설정을 사용하지 않는다.
+- 스크롤은 고정 표시 스타일로 WebKit의 thumb 폭/높이 3px·라운드 2px·투명 track을 요청한다. 앱 IPC·외부 eval 권한·host bridge를 추가하지 않는다. 텍스트 메모의 완전한 overlay·자동 숨김·12px 확장 hit 영역을 외부 사이트에 보장하지 않으며 native/WebView 레이아웃에서 3px 공간이 남을 수 있다. macOS는 해당 외부 WebView의 공개 NSScrollView 하위에만 native Overlay를 요청한다(실제 수용은 검증 기록에서 별도 판정). 사이트 CSS·CSP·shadow DOM·프레임과 페이지 자체 커스텀 스크롤은 통일 대상 보장 밖이다. 적용 불가 시 페이지/OS native 스크롤을 유지하며 forced-colors는 native 크기로 복귀한다.
+- [웹 시안 SVG](design/web-welcome.svg) · [PNG](design/web-welcome.png). 설명 시안과 실제 native 검증은 구분하며 [검증 기록](verification/issue177-web-mobile-chrome.md)에 실행 결과와 미검증을 기록한다.
 ## 자동저장 — #174 후속 · 2026-11-14
 
 - **사용자 확정:** 텍스트 메모를 자동저장한다. 기존 명시 저장만 사용하던 아래 #174의 저장 정책을 이 절로 대체한다. 현재 구현값은 마지막 변경 후 **600ms** 대기이며 새로운 입력은 대기를 다시 시작한다. 읽기/선택만으로는 저장하지 않고, 한글 조합 중에는 대기한 뒤 확정 후 저장한다.
@@ -1065,3 +1071,5 @@ macOS에서는 앱 재시작 시 직전 전경 프로세스가 [자동 재실행
 Windows·Linux에서 복원 실행을 요청하면 ‘터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.’를 기존 상태 영역에 표시한다. 복원 버튼과 자동 재실행 요청 모두 프론트엔드와 백엔드에서 차단한다. 취소는 Welcome으로 이동한다. Windows 후속 범위는 [#185](https://github.com/egoing/agent-gibbon/issues/185)에 기록했다.
 
 [macOS 명령 조사](research/macos-auto-restore-commands.md)에 따라 기본 명령 `nettop`과 설치 도구 `htop`·`btop`을 자동 재실행 목록에 포함한다. 목록은 프로그램 이름과 설치 출처로 관리한다. `system`은 OS 시스템 디렉터리, `homebrew`는 Apple Silicon·Intel 설치 디렉터리에서 확인하며 실제 실행은 확인된 절대 경로를 사용한다.
+
+2026-11-15 최신 main 통합 뒤 macOS에서 자동 재실행·복원 추천·편집 실행·취소를 다시 검증했다. 종료된 셸의 자동 재실행 표시를 해제하고 bash 프롬프트 내부 명령이 마지막 사용자 명령을 덮어쓰지 않도록 보강했다. 기존 화면 배치를 유지했다. 최종 Rust 227개·UI 184개 및 실제 검증 범위는 [기록](verification/terminal-monitor-restore.md#2026-11-15-close-최종-통합)에 명시한다.

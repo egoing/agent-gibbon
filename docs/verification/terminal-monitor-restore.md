@@ -36,3 +36,15 @@ date 실행 계획에 ` ; touch /tmp/bb80-current-edited-proof`를 실제 키 �
 `pnpm test`에서 Rust 225개와 UI 184개가 통과했다. Windows·Linux에 대해 백엔드 복원 실행 정책을 검사했고 UI에서는 미지원 안내·자동 실행 차단·편집 후 복원 차단·취소 후 Welcome을 검증했다. `pnpm check`와 `pnpm dev:build`도 통과했다. Windows·Linux의 네이티브 빌드와 실기기 실행은 수행하지 않았다. Windows 후속 작업은 [#185](https://github.com/egoing/agent-gibbon/issues/185)에 기록했다.
 
 Conf 5는 위 macOS 실제 재시작 흐름에 해당한다. Windows·Linux 차단의 확신도는 정책·UI 테스트 기준 Conf 3이다. Risk Medium으로, 창별 저장 상태와 프로세스 시작 동작에 영향을 준다.
+
+## 2026-11-15 close 최종 통합
+
+origin/main `ea0531a`의 웹 메모·시작 패닉 방지 변경을 통합했다. 독립 코드 감사에서 셸 종료 뒤 자동 복원 플래그가 남는 경우와 bash의 PROMPT_COMMAND가 마지막 사용자 명령을 덮어쓰는 경우를 발견해 보강했다. 셸이 종료되면 자동 복원 상태를 해제하며, 아직 세션이 없는 복원 대기 창의 기록은 유지한다.
+
+bash에는 프롬프트 전후 상태를 구분하는 훅을 추가했다. macOS 기본 bash 3.2의 문자열 PROMPT_COMMAND와 최신 bash의 배열 형식을 구분한다. 초기 보강 과정에서 긴 초기화 입력이 PTY 버퍼를 막는 실패가 있었으며, 초기화 정의를 자식 셸 환경으로 전달한 뒤 짧은 eval과 환경 변수 제거를 수행하도록 고쳤다. 실제 bash에서 date·빈 입력·pwd를 실행하는 회귀 테스트가 통과했다.
+
+최종 `pnpm test`는 Rust 227개·UI 184개 통과, `pnpm check`·`pnpm dev:build`·Rustfmt·origin/main 대비 diff 검사도 통과했다. 로그는 `/tmp/bb80-close-tests.log`, `/tmp/bb80-close-clippy.log`, `/tmp/bb80-close-build.log`에 있다.
+
+동일 작업 루트·인스턴스의 실제 바이너리와 PID를 대조하고 V28UE-M의 여섯 테스트 창을 재검증했다. 최초 PID 17481, 첫 재시작 PID 20603에서 htop·btop·nettop 자동 실행과 인자 있는 htop·top·date의 추천 대기, 편집 입력의 임시 파일 생성, 취소 후 Welcome을 확인했다. 이어 테스트 htop 셸만 종료하고 inspect의 running·auto_restore가 모두 false임을 확인했으며, 다시 시작한 PID 22145에서도 해당 창이 자동 실행되지 않았다. 검증용 자식 프로세스만 종료했고 기존 설치 앱·다른 워크트리는 조작하지 않았다. 실제 실행 로그는 `/tmp/bb80-close-live.log`에 있다.
+
+Windows·Linux 네이티브 실행, Intel Mac, PowerShell 7, 에이전트 대화 재개는 이번 최종 검증 범위에 포함하지 않았다. OS별 복원 실행 차단의 정책·UI 테스트는 통과했다.

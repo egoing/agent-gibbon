@@ -594,6 +594,17 @@ fn start_shell(
     cmd.env("TERM", "xterm-256color");
     cmd.env_remove("NO_COLOR");
     #[cfg(unix)]
+    let setup = match shell.file_name().and_then(|name| name.to_str()) {
+        Some("zsh") => Some("autoload -Uz add-zsh-hook; add-zsh-hook preexec _gibbon_record"),
+        Some("bash") => Some(include_str!("restore-bash-hook.sh")),
+        _ => None,
+    };
+    #[cfg(unix)]
+    if let Some(hook) = setup {
+        let definitions = include_str!("restore-hook.sh").replace("GIBBON_TOKEN", &prompt.token);
+        cmd.env("AGENT_GIBBON_SHELL_SETUP", format!("{definitions}\n{hook}"));
+    }
+    #[cfg(unix)]
     {
         cmd.arg("-i");
         // A shell which replaces PS1 remains unknown and asks before closing.
@@ -630,18 +641,12 @@ fn start_shell(
     let reader = session.master.try_clone_reader().map_err(err)?;
     session.writer = session.master.take_writer().map_err(err)?;
     #[cfg(unix)]
-    if let Some(hook) = match shell.file_name().and_then(|name| name.to_str()) {
-        Some("zsh") => Some("autoload -Uz add-zsh-hook; add-zsh-hook preexec _gibbon_record"),
-        Some("bash") => Some(
-            "if [[ -z $(trap -p DEBUG) ]]; then trap '_gibbon_record \"$BASH_COMMAND\"' DEBUG; fi",
-        ),
-        _ => None,
-    } {
-        let setup = include_str!("restore-hook.sh").replace("GIBBON_TOKEN", &session.prompt.token);
-        // One compound command keeps multiline setup out of interactive continuation prompts.
-        let setup = setup.lines().map(str::trim).collect::<Vec<_>>().join(" ");
-        let setup = format!(" eval {}; {hook}\r", quote(&setup));
-        session.writer.write_all(setup.as_bytes()).map_err(err)?;
+    if setup.is_some() {
+        // Keep the initial PTY input short, so startup can finish before output draining begins.
+        session
+            .writer
+            .write_all(b" eval \"$AGENT_GIBBON_SHELL_SETUP\"; unset AGENT_GIBBON_SHELL_SETUP\r")
+            .map_err(err)?;
     }
     #[cfg(unix)]
     if let Some(line) = line {
@@ -1194,6 +1199,64 @@ mod lifecycle_tests {
             assert!(dir.path().join("restored").exists(), "{shell}");
         }
     }
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn bash_prompt_commands_and_blank_lines_do_not_replace_the_user_command() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let rc = dir.path().join("rc");
+        std::fs::write(&rc, "PROMPT_COMMAND='printf prompt'\n").unwrap();
+        let bash = dir.path().join("bash");
+        std::fs::write(
+            &bash,
+            format!(
+                "#!/bin/sh\nexec /bin/bash --noprofile --rcfile {} -i\n",
+                quote(&rc.to_string_lossy())
+            ),
+        )
+        .unwrap();
+        std::fs::set_permissions(&bash, std::fs::Permissions::from_mode(0o700)).unwrap();
+        let (mut session, mut reader) = start_shell(
+            dir.path(),
+            Some("date".into()),
+            size(80, 24).unwrap(),
+            &bash,
+        )
+        .unwrap();
+        let token = session.prompt.token.clone();
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let mut parser = DirectoryReport::default();
+            let mut bytes = [0u8; 4096];
+            while let Ok(n) = reader.read(&mut bytes) {
+                if n == 0 {
+                    break;
+                }
+                parser.feed(&bytes[..n]);
+                if let Some(plan) = parser.take_plan(&token) {
+                    if tx.send(plan).is_err() {
+                        break;
+                    }
+                }
+            }
+        });
+        assert_eq!(
+            rx.recv_timeout(std::time::Duration::from_secs(5)).unwrap(),
+            "date"
+        );
+        session.writer.write_all(b"\r").unwrap();
+        session.writer.flush().unwrap();
+        assert!(rx
+            .recv_timeout(std::time::Duration::from_millis(300))
+            .is_err());
+        session.writer.write_all(b"pwd\r").unwrap();
+        session.writer.flush().unwrap();
+        assert_eq!(
+            rx.recv_timeout(std::time::Duration::from_secs(5)).unwrap(),
+            "pwd"
+        );
+    }
+
     #[cfg(unix)]
     #[test]
     fn real_shell_prompt_builtin_busy_and_child_cleanup() {
