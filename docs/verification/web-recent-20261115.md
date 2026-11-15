@@ -10,7 +10,7 @@
 
 ## 출처와 검사
 
-- 작업 루트 `/Users/egoinglee/.codex/worktrees/web-mobile-chrome/agent-gibbon`, `codex/web-welcome-copy`, HEAD 기준 `ea0531a`, 제품 변경 미커밋.
+- 작업 루트 `/Users/egoinglee/.codex/worktrees/web-mobile-chrome/agent-gibbon`, `codex/web-welcome-copy`, 최초 작업 기준 `ea0531a`. 아래 close 기록에 통합·커밋 상태를 별도로 남긴다.
 - Rust226·UI180 통과. 최근주소 신규 Rust2개에서 파일 재조회·중복·최신순·10개 제한·삭제·루트 격리·거부 URL 정제·손상파일 보존을 확인했다.
 - Clippy all-targets -D warnings 및 개발 빌드 통과. native 앱을 열거나 종료하지 않았다.
 - `scripts/web-recent-smoke.mjs`: 실제 frontend 자산+mock native IPC로 240×160,320×240,600×400의 접근성이름/라벨제거/목록·Enter즉시이동·연결오류 입력보존·삭제실패 보존·삭제포커스·페이지reload후 목록유지·빈목록 숨김·가로overflow 없음을 확인했다. 실제 filesystem 재시작 보존 근거는 Rust 파일 재조회 검사이며 mock reload와 구분한다.
@@ -25,3 +25,12 @@
 Orca/제거 스킬·native GUI를 사용하지 않았고 기존 사용자 앱·창·포커스를 조작하거나 종료하지 않았다. native Welcome 연결·실제 앱 재시작·외부페이지 신규 명령거부의 실환경 재검증과 Windows/Intel·전체 플랫폼 CI/배포는 미실행이다. 기존177의 미완료 검증도 이번 작업으로 완료 처리하지 않는다.
 
 Conf4(브라우저 상호작용·Rust 저장 통합 검사), RiskLow(로컬 최근주소 목록, 삭제로 열린세션에 영향 없음). 최종 커밋·push·PR·병합은 새 승인 대기다.
+
+
+## close 승인 후 최신 main 통합
+
+사용자가 `$close`를 호출해 문구 축소와 최근 주소 기능의 커밋·push·PR병합·main동기화를 승인했다. 제품1ae87c3을 커밋하고 main6d1bf73을2c5803b에 통합했으며, 15번 PR179 병합 후 main f9f701e를 ab6ea09에 통합했다. 앞서 미커밋 문서 때문에 중단됐던 main통합은 변경을 커밋한 뒤 정상 완료했고 자동stash/reset은 사용하지 않았다.
+
+통합 코드 ab6ea09 및 최종 toolbar mock 수정에서 Rust231/UI184·Clippy all-targets -D warnings·개발 빌드·rustfmt/diff-check를 통과했다. 실제 자산 Chromium 최근주소3화면·toolbar15조합도 재검증했다. 최신 main의 terminal-scrollbar 모듈이 기존 toolbar CSS 비교 mock의 빈 terminal runtime에 onScroll을 호출하는 실패가 있어, terminal CSS만 비교하는 해당 테스트에서 그 모듈을 no-op 대역으로 명시한 뒤 재실행했다. 실제 terminal runtime을 검증한 것으로 보고하지 않는다. 최근주소 제품코드는 통합 과정에서 바뀌지 않았다.
+
+최신 검사 브라우저 캡처를 이 기록의600/240 PNG에 반영했다. 실제 앱/native GUI·Windows/Intel 및 전체 플랫폼 CI/배포는 미실행이며 기존 사용자 앱을 열거나 종료하지 않았다. 파일 영속성은 Rust 실파일 재조회/삭제 검사, UI interaction/reload는 mock IPC 브라우저로 구분한다. 이 범위의186 완료기준을 충족하며 기존177 native 미검증은 종료하지 않는다. PR187에 변경과 근거를 모으고 일반 병합 및 main3종SHA 확인 결과는186 마무리 댓글에 남긴다.

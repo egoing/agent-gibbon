@@ -22,6 +22,8 @@ try {
  });
  await page.route('http://gibbon.test/**', route=>{
   const file=path.join(root,'ui',new URL(route.request().url()).pathname);
+  // This test compares terminal CSS only; no terminal runtime is started.
+  if(file.endsWith('/terminal-scrollbar.mjs')) return route.fulfill({body:'export function installTerminalScrollbar() {}',contentType:'text/javascript'});
   if(/(terminal|terminal-ime)\.js$/.test(file)||file.includes('/vendor/')) return route.fulfill({body:'',contentType:'text/javascript'});
   return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.css')?'text/css':/\.m?js$/.test(file)?'text/javascript':'text/html'});
  });

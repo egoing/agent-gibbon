@@ -9,3 +9,6 @@
 - [실제 자산의 Chromium 캡처](web-welcome-copy-20261115.png)와 시안은 구분한다. 캡처는 mock IPC 환경이며 native/외부 웹 탐색 증거가 아니다. 추가 작은화면 캡처: `/tmp/gibbon-welcome-copy-20261115/clean-240.png`.
 - native 앱/GUI·Orca는 사용하거나 종료하지 않았다. Rust 변경·native 빌드·실환경 GUI 재검증은 수행하지 않았다. 기존177의 남은 native 검증은 이번 문구 변경으로 해결했다고 표시하지 않는다.
 - 이번 문구 변경 Conf4(실제 프론트 자산 브라우저 검증), RiskLow. 최종 제품 커밋·push·새PR은 새 승인 전 대기한다.
+
+
+사용자 close 후 문구 축소는 최근주소186과 함께 제품1ae87c3 및 main통합ab6ea09에 포함했다. 최신통합 Rust231/UI184·Clippy/build·Chromium 최근목록3화면/툴바15조합을 재검증했다. 최종 PR187/이슈186에서 병합 결과를 추적하며 앞선 승인대기/미커밋 표기는 당시 상태다.
