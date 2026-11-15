@@ -233,11 +233,17 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     menu.append(&PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?)
         .map_err(|e| e.to_string())?;
     #[cfg(target_os = "macos")]
-    menu.append(
-        &MenuItem::with_id(app, "permission-guide", "권한 설정", true, None::<&str>)
-            .map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
+    {
+        let (screen, access) = crate::capture::permission_status();
+        if permission_item_visible(
+            &app.state::<crate::storage::Store>().0,
+            screen && access,
+            false,
+        )? {
+            menu.append(&permission_item(app)?)
+                .map_err(|e| e.to_string())?;
+        }
+    }
     menu.append(
         &MenuItem::with_id(app, "quit-app", "Agent Gibbon 종료", true, None::<&str>)
             .map_err(|e| e.to_string())?,
@@ -245,6 +251,72 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     .map_err(|e| e.to_string())?;
     template_icons(app, &menu)?;
     Ok(menu)
+}
+
+#[cfg(any(test, target_os = "macos"))]
+fn permission_item_visible(
+    root: &std::path::Path,
+    complete: bool,
+    blocked: bool,
+) -> Result<bool, String> {
+    // An empty marker records completed setup per instance, independently of live grants.
+    let marker = root.join("permission-setup-complete");
+    if blocked {
+        match std::fs::remove_file(&marker) {
+            Ok(()) => (),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
+            Err(e) => return Err(e.to_string()),
+        }
+        return Ok(true);
+    }
+    if marker.try_exists().map_err(|e| e.to_string())? {
+        return Ok(false);
+    }
+    if complete {
+        std::fs::create_dir_all(root).map_err(|e| e.to_string())?;
+        std::fs::File::create(&marker).map_err(|e| e.to_string())?;
+    }
+    Ok(!complete)
+}
+
+#[cfg(target_os = "macos")]
+fn permission_item(app: &tauri::AppHandle) -> Result<MenuItem<tauri::Wry>, String> {
+    MenuItem::with_id(app, "permission-guide", "권한 설정", true, None::<&str>)
+        .map_err(|e| e.to_string())
+}
+
+#[cfg(target_os = "macos")]
+pub(crate) fn sync_permission_item(
+    app: &tauri::AppHandle,
+    complete: bool,
+    blocked: bool,
+) -> Result<(), String> {
+    let visible =
+        permission_item_visible(&app.state::<crate::storage::Store>().0, complete, blocked)?;
+    let Some(state) = app.try_state::<TrayMenu>() else {
+        return Ok(());
+    };
+    let Some(menu) = state.lock().map_err(|e| e.to_string())?.clone() else {
+        return Ok(());
+    };
+    let items = menu.items().map_err(|e| e.to_string())?;
+    match (
+        visible,
+        items
+            .iter()
+            .find(|item| item.id().as_ref() == "permission-guide"),
+    ) {
+        (false, Some(item)) => menu.remove(item).map_err(|e| e.to_string()),
+        (true, None) => {
+            let index = items
+                .iter()
+                .position(|item| item.id().as_ref() == "quit-app")
+                .ok_or("종료 메뉴를 찾지 못했습니다")?;
+            menu.insert(&permission_item(app)?, index)
+                .map_err(|e| e.to_string())
+        }
+        _ => Ok(()),
+    }
 }
 
 pub fn refresh(app: &tauri::AppHandle) -> Result<(), String> {
@@ -522,6 +594,18 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn completed_setup_survives_restart_until_blocked_capture() {
+        let dir = tempfile::tempdir().unwrap();
+        let visible =
+            |complete, blocked| permission_item_visible(dir.path(), complete, blocked).unwrap();
+        assert!(visible(false, false));
+        assert!(!visible(true, false));
+        assert!(!visible(false, false)); // Reopen or restart after a passive revocation.
+        assert!(visible(false, true)); // An actual capture was blocked.
+        assert!(visible(false, false));
+        assert!(!visible(true, false));
+    }
     #[test]
     fn native_menu_wait_allows_ui_snapshot_to_acquire_notes() {
         use std::{

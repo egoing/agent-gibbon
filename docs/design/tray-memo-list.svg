@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="680" height="590" viewBox="0 0 680 590">
-<rect width="680" height="590" fill="#f3f4f6" />
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="714" viewBox="0 0 680 714">
+<rect width="680" height="714" fill="#f3f4f6" />
 <g font-family="Arial,Apple SD Gothic Neo,sans-serif" fill="#27313c">
 <text x="24" y="32" font-size="19">Tray Menu · 최근 목록</text>
 <rect x="24" y="52" width="632" height="436" rx="7" fill="white" stroke="#ccc" />
@@ -38,4 +38,9 @@
 <text x="24" y="515">설명용 macOS 시안 · 본문 예시는 일부 생략 · 하위 메뉴 없음</text>
 <text x="24" y="537">실제 창 보임 100% / 숨김 45% · 숨김 항목도 선택 가능 · PTY 상태와 독립</text>
 <text x="24" y="559">최근 30개 · 마지막 갱신 시각 내림차순 · 더보기는 관리 창의 전체 목록</text>
+<text x="24" y="592">macOS · 종료 위 메뉴의 두 상태</text>
+<rect x="24" y="604" width="300" height="90" rx="6" fill="white" stroke="#ccc"/>
+<rect x="340" y="604" width="316" height="90" rx="6" fill="white" stroke="#ccc"/>
+<text x="40" y="625">첫 설정 전 또는 권한 부족으로 캡처 차단</text><text x="40" y="654" font-size="15">권한 설정</text><text x="40" y="680" font-size="15">Agent Gibbon 종료</text>
+<text x="356" y="625">설정 완료 후 · 권한 회수만으로는 숨김 유지</text><text x="356" y="654" font-size="15">Agent Gibbon 종료</text>
 </g></g></svg>
