@@ -1,0 +1,185 @@
+{
+  "stage": "after-user-resize",
+  "time": "2026-11-15T21:02:49.453680+09:00",
+  "processes": [
+    "53980 /Users/egoinglee/.codex/worktrees/4c75/agent-gibbon/src-tauri/target/debug/agent-gibbon"
+  ],
+  "instance": "dev-54e35761915b899a5349d485",
+  "monitor_layout": {
+    "crowded": false,
+    "error": null,
+    "pending": false,
+    "screens": [
+      {
+        "bounds": {
+          "height": 1117,
+          "width": 1728,
+          "x": -1728,
+          "y": 0
+        },
+        "name": "Monitor #41040",
+        "scale": 2.0,
+        "work": {
+          "height": 1085,
+          "width": 1728,
+          "x": -1728,
+          "y": 32
+        }
+      },
+      {
+        "bounds": {
+          "height": 1080,
+          "width": 1920,
+          "x": 0,
+          "y": -1080
+        },
+        "name": "Monitor #10240",
+        "scale": 2.0,
+        "work": {
+          "height": 1080,
+          "width": 1920,
+          "x": 0,
+          "y": -1080
+        }
+      },
+      {
+        "bounds": {
+          "height": 1152,
+          "width": 2048,
+          "x": 0,
+          "y": 0
+        },
+        "name": "Monitor #30544",
+        "scale": 2.0,
+        "work": {
+          "height": 1127,
+          "width": 2048,
+          "x": 0,
+          "y": 25
+        }
+      }
+    ],
+    "temporary_windows": [
+      "note-monitor20-c-manual"
+    ]
+  },
+  "notes": [
+    {
+      "id": "monitor20-a-keep",
+      "visible": true,
+      "position": {
+        "x": 200,
+        "y": 250
+      },
+      "size": {
+        "height": 360,
+        "width": 640
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": false
+    },
+    {
+      "id": "monitor20-b-return",
+      "visible": true,
+      "position": {
+        "x": 200,
+        "y": -1960
+      },
+      "size": {
+        "height": 420,
+        "width": 680
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": false
+    },
+    {
+      "id": "monitor20-c-manual",
+      "visible": true,
+      "position": {
+        "x": 3118,
+        "y": 200
+      },
+      "size": {
+        "height": 460,
+        "width": 720
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": false
+    },
+    {
+      "id": "monitor20-h-hidden",
+      "visible": false,
+      "position": {
+        "x": 1960,
+        "y": -920
+      },
+      "size": {
+        "height": 360,
+        "width": 640
+      },
+      "folded": false,
+      "always_on_top": true,
+      "focused": false
+    }
+  ],
+  "comparison": [
+    {
+      "id": "monitor20-a-keep",
+      "position_changed": false,
+      "size_changed": false
+    },
+    {
+      "id": "monitor20-b-return",
+      "position_changed": false,
+      "size_changed": false
+    },
+    {
+      "id": "monitor20-c-manual",
+      "position_changed": false,
+      "size_changed": false
+    },
+    {
+      "id": "monitor20-h-hidden",
+      "position_changed": false,
+      "size_changed": false
+    }
+  ],
+  "saved_c": {
+    "label": "note-monitor20-c-manual",
+    "x": 3118,
+    "y": 200,
+    "width": 720,
+    "height": 460,
+    "visible": true,
+    "minimized": false,
+    "always_on_top": true
+  },
+  "saved_c_home": {
+    "frame": {
+      "x": 1559,
+      "y": 100,
+      "width": 360,
+      "height": 230
+    },
+    "screen": {
+      "name": "Monitor #30544",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 2560,
+        "height": 1440
+      },
+      "work": {
+        "x": 0,
+        "y": 25,
+        "width": 2560,
+        "height": 1415
+      },
+      "scale": 2.0
+    },
+    "unfolded_height": null
+  }
+}

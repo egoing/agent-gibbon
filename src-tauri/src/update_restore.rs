@@ -224,10 +224,14 @@ pub(crate) fn apply(window: &WebviewWindow, saved: &WindowState) -> Result<(), S
     } else {
         window.hide().map_err(|e| e.to_string())?;
     }
-    if saved.minimized {
-        window.minimize().map_err(|e| e.to_string())?;
-    } else {
-        window.unminimize().map_err(|e| e.to_string())?;
+    // Deminiaturizing an already normal window can activate it on AppKit.
+    // Restore only a genuinely different native minimized state.
+    if window.is_minimized().map_err(|e| e.to_string())? != saved.minimized {
+        if saved.minimized {
+            window.minimize().map_err(|e| e.to_string())?;
+        } else {
+            window.unminimize().map_err(|e| e.to_string())?;
+        }
     }
     Ok(())
 }
