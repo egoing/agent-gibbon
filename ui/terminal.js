@@ -12,6 +12,28 @@ let homePath=null, selectedFolder=null, selectedChoice=null, availableChoices=[]
 let restoreSupported=true;
 let started=false, starting=false, input=Promise.resolve(), resizeTimer;
 function report(e){status.textContent=String(e);}
+// A successful terminal_start creates the PTY at the supplied cell size. Only
+// one subsequent resize may be in flight; xterm holds the latest desired grid.
+let appliedSize=null, resizing=false, retryTimer;
+async function syncPtySize(retry=true){
+  if(!started || resizing)return;
+  clearTimeout(retryTimer);
+  resizing=true;
+  try{
+    while(terminal.cols!==appliedSize.cols || terminal.rows!==appliedSize.rows){
+      const size={cols:terminal.cols,rows:terminal.rows};
+      try{
+        await invoke('terminal_resize',size);
+        appliedSize=size;
+      }catch(error){
+        report(error);
+        if(size.cols!==terminal.cols || size.rows!==terminal.rows)continue;
+        if(retry)retryTimer=setTimeout(()=>syncPtySize(false),120);
+        break;
+      }
+    }
+  }finally{resizing=false;}
+}
 function measure(){
   const host=document.getElementById('terminal');
   if(!host.clientWidth||!host.clientHeight)return;
@@ -25,9 +47,14 @@ function measure(){
   const forced=matchMedia('(forced-colors: active)').matches;
   if(forced)fit.fit();
   else if(cellWidth>0&&cellHeight>0)terminal.resize(Math.max(2,Math.floor(width/cellWidth)),Math.max(1,Math.floor(height/cellHeight)));
-  if(started)invoke('terminal_resize',{cols:terminal.cols,rows:terminal.rows}).catch(report);
+  void syncPtySize();
 }
-new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(measure,60);}).observe(document.getElementById('terminal'));
+function scheduleMeasure(){
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(measure,60);
+}
+new ResizeObserver(scheduleMeasure).observe(document.getElementById('terminal'));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleMeasure();});
 function sendInput(data){input=input.then(()=>invoke('terminal_write',{data})).catch(report);}
 terminal.onData(sendInput);
 window.installTerminalIme(terminal, sendInput);
@@ -79,7 +106,9 @@ async function start(choice, trigger, plan){
   try{
     if(selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
     await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('terminal.start', async flow => {
-      await flow.invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output,choice,...(plan === undefined ? {} : {plan})});
+      const size={cols:terminal.cols,rows:terminal.rows};
+      await flow.invoke('terminal_start',{...size,output,choice,...(plan === undefined ? {} : {plan})});
+      appliedSize=size;
       flow.stage('response');
       flow.frame?.();
     });
@@ -166,7 +195,7 @@ document.getElementById('pin').onclick=async()=>{
 };
 document.getElementById('font-size').onclick=()=>{
   const sizes=[13,14,16,18];terminal.options.fontSize=sizes[(sizes.indexOf(terminal.options.fontSize)+1)%sizes.length];
-  const button=document.getElementById('font-size');button.title=`글자 크기 ${terminal.options.fontSize}px · 클릭하여 변경`;button.setAttribute('aria-label',button.title);measure();
+  const button=document.getElementById('font-size');button.title=`글자 크기 ${terminal.options.fontSize}px · 클릭하여 변경`;button.setAttribute('aria-label',button.title);scheduleMeasure();
 };
 document.getElementById('copy').onclick=()=>{
   const text=terminal.getSelection();if(text)window.__TAURI__.clipboardManager.writeText(text).catch(report);

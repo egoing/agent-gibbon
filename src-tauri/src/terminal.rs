@@ -10,6 +10,8 @@ use std::{
 };
 use tauri::{ipc::Channel, Emitter, Manager, WebviewWindow};
 
+mod persistence;
+use persistence::EditSource;
 pub mod welcome;
 pub use welcome::{create as create_terminal, request_close};
 
@@ -151,7 +153,7 @@ enum Slot {
 }
 #[derive(Default)]
 pub struct Terminals {
-    records: Mutex<BTreeMap<String, Terminal>>,
+    records: persistence::Records,
     sessions: Mutex<BTreeMap<String, Slot>>,
 }
 struct Start<'a> {
@@ -204,17 +206,23 @@ fn root(app: &tauri::AppHandle) -> PathBuf {
 fn metadata(root: &Path) -> PathBuf {
     root.join(".agent-gibbon-terminals")
 }
-fn valid_id(id: &str) -> bool {
+pub(crate) fn valid_id(id: &str) -> bool {
     id.strip_prefix("terminal-")
         .is_some_and(|s| !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit()))
         && id.len() <= 64
 }
 fn save(root: &Path, agent: &Terminal) -> Result<(), String> {
-    std::fs::create_dir_all(metadata(root)).map_err(err)?;
-    let path = metadata(root).join(format!("{}.json", agent.id));
-    let tmp = path.with_extension("tmp");
-    std::fs::write(&tmp, serde_json::to_vec(agent).map_err(err)?).map_err(err)?;
-    std::fs::rename(tmp, path).map_err(err)
+    // Unique sibling temp + atomic replacement. Failure leaves the previous
+    // JSON in place; filenames and user-supplied metadata stay out of errors.
+    (|| -> std::io::Result<()> {
+        let dir = metadata(root);
+        std::fs::create_dir_all(&dir)?;
+        let mut temp = tempfile::NamedTempFile::new_in(&dir)?;
+        temp.write_all(&serde_json::to_vec(agent)?)?;
+        temp.persist(dir.join(format!("{}.json", agent.id)))?;
+        Ok(())
+    })()
+    .map_err(|_| "터미널 메타데이터를 저장할 수 없습니다".into())
 }
 // Read legacy dedicated-agent metadata only to recognize and ignore it. Never
 // rewrite/remove its metadata or project directory, and never load it as a PTY.
@@ -248,28 +256,13 @@ fn read_records(root: &Path) -> Result<Vec<Terminal>, String> {
 }
 pub fn restore(app: &tauri::AppHandle) -> Result<(), String> {
     let restored = read_records(&root(app))?;
-    let state = app.state::<Terminals>();
-    let mut records = state.records.lock().map_err(err)?;
-    for record in restored {
-        records.insert(record.id.clone(), record);
-    }
-    Ok(())
+    app.state::<Terminals>().records.restore(restored)
 }
 pub fn entries(app: &tauri::AppHandle) -> Vec<Terminal> {
-    app.state::<Terminals>()
-        .records
-        .lock()
-        .unwrap()
-        .values()
-        .cloned()
-        .collect()
+    app.state::<Terminals>().records.all()
 }
 pub fn contains(app: &tauri::AppHandle, id: &str) -> bool {
-    app.state::<Terminals>()
-        .records
-        .lock()
-        .unwrap()
-        .contains_key(id)
+    app.state::<Terminals>().records.contains(id)
 }
 pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     open_presented(app, id, true)
@@ -280,18 +273,15 @@ pub(crate) fn open_presented(
     present: bool,
 ) -> Result<(), String> {
     let _root = crate::telemetry::Timing::new("terminal.window.open");
-    let agent = app
-        .state::<Terminals>()
-        .records
-        .lock()
-        .map_err(err)?
-        .get(id)
-        .cloned()
-        .ok_or("터미널 창이 없습니다")?;
+    let mut agent = app.state::<Terminals>().records.get(id)?;
     crate::focus::remember(app, id);
     let win = if let Some(win) = app.get_webview_window(id) {
         win
     } else {
+        if let Some((bounds, physical)) = crate::session_restore::reopen_geometry(app, id) {
+            agent.bounds = bounds;
+            agent.physical_position = physical;
+        }
         let window = {
             let _creation = crate::telemetry::Timing::new("terminal.window.create");
             crate::telemetry::checkpoint("terminal.window.create");
@@ -355,6 +345,7 @@ pub(crate) fn open_presented(
                     .map_err(err)?;
             }
         }
+        crate::session_restore::mark_reopened(app, id);
         window
     };
     if !present {
@@ -379,18 +370,17 @@ pub(crate) fn open_presented(
 }
 pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
     welcome::refresh_path(app, id)?;
-    let agent = app
-        .state::<Terminals>()
-        .records
-        .lock()
-        .map_err(err)?
-        .get(id)
-        .cloned()
-        .ok_or("터미널 창이 없습니다")?;
+    let agent = app.state::<Terminals>().records.get(id)?;
     if !contains(app, id) {
         return Err("터미널 창이 없습니다".into());
     }
     let win = app.get_webview_window(id);
+    let bounds = win
+        .as_ref()
+        .and_then(|w| crate::session_restore::logical_geometry(w).ok())
+        .or_else(|| crate::session_restore::reopen_geometry(app, id))
+        .map(|(bounds, _)| bounds)
+        .unwrap_or_else(|| agent.bounds.clone());
     let session = app
         .state::<Terminals>()
         .sessions
@@ -411,7 +401,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         (None, None, None, false)
     };
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":agent.bounds,"pid":pid,"program":program,"running":running,"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":bounds,"metadata_save_failed":app.state::<Terminals>().records.save_failed(id),"pid":pid,"program":program,"running":running,"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
     )
 }
 pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value, String> {
@@ -490,13 +480,7 @@ pub async fn terminal_start(
             let dimensions = size(cols, rows)?;
             let state = app.state::<Terminals>();
             let reservation = Start::reserve(&state, &id)?;
-            let agent = state
-                .records
-                .lock()
-                .map_err(err)?
-                .get(&id)
-                .cloned()
-                .ok_or("터미널 창이 없습니다")?;
+            let agent = state.records.get(&id)?;
             let (session, mut reader) = welcome::start(
                 &agent,
                 choice.as_deref().unwrap_or("shell"),
@@ -555,7 +539,12 @@ pub async fn terminal_start(
                                     welcome::remember_plan(&watched_app, &watched_id, Some(&plan));
                                 }
                                 for path in paths {
-                                    let _ = welcome::set_path(&watched_app, &watched_id, path);
+                                    let _ = welcome::set_path(
+                                        &watched_app,
+                                        &watched_id,
+                                        path,
+                                        EditSource::Observation,
+                                    );
                                 }
                             }
                             drop(sessions);
@@ -633,35 +622,6 @@ pub fn terminal_info(window: WebviewWindow) -> Result<Value, String> {
     let id = caller(&window)?;
     inspect(window.app_handle(), &id)
 }
-pub fn geometry(window: &tauri::Window) {
-    let app = window.app_handle();
-    if app
-        .get_webview_window(window.label())
-        .is_some_and(|w| crate::stash::owns(&w))
-    {
-        return;
-    }
-    let state = app.state::<Terminals>();
-    let Ok(mut agents) = state.records.lock() else {
-        return;
-    };
-    if let Some(agent) = agents.get_mut(window.label()) {
-        if let (Ok(p), Ok(s), Ok(scale)) = (
-            window.outer_position(),
-            window.inner_size(),
-            window.scale_factor(),
-        ) {
-            agent.bounds = crate::capture::ImageNote {
-                x: f64::from(p.x) / if cfg!(windows) { 1.0 } else { scale },
-                y: f64::from(p.y) / if cfg!(windows) { 1.0 } else { scale },
-                width: f64::from(s.width) / scale,
-                height: f64::from(s.height) / scale,
-            };
-            agent.physical_position = cfg!(windows);
-            let _ = save(&root(app), agent);
-        }
-    }
-}
 pub fn update_blocked(app: &tauri::AppHandle) -> Result<bool, String> {
     Ok(!app
         .state::<Terminals>()
@@ -675,7 +635,11 @@ pub fn shutdown(app: &tauri::AppHandle) {
     for agent in entries(app) {
         let _ = welcome::refresh_path(app, &agent.id);
     }
-    app.state::<Terminals>().sessions.lock().unwrap().clear();
+    let state = app.state::<Terminals>();
+    state.sessions.lock().unwrap().clear();
+    if state.records.finish(&root(app)).is_err() {
+        eprintln!("터미널 기록의 마지막 저장에 실패했습니다.");
+    }
 }
 
 #[cfg(test)]

@@ -37,6 +37,7 @@ impl Rect {
 #[derive(Clone)]
 struct Saved {
     rect: Rect,
+    inner_size: tauri::PhysicalSize<u32>,
     scale: f64,
     alpha: f64,
 }
@@ -511,6 +512,19 @@ fn err(e: impl std::fmt::Display) -> String {
 pub fn active(app: &tauri::AppHandle) -> bool {
     app.state::<Stash>().session.lock().unwrap().is_some()
 }
+// Inspect uses the pre-animation client size while the stash owns the frame.
+pub(crate) fn saved_geometry(w: &WebviewWindow) -> Option<crate::capture::ImageNote> {
+    let stash = w.state::<Stash>();
+    let session = stash.session.lock().ok()?;
+    let saved = session.as_ref()?.windows.get(w.label())?;
+    let pos_scale = if cfg!(windows) { 1.0 } else { saved.scale };
+    Some(crate::capture::ImageNote {
+        x: saved.rect.x * unit(saved.scale) / pos_scale,
+        y: saved.rect.y * unit(saved.scale) / pos_scale,
+        width: f64::from(saved.inner_size.width) / saved.scale,
+        height: f64::from(saved.inner_size.height) / saved.scale,
+    })
+}
 pub fn owns(w: &WebviewWindow) -> bool {
     w.state::<Stash>()
         .session
@@ -651,6 +665,7 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
                 let frame = if !s.animating {
                     Saved {
                         rect: compact(saved.rect, s.area, s.top),
+                        inner_size: saved.inner_size,
                         scale: saved.scale,
                         alpha: saved.alpha * 0.1,
                     }
@@ -665,6 +680,7 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
                     };
                     Saved {
                         rect: rect(&w)?,
+                        inner_size: saved.inner_size,
                         scale: saved.scale,
                         alpha: start.alpha + (target - start.alpha) * e,
                     }
@@ -760,6 +776,7 @@ pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
             w.label().into(),
             Saved {
                 rect: rect(&w)?,
+                inner_size: w.inner_size().map_err(err)?,
                 scale: w.scale_factor().map_err(err)?,
                 alpha: alpha_value,
             },

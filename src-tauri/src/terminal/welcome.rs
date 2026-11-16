@@ -44,8 +44,9 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
         auto_restore: false,
     };
     crate::memo_color::create(&root(app), &id)?;
-    save(&root(app), &agent)?;
-    state.records.lock().map_err(err)?.insert(id.clone(), agent);
+    state.records.insert(&root(app), agent)?;
+    // A newly created record owns its selected frame even if this ID was reused.
+    crate::session_restore::mark_reopened(app, &id);
     open(app, &id)?;
     crate::tray::refresh(app)?;
     inspect(app, &id)
@@ -273,7 +274,7 @@ pub async fn terminal_folder(window: WebviewWindow, path: Option<String>) -> Res
         let mut selected = false;
         if let Some(path) = path {
             selected = true;
-            set_path(&app, &id, PathBuf::from(path))?;
+            set_path(&app, &id, PathBuf::from(path), EditSource::Request)?;
         } else if let Some(path) = app
             .dialog()
             .file()
@@ -282,7 +283,7 @@ pub async fn terminal_folder(window: WebviewWindow, path: Option<String>) -> Res
         {
             selected = true;
             let path = path.into_path().map_err(err)?;
-            set_path(&app, &id, path)?;
+            set_path(&app, &id, path, EditSource::Request)?;
         }
         let mut info = inspect(&app, &id)?;
         info["folder_selected"] = json!(selected);
@@ -291,19 +292,24 @@ pub async fn terminal_folder(window: WebviewWindow, path: Option<String>) -> Res
     .await
     .map_err(err)?
 }
-pub(super) fn set_path(app: &tauri::AppHandle, id: &str, path: PathBuf) -> Result<(), String> {
+pub(super) fn set_path(
+    app: &tauri::AppHandle,
+    id: &str,
+    path: PathBuf,
+    source: EditSource,
+) -> Result<(), String> {
     if !path.is_absolute() || !path.is_dir() {
         return Err("사용 가능한 폴더가 아닙니다".into());
     }
     let state = app.state::<Terminals>();
-    let mut agents = state.records.lock().map_err(err)?;
-    let agent = agents.get_mut(id).ok_or("터미널 창이 없습니다")?;
-    if agent.kind != Kind::Terminal {
-        return Ok(());
-    }
-    if agent.last_path.as_ref() != Some(&path) {
+    if !state.records.edit(&root(app), id, source, |agent| {
+        if agent.kind != Kind::Terminal || agent.last_path.as_ref() == Some(&path) {
+            return false;
+        }
         remember_path(agent, path, now());
-        save(&root(app), agent)?;
+        true
+    })? {
+        return Err("터미널 창이 없습니다".into());
     }
     Ok(())
 }
@@ -315,11 +321,18 @@ pub fn terminal_rename(window: WebviewWindow, title: String) -> Result<Value, St
     }
     {
         let state = window.state::<Terminals>();
-        let mut agents = state.records.lock().map_err(err)?;
-        let a = agents.get_mut(&id).ok_or("터미널 창이 없습니다")?;
-        a.title = title.trim().into();
-        a.updated_at = now();
-        save(&root(window.app_handle()), a)?;
+        if !state.records.edit(
+            &root(window.app_handle()),
+            &id,
+            EditSource::Request,
+            |record| {
+                record.title = title.trim().into();
+                record.updated_at = now();
+                true
+            },
+        )? {
+            return Err("터미널 창이 없습니다".into());
+        }
     }
     crate::tray::refresh(window.app_handle())?;
     inspect(window.app_handle(), &id)
@@ -457,13 +470,7 @@ fn bare_monitor(_: &Session) -> Option<String> {
 
 pub(super) fn refresh_path(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     let state = app.state::<Terminals>();
-    if state
-        .records
-        .lock()
-        .map_err(err)?
-        .get(id)
-        .is_none_or(|a| a.kind != Kind::Terminal)
-    {
+    if !state.records.contains(id) {
         return Ok(());
     }
     let session = state
@@ -481,17 +488,20 @@ pub(super) fn refresh_path(app: &tauri::AppHandle, id: &str) -> Result<(), Strin
                 remember_plan(app, id, Some(&name));
             }
         }
-        if let Some(record) = state.records.lock().map_err(err)?.get_mut(id) {
-            let eligible = monitor.is_some() && monitor == record.restore_plan;
-            if record.auto_restore != eligible {
+        state
+            .records
+            .edit(&root(app), id, EditSource::Observation, |record| {
+                let eligible = monitor.is_some() && monitor == record.restore_plan;
+                if record.auto_restore == eligible {
+                    return false;
+                }
                 record.auto_restore = eligible;
-                save(&root(app), record)?;
-            }
-        }
+                true
+            })?;
         if alive {
             if let Some(path) = s.child.process_id().and_then(process_cwd) {
                 drop(s);
-                set_path(app, id, path)?;
+                set_path(app, id, path, EditSource::Observation)?;
             }
         }
     }
@@ -527,16 +537,16 @@ fn plan_preview(line: &str) -> Option<String> {
 }
 pub(super) fn remember_plan(app: &tauri::AppHandle, id: &str, line: Option<&str>) {
     let state = app.state::<Terminals>();
-    let Ok(mut records) = state.records.lock() else {
-        return;
-    };
-    if let Some(record) = records.get_mut(id) {
-        let plan = line.and_then(plan_preview);
-        if record.restore_plan != plan {
+    let plan = line.and_then(plan_preview);
+    let _ = state
+        .records
+        .edit(&root(app), id, EditSource::Observation, |record| {
+            if record.restore_plan == plan {
+                return false;
+            }
             record.restore_plan = plan;
-            let _ = save(&root(app), record);
-        }
-    }
+            true
+        });
 }
 pub(super) fn start(
     agent: &Terminal,
@@ -732,6 +742,35 @@ fn close_identity(slot: Option<&Slot>) -> Option<(bool, usize)> {
         Slot::Running(session) => (true, Arc::as_ptr(session) as usize),
     })
 }
+fn destroy_remembering_geometry(window: &WebviewWindow) -> Result<(), String> {
+    let app = window.app_handle();
+    let id = window.label();
+    crate::stash::release(window)?;
+    // Capture after releasing any temporary stash frame and before the window
+    // disappears. An unavailable journal leaves legacy metadata as the fallback.
+    let durable = crate::session_restore::remember_closed(window)?;
+    let result = (|| {
+        if !durable {
+            let (bounds, physical) = crate::session_restore::logical_geometry(window)?;
+            if !app
+                .state::<Terminals>()
+                .records
+                .edit(&root(app), id, EditSource::Request, |r| {
+                    r.bounds = bounds;
+                    r.physical_position = physical;
+                    true
+                })?
+            {
+                return Err("터미널 창이 없습니다".into());
+            }
+        }
+        window.destroy().map_err(err)
+    })();
+    if result.is_err() {
+        crate::session_restore::mark_reopened(app, id);
+    }
+    result
+}
 fn finish_close(
     app: &tauri::AppHandle,
     id: &str,
@@ -744,8 +783,7 @@ fn finish_close(
         return Ok(());
     }
     if let Some(window) = app.get_webview_window(id) {
-        crate::stash::release(&window)?;
-        window.destroy().map_err(err)?;
+        destroy_remembering_geometry(&window)?;
     }
     sessions.remove(id);
     drop(sessions);
@@ -1039,15 +1077,14 @@ pub fn delete(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     if state.sessions.lock().map_err(err)?.contains_key(id) {
         return Err("먼저 터미널 창을 종료하세요".into());
     }
-    if !state.records.lock().map_err(err)?.contains_key(id) {
+    if !state.records.contains(id) {
         return Err("터미널이 없습니다".into());
     }
     if let Some(w) = app.get_webview_window(id) {
-        crate::stash::release(&w)?;
-        w.destroy().map_err(err)?;
+        destroy_remembering_geometry(&w)?;
     }
-    std::fs::remove_file(metadata(&root(app)).join(format!("{id}.json"))).map_err(err)?;
-    state.records.lock().map_err(err)?.remove(id);
+    state.records.delete(&root(app), id)?;
+    crate::session_restore::forget_closed(app, id)?;
     crate::tray::refresh(app)
 }
 
@@ -1124,14 +1161,15 @@ impl PromptState {
 }
 pub(super) fn touch_path(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     let state = app.state::<Terminals>();
-    let mut agents = state.records.lock().map_err(err)?;
-    if let Some(agent) = agents
-        .get_mut(id)
-        .filter(|a| a.kind == Kind::Terminal && a.last_path.is_some())
-    {
-        agent.path_updated = now();
-        save(&root(app), agent)?;
-    }
+    state
+        .records
+        .edit(&root(app), id, EditSource::Request, |agent| {
+            if agent.kind != Kind::Terminal || agent.last_path.is_none() {
+                return false;
+            }
+            agent.path_updated = now();
+            true
+        })?;
     Ok(())
 }
 

@@ -7,13 +7,14 @@ import {readFileSync} from 'node:fs';
 const flush=async()=>{for(let i=0;i<20;i++)await Promise.resolve();};
 const folder=path=>({path,name:path.split('/').at(-1),parent:path.slice(0,path.lastIndexOf('/')),command:`cd -- '${path}'`});
 const shell={id:'shell',label:'셸',command:"'/bin/zsh' -i"};
-function ui({restoreSupported=true,plan=null,restored=false,autoRestore=false,kind='terminal',path=null,fail=false,focused=true,picker=null,folders=[],choices=[{id:'git',label:'git log',command:"'/usr/bin/git' log --oneline --decorate -20"},shell]}={}){
+function ui({grid=null,ipc=null,restoreSupported=true,plan=null,restored=false,autoRestore=false,kind='terminal',path=null,fail=false,focused=true,picker=null,folders=[],choices=[{id:'git',label:'git log',command:"'/usr/bin/git' log --oneline --decorate -20"},shell]}={}){
  const elements={},calls=[],intervals=[];
  const element=id=>elements[id]??=({id,hidden:false,textContent:'',value:'',children:[],attrs:{},dataset:{},focus(){this.focused=true;},addEventListener(){},setAttribute(k,v){this.attrs[k]=v;},getAttribute(k){return this.attrs[k];},replaceChildren(){this.children=[];},append(...children){this.children.push(...children);}});
  element('rename-title');
  const info={restore_supported:restoreSupported,restore_plan:plan,restored,auto_restore:autoRestore,kind,id:'terminal-123',title:'터미널',last_path:path};
  const context={innerWidth:720,innerHeight:460,navigator:{platform:'MacIntel'},setTimeout,clearTimeout,setInterval:fn=>intervals.push(fn),ResizeObserver:class{observe(){}},Terminal:class{constructor(){this.cols=80;this.rows=24;this.options={fontSize:13};}loadAddon(){}open(){}onData(){}attachCustomKeyEventHandler(){}focus(){}write(){}},FitAddon:{FitAddon:class{fit(){}}},document:{hasFocus:()=>focused,getElementById:element,createElement:()=>element('element'+Math.random()),querySelector:()=>element('header'),querySelectorAll:()=>[]},window:{installTerminalIme(){},__TAURI__:{core:{Channel:class{},invoke:async(name,args)=>{
   calls.push([name,args]);
+  if(ipc && (name==='terminal_resize'||name==='terminal_start'))return ipc(name,args);
   if(name==='terminal_folder'&&args?.path===null&&picker)return await picker();
   if(name==='terminal_folder')info.last_path=args?.path||'/tmp/chosen';
   if(name==='terminal_rename')info.title=args.title;
@@ -21,6 +22,25 @@ function ui({restoreSupported=true,plan=null,restored=false,autoRestore=false,ki
   if(name==='terminal_start'&&fail)throw Error('missing');
   return {...info};
  }},window:{getCurrentWindow:()=>({startDragging:async()=>{},startResizeDragging:async()=>{}})}}}};
+ context.document.addEventListener=(name,listener)=>{if(grid && name==='visibilitychange')grid.visibilityChanged=listener;};
+ if(grid){
+   const host=element('terminal'),screen={};
+   let terminal;
+   host.querySelector=()=>screen;
+   Object.defineProperties(host,{
+     clientWidth:{get:()=>host.hidden?0:grid.width},
+     clientHeight:{get:()=>host.hidden?0:grid.height},
+   });
+   context.Terminal=class extends context.Terminal{
+     constructor(){super();terminal=this;}
+     resize(cols,rows){Object.assign(this,{cols,rows});}
+   };
+   context.getComputedStyle=node=>node===screen
+     ? {width:terminal.cols*(terminal.options.fontSize-3),height:terminal.rows*20}
+     : {paddingLeft:0,paddingRight:0,paddingTop:0,paddingBottom:0};
+   context.matchMedia=()=>({matches:false});
+   context.ResizeObserver=class{constructor(callback){grid.observed=callback;}observe(){}};
+ }
  vm.runInNewContext(readFileSync(new URL('../ui/terminal.js',import.meta.url),'utf8'),context);return {elements,calls,intervals};
 }
 test('no history uses home preview and retains folder picker and shell without autostart',async()=>{const {elements,calls}=ui();await flush();assert.equal(elements['home-hint'].hidden,false);assert.equal(elements['recent-folders'].children.length,0);assert.equal(calls.some(([n])=>n==='terminal_start'),false);assert.equal(typeof elements['choose-folder'].onclick,'function');assert.ok(elements.recommendations.children.some(b=>b.dataset.choice==='shell'));assert.match(elements['command-preview'].textContent,/cd -- '\/home\/test'/);});
@@ -79,4 +99,116 @@ test('unsupported restoration shows an explanation and blocks auto and edited ex
  assert.equal(elements['welcome-panel'].hidden,false);
  await elements['run-task'].onclick();
  assert.equal(calls.filter(([name])=>name==='terminal_start').length,1);
+});
+
+function gridFixture(t, options={}){
+  t.mock.timers.enable({apis:['setTimeout']});
+  const grid={width:800,height:480};
+  const result=ui({...options,grid});
+  function viewport(width,height=480){
+    Object.assign(grid,{width,height});
+    grid.observed();
+    t.mock.timers.tick(60);
+  }
+  const resizes=()=>result.calls.filter(([name])=>name==='terminal_resize')
+    .map(([,args])=>[args.cols,args.rows]);
+  return {...result,grid,viewport,resizes};
+}
+
+test('a PTY starts with its measured grid and equivalent later measurements send no resize',async t=>{
+  const {elements,calls,viewport,resizes}=gridFixture(t);
+  await flush();
+  await elements['run-task'].onclick();
+  const start=calls.find(([name])=>name==='terminal_start')[1];
+  assert.deepEqual([start.cols,start.rows],[80,24]);
+  for(let i=0;i<100;i++){viewport(800+i%10);await flush();}
+  assert.equal(resizes().length,0);
+  viewport(810);
+  await flush();
+  assert.deepEqual(resizes(),[[81,24]]);
+});
+
+test('resizing during start and a delayed resize converges to the latest measured grid',async t=>{
+  const requests=[];
+  const {elements,viewport,resizes}=gridFixture(t,{ipc:()=>new Promise(resolve=>requests.push(resolve))});
+  await flush();
+  const start=elements['run-task'].onclick();
+  await flush();
+  viewport(900);
+  assert.deepEqual(resizes(),[]);
+  requests.shift()();
+  await start;
+  assert.deepEqual(resizes(),[[90,24]]);
+  for(const width of [910,920,895,800])viewport(width);
+  assert.deepEqual(resizes(),[[90,24]]);
+  requests.shift()();
+  await flush();
+  assert.deepEqual(resizes(),[[90,24],[80,24]]);
+  requests.shift()();
+  await flush();
+  viewport(800);
+  assert.equal(resizes().length,2);
+});
+
+test('a failed resize retries once, then a fresh measurement may retry the same grid',async t=>{
+  let attempts=0;
+  const {elements,viewport,resizes}=gridFixture(t,{ipc:async name=>{
+    if(name==='terminal_resize' && ++attempts<=2)throw Error('resize unavailable');
+  }});
+  await flush();
+  await elements['run-task'].onclick();
+  viewport(900);
+  await flush();
+  t.mock.timers.tick(1000);
+  await flush();
+  t.mock.timers.tick(1000);
+  await flush();
+  assert.deepEqual(resizes(),[[90,24],[90,24]]);
+  assert.match(elements.status.textContent,/resize unavailable/);
+  viewport(901);
+  await flush();
+  viewport(903);
+  assert.deepEqual(resizes(),[[90,24],[90,24],[90,24]]);
+});
+
+test('restored PTY, hidden host and font change use the visible grid',async t=>{
+  const {elements,calls,grid,viewport,resizes}=gridFixture(t,{restored:true,plan:'htop',autoRestore:true});
+  await flush();
+  assert.equal(calls.find(([name])=>name==='terminal_start')[1].cols,80);
+  elements.terminal.hidden=true;
+  viewport(990);
+  assert.deepEqual(resizes(),[]);
+  elements.terminal.hidden=false;
+  grid.visibilityChanged();
+  t.mock.timers.tick(60);
+  await flush();
+  assert.deepEqual(resizes(),[[99,24]]);
+  elements['font-size'].onclick();
+  t.mock.timers.tick(60);
+  await flush();
+  assert.deepEqual(resizes(),[[99,24],[90,24]]);
+});
+
+test('a failed launch may restart with a different grid, and a failed stale resize yields to newer cells',async t=>{
+  let launch=0, rejectResize;
+  const {elements,calls,viewport,resizes}=gridFixture(t,{ipc:name=>{
+    if(name==='terminal_start'){
+      if(++launch===1)throw Error('launch failed');
+    }else if(!rejectResize){
+      return new Promise((_,reject)=>{rejectResize=reject;});
+    }
+  }});
+  await flush();
+  await elements['run-task'].onclick();
+  viewport(900);
+  await elements['run-task'].onclick();
+  assert.deepEqual(calls.filter(([name])=>name==='terminal_start').map(([,args])=>args.cols),[80,90]);
+  assert.deepEqual(resizes(),[]);
+  viewport(910);
+  viewport(930);
+  rejectResize(Error('resize unavailable'));
+  await flush();
+  assert.deepEqual(resizes(),[[91,24],[93,24]]);
+  t.mock.timers.tick(1000);
+  assert.equal(resizes().length,2);
 });
