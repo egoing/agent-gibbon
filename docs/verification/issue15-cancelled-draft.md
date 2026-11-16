@@ -1,6 +1,6 @@
 # #15 · 취소한 초안 복구 검증 (2026-11-16)
 
-기준 main `22dc7de7309f8d47772bb0cf1f2c88768f742ef8`, 전용 브랜치 `codex/issue15-cancelled-draft`, 계획 커밋 `41c19a36574052c3585e111975001f9201808856`. 원격 [Draft #210](https://github.com/egoing/agent-gibbon/pull/210)은 계획만 포함한다. [#15](https://github.com/egoing/agent-gibbon/issues/15)의 분리 편집기와 현행 [#174](issue174-milkdown.md)의 차이: 현재 정상 입력은 600ms 자동저장하며, 실패하면 ‘변경 취소’가 나타난다. Esc는 저장 뒤 숨기기다.
+기준 main `22dc7de7309f8d47772bb0cf1f2c88768f742ef8`, 전용 브랜치 `codex/issue15-cancelled-draft`, 계획 커밋 `41c19a36574052c3585e111975001f9201808856`. 이 독립 검증을 수행할 당시 [PR #210](https://github.com/egoing/agent-gibbon/pull/210)에는 계획 커밋만 있었다. [#15](https://github.com/egoing/agent-gibbon/issues/15)의 분리 편집기와 현행 [#174](issue174-milkdown.md)의 차이: 현재 정상 입력은 600ms 자동저장하며, 실패하면 ‘변경 취소’가 나타난다. Esc는 저장 뒤 숨기기다.
 
 ## 재현과 검증
 
