@@ -694,10 +694,11 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     return;
                 }
             }
-            if matches!(
+            if matches!(event, tauri::WindowEvent::Moved(_)) {
+                relation_prototype::moved(win.app_handle(), win.label());
+            } else if matches!(
                 event,
-                tauri::WindowEvent::Moved(_)
-                    | tauri::WindowEvent::Resized(_)
+                tauri::WindowEvent::Resized(_)
                     | tauri::WindowEvent::ScaleFactorChanged { .. }
                     | tauri::WindowEvent::Destroyed
             ) {

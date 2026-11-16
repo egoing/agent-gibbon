@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="490" viewBox="0 0 1040 490">
-<rect width="1040" height="490" fill="#f4f5f7"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="840" viewBox="0 0 1040 840">
+<rect width="1040" height="840" fill="#f4f5f7"/>
 <g font-family="-apple-system,Apple SD Gothic Neo,sans-serif" fill="#2c2f7e">
 <text x="24" y="30" font-size="20" font-weight="600">#174 · Milkdown 본문 통합 편집</text>
 <text x="24" y="53" font-size="12" fill="#626b79">동작·배치 설명 시안 · 실제 앱 캡처 아님 · 입력 유휴 후 자동저장 · 조합 중 대기</text>
@@ -28,10 +28,10 @@
 <text x="4" y="110" text-decoration="underline">링크는 선택·편집, 탐색하지 않음</text>
 </g>
 <g transform="translate(4 127)">
-<rect width="180" height="28" rx="4" fill="#dfe2dd" stroke="#a0a3bc"/>
+<rect width="220" height="28" rx="4" fill="#dfe2dd" stroke="#a0a3bc"/>
 <rect x="3" y="3" width="23" height="22" rx="2" fill="#cdd0d3"/>
 <g fill="#2c2f7e" font-size="11" font-family="-apple-system,Apple SD Gothic Neo,sans-serif" text-anchor="middle">
-<text x="15" y="18" font-weight="700">B</text><text x="40" y="18" font-style="italic">I</text><text x="65" y="18" text-decoration="line-through">S</text><text x="90" y="18">&lt;/&gt;</text><text x="115" y="18">H1</text><text x="140" y="18">H2</text><text x="165" y="18">P</text>
+<text x="15" y="18" font-weight="700">B</text><text x="40" y="18" font-style="italic">I</text><text x="65" y="18" text-decoration="line-through">S</text><text x="92" y="18">코드</text><text x="125" y="18">큰제목</text><text x="170" y="18">작은제목</text><text x="205" y="18">P</text>
 </g></g>
 <rect x=".5" y=".5" width="311" height="231" rx="4" fill="none" stroke="#2c2f7e" stroke-opacity=".65" stroke-width="2"/>
 </g>
@@ -72,5 +72,51 @@
 <text x="24" y="409">이미지 메모는 기존 복사·파일 내보내기 유지 · 이미지/HTML/URL의 요청·실행·탐색 차단</text>
 <text x="24" y="433">내부 Feedback은 창 크기 유지 · 접힘/숨김/수동 크기 보존 · 처음 실제 입력할 때만 편집 높이 확보</text>
 <text x="24" y="457">글자 선택 시 서식 메뉴 · 선택 유지 · 실제 OS 한글 IME·Intel·Windows는 별도 검증</text>
+</g>
+
+<g font-family="-apple-system,Apple SD Gothic Neo,sans-serif" fill="#2c2f7e">
+<text x="24" y="492" font-size="16" font-weight="600">#15 · 취소한 초안 복구</text>
+<text x="24" y="518" font-size="14">변경 취소 직후 · 최신 메모 표시</text>
+<text x="368" y="518" font-size="14">외부 revision 변경 후 복구 · 자동저장 차단</text>
+</g>
+<g transform="translate(24 534)">
+<rect width="312" height="196" rx="4" fill="#dfe2dd"/>
+<use href="#chrome"/>
+<g fill="#2c2f7e" font-family="-apple-system,Apple SD Gothic Neo,sans-serif" font-size="12">
+<text x="4" y="38" font-size="15" font-weight="600">프로젝트 메모</text>
+<text x="4" y="60">최신 저장 본문을 표시합니다.</text>
+<path d="M3 168h306" stroke="#2c2f7e" stroke-opacity=".25"/>
+<text x="4" y="186" font-size="11">편집을 취소했습니다</text>
+<rect x="249" y="171" width="59" height="22" rx="3" fill="#cdd0d3"/>
+<rect x="250" y="172" width="57" height="20" rx="2" fill="none" stroke="#2c2f7e" stroke-width="2"/>
+<text x="278.5" y="186" font-size="11" text-anchor="middle" font-weight="600">초안 복구</text>
+</g>
+<rect x=".5" y=".5" width="311" height="195" rx="4" fill="none" stroke="#2c2f7e" stroke-opacity=".65" stroke-width="2"/>
+</g>
+<g transform="translate(368 534)">
+<rect width="312" height="196" rx="4" fill="#dfe2dd"/>
+<use href="#chrome"/>
+<g fill="#2c2f7e" font-family="-apple-system,Apple SD Gothic Neo,sans-serif" font-size="12">
+<text x="4" y="38" font-size="15" font-weight="600">프로젝트 메모</text>
+<text x="4" y="60">취소했던 초안을 다시 편집합니다.</text>
+<path d="M3 137h306" stroke="#2c2f7e" stroke-opacity=".25"/>
+<text x="4" y="154" font-size="11">⚠ 외부 갱신과 충돌 · 초안 유지</text>
+<rect x="180" y="171" width="61" height="22" rx="3" fill="none"/>
+<text x="210.5" y="186" font-size="11" text-anchor="middle">변경 취소</text>
+<rect x="247" y="171" width="61" height="22" rx="3" fill="#cdd0d3"/>
+<text x="277.5" y="186" font-size="11" text-anchor="middle" font-weight="600">다시 저장</text>
+</g>
+<rect x=".5" y=".5" width="311" height="195" rx="4" fill="none" stroke="#2c2f7e" stroke-opacity=".65" stroke-width="2"/>
+</g>
+<g font-family="-apple-system,Apple SD Gothic Neo,sans-serif" fill="#626b79" font-size="12">
+<text x="712" y="558">기존 내부 Feedback 사용</text>
+<text x="712" y="582">11px 글자 · 버튼 최소 높이 22px</text>
+<text x="712" y="606">Tab → Enter / Space로 복구</text>
+<text x="712" y="630">초점선 2px · 새 단축키 없음</text>
+<text x="712" y="654">충돌 문구는 상태 설명용 요약</text>
+<text x="712" y="678">실제 기존 충돌 안내·CAS 유지</text>
+<text x="24" y="761">WebView당 최근 dirty 취소 1개 · 메모리만 보관 · clean 취소/숨김·표시/외부 갱신에도 유지</text>
+<text x="24" y="785">새 dirty 입력 시 이전 후보 폐기 · 다음 dirty 취소로 교체 · 명시 복구 성공 시 소비 · 재시작 시 소멸</text>
+<text x="24" y="809">revision 다르면 자동저장 차단 · 동일 본문은 no-op · Escape는 저장 후 숨김 유지 · 시안은 실제 앱 캡처 아님</text>
 </g>
 </svg>

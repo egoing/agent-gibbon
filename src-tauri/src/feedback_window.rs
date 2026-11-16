@@ -10,6 +10,9 @@ pub struct Button {
     disabled: bool,
     #[serde(default)]
     primary: bool,
+    // An action may identify a transient candidate independently of highlights.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    revision: Option<u64>,
 }
 #[derive(Clone, Default, Deserialize, Serialize)]
 pub struct View {
@@ -60,10 +63,11 @@ fn accepts_action(view: &View, action: &str, revision: Option<u64>) -> bool {
     (matches!(action, "export" | "save-shortcut")
         && (!view.message.is_empty() || !view.buttons.is_empty()))
         || (action != "acknowledge" || view.revision == revision)
-            && view
-                .buttons
-                .iter()
-                .any(|button| button.id == action && !button.disabled)
+            && view.buttons.iter().any(|button| {
+                button.id == action
+                    && !button.disabled
+                    && button.revision.is_none_or(|token| Some(token) == revision)
+            })
 }
 
 #[tauri::command]
@@ -157,6 +161,21 @@ mod tests {
         assert!(accepts_action(&view, "save", Some(2)));
         view.buttons[0].disabled = true;
         assert!(!accepts_action(&view, "save", Some(2)));
+    }
+    #[test]
+    fn recovery_targets_the_displayed_draft_even_if_highlight_changes() {
+        let view = View {
+            revision: Some(8),
+            buttons: vec![Button {
+                id: "restore_draft".into(),
+                revision: Some(2),
+                ..Button::default()
+            }],
+            ..View::default()
+        };
+        assert!(accepts_action(&view, "restore_draft", Some(2)));
+        assert!(!accepts_action(&view, "restore_draft", Some(8)));
+        assert!(!accepts_action(&view, "restore_draft", None));
     }
     #[test]
     fn shortcut_reaches_owner_without_trusting_stale_edit_buttons() {

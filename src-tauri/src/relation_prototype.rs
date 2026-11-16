@@ -148,19 +148,106 @@ fn frame(points: &[[f64; 2]; 4], previous: Option<Rect>, padding: f64) -> Rect {
 fn local_points(points: [[f64; 2]; 4], actual: Rect) -> [[f64; 2]; 4] {
     points.map(|p| [p[0] - actual.x, p[1] - actual.y])
 }
+static NEXT_DRAW: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
 static WAKE: OnceLock<mpsc::SyncSender<()>> = OnceLock::new();
 static CONNECTED: OnceLock<std::sync::RwLock<std::collections::BTreeSet<String>>> = OnceLock::new();
 static SURFACE_DIRTY: OnceLock<std::sync::Mutex<std::collections::BTreeSet<String>>> =
     OnceLock::new();
 const SETTLE: Duration = Duration::from_millis(150);
+// The native drag request can return before mouse-up on both platforms.
+#[derive(Default)]
+struct DragEnd {
+    #[cfg(target_os = "macos")]
+    mouse_ups: u32,
+    #[cfg(windows)]
+    window_loops: Option<(Arc<crate::windows_window::MoveLoops>, u64)>,
+}
+#[cfg(target_os = "macos")]
+fn mouse_ups() -> u32 {
+    #[link(name = "CoreGraphics", kind = "framework")]
+    extern "C" {
+        fn CGEventSourceCounterForEventType(state: i32, event: u32) -> u32;
+    }
+    // Combined session state and kCGEventLeftMouseUp. This includes releases
+    // outside the WebView and between two samples of the pressed button.
+    unsafe { CGEventSourceCounterForEventType(0, 2) }
+}
+impl DragEnd {
+    fn observe(_window: &WebviewWindow) -> Self {
+        Self {
+            #[cfg(target_os = "macos")]
+            mouse_ups: mouse_ups(),
+            #[cfg(windows)]
+            window_loops: crate::windows_window::move_loops(_window)
+                .ok()
+                .map(|loops| {
+                    let before = loops.started();
+                    (loops, before)
+                }),
+        }
+    }
+    fn observed(&self) -> bool {
+        #[cfg(target_os = "macos")]
+        {
+            self.mouse_ups != mouse_ups()
+        }
+        #[cfg(windows)]
+        {
+            self.window_loops
+                .as_ref()
+                .is_some_and(|(loops, before)| loops.ended_after(*before))
+        }
+        #[cfg(not(any(target_os = "macos", windows)))]
+        {
+            false
+        }
+    }
+}
+struct Drag {
+    label: String,
+    end: DragEnd,
+}
 #[derive(Default)]
 struct Motion {
+    drag: Option<Drag>,
+    request: u64,
     changed: BTreeMap<String, Instant>,
     all: Option<Instant>,
 }
 impl Motion {
+    fn begin(&mut self, label: &str, end: DragEnd) -> u64 {
+        self.request = self.request.wrapping_add(1);
+        self.drag = Some(Drag {
+            label: label.into(),
+            end,
+        });
+        self.request
+    }
+    fn finish(&mut self, request: u64) {
+        if self.request == request {
+            self.drag = None;
+        }
+    }
+    fn poll_drag(
+        &mut self,
+        held: impl FnOnce() -> bool,
+        ended: impl FnOnce(&DragEnd) -> bool,
+        host_exists: impl FnOnce(&str) -> bool,
+    ) {
+        if self
+            .drag
+            .as_ref()
+            .is_some_and(|d| ended(&d.end) || !held() || !host_exists(&d.label))
+        {
+            self.drag = None;
+        }
+    }
     fn paused(&self, from: &str, to: &str, now: Instant, stashed: bool) -> bool {
         stashed
+            || self
+                .drag
+                .as_ref()
+                .is_some_and(|drag| drag.label == from || drag.label == to)
             || [
                 self.all,
                 self.changed.get(from).copied(),
@@ -169,6 +256,14 @@ impl Motion {
             .into_iter()
             .flatten()
             .any(|last| now.saturating_duration_since(last) < SETTLE)
+    }
+    fn record_change(&mut self, label: &str, now: Instant, moved: bool) -> bool {
+        if moved && self.drag.as_ref().is_some_and(|d| d.label == label) {
+            // Hidden since drag start; release will read the final native geometry.
+            return false;
+        }
+        self.changed.insert(label.into(), now);
+        true
     }
     fn dirty_since(&self, from: &str, to: &str, checked: Instant) -> bool {
         [
@@ -181,6 +276,9 @@ impl Motion {
         .any(|t| t > checked)
     }
     fn delay(&self, now: Instant) -> Duration {
+        if self.drag.is_some() {
+            return Duration::from_millis(32);
+        }
         self.changed
             .values()
             .copied()
@@ -192,14 +290,63 @@ impl Motion {
     }
 }
 fn suspend(surface: &mut Surface) {
-    surface.generation = surface.generation.wrapping_add(1);
     surface.pending = None;
     surface.payload = None;
     if surface.window.is_visible().unwrap_or(false) {
         let _ = surface.window.hide();
     }
 }
+pub(crate) fn start_drag(window: &WebviewWindow) -> Result<(), String> {
+    // Serialize arming, hiding and native dispatch with tick/ready on the UI thread.
+    let target = window.clone();
+    let (tx, rx) = mpsc::sync_channel(1);
+    window
+        .run_on_main_thread(move || {
+            let _ = tx.send(start_drag_on_main(&target));
+        })
+        .map_err(|e| e.to_string())?;
+    rx.recv()
+        .map_err(|_| "창 이동 요청이 종료되었습니다".to_string())?
+}
+fn start_drag_on_main(window: &WebviewWindow) -> Result<(), String> {
+    let app = window.app_handle();
+    let Some(state) = app.try_state::<std::sync::Mutex<Prototype>>() else {
+        return window.start_dragging().map_err(|e| e.to_string());
+    };
+    let end = DragEnd::observe(window);
+    let request = {
+        let mut state = state.lock().map_err(|e| e.to_string())?;
+        let request = state.motion.begin(window.label(), end);
+        suspend_endpoint(app, &mut state, window.label());
+        request
+    };
+    focus_changed();
+    let result = window.start_dragging().map_err(|e| e.to_string());
+    if result.is_err() {
+        if let Ok(mut state) = state.lock() {
+            state.motion.finish(request);
+        }
+        focus_changed();
+    }
+    result
+}
+
+fn suspend_endpoint(app: &tauri::AppHandle, state: &mut Prototype, label: &str) {
+    for (i, r) in state.relations.iter().enumerate() {
+        if endpoint_label(app, &r.from) == label || endpoint_label(app, &r.to) == label {
+            if let Some(surface) = state.surfaces.get_mut(&format!("relation-prototype-{i}")) {
+                suspend(surface);
+            }
+        }
+    }
+}
+pub fn moved(app: &tauri::AppHandle, label: &str) {
+    geometry_changed(app, label, true);
+}
 pub fn changed(app: &tauri::AppHandle, label: &str) {
+    geometry_changed(app, label, false);
+}
+fn geometry_changed(app: &tauri::AppHandle, label: &str, moved: bool) {
     if label.starts_with("relation-prototype-") {
         if let Some(dirty) = SURFACE_DIRTY.get() {
             if let Ok(mut dirty) = dirty.lock() {
@@ -228,20 +375,8 @@ pub fn changed(app: &tauri::AppHandle, label: &str) {
     }
     if let Some(state) = app.try_state::<std::sync::Mutex<Prototype>>() {
         if let Ok(mut state) = state.try_lock() {
-            state.motion.changed.insert(label.into(), Instant::now());
-            let affected: Vec<_> = state
-                .relations
-                .iter()
-                .enumerate()
-                .filter_map(|(i, r)| {
-                    (endpoint_label(app, &r.from) == label || endpoint_label(app, &r.to) == label)
-                        .then_some(format!("relation-prototype-{i}"))
-                })
-                .collect();
-            for key in affected {
-                if let Some(surface) = state.surfaces.get_mut(&key) {
-                    suspend(surface);
-                }
+            if state.motion.record_change(label, Instant::now(), moved) {
+                suspend_endpoint(app, &mut state, label);
             }
         }
     }
@@ -317,6 +452,22 @@ pub fn transition_started(app: &tauri::AppHandle) {
         let _ = tx.try_send(());
     }
 }
+#[derive(Clone, Copy)]
+struct PendingDraw {
+    generation: u64,
+    endpoints: (Rect, Rect),
+}
+impl PendingDraw {
+    fn new(endpoints: (Rect, Rect)) -> Self {
+        Self {
+            generation: NEXT_DRAW.fetch_add(1, Ordering::Relaxed),
+            endpoints,
+        }
+    }
+    fn current(&self, endpoints: Option<(Rect, Rect)>) -> bool {
+        Some(self.endpoints) == endpoints
+    }
+}
 fn acknowledged(pending: Option<u64>, generation: u64, paused: bool) -> bool {
     !paused && pending == Some(generation)
 }
@@ -345,31 +496,40 @@ pub fn relation_ready(window: WebviewWindow, generation: u64) -> Result<bool, St
         return Ok(false);
     }
     let mut state = state.lock().map_err(|e| e.to_string())?;
-    if !has_focus {
-        // A brief focus loss can reject this acknowledgement before tick sees
-        // the blur. Invalidate it now so refocus still gets a fresh redraw.
-        if let Some(surface) = state.surfaces.get_mut(window.label()) {
-            if surface.pending == Some(generation) {
-                suspend(surface);
-            }
-        }
+    let Some(draw) = state.surfaces.get(window.label()).and_then(|s| s.pending) else {
+        return Ok(false);
+    };
+    if !acknowledged(Some(draw.generation), generation, false) {
         return Ok(false);
     }
     let Some(r) = state.relations.get(index) else {
         return Ok(false);
     };
-    if state.motion.paused(
-        &endpoint_label(app, &r.from),
-        &endpoint_label(app, &r.to),
-        Instant::now(),
-        crate::stash::active(window.app_handle()),
-    ) {
+    let paused = !has_focus
+        || state.motion.paused(
+            &endpoint_label(app, &r.from),
+            &endpoint_label(app, &r.to),
+            Instant::now(),
+            crate::stash::active(app),
+        );
+    if paused {
+        // Even a transient focus/stash change can consume an ack before tick.
+        // Discard its cached payload so the next eligible tick redraws.
+        if let Some(surface) = state.surfaces.get_mut(window.label()) {
+            suspend(surface);
+        }
         return Ok(false);
-    };
+    }
+    // The endpoints can move, hide, close or overlap between draw and ack.
+    let endpoints = endpoint_window(app, &r.from)
+        .and_then(|a| rect(&a))
+        .zip(endpoint_window(app, &r.to).and_then(|b| rect(&b)));
     let Some(surface) = state.surfaces.get_mut(window.label()) else {
         return Ok(false);
     };
-    if !acknowledged(surface.pending, generation, false) {
+    if !draw.current(endpoints) {
+        suspend(surface);
+        focus_changed();
         return Ok(false);
     };
     surface.pending = None;
@@ -390,8 +550,7 @@ struct Surface {
     frame: Option<Rect>,
     actual_frame: Option<Rect>,
     payload: Option<serde_json::Value>,
-    generation: u64,
-    pending: Option<u64>,
+    pending: Option<PendingDraw>,
     checked: Option<Instant>,
 }
 #[derive(Default)]
@@ -456,7 +615,6 @@ fn overlay(app: &tauri::AppHandle, key: &str) -> Result<Surface, String> {
         frame: None,
         actual_frame: None,
         payload: None,
-        generation: 0,
         pending: None,
         checked: None,
     })
@@ -513,6 +671,15 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
                 .collect();
         }
     }
+    state.motion.poll_drag(
+        crate::monitor_layout::primary_mouse_held,
+        DragEnd::observed,
+        |label| {
+            // Hiding/minimizing is reversible while the user still holds the button.
+            // Destruction removes the host. Visibility is checked separately before draw/ack.
+            crate::web::managed_window(app, label).is_some()
+        },
+    );
     if !memo_focused(app) {
         for surface in state.surfaces.values_mut() {
             if surface.pending.is_some()
@@ -579,9 +746,10 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
             let a = endpoint_window(app, &r.from)?;
             let b = endpoint_window(app, &r.to)?;
             state.layouts += 1;
-            Some((r, curve(rect(&a)?, rect(&b)?)?))
+            let ends = (rect(&a)?, rect(&b)?);
+            Some((r, ends, curve(ends.0, ends.1)?))
         });
-        let Some((relation, points)) = geometry else {
+        let Some((relation, ends, points)) = geometry else {
             if let Some(s) = state.surfaces.remove(&key) {
                 let _ = s.window.destroy();
             }
@@ -620,9 +788,9 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
         let payload = serde_json::json!({"width":actual.w,"height":actual.h,"points":relative,"label":relation.label,"scale":scale,"relation":[relation.from,relation.to],"arrow":relation.arrow});
         if native_changed || surface.payload.as_ref() != Some(&payload) {
             // A fresh generation cannot be revealed by a stale pre-move acknowledgement.
-            surface.generation = surface.generation.wrapping_add(1);
-            surface.pending = Some(surface.generation);
-            let generation = surface.generation;
+            let draw = PendingDraw::new(ends);
+            let generation = draw.generation;
+            surface.pending = Some(draw);
             w.eval(format!("window.drawRelation({payload},{generation})"))
                 .map_err(|e| e.to_string())?;
             surface.payload = Some(payload);
@@ -757,7 +925,9 @@ pub fn install(app: &tauri::AppHandle) {
             {
                 break;
             }
-            let Ok(wait) = rx.recv_timeout(Duration::from_secs(5)) else {
+            // A native move loop can occupy the main thread for arbitrarily long.
+            // Its next completed tick still owns this worker; never queue a second tick.
+            let Ok(wait) = rx.recv() else {
                 break;
             };
             // Idle fallback detects visibility and atomic config replacement, without repainting.
@@ -964,6 +1134,91 @@ mod tests {
             assert_eq!([resized.x + local[0], resized.y + local[1]], global);
         }
     }
+    #[test]
+    fn held_pause_blocks_only_incident_layout_until_native_release() {
+        let start = Instant::now();
+        let mut motion = Motion::default();
+        motion.begin("note-a", DragEnd::default());
+        for ms in [0, 60, 750, 5_500, 5_700] {
+            let now = start + Duration::from_millis(ms);
+            if matches!(ms, 60 | 5_500) {
+                assert!(!motion.record_change("note-a", now, true));
+            }
+            motion.poll_drag(|| true, |_| false, |_| true);
+            assert!(motion.paused("note-b", "note-a", now, false));
+            assert!(!motion.paused("terminal-c", "webview-d", now, false));
+        }
+        assert!(!motion.record_change("note-a", start + Duration::from_millis(5700), true));
+        motion.poll_drag(|| false, |_| false, |_| true);
+        let now = start + Duration::from_millis(5701);
+        assert!(!motion.paused("note-a", "note-b", now, false));
+        assert!(motion.paused("note-a", "note-b", now, true));
+        assert!(!acknowledged(Some(32), 31, false));
+        assert!(acknowledged(Some(32), 32, false));
+    }
+
+    #[test]
+    fn new_drag_survives_old_failure_and_native_end_survives_a_second_press() {
+        let now = Instant::now();
+        let mut motion = Motion::default();
+        let old = motion.begin("note-a", DragEnd::default());
+        motion.begin("webview-b", DragEnd::default());
+        motion.finish(old);
+        assert!(motion.paused("webview-b", "terminal-c", now, false));
+        assert!(!motion.paused("note-a", "note-d", now, false));
+        motion.poll_drag(|| true, |_| true, |_| true);
+        assert!(!motion.paused("webview-b", "terminal-c", now, false));
+
+        let failed = motion.begin("terminal-c", DragEnd::default());
+        motion.finish(failed);
+        assert!(!motion.paused("webview-b", "terminal-c", now, false));
+        motion.begin("terminal-c", DragEnd::default());
+        motion.poll_drag(|| true, |_| false, |label| label != "terminal-c");
+        assert!(!motion.paused("terminal-c", "note-b", now, false));
+        motion.poll_drag(
+            || panic!("idle sampled input"),
+            |_| unreachable!(),
+            |_| unreachable!(),
+        );
+    }
+
+    #[test]
+    fn resize_or_restore_settle_survives_drag_release() {
+        let now = Instant::now();
+        let mut motion = Motion::default();
+        motion.begin("note-a", DragEnd::default());
+        assert!(motion.record_change("note-a", now, false));
+        assert!(motion.record_change("terminal-c", now, true));
+        motion.poll_drag(|| false, |_| false, |_| true);
+        assert!(motion.paused("note-a", "note-b", now, false));
+        assert!(motion.paused("terminal-c", "note-d", now, false));
+        assert!(!motion.paused("note-a", "note-b", now + SETTLE, false));
+        motion.all = Some(now + SETTLE);
+        assert!(motion.paused("note-a", "note-b", now + SETTLE, false));
+    }
+
+    #[test]
+    fn release_draw_requires_visible_unchanged_endpoints_and_its_own_ack() {
+        let a = Rect {
+            x: 100.,
+            y: 80.,
+            w: 250.,
+            h: 125.,
+        };
+        let b = Rect { x: 500., ..a };
+        let moved = Rect { x: -320., ..a };
+        let overlap = Rect { x: 490., ..a };
+        assert!(curve(overlap, b).is_none());
+        let old = PendingDraw::new((a, b));
+        let new = PendingDraw::new((moved, b));
+        assert!(!acknowledged(Some(new.generation), old.generation, false));
+        assert!(!new.current(None)); // closed, hidden, minimized, or stash-owned endpoint
+        assert!(!new.current(Some((overlap, b))));
+        assert!(!new.current(Some((a, b))));
+        assert!(new.current(Some((moved, b))));
+        assert!(acknowledged(Some(new.generation), new.generation, false));
+    }
+
     #[test]
     fn motion_quiet_period_is_per_endpoint_and_restarts_on_each_event() {
         let start = Instant::now();

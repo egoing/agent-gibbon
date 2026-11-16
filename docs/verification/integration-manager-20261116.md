@@ -1,6 +1,6 @@
 # 웹 세션 종료와 관리 창 검색 통합 검증
 
-[#119](https://github.com/egoing/agent-gibbon/issues/119), [#184](https://github.com/egoing/agent-gibbon/issues/184), [#30](https://github.com/egoing/agent-gibbon/issues/30)을 main `22dc7de7309f8d47772bb0cf1f2c88768f742ef8` 위에서 함께 검증했다. 브랜치는 `codex/issue30-manager-search`, 계획 커밋은 `3ee80bf59b9b50b0e8547946deeb464729367609`다. [Draft #211](https://github.com/egoing/agent-gibbon/pull/211)은 계획만 담고 있다. [Draft #205](https://github.com/egoing/agent-gibbon/pull/205)와 [Draft #206](https://github.com/egoing/agent-gibbon/pull/206)은 통합 검토본에 포함한 개별 제안이다.
+[#119](https://github.com/egoing/agent-gibbon/issues/119), [#184](https://github.com/egoing/agent-gibbon/issues/184), [#30](https://github.com/egoing/agent-gibbon/issues/30)을 main `22dc7de7309f8d47772bb0cf1f2c88768f742ef8` 위에서 함께 검증했다. 브랜치는 `codex/issue30-manager-search`, 계획 커밋은 `3ee80bf59b9b50b0e8547946deeb464729367609`다. [Draft #211](https://github.com/egoing/agent-gibbon/pull/211)은 야간 검증 당시 계획만 담고 있었다. [Draft #205](https://github.com/egoing/agent-gibbon/pull/205)와 [Draft #206](https://github.com/egoing/agent-gibbon/pull/206)은 이후 main에 병합됐다. #211은 그 위에 검색과 세션별 갱신을 적용한다.
 
 ## 통합 동작
 
