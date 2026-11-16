@@ -203,7 +203,7 @@ body.dirty #save { background: var(--panel); }
 #memo-editor img.ProseMirror-separator { display: inline !important; border: none !important; margin: 0 !important; width: 1px !important; height: 1px !important; }
 
 .selection-format { position: fixed; z-index: 10; display: flex; gap: 1px; max-width: calc(100vw - 8px); padding: 2px; overflow-x: auto; background: var(--background); color: var(--foreground); border: 1px solid var(--border); border-radius: 4px; box-shadow: 0 2px 5px #0002; user-select: none; -webkit-user-select: none; cursor: default; }
-.selection-format button { flex: 0 0 24px; width: 24px; height: 22px; padding: 0; font-size: 11px; }
+.selection-format button { flex: none; width: auto; min-width: 24px; height: 22px; padding: 0 3px; white-space: nowrap; font-size: 11px; }
 .selection-format button[aria-pressed=true] { background: var(--panel); }
 .selection-format button:focus-visible { outline: 2px solid color-mix(in srgb, var(--foreground) 28%, transparent); outline-offset: -2px; }
 .selection-format button[data-format=strong] { font-weight: 700; }
