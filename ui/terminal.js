@@ -10,8 +10,32 @@ terminal.loadAddon(fit);
 terminal.open(document.getElementById('terminal'));
 let homePath=null, selectedFolder=null, selectedChoice=null, availableChoices=[], folders=[], expandedFolders=false, selectingFolder=false;
 let restoreSupported=true;
+let ended=false;
 let started=false, starting=false, input=Promise.resolve(), resizeTimer;
 function report(e){status.textContent=String(e);}
+// A successful terminal_start creates the PTY at the supplied cell size. Only
+// one subsequent resize may be in flight; xterm holds the latest desired grid.
+let appliedSize=null, resizing=false, retryTimer;
+async function syncPtySize(retry=true){
+  if(!started || ended || resizing)return;
+  clearTimeout(retryTimer);
+  resizing=true;
+  try{
+    while(!ended && (terminal.cols!==appliedSize.cols || terminal.rows!==appliedSize.rows)){
+      const size={cols:terminal.cols,rows:terminal.rows};
+      try{
+        await invoke('terminal_resize',size);
+        appliedSize=size;
+      }catch(error){
+        if(ended)break;
+        report(error);
+        if(size.cols!==terminal.cols || size.rows!==terminal.rows)continue;
+        if(retry)retryTimer=setTimeout(()=>syncPtySize(false),120);
+        break;
+      }
+    }
+  }finally{resizing=false;}
+}
 function measure(){
   const host=document.getElementById('terminal');
   if(!host.clientWidth||!host.clientHeight)return;
@@ -25,10 +49,15 @@ function measure(){
   const forced=matchMedia('(forced-colors: active)').matches;
   if(forced)fit.fit();
   else if(cellWidth>0&&cellHeight>0)terminal.resize(Math.max(2,Math.floor(width/cellWidth)),Math.max(1,Math.floor(height/cellHeight)));
-  if(started)invoke('terminal_resize',{cols:terminal.cols,rows:terminal.rows}).catch(report);
+  void syncPtySize();
 }
-new ResizeObserver(()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(measure,60);}).observe(document.getElementById('terminal'));
-function sendInput(data){input=input.then(()=>invoke('terminal_write',{data})).catch(report);}
+function scheduleMeasure(){
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(measure,60);
+}
+new ResizeObserver(scheduleMeasure).observe(document.getElementById('terminal'));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleMeasure();});
+function sendInput(data){input=input.then(()=>{if(!ended)return invoke('terminal_write',{data});}).catch(report);}
 terminal.onData(sendInput);
 window.installTerminalIme(terminal, sendInput);
 // xterm owns composition events and Ctrl+C. Copy/paste uses local clipboard only.
@@ -53,11 +82,12 @@ document.getElementById('terminal').addEventListener('pointerdown', e => {
 document.querySelectorAll('.resize').forEach(handle=>handle.addEventListener('pointerdown',e=>{if(e.button===0)win.startResizeDragging(handle.dataset.direction).catch(report);}));
 document.getElementById('close').onclick=()=>invoke('terminal_close').catch(report);
 function setInfo(info){
+  ended ||= info.exit_code!=null;
   document.getElementById('title').textContent=info.running && info.program && info.program !== 'shell' ? info.program : info.title;
 
 }
 async function start(choice, trigger, plan){
-  if(started||starting)return;
+  if(started||starting||ended)return;
   if(!restoreSupported && (plan !== undefined || choice === 'auto-monitor')){
     report('터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.');
     return;
@@ -79,7 +109,9 @@ async function start(choice, trigger, plan){
   try{
     if(selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
     await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('terminal.start', async flow => {
-      await flow.invoke('terminal_start',{cols:terminal.cols,rows:terminal.rows,output,choice,...(plan === undefined ? {} : {plan})});
+      const size={cols:terminal.cols,rows:terminal.rows};
+      await flow.invoke('terminal_start',{...size,output,choice,...(plan === undefined ? {} : {plan})});
+      appliedSize=size;
       flow.stage('response');
       flow.frame?.();
     });
@@ -148,6 +180,12 @@ document.getElementById('choose-folder').onclick=async()=>{
   setInfo(info);
   {
     const close=document.getElementById('close');close.title='터미널 종료';close.setAttribute('aria-label','터미널 종료');
+    if(ended){
+      document.getElementById('welcome').hidden=true;
+      document.getElementById('terminal').hidden=false;
+      terminal.write('\r\n[PTY 세션 종료]\r\n');
+      return;
+    }
     document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;
     await welcome();
     if(info.restore_plan && !info.running){planInput.value=info.restore_plan;restorePanel.hidden=false;welcomePanel.hidden=true;
@@ -159,14 +197,14 @@ document.getElementById('choose-folder').onclick=async()=>{
   window.gibbonMeasure?.('terminal.ui.ready',clock());
 })().catch(report);
 // Refresh only the current directory; never collect input, output or history.
-setInterval(()=>{if(started)invoke('terminal_info').then(setInfo).catch(report);},2000);
+setInterval(()=>{if(started && !ended)invoke('terminal_info').then(setInfo).catch(report);},2000);
 
 document.getElementById('pin').onclick=async()=>{
   try { await invoke('toggle_pin'); const button=document.getElementById('pin'); button.setAttribute('aria-pressed',String(button.getAttribute('aria-pressed')!=='true')); } catch(e){report(e);}
 };
 document.getElementById('font-size').onclick=()=>{
   const sizes=[13,14,16,18];terminal.options.fontSize=sizes[(sizes.indexOf(terminal.options.fontSize)+1)%sizes.length];
-  const button=document.getElementById('font-size');button.title=`글자 크기 ${terminal.options.fontSize}px · 클릭하여 변경`;button.setAttribute('aria-label',button.title);measure();
+  const button=document.getElementById('font-size');button.title=`글자 크기 ${terminal.options.fontSize}px · 클릭하여 변경`;button.setAttribute('aria-label',button.title);scheduleMeasure();
 };
 document.getElementById('copy').onclick=()=>{
   const text=terminal.getSelection();if(text)window.__TAURI__.clipboardManager.writeText(text).catch(report);

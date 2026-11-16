@@ -44,8 +44,7 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
         auto_restore: false,
     };
     crate::memo_color::create(&root(app), &id)?;
-    save(&root(app), &agent)?;
-    state.records.lock().map_err(err)?.insert(id.clone(), agent);
+    state.records.insert(&root(app), agent)?;
     open(app, &id)?;
     crate::tray::refresh(app)?;
     inspect(app, &id)
@@ -273,7 +272,7 @@ pub async fn terminal_folder(window: WebviewWindow, path: Option<String>) -> Res
         let mut selected = false;
         if let Some(path) = path {
             selected = true;
-            set_path(&app, &id, PathBuf::from(path))?;
+            set_path(&app, &id, PathBuf::from(path), EditSource::Request)?;
         } else if let Some(path) = app
             .dialog()
             .file()
@@ -282,7 +281,7 @@ pub async fn terminal_folder(window: WebviewWindow, path: Option<String>) -> Res
         {
             selected = true;
             let path = path.into_path().map_err(err)?;
-            set_path(&app, &id, path)?;
+            set_path(&app, &id, path, EditSource::Request)?;
         }
         let mut info = inspect(&app, &id)?;
         info["folder_selected"] = json!(selected);
@@ -291,19 +290,24 @@ pub async fn terminal_folder(window: WebviewWindow, path: Option<String>) -> Res
     .await
     .map_err(err)?
 }
-pub(super) fn set_path(app: &tauri::AppHandle, id: &str, path: PathBuf) -> Result<(), String> {
+pub(super) fn set_path(
+    app: &tauri::AppHandle,
+    id: &str,
+    path: PathBuf,
+    source: EditSource,
+) -> Result<(), String> {
     if !path.is_absolute() || !path.is_dir() {
         return Err("사용 가능한 폴더가 아닙니다".into());
     }
     let state = app.state::<Terminals>();
-    let mut agents = state.records.lock().map_err(err)?;
-    let agent = agents.get_mut(id).ok_or("터미널 창이 없습니다")?;
-    if agent.kind != Kind::Terminal {
-        return Ok(());
-    }
-    if agent.last_path.as_ref() != Some(&path) {
+    if !state.records.edit(&root(app), id, source, |agent| {
+        if agent.kind != Kind::Terminal || agent.last_path.as_ref() == Some(&path) {
+            return false;
+        }
         remember_path(agent, path, now());
-        save(&root(app), agent)?;
+        true
+    })? {
+        return Err("터미널 창이 없습니다".into());
     }
     Ok(())
 }
@@ -315,11 +319,18 @@ pub fn terminal_rename(window: WebviewWindow, title: String) -> Result<Value, St
     }
     {
         let state = window.state::<Terminals>();
-        let mut agents = state.records.lock().map_err(err)?;
-        let a = agents.get_mut(&id).ok_or("터미널 창이 없습니다")?;
-        a.title = title.trim().into();
-        a.updated_at = now();
-        save(&root(window.app_handle()), a)?;
+        if !state.records.edit(
+            &root(window.app_handle()),
+            &id,
+            EditSource::Request,
+            |record| {
+                record.title = title.trim().into();
+                record.updated_at = now();
+                true
+            },
+        )? {
+            return Err("터미널 창이 없습니다".into());
+        }
     }
     crate::tray::refresh(window.app_handle())?;
     inspect(window.app_handle(), &id)
@@ -457,13 +468,7 @@ fn bare_monitor(_: &Session) -> Option<String> {
 
 pub(super) fn refresh_path(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     let state = app.state::<Terminals>();
-    if state
-        .records
-        .lock()
-        .map_err(err)?
-        .get(id)
-        .is_none_or(|a| a.kind != Kind::Terminal)
-    {
+    if !state.records.contains(id) {
         return Ok(());
     }
     let session = state
@@ -471,31 +476,204 @@ pub(super) fn refresh_path(app: &tauri::AppHandle, id: &str) -> Result<(), Strin
         .lock()
         .map_err(err)?
         .get(id)
-        .and_then(running);
-    if let Some(session) = session {
+        .and_then(running_generation);
+    if let Some((token, session)) = session {
         let mut s = session.lock().map_err(err)?;
-        let alive = s.child.try_wait().map_err(err)?.is_none();
-        let monitor = if alive { bare_monitor(&s) } else { None };
-        if alive && !s.observed_command {
-            if let Some(name) = foreground_name(&s) {
-                remember_plan(app, id, Some(&name));
-            }
-        }
-        if let Some(record) = state.records.lock().map_err(err)?.get_mut(id) {
-            let eligible = monitor.is_some() && monitor == record.restore_plan;
-            if record.auto_restore != eligible {
-                record.auto_restore = eligible;
-                save(&root(app), record)?;
-            }
-        }
-        if alive {
-            if let Some(path) = s.child.process_id().and_then(process_cwd) {
-                drop(s);
-                set_path(app, id, path)?;
-            }
-        }
+        refresh_session_path(&state, &root(app), id, RecordOwner::Active(token), &mut s)?;
     }
     Ok(())
+}
+
+#[derive(Clone, Copy)]
+pub(super) enum RecordOwner {
+    Active(u64),
+    Exited(u64),
+    Shutdown,
+}
+
+impl Terminals {
+    pub(super) fn edit_owned(
+        &self,
+        root: &Path,
+        id: &str,
+        owner: RecordOwner,
+        source: EditSource,
+        edit: impl FnOnce(&mut Terminal) -> bool,
+    ) -> Result<(), String> {
+        // Serialize with all metadata writers, then recheck the slot at the
+        // point of mutation. Release the registry before doing any disk I/O.
+        let exists = self.records.edit_checked(root, id, source, |record| {
+            let slots = self.sessions.lock().map_err(err)?;
+            let slot = slots.get(id);
+            let allowed = match owner {
+                RecordOwner::Shutdown => self.stopping.load(Ordering::Acquire) && slot.is_none(),
+                RecordOwner::Active(token) => {
+                    !self.stopping.load(Ordering::Acquire)
+                        && slot.is_some_and(|s| {
+                            s.token() == token && !matches!(s, Slot::Exited { .. })
+                        })
+                }
+                RecordOwner::Exited(token) => {
+                    matches!(slot, Some(Slot::Exited { token: current, .. }) if *current == token)
+                }
+            };
+            if !allowed {
+                return match source {
+                    EditSource::Request => Err("터미널 세션이 변경되었습니다".into()),
+                    EditSource::Observation => Ok(false),
+                };
+            }
+            Ok(edit(record))
+        })?;
+        if !exists && source == EditSource::Request {
+            return Err("터미널 창이 없습니다".into());
+        }
+        Ok(())
+    }
+}
+
+pub(super) fn start_metadata(
+    app: &tauri::AppHandle,
+    id: &str,
+    token: u64,
+    initial: Option<&str>,
+) -> Result<(), String> {
+    app.state::<Terminals>().edit_owned(
+        &root(app),
+        id,
+        RecordOwner::Active(token),
+        EditSource::Request,
+        |record| {
+            let plan = initial.and_then(plan_preview);
+            let changed =
+                record.restore_plan != plan || record.last_path.is_some() || record.auto_restore;
+            record.restore_plan = plan;
+            record.auto_restore = false;
+            if record.last_path.is_some() {
+                record.path_updated = now();
+            }
+            changed
+        },
+    )
+}
+
+pub(super) fn reset_auto_restore(record: &mut Terminal) -> bool {
+    std::mem::take(&mut record.auto_restore)
+}
+
+pub(super) fn retire(
+    app: &tauri::AppHandle,
+    id: &str,
+    token: u64,
+    status: portable_pty::ExitStatus,
+    jobs: OwnedJobs,
+) -> bool {
+    let state = app.state::<Terminals>();
+    if !state.mark_exited(id, token, status, jobs) {
+        return false;
+    }
+    let _ = state.edit_owned(
+        &root(app),
+        id,
+        RecordOwner::Exited(token),
+        EditSource::Observation,
+        reset_auto_restore,
+    );
+    true
+}
+
+pub(super) fn output_metadata(
+    app: &tauri::AppHandle,
+    id: &str,
+    token: u64,
+    plan: Option<&str>,
+    paths: Vec<PathBuf>,
+) {
+    let paths: Vec<_> = paths
+        .into_iter()
+        .filter(|p| p.is_absolute() && p.is_dir())
+        .collect();
+    let _ = app.state::<Terminals>().edit_owned(
+        &root(app),
+        id,
+        RecordOwner::Active(token),
+        EditSource::Observation,
+        |record| {
+            let mut changed = false;
+            if let Some(plan) = plan {
+                let plan = plan_preview(plan);
+                if record.restore_plan != plan {
+                    record.restore_plan = plan;
+                    changed = true;
+                }
+            }
+            for path in paths {
+                if record.last_path.as_ref() != Some(&path) {
+                    remember_path(record, path, now());
+                    changed = true;
+                }
+            }
+            changed
+        },
+    );
+}
+
+#[derive(Default)]
+struct SessionSnapshot {
+    plan: Option<String>,
+    monitor: Option<String>,
+    path: Option<PathBuf>,
+}
+
+impl SessionSnapshot {
+    fn observe(s: &mut Session) -> Result<Self, String> {
+        if s.child.try_wait().map_err(err)?.is_some() {
+            return Ok(Self::default());
+        }
+        Ok(Self {
+            plan: (!s.observed_command).then(|| foreground_name(s)).flatten(),
+            monitor: bare_monitor(s),
+            path: s
+                .child
+                .process_id()
+                .and_then(process_cwd)
+                .filter(|p| p.is_absolute() && p.is_dir()),
+        })
+    }
+
+    fn apply(self, record: &mut Terminal) -> bool {
+        let mut changed = false;
+        if let Some(name) = self.plan {
+            let plan = plan_preview(&name);
+            changed |= record.restore_plan != plan;
+            record.restore_plan = plan;
+        }
+        let eligible = self.monitor.is_some() && self.monitor == record.restore_plan;
+        changed |= record.auto_restore != eligible;
+        record.auto_restore = eligible;
+        if let Some(path) = self.path.filter(|p| record.last_path.as_ref() != Some(p)) {
+            remember_path(record, path, now());
+            changed = true;
+        }
+        changed
+    }
+}
+
+pub(super) fn refresh_session_path(
+    state: &Terminals,
+    root: &Path,
+    id: &str,
+    owner: RecordOwner,
+    s: &mut Session,
+) -> Result<(), String> {
+    let snapshot = match SessionSnapshot::observe(s) {
+        Ok(value) => value,
+        Err(_) if matches!(owner, RecordOwner::Shutdown) => SessionSnapshot::default(),
+        Err(error) => return Err(error),
+    };
+    state.edit_owned(root, id, owner, EditSource::Observation, |record| {
+        snapshot.apply(record)
+    })
 }
 fn plan_preview(line: &str) -> Option<String> {
     let mut words = line.split_ascii_whitespace();
@@ -525,25 +703,13 @@ fn plan_preview(line: &str) -> Option<String> {
         Some(name.into())
     }
 }
-pub(super) fn remember_plan(app: &tauri::AppHandle, id: &str, line: Option<&str>) {
-    let state = app.state::<Terminals>();
-    let Ok(mut records) = state.records.lock() else {
-        return;
-    };
-    if let Some(record) = records.get_mut(id) {
-        let plan = line.and_then(plan_preview);
-        if record.restore_plan != plan {
-            record.restore_plan = plan;
-            let _ = save(&root(app), record);
-        }
-    }
-}
 pub(super) fn start(
     agent: &Terminal,
     choice: &str,
     plan: Option<&str>,
     dimensions: PtySize,
-) -> Result<(Session, Box<dyn Read + Send>), String> {
+    spawned: impl FnOnce(OwnedChild),
+) -> Result<(Session, PtyReader), String> {
     require_restore_support(
         std::env::consts::OS,
         plan.is_some() || choice == "auto-monitor",
@@ -577,14 +743,24 @@ pub(super) fn start(
     };
     let shell = default_shell()?;
     drop(prepare);
-    start_shell(&cwd, line, dimensions, &shell)
+    start_shell_supervised(&cwd, line, dimensions, &shell, spawned)
 }
+#[cfg(test)]
 fn start_shell(
     cwd: &Path,
     line: Option<String>,
     dimensions: PtySize,
     shell: &Path,
-) -> Result<(Session, Box<dyn Read + Send>), String> {
+) -> Result<(Session, PtyReader), String> {
+    start_shell_supervised(cwd, line, dimensions, shell, drop)
+}
+fn start_shell_supervised(
+    cwd: &Path,
+    line: Option<String>,
+    dimensions: PtySize,
+    shell: &Path,
+    spawned: impl FnOnce(OwnedChild),
+) -> Result<(Session, PtyReader), String> {
     let prompt = PromptState::new();
     let pair = {
         let _timing = crate::telemetry::Timing::new("terminal.pty.create");
@@ -630,16 +806,18 @@ fn start_shell(
         pair.slave.spawn_command(cmd).map_err(err)?
     };
     drop(pair.slave);
+    let child = OwnedChild::new(child);
+    spawned(child.clone());
     let mut session = Session {
         master: pair.master,
         writer: Box::new(std::io::sink()),
-        child: OwnedChild(Some(child)),
+        child,
         program: "shell".into(),
         observed_command: false,
         prompt,
     };
     let _attach = crate::telemetry::Timing::new("terminal.io.attach");
-    let reader = session.master.try_clone_reader().map_err(err)?;
+    let reader = PtyReader::new(&*session.master)?;
     session.writer = session.master.take_writer().map_err(err)?;
     #[cfg(unix)]
     if setup.is_some() {
@@ -662,7 +840,8 @@ fn start_shell(
 }
 fn busy(session: &mut Session) -> bool {
     if session.child.try_wait().ok().flatten().is_some() {
-        return false;
+        // The root has exited but the pump may still be draining a background job.
+        return true;
     }
     if !session.prompt.ready {
         return true;
@@ -694,15 +873,17 @@ pub fn terminal_close(window: WebviewWindow) -> Result<(), String> {
 pub fn request_close(window: &WebviewWindow) -> Result<(), String> {
     let app = window.app_handle();
     let id = window.label().to_string();
-    refresh_path(app, &id)?;
     let state = app.state::<Terminals>();
     let sessions = state.sessions.lock().map_err(err)?;
     let expected = close_identity(sessions.get(&id));
+    let remaining_jobs =
+        matches!(sessions.get(&id), Some(Slot::Exited {jobs,..}) if jobs.may_have_jobs());
     let session = sessions.get(&id).and_then(running);
     drop(sessions);
-    let needs_confirm = session
-        .as_ref()
-        .is_some_and(|s| busy(&mut s.lock().unwrap()));
+    let needs_confirm = remaining_jobs
+        || session
+            .as_ref()
+            .is_some_and(|s| s.try_lock().map(|mut s| busy(&mut s)).unwrap_or(true));
     if needs_confirm {
         let app = app.clone();
         app.clone()
@@ -726,30 +907,123 @@ pub fn request_close(window: &WebviewWindow) -> Result<(), String> {
         finish_close(app, &id, expected)
     }
 }
-fn close_identity(slot: Option<&Slot>) -> Option<(bool, usize)> {
-    slot.map(|slot| match slot {
-        Slot::Starting(token) => (false, *token as usize),
-        Slot::Running(session) => (true, Arc::as_ptr(session) as usize),
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CloseIdentity {
+    Starting(u64),
+    Session(u64),
+}
+fn close_identity(slot: Option<&Slot>) -> Option<CloseIdentity> {
+    slot.map(|s| match s {
+        Slot::Starting { token, .. } => CloseIdentity::Starting(*token),
+        Slot::Running { token, .. } | Slot::Exited { token, .. } => CloseIdentity::Session(*token),
     })
 }
+struct WindowChange<'a> {
+    state: &'a Terminals,
+    id: &'a str,
+}
+
+impl<'a> WindowChange<'a> {
+    fn begin(
+        state: &'a Terminals,
+        id: &'a str,
+        expected: Option<CloseIdentity>,
+    ) -> Result<Option<Self>, String> {
+        let sessions = state.sessions.lock().map_err(err)?;
+        if state.stopping.load(Ordering::Acquire)
+            || close_identity(sessions.get(id)) != expected
+            || !state.closing.lock().map_err(err)?.insert(id.to_owned())
+        {
+            return Ok(None);
+        }
+        Ok(Some(Self { state, id }))
+    }
+}
+impl Drop for WindowChange<'_> {
+    fn drop(&mut self) {
+        let _sessions = self.state.sessions.lock().unwrap();
+        self.state.closing.lock().unwrap().remove(self.id);
+    }
+}
+
 fn finish_close(
     app: &tauri::AppHandle,
     id: &str,
-    expected: Option<(bool, usize)>,
+    expected: Option<CloseIdentity>,
 ) -> Result<(), String> {
     let state = app.state::<Terminals>();
-    refresh_path(app, id)?;
-    let mut sessions = state.sessions.lock().map_err(err)?;
-    if close_identity(sessions.get(id)) != expected {
-        return Ok(());
+    if close_window(&state, &root(app), id, expected, || {
+        if let Some(window) = app.get_webview_window(id) {
+            crate::stash::release(&window)?;
+            window.destroy().map_err(err)?;
+        }
+        Ok(())
+    })? {
+        crate::tray::refresh(app)?;
     }
-    if let Some(window) = app.get_webview_window(id) {
-        crate::stash::release(&window)?;
-        window.destroy().map_err(err)?;
+    Ok(())
+}
+
+fn close_window(
+    state: &Terminals,
+    root: &Path,
+    id: &str,
+    expected: Option<CloseIdentity>,
+    destroy: impl FnOnce() -> Result<(), String>,
+) -> Result<bool, String> {
+    let Some(guard) = WindowChange::begin(state, id, expected)? else {
+        return Ok(false);
+    };
+    let session = state
+        .sessions
+        .lock()
+        .map_err(err)?
+        .get(id)
+        .and_then(running);
+    let snapshot = session.and_then(|s| SessionSnapshot::observe(&mut *s.try_lock().ok()?).ok());
+    destroy()?;
+
+    // Transfer the slot and register its final write together. Quit either
+    // owns the slot itself or waits for this producer before sealing Records.
+    let (slot, _save) = {
+        let mut slots = state.sessions.lock().map_err(err)?;
+        let Some(slot) = slots.remove(id) else {
+            return Ok(true);
+        };
+        (slot, state.close_saves.enter())
+    };
+    // Signal the supervisor before acquiring Records::io. A blocked writer
+    // may retain Session, but cannot postpone dropping Control.
+    let mut snapshot = snapshot.unwrap_or_default();
+    if !matches!(slot, Slot::Running { .. }) {
+        snapshot.monitor = None;
     }
-    sessions.remove(id);
-    drop(sessions);
-    crate::tray::refresh(app)
+    match slot {
+        Slot::Exited { jobs, .. } => jobs.stop(),
+        other => drop(other),
+    }
+    state
+        .records
+        .edit(root, id, EditSource::Observation, |r| snapshot.apply(r))?;
+    drop(guard);
+    Ok(true)
+}
+
+#[cfg(all(test, unix))]
+pub(super) fn close_fixture(
+    state: &Terminals,
+    root: &Path,
+    id: &str,
+    token: u64,
+    destroyed: impl FnOnce() -> Result<(), String>,
+) -> Result<bool, String> {
+    close_window(
+        state,
+        root,
+        id,
+        Some(CloseIdentity::Session(token)),
+        destroyed,
+    )
 }
 
 #[cfg(test)]
@@ -1036,18 +1310,15 @@ mod report_tests {
 // List deletion is deliberately distinct from closing a window or hiding a session.
 pub fn delete(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     let state = app.state::<Terminals>();
-    if state.sessions.lock().map_err(err)?.contains_key(id) {
-        return Err("먼저 터미널 창을 종료하세요".into());
-    }
-    if !state.records.lock().map_err(err)?.contains_key(id) {
+    let _deleting = WindowChange::begin(&state, id, None)?.ok_or("먼저 터미널 창을 종료하세요")?;
+    if !state.records.contains(id) {
         return Err("터미널이 없습니다".into());
     }
     if let Some(w) = app.get_webview_window(id) {
         crate::stash::release(&w)?;
         w.destroy().map_err(err)?;
     }
-    std::fs::remove_file(metadata(&root(app)).join(format!("{id}.json"))).map_err(err)?;
-    state.records.lock().map_err(err)?.remove(id);
+    state.records.delete(&root(app), id)?;
     crate::tray::refresh(app)
 }
 
@@ -1108,7 +1379,7 @@ impl PromptState {
         self.due = self.due.saturating_sub(1);
         self.ready = self.due == 0 && !self.editing;
     }
-    fn new() -> Self {
+    pub(super) fn new() -> Self {
         static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
         Self {
             token: format!(
@@ -1122,16 +1393,21 @@ impl PromptState {
         }
     }
 }
-pub(super) fn touch_path(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+pub(super) fn touch_path(app: &tauri::AppHandle, id: &str, token: u64) -> Result<(), String> {
     let state = app.state::<Terminals>();
-    let mut agents = state.records.lock().map_err(err)?;
-    if let Some(agent) = agents
-        .get_mut(id)
-        .filter(|a| a.kind == Kind::Terminal && a.last_path.is_some())
-    {
-        agent.path_updated = now();
-        save(&root(app), agent)?;
-    }
+    state.edit_owned(
+        &root(app),
+        id,
+        RecordOwner::Active(token),
+        EditSource::Request,
+        |agent| {
+            if agent.kind != Kind::Terminal || agent.last_path.is_none() {
+                return false;
+            }
+            agent.path_updated = now();
+            true
+        },
+    )?;
     Ok(())
 }
 
@@ -1152,14 +1428,43 @@ mod lifecycle_tests {
     }
     #[test]
     fn old_reservation_does_not_match_reopened_window() {
+        let state = Terminals::default();
+        let first = Start::reserve(&state, "terminal-1").unwrap();
+        let old = close_identity(state.sessions.lock().unwrap().get("terminal-1"));
+        drop(first);
+        let _next = Start::reserve(&state, "terminal-1").unwrap();
         assert_ne!(
-            close_identity(Some(&Slot::Starting(1))),
-            close_identity(Some(&Slot::Starting(2)))
+            old,
+            close_identity(state.sessions.lock().unwrap().get("terminal-1"))
         );
-        assert_ne!(
-            close_identity(None),
-            close_identity(Some(&Slot::Starting(1)))
-        );
+        assert_ne!(old, None);
+    }
+    #[test]
+    fn deleting_or_closing_a_window_excludes_start_and_duplicate_changes() {
+        let state = Terminals::default();
+        let guard = WindowChange::begin(&state, "terminal-1", None)
+            .unwrap()
+            .unwrap();
+        assert!(Start::reserve(&state, "terminal-1").is_err());
+        assert!(WindowChange::begin(&state, "terminal-1", None)
+            .unwrap()
+            .is_none());
+        drop(guard);
+        let start = Start::reserve(&state, "terminal-1").unwrap();
+        assert!(WindowChange::begin(&state, "terminal-1", None)
+            .unwrap()
+            .is_none());
+        let close = WindowChange::begin(
+            &state,
+            "terminal-1",
+            Some(CloseIdentity::Starting(start.token)),
+        )
+        .unwrap()
+        .unwrap();
+        drop(start);
+        assert!(Start::reserve(&state, "terminal-1").is_err());
+        drop(close);
+        assert!(Start::reserve(&state, "terminal-1").is_ok());
     }
     #[cfg(target_os = "macos")]
     #[test]
@@ -1332,17 +1637,25 @@ mod lifecycle_tests {
         };
         assert!(busy(&mut session));
         drop(session);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(5);
         for child in children {
-            // A reparented zombie may remain until launchd/init reaps it; it must not run.
-            let status = std::process::Command::new("/bin/ps")
-                .args(["-o", "stat=", "-p", &child.to_string()])
-                .output()
-                .unwrap();
-            let status = String::from_utf8_lossy(&status.stdout);
-            assert!(
-                status.trim().is_empty() || status.trim().starts_with('Z'),
-                "child remains alive: {status}"
-            );
+            // The reaper runs outside the window-close callback. A reparented
+            // zombie may remain until launchd/init reaps it; it must not run.
+            loop {
+                let status = std::process::Command::new("/bin/ps")
+                    .args(["-o", "stat=", "-p", &child.to_string()])
+                    .output()
+                    .unwrap();
+                let status = String::from_utf8_lossy(&status.stdout);
+                if status.trim().is_empty() || status.trim().starts_with('Z') {
+                    break;
+                }
+                assert!(
+                    std::time::Instant::now() < deadline,
+                    "child remains alive: {status}"
+                );
+                std::thread::sleep(std::time::Duration::from_millis(10));
+            }
         }
     }
 }

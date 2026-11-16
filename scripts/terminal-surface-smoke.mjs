@@ -78,7 +78,11 @@ try {
   await page.evaluate(()=>new Promise(done=>terminal.write('\x1b[?1000l\x1b[?1006l\x1b[?1049l',done)));
  }
 
- const resizes=await page.evaluate(()=>window.calls.filter(c=>c.name==='terminal_resize').map(c=>c.args));assert(resizes.some(r=>r.cols===g.cols&&r.rows===g.rows));
+ const applied=await page.evaluate(()=>{
+  const {cols,rows}=window.calls.filter(c=>c.name==='terminal_start'||c.name==='terminal_resize').at(-1).args;
+  return {cols,rows,screenCols:terminal.cols,screenRows:terminal.rows};
+ });
+ assert.equal(applied.cols,applied.screenCols);assert.equal(applied.rows,applied.screenRows);
  // Actual capture layout styles; keep an intrinsic 16:9 image and no toolbar gap.
  await page.evaluate(()=>{document.body.classList.add('image-note');document.querySelector('header').replaceWith(document.querySelector('#controls'));document.querySelector('#terminal').hidden=true;const v=document.createElement('main');v.id='viewport';v.innerHTML='<article id="content"><img alt="fixture" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221600%22 height=%22900%22%3E%3Crect width=%221600%22 height=%22900%22 fill=%22%235a8%22/%3E%3C/svg%3E"></article>';document.querySelector('#memo-surface').append(v);});
  const image=await page.locator('#viewport').evaluate(e=>({top:e.getBoundingClientRect().top,bottom:document.querySelector('#controls').getBoundingClientRect().bottom,padding:getComputedStyle(e).padding,fit:getComputedStyle(e.querySelector('img')).objectFit}));assert.equal(image.top,image.bottom);assert.equal(image.padding,'0px');assert.equal(image.fit,'contain');
