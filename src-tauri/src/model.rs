@@ -159,6 +159,8 @@ pub struct Note {
     pub title: String,
     pub color: String,
     pub html: String,
+    #[serde(skip)]
+    pub manager_body_token: std::sync::OnceLock<String>,
     pub change_html: String,
     pub completion_html: Option<String>,
     pub quiet_update: bool,
@@ -182,6 +184,7 @@ impl Default for Note {
             title: "Agent Gibbon".into(),
             color: "#20252e".into(),
             html: html.clone(),
+            manager_body_token: Default::default(),
             change_html: html,
             completion_html: None,
             quiet_update: false,
@@ -317,6 +320,7 @@ impl Note {
                 }
             }
             self.html = render(markdown);
+            self.manager_body_token.take();
             self.markdown = markdown.clone();
             self.source_path = request.source_path.clone();
         }

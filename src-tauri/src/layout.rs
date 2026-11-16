@@ -37,6 +37,18 @@ pub fn register(w: &WebviewWindow, already_open: bool) {
         .unwrap()
         .open(w.label(), already_open);
 }
+pub(crate) fn forget(w: &WebviewWindow) {
+    w.state::<Exclusions>().0.lock().unwrap().remove(w.label());
+    w.state::<OpenOrder>()
+        .0
+        .lock()
+        .unwrap()
+        .0
+        .retain(|label| label != w.label());
+    if let Some((_, frames)) = w.state::<Undo>().0.lock().unwrap().as_mut() {
+        frames.retain(|(window, _, _)| window.label() != w.label());
+    }
+}
 pub fn excluded(w: &WebviewWindow) -> bool {
     w.state::<Exclusions>()
         .0

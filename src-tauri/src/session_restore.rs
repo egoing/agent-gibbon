@@ -4,6 +4,7 @@ use std::{
     collections::BTreeSet,
     fs,
     io::{Read, Write},
+    path::Path,
     sync::{
         atomic::{AtomicBool, Ordering},
         Mutex,
@@ -52,9 +53,39 @@ struct Snapshot {
 struct Journal {
     ready: AtomicBool,
     queued: AtomicBool,
-    last: Mutex<Vec<u8>>,
+    file: Mutex<FileState>,
     terminals: Mutex<BTreeSet<String>>,
     commands: Mutex<std::collections::BTreeMap<String, CommandPreview>>,
+}
+#[derive(Default)]
+struct FileState {
+    generation: u64,
+    closing: usize,
+    last: Vec<u8>,
+}
+
+impl Journal {
+    fn during_close(&self, close: impl FnOnce() -> Result<(), String>) -> Result<(), String> {
+        {
+            let mut file = self.file.lock().map_err(|e| e.to_string())?;
+            file.generation += 1;
+            file.closing += 1;
+        }
+        // Native destroy can dispatch another callback; no journal lock spans it.
+        let result = close();
+        self.file.lock().map_err(|e| e.to_string())?.closing -= 1;
+        result
+    }
+}
+
+pub(crate) fn during_web_close(
+    app: &tauri::AppHandle,
+    close: impl FnOnce() -> Result<(), String>,
+) -> Result<(), String> {
+    if app.try_state::<Journal>().is_none() {
+        app.manage(Journal::default());
+    }
+    app.state::<Journal>().during_close(close)
 }
 // A fixed allowlist is deliberately stricter than secret-pattern guessing. No raw
 // command line reaches disk; edits, escape sequences, arguments and multiline input
@@ -198,18 +229,14 @@ pub fn terminal_restored(app: &tauri::AppHandle, id: &str) -> bool {
     app.try_state::<Journal>()
         .is_some_and(|j| j.terminals.lock().is_ok_and(|ids| ids.contains(id)))
 }
-pub fn restore(app: &tauri::AppHandle) -> Result<bool, String> {
-    if crate::privacy::onboarding_required(app) {
-        return Ok(false);
-    }
-    let path = app.state::<crate::storage::Store>().0.join(FILE);
-    if !path.exists() {
-        return Ok(false);
-    }
+fn read_snapshot(root: &Path) -> Result<Option<Snapshot>, String> {
+    let file = match fs::File::open(root.join(FILE)) {
+        Ok(file) => file,
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+        Err(e) => return Err(e.to_string()),
+    };
     let mut bytes = Vec::new();
-    fs::File::open(path)
-        .map_err(|e| e.to_string())?
-        .take(MAX_BYTES + 1)
+    file.take(MAX_BYTES + 1)
         .read_to_end(&mut bytes)
         .map_err(|e| e.to_string())?;
     if bytes.len() as u64 > MAX_BYTES {
@@ -218,6 +245,16 @@ pub fn restore(app: &tauri::AppHandle) -> Result<bool, String> {
     let snapshot: Snapshot = serde_json::from_slice(&bytes)
         .map_err(|_| "시작 상태 파일을 해석할 수 없습니다".to_string())?;
     validate(&snapshot)?;
+    Ok(Some(snapshot))
+}
+pub fn restore(app: &tauri::AppHandle) -> Result<bool, String> {
+    if crate::privacy::onboarding_required(app) {
+        return Ok(false);
+    }
+    let store = app.state::<crate::storage::Store>();
+    let Some(snapshot) = read_snapshot(&store.0)? else {
+        return Ok(false);
+    };
     crate::monitor_layout::restore(app, snapshot.monitor_layout)?;
     app.manage(Journal::default());
     for id in &snapshot.closed_notes {
@@ -276,14 +313,23 @@ fn save(app: &tauri::AppHandle) -> Result<(), String> {
     {
         return Ok(());
     }
+    let store = app.state::<crate::storage::Store>();
+    checkpoint_file(&journal, &store.0, || collect_windows(app))
+}
+
+fn collect_windows(app: &tauri::AppHandle) -> Result<Option<Snapshot>, String> {
     let mut windows = Vec::new();
     let managed = crate::web::managed_windows(app);
     for (label, window) in managed {
-        if !supported(&label) {
+        if !supported(&label)
+            || label
+                .strip_prefix("webview-")
+                .is_some_and(|id| crate::web::closing(app, id))
+        {
             continue;
         }
         if crate::sizing::pending(&window) || crate::entrance::active(&window) {
-            return Ok(());
+            return Ok(None);
         }
         let url = if let Some(id) = label.strip_prefix("webview-") {
             let value = crate::web::inspect(app, id)?;
@@ -318,23 +364,109 @@ fn save(app: &tauri::AppHandle) -> Result<(), String> {
             .cloned()
             .collect(),
     };
+    Ok(Some(snapshot))
+}
+
+fn checkpoint_file(
+    journal: &Journal,
+    root: &Path,
+    collect: impl FnOnce() -> Result<Option<Snapshot>, String>,
+) -> Result<(), String> {
+    let generation = {
+        let file = journal.file.lock().map_err(|e| e.to_string())?;
+        if file.closing != 0 {
+            return Ok(());
+        }
+        file.generation
+    };
+    let Some(snapshot) = collect()? else {
+        return Ok(());
+    };
     validate(&snapshot)?;
     let bytes = serde_json::to_vec(&snapshot).map_err(|e| e.to_string())?;
-    let mut last = journal.last.lock().map_err(|e| e.to_string())?;
-    if *last == bytes {
+    let mut file = journal.file.lock().map_err(|e| e.to_string())?;
+    if file.generation != generation || file.last == bytes {
         return Ok(());
     }
-    let store = app.state::<crate::storage::Store>();
-    // Open/update/save_edit commit contents synchronously through Store. Geometry
-    // checkpoints must not rewrite every note on every drag or URL navigation.
-    fs::create_dir_all(&store.0).map_err(|e| e.to_string())?;
-    let mut temp = tempfile::NamedTempFile::new_in(&store.0).map_err(|e| e.to_string())?;
-    temp.write_all(&bytes).map_err(|e| e.to_string())?;
-    temp.as_file().sync_all().map_err(|e| e.to_string())?;
-    temp.persist(store.0.join(FILE))
-        .map_err(|e| e.to_string())?;
-    *last = bytes;
+    write_bytes(root, &bytes)?;
+    file.last = bytes;
     Ok(())
+}
+fn write_bytes(root: &Path, bytes: &[u8]) -> Result<(), String> {
+    if bytes.len() as u64 > MAX_BYTES {
+        return Err("시작 상태 파일이 너무 큽니다".into());
+    }
+    fs::create_dir_all(root).map_err(|e| e.to_string())?;
+    let mut temp = tempfile::NamedTempFile::new_in(root).map_err(|e| e.to_string())?;
+    temp.write_all(bytes).map_err(|e| e.to_string())?;
+    temp.as_file().sync_all().map_err(|e| e.to_string())?;
+    temp.persist(root.join(FILE)).map_err(|e| e.to_string())?;
+    Ok(())
+}
+// A full checkpoint can be deferred while other windows are stashed or moving.
+// Edit the last durable snapshot so a restart immediately after close is safe.
+fn forget_saved_web(
+    journal: &Journal,
+    root: &Path,
+    label: &str,
+    destroy: impl FnOnce() -> Result<(), String>,
+) -> Result<(), String> {
+    if !label.starts_with("webview-") || !supported(label) {
+        return Err("웹 창 이름이 유효하지 않습니다".into());
+    }
+    let undo = {
+        let mut file = journal.file.lock().map_err(|e| e.to_string())?;
+        file.last.clear();
+        let mut undo = None;
+        if let Some(mut snapshot) = read_snapshot(root)? {
+            let entry = snapshot
+                .windows
+                .iter()
+                .position(|e| e.window.label == label)
+                .map(|index| (index, snapshot.windows.remove(index)));
+            let layout = snapshot.monitor_layout.take_record(label);
+            if entry.is_some() || layout.is_some() {
+                write_bytes(
+                    root,
+                    &serde_json::to_vec(&snapshot).map_err(|e| e.to_string())?,
+                )?;
+                undo = Some((entry, layout));
+            }
+        }
+        undo
+    };
+    if let Err(error) = destroy() {
+        if let Some((entry, layout)) = undo {
+            let rollback = || -> Result<(), String> {
+                let _file = journal.file.lock().map_err(|e| e.to_string())?;
+                let mut snapshot = read_snapshot(root)?.ok_or("시작 기록을 찾을 수 없습니다")?;
+                // Another web close may have completed during native dispatch.
+                // Restore only this session, leaving that close intact.
+                if let Some((index, entry)) = entry {
+                    snapshot
+                        .windows
+                        .insert(index.min(snapshot.windows.len()), entry);
+                }
+                if let Some(layout) = layout {
+                    snapshot.monitor_layout.put_record(label, layout);
+                }
+                write_bytes(
+                    root,
+                    &serde_json::to_vec(&snapshot).map_err(|e| e.to_string())?,
+                )
+            };
+            rollback().map_err(|rollback| format!("{error}; 시작 기록 복구 실패: {rollback}"))?;
+        }
+        return Err(error);
+    }
+    Ok(())
+}
+pub(crate) fn close_web(window: &tauri::WebviewWindow) -> Result<(), String> {
+    let app = window.app_handle();
+    let root = app.state::<crate::storage::Store>();
+    forget_saved_web(&app.state::<Journal>(), &root.0, window.label(), || {
+        window.destroy().map_err(|e| e.to_string())
+    })
 }
 pub fn checkpoint(app: &tauri::AppHandle) {
     // Flush explicit geometry ownership before serializing the matching frame.
@@ -436,6 +568,135 @@ mod tests {
             serde_json::json!([600., 400.])
         );
         assert_eq!(value["windows"][0]["url"], "https://example.com/last");
+    }
+    #[test]
+    fn close_web_removes_only_its_restart_entry_even_when_retried() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        let mut snapshot = sample();
+        for label in ["webview-web-b", "note-text", "note-image", "terminal-demo"] {
+            let mut entry = sample().windows.remove(0);
+            entry.window.label = label.into();
+            if !label.starts_with("webview-") {
+                entry.url = None;
+            }
+            if label.starts_with("terminal-") {
+                entry.terminal_command = Some("pwd".into());
+            }
+            snapshot.windows.push(entry);
+        }
+        snapshot.closed_notes.push("closed-text".into());
+        let frame = serde_json::json!({"x":0,"y":0,"width":600,"height":400});
+        let layout = serde_json::json!({
+            "last":frame, "screen":{"bounds":frame,"work":frame,"scale":1.0},
+            "folded":true
+        });
+        snapshot.monitor_layout = serde_json::from_value(serde_json::json!({
+            "records": {"webview-web-a":layout, "note-text":layout}
+        }))
+        .unwrap();
+        let expected = serde_json::to_value(&snapshot.windows[1..]).unwrap();
+        write_bytes(root, &serde_json::to_vec(&snapshot).unwrap()).unwrap();
+
+        for _ in 0..2 {
+            forget_saved_web(&Journal::default(), root, "webview-web-a", || Ok(())).unwrap();
+            let restored = read_snapshot(root).unwrap().unwrap();
+            assert_eq!(serde_json::to_value(restored.windows).unwrap(), expected);
+            assert_eq!(restored.closed_notes, ["closed-text"]);
+            let layout = serde_json::to_value(restored.monitor_layout).unwrap();
+            let records = layout["records"].as_object().unwrap();
+            assert_eq!(records.len(), 1);
+            assert!(records.contains_key("note-text"));
+        }
+        forget_saved_web(&Journal::default(), root, "webview-web-b", || Ok(())).unwrap();
+        let restored = read_snapshot(root).unwrap().unwrap();
+        assert!(restored.windows.iter().all(|e| e.url.is_none()));
+        assert_eq!(restored.windows.len(), 3);
+    }
+
+    #[test]
+    fn checkpoint_collected_before_close_cannot_restore_the_closed_web() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        let journal = Journal::default();
+        write_bytes(root, &serde_json::to_vec(&sample()).unwrap()).unwrap();
+        checkpoint_file(&journal, root, || {
+            let prepared = read_snapshot(root)?;
+            journal
+                .during_close(|| forget_saved_web(&journal, root, "webview-web-a", || Ok(())))?;
+            Ok(prepared)
+        })
+        .unwrap();
+        assert!(read_snapshot(root).unwrap().unwrap().windows.is_empty());
+    }
+
+    #[test]
+    fn reentrant_checkpoint_and_second_close_preserve_only_the_failed_session() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        let journal = Journal::default();
+        let mut snapshot = sample();
+        let mut other = sample().windows.remove(0);
+        other.window.label = "webview-web-b".into();
+        snapshot.windows.push(other);
+        write_bytes(root, &serde_json::to_vec(&snapshot).unwrap()).unwrap();
+        let failed = journal.during_close(|| {
+            forget_saved_web(&journal, root, "webview-web-a", || {
+                checkpoint_file(&journal, root, || {
+                    panic!("native callback must defer collection")
+                })?;
+                journal.during_close(|| {
+                    forget_saved_web(&journal, root, "webview-web-b", || Ok(()))
+                })?;
+                Err("failed".into())
+            })
+        });
+        assert_eq!(failed, Err("failed".into()));
+        let restored = read_snapshot(root).unwrap().unwrap();
+        assert_eq!(restored.windows.len(), 1);
+        assert_eq!(restored.windows[0].window.label, "webview-web-a");
+        checkpoint_file(&journal, root, || {
+            let mut next = restored;
+            next.windows[0].window.width = 900;
+            Ok(Some(next))
+        })
+        .unwrap();
+        assert_eq!(
+            read_snapshot(root).unwrap().unwrap().windows[0]
+                .window
+                .width,
+            900
+        );
+    }
+
+    #[test]
+    fn failed_destroy_dispatch_restores_restart_entry() {
+        let dir = tempfile::tempdir().unwrap();
+        let original = serde_json::to_vec(&sample()).unwrap();
+        write_bytes(dir.path(), &original).unwrap();
+        let result = forget_saved_web(&Journal::default(), dir.path(), "webview-web-a", || {
+            assert!(read_snapshot(dir.path())
+                .unwrap()
+                .unwrap()
+                .windows
+                .is_empty());
+            Err("dispatch failed".into())
+        });
+        assert_eq!(result, Err("dispatch failed".into()));
+        assert_eq!(fs::read(dir.path().join(FILE)).unwrap(), original);
+    }
+
+    #[test]
+    fn close_preserves_invalid_journal_and_never_creates_an_absent_one() {
+        let dir = tempfile::tempdir().unwrap();
+        forget_saved_web(&Journal::default(), dir.path(), "webview-web-a", || Ok(())).unwrap();
+        let path = dir.path().join(FILE);
+        assert!(!path.exists());
+        fs::write(&path, b"invalid").unwrap();
+        assert!(
+            forget_saved_web(&Journal::default(), dir.path(), "webview-web-a", || Ok(())).is_err()
+        );
+        assert_eq!(fs::read(path).unwrap(), b"invalid");
     }
     #[test]
     fn invalid_records_are_rejected() {
