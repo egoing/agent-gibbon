@@ -732,12 +732,6 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 return;
             }
             if win.label().starts_with("terminal-") {
-                if matches!(
-                    event,
-                    tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_)
-                ) {
-                    terminal::geometry(win);
-                }
                 if let Some(w) = win.app_handle().get_webview_window(win.label()) {
                     match event {
                         tauri::WindowEvent::CloseRequested { api, .. } => {

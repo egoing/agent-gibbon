@@ -127,8 +127,7 @@ pub struct Terminals {
     stopping: AtomicBool,
     workers: Arc<Workers>,
     close_saves: Arc<Workers>,
-    records: Arc<persistence::Records>,
-    metadata_worker: Mutex<Option<std::thread::JoinHandle<Result<(), String>>>>,
+    records: persistence::Records,
     sessions: Mutex<BTreeMap<String, Slot>>,
     // Access only with the sessions mutex acquired first. Closing a native
     // window may call back into application code. Keep its slot until success.
@@ -224,7 +223,7 @@ fn root(app: &tauri::AppHandle) -> PathBuf {
 fn metadata(root: &Path) -> PathBuf {
     root.join(".agent-gibbon-terminals")
 }
-fn valid_id(id: &str) -> bool {
+pub(crate) fn valid_id(id: &str) -> bool {
     id.strip_prefix("terminal-")
         .is_some_and(|s| !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit()))
         && id.len() <= 64
@@ -273,11 +272,8 @@ fn read_records(root: &Path) -> Result<Vec<Terminal>, String> {
     Ok(records)
 }
 pub fn restore(app: &tauri::AppHandle) -> Result<(), String> {
-    let root = root(app);
-    let restored = read_records(&root)?;
-    let state = app.state::<Terminals>();
-    *state.metadata_worker.lock().map_err(err)? = Some(state.records.start(root, restored)?);
-    Ok(())
+    let restored = read_records(&root(app))?;
+    app.state::<Terminals>().records.restore(restored)
 }
 pub fn entries(app: &tauri::AppHandle) -> Vec<Terminal> {
     app.state::<Terminals>().records.all()
@@ -294,11 +290,15 @@ pub(crate) fn open_presented(
     present: bool,
 ) -> Result<(), String> {
     let _root = crate::telemetry::Timing::new("terminal.window.open");
-    let agent = app.state::<Terminals>().records.get(id)?;
+    let mut agent = app.state::<Terminals>().records.get(id)?;
     crate::focus::remember(app, id);
     let win = if let Some(win) = app.get_webview_window(id) {
         win
     } else {
+        if let Some((bounds, physical)) = crate::session_restore::reopen_geometry(app, id) {
+            agent.bounds = bounds;
+            agent.physical_position = physical;
+        }
         let window = {
             let _creation = crate::telemetry::Timing::new("terminal.window.create");
             crate::telemetry::checkpoint("terminal.window.create");
@@ -362,6 +362,7 @@ pub(crate) fn open_presented(
                     .map_err(err)?;
             }
         }
+        crate::session_restore::mark_reopened(app, id);
         window
     };
     if !present {
@@ -391,6 +392,12 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         return Err("터미널 창이 없습니다".into());
     }
     let win = app.get_webview_window(id);
+    let bounds = win
+        .as_ref()
+        .and_then(|w| crate::session_restore::logical_geometry(w).ok())
+        .or_else(|| crate::session_restore::reopen_geometry(app, id))
+        .map(|(bounds, _)| bounds)
+        .unwrap_or_else(|| agent.bounds.clone());
     let state = app.state::<Terminals>();
     let sessions = state.sessions.lock().map_err(err)?;
     let slot = sessions.get(id);
@@ -413,7 +420,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         (None, None, None, false)
     };
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":agent.bounds,"metadata_save_failed":app.state::<Terminals>().records.save_failed(id),"pid":pid,"program":program,"running":running,"exit_code":exit_status.as_ref().map(|s|s.exit_code()),"exit_signal":exit_status.as_ref().and_then(|s|s.signal()),"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":bounds,"metadata_save_failed":app.state::<Terminals>().records.save_failed(id),"pid":pid,"program":program,"running":running,"exit_code":exit_status.as_ref().map(|s|s.exit_code()),"exit_signal":exit_status.as_ref().and_then(|s|s.signal()),"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
     )
 }
 pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value, String> {
@@ -644,30 +651,6 @@ pub fn terminal_info(window: WebviewWindow) -> Result<Value, String> {
     let id = caller(&window)?;
     inspect(window.app_handle(), &id)
 }
-pub fn geometry(window: &tauri::Window) {
-    let app = window.app_handle();
-    if app
-        .get_webview_window(window.label())
-        .is_some_and(|w| crate::stash::owns(&w))
-    {
-        return;
-    }
-    if let (Ok(p), Ok(s), Ok(scale)) = (
-        window.outer_position(),
-        window.inner_size(),
-        window.scale_factor(),
-    ) {
-        let bounds = crate::capture::ImageNote {
-            x: f64::from(p.x) / if cfg!(windows) { 1.0 } else { scale },
-            y: f64::from(p.y) / if cfg!(windows) { 1.0 } else { scale },
-            width: f64::from(s.width) / scale,
-            height: f64::from(s.height) / scale,
-        };
-        app.state::<Terminals>()
-            .records
-            .geometry(window.label(), bounds, cfg!(windows));
-    }
-}
 pub fn update_blocked(app: &tauri::AppHandle) -> Result<bool, String> {
     app.state::<Terminals>().update_blocked()
 }
@@ -730,19 +713,15 @@ impl Terminals {
         }
     }
 
-    fn finish_metadata(&self, drained: mpsc::Receiver<()>) {
+    fn finish_metadata(&self, root: &Path, drained: mpsc::Receiver<()>) {
         // Final snapshots can outlive the PTY budget when storage is slow.
-        // Wait for their producers before sealing and flushing geometry.
+        // Wait for their producers before sealing and retrying failed edits.
         let _ = drained.recv();
         // After stop_all takes the registry, no close can claim another slot.
         // A close that won that race has already registered its pending save.
         self.close_saves.wait();
-        self.records.seal();
-        let worker = self.metadata_worker.lock().unwrap().take();
-        if let Some(worker) = worker {
-            if !matches!(worker.join(), Ok(Ok(()))) {
-                eprintln!("터미널 기록의 마지막 저장에 실패했습니다.");
-            }
+        if self.records.finish(root).is_err() {
+            eprintln!("터미널 기록의 마지막 저장에 실패했습니다.");
         }
     }
     fn stop_all(&self, refresh: impl Fn(&str, Option<&mut Session>) + Send + Sync + 'static) {
@@ -805,7 +784,7 @@ pub fn shutdown(app: &tauri::AppHandle) {
     if !complete {
         eprintln!("터미널 종료 대기 시간 초과");
     }
-    state.finish_metadata(drained);
+    state.finish_metadata(&root(app), drained);
 }
 
 #[cfg(test)]

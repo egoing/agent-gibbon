@@ -610,13 +610,29 @@ fn metadata_record(id: &str) -> Terminal {
     .unwrap()
 }
 
+fn background_title_edit(
+    state: &Arc<Terminals>,
+    root: &Path,
+    id: &'static str,
+) -> thread::JoinHandle<()> {
+    let state = state.clone();
+    let root = root.to_owned();
+    thread::spawn(move || {
+        assert!(state
+            .records
+            .edit(&root, id, EditSource::Request, |r| {
+                r.title = "slow edit".into();
+                true
+            })
+            .unwrap());
+    })
+}
+
 #[test]
-fn final_snapshots_outlive_the_pty_budget_and_flush_latest_geometry() {
+fn final_snapshots_outlive_the_pty_budget_and_preserve_a_concurrent_metadata_edit() {
     let dir = tempfile::tempdir().unwrap();
     let root = dir.path().canonicalize().unwrap();
     let state = Arc::new(Terminals::default());
-    *state.metadata_worker.lock().unwrap() =
-        Some(state.records.start(root.clone(), vec![]).unwrap());
     let live = "terminal-1";
     let starting = "terminal-2";
     let exited = "terminal-3";
@@ -644,12 +660,8 @@ fn final_snapshots_outlive_the_pty_budget_and_flush_latest_geometry() {
         entered.send(()).unwrap();
         released.recv_timeout(Duration::from_secs(6)).unwrap();
     }));
-    let mut bounds = metadata_record(live).bounds;
-    bounds.x = 44.;
-    state.records.geometry(live, bounds.clone(), true);
+    let edit = background_title_edit(&state, &root, live);
     writing.recv_timeout(Duration::from_secs(2)).unwrap();
-    bounds.x = 89.;
-    state.records.geometry(live, bounds, true);
     state.stopping.store(true, Ordering::Release);
     let (producers, drained) = mpsc::channel::<()>();
     let stopping = state.clone();
@@ -669,8 +681,9 @@ fn final_snapshots_outlive_the_pty_budget_and_flush_latest_geometry() {
     assert!(Start::reserve(&state, "terminal-10").is_err());
     let flush = state.clone();
     let (flushed, done) = mpsc::channel();
+    let flush_root = root.clone();
     let join = thread::spawn(move || {
-        flush.finish_metadata(drained);
+        flush.finish_metadata(&flush_root, drained);
         flushed.send(()).unwrap();
     });
     assert!(matches!(
@@ -678,6 +691,7 @@ fn final_snapshots_outlive_the_pty_budget_and_flush_latest_geometry() {
         Err(mpsc::RecvTimeoutError::Timeout)
     ));
     release.send(()).unwrap();
+    edit.join().unwrap();
     done.recv_timeout(Duration::from_secs(3)).unwrap();
     join.join().unwrap();
     drop(guard);
@@ -689,14 +703,13 @@ fn final_snapshots_outlive_the_pty_budget_and_flush_latest_geometry() {
     assert_eq!(records.len(), 4);
     assert!(records.iter().all(|r| !r.auto_restore));
     let stored = records.iter().find(|r| r.id == live).unwrap();
-    assert_eq!(stored.bounds.x, 89.);
-    assert!(stored.physical_position);
+    assert_eq!(stored.title, "slow edit");
     assert_eq!(stored.last_path.as_ref(), Some(&root));
     assert!(state
         .records
         .edit(&root, live, EditSource::Request, |_| true)
         .is_err());
-    eprintln!("direct child PIDs {}, {} reaped at {} ms; final file flush at {} ms; cwd, geometry and four eligibility flags verified",session.pid,blocked.pid,pty_time.as_millis(),started.elapsed().as_millis());
+    eprintln!("direct child PIDs {}, {} reaped at {} ms; final file flush at {} ms; cwd, title and four eligibility flags verified",session.pid,blocked.pid,pty_time.as_millis(),started.elapsed().as_millis());
 }
 
 #[test]
@@ -705,20 +718,16 @@ fn old_reader_and_retirement_cannot_modify_reused_id_after_a_slow_write() {
     let root = dir.path().to_owned();
     let id = "terminal-1";
     let state = Arc::new(Terminals::default());
-    *state.metadata_worker.lock().unwrap() =
-        Some(state.records.start(root.clone(), vec![]).unwrap());
     state.records.insert(&root, metadata_record(id)).unwrap();
     let old = fixture(&state, &root, id, "error", true);
     assert!(old.done.recv_timeout(Duration::from_secs(3)).unwrap());
-    let mut bounds = metadata_record(id).bounds;
-    bounds.y = 118.;
     let (entered, writing) = mpsc::channel();
     let (release, released) = mpsc::channel();
     *state.records.before_write.lock().unwrap() = Some(Box::new(move || {
         entered.send(()).unwrap();
         released.recv_timeout(Duration::from_secs(4)).unwrap();
     }));
-    state.records.geometry(id, bounds, true);
+    let edit = background_title_edit(&state, &root, id);
     writing.recv_timeout(Duration::from_secs(2)).unwrap();
     let stale = state.clone();
     let old_root = root.clone();
@@ -755,13 +764,14 @@ fn old_reader_and_retirement_cannot_modify_reused_id_after_a_slow_write() {
         )
         .unwrap();
     observer.join().unwrap();
+    edit.join().unwrap();
     let (tx, rx) = mpsc::channel();
     drop(tx);
-    state.finish_metadata(rx);
+    state.finish_metadata(&root, rx);
     let record = read_records(&root).unwrap().pop().unwrap();
     assert_eq!(record.restore_plan.as_deref(), Some("new"));
     assert!(record.auto_restore);
-    assert_eq!(record.bounds.y, 118.);
+    assert_eq!(record.title, "slow edit");
 }
 
 fn already_reaped(pid: i32) -> bool {
@@ -783,8 +793,6 @@ fn explicit_close_stalled_storage(before_lock: bool, locked_writer: bool) {
     let root = dir.path().to_owned();
     let state = Arc::new(Terminals::default());
     let id = "terminal-1";
-    *state.metadata_worker.lock().unwrap() =
-        Some(state.records.start(root.clone(), vec![]).unwrap());
     state.records.insert(&root, metadata_record(id)).unwrap();
     let f = fixture(&state, &root, id, "wait", true);
     let running_session = state
@@ -801,18 +809,25 @@ fn explicit_close_stalled_storage(before_lock: bool, locked_writer: bool) {
         write.send(()).unwrap();
         released.recv_timeout(Duration::from_secs(8)).unwrap();
     }));
+    let prior_edit = before_lock.then(|| background_title_edit(&state, &root, id));
     if before_lock {
-        state.records.geometry(id, metadata_record(id).bounds, true);
         writing.recv_timeout(Duration::from_secs(2)).unwrap();
     }
     let closing = state.clone();
     let close_root = root.clone();
     let (destroy, destroyed) = mpsc::channel();
     let close = thread::spawn(move || {
-        welcome::close_fixture(&closing, &close_root, id, f.token, || {
-            destroy.send(()).unwrap();
-            Ok(())
-        })
+        welcome::close_fixture(
+            &closing,
+            &close_root,
+            id,
+            f.token,
+            || {
+                destroy.send(()).unwrap();
+                Ok(())
+            },
+            |()| Ok(()),
+        )
     });
     destroyed.recv_timeout(Duration::from_secs(2)).unwrap();
     if !before_lock {
@@ -855,8 +870,9 @@ fn explicit_close_stalled_storage(before_lock: bool, locked_writer: bool) {
     assert!(state.close_saves.active());
     let final_state = state.clone();
     let (flushed, done) = mpsc::channel();
+    let flush_root = root.clone();
     let flush = thread::spawn(move || {
-        final_state.finish_metadata(drained);
+        final_state.finish_metadata(&flush_root, drained);
         flushed.send(()).unwrap();
     });
     assert!(matches!(
@@ -864,6 +880,9 @@ fn explicit_close_stalled_storage(before_lock: bool, locked_writer: bool) {
         Err(mpsc::RecvTimeoutError::Timeout)
     ));
     release.send(()).unwrap();
+    if let Some(edit) = prior_edit {
+        edit.join().unwrap();
+    }
     drop(input);
     assert!(close.join().unwrap().unwrap());
     if let Err(error) = late.join().unwrap() {
@@ -885,6 +904,48 @@ fn explicit_close_stalled_storage(before_lock: bool, locked_writer: bool) {
 }
 
 #[test]
+fn explicit_close_reaps_before_the_common_journal_write_completes() {
+    let dir = tempfile::tempdir().unwrap();
+    let root = dir.path().to_owned();
+    let state = Arc::new(Terminals::default());
+    let id = "terminal-1";
+    state.records.insert(&root, metadata_record(id)).unwrap();
+    let f = fixture(&state, &root, id, "wait", true);
+    let (entered, writing) = mpsc::channel();
+    let (release, wait) = mpsc::channel();
+    let closing = state.clone();
+    let root_for_close = root.clone();
+    let close = thread::spawn(move || {
+        welcome::close_fixture(
+            &closing,
+            &root_for_close,
+            id,
+            f.token,
+            || Ok(()),
+            |()| {
+                entered.send(()).unwrap();
+                wait.recv_timeout(Duration::from_secs(5)).unwrap();
+                Ok(())
+            },
+        )
+    });
+    writing.recv_timeout(Duration::from_secs(2)).unwrap();
+    assert!(state.close_saves.active());
+    assert!(!state.sessions.lock().unwrap().contains_key(id));
+    assert!(Start::reserve(&state, id).is_err());
+    let deadline = Instant::now() + Duration::from_millis(750);
+    while !already_reaped(f.pid) && Instant::now() < deadline {
+        thread::sleep(Duration::from_millis(5));
+    }
+    let reaped_during_write = already_reaped(f.pid);
+    release.send(()).unwrap();
+    assert!(close.join().unwrap().unwrap());
+    assert!(reaped_during_write);
+    assert!(!state.close_saves.active());
+    assert!(!read_records(&root).unwrap()[0].auto_restore);
+}
+
+#[test]
 fn explicit_close_reaps_while_waiting_for_the_file_lock() {
     explicit_close_stalled_storage(true, true);
 }
@@ -895,6 +956,6 @@ fn explicit_close_reaps_while_its_own_file_write_is_stalled() {
 }
 
 #[test]
-fn explicit_close_reaps_and_saves_observed_cwd_despite_prior_geometry_io() {
+fn explicit_close_reaps_and_saves_observed_cwd_despite_prior_metadata_io() {
     explicit_close_stalled_storage(true, false);
 }

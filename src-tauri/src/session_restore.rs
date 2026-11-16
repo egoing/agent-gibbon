@@ -1,7 +1,7 @@
 //! Local-only presentation journal. Never persists terminal input/output or starts a PTY.
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
     fs,
     io::{Read, Write},
     path::Path,
@@ -48,44 +48,57 @@ struct Snapshot {
     closed_notes: Vec<String>,
     #[serde(default)]
     monitor_layout: crate::monitor_layout::Saved,
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    closed_geometry: BTreeMap<String, ReopenGeometry>,
 }
 #[derive(Default)]
 struct Journal {
     ready: AtomicBool,
     queued: AtomicBool,
-    file: Mutex<FileState>,
+    file: Mutex<JournalFile>,
+    closes: Mutex<CloseState>,
     terminals: Mutex<BTreeSet<String>>,
     commands: Mutex<std::collections::BTreeMap<String, CommandPreview>>,
 }
 #[derive(Default)]
-struct FileState {
+struct CloseState {
     generation: u64,
-    closing: usize,
-    last: Vec<u8>,
+    active: usize,
 }
-
 impl Journal {
-    fn during_close(&self, close: impl FnOnce() -> Result<(), String>) -> Result<(), String> {
+    fn collection_generation(&self) -> Result<Option<u64>, String> {
+        let closes = self.closes.lock().map_err(|e| e.to_string())?;
+        Ok((closes.active == 0).then_some(closes.generation))
+    }
+
+    fn during_close<T>(&self, close: impl FnOnce() -> Result<T, String>) -> Result<T, String> {
         {
-            let mut file = self.file.lock().map_err(|e| e.to_string())?;
-            file.generation += 1;
-            file.closing += 1;
+            // Never block PTY teardown on a checkpoint's disk I/O.
+            let mut closes = self.closes.lock().map_err(|e| e.to_string())?;
+            closes.generation += 1;
+            closes.active += 1;
         }
         // Native destroy can dispatch another callback; no journal lock spans it.
         let result = close();
-        self.file.lock().map_err(|e| e.to_string())?.closing -= 1;
+        self.closes.lock().map_err(|e| e.to_string())?.active -= 1;
         result
     }
 }
 
-pub(crate) fn during_web_close(
+pub(crate) fn during_native_close<T>(
     app: &tauri::AppHandle,
-    close: impl FnOnce() -> Result<(), String>,
-) -> Result<(), String> {
+    close: impl FnOnce() -> Result<T, String>,
+) -> Result<T, String> {
     if app.try_state::<Journal>().is_none() {
         app.manage(Journal::default());
     }
     app.state::<Journal>().during_close(close)
+}
+pub(crate) fn during_web_close(
+    app: &tauri::AppHandle,
+    close: impl FnOnce() -> Result<(), String>,
+) -> Result<(), String> {
+    during_native_close(app, close)
 }
 // A fixed allowlist is deliberately stricter than secret-pattern guessing. No raw
 // command line reaches disk; edits, escape sequences, arguments and multiline input
@@ -164,6 +177,231 @@ fn supported(label: &str) -> bool {
             })
         })
 }
+#[derive(Clone, Serialize, Deserialize)]
+struct ReopenGeometry {
+    bounds: crate::capture::ImageNote,
+    physical_position: bool,
+}
+
+impl ReopenGeometry {
+    fn valid(&self, id: &str) -> bool {
+        crate::terminal::valid_id(id)
+            && self.bounds.x.is_finite()
+            && self.bounds.y.is_finite()
+            && (1.0..=100_000.).contains(&self.bounds.width)
+            && (1.0..=100_000.).contains(&self.bounds.height)
+    }
+}
+
+#[derive(Default)]
+struct JournalFile {
+    last: Vec<u8>,
+    closed: BTreeMap<String, ReopenGeometry>,
+    revision: u64,
+}
+
+impl JournalFile {
+    fn load(path: &Path) -> Result<Option<(Snapshot, Self)>, String> {
+        let mut bytes = Vec::new();
+        let file = match fs::File::open(path) {
+            Ok(file) => file,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+            Err(e) => return Err(e.to_string()),
+        };
+        file.take(MAX_BYTES + 1)
+            .read_to_end(&mut bytes)
+            .map_err(|e| e.to_string())?;
+        if bytes.len() as u64 > MAX_BYTES {
+            return Err("시작 상태 파일이 너무 큽니다".into());
+        }
+        let snapshot: Snapshot =
+            serde_json::from_slice(&bytes).map_err(|_| "시작 상태 파일을 해석할 수 없습니다")?;
+        validate(&snapshot)?;
+        let closed = snapshot.closed_geometry.clone();
+        Ok(Some((
+            snapshot,
+            Self {
+                last: bytes,
+                closed,
+                ..Default::default()
+            },
+        )))
+    }
+
+    // Web close and rollback operate on the current durable open-window list.
+    // Keep its bytes in sync without resetting pending closed terminal frames.
+    fn read_current(&mut self, root: &Path) -> Result<Option<Snapshot>, String> {
+        let Some((snapshot, durable)) = Self::load(&root.join(FILE))? else {
+            self.last.clear();
+            return Ok(None);
+        };
+        self.last = durable.last;
+        Ok(Some(snapshot))
+    }
+
+    fn persist(&mut self, root: &Path, snapshot: &Snapshot) -> Result<(), String> {
+        validate(snapshot)?;
+        let bytes = serde_json::to_vec(snapshot).map_err(|e| e.to_string())?;
+        if bytes == self.last {
+            return Ok(());
+        }
+        write_bytes(root, &bytes)?;
+        self.last = bytes;
+        Ok(())
+    }
+
+    fn checkpoint(
+        &mut self,
+        root: &Path,
+        revision: u64,
+        mut snapshot: Snapshot,
+    ) -> Result<(), String> {
+        if revision != self.revision {
+            return Ok(());
+        }
+        snapshot
+            .windows
+            .retain(|e| !self.closed.contains_key(&e.window.label));
+        snapshot.closed_geometry.clone_from(&self.closed);
+        self.persist(root, &snapshot)
+    }
+
+    fn reopened(&mut self, id: &str) {
+        if self.closed.remove(id).is_some() {
+            self.revision += 1;
+        }
+    }
+
+    // The host has already been destroyed. Retain a valid frame for the
+    // next full checkpoint even when this immediate disk write fails.
+    fn closed_after_destroy(
+        &mut self,
+        root: &Path,
+        id: &str,
+        frame: ReopenGeometry,
+    ) -> Result<bool, String> {
+        if !frame.valid(id) {
+            return Err("닫힌 창의 위치 또는 크기가 유효하지 않습니다".into());
+        }
+        if let Err(error) = self.set_closed(root, id, Some(frame.clone())) {
+            self.closed.insert(id.into(), frame);
+            self.revision += 1;
+            return Err(error);
+        }
+        Ok(!self.last.is_empty())
+    }
+
+    // Persist just the transition. Other windows may be in a transient layout.
+    fn set_closed(
+        &mut self,
+        root: &Path,
+        id: &str,
+        frame: Option<ReopenGeometry>,
+    ) -> Result<(), String> {
+        // Before the first checkpoint no complete open-window list exists.
+        // Leave the legacy close frame durable and include this entry in the
+        // first complete snapshot instead of creating an empty session.
+        if !self.last.is_empty() {
+            let mut snapshot: Snapshot =
+                serde_json::from_slice(&self.last).map_err(|e| e.to_string())?;
+            snapshot.windows.retain(|entry| entry.window.label != id);
+            if let Some(frame) = &frame {
+                snapshot.closed_geometry.insert(id.into(), frame.clone());
+            } else {
+                snapshot.closed_geometry.remove(id);
+            }
+            self.persist(root, &snapshot)?;
+        }
+        if let Some(frame) = frame {
+            self.closed.insert(id.into(), frame);
+        } else {
+            self.closed.remove(id);
+        }
+        self.revision += 1;
+        Ok(())
+    }
+}
+
+pub(crate) fn logical_geometry(
+    w: &tauri::WebviewWindow,
+) -> Result<(crate::capture::ImageNote, bool), String> {
+    if let Some(g) = crate::stash::saved_geometry(w) {
+        return Ok((g, cfg!(windows)));
+    }
+    let p = w.outer_position().map_err(|e| e.to_string())?;
+    let s = w.inner_size().map_err(|e| e.to_string())?;
+    let scale = w.scale_factor().map_err(|e| e.to_string())?;
+    let unit = if cfg!(windows) { 1. } else { scale };
+    Ok((
+        crate::capture::ImageNote {
+            x: p.x as f64 / unit,
+            y: p.y as f64 / unit,
+            width: s.width as f64 / scale,
+            height: s.height as f64 / scale,
+        },
+        cfg!(windows),
+    ))
+}
+
+pub(crate) fn remember_closed(
+    app: &tauri::AppHandle,
+    id: &str,
+    bounds: crate::capture::ImageNote,
+    physical_position: bool,
+) -> Result<bool, String> {
+    let Some(j) = app.try_state::<Journal>() else {
+        return Ok(false);
+    };
+    if !j.ready.load(Ordering::Acquire) || crate::privacy::onboarding_required(app) {
+        return Ok(false);
+    }
+    let mut file = j.file.lock().map_err(|e| e.to_string())?;
+    file.closed_after_destroy(
+        &app.state::<crate::storage::Store>().0,
+        id,
+        ReopenGeometry {
+            bounds,
+            physical_position,
+        },
+    )
+}
+
+pub(crate) fn reopen_geometry(
+    app: &tauri::AppHandle,
+    id: &str,
+) -> Option<(crate::capture::ImageNote, bool)> {
+    let j = app.try_state::<Journal>()?;
+    if crate::privacy::onboarding_required(app) {
+        return None;
+    }
+    let f = j.file.lock().ok()?;
+    f.closed
+        .get(id)
+        .map(|g| (g.bounds.clone(), g.physical_position))
+}
+
+pub(crate) fn mark_reopened(app: &tauri::AppHandle, id: &str) {
+    if let Some(j) = app.try_state::<Journal>() {
+        j.file.lock().unwrap().reopened(id);
+    }
+}
+
+pub(crate) fn forget_closed(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
+    let Some(j) = app.try_state::<Journal>() else {
+        return Ok(());
+    };
+    if j.ready.load(Ordering::Acquire) && !crate::privacy::onboarding_required(app) {
+        let mut file = j.file.lock().map_err(|e| e.to_string())?;
+        let result = file.set_closed(&app.state::<crate::storage::Store>().0, id, None);
+        if result.is_err() {
+            // The terminal metadata has already been removed. Let the next
+            // checkpoint discard its stale index entry even if this write fails.
+            file.reopened(id);
+        }
+        result?;
+    }
+    Ok(())
+}
 fn validate(snapshot: &Snapshot) -> Result<(), String> {
     snapshot.monitor_layout.validate()?;
     if snapshot.version != 1 || snapshot.windows.len() > 1000 {
@@ -185,12 +423,18 @@ fn validate(snapshot: &Snapshot) -> Result<(), String> {
     if closed.len() != snapshot.closed_notes.len() {
         return Err("닫힌 메모가 중복되었습니다".into());
     }
+    for (id, g) in &snapshot.closed_geometry {
+        if !g.valid(id) {
+            return Err("닫힌 창의 위치 또는 크기가 유효하지 않습니다".into());
+        }
+    }
     let mut labels = BTreeSet::new();
     for entry in &snapshot.windows {
         if entry.work_area_restore.as_ref().is_some_and(|r| !r.valid()) {
             return Err("잘못된 작업 영역 확대 복원 상태".into());
         }
         if !supported(&entry.window.label)
+            || snapshot.closed_geometry.contains_key(&entry.window.label)
             || closed.contains(&entry.window.label)
             || !labels.insert(&entry.window.label)
         {
@@ -229,34 +473,19 @@ pub fn terminal_restored(app: &tauri::AppHandle, id: &str) -> bool {
     app.try_state::<Journal>()
         .is_some_and(|j| j.terminals.lock().is_ok_and(|ids| ids.contains(id)))
 }
-fn read_snapshot(root: &Path) -> Result<Option<Snapshot>, String> {
-    let file = match fs::File::open(root.join(FILE)) {
-        Ok(file) => file,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
-        Err(e) => return Err(e.to_string()),
-    };
-    let mut bytes = Vec::new();
-    file.take(MAX_BYTES + 1)
-        .read_to_end(&mut bytes)
-        .map_err(|e| e.to_string())?;
-    if bytes.len() as u64 > MAX_BYTES {
-        return Err("시작 상태 파일이 너무 큽니다".into());
-    }
-    let snapshot: Snapshot = serde_json::from_slice(&bytes)
-        .map_err(|_| "시작 상태 파일을 해석할 수 없습니다".to_string())?;
-    validate(&snapshot)?;
-    Ok(Some(snapshot))
-}
 pub fn restore(app: &tauri::AppHandle) -> Result<bool, String> {
     if crate::privacy::onboarding_required(app) {
         return Ok(false);
     }
-    let store = app.state::<crate::storage::Store>();
-    let Some(snapshot) = read_snapshot(&store.0)? else {
+    let path = app.state::<crate::storage::Store>().0.join(FILE);
+    let Some((snapshot, file)) = JournalFile::load(&path)? else {
         return Ok(false);
     };
     crate::monitor_layout::restore(app, snapshot.monitor_layout)?;
-    app.manage(Journal::default());
+    app.manage(Journal {
+        file: Mutex::new(file),
+        ..Default::default()
+    });
     for id in &snapshot.closed_notes {
         if let Some(window) = app.get_webview_window(&crate::label(id)) {
             crate::close_note(window)?;
@@ -353,6 +582,7 @@ fn collect_windows(app: &tauri::AppHandle) -> Result<Option<Snapshot>, String> {
     }
     windows.sort_by(|a, b| a.window.label.cmp(&b.window.label));
     let snapshot = Snapshot {
+        closed_geometry: Default::default(),
         version: 1,
         monitor_layout: crate::monitor_layout::snapshot(app),
         windows,
@@ -372,25 +602,20 @@ fn checkpoint_file(
     root: &Path,
     collect: impl FnOnce() -> Result<Option<Snapshot>, String>,
 ) -> Result<(), String> {
-    let generation = {
-        let file = journal.file.lock().map_err(|e| e.to_string())?;
-        if file.closing != 0 {
-            return Ok(());
-        }
-        file.generation
+    let Some(generation) = journal.collection_generation()? else {
+        return Ok(());
     };
+    let revision = journal.file.lock().map_err(|e| e.to_string())?.revision;
     let Some(snapshot) = collect()? else {
         return Ok(());
     };
-    validate(&snapshot)?;
-    let bytes = serde_json::to_vec(&snapshot).map_err(|e| e.to_string())?;
     let mut file = journal.file.lock().map_err(|e| e.to_string())?;
-    if file.generation != generation || file.last == bytes {
+    // A close may have started during collection or while waiting for file
+    // access. Any later close persists its transition after this writer.
+    if journal.collection_generation()? != Some(generation) {
         return Ok(());
     }
-    write_bytes(root, &bytes)?;
-    file.last = bytes;
-    Ok(())
+    file.checkpoint(root, revision, snapshot)
 }
 fn write_bytes(root: &Path, bytes: &[u8]) -> Result<(), String> {
     if bytes.len() as u64 > MAX_BYTES {
@@ -416,9 +641,8 @@ fn forget_saved_web(
     }
     let undo = {
         let mut file = journal.file.lock().map_err(|e| e.to_string())?;
-        file.last.clear();
         let mut undo = None;
-        if let Some(mut snapshot) = read_snapshot(root)? {
+        if let Some(mut snapshot) = file.read_current(root)? {
             let entry = snapshot
                 .windows
                 .iter()
@@ -426,10 +650,7 @@ fn forget_saved_web(
                 .map(|index| (index, snapshot.windows.remove(index)));
             let layout = snapshot.monitor_layout.take_record(label);
             if entry.is_some() || layout.is_some() {
-                write_bytes(
-                    root,
-                    &serde_json::to_vec(&snapshot).map_err(|e| e.to_string())?,
-                )?;
+                file.persist(root, &snapshot)?;
                 undo = Some((entry, layout));
             }
         }
@@ -438,8 +659,10 @@ fn forget_saved_web(
     if let Err(error) = destroy() {
         if let Some((entry, layout)) = undo {
             let rollback = || -> Result<(), String> {
-                let _file = journal.file.lock().map_err(|e| e.to_string())?;
-                let mut snapshot = read_snapshot(root)?.ok_or("시작 기록을 찾을 수 없습니다")?;
+                let mut file = journal.file.lock().map_err(|e| e.to_string())?;
+                let mut snapshot = file
+                    .read_current(root)?
+                    .ok_or("시작 기록을 찾을 수 없습니다")?;
                 // Another web close may have completed during native dispatch.
                 // Restore only this session, leaving that close intact.
                 if let Some((index, entry)) = entry {
@@ -450,10 +673,7 @@ fn forget_saved_web(
                 if let Some(layout) = layout {
                     snapshot.monitor_layout.put_record(label, layout);
                 }
-                write_bytes(
-                    root,
-                    &serde_json::to_vec(&snapshot).map_err(|e| e.to_string())?,
-                )
+                file.persist(root, &snapshot)
             };
             rollback().map_err(|rollback| format!("{error}; 시작 기록 복구 실패: {rollback}"))?;
         }
@@ -476,8 +696,26 @@ pub fn checkpoint(app: &tauri::AppHandle) {
     }
 }
 pub fn start(app: &tauri::AppHandle, enabled: bool) {
+    let mut enabled = enabled;
     if app.try_state::<Journal>().is_none() {
-        app.manage(Journal::default());
+        // Update restoration may skip normal startup restoration. Keep the
+        // closed-window index without applying the old open-window list.
+        let file = if enabled {
+            match JournalFile::load(&app.state::<crate::storage::Store>().0.join(FILE)) {
+                Ok(saved) => saved.map(|(_, file)| file).unwrap_or_default(),
+                Err(_) => {
+                    enabled = false;
+                    eprintln!("시작 창 상태 파일을 보존하기 위해 저장을 중지했습니다.");
+                    JournalFile::default()
+                }
+            }
+        } else {
+            JournalFile::default()
+        };
+        app.manage(Journal {
+            file: Mutex::new(file),
+            ..Default::default()
+        });
     }
     app.state::<Journal>()
         .ready
@@ -516,9 +754,115 @@ pub fn start(app: &tauri::AppHandle, enabled: bool) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn read_snapshot(root: &Path) -> Result<Option<Snapshot>, String> {
+        Ok(JournalFile::load(&root.join(FILE))?.map(|(snapshot, _)| snapshot))
+    }
     fn sample() -> Snapshot {
         serde_json::from_value(serde_json::json!({"version":1,"windows":[{"window":{"label":"webview-web-a","x":-100,"y":20,"width":600,"height":24,"visible":false,"minimized":false,"always_on_top":true},"expanded":[600,400],"url":"https://example.com/last"}]})).unwrap()
     }
+    fn moved() -> ReopenGeometry {
+        ReopenGeometry {
+            bounds: crate::capture::ImageNote {
+                x: -1740.,
+                y: 42.,
+                width: 803.5,
+                height: 411.,
+            },
+            physical_position: true,
+        }
+    }
+
+    #[test]
+    fn checkpoint_close_reload_and_reopen_preserve_distinct_window_lifecycles() {
+        let root = tempfile::tempdir().unwrap();
+        let id = "terminal-42";
+        let open = || {
+            let mut s = sample();
+            let mut terminal = sample().windows.pop().unwrap();
+            terminal.url = None;
+            terminal.expanded = None;
+            terminal.window.label = id.into();
+            terminal.terminal_command = Some("pwd".into());
+            s.windows.push(terminal);
+            s
+        };
+        let mut file = JournalFile::default();
+        file.checkpoint(root.path(), 0, open()).unwrap();
+        // The v1 journal has no new field until a terminal actually closes.
+        assert!(!String::from_utf8_lossy(&file.last).contains("closed_geometry"));
+        file.set_closed(root.path(), id, Some(moved())).unwrap();
+        let committed = file.last.clone();
+        file.checkpoint(root.path(), 0, open()).unwrap();
+        assert_eq!(file.last, committed); // stale collection cannot reopen it
+        let (disk, mut loaded) = JournalFile::load(&root.path().join(FILE)).unwrap().unwrap();
+        assert_eq!(disk.windows.len(), 1);
+        assert_eq!(
+            disk.windows[0].url.as_deref(),
+            Some("https://example.com/last")
+        );
+        assert!(loaded.closed[id].physical_position);
+        assert_eq!(loaded.closed[id].bounds.width, 803.5);
+        loaded.reopened(id);
+        loaded
+            .checkpoint(root.path(), loaded.revision, open())
+            .unwrap();
+        let (disk, mut loaded) = JournalFile::load(&root.path().join(FILE)).unwrap().unwrap();
+        assert!(loaded.closed.is_empty());
+        assert_eq!(disk.windows[1].terminal_command.as_deref(), Some("pwd"));
+        loaded.set_closed(root.path(), id, Some(moved())).unwrap();
+        loaded.set_closed(root.path(), id, None).unwrap();
+        assert!(JournalFile::load(&root.path().join(FILE))
+            .unwrap()
+            .unwrap()
+            .1
+            .closed
+            .is_empty());
+    }
+
+    #[test]
+    fn moving_open_windows_uses_the_shared_checkpoint_and_skips_equal_frames() {
+        let root = tempfile::tempdir().unwrap();
+        let snapshot = |step: u32| {
+            let mut s = sample();
+            for label in ["note-text", "note-image", "note-capture", "terminal-12"] {
+                let mut e = sample().windows.pop().unwrap();
+                e.window.label = label.to_owned();
+                e.url = None;
+                e.window.width += step;
+                s.windows.push(e);
+            }
+            s
+        };
+        let mut file = JournalFile::default();
+        file.checkpoint(root.path(), 0, snapshot(0)).unwrap();
+        file.checkpoint(root.path(), 0, snapshot(240)).unwrap();
+        // An equal checkpoint succeeds even with an unusable destination: it
+        // must return before directory creation, temp-file I/O or rename.
+        file.checkpoint(&root.path().join(FILE), 0, snapshot(240))
+            .unwrap();
+        let (s, _) = JournalFile::load(&root.path().join(FILE)).unwrap().unwrap();
+        assert_eq!(s.windows.len(), 5);
+        assert!(s.windows.iter().skip(1).all(|e| e.window.width == 840));
+        assert!(s.closed_geometry.is_empty());
+        assert_eq!(fs::read_dir(root.path()).unwrap().count(), 1);
+    }
+
+    #[test]
+    fn failed_close_keeps_last_good_journal_and_first_close_does_not_invent_an_empty_session() {
+        let root = tempfile::tempdir().unwrap();
+        let id = "terminal-10";
+        let mut file = JournalFile::default();
+        file.set_closed(root.path(), id, Some(moved())).unwrap();
+        assert!(!root.path().join(FILE).exists());
+        file.checkpoint(root.path(), file.revision, sample())
+            .unwrap();
+        let original = fs::read(root.path().join(FILE)).unwrap();
+        assert!(file.set_closed(&root.path().join(FILE), id, None).is_err());
+        assert!(file.closed.contains_key(id));
+        assert_eq!(file.last, original);
+        assert_eq!(fs::read(root.path().join(FILE)).unwrap(), original);
+    }
+
     #[test]
     fn web_url_before_load_restores_request_without_confusing_navigation() {
         use serde_json::json;
@@ -667,6 +1011,100 @@ mod tests {
                 .width,
             900
         );
+    }
+
+    #[test]
+    fn native_close_guard_never_waits_for_the_journal_writer() {
+        let journal = Journal::default();
+        std::thread::scope(|threads| {
+            let writer = journal.file.lock().unwrap();
+            let (done, finished) = std::sync::mpsc::channel();
+            let shared = &journal;
+            threads.spawn(move || {
+                let result = shared.during_close(|| {
+                    assert_eq!(shared.collection_generation()?, None);
+                    Ok(true)
+                });
+                let _ = done.send(result);
+            });
+            let result = finished.recv_timeout(Duration::from_secs(2));
+            drop(writer);
+            assert_eq!(result.unwrap(), Ok(true));
+        });
+        assert_eq!(journal.collection_generation().unwrap(), Some(1));
+    }
+
+    #[test]
+    fn web_rollback_preserves_nested_terminal_close_and_its_final_geometry() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        let journal = Journal::default();
+        let id = "terminal-42";
+        let mixed = || {
+            let mut s = sample();
+            let mut t = sample().windows.remove(0);
+            t.window.label = id.into();
+            t.url = None;
+            s.windows.push(t);
+            s
+        };
+        checkpoint_file(&journal, root, || Ok(Some(mixed()))).unwrap();
+        checkpoint_file(&journal, root, || {
+            let failed = journal.during_close(|| {
+                forget_saved_web(&journal, root, "webview-web-a", || {
+                    journal.during_close(|| {
+                        journal
+                            .file
+                            .lock()
+                            .unwrap()
+                            .closed_after_destroy(root, id, moved())
+                    })?;
+                    Err("web dispatch failed".into())
+                })
+            });
+            assert_eq!(failed, Err("web dispatch failed".into()));
+            Ok(Some(mixed()))
+        })
+        .unwrap();
+        let restored = read_snapshot(root).unwrap().unwrap();
+        assert_eq!(restored.windows.len(), 1);
+        assert_eq!(restored.windows[0].window.label, "webview-web-a");
+        assert_eq!(restored.closed_geometry[id].bounds.x, -1740.);
+        assert!(restored.closed_geometry[id].physical_position);
+        assert_eq!(
+            journal.file.lock().unwrap().last,
+            fs::read(root.join(FILE)).unwrap()
+        );
+    }
+
+    #[test]
+    fn failed_terminal_close_write_recovers_via_checkpoint_after_web_close() {
+        let dir = tempfile::tempdir().unwrap();
+        let root = dir.path();
+        let journal = Journal::default();
+        let id = "terminal-10";
+        checkpoint_file(&journal, root, || Ok(Some(sample()))).unwrap();
+        let original = fs::read(root.join(FILE)).unwrap();
+        assert!(journal
+            .during_close(|| {
+                journal
+                    .file
+                    .lock()
+                    .unwrap()
+                    .closed_after_destroy(&root.join(FILE), id, moved())
+            })
+            .is_err());
+        assert_eq!(fs::read(root.join(FILE)).unwrap(), original);
+        journal
+            .during_close(|| forget_saved_web(&journal, root, "webview-web-a", || Ok(())))
+            .unwrap();
+        // The web transition read a durable file without the failed frame.
+        // The in-memory frame must still be present for the next full snapshot.
+        checkpoint_file(&journal, root, || read_snapshot(root)).unwrap();
+        let restored = read_snapshot(root).unwrap().unwrap();
+        assert!(restored.windows.is_empty());
+        assert_eq!(restored.closed_geometry[id].bounds.width, 803.5);
+        assert!(restored.closed_geometry[id].physical_position);
     }
 
     #[test]

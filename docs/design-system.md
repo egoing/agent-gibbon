@@ -1216,7 +1216,7 @@ macOS가 설정 열기 요청을 받아들이면 현재 화면 하단에 별도 
 - 터미널은 좌우·하단에 공통 `--memo-padding` 3px만 두고 나머지 영역을 PTY의 기존 배경으로 채운다. xterm의 정수 셀을 완전히 담는 열·행 수를 계산하며 남은 한 셀 미만의 공간은 배경으로 채운다. native 창도 투명하게 만들어 기존 4px 라운드 밖을 노출하지 않도록 한다. 활성 선은 기존 viewport의 안쪽 2px overlay를 유지한다.
 - 터미널 출력 기록 scrollbar는 텍스트와 같은 우측 3px·트랙 없음·최소 24px thumb·1초 표시/160ms fade·호버/드래그 시 12px hit area를 사용한다. 공통 표시 CSS와 geometry를 재사용하며 실제 이동은 xterm의 공개 buffer/scrollToLine API를 사용한다. normal buffer에만 표시하며 alternate screen에서는 숨긴다. 본문 휠·키·TUI mouse reporting은 xterm에 맡긴다. thumb의 방향키·PageUp/Down·Home/End와 접근성 현재값은 출력 기록의 행 단위다. forced-colors는 xterm 기본 scrollbar로 돌아간다.
 - 캡처는 기존 본문 외부 패딩 0과 `object-fit: contain`을 유지한다. 이미지 비율과 창 비율의 차이로 생기는 letterbox는 원본을 자르지 않기 위해 유지한다. 확대·메모 드래그·원본 이미지 복사 경로는 변경하지 않는다.
-- #22: 창 위치·크기는 이동 중 즉시 반영하고 같은 창의 연속 파일 저장은 합친다. PTY는 시작 시 적용된 셀 크기를 기준으로 삼으며, 화면 셀이 달라지면 한 번에 하나씩 최신값을 전달한다. 숨김 복원·글자 크기 변경도 다시 측정한다. 외형과 셀 맞춤 기준은 그대로다. [합성 파일·브라우저 검증 및 실기기 미확인 범위](verification/issue22-terminal-geometry.md).
+- 열린 텍스트·이미지·캡처·웹·터미널 창의 위치·크기는 공용 세션 기록에서 복원한다. 터미널을 닫으면 같은 기록에 마지막 위치와 크기를 따로 보관하고, 목록에서 다시 열 때 사용한다. 이전 버전에서 닫은 터미널은 기존 좌표를 사용한다. PTY에는 시작할 때 적용된 셀 크기와 달라진 경우에만 새 행·열을 전달한다. [저장 경로와 검증 범위](verification/issue22-terminal-geometry.md).
 - [설명용 SVG](design/terminal-capture-surface.svg) · [PNG](design/terminal-capture-surface.png). Chromium의 실제 xterm/스타일 비교와 native 검증의 범위·한계는 [#176 검증 기록](verification/issue176-terminal-capture.md)을 따른다. 시안은 실행 증거가 아니다.
 
 ### #176 사용자 검수 반영 — 2026-11-15

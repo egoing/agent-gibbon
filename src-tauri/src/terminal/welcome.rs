@@ -45,6 +45,7 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
     };
     crate::memo_color::create(&root(app), &id)?;
     state.records.insert(&root(app), agent)?;
+    crate::session_restore::mark_reopened(app, &id);
     open(app, &id)?;
     crate::tray::refresh(app)?;
     inspect(app, &id)
@@ -946,30 +947,74 @@ impl Drop for WindowChange<'_> {
     }
 }
 
+type CloseFrame = (crate::capture::ImageNote, bool);
+
+// Finish all native calls before releasing the slot. File IO happens afterwards.
+fn destroy_capturing_frame(app: &tauri::AppHandle, id: &str) -> Result<Option<CloseFrame>, String> {
+    let Some(window) = app.get_webview_window(id) else {
+        return Ok(None);
+    };
+    crate::stash::release(&window)?;
+    let frame = crate::session_restore::logical_geometry(&window)?;
+    window.destroy().map_err(err)?;
+    Ok(Some(frame))
+}
+
+fn save_close_frame(
+    app: &tauri::AppHandle,
+    id: &str,
+    frame: Option<CloseFrame>,
+) -> Result<(), String> {
+    let Some((bounds, physical)) = frame else {
+        return Ok(());
+    };
+    let journal = crate::session_restore::remember_closed(app, id, bounds.clone(), physical);
+    if !matches!(journal, Ok(true)) {
+        // Preserve the frame even if the first journal commit is unavailable or fails.
+        if !app
+            .state::<Terminals>()
+            .records
+            .edit(&root(app), id, EditSource::Request, |r| {
+                r.bounds = bounds;
+                r.physical_position = physical;
+                true
+            })?
+        {
+            return Err("터미널 창이 없습니다".into());
+        }
+    }
+    journal.map(|_| ())
+}
+
 fn finish_close(
     app: &tauri::AppHandle,
     id: &str,
     expected: Option<CloseIdentity>,
 ) -> Result<(), String> {
     let state = app.state::<Terminals>();
-    if close_window(&state, &root(app), id, expected, || {
-        if let Some(window) = app.get_webview_window(id) {
-            crate::stash::release(&window)?;
-            window.destroy().map_err(err)?;
-        }
-        Ok(())
-    })? {
+    let closed = crate::session_restore::during_native_close(app, || {
+        close_window(
+            &state,
+            &root(app),
+            id,
+            expected,
+            || destroy_capturing_frame(app, id),
+            |frame| save_close_frame(app, id, frame),
+        )
+    })?;
+    if closed {
         crate::tray::refresh(app)?;
     }
     Ok(())
 }
 
-fn close_window(
+fn close_window<F>(
     state: &Terminals,
     root: &Path,
     id: &str,
     expected: Option<CloseIdentity>,
-    destroy: impl FnOnce() -> Result<(), String>,
+    destroy: impl FnOnce() -> Result<F, String>,
+    save_frame: impl FnOnce(F) -> Result<(), String>,
 ) -> Result<bool, String> {
     let Some(guard) = WindowChange::begin(state, id, expected)? else {
         return Ok(false);
@@ -981,30 +1026,32 @@ fn close_window(
         .get(id)
         .and_then(running);
     let snapshot = session.and_then(|s| SessionSnapshot::observe(&mut *s.try_lock().ok()?).ok());
-    destroy()?;
+    let frame = destroy()?;
 
-    // Transfer the slot and register its final write together. Quit either
-    // owns the slot itself or waits for this producer before sealing Records.
+    // No native calls remain. Register the final save under the slot registry
+    // lock used by quit, then drop Control before either kind of disk write.
     let (slot, _save) = {
         let mut slots = state.sessions.lock().map_err(err)?;
-        let Some(slot) = slots.remove(id) else {
-            return Ok(true);
-        };
-        (slot, state.close_saves.enter())
+        (slots.remove(id), state.close_saves.enter())
     };
-    // Signal the supervisor before acquiring Records::io. A blocked writer
-    // may retain Session, but cannot postpone dropping Control.
-    let mut snapshot = snapshot.unwrap_or_default();
-    if !matches!(slot, Slot::Running { .. }) {
-        snapshot.monitor = None;
+    let snapshot = slot.map(|slot| {
+        let mut snapshot = snapshot.unwrap_or_default();
+        if !matches!(slot, Slot::Running { .. }) {
+            snapshot.monitor = None;
+        }
+        match slot {
+            Slot::Exited { jobs, .. } => jobs.stop(),
+            other => drop(other),
+        }
+        snapshot
+    });
+    let geometry_result = save_frame(frame);
+    if let Some(snapshot) = snapshot {
+        state
+            .records
+            .edit(root, id, EditSource::Observation, |r| snapshot.apply(r))?;
     }
-    match slot {
-        Slot::Exited { jobs, .. } => jobs.stop(),
-        other => drop(other),
-    }
-    state
-        .records
-        .edit(root, id, EditSource::Observation, |r| snapshot.apply(r))?;
+    geometry_result?;
     drop(guard);
     Ok(true)
 }
@@ -1016,6 +1063,7 @@ pub(super) fn close_fixture(
     id: &str,
     token: u64,
     destroyed: impl FnOnce() -> Result<(), String>,
+    save_frame: impl FnOnce(()) -> Result<(), String>,
 ) -> Result<bool, String> {
     close_window(
         state,
@@ -1023,6 +1071,7 @@ pub(super) fn close_fixture(
         id,
         Some(CloseIdentity::Session(token)),
         destroyed,
+        save_frame,
     )
 }
 
@@ -1314,11 +1363,14 @@ pub fn delete(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     if !state.records.contains(id) {
         return Err("터미널이 없습니다".into());
     }
-    if let Some(w) = app.get_webview_window(id) {
-        crate::stash::release(&w)?;
-        w.destroy().map_err(err)?;
-    }
-    state.records.delete(&root(app), id)?;
+    crate::session_restore::during_native_close(app, || {
+        let frame = destroy_capturing_frame(app, id)?;
+        if let Err(error) = state.records.delete(&root(app), id) {
+            save_close_frame(app, id, frame)?;
+            return Err(error);
+        }
+        crate::session_restore::forget_closed(app, id)
+    })?;
     crate::tray::refresh(app)
 }
 
