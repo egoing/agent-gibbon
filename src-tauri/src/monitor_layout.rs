@@ -77,7 +77,7 @@ impl Home {
     }
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
-struct Record {
+pub(crate) struct Record {
     last: Frame,
     screen: Screen,
     home: Option<Home>,
@@ -133,6 +133,12 @@ pub(crate) fn forget(app: &tauri::AppHandle, label: &str) {
 }
 
 impl Saved {
+    pub(crate) fn take_record(&mut self, label: &str) -> Option<Record> {
+        self.records.remove(label)
+    }
+    pub(crate) fn put_record(&mut self, label: &str, record: Record) {
+        self.records.insert(label.to_owned(), record);
+    }
     pub(crate) fn forget(&mut self, label: &str) -> bool {
         self.records.remove(label).is_some()
     }

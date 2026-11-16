@@ -8,7 +8,7 @@ mod recent;
 use std::{
     collections::BTreeMap,
     sync::{
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicU64, Ordering},
         Arc, Mutex,
     },
 };
@@ -26,10 +26,20 @@ pub struct Windows(Mutex<BTreeMap<String, Record>>);
 
 // A host and its child own one lifetime. Deferred WebKit callbacks never look
 // up a session by its reusable public ID.
-#[derive(Default)]
 struct Session {
+    generation: u64,
     closing: AtomicBool,
     urls: Mutex<Urls>,
+}
+impl Default for Session {
+    fn default() -> Self {
+        static NEXT_SESSION: AtomicU64 = AtomicU64::new(1);
+        Self {
+            generation: NEXT_SESSION.fetch_add(1, Ordering::Relaxed),
+            closing: AtomicBool::new(false),
+            urls: Mutex::default(),
+        }
+    }
 }
 #[derive(Default)]
 struct Urls {
@@ -215,27 +225,37 @@ pub fn entries(app: &tauri::AppHandle) -> Result<Vec<Value>, String> {
         .collect();
     ids.iter().map(|id| inspect(app, id)).collect()
 }
+fn host_title(id: &str) -> String {
+    format!("{} — 웹 — {id}", crate::instance::current().title())
+}
 // Poll only registered hosts. CLI inspect also queries the remote view, reads
 // color storage and measures geometry, none of which the manager needs.
 pub(crate) fn manager_entries(app: &tauri::AppHandle) -> Result<Vec<Value>, String> {
     let records = app.state::<Windows>().0.lock().map_err(err)?.clone();
-    records
-        .into_iter()
-        .filter(|(_, record)| !record.session.closing())
-        .map(|(id, record)| {
-            Ok(json!({
-                "id": id, "kind": "web",
-                "title": record.url.as_deref().unwrap_or("Welcome"),
-                "visible": crate::manager::window_visible(&record.host)?
-            }))
-        })
-        .collect()
+    let mut rows = Vec::with_capacity(records.len());
+    for (id, record) in records {
+        if record.session.closing() {
+            continue;
+        }
+        let visible = crate::manager::window_visible(&record.host);
+        // A retiring native host must not make every other row unavailable.
+        if record.session.closing() {
+            continue;
+        }
+        rows.push(json!({
+            "id":id, "kind":"web", "session":record.session.generation.to_string(),
+            "sourceTitle":host_title(&id), "title":record.url.as_deref().unwrap_or("Welcome"),
+            "visible":visible?
+        }));
+    }
+    Ok(rows)
 }
 
 pub(crate) fn set_manager_visibility(
     app: &tauri::AppHandle,
     id: &str,
     visible: bool,
+    expected_session: &str,
 ) -> Result<bool, String> {
     let _activity = crate::updater::activity(app)?;
     if crate::privacy::onboarding_required(app) {
@@ -244,8 +264,8 @@ pub(crate) fn set_manager_visibility(
     // Look up the host at click time. A removed web session must never fall
     // through to the ordinary open path, which can create a blank text memo.
     let record = record(app, id)?;
-    if record.session.closing() {
-        return Err("닫는 중인 웹 창입니다".into());
+    if record.session.closing() || record.session.generation.to_string() != expected_session {
+        return Err("웹 세션이 종료되었거나 변경되었습니다".into());
     }
     let host = record.host;
     if visible {
@@ -440,10 +460,7 @@ pub(crate) fn create_presented(
         crate::focus::remember(app, &label);
         let window =
             tauri::WebviewWindowBuilder::new(app, &label, WebviewUrl::App("web.html".into()))
-                .title(format!(
-                    "{} — 웹 — {id}",
-                    crate::instance::current().title()
-                ))
+                .title(host_title(&id))
                 .inner_size(600.0, 400.0)
                 .min_inner_size(240.0, 160.0)
                 .always_on_top(true)
@@ -697,18 +714,20 @@ pub async fn web_run(window: tauri::Webview, url: String) -> Result<Value, Strin
 fn end_session(id: &str, r: &Record) -> Result<(), String> {
     let w = &r.host;
     let app = w.app_handle();
-    r.session.request_close(|| {
-        crate::session_restore::close_web(w)?;
-        crate::relation_editor::endpoint_closed(app, id);
-        crate::stash::forget(w);
-        crate::layout::forget(w);
-        crate::sizing::forget(w);
-        crate::monitor_layout::forget(app, w.label());
-        crate::focus::discard_restore(app, w.label());
-        let _ = crate::entrance::cancel(w);
-        let _ = crate::feedback_window::destroy(w);
-        crate::relation_prototype::changed(app, w.label());
-        Ok(())
+    crate::session_restore::during_web_close(app, || {
+        r.session.request_close(|| {
+            crate::session_restore::close_web(w)?;
+            crate::relation_editor::endpoint_closed(app, id);
+            crate::stash::forget(w);
+            crate::layout::forget(w);
+            crate::sizing::forget(w);
+            crate::monitor_layout::forget(app, w.label());
+            crate::focus::discard_restore(app, w.label());
+            let _ = crate::entrance::cancel(w);
+            let _ = crate::feedback_window::destroy(w);
+            crate::relation_prototype::changed(app, w.label());
+            Ok(())
+        })
     })
 }
 #[tauri::command]
