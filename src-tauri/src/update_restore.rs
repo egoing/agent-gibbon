@@ -54,7 +54,9 @@ fn permitted_label(label: &str) -> bool {
         })
 }
 
-fn check_live_window_kinds<'a>(labels: impl Iterator<Item = &'a str>) -> Result<(), String> {
+pub(crate) fn check_live_window_kinds<'a>(
+    labels: impl Iterator<Item = &'a str>,
+) -> Result<(), String> {
     for label in labels {
         if label.starts_with("terminal-") {
             return Err(
@@ -63,7 +65,7 @@ fn check_live_window_kinds<'a>(labels: impl Iterator<Item = &'a str>) -> Result<
             );
         }
         if label.starts_with("webview-") || label.starts_with("webpage-") {
-            return Err("웹 창 세션이 있어 업데이트를 보류했습니다. 앱을 다시 시작하면 웹 창이 종료되며, 이후 업데이트를 설치할 수 있습니다.".into());
+            return Err("웹 창 세션이 있어 업데이트를 보류했습니다. 각 웹 창의 닫기 버튼으로 세션을 종료한 뒤 다시 설치하세요.".into());
         }
     }
     Ok(())
