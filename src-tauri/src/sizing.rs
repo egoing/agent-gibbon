@@ -359,6 +359,9 @@ pub fn pending(window: &WebviewWindow) -> bool {
         .and_then(|s| s.get(window.label()).map(|s| s.pending.is_some()))
         .unwrap_or(false)
 }
+pub(crate) fn forget(w: &WebviewWindow) {
+    w.state::<Sizes>().0.lock().unwrap().remove(w.label());
+}
 pub fn cancel(window: &WebviewWindow) {
     if let Ok(mut states) = window.state::<Sizes>().0.lock() {
         if let Some(s) = states.get_mut(window.label()) {

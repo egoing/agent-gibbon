@@ -125,7 +125,17 @@ pub fn restore_override(w: &WebviewWindow, previous: RecoveryPoint) -> Result<()
     }
     Ok(())
 }
+pub(crate) fn forget(app: &tauri::AppHandle, label: &str) {
+    let state = app.state::<State>();
+    let mut runtime = state.0.lock().unwrap();
+    runtime.saved.forget(label);
+    runtime.manual.remove(label);
+}
+
 impl Saved {
+    pub(crate) fn forget(&mut self, label: &str) -> bool {
+        self.records.remove(label).is_some()
+    }
     pub fn validate(&self) -> Result<(), String> {
         if self.records.len() > 1000
             || self.records.iter().any(|(label, r)| {
@@ -623,7 +633,12 @@ pub fn tick(app: &tauri::AppHandle) -> Result<(), String> {
         return Ok(());
     }
     // Avoid replacing a stash/entrance transaction or a live user drag.
-    let windows = crate::web::managed_windows(app);
+    let mut windows = crate::web::managed_windows(app);
+    windows.retain(|label, _| {
+        !label
+            .strip_prefix("webview-")
+            .is_some_and(|id| crate::web::closing(app, id))
+    });
     if crate::stash::active(app)
         || crate::stash::chord_busy(app)
         || crate::capture::active(app)

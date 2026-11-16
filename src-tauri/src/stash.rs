@@ -527,6 +527,12 @@ pub fn inspect(app: &tauri::AppHandle) -> serde_json::Value {
     let s = state.session.lock().unwrap();
     serde_json::json!({"last_arrangement":state.last_arrangement.lock().unwrap().clone(),"active":s.is_some(),"animating":s.as_ref().is_some_and(|s|s.animating),"restoring":s.as_ref().is_some_and(|s|s.restoring),"indicator_moving":s.as_ref().is_some_and(|s|s.flight.is_some()),"tip_visible":s.as_ref().is_some_and(|s|s.flight.is_none() && s.displayed.is_some_and(|d|d.1)),"windows":s.as_ref().map(|s|s.windows.keys().collect::<Vec<_>>()),"shortcut":shortcut(app),"indicator":app.get_webview_window(ICON).and_then(|w|rect(&w).ok()).map(|r|serde_json::json!({"x":r.x,"y":r.y,"width":r.w,"height":r.h}))})
 }
+pub(crate) fn forget(w: &WebviewWindow) {
+    if let Some(s) = w.state::<Stash>().session.lock().unwrap().as_mut() {
+        s.windows.remove(w.label());
+        s.from.remove(w.label());
+    }
+}
 // Explicit individual open/close takes ownership away from the transaction.
 pub fn release(w: &WebviewWindow) -> Result<(), String> {
     let saved = w

@@ -28,10 +28,10 @@
 <text x="4" y="110" text-decoration="underline">링크는 선택·편집, 탐색하지 않음</text>
 </g>
 <g transform="translate(4 127)">
-<rect width="180" height="28" rx="4" fill="#dfe2dd" stroke="#a0a3bc"/>
+<rect width="220" height="28" rx="4" fill="#dfe2dd" stroke="#a0a3bc"/>
 <rect x="3" y="3" width="23" height="22" rx="2" fill="#cdd0d3"/>
 <g fill="#2c2f7e" font-size="11" font-family="-apple-system,Apple SD Gothic Neo,sans-serif" text-anchor="middle">
-<text x="15" y="18" font-weight="700">B</text><text x="40" y="18" font-style="italic">I</text><text x="65" y="18" text-decoration="line-through">S</text><text x="90" y="18">&lt;/&gt;</text><text x="115" y="18">H1</text><text x="140" y="18">H2</text><text x="165" y="18">P</text>
+<text x="15" y="18" font-weight="700">B</text><text x="40" y="18" font-style="italic">I</text><text x="65" y="18" text-decoration="line-through">S</text><text x="92" y="18">코드</text><text x="125" y="18">큰제목</text><text x="170" y="18">작은제목</text><text x="205" y="18">P</text>
 </g></g>
 <rect x=".5" y=".5" width="311" height="231" rx="4" fill="none" stroke="#2c2f7e" stroke-opacity=".65" stroke-width="2"/>
 </g>

@@ -59,7 +59,9 @@ async function detail() {
     const desired = !notes.find(n => n.id === note.id)?.visible;
     visibilityPending.add(note.id); visibilityVersion++; syncVisibility(); error.hidden = true;
     try {
-      const visible = await invoke('manager_set_visibility', { id: note.id, visible: desired });
+      const args = { id: note.id, visible: desired };
+      if (note.kind === 'web') args.kind = 'web';
+      const visible = await invoke('manager_set_visibility', args);
       const current = notes.find(n => n.id === note.id);
       if (current) current.visible = visible;
     }
@@ -72,7 +74,9 @@ async function detail() {
     const title = document.createElement('h1'); title.textContent = note.title || note.id; target.append(title);
   }
   if (note.kind) {
-    const kind=document.createElement('p');kind.textContent='터미널';target.append(kind);
+    const kind = document.createElement('p');
+    kind.textContent = note.kind === 'web' ? '웹' : '터미널';
+    target.append(kind);
     if(note.kind==='terminal'){const remove=document.createElement('button');remove.textContent='목록에서 삭제';remove.onclick=async()=>{try{await invoke('manager_terminal',{id:note.id,action:'delete'});await refresh(true);}catch(e){el('error').hidden=false;remove.title=String(e);}};target.append(remove);}
   } else if (note.capture) {
     try {
@@ -91,7 +95,15 @@ function render() {
   list.replaceChildren();
   if (!notes.length) list.textContent = '아직 메모가 없습니다.';
   for (const note of notes) {
-    const button = document.createElement('button'); button.textContent = note.title;
+    const button = document.createElement('button');
+    if (note.kind === 'web') {
+      button.className = 'web-row';
+      const name = document.createElement('span');
+      name.textContent = Array.from(note.title).slice(0, 30).join('');
+      const kind = document.createElement('span');
+      kind.textContent = '웹';
+      button.append(name, kind);
+    } else button.textContent = note.title;
     button.title = note.title || note.id;
     button.dataset.id = note.id; button.setAttribute('aria-current', String(note.id === selected));
     button.onclick = () => { selected = note.id; render(); detail(); };
@@ -106,7 +118,7 @@ async function refresh(force = false) {
   busy = true;
   const version = visibilityVersion;
   try {
-    const next = (await invoke('manager_notes')).filter(note => !note.kind || note.kind === 'terminal');
+    const next = (await invoke('manager_notes')).filter(note => !note.kind || note.kind === 'terminal' || note.kind === 'web');
     if (version !== visibilityVersion) return;
     const nextSignature = JSON.stringify(next.map(({ visible, ...note }) => note));
     el('error').hidden = true;
