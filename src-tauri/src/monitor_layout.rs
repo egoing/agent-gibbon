@@ -518,6 +518,30 @@ pub fn native_event(w: &tauri::Window, event: &tauri::WindowEvent) {
         }
     }
 }
+#[cfg(windows)]
+fn physical_button_held(key: i32) -> bool {
+    #[link(name = "user32")]
+    extern "system" {
+        fn GetAsyncKeyState(key: i32) -> i16;
+    }
+    unsafe { GetAsyncKeyState(key) < 0 }
+}
+
+pub(crate) fn primary_mouse_held() -> bool {
+    #[cfg(windows)]
+    {
+        #[link(name = "user32")]
+        extern "system" {
+            fn GetSystemMetrics(index: i32) -> i32;
+        }
+        // SM_SWAPBUTTON selects the physical right button for a logical primary drag.
+        if unsafe { GetSystemMetrics(23) } != 0 {
+            return physical_button_held(2);
+        }
+    }
+    mouse_held()
+}
+
 fn mouse_held() -> bool {
     #[cfg(target_os = "macos")]
     {
@@ -525,11 +549,7 @@ fn mouse_held() -> bool {
     }
     #[cfg(windows)]
     {
-        #[link(name = "user32")]
-        extern "system" {
-            fn GetAsyncKeyState(key: i32) -> i16;
-        }
-        unsafe { GetAsyncKeyState(1) < 0 }
+        physical_button_held(1)
     }
     #[cfg(not(any(target_os = "macos", windows)))]
     {

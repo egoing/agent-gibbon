@@ -555,8 +555,7 @@ pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String>
         "inspect" => inspect(window.app_handle(), id),
         "drag" => {
             crate::monitor_layout::manual(&window);
-            crate::relation_prototype::changed(window.app_handle(), window.label());
-            window.start_dragging().map_err(err)?;
+            crate::relation_prototype::start_drag(&window)?;
             Ok(json!({"ok":true}))
         }
         action if action.starts_with("resize-") => {

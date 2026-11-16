@@ -13,6 +13,7 @@ function fixture(script,invoke){
  };
  const document={getElementById:node,querySelector:()=>node('svg'),createElement:()=>({...node('new'),listeners:{},attributes:{}}),addEventListener(k,fn){events[k]=fn;}};
  const context={document,requestAnimationFrame(fn){frames.push(fn);return frames.length;},window:{__TAURI__:{core:{invoke(name,args){calls.push([name,args]);return invoke(name,args);}},event:{async listen(name,fn){native[name]=fn;}}}}};
+ if(script==='relation-pick.js')vm.runInNewContext(readFileSync(new URL('../ui/relation-curve.js',import.meta.url),'utf8'),context);
  vm.runInNewContext(readFileSync(new URL(`../ui/${script}`,import.meta.url),'utf8'),context);
  return{node,events,frames,calls,native};
 }
@@ -37,8 +38,8 @@ test('picker coalesces pointer motion, snaps hover and confirms click coordinate
  f.events.pointermove({clientX:10,clientY:20});f.events.pointermove({clientX:30,clientY:40});
  await f.frames.shift()();
  assert.deepEqual(JSON.parse(JSON.stringify(f.calls.at(-1))),['relation_pick',{x:30,y:40,choose:false}]);
- f.native['relation-preview']({payload:{width:800,height:600,scale:2,points:[[1,2],[3,4],[5,6],[7,8]],target:'target',highlight:{x:90,y:80,width:100,height:120}}});
- assert.equal(f.node('line').attributes.d,'M1,2 C3,4 5,6 7,8');assert.equal(f.node('target').style.display,'block');
+ f.native['relation-preview']({payload:{width:800,height:600,scale:2,points:[[1,2],[51,2],[51,8],[101,8]],target:'target',highlight:{x:90,y:80,width:100,height:120}}});
+ assert.equal(f.node('line').attributes.d,'M1,2 C37,2 37,8 73,8');assert.equal(f.node('target').style.display,'block');
  const click={clientX:100,clientY:200,target:{closest:()=>false}};
  await f.events.click(click);assert.match(f.node('hint').textContent,/다른 메모/);
  selected=true;await f.events.click({...click,clientX:110});
