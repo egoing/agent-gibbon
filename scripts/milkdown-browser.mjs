@@ -26,7 +26,7 @@ async function open(markdown, size = { width: 300, height: 240 }) {
         window.testCalls.push({ name, args });
         if (name === 'snapshot') return { ...window.testState, note: window.testNote };
         if (name === 'fit_note') return true;
-        if (name === 'feedback_action') return window.testListeners['feedback-action']({ payload: {owner:'note-milkdown-browser',action:args.action} });
+        if (name === 'feedback_action') return window.testListeners['feedback-action']({ payload: {owner:'note-milkdown-browser',action:args.action,revision:args.revision} });
         if (name === 'poll_fold') return window.testState.folded;
         if (name === 'toggle_fold') return window.testState.folded = !window.testState.folded;
         if (name === 'poll_warp') return false;
@@ -123,12 +123,18 @@ async function testEditor() {
   await page.getByRole('button', {name:'변경 취소',exact:true}).click(); await tick(page);
   assert.equal(await page.locator('#memo-editor').innerText(), '외부 갱신');
   // Toolbar blank area is the only text-note drag handle.
-  const before = await page.evaluate(() => window.testCalls.filter(c => c.name === 'chrome_drag').length);
+  const drags = () => page.evaluate(() => window.testCalls.filter(c => c.name === 'chrome_drag').length);
+  const before = await drags();
   await page.locator('#memo-editor').click();
-  assert.equal(await page.evaluate(() => window.testCalls.filter(c => c.name === 'chrome_drag').length), before);
-  await page.locator('#controls').dispatchEvent('pointerdown', { button: 0, pointerId: 24, clientX: 0, clientY: 0 });
-  await page.locator('#controls').dispatchEvent('pointermove', { buttons: 1, pointerId: 24, clientX: 5, clientY: 0 });
-  assert.equal(await page.evaluate(() => window.testCalls.filter(c => c.name === 'chrome_drag').length), before + 1);
+  assert.equal(await drags(), before);
+  const controls = page.locator('#controls');
+  const press = { button: 0, buttons: 1, pointerId: 1, clientX: 0, clientY: 0 };
+  await controls.dispatchEvent('pointerdown', press);
+  await controls.dispatchEvent('pointermove', { ...press, clientX: 3 });
+  assert.equal(await drags(), before);
+  await controls.dispatchEvent('pointermove', { ...press, clientX: 4 });
+  assert.equal(await drags(), before + 1);
+  await controls.dispatchEvent('pointerup', { ...press, buttons: 0, clientX: 4 });
   // Composition guards save/cancel and protects remote refresh until composition ends.
   await page.locator('#memo-editor').dispatchEvent('compositionstart');
   await page.locator('#memo-editor').dispatchEvent('compositionupdate', { data: '한글' });
