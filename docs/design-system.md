@@ -1261,3 +1261,7 @@ macOS에서는 첫 설정 전 종료 위에 권한 설정을 표시한다. 화�
 ### 정렬 불투명·복원 눈 아이콘 — #191 후속
 
 사용자의 2026-11-15 후속 요청에 따라 이동 중 불투명 표시와 이동 후 우연한 포인터 겹침 강조 억제, 방향 안내의 복원용 뜬 눈 상태를 적용한다. [상태 비교 SVG](design/direction-guide-states.svg) · [PNG](design/direction-guide-states.png), [복원 안내 SVG](../ui/direction-guide-restore.svg) · [PNG](design/direction-guide-restore.png), [숨기기 안내 SVG](../ui/direction-guide.svg) · [PNG](design/direction-guide.png). 검증은 [후속 기록](verification/issue191-motion-opacity.md)을 따른다. 이 변경은 논의 중인 그라데이션·바둑판 보기 닫기·취소 버튼의 새 배치를 확정하지 않는다.
+
+## 빈 텍스트 메모 입력 — #202 · 2026-11-16
+
+텍스트 메모의 본문 빈 공간을 클릭해도 커서를 두고 입력할 수 있다. 글이 짧으면 편집기가 본문 높이를 채우고 긴 글은 기존처럼 스크롤된다. 툴바와 본문 여백의 외형은 그대로다. 빈 본문 아래쪽 클릭 후 첫 입력·저장·다시 읽기를 Chromium에서 확인했다. [조사 기록](verification/issue202-text-input.md)
