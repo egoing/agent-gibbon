@@ -378,15 +378,16 @@ fn toggle_pin(window: tauri::WebviewWindow) -> Result<(), String> {
         .map_err(|e| e.to_string())
 }
 fn apply(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
-    apply_with_presentation(app, request, entrance::Presentation::Cursor)
+    apply_with_presentation(app, request, entrance::Presentation::Cursor, None)
 }
 fn apply_direct(app: &tauri::AppHandle, request: Request) -> Result<Value, String> {
-    apply_with_presentation(app, request, entrance::Presentation::Direct)
+    apply_with_presentation(app, request, entrance::Presentation::Direct, None)
 }
 fn apply_with_presentation(
     app: &tauri::AppHandle,
     request: Request,
     presentation: entrance::Presentation,
+    expected: Option<manager::RowKind>,
 ) -> Result<Value, String> {
     request.validate()?;
     // Read-only diagnostics must remain observable during the installation handshake.
@@ -408,6 +409,9 @@ fn apply_with_presentation(
         return Ok(telemetry::probe());
     }
     if matches!(request.action, Action::Web) || web::contains(app, request.id()) {
+        if expected.is_some() {
+            return Err("메모 종류가 변경되었습니다".into());
+        }
         return web::handle(app, &request);
     }
     let _timing = telemetry::Timing::new(match request.action {
@@ -419,6 +423,9 @@ fn apply_with_presentation(
         _ => unreachable!(),
     });
     if terminal::contains(app, request.id()) {
+        if expected == Some(manager::RowKind::Note) {
+            return Err("메모 종류가 변경되었습니다".into());
+        }
         return terminal::handle(app, &request);
     }
     let state = app.state::<AppNotes>();
@@ -442,6 +449,9 @@ fn apply_with_presentation(
     let id = request.id().to_string();
     // No lock is held while creating a WebView: its startup may invoke snapshot.
     let existing = state.lock().map_err(|e| e.to_string())?.get(&id).cloned();
+    if expected == Some(manager::RowKind::Terminal) || (expected.is_some() && existing.is_none()) {
+        return Err("메모가 없거나 종류가 변경되었습니다".into());
+    }
     if existing.is_none() && !matches!(request.action, Action::Open) {
         return Err(format!(
             "메모 창을 찾을 수 없습니다: {id}. 먼저 open --id {id}를 실행하세요"
@@ -684,10 +694,11 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     return;
                 }
             }
-            if matches!(
+            if matches!(event, tauri::WindowEvent::Moved(_)) {
+                relation_prototype::moved(win.app_handle(), win.label());
+            } else if matches!(
                 event,
-                tauri::WindowEvent::Moved(_)
-                    | tauri::WindowEvent::Resized(_)
+                tauri::WindowEvent::Resized(_)
                     | tauri::WindowEvent::ScaleFactorChanged { .. }
                     | tauri::WindowEvent::Destroyed
             ) {
@@ -706,11 +717,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 return;
             }
             if win.label().starts_with("webview-") || win.label().starts_with("webpage-") {
-                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                    api.prevent_close();
-                    relation_prototype::changed(win.app_handle(), win.label());
-                    let _ = win.hide();
-                }
+                // The web host handles close with its own session identity.
                 return;
             }
             if win.label() == "updater-notice" {

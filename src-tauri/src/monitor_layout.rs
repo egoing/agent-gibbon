@@ -77,7 +77,7 @@ impl Home {
     }
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
-struct Record {
+pub(crate) struct Record {
     last: Frame,
     screen: Screen,
     home: Option<Home>,
@@ -125,7 +125,23 @@ pub fn restore_override(w: &WebviewWindow, previous: RecoveryPoint) -> Result<()
     }
     Ok(())
 }
+pub(crate) fn forget(app: &tauri::AppHandle, label: &str) {
+    let state = app.state::<State>();
+    let mut runtime = state.0.lock().unwrap();
+    runtime.saved.forget(label);
+    runtime.manual.remove(label);
+}
+
 impl Saved {
+    pub(crate) fn take_record(&mut self, label: &str) -> Option<Record> {
+        self.records.remove(label)
+    }
+    pub(crate) fn put_record(&mut self, label: &str, record: Record) {
+        self.records.insert(label.to_owned(), record);
+    }
+    pub(crate) fn forget(&mut self, label: &str) -> bool {
+        self.records.remove(label).is_some()
+    }
     pub fn validate(&self) -> Result<(), String> {
         if self.records.len() > 1000
             || self.records.iter().any(|(label, r)| {
@@ -518,6 +534,30 @@ pub fn native_event(w: &tauri::Window, event: &tauri::WindowEvent) {
         }
     }
 }
+#[cfg(windows)]
+fn physical_button_held(key: i32) -> bool {
+    #[link(name = "user32")]
+    extern "system" {
+        fn GetAsyncKeyState(key: i32) -> i16;
+    }
+    unsafe { GetAsyncKeyState(key) < 0 }
+}
+
+pub(crate) fn primary_mouse_held() -> bool {
+    #[cfg(windows)]
+    {
+        #[link(name = "user32")]
+        extern "system" {
+            fn GetSystemMetrics(index: i32) -> i32;
+        }
+        // SM_SWAPBUTTON selects the physical right button for a logical primary drag.
+        if unsafe { GetSystemMetrics(23) } != 0 {
+            return physical_button_held(2);
+        }
+    }
+    mouse_held()
+}
+
 fn mouse_held() -> bool {
     #[cfg(target_os = "macos")]
     {
@@ -525,11 +565,7 @@ fn mouse_held() -> bool {
     }
     #[cfg(windows)]
     {
-        #[link(name = "user32")]
-        extern "system" {
-            fn GetAsyncKeyState(key: i32) -> i16;
-        }
-        unsafe { GetAsyncKeyState(1) < 0 }
+        physical_button_held(1)
     }
     #[cfg(not(any(target_os = "macos", windows)))]
     {
@@ -603,7 +639,12 @@ pub fn tick(app: &tauri::AppHandle) -> Result<(), String> {
         return Ok(());
     }
     // Avoid replacing a stash/entrance transaction or a live user drag.
-    let windows = crate::web::managed_windows(app);
+    let mut windows = crate::web::managed_windows(app);
+    windows.retain(|label, _| {
+        !label
+            .strip_prefix("webview-")
+            .is_some_and(|id| crate::web::closing(app, id))
+    });
     if crate::stash::active(app)
         || crate::stash::chord_busy(app)
         || crate::capture::active(app)
