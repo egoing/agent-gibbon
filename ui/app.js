@@ -43,6 +43,13 @@ let saving = false;
 let savePromise;
 let autosaveTimer;
 let autosaveBlocked = false;
+let discardedDraft = null;
+let discardGeneration = 0;
+const externalDraftMessage = '메모가 외부에서 갱신되었습니다. 초안을 복사한 뒤 취소하면 최신 내용을 확인할 수 있습니다.';
+function restoredConflict() {
+  const origin = editor?.status().draftRevision;
+  return editing && origin != null && origin !== latestNote?.revision;
+}
 window.gibbonUpdateActivity = () => ({ editing: editing || composition, saving, exporting });
 window.gibbonUpdateBusy = () => editing || composition || saving || exporting;
 let exporting = false;
@@ -103,8 +110,12 @@ function editorChanged(state) {
   sourceProtected = state.protected;
   document.body.classList.toggle('dirty', editing);
   $('save').disabled = !editing || saving || composition || sourceProtected;
-  if (!editing && wasDirty) displayedHtml = undefined;
+  if (!editing && wasDirty) {
+    displayedHtml = undefined;
+    if (state.draftRevision != null) { autosaveBlocked = false; clearNotice(); }
+  }
   if (editing && !wasDirty) {
+    discardedDraft = null;
     readRevision = null;
     clearNotice();
     if (!editorHeightRequested && memoVisible && !folded) {
@@ -112,20 +123,22 @@ function editorChanged(state) {
       invoke('enter_note_editor', { revision: latestNote.revision }).catch(failure);
     }
   }
+  if (restoredConflict()) notify(externalDraftMessage, 'error', true);
   contentAction();
   scheduleAutosave();
   publishFeedback();
 }
 function scheduleAutosave() {
   clearTimeout(autosaveTimer);
-  if (!editing || composition || saving || sourceProtected || autosaveBlocked) return;
+  if (!editing || composition || saving || sourceProtected || autosaveBlocked || restoredConflict()) return;
   autosaveTimer = setTimeout(function autosaveTick() { return save(true); }, 600);
 }
 function endEditing() {
-  if (!editor || saving || composition) return;
+  if (!editing || !editor || latestNote?.capture || saving || exporting || sourceProtected || composition || editor.status().composing) return;
   clearTimeout(autosaveTimer);
   autosaveBlocked = false;
-  editor.discard(latestNote);
+  discardedDraft = editor.discard(latestNote);
+  discardGeneration++;
   editing = false;
   document.body.classList.toggle('dirty', false);
   clearNotice();
@@ -134,11 +147,27 @@ function endEditing() {
   refresh(false);
 }
 
+function restoreDiscarded(generation) {
+  if (!discardedDraft || generation !== discardGeneration || !memoVisible || folded || stashActive || latestNote?.capture ||
+      editing || saving || exporting || composition || editor.status().composing) return;
+  // A snapshot received during composition may not have reached the editor yet.
+  const state = editor.sync(latestNote);
+  if (state.protected || state.dirty || state.conflict) return;
+  if (editor.restore(discardedDraft)) {
+    discardedDraft = null;
+    if (!editing) clearNotice();
+    // The IPC response may arrive after the user has moved to another control/app.
+    if (document.hasFocus() && (document.activeElement === document.body ||
+        document.activeElement?.dataset?.action === 'restore_draft')) editor.focus();
+    publishFeedback();
+  }
+}
+
 function save(automatic = false) {
   clearTimeout(autosaveTimer);
   if (saving) return savePromise;
   if (!editing) return Promise.resolve(true);
-  if (exporting || composition || sourceProtected || editor?.status().composing || automatic && autosaveBlocked) return Promise.resolve(false);
+  if (exporting || composition || sourceProtected || editor?.status().composing || automatic && (autosaveBlocked || restoredConflict())) return Promise.resolve(false);
   savePromise = performSave();
   return savePromise;
 }
@@ -203,7 +232,7 @@ function notify(text, kind = 'result', persistent = false) {
 function failure(error) { notify(String(error), 'error', editing); }
 async function publishFeedback() {
   if (publishing) { publishAgain = true; return; }
-  const view = feedbackView({ editing, saving, exporting, composition, sourceProtected, autosaveBlocked, unified: !latestNote?.capture, acknowledging, highlightRevision, notice, color: latestNote?.color });
+  const view = feedbackView({ editing, saving, exporting, composition, sourceProtected, autosaveBlocked: autosaveBlocked || restoredConflict(), recovery: discardedDraft ? discardGeneration : null, unified: !latestNote?.capture, acknowledging, highlightRevision, notice, color: latestNote?.color });
   renderFeedback(view, folded || !memoVisible || stashActive);
   if (!memoVisible) return;
   const signature = JSON.stringify({ folded, stashActive, view });
@@ -253,7 +282,7 @@ async function refresh(schedule = true) {
         composition = editorState.composing;
         sourceProtected = editorState.protected;
         $('save').disabled = !editing || saving || composition || sourceProtected;
-        if (editorState.conflict && editing && !notice?.text?.includes('외부')) notify('메모가 외부에서 갱신되었습니다. 초안을 복사한 뒤 취소하면 최신 내용을 확인할 수 있습니다.', 'error', true);
+        if (editorState.conflict && editing && !notice?.text?.includes('외부')) notify(externalDraftMessage, 'error', true);
         else if (sourceProtected && !notice) notify('지원하지 않는 문법의 손실을 막기 위해 원문을 보호하고 있습니다. 원문 복사를 사용할 수 있습니다.', 'error', true);
       }
       $('font-size').disabled = !!state.note.capture;
@@ -477,6 +506,7 @@ pollFold();
 window.__TAURI__.event.listen('feedback-action', ({ payload }) => {
   if (payload.owner !== win.label) return;
   const action = payload.action;
+  if (action === 'restore_draft') return restoreDiscarded(payload.revision);
   if (action === 'save-shortcut') return saveShortcut();
   if (action === 'export') return exportNote();
   if (action === 'save') return save();

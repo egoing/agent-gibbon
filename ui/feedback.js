@@ -4,12 +4,12 @@ export function createFeedback(doc, action) {
   const message = doc.getElementById('message');
   const actions = doc.getElementById('actions');
   let signature;
-  let revision = null;
+  let currentView;
   return (view, suppressed = false) => {
     surface.hidden = suppressed || (!view.message && !view.buttons.length);
     const next = JSON.stringify(view);
     if (signature === next) return;
-    revision = view.revision;
+    currentView = view;
     surface.classList.toggle('error', !!view.error);
     message.setAttribute('role', view.error ? 'alert' : 'status');
     message.textContent = view.message;
@@ -20,7 +20,10 @@ export function createFeedback(doc, action) {
       if (!button) {
         button = doc.createElement('button');
         button.dataset.action = item.id;
-        button.addEventListener('click', () => action(item.id, revision));
+        button.addEventListener('click', () => {
+          const current = currentView.buttons.find(b => b.id === item.id);
+          if (current && !current.disabled) action(item.id, current.revision ?? currentView.revision);
+        });
         actions.appendChild(button);
       }
       const shortcut = /Mac|iPhone|iPad/.test(doc.defaultView.navigator.platform) ? 'Command S' : 'Ctrl S';

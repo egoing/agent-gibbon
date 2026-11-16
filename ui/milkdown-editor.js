@@ -4,7 +4,8 @@ import { commonmark, imageSchema, linkSchema } from '@milkdown/preset-commonmark
 import { gfm } from '@milkdown/preset-gfm';
 import { history } from '@milkdown/plugin-history';
 import { $prose } from '@milkdown/utils';
-import { Plugin, EditorState, TextSelection } from '@milkdown/prose/state';
+import { Plugin, PluginKey, EditorState, TextSelection } from '@milkdown/prose/state';
+import { closeHistory, isHistoryTransaction, undoDepth } from '@milkdown/prose/history';
 import { Decoration, DecorationSet } from '@milkdown/prose/view';
 import { preservesMarkdown } from './markdown-policy.mjs';
 import { createFormatMenu } from './editor-format-menu.js';
@@ -23,10 +24,11 @@ export async function createMemoEditor(root, onChange) {
   let loading = true, locked = false, protectedSource = false, decorations = DecorationSet.empty;
   let composition = false, restoreInputFocus = false, pendingWrite = false;
   let formatMenu;
+  const restoredFrom = new PluginKey('restoredDraftOrigin');
   const status = () => ({
     dirty: !!baseDoc && !view.state.doc.eq(baseDoc),
     composing: composition || !!view?.composing,
-    protected: protectedSource, revision: baseRevision,
+    protected: protectedSource, revision: baseRevision, draftRevision: view && restoredFrom.getState(view.state),
   });
   const changed = () => { if (!loading && view) onChange(status()); };
   function taskView(node, editorView, getPos) {
@@ -59,6 +61,23 @@ export async function createMemoEditor(root, onChange) {
     return { dom, contentDOM, update, stopEvent: event => button.contains(event.target), ignoreMutation: mutation => mutation.type === 'attributes' && (mutation.target === dom || mutation.target === button) };
   }
   const integration = $prose(() => new Plugin({
+    key: restoredFrom,
+    state: {
+      init: () => null,
+      apply(tr, origin, previous) {
+        const restored = tr.getMeta(restoredFrom);
+        if (restored !== undefined) return restored;
+        // Redo still belongs to the discarded draft. Fresh typing after undo
+        // starts a new history branch from the current clean document.
+        // Matching the base by typing is not enough: undo could still bring
+        // back the stale document. Only detach when that history is gone.
+        // Non-history and appended plugin changes can preserve the redo branch.
+        if (origin !== null && tr.docChanged && previous.doc.eq(baseDoc) &&
+            tr.getMeta('addToHistory') !== false && !tr.getMeta('appendedTransaction') &&
+            !isHistoryTransaction(tr) && undoDepth(previous) === 0) return null;
+        return origin;
+      },
+    },
     filterTransaction: transaction => !transaction.docChanged || (!locked && !protectedSource),
     props: {
       decorations: () => decorations,
@@ -119,6 +138,7 @@ export async function createMemoEditor(root, onChange) {
     } finally { loading = false; }
     return status();
   }
+  const draftSnapshot = () => ({ doc: view.state.doc, revision: restoredFrom.getState(view.state) ?? baseRevision });
   return {
     status,
     sync(note) {
@@ -127,15 +147,27 @@ export async function createMemoEditor(root, onChange) {
       if (baseRevision >= 0 && baseMarkdown === note.markdown) { baseRevision = note.revision; return status(); }
       return load(note);
     },
-    discard: note => load(note),
+    discard(note) {
+      const draft = draftSnapshot();
+      load(note);
+      return draft;
+    },
+    restore(draft) {
+      if (locked || pendingWrite || protectedSource || status().composing || status().dirty) return false;
+      if (view.state.doc.eq(draft.doc)) return true;
+      const tr = view.state.tr.replaceWith(0, view.state.doc.content.size, draft.doc.content);
+      view.dispatch(closeHistory(tr).setMeta(restoredFrom, draft.revision));
+      return view.state.doc.eq(draft.doc);
+    },
     markdown() {
       if (status().composing) throw new Error('한글 조합을 마친 뒤 저장해 주세요');
       if (protectedSource) throw new Error('보존할 수 없는 문법이 있어 원문을 보호하고 있습니다');
       return status().dirty ? editor.action(ctx => ctx.get(serializerCtx)(view.state.doc)) : baseMarkdown;
     },
-    capture() { return { doc: view.state.doc, markdown: this.markdown(), revision: baseRevision }; },
+    capture() { return { ...draftSnapshot(), markdown: this.markdown() }; },
     pending(value) { pendingWrite = value; },
     saved(note, snapshot) {
+      if (restoredFrom.getState(view.state) !== null) view.dispatch(view.state.tr.setMeta(restoredFrom, null));
       baseDoc = snapshot?.doc || view.state.doc; baseMarkdown = note.markdown; baseRevision = note.revision;
       decorations = DecorationSet.empty;
       view.setProps({});
