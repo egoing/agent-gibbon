@@ -8,7 +8,7 @@ export function createFormatMenu(view, root, enabled) {
   menu.setAttribute('role', 'toolbar'); menu.setAttribute('aria-label', '선택한 글자 서식');
   const actions = [
     ['굵게', 'B', 'strong'], ['기울임', 'I', 'emphasis'], ['취소선', 'S', 'strike_through'],
-    ['코드', '</>', 'inlineCode'], ['제목 1', 'H1', 1], ['제목 2', 'H2', 2], ['본문', 'P', 0],
+    ['코드', '코드', 'inlineCode'], ['큰제목', '큰제목', 1], ['작은제목', '작은제목', 2], ['본문', 'P', 0],
   ];
   const buttons = actions.map(([label, text, type]) => {
     const button = document.createElement('button');

@@ -7,11 +7,11 @@ import {readFileSync} from 'node:fs';
 const flush=async()=>{for(let i=0;i<20;i++)await Promise.resolve();};
 const folder=path=>({path,name:path.split('/').at(-1),parent:path.slice(0,path.lastIndexOf('/')),command:`cd -- '${path}'`});
 const shell={id:'shell',label:'셸',command:"'/bin/zsh' -i"};
-function ui({grid=null,ipc=null,restoreSupported=true,plan=null,restored=false,autoRestore=false,kind='terminal',path=null,fail=false,focused=true,picker=null,folders=[],choices=[{id:'git',label:'git log',command:"'/usr/bin/git' log --oneline --decorate -20"},shell]}={}){
+function ui({exitCode=null,grid=null,ipc=null,restoreSupported=true,plan=null,restored=false,autoRestore=false,kind='terminal',path=null,fail=false,focused=true,picker=null,folders=[],choices=[{id:'git',label:'git log',command:"'/usr/bin/git' log --oneline --decorate -20"},shell]}={}){
  const elements={},calls=[],intervals=[];
  const element=id=>elements[id]??=({id,hidden:false,textContent:'',value:'',children:[],attrs:{},dataset:{},focus(){this.focused=true;},addEventListener(){},setAttribute(k,v){this.attrs[k]=v;},getAttribute(k){return this.attrs[k];},replaceChildren(){this.children=[];},append(...children){this.children.push(...children);}});
  element('rename-title');
- const info={restore_supported:restoreSupported,restore_plan:plan,restored,auto_restore:autoRestore,kind,id:'terminal-123',title:'터미널',last_path:path};
+ const info={exit_code:exitCode,restore_supported:restoreSupported,restore_plan:plan,restored,auto_restore:autoRestore,kind,id:'terminal-123',title:'터미널',last_path:path};
  const context={innerWidth:720,innerHeight:460,navigator:{platform:'MacIntel'},setTimeout,clearTimeout,setInterval:fn=>intervals.push(fn),ResizeObserver:class{observe(){}},Terminal:class{constructor(){this.cols=80;this.rows=24;this.options={fontSize:13};}loadAddon(){}open(){}onData(){}attachCustomKeyEventHandler(){}focus(){}write(){}},FitAddon:{FitAddon:class{fit(){}}},document:{hasFocus:()=>focused,getElementById:element,createElement:()=>element('element'+Math.random()),querySelector:()=>element('header'),querySelectorAll:()=>[]},window:{installTerminalIme(){},__TAURI__:{core:{Channel:class{},invoke:async(name,args)=>{
   calls.push([name,args]);
   if(ipc && (name==='terminal_resize'||name==='terminal_start'))return ipc(name,args);
@@ -41,7 +41,7 @@ function ui({grid=null,ipc=null,restoreSupported=true,plan=null,restored=false,a
    context.matchMedia=()=>({matches:false});
    context.ResizeObserver=class{constructor(callback){grid.observed=callback;}observe(){}};
  }
- vm.runInNewContext(readFileSync(new URL('../ui/terminal.js',import.meta.url),'utf8'),context);return {elements,calls,intervals};
+ vm.runInNewContext(readFileSync(new URL('../ui/terminal.js',import.meta.url),'utf8'),context);return {elements,calls,intervals,info};
 }
 test('no history uses home preview and retains folder picker and shell without autostart',async()=>{const {elements,calls}=ui();await flush();assert.equal(elements['home-hint'].hidden,false);assert.equal(elements['recent-folders'].children.length,0);assert.equal(calls.some(([n])=>n==='terminal_start'),false);assert.equal(typeof elements['choose-folder'].onclick,'function');assert.ok(elements.recommendations.children.some(b=>b.dataset.choice==='shell'));assert.match(elements['command-preview'].textContent,/cd -- '\/home\/test'/);});
 test('recent folders show three, expand, select locally and update preview',async()=>{const folders=['/a/one','/b/two','/c/three','/d/four'].map(folder);const {elements,calls}=ui({path:folders[0].path,folders});await flush();assert.equal(elements['recent-folders'].children.length,3);assert.equal(elements['more-folders'].hidden,false);await elements['more-folders'].onclick();assert.equal(elements['recent-folders'].children.length,4);const row=elements['recent-folders'].children[3];row.onclick();assert.equal(row.attrs['aria-pressed'],'true');assert.equal(elements['recent-folders'].children[0].attrs['aria-pressed'],'false');assert.ok(elements['command-preview'].textContent.includes(folders[3].command));assert.equal(calls.some(([n])=>n==='terminal_folder'||n==='terminal_start'),false);await elements['run-task'].onclick();const writes=calls.filter(([n])=>n==='terminal_folder'||n==='terminal_start');assert.equal(writes[0][0],'terminal_folder');assert.equal(writes[0][1].path,folders[3].path);assert.equal(writes[1][0],'terminal_start');});
@@ -99,6 +99,17 @@ test('unsupported restoration shows an explanation and blocks auto and edited ex
  assert.equal(elements['welcome-panel'].hidden,false);
  await elements['run-task'].onclick();
  assert.equal(calls.filter(([name])=>name==='terminal_start').length,1);
+});
+
+
+test('a recreated webview for a retained exited session cannot rerun the saved plan',async()=>{
+ const {elements,calls}=ui({exitCode:0,plan:'htop',restored:true,autoRestore:true});
+ await flush();
+ assert.equal(elements.welcome.hidden,true);
+ assert.equal(elements.terminal.hidden,false);
+ assert.equal(calls.some(([name])=>name==='terminal_welcome'||name==='terminal_start'),false);
+ await elements.close.onclick();
+ assert.equal(calls.at(-1)[0],'terminal_close');
 });
 
 function gridFixture(t, options={}){
@@ -211,4 +222,28 @@ test('a failed launch may restart with a different grid, and a failed stale resi
   assert.deepEqual(resizes(),[[91,24],[93,24]]);
   t.mock.timers.tick(1000);
   assert.equal(resizes().length,2);
+});
+
+test('an exit observed during a pending resize blocks the queued latest grid',async t=>{
+  let finishResize;
+  const {elements,calls,intervals,info,viewport,resizes}=gridFixture(t,{ipc:name=>{
+    if(name==='terminal_resize')return new Promise(resolve=>{finishResize=resolve;});
+  }});
+  await flush();
+  await elements['run-task'].onclick();
+  viewport(900);
+  assert.deepEqual(resizes(),[[90,24]]);
+  viewport(920);
+  assert.deepEqual(resizes(),[[90,24]]);
+
+  // The periodic terminal_info response records natural exit while resize is
+  // still in flight. Completing that resize must not launch the pending grid.
+  info.exit_code=0;
+  const infoCall=intervals[0]();
+  await flush();
+  finishResize();
+  await infoCall;
+  await flush();
+  assert.deepEqual(resizes(),[[90,24]]);
+  assert.equal(calls.filter(([name])=>name==='terminal_start').length,1);
 });

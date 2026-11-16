@@ -2,18 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
+const geometry=readFileSync(new URL('../ui/relation-curve.js',import.meta.url),'utf8');
 const source=readFileSync(new URL('../ui/relation-prototype.js',import.meta.url),'utf8');
 function renderer(){
  let measured=0;
  const node=()=>({style:{},attributes:{},setAttribute(k,v){this.attributes[k]=v;}});
- const path=node(),text=node(),box=node(),label=node(),svg=node(),acks=[];
+ const path=node(),text=node(),box=node(),label=node(),svg=node(),marker=node(),acks=[];
  text.getBBox=()=>{measured++;return{x:-20,y:-6,width:40,height:12};};
- const nodes={'.connector':path,text,rect:box,'.label':label};svg.querySelector=s=>nodes[s];
+ const nodes={'.connector':path,marker,text,rect:box,'.label':label};svg.querySelector=s=>nodes[s];
  const context={window:{__TAURI_INTERNALS__:{invoke:(command,args)=>{acks.push({command,...args});return Promise.resolve(true);}}},document:{querySelector:()=>svg},requestAnimationFrame(){throw Error('Hidden renderer must not schedule animation frames');}};
+ vm.runInNewContext(geometry,context);
  vm.runInNewContext(source,context);
- return{window:context.window,path,label,acks,measured:()=>measured};
+ return{window:context.window,path,label,marker,acks,measured:()=>measured};
 }
-const payload={width:1000,height:800,scale:2,label:'참고',relation:['a','b'],points:[[0,0],[100,0],[200,200],[300,200]]};
+const payload={width:1000,height:800,scale:2,arrow:'none',label:'참고',relation:['a','b'],points:[[0,0],[100,0],[200,200],[300,200]]};
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
 test('settled geometry is drawn once and acknowledged without relying on a visible frame',async()=>{
  const r=renderer();r.window.drawRelation(payload,1);
@@ -45,4 +47,32 @@ test('arrow choice supports target-only, both ends and no arrow without stale ma
   assert.equal(r.path.attributes['marker-end'],end);
  }
  await flush();
+});
+
+test('a steep diagonal joins the center of the full-size head base and keeps its tip at the port',()=>{
+ const r=renderer(), points=[[300,145],[300,122.5],[120,122.5],[120,100]];
+ r.window.drawRelation({...payload,scale:1,points,arrow:'end'},1);
+ assert.equal(r.path.attributes.d,'M300,145 C300,129.5 120,129.5 120,114');
+ assert.equal(r.marker.attributes.markerHeight,7);
+ assert.equal(r.label.attributes.transform,'translate(210 129.5)');
+ for(const name of ['relation-prototype','relation-pick']){
+  const html=readFileSync(new URL(`../ui/${name}.html`,import.meta.url),'utf8');
+  assert.match(html,/<marker [^>]*refX="0" refY="5"/);
+ }
+});
+test('opposed heads fit inside a narrow gap and reset to full size after movement',()=>{
+ const r=renderer(), points=[[0,20],[4,20],[4,200],[8,200]];
+ r.window.drawRelation({...payload,scale:1,points,arrow:'both'},1);
+ assert.equal(r.path.attributes.d,'M3.5,20 C4,20 4,200 4.5,200');
+ assert.equal(r.marker.attributes.markerWidth,1.75);
+ r.window.drawRelation({...payload,scale:1,points:[[0,20],[20,20],[20,200],[40,200]],arrow:'both'},2);
+ assert.equal(r.marker.attributes.markerWidth,7);
+ assert.equal(r.path.attributes.d,'M14,20 C20,20 20,200 26,200');
+});
+test('touching ports retain the straight chord and coincident ports have no drawable arrow',()=>{
+ const r=renderer(), points=[[20,10],[20,10],[20,80],[20,80]];
+ r.window.drawRelation({...payload,scale:1,points,arrow:'end'},1);
+ assert.equal(r.path.attributes.d,'M20,10 C20,38 20,38 20,66');
+ r.window.drawRelation({...payload,points:Array(4).fill([20,10]),arrow:'both'},2);
+ assert.equal(r.path.attributes.d,'');
 });

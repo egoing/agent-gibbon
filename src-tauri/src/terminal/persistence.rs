@@ -23,6 +23,8 @@ struct Data {
 
 #[derive(Default)]
 pub(super) struct Records {
+    #[cfg(test)]
+    pub(super) before_write: Mutex<Option<Box<dyn FnOnce() + Send>>>,
     io: Mutex<()>,
     data: Mutex<Data>,
 }
@@ -106,6 +108,16 @@ impl Records {
         source: EditSource,
         edit: impl FnOnce(&mut Terminal) -> bool,
     ) -> Result<bool, String> {
+        self.edit_checked(root, id, source, |record| Ok(edit(record)))
+    }
+
+    pub(super) fn edit_checked(
+        &self,
+        root: &Path,
+        id: &str,
+        source: EditSource,
+        edit: impl FnOnce(&mut Terminal) -> Result<bool, String>,
+    ) -> Result<bool, String> {
         let _writer = self.io.lock().map_err(err)?;
         let snapshot = {
             let mut data = self.data.lock().map_err(err)?;
@@ -118,11 +130,15 @@ impl Records {
             let Some(record) = data.records.get_mut(id) else {
                 return Ok(false);
             };
-            if !edit(record) && !retry {
+            if !edit(record)? && !retry {
                 return Ok(true);
             }
             record.clone()
         };
+        #[cfg(test)]
+        if let Some(hook) = self.before_write.lock().unwrap().take() {
+            hook();
+        }
         if let Err(error) = save(root, &snapshot) {
             self.data.lock().map_err(err)?.failed.insert(id.to_owned());
             eprintln!("터미널 메타데이터를 저장할 수 없습니다.");
