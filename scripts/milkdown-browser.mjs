@@ -54,6 +54,35 @@ async function open(markdown, size = { width: 300, height: 240 }) {
 const tick = page => page.waitForTimeout(450);
 const save = page => page.keyboard.press('Control+s');
 async function testEditor() {
+  // Clicking whitespace in a new region note must place the first caret.
+  const blank = await open('');
+  const area = await blank.locator('#viewport').boundingBox();
+  await blank.mouse.click(area.x + area.width / 2, area.y + area.height * 0.75);
+  await blank.keyboard.type('first');
+  assert.equal(await blank.locator('#memo-editor').innerText(), 'first');
+  assert.equal(await blank.evaluate(() => document.activeElement.id), 'memo-editor');
+  await save(blank);
+  await blank.waitForFunction(() => window.testNote.markdown.trim() === 'first');
+  const reopened = await open(await blank.evaluate(() => window.testNote.markdown));
+  assert.equal(await reopened.locator('#memo-editor').innerText(), 'first');
+  await reopened.close();
+  await blank.close();
+  results.push('empty note whitespace click, first keystrokes, explicit save, load saved Markdown');
+
+  // Printable typing must traverse keydown/beforeinput, not only insertText.
+  const keyboardPage = await open('키보드 본문\n');
+  await keyboardPage.locator('#memo-editor p').click();
+  await keyboardPage.keyboard.press('End');
+  await keyboardPage.keyboard.type(' abc');
+  await keyboardPage.keyboard.press('Enter');
+  await keyboardPage.keyboard.type('XYZ');
+  await keyboardPage.keyboard.press('Backspace');
+  assert.equal(await keyboardPage.locator('#memo-editor').innerText(), '키보드 본문 abc\n\nXY');
+  assert.equal(await keyboardPage.evaluate(() => document.activeElement.id), 'memo-editor');
+  await save(keyboardPage); await tick(keyboardPage);
+  assert.match(await keyboardPage.evaluate(() => window.testNote.markdown), /키보드 본문 abc\n\nXY/);
+  await keyboardPage.close();
+  results.push('printable keydown typing, Enter/Backspace, DOM input focus, explicit save');
   const original = '# 제목\n\n본문 한글\n\n- [ ] 할 일\n- [x] 완료\n\n| 가 | 나 |\n| --- | --- |\n| 1 | 2 |\n\n```js\n[ ] 코드\n```\n';
   const page = await open(original);
   assert.equal(await page.locator('#memo-editor').getAttribute('aria-readonly'), 'false');

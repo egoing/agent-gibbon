@@ -321,14 +321,13 @@ pub fn cancel(window: &WebviewWindow) -> Result<(), String> {
 }
 #[tauri::command]
 pub fn drag_note(window: WebviewWindow) -> Result<(), String> {
-    crate::relation_prototype::changed(window.app_handle(), window.label());
     if crate::stash::owns(&window) {
         return Ok(());
     }
     cancel(&window)?;
     crate::layout::mark(&window, true);
     crate::monitor_layout::manual(&window);
-    window.start_dragging().map_err(|e| e.to_string())
+    crate::relation_prototype::start_drag(&window)
 }
 fn near(a: Point, b: Point) -> bool {
     (a.x - b.x).abs() <= 2.0 && (a.y - b.y).abs() <= 2.0

@@ -27,13 +27,41 @@ const GWL_EXSTYLE: i32 = -20;
 const WS_EX_LAYERED: i32 = 0x0008_0000;
 const WS_EX_NOACTIVATE: i32 = 0x0800_0000;
 const LWA_ALPHA: u32 = 2;
+const WM_ENTERSIZEMOVE: u32 = 0x0231;
+const WM_EXITSIZEMOVE: u32 = 0x0232;
 const WM_SIZING: u32 = 0x0214;
 const WM_NCDESTROY: u32 = 0x0082;
 const RESIZE_OBSERVER: usize = 1;
 
 #[derive(Default)]
+pub(crate) struct MoveLoops {
+    started: AtomicU64,
+    finished: AtomicU64,
+    destroyed: AtomicBool,
+}
+impl MoveLoops {
+    fn observe(&self, message: u32) {
+        match message {
+            WM_ENTERSIZEMOVE => {
+                self.started.fetch_add(1, Ordering::Release);
+            }
+            WM_EXITSIZEMOVE => self.finished.store(self.started(), Ordering::Release),
+            WM_NCDESTROY => self.destroyed.store(true, Ordering::Release),
+            _ => {}
+        }
+    }
+    pub(crate) fn started(&self) -> u64 {
+        self.started.load(Ordering::Acquire)
+    }
+    pub(crate) fn ended_after(&self, before: u64) -> bool {
+        self.destroyed.load(Ordering::Acquire) || self.finished.load(Ordering::Acquire) > before
+    }
+}
+
+#[derive(Default)]
 struct ResizeObserver {
     resized: AtomicBool,
+    move_loops: std::sync::Arc<MoveLoops>,
     // Capture notes use client coordinates; ordinary notes retain outer anchors.
     preserve_client_rect: AtomicBool,
     // Zero disables the image constraint. Access never locks application state.
@@ -135,6 +163,10 @@ unsafe extern "system" fn observe_resize(
     id: usize,
     data: usize,
 ) -> isize {
+    // Same-thread subclass data remains live until WM_NCDESTROY below.
+    unsafe { &*(data as *const ResizeObserver) }
+        .move_loops
+        .observe(message);
     if message == WM_SIZING {
         // WM_SIZING is user-only; WM_SIZE also fires for fit/fold/placement.
         // Never call Tauri or lock app state from this reentrant native callback.
@@ -218,6 +250,18 @@ pub fn install_resize_observer(window: &WebviewWindow) -> Result<(), String> {
     })
 }
 
+pub(crate) fn move_loops(window: &WebviewWindow) -> Result<std::sync::Arc<MoveLoops>, String> {
+    on_owner_thread(window, |window| {
+        let hwnd = window.hwnd().map_err(|e| e.to_string())?.0 as isize;
+        install_resize_observer_for_handle(hwnd)?;
+        let data = resize_observer(hwnd).ok_or("창 이동 감시를 찾을 수 없습니다")?;
+        // SAFETY: the owning thread holds the HWND subclass until WM_NCDESTROY.
+        Ok(unsafe { &*(data as *const ResizeObserver) }
+            .move_loops
+            .clone())
+    })
+}
+
 fn take_native_resize_for_handle(window: isize) -> bool {
     resize_observer(window).is_some_and(|data| {
         // Keep the signal until consumed even after the native drag loop exits;
@@ -279,6 +323,7 @@ pub fn take_native_resize(window: &WebviewWindow) -> Result<bool, String> {
 
 #[link(name = "user32")]
 extern "system" {
+    fn ShowWindow(window: isize, command: i32) -> i32;
     fn GetWindowRect(window: isize, rect: *mut Rect) -> i32;
     fn GetClientRect(window: isize, rect: *mut Rect) -> i32;
     fn ClientToScreen(window: isize, point: *mut Point) -> i32;
@@ -319,6 +364,18 @@ fn extended_style(handle: isize) -> Result<i32, String> {
         }
         Ok(style)
     }
+}
+
+// Tao's unminimize uses SW_RESTORE, which activates the HWND. The manager
+// restores the selected web host without taking focus from its current owner.
+pub fn restore_minimized_without_focus(window: &WebviewWindow) -> Result<(), String> {
+    const SW_SHOWNOACTIVATE: i32 = 4;
+    on_owner_thread(window, |window| {
+        let handle = window.hwnd().map_err(|e| e.to_string())?.0 as isize;
+        // ShowWindow returns the previous visibility, not success/failure.
+        unsafe { ShowWindow(handle, SW_SHOWNOACTIVATE) };
+        Ok(())
+    })
 }
 
 pub fn show_without_focus(window: &WebviewWindow) -> Result<(), String> {

@@ -357,6 +357,18 @@ pub fn relation_cancel(view: tauri::Webview, generation: Option<u64>) -> Result<
     cancel(app, true);
     Ok(())
 }
+pub(crate) fn endpoint_closed(app: &tauri::AppHandle, id: &str) {
+    let involved = app
+        .state::<Editor>()
+        .0
+        .lock()
+        .unwrap()
+        .as_ref()
+        .is_some_and(|d| d.from == id || d.to.as_deref() == Some(id));
+    if involved {
+        cancel(app, false);
+    }
+}
 pub(crate) fn sweep(app: &tauri::AppHandle) {
     let Some(state) = app.try_state::<Editor>() else {
         return;

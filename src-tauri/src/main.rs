@@ -684,10 +684,11 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     return;
                 }
             }
-            if matches!(
+            if matches!(event, tauri::WindowEvent::Moved(_)) {
+                relation_prototype::moved(win.app_handle(), win.label());
+            } else if matches!(
                 event,
-                tauri::WindowEvent::Moved(_)
-                    | tauri::WindowEvent::Resized(_)
+                tauri::WindowEvent::Resized(_)
                     | tauri::WindowEvent::ScaleFactorChanged { .. }
                     | tauri::WindowEvent::Destroyed
             ) {
@@ -706,11 +707,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 return;
             }
             if win.label().starts_with("webview-") || win.label().starts_with("webpage-") {
-                if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                    api.prevent_close();
-                    relation_prototype::changed(win.app_handle(), win.label());
-                    let _ = win.hide();
-                }
+                // The web host handles close with its own session identity.
                 return;
             }
             if win.label() == "updater-notice" {

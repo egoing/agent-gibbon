@@ -5,22 +5,83 @@ use crate::{
 };
 use serde_json::{json, Value};
 mod recent;
-use std::{collections::BTreeMap, sync::Mutex};
+use std::{
+    collections::BTreeMap,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, Mutex,
+    },
+};
 use tauri::{Emitter, Manager, WebviewUrl, WebviewWindow};
 #[derive(Clone)]
-struct Record {
+struct Record<W = WebviewWindow> {
+    session: Arc<Session>,
     label: String,
-    host: WebviewWindow,
+    host: W,
     url: Option<String>,
     created_at: std::time::SystemTime,
 }
 #[derive(Default)]
-pub struct Windows(
-    Mutex<BTreeMap<String, Record>>,
-    // Navigation callbacks can precede record insertion during native startup.
-    Mutex<BTreeMap<String, String>>,
-    Mutex<BTreeMap<String, String>>,
-);
+pub struct Windows(Mutex<BTreeMap<String, Record>>);
+
+// A host and its child own one lifetime. Deferred WebKit callbacks never look
+// up a session by its reusable public ID.
+#[derive(Default)]
+struct Session {
+    closing: AtomicBool,
+    urls: Mutex<Urls>,
+}
+#[derive(Default)]
+struct Urls {
+    navigation: Option<String>,
+    current: Option<String>,
+}
+impl Session {
+    fn closing(&self) -> bool {
+        self.closing.load(Ordering::Acquire)
+    }
+
+    fn request_close(&self, close: impl FnOnce() -> Result<(), String>) -> Result<(), String> {
+        if self.closing.swap(true, Ordering::AcqRel) {
+            return Ok(());
+        }
+        if let Err(error) = close() {
+            self.closing.store(false, Ordering::Release);
+            return Err(error);
+        }
+        Ok(())
+    }
+
+    fn navigate(&self, url: &tauri::Url) -> bool {
+        if self.closing() || validate_url(url.as_str()).is_err() {
+            return false;
+        }
+        let mut urls = self.urls.lock().unwrap();
+        urls.current = None;
+        urls.navigation = Some(url.to_string());
+        true
+    }
+}
+
+// IDs can be reopened. Only the owning host may retire its registry entry.
+fn finish_destroy<W>(records: &mut BTreeMap<String, Record<W>>, id: &str, session: &Arc<Session>) {
+    if records
+        .get(id)
+        .is_some_and(|r| Arc::ptr_eq(&r.session, session))
+    {
+        records.remove(id);
+    }
+}
+
+pub(crate) fn closing(app: &tauri::AppHandle, id: &str) -> bool {
+    app.state::<Windows>()
+        .0
+        .lock()
+        .unwrap()
+        .get(id)
+        .is_some_and(|r| r.session.closing())
+}
+
 // Preserve app-wide window enumeration for hosts containing remote child WebViews.
 pub fn managed_windows(app: &tauri::AppHandle) -> std::collections::HashMap<String, WebviewWindow> {
     let mut windows = app.webview_windows();
@@ -104,12 +165,11 @@ fn record(app: &tauri::AppHandle, id: &str) -> Result<Record, String> {
 // Wry 0.57 macOS url() unwraps WKWebView.URL even before a document exists.
 // Read the public nullable property directly and report unknown as null. Do not
 // confuse the last allowed navigation target with the committed/current URL.
-fn current_webview_url(view: &tauri::Webview, app: &tauri::AppHandle, id: &str) -> Option<String> {
+fn current_webview_url(view: &tauri::Webview, session: &Arc<Session>) -> Option<String> {
     #[cfg(target_os = "macos")]
     {
-        let app = app.clone();
-        let id = id.to_owned();
-        let observed = app.state::<Windows>().2.lock().ok()?.get(&id).cloned();
+        let observed = session.urls.lock().ok()?.current.clone();
+        let session = session.clone();
         view.with_webview(move |platform| unsafe {
             let native = &*platform.inner().cast::<objc2::runtime::AnyObject>();
             let url: Option<objc2::rc::Retained<objc2_foundation::NSURL>> =
@@ -117,13 +177,7 @@ fn current_webview_url(view: &tauri::Webview, app: &tauri::AppHandle, id: &str) 
             let value = url
                 .and_then(|url| url.absoluteString())
                 .map(|s| s.to_string());
-            if let Ok(mut urls) = app.state::<Windows>().2.lock() {
-                if let Some(value) = value {
-                    urls.insert(id, value);
-                } else {
-                    urls.remove(&id);
-                }
-            }
+            session.urls.lock().unwrap().current = value;
         })
         .ok()?;
         // Native callbacks may be deferred. Return only an actually observed
@@ -132,22 +186,19 @@ fn current_webview_url(view: &tauri::Webview, app: &tauri::AppHandle, id: &str) 
     }
     #[cfg(not(target_os = "macos"))]
     {
-        let _ = (app, id);
+        let _ = session;
         view.url().ok().map(|url| url.to_string())
     }
 }
 pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
     let r = record(app, id)?;
+    if r.session.closing() {
+        return Err("웹 창 종료 중입니다".into());
+    }
     let w = r.host.clone();
     let content = app.get_webview(&format!("webpage-{id}"));
-    let current_url = current_webview_url(content.as_ref().unwrap_or(w.as_ref()), app, id);
-    let navigation_url = app
-        .state::<Windows>()
-        .1
-        .lock()
-        .map_err(err)?
-        .get(id)
-        .cloned();
+    let current_url = current_webview_url(content.as_ref().unwrap_or(w.as_ref()), &r.session);
+    let navigation_url = r.session.urls.lock().map_err(err)?.navigation.clone();
     Ok(
         json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":"web","color":crate::memo_color::read(&app.state::<crate::storage::Store>().0, id)?,"title":w.title().map_err(err)?,"url":r.url,"welcome":r.url.is_none(),"current_url":current_url,"navigation_url":navigation_url,"visible":w.is_visible().map_err(err)?,"focused":w.is_focused().map_err(err)?,"always_on_top":w.is_always_on_top().map_err(err)?,"position":w.outer_position().map_err(err)?,"size":w.inner_size().map_err(err)?}),
     )
@@ -158,10 +209,81 @@ pub fn entries(app: &tauri::AppHandle) -> Result<Vec<Value>, String> {
         .0
         .lock()
         .map_err(err)?
-        .keys()
-        .cloned()
+        .iter()
+        .filter(|(_, r)| !r.session.closing())
+        .map(|(id, _)| id.clone())
         .collect();
     ids.iter().map(|id| inspect(app, id)).collect()
+}
+// Poll only registered hosts. CLI inspect also queries the remote view, reads
+// color storage and measures geometry, none of which the manager needs.
+pub(crate) fn manager_entries(app: &tauri::AppHandle) -> Result<Vec<Value>, String> {
+    let records = app.state::<Windows>().0.lock().map_err(err)?.clone();
+    records
+        .into_iter()
+        .filter(|(_, record)| !record.session.closing())
+        .map(|(id, record)| {
+            Ok(json!({
+                "id": id, "kind": "web",
+                "title": record.url.as_deref().unwrap_or("Welcome"),
+                "visible": crate::manager::window_visible(&record.host)?
+            }))
+        })
+        .collect()
+}
+
+pub(crate) fn set_manager_visibility(
+    app: &tauri::AppHandle,
+    id: &str,
+    visible: bool,
+) -> Result<bool, String> {
+    let _activity = crate::updater::activity(app)?;
+    if crate::privacy::onboarding_required(app) {
+        return Err("약관 확인이 필요합니다".into());
+    }
+    // Look up the host at click time. A removed web session must never fall
+    // through to the ordinary open path, which can create a blank text memo.
+    let record = record(app, id)?;
+    if record.session.closing() {
+        return Err("닫는 중인 웹 창입니다".into());
+    }
+    let host = record.host;
+    if visible {
+        crate::focus::discard_restore(app, host.label());
+        if host.is_minimized().map_err(err)? {
+            restore_minimized_without_focus(&host)?;
+        }
+        show(&host)?;
+    } else {
+        hide(&host)?;
+    }
+    crate::manager::window_visible(&host)
+}
+
+#[cfg(target_os = "macos")]
+fn restore_minimized_without_focus(host: &WebviewWindow) -> Result<(), String> {
+    // The manager command runs on the main thread. Tao consults the window's
+    // focusable flag in both canBecomeKeyWindow and canBecomeMainWindow.
+    let native = unsafe { &*(host.ns_window().map_err(err)? as *const objc2_app_kit::NSWindow) };
+    if !native.canBecomeKeyWindow() {
+        return host.unminimize().map_err(err);
+    }
+    host.set_focusable(false).map_err(err)?;
+    let restored = host.unminimize().map_err(err);
+    let focusable = host.set_focusable(true).map_err(err);
+    restored.and(focusable)
+}
+#[cfg(windows)]
+use crate::windows_window::restore_minimized_without_focus;
+#[cfg(not(any(target_os = "macos", windows)))]
+fn restore_minimized_without_focus(host: &WebviewWindow) -> Result<(), String> {
+    host.unminimize().map_err(err)
+}
+
+fn hide(w: &WebviewWindow) -> Result<(), String> {
+    crate::stash::release(w)?;
+    crate::relation_prototype::changed(w.app_handle(), w.label());
+    w.hide().map_err(err)
 }
 fn show(w: &WebviewWindow) -> Result<(), String> {
     crate::stash::release(w)?;
@@ -281,6 +403,9 @@ pub(crate) fn create_presented(
         None
     };
     if let Some(r) = &old {
+        if r.session.closing() {
+            return Err("웹 창 종료 중입니다".into());
+        }
         if url.is_none() || r.url.as_deref() == url {
             let w = r.host.clone();
             show(&w)?;
@@ -308,6 +433,7 @@ pub(crate) fn create_presented(
         show(w)?;
         return inspect(app, &id);
     }
+    let session = old.as_ref().map(|r| r.session.clone()).unwrap_or_default();
     let w = if let Some(previous) = &previous {
         previous.clone()
     } else {
@@ -356,7 +482,33 @@ pub(crate) fn create_presented(
         let handle = app.clone();
         let content_label = format!("webpage-{id}");
         let parent_label = label.clone();
+        let host_id = id.clone();
+        let host_session = session.clone();
         window.on_window_event(move |event| {
+            match event {
+                tauri::WindowEvent::CloseRequested { api, .. } => {
+                    api.prevent_close();
+                    if let Ok(r) = record(&handle, &host_id) {
+                        if Arc::ptr_eq(&r.session, &host_session) {
+                            if let Err(error) = end_session(&host_id, &r) {
+                                eprintln!("웹 창 종료 실패: {error}");
+                            }
+                        }
+                    }
+                    return;
+                }
+                tauri::WindowEvent::Destroyed => {
+                    let state = handle.state::<Windows>();
+                    let mut records = state.0.lock().unwrap();
+                    finish_destroy(&mut records, &host_id, &host_session);
+                    return;
+                }
+                _ => {}
+            }
+            if host_session.closing() {
+                return;
+            }
+
             if matches!(
                 event,
                 tauri::WindowEvent::Resized(_) | tauri::WindowEvent::ScaleFactorChanged { .. }
@@ -381,20 +533,8 @@ pub(crate) fn create_presented(
         .user_agent(MOBILE_USER_AGENT)
         .initialization_script(include_str!("web_presentation.js"))
         .on_navigation({
-            let app = app.clone();
-            let id = id.clone();
-            move |url| {
-                if validate_url(url.as_str()).is_err() {
-                    return false;
-                }
-                if let Ok(mut observed) = app.state::<Windows>().2.lock() {
-                    observed.remove(&id);
-                }
-                if let Ok(mut urls) = app.state::<Windows>().1.lock() {
-                    urls.insert(id.clone(), url.as_str().to_owned());
-                }
-                true
-            }
+            let session = session.clone();
+            move |url| session.navigate(url)
         })
         .on_new_window(|_, _| tauri::webview::NewWindowResponse::Deny)
         .on_download(|_, _| false);
@@ -434,6 +574,7 @@ pub(crate) fn create_presented(
                 .as_ref()
                 .map(|r| r.created_at)
                 .unwrap_or_else(|| creation_time(&id)),
+            session,
             host: w.clone(),
             label,
             url: url.map(str::to_owned),
@@ -460,6 +601,9 @@ pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String
     }
     let r = record(app, request.id())?;
     let w = r.host.clone();
+    if r.session.closing() {
+        return Err("웹 창 종료 중입니다".into());
+    }
     match request.action {
         Action::Update
             if request.color.is_some()
@@ -482,9 +626,7 @@ pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String
         }
         Action::Inspect => inspect(app, request.id()),
         Action::Close => {
-            crate::stash::release(&w)?;
-            crate::relation_prototype::changed(w.app_handle(), w.label());
-            w.hide().map_err(err)?;
+            hide(&w)?;
             inspect(app, request.id())
         }
         Action::Open => {
@@ -527,6 +669,7 @@ pub async fn web_run(window: tauri::Webview, url: String) -> Result<Value, Strin
     if r.label != window.label() || r.url.is_some() {
         return Err("웹 Welcome에서만 실행할 수 있습니다".into());
     }
+    let expected = r.session;
     let id = id.to_owned();
     let app = window.app_handle().clone();
     // Native window construction/order/focus must run on the main thread.
@@ -535,13 +678,38 @@ pub async fn web_run(window: tauri::Webview, url: String) -> Result<Value, Strin
         let (tx, rx) = std::sync::mpsc::channel();
         let handle = app.clone();
         app.run_on_main_thread(move || {
-            let _ = tx.send(create(&handle, None, Some(&id), Some(&url)));
+            let result = record(&handle, &id).and_then(|r| {
+                if !Arc::ptr_eq(&r.session, &expected) || r.session.closing() || r.url.is_some() {
+                    return Err("웹 시작 화면이 종료되었습니다".into());
+                }
+                create(&handle, None, Some(&id), Some(&url))
+            });
+            let _ = tx.send(result);
         })
         .map_err(err)?;
         rx.recv().map_err(err)?
     })
     .await
     .map_err(err)?
+}
+// Tauri dispatches destruction asynchronously. Keep the registry entry until
+// this exact host receives Destroyed so the updater still sees a live WebView.
+fn end_session(id: &str, r: &Record) -> Result<(), String> {
+    let w = &r.host;
+    let app = w.app_handle();
+    r.session.request_close(|| {
+        crate::session_restore::close_web(w)?;
+        crate::relation_editor::endpoint_closed(app, id);
+        crate::stash::forget(w);
+        crate::layout::forget(w);
+        crate::sizing::forget(w);
+        crate::monitor_layout::forget(app, w.label());
+        crate::focus::discard_restore(app, w.label());
+        let _ = crate::entrance::cancel(w);
+        let _ = crate::feedback_window::destroy(w);
+        crate::relation_prototype::changed(app, w.label());
+        Ok(())
+    })
 }
 #[tauri::command]
 pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String> {
@@ -551,12 +719,14 @@ pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String>
         .ok_or("웹 툴바에서만 실행할 수 있습니다")?;
     let r = record(view.app_handle(), id)?;
     let window = r.host.clone();
+    if r.session.closing() && action != "close" {
+        return Err("웹 창 종료 중입니다".into());
+    }
     match action.as_str() {
         "inspect" => inspect(window.app_handle(), id),
         "drag" => {
             crate::monitor_layout::manual(&window);
-            crate::relation_prototype::changed(window.app_handle(), window.label());
-            window.start_dragging().map_err(err)?;
+            crate::relation_prototype::start_drag(&window)?;
             Ok(json!({"ok":true}))
         }
         action if action.starts_with("resize-") => {
@@ -579,10 +749,8 @@ pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String>
             inspect(window.app_handle(), id)
         }
         "close" => {
-            // Match the current web window close contract, which preserves the session.
-            crate::relation_prototype::changed(window.app_handle(), window.label());
-            window.hide().map_err(err)?;
-            Ok(json!({"ok":true,"url":r.url}))
+            end_session(id, &r)?;
+            Ok(json!({"ok":true}))
         }
         _ => Err("Unknown web toolbar action".into()),
     }
@@ -602,6 +770,50 @@ mod tests {
     }
 
     use super::*;
+    #[test]
+    fn closing_one_host_waits_for_destroy_and_isolates_reused_ids() {
+        let make_record = |id: &str| Record {
+            label: format!("webview-{id}"),
+            session: Arc::default(),
+            host: (),
+            url: None,
+            created_at: creation_time(id),
+        };
+        let mut records = BTreeMap::from([
+            ("web-a".to_owned(), make_record("web-a")),
+            ("web-b".to_owned(), make_record("web-b")),
+        ]);
+        let old = records["web-a"].session.clone();
+        let peer = records["web-b"].session.clone();
+        let url = validate_url("https://example.org/").unwrap();
+        assert!(old.navigate(&url));
+        assert!(old.request_close(|| Err("journal error".into())).is_err());
+        assert!(old.navigate(&url));
+        old.request_close(|| Ok(())).unwrap();
+        old.request_close(|| panic!("duplicate destroy")).unwrap();
+        assert!(!old.navigate(&url));
+        assert!(peer.navigate(&url));
+        let gate = |records: &BTreeMap<String, Record<()>>| {
+            crate::update_restore::check_live_window_kinds(
+                records.values().map(|r| r.label.as_str()),
+            )
+        };
+        assert_eq!(records.len(), 2);
+        assert!(gate(&records).is_err());
+        finish_destroy(&mut records, "web-a", &old);
+        assert_eq!(records.len(), 1);
+        assert!(gate(&records).is_err());
+        peer.request_close(|| Ok(())).unwrap();
+        finish_destroy(&mut records, "web-b", &peer);
+        assert!(gate(&records).is_ok());
+        records.insert("web-a".into(), make_record("web-a"));
+        finish_destroy(&mut records, "web-a", &old);
+        let next = &records["web-a"].session;
+        assert!(!old.navigate(&url));
+        assert!(next.urls.lock().unwrap().navigation.is_none());
+        assert!(next.navigate(&url));
+    }
+
     #[test]
     fn navigation_validation_rejects_internal_and_credential_urls() {
         for url in [
