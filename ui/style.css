@@ -181,8 +181,9 @@ body.toolbar-collapsed #controls { align-items: flex-start; }
 /* One permanent editable surface; dirty state never changes the layout. */
 body.text-note:not(.toolbar-collapsed) #controls { flex-basis: 22px; height: 22px; }
 body.text-note:not(.folded) #viewport { padding-top: 0; }
-#editor { display: block; height: auto; min-height: 100%; cursor: text; user-select: text; -webkit-user-select: text; }
-#editor .milkdown, #memo-editor { min-height: inherit; }
+#editor { display: flex; flex-direction: column; height: auto; min-height: 100%; cursor: text; user-select: text; -webkit-user-select: text; }
+#editor .milkdown { display: flex; flex-direction: column; flex: 1; }
+#memo-editor { flex: 1; }
 #memo-editor { white-space: pre-wrap; overflow-wrap: anywhere; outline: none; user-select: text; -webkit-user-select: text; cursor: text; }
 #memo-editor > :first-child { margin-top: 0; }
 #memo-editor .ProseMirror-selectednode { outline: 1px solid var(--border); }
