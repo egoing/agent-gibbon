@@ -53,7 +53,7 @@ async function open(markdown, size = { width: 300, height: 240 }) {
 }
 const tick = page => page.waitForTimeout(450);
 const save = page => page.keyboard.press('Control+s');
-try {
+async function testEditor() {
   const original = '# 제목\n\n본문 한글\n\n- [ ] 할 일\n- [x] 완료\n\n| 가 | 나 |\n| --- | --- |\n| 1 | 2 |\n\n```js\n[ ] 코드\n```\n';
   const page = await open(original);
   assert.equal(await page.locator('#memo-editor').getAttribute('aria-readonly'), 'false');
@@ -128,6 +128,8 @@ try {
   results.push('direct editing, no-op source preservation, explicit save, undo/redo, task, conflict, fold/hide, toolbar drag, composition guard');
   await page.close();
 
+}
+async function testFormatMenu() {
   const format = await open('제목으로 바꿀 문장\n\n일반 본문\n');
   const selectText = async target => {
     await target.locator('#memo-editor p').first().click();
@@ -143,9 +145,33 @@ try {
   await format.locator('#selection-format button[aria-label="굵게"]').click();
   assert.equal(await format.locator('#memo-editor strong').textContent(), selected);
   assert.equal(await format.evaluate(() => getSelection().toString()), selected);
-  await format.locator('#selection-format button[aria-label="제목 1"]').click();
+  await format.keyboard.press(process.platform === 'darwin' ? 'Meta+z' : 'Control+z');
+  assert.equal(await format.locator('#memo-editor strong').count(), 0);
+  assert.equal(await format.evaluate(() => getSelection().toString()), selected);
+  await format.keyboard.press(process.platform === 'darwin' ? 'Meta+Shift+Z' : 'Control+Shift+Z');
+  assert.equal(await format.locator('#memo-editor strong').textContent(), selected);
+  const toolbar = format.getByRole('toolbar', { name: '선택한 글자 서식' });
+  for (const label of ['코드', '큰제목', '작은제목']) {
+    const button = toolbar.getByRole('button', { name: label, exact: true });
+    assert.equal(await button.textContent(), label);
+    assert.equal(await button.getAttribute('title'), label);
+  }
+  await toolbar.getByRole('button', { name: '큰제목' }).click();
   assert.equal(await format.locator('#memo-editor h1').textContent(), selected);
-  await format.locator('#selection-format button[aria-label="본문"]').click();
+  await save(format);
+  await format.waitForFunction(() => /^# /.test(window.testNote.markdown));
+  await toolbar.getByRole('button', { name: '작은제목' }).click();
+  assert.equal(await format.locator('#memo-editor h2').textContent(), selected);
+  assert.equal(await format.evaluate(() => window.gibbonUpdateBusy()), true);
+  await save(format);
+  await format.waitForFunction(() => /^## /.test(window.testNote.markdown));
+  await toolbar.getByRole('button', { name: '본문' }).click();
+  await toolbar.getByRole('button', { name: '코드' }).click();
+  assert.equal(await format.locator('#memo-editor p code').textContent(), selected);
+  assert.equal(await format.evaluate(() => getSelection().toString()), selected);
+  await save(format);
+  await format.waitForFunction(() => window.testNote.markdown.includes('`제목으로 바꿀 문장`'));
+  await toolbar.getByRole('button', { name: '코드' }).click();
   assert.equal(await format.locator('#memo-editor h1').count(), 0);
   await format.screenshot({ path: path.join(output, 'selection-format-300.png') });
   await save(format); await tick(format);
@@ -162,12 +188,28 @@ try {
   await narrowFormat.locator('#memo-editor').press('Alt+F10');
   assert.equal(await narrowFormat.evaluate(() => document.activeElement.closest('#selection-format')?.id), 'selection-format');
   await narrowFormat.keyboard.press('End');
-  await narrowFormat.keyboard.press('Enter');
-  assert.equal(await narrowFormat.locator('#selection-format').isVisible(), true);
+  assert.equal(await narrowFormat.evaluate(() => document.activeElement.textContent), '작은제목');
+  assert(await narrowFormat.locator('#selection-format').evaluate(menu => {
+    const button = document.activeElement.getBoundingClientRect();
+    const bounds = menu.getBoundingClientRect();
+    return menu.scrollWidth > menu.clientWidth && menu.scrollLeft > 0
+      && button.left >= bounds.left && button.right <= bounds.right;
+  }));
   await narrowFormat.screenshot({ path: path.join(output, 'selection-format-144.png') });
+  await narrowFormat.keyboard.press('ArrowLeft');
+  assert.equal(await narrowFormat.evaluate(() => document.activeElement.textContent), '큰제목');
+  await narrowFormat.keyboard.press('Home');
+  await narrowFormat.keyboard.press('ArrowRight');
+  assert.equal(await narrowFormat.evaluate(() => document.activeElement.textContent), 'I');
+  assert.equal(await narrowFormat.locator('#selection-format').isVisible(), true);
+  await narrowFormat.keyboard.press('Escape');
+  assert.equal(await narrowFormat.locator('#selection-format').isVisible(), false);
+  assert.equal(await narrowFormat.evaluate(() => document.activeElement.id), 'memo-editor');
+  assert.equal(await narrowFormat.evaluate(() => getSelection().toString()), '좁은 창 선택 메뉴');
   await narrowFormat.close();
   results.push('selection format toolbar bold/heading/paragraph, retained selection, save, IME hiding, narrow bounds and keyboard access');
-
+}
+async function testAutosaveAndDocuments() {
   const automatic = await open('자동 저장 본문\n');
   assert.equal(await automatic.locator('#save').isVisible(), false);
   await automatic.locator('#memo-editor p').click(); await automatic.keyboard.press('End');
@@ -250,6 +292,12 @@ try {
   assert.match(await large.evaluate(() => window.testNote.markdown), /편집/);
   results.push('large 66k-character document edit/save');
   await large.close();
+}
+try {
+  const formatOnly = process.argv.includes('--format-menu-only');
+  if (!formatOnly) await testEditor();
+  await testFormatMenu();
+  if (!formatOnly) await testAutosaveAndDocuments();
   assert.deepEqual(errors, []); assert.deepEqual(requests, []);
   console.log(JSON.stringify({ browser: browser.version(), nativeIPC: 'simulated', nativeIME: 'not tested', results, output, errors, externalRequests: requests }, null, 2));
 } finally { await browser.close(); }
