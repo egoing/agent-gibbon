@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 const source = readFileSync(new URL('../ui/manager.js', import.meta.url), 'utf8');
 function setup() {
   const elements = new Map();
-  const make = tagName => ({ tagName, hidden: false, children: [], dataset: {}, parentElement: { scrollTop: 0 }, setAttribute(k,v) { this[k] = v; }, append(x) { this.children.push(x); }, replaceChildren() { this.children = []; this.textContent = ''; }, addEventListener() {}, focus() {} });
+  const make = tagName => ({ tagName, hidden: false, children: [], dataset: {}, parentElement: { scrollTop: 0 }, setAttribute(k,v) { this[k] = v; }, append(...nodes) { this.children.push(...nodes); }, replaceChildren() { this.children = []; this.textContent = ''; }, addEventListener() {}, focus() {} });
   for (const id of ['notes-page','settings-page','notes-nav','settings-nav','retry','refresh','detail','list','error','settings-privacy','settings-skills','settings-privacy-nav','settings-skills-nav','settings-appearance','settings-appearance-nav']) elements.set(id, make());
   let data = [{id:'hidden',title:'숨긴 메모',html:'<h1>숨긴 메모</h1><p>내용</p>',capture:null,visible:false}];
   const calls = [], requests = [];
@@ -167,4 +167,25 @@ test('retired agent records cannot appear in the manager list', async () => {
   await app.run('refresh(true)');
   assert.equal(app.elements.get('list').children.length,1);
   assert.equal(app.elements.get('list').children[0].textContent,'터미널');
+});
+
+test('web rows keep their session id across Welcome and navigation and send typed visibility actions', async () => {
+  const app = setup(); await tick();
+  const row = { id: 'web-a', kind: 'web', title: 'Welcome', visible: false };
+  app.setData([row]); await app.run('refresh(true)');
+  app.elements.get('list').children[0].onclick();
+  const address = 'https://example.test/' + '한'.repeat(20);
+  app.setData([{ ...row, title: address }]); await app.run('refresh()');
+  const [button] = app.elements.get('list').children;
+  assert.equal(button['aria-current'], 'true');
+  assert.equal(button.children[0].textContent, Array.from(address).slice(0, 30).join(''));
+  assert.equal(button.children[1].textContent, '웹');
+  assert.equal(button.title, address);
+  const [, heading, kind] = app.elements.get('detail').children;
+  assert.equal(heading.textContent, address);
+  assert.equal(kind.textContent, '웹');
+  await openButton(app).onclick();
+  const { name, args } = app.requests.at(-1);
+  assert.equal(name, 'manager_set_visibility');
+  assert.deepEqual({ ...args }, { id: 'web-a', visible: true, kind: 'web' });
 });
