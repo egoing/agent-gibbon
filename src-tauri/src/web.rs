@@ -221,6 +221,7 @@ pub(crate) fn manager_entries(app: &tauri::AppHandle) -> Result<Vec<Value>, Stri
     let records = app.state::<Windows>().0.lock().map_err(err)?.clone();
     records
         .into_iter()
+        .filter(|(_, record)| !record.session.closing())
         .map(|(id, record)| {
             Ok(json!({
                 "id": id, "kind": "web",
@@ -242,7 +243,11 @@ pub(crate) fn set_manager_visibility(
     }
     // Look up the host at click time. A removed web session must never fall
     // through to the ordinary open path, which can create a blank text memo.
-    let host = record(app, id)?.host;
+    let record = record(app, id)?;
+    if record.session.closing() {
+        return Err("닫는 중인 웹 창입니다".into());
+    }
+    let host = record.host;
     if visible {
         crate::focus::discard_restore(app, host.label());
         if host.is_minimized().map_err(err)? {
