@@ -1,15 +1,29 @@
 //! Local PTYs, scoped to the calling terminal window. Shell commands stay backend-owned; selected directories are validated.
-use portable_pty::{native_pty_system, Child, CommandBuilder, MasterPty, PtySize};
+use portable_pty::{native_pty_system, CommandBuilder, MasterPty, PtySize};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{
-    collections::BTreeMap,
-    io::{Read, Write},
+    collections::{BTreeMap, BTreeSet},
+    io::Write,
     path::{Path, PathBuf},
-    sync::{Arc, Mutex},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        mpsc, Arc, Mutex,
+    },
+    time::{Duration, Instant},
 };
 use tauri::{ipc::Channel, Emitter, Manager, WebviewWindow};
 
+#[cfg(test)]
+use std::io::Read;
+mod jobs;
+use jobs::OwnedJobs;
+mod lifecycle;
+#[cfg(all(test, unix))]
+mod lifecycle_tests;
+use lifecycle::{Control, Event, OwnedChild, PtyReader, Worker, Workers};
+mod persistence;
+use persistence::EditSource;
 pub mod welcome;
 pub use welcome::{create as create_terminal, request_close};
 
@@ -75,29 +89,6 @@ impl Terminal {
             .unwrap_or_else(|| "터미널".into())
     }
 }
-// Reap after Session's PTY handles are dropped; waiting before closing those handles
-// can deadlock shell exit on macOS if no reader was successfully attached.
-struct OwnedChild(Option<Box<dyn Child + Send + Sync>>);
-impl std::ops::Deref for OwnedChild {
-    type Target = dyn Child + Send + Sync;
-    fn deref(&self) -> &Self::Target {
-        self.0.as_deref().unwrap()
-    }
-}
-impl std::ops::DerefMut for OwnedChild {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        self.0.as_deref_mut().unwrap()
-    }
-}
-impl Drop for OwnedChild {
-    fn drop(&mut self) {
-        if let Some(mut child) = self.0.take() {
-            std::thread::spawn(move || {
-                let _ = child.wait();
-            });
-        }
-    }
-}
 struct Session {
     master: Box<dyn MasterPty + Send>,
     writer: Box<dyn Write + Send>,
@@ -106,55 +97,48 @@ struct Session {
     observed_command: bool,
     prompt: welcome::PromptState,
 }
-impl Drop for Session {
-    fn drop(&mut self) {
-        #[cfg(windows)]
-        if let Some(pid) = self
-            .child
-            .process_id()
-            .filter(|_| self.child.try_wait().ok().flatten().is_none())
-        {
-            let _ = std::process::Command::new("taskkill.exe")
-                .args(["/PID", &pid.to_string(), "/T", "/F"])
-                .output();
-        }
-        #[cfg(unix)]
-        if self.child.try_wait().ok().flatten().is_none() {
-            if let Some(pid) = self.child.process_id() {
-                // Include background jobs: job-control shells give them separate groups.
-                if let Some(children) = welcome::descendants(pid) {
-                    for child in children.into_iter().rev() {
-                        unsafe {
-                            libc::kill(child, libc::SIGKILL);
-                        }
-                    }
-                }
-                // portable-pty creates a new session; signal only our child group.
-                unsafe {
-                    if let Some(fg) = self
-                        .master
-                        .process_group_leader()
-                        .filter(|fg| *fg > 0 && *fg != pid as i32)
-                    {
-                        libc::kill(-fg, libc::SIGKILL);
-                    }
-                    libc::kill(-(pid as i32), libc::SIGKILL);
-                }
-            }
-        }
-        let _ = self.child.kill();
-    }
-}
 enum Slot {
-    Starting(u64),
-    Running(Arc<Mutex<Session>>),
+    Starting {
+        token: u64,
+        control: Control,
+    },
+    Running {
+        token: u64,
+        control: Control,
+        session: Arc<Mutex<Session>>,
+    },
+    Exited {
+        token: u64,
+        status: portable_pty::ExitStatus,
+        jobs: OwnedJobs,
+    },
+}
+impl Slot {
+    fn token(&self) -> u64 {
+        match self {
+            Self::Starting { token, .. }
+            | Self::Running { token, .. }
+            | Self::Exited { token, .. } => *token,
+        }
+    }
 }
 #[derive(Default)]
 pub struct Terminals {
-    records: Mutex<BTreeMap<String, Terminal>>,
+    stopping: AtomicBool,
+    workers: Arc<Workers>,
+    close_saves: Arc<Workers>,
+    records: Arc<persistence::Records>,
+    metadata_worker: Mutex<Option<std::thread::JoinHandle<Result<(), String>>>>,
     sessions: Mutex<BTreeMap<String, Slot>>,
+    // Access only with the sessions mutex acquired first. Closing a native
+    // window may call back into application code. Keep its slot until success.
+    closing: Mutex<BTreeSet<String>>,
 }
 struct Start<'a> {
+    _worker: Worker,
+    sender: mpsc::Sender<Event>,
+    cancelled: Arc<AtomicBool>,
+    events: Option<mpsc::Receiver<Event>>,
     state: &'a Terminals,
     id: String,
     token: u64,
@@ -162,41 +146,77 @@ struct Start<'a> {
 impl<'a> Start<'a> {
     fn reserve(state: &'a Terminals, id: &str) -> Result<Self, String> {
         let mut sessions = state.sessions.lock().map_err(err)?;
-        if sessions.contains_key(id) {
+        if state.stopping.load(Ordering::Acquire) {
+            return Err("앱이 종료 중입니다".into());
+        }
+        if sessions.contains_key(id) || state.closing.lock().map_err(err)?.contains(id) {
             return Err("이미 시작 중이거나 시작된 세션입니다. 창을 숨겼다가 복원하세요".into());
         }
         static NEXT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(1);
         let token = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-        sessions.insert(id.into(), Slot::Starting(token));
+        let (sender, events) = mpsc::channel();
+        let cancelled = Arc::new(AtomicBool::new(false));
+        sessions.insert(
+            id.into(),
+            Slot::Starting {
+                token,
+                control: Control {
+                    sender: sender.clone(),
+                    cancelled: cancelled.clone(),
+                },
+            },
+        );
+
         Ok(Self {
+            _worker: state.workers.enter(),
+            sender,
+            events: Some(events),
+            cancelled,
             state,
             id: id.into(),
             token,
         })
     }
-    fn finish(self, session: Session) -> Result<Arc<Mutex<Session>>, String> {
+    fn finish(&self, session: Session) -> Result<Arc<Mutex<Session>>, String> {
         let mut sessions = self.state.sessions.lock().map_err(err)?;
-        if !matches!(sessions.get(&self.id), Some(Slot::Starting(token)) if *token == self.token) {
+        if self.state.stopping.load(Ordering::Acquire)
+            || self.state.closing.lock().map_err(err)?.contains(&self.id)
+            || !matches!(sessions.get(&self.id), Some(Slot::Starting {token, ..}) if *token == self.token)
+        {
             return Err("터미널 시작이 취소되었습니다".into());
         }
+        let Some(Slot::Starting { control, .. }) = sessions.remove(&self.id) else {
+            unreachable!()
+        };
         let session = Arc::new(Mutex::new(session));
-        sessions.insert(self.id.clone(), Slot::Running(session.clone()));
+        sessions.insert(
+            self.id.clone(),
+            Slot::Running {
+                token: self.token,
+                session: session.clone(),
+                control,
+            },
+        );
         Ok(session)
     }
 }
 impl Drop for Start<'_> {
     fn drop(&mut self) {
         let mut sessions = self.state.sessions.lock().unwrap();
-        if matches!(sessions.get(&self.id), Some(Slot::Starting(token)) if *token == self.token) {
+        if matches!(sessions.get(&self.id), Some(Slot::Starting {token, ..}) if *token == self.token)
+        {
             sessions.remove(&self.id);
         }
     }
 }
 fn running(slot: &Slot) -> Option<Arc<Mutex<Session>>> {
     match slot {
-        Slot::Starting(_) => None,
-        Slot::Running(s) => Some(s.clone()),
+        Slot::Starting { .. } | Slot::Exited { .. } => None,
+        Slot::Running { session, .. } => Some(session.clone()),
     }
+}
+fn running_generation(slot: &Slot) -> Option<(u64, Arc<Mutex<Session>>)> {
+    running(slot).map(|session| (slot.token(), session))
 }
 fn root(app: &tauri::AppHandle) -> PathBuf {
     app.state::<crate::storage::Store>().0.clone()
@@ -210,11 +230,17 @@ fn valid_id(id: &str) -> bool {
         && id.len() <= 64
 }
 fn save(root: &Path, agent: &Terminal) -> Result<(), String> {
-    std::fs::create_dir_all(metadata(root)).map_err(err)?;
-    let path = metadata(root).join(format!("{}.json", agent.id));
-    let tmp = path.with_extension("tmp");
-    std::fs::write(&tmp, serde_json::to_vec(agent).map_err(err)?).map_err(err)?;
-    std::fs::rename(tmp, path).map_err(err)
+    // Unique sibling temp + atomic replacement. Failure leaves the previous
+    // JSON in place; filenames and user-supplied metadata stay out of errors.
+    (|| -> std::io::Result<()> {
+        let dir = metadata(root);
+        std::fs::create_dir_all(&dir)?;
+        let mut temp = tempfile::NamedTempFile::new_in(&dir)?;
+        temp.write_all(&serde_json::to_vec(agent)?)?;
+        temp.persist(dir.join(format!("{}.json", agent.id)))?;
+        Ok(())
+    })()
+    .map_err(|_| "터미널 메타데이터를 저장할 수 없습니다".into())
 }
 // Read legacy dedicated-agent metadata only to recognize and ignore it. Never
 // rewrite/remove its metadata or project directory, and never load it as a PTY.
@@ -247,29 +273,17 @@ fn read_records(root: &Path) -> Result<Vec<Terminal>, String> {
     Ok(records)
 }
 pub fn restore(app: &tauri::AppHandle) -> Result<(), String> {
-    let restored = read_records(&root(app))?;
+    let root = root(app);
+    let restored = read_records(&root)?;
     let state = app.state::<Terminals>();
-    let mut records = state.records.lock().map_err(err)?;
-    for record in restored {
-        records.insert(record.id.clone(), record);
-    }
+    *state.metadata_worker.lock().map_err(err)? = Some(state.records.start(root, restored)?);
     Ok(())
 }
 pub fn entries(app: &tauri::AppHandle) -> Vec<Terminal> {
-    app.state::<Terminals>()
-        .records
-        .lock()
-        .unwrap()
-        .values()
-        .cloned()
-        .collect()
+    app.state::<Terminals>().records.all()
 }
 pub fn contains(app: &tauri::AppHandle, id: &str) -> bool {
-    app.state::<Terminals>()
-        .records
-        .lock()
-        .unwrap()
-        .contains_key(id)
+    app.state::<Terminals>().records.contains(id)
 }
 pub fn open(app: &tauri::AppHandle, id: &str) -> Result<(), String> {
     open_presented(app, id, true)
@@ -280,14 +294,7 @@ pub(crate) fn open_presented(
     present: bool,
 ) -> Result<(), String> {
     let _root = crate::telemetry::Timing::new("terminal.window.open");
-    let agent = app
-        .state::<Terminals>()
-        .records
-        .lock()
-        .map_err(err)?
-        .get(id)
-        .cloned()
-        .ok_or("터미널 창이 없습니다")?;
+    let agent = app.state::<Terminals>().records.get(id)?;
     crate::focus::remember(app, id);
     let win = if let Some(win) = app.get_webview_window(id) {
         win
@@ -379,31 +386,26 @@ pub(crate) fn open_presented(
 }
 pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
     welcome::refresh_path(app, id)?;
-    let agent = app
-        .state::<Terminals>()
-        .records
-        .lock()
-        .map_err(err)?
-        .get(id)
-        .cloned()
-        .ok_or("터미널 창이 없습니다")?;
+    let agent = app.state::<Terminals>().records.get(id)?;
     if !contains(app, id) {
         return Err("터미널 창이 없습니다".into());
     }
     let win = app.get_webview_window(id);
-    let session = app
-        .state::<Terminals>()
-        .sessions
-        .lock()
-        .map_err(err)?
-        .get(id)
-        .and_then(running);
+    let state = app.state::<Terminals>();
+    let sessions = state.sessions.lock().map_err(err)?;
+    let slot = sessions.get(id);
+    let exit_status = match slot {
+        Some(Slot::Exited { status, .. }) => Some(status.clone()),
+        _ => None,
+    };
+    let session = slot.and_then(running);
+    drop(sessions);
     let (pid, program, size, running) = if let Some(session) = session {
         let mut s = session.lock().map_err(err)?;
         let running = observe_exit(&mut s)?;
         (
             s.child.process_id(),
-            welcome::foreground_name(&s).or_else(|| Some(s.program.clone())),
+            running.then(|| welcome::foreground_name(&s).unwrap_or_else(|| s.program.clone())),
             Some(s.master.get_size().map_err(err)?),
             running,
         )
@@ -411,7 +413,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
         (None, None, None, false)
     };
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":agent.bounds,"pid":pid,"program":program,"running":running,"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":agent.bounds,"metadata_save_failed":app.state::<Terminals>().records.save_failed(id),"pid":pid,"program":program,"running":running,"exit_code":exit_status.as_ref().map(|s|s.exit_code()),"exit_signal":exit_status.as_ref().and_then(|s|s.signal()),"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
     )
 }
 pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value, String> {
@@ -489,22 +491,31 @@ pub async fn terminal_start(
             let _timing = crate::telemetry::Timing::new("terminal.start");
             let dimensions = size(cols, rows)?;
             let state = app.state::<Terminals>();
-            let reservation = Start::reserve(&state, &id)?;
-            let agent = state
-                .records
-                .lock()
-                .map_err(err)?
-                .get(&id)
-                .cloned()
-                .ok_or("터미널 창이 없습니다")?;
+            let mut reservation = Start::reserve(&state, &id)?;
+            let agent = state.records.get(&id)?;
+            let token = reservation.token;
+            let watched_app = app.clone();
+            let watched_id = id.clone();
+            let end_output = output.clone();
+            let events = reservation.events.take().unwrap();
+            let supervisor_worker = state.workers.enter();
             let (session, mut reader) = welcome::start(
                 &agent,
                 choice.as_deref().unwrap_or("shell"),
                 plan.as_deref(),
                 dimensions,
+                move |child| {
+                    std::thread::spawn(move || {
+                        let _worker = supervisor_worker;
+                        lifecycle::supervise(child, events, |status, jobs| {
+                            if welcome::retire(&watched_app, &watched_id, token, status, jobs) {
+                                let _ =
+                                    end_output.send("\r\n[PTY 세션 종료]\r\n".as_bytes().to_vec());
+                            }
+                        });
+                    });
+                },
             )?;
-            crate::session_restore::terminal_started(&app, &id);
-            let watched_session = Arc::downgrade(&reservation.finish(session)?);
             let initial = if choice.as_deref() == Some("auto-monitor") {
                 agent.restore_plan.as_deref()
             } else {
@@ -512,67 +523,56 @@ pub async fn terminal_start(
                     .or(choice.as_deref())
                     .filter(|s| *s != "shell")
             };
-            welcome::remember_plan(&app, &id, initial);
-            welcome::touch_path(&app, &id)?;
+            welcome::start_metadata(&app, &id, token, initial)?;
+            let watched_session = Arc::downgrade(&reservation.finish(session)?);
+            crate::session_restore::terminal_started(&app, &id);
             let watched_app = app.clone();
             let watched_id = id.clone();
             let output_parent = crate::local_trace::current();
             // Raw bytes preserve UTF-8 across arbitrary PTY read boundaries.
-            std::thread::spawn(move || {
+            let reader_worker = state.workers.enter();
+            let cancelled = reservation.cancelled.clone();
+            let reader_thread = std::thread::spawn(move || {
+                let _worker = reader_worker;
                 let mut directory_report = welcome::DirectoryReport::default();
-                let mut bytes = [0u8; 8192];
-                loop {
-                    match reader.read(&mut bytes) {
-                        Ok(0) | Err(_) => break,
-                        Ok(n) => {
-                            let _scope = crate::local_trace::Scope::enter(output_parent);
-                            let _timing = crate::telemetry::Timing::new("terminal.output");
-                            let paths = {
-                                let _filter =
-                                    crate::telemetry::Timing::new("terminal.output.filter");
-                                directory_report.feed(&bytes[..n])
-                            };
-                            let state = watched_app.state::<Terminals>();
-                            let sessions = state.sessions.lock().unwrap();
-                            if sessions
-                                .get(&watched_id)
-                                .and_then(running)
-                                .is_some_and(|s| {
-                                    std::ptr::eq(Arc::as_ptr(&s), watched_session.as_ptr())
-                                })
-                            {
-                                let Some(watched_session) = watched_session.upgrade() else {
-                                    break;
-                                };
-                                let mut s = watched_session.lock().unwrap();
-                                if directory_report.take_prompt(&s.prompt.token) {
-                                    s.prompt.report();
-                                }
-                                let plan = directory_report.take_plan(&s.prompt.token);
-                                s.observed_command |= plan.is_some();
-                                drop(s);
-                                if let Some(plan) = plan {
-                                    welcome::remember_plan(&watched_app, &watched_id, Some(&plan));
-                                }
-                                for path in paths {
-                                    let _ = welcome::set_path(&watched_app, &watched_id, path);
-                                }
-                            }
-                            drop(sessions);
-                            // Keep draining after the webview closes: a full PTY can block shell exit.
-                            let _dispatch =
-                                crate::telemetry::Timing::new("terminal.output.dispatch");
-                            let _ = output.send(bytes[..n].to_vec());
-                        }
+                reader.drain(&cancelled, |bytes| {
+                    let _scope = crate::local_trace::Scope::enter(output_parent);
+                    let _timing = crate::telemetry::Timing::new("terminal.output");
+                    let paths = {
+                        let _filter = crate::telemetry::Timing::new("terminal.output.filter");
+                        directory_report.feed(bytes)
+                    };
+                    let Some(session) = watched_session.upgrade() else {
+                        return;
+                    };
+                    let mut s = session.lock().unwrap();
+                    if directory_report.take_prompt(&s.prompt.token) {
+                        s.prompt.report();
                     }
-                }
-                if let Some(session) = watched_session.upgrade() {
-                    let _ = observe_exit(&mut session.lock().unwrap());
-                }
-                let _ = output.send(
-                    b"\r\n[PTY \xec\x84\xb8\xec\x85\x98 \xec\xa2\x85\xeb\xa3\x8c]\r\n".to_vec(),
-                );
+                    let plan = directory_report.take_plan(&s.prompt.token);
+                    s.observed_command |= plan.is_some();
+                    drop(s);
+                    if plan.is_some() || !paths.is_empty() {
+                        welcome::output_metadata(
+                            &watched_app,
+                            &watched_id,
+                            token,
+                            plan.as_deref(),
+                            paths,
+                        );
+                    }
+                    if cancelled.load(Ordering::Acquire) {
+                        return;
+                    }
+                    // Keep draining after the webview closes: a full PTY can block shell exit.
+                    let _dispatch = crate::telemetry::Timing::new("terminal.output.dispatch");
+                    let _ = output.send(bytes.to_vec());
+                });
             });
+            reservation
+                .sender
+                .send(Event::Reader(reader_thread))
+                .map_err(err)?;
             inspect(&app, &id)
         })();
         worker_call.finish(result.is_ok());
@@ -581,7 +581,7 @@ pub async fn terminal_start(
     .await
     .map_err(err)?
 }
-fn session(window: &WebviewWindow) -> Result<Arc<Mutex<Session>>, String> {
+fn session(window: &WebviewWindow) -> Result<(u64, Arc<Mutex<Session>>), String> {
     let id = caller(window)?;
     window
         .state::<Terminals>()
@@ -589,7 +589,7 @@ fn session(window: &WebviewWindow) -> Result<Arc<Mutex<Session>>, String> {
         .lock()
         .map_err(err)?
         .get(&id)
-        .and_then(running)
+        .and_then(running_generation)
         .ok_or("실행 중인 세션이 없습니다".into())
 }
 #[tauri::command]
@@ -598,11 +598,14 @@ pub fn terminal_write(window: WebviewWindow, data: String) -> Result<(), String>
     if data.len() > 65536 {
         return Err("입력은 64KiB 이하여야 합니다".into());
     }
-    let session = session(&window)?;
+    let (token, session) = session(&window)?;
     let mut session = {
         let _lock = crate::telemetry::Timing::new("terminal.session.lock");
         session.lock().map_err(err)?
     };
+    if session.child.try_wait().map_err(err)?.is_some() {
+        return Err("종료된 세션입니다".into());
+    }
     crate::session_restore::command_input(window.app_handle(), &caller(&window)?, &data);
     session.prompt.input(data.as_bytes());
     let write = crate::telemetry::Timing::new("terminal.input.write");
@@ -610,17 +613,25 @@ pub fn terminal_write(window: WebviewWindow, data: String) -> Result<(), String>
     session.writer.flush().map_err(err)?;
     drop(write);
     drop(session);
-    welcome::touch_path(window.app_handle(), &caller(&window)?)
+    welcome::touch_path(window.app_handle(), &caller(&window)?, token)
 }
 #[tauri::command]
 pub fn terminal_resize(window: WebviewWindow, cols: u16, rows: u16) -> Result<(), String> {
     let _timing = crate::telemetry::Timing::new("terminal.resize");
-    session(&window)?
-        .lock()
-        .map_err(err)?
-        .master
-        .resize(size(cols, rows)?)
-        .map_err(err)
+    let dimensions = size(cols, rows)?;
+    let id = caller(&window)?;
+    let state = window.state::<Terminals>();
+    let sessions = state.sessions.lock().map_err(err)?;
+    if matches!(sessions.get(&id), Some(Slot::Exited { .. })) {
+        return Ok(());
+    }
+    let session = sessions
+        .get(&id)
+        .and_then(running)
+        .ok_or("실행 중인 세션이 없습니다")?;
+    drop(sessions);
+    let session = session.lock().map_err(err)?;
+    session.master.resize(dimensions).map_err(err)
 }
 pub fn terminal_hide(window: WebviewWindow) -> Result<(), String> {
     caller(&window)?;
@@ -641,41 +652,160 @@ pub fn geometry(window: &tauri::Window) {
     {
         return;
     }
-    let state = app.state::<Terminals>();
-    let Ok(mut agents) = state.records.lock() else {
-        return;
-    };
-    if let Some(agent) = agents.get_mut(window.label()) {
-        if let (Ok(p), Ok(s), Ok(scale)) = (
-            window.outer_position(),
-            window.inner_size(),
-            window.scale_factor(),
-        ) {
-            agent.bounds = crate::capture::ImageNote {
-                x: f64::from(p.x) / if cfg!(windows) { 1.0 } else { scale },
-                y: f64::from(p.y) / if cfg!(windows) { 1.0 } else { scale },
-                width: f64::from(s.width) / scale,
-                height: f64::from(s.height) / scale,
-            };
-            agent.physical_position = cfg!(windows);
-            let _ = save(&root(app), agent);
-        }
+    if let (Ok(p), Ok(s), Ok(scale)) = (
+        window.outer_position(),
+        window.inner_size(),
+        window.scale_factor(),
+    ) {
+        let bounds = crate::capture::ImageNote {
+            x: f64::from(p.x) / if cfg!(windows) { 1.0 } else { scale },
+            y: f64::from(p.y) / if cfg!(windows) { 1.0 } else { scale },
+            width: f64::from(s.width) / scale,
+            height: f64::from(s.height) / scale,
+        };
+        app.state::<Terminals>()
+            .records
+            .geometry(window.label(), bounds, cfg!(windows));
     }
 }
 pub fn update_blocked(app: &tauri::AppHandle) -> Result<bool, String> {
-    Ok(!app
-        .state::<Terminals>()
-        .sessions
-        .lock()
-        .map_err(err)?
-        .is_empty())
+    app.state::<Terminals>().update_blocked()
+}
+
+impl Terminals {
+    fn update_blocked(&self) -> Result<bool, String> {
+        let sessions = self.sessions.lock().map_err(err)?;
+        // A removed slot can still have a draining pump or a child reaper.
+        // reserve and window changes take the registry lock first as well.
+        Ok(!sessions.is_empty()
+            || !self.closing.lock().map_err(err)?.is_empty()
+            || self.workers.active())
+    }
+
+    fn mark_exited(
+        &self,
+        id: &str,
+        token: u64,
+        status: portable_pty::ExitStatus,
+        jobs: OwnedJobs,
+    ) -> bool {
+        let mut sessions = self.sessions.lock().unwrap();
+        if !matches!(sessions.get(id), Some(Slot::Running {token: current, ..}) if *current == token)
+        {
+            drop(sessions);
+            jobs.stop();
+            return false;
+        }
+        let old = sessions.insert(
+            id.to_owned(),
+            Slot::Exited {
+                token,
+                status,
+                jobs,
+            },
+        );
+        drop(sessions);
+        drop(old);
+        true
+    }
+}
+
+const QUIT_BUDGET: Duration = Duration::from_millis(750);
+
+impl Terminals {
+    fn final_snapshot(&self, root: &Path, id: &str, session: Option<&mut Session>) {
+        let owner = welcome::RecordOwner::Shutdown;
+        let result = match session {
+            Some(s) => welcome::refresh_session_path(self, root, id, owner, s),
+            None => self.edit_owned(
+                root,
+                id,
+                owner,
+                EditSource::Observation,
+                welcome::reset_auto_restore,
+            ),
+        };
+        if result.is_err() {
+            eprintln!("터미널 마지막 상태를 저장할 수 없습니다.");
+        }
+    }
+
+    fn finish_metadata(&self, drained: mpsc::Receiver<()>) {
+        // Final snapshots can outlive the PTY budget when storage is slow.
+        // Wait for their producers before sealing and flushing geometry.
+        let _ = drained.recv();
+        // After stop_all takes the registry, no close can claim another slot.
+        // A close that won that race has already registered its pending save.
+        self.close_saves.wait();
+        self.records.seal();
+        let worker = self.metadata_worker.lock().unwrap().take();
+        if let Some(worker) = worker {
+            if !matches!(worker.join(), Ok(Ok(()))) {
+                eprintln!("터미널 기록의 마지막 저장에 실패했습니다.");
+            }
+        }
+    }
+    fn stop_all(&self, refresh: impl Fn(&str, Option<&mut Session>) + Send + Sync + 'static) {
+        let slots = std::mem::take(&mut *self.sessions.lock().unwrap());
+        let refresh = Arc::new(refresh);
+        let until = Instant::now() + Duration::from_millis(75);
+        for (id, slot) in slots {
+            let (session, done) = match slot {
+                Slot::Running {
+                    session, control, ..
+                } => {
+                    let (done, saved) = mpsc::channel();
+                    let _ = control.sender.send(Event::Quit { saved, until });
+                    (Some(session), Some(done))
+                }
+                Slot::Exited { jobs, .. } => {
+                    jobs.stop();
+                    (None, None)
+                }
+                Slot::Starting { .. } => (None, None),
+            };
+            let refresh = refresh.clone();
+            let worker = self.workers.enter();
+            std::thread::spawn(move || {
+                let _worker = worker;
+                let mut guard = session.as_ref().and_then(|s| s.try_lock().ok());
+                refresh(&id, guard.as_deref_mut());
+                drop(done);
+            });
+        }
+    }
+}
+
+fn bounded_shutdown(cleanup: impl FnOnce(Instant) -> bool + Send + 'static) -> bool {
+    let deadline = Instant::now() + QUIT_BUDGET;
+    let (tx, rx) = mpsc::channel();
+    std::thread::spawn(move || {
+        let _ = tx.send(cleanup(deadline));
+    });
+    rx.recv_timeout(deadline.saturating_duration_since(Instant::now()))
+        .unwrap_or(false)
 }
 
 pub fn shutdown(app: &tauri::AppHandle) {
-    for agent in entries(app) {
-        let _ = welcome::refresh_path(app, &agent.id);
+    app.state::<Terminals>()
+        .stopping
+        .store(true, Ordering::Release);
+    let state = app.state::<Terminals>();
+    let handle = app.clone();
+    let (producers, drained) = mpsc::channel::<()>();
+    let complete = bounded_shutdown(move |deadline| {
+        let state = handle.state::<Terminals>();
+        let app = handle.clone();
+        state.stop_all(move |id, s| {
+            let _producer = &producers;
+            app.state::<Terminals>().final_snapshot(&root(&app), id, s);
+        });
+        state.workers.wait_until(deadline)
+    });
+    if !complete {
+        eprintln!("터미널 종료 대기 시간 초과");
     }
-    app.state::<Terminals>().sessions.lock().unwrap().clear();
+    state.finish_metadata(drained);
 }
 
 #[cfg(test)]

@@ -79,3 +79,27 @@ pub fn has_children(pid: u32) -> Option<bool> {
         Some(found)
     }
 }
+
+// Called only while the original process handle is held and try_wait says
+// the shell is live. Use the OS utility independent of cwd or PATH.
+pub(crate) fn stop_owned_tree(pid: u32) -> bool {
+    use std::os::windows::{ffi::OsStringExt, process::CommandExt};
+    #[link(name = "kernel32")]
+    extern "system" {
+        fn GetSystemDirectoryW(buffer: *mut u16, size: u32) -> u32;
+    }
+    let mut buffer = [0u16; 1024];
+    let len = unsafe { GetSystemDirectoryW(buffer.as_mut_ptr(), buffer.len() as u32) } as usize;
+    if len == 0 || len >= buffer.len() {
+        return false;
+    }
+    let dir = std::ffi::OsString::from_wide(&buffer[..len]);
+    Command::new(std::path::PathBuf::from(dir).join("taskkill.exe"))
+        .args(["/PID", &pid.to_string(), "/T", "/F"])
+        .creation_flags(0x0800_0000)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .status()
+        .is_ok_and(|result| result.success())
+}

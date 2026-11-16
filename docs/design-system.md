@@ -1189,6 +1189,7 @@ macOS가 설정 열기 요청을 받아들이면 현재 화면 하단에 별도 
 - 터미널은 좌우·하단에 공통 `--memo-padding` 3px만 두고 나머지 영역을 PTY의 기존 배경으로 채운다. xterm의 정수 셀을 완전히 담는 열·행 수를 계산하며 남은 한 셀 미만의 공간은 배경으로 채운다. native 창도 투명하게 만들어 기존 4px 라운드 밖을 노출하지 않도록 한다. 활성 선은 기존 viewport의 안쪽 2px overlay를 유지한다.
 - 터미널 출력 기록 scrollbar는 텍스트와 같은 우측 3px·트랙 없음·최소 24px thumb·1초 표시/160ms fade·호버/드래그 시 12px hit area를 사용한다. 공통 표시 CSS와 geometry를 재사용하며 실제 이동은 xterm의 공개 buffer/scrollToLine API를 사용한다. normal buffer에만 표시하며 alternate screen에서는 숨긴다. 본문 휠·키·TUI mouse reporting은 xterm에 맡긴다. thumb의 방향키·PageUp/Down·Home/End와 접근성 현재값은 출력 기록의 행 단위다. forced-colors는 xterm 기본 scrollbar로 돌아간다.
 - 캡처는 기존 본문 외부 패딩 0과 `object-fit: contain`을 유지한다. 이미지 비율과 창 비율의 차이로 생기는 letterbox는 원본을 자르지 않기 위해 유지한다. 확대·메모 드래그·원본 이미지 복사 경로는 변경하지 않는다.
+- #22: 창 위치·크기는 이동 중 즉시 반영하고 같은 창의 연속 파일 저장은 합친다. PTY는 시작 시 적용된 셀 크기를 기준으로 삼으며, 화면 셀이 달라지면 한 번에 하나씩 최신값을 전달한다. 숨김 복원·글자 크기 변경도 다시 측정한다. 외형과 셀 맞춤 기준은 그대로다. [합성 파일·브라우저 검증 및 실기기 미확인 범위](verification/issue22-terminal-geometry.md).
 - [설명용 SVG](design/terminal-capture-surface.svg) · [PNG](design/terminal-capture-surface.png). Chromium의 실제 xterm/스타일 비교와 native 검증의 범위·한계는 [#176 검증 기록](verification/issue176-terminal-capture.md)을 따른다. 시안은 실행 증거가 아니다.
 
 ### #176 사용자 검수 반영 — 2026-11-15
@@ -1198,6 +1199,12 @@ macOS가 설정 열기 요청을 받아들이면 현재 화면 하단에 별도 
 - 터미널 Welcome도 텍스트 메모의 동일한 overlay scrollbar 구현을 사용한다. 3px 표시·12px hover hit area·최소 24px thumb·1초 표시/160ms fade·키보드/휠/드래그·forced-colors native fallback을 공유한다. 긴 명령 미리보기는 별도 scrollbar 대신 Welcome 본문과 함께 스크롤한다. PTY 실행 시 Welcome thumb를 숨긴다.
 - Welcome에서 창 제목 변경 details/form과 이벤트를 제거한다. 기존에 저장한 제목과 관리 창의 다른 기능은 변경하지 않는다.
 - [캡처 배치 SVG](design/capture-original-bounds.svg) · [PNG](design/capture-original-bounds.png), [Welcome SVG](design/terminal-welcome.svg) · [PNG](design/terminal-welcome.png). 아래 검증은 [#176 후속 검증 기록](verification/issue176-terminal-capture.md#2026-11-15-사용자-검수-후속)에서 최초 검사와 구분한다.
+
+### PTY 종료 후 화면 보존 — #24 검토본
+
+실행 중인 창에서는 마지막 출력까지 표시한 뒤 기존 종료 문구를 한 번 붙인다. 창을 숨겼다가 열어도 같은 xterm 버퍼를 사용한다. 종료 상태에서는 창 크기와 출력 선택을 계속 사용할 수 있고 새 입력은 전송하지 않는다. WebView 자체가 재생성되면 메모리에 남은 종료 상태로 기존 종료 문구를 표시한다. 이전 출력 원문을 디스크에 저장하거나 실행 계획을 다시 실행하지 않는다. 창을 명시적으로 종료한 뒤 다시 열 때는 기존 Welcome·복원 흐름을 따른다.
+
+종료 상태를 관측한 뒤에도 xterm은 창 크기에 맞춰 화면을 다시 배치한다. 진행 중이던 PTY resize가 끝나도 다음 resize나 재시작을 요청하지 않는다. 결합 소스에서 종료 시점과 resize 응답이 겹치는 경우를 검사했고, 실제 xterm을 사용한 Chromium 18개 조합으로 기존 셀 맞춤과 출력 화면을 검증했다. 기존 종료 문구·표면·복원 시안을 사용한다. 설치 앱의 네이티브 화면은 미검증이다. [적용 범위와 플랫폼별 검증](verification/issue24-lifecycle.md)
 
 ### 종료된 터미널의 실행 계획
 
