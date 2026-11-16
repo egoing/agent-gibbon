@@ -107,3 +107,7 @@ input:focus-visible,a:focus-visible{outline:2px solid var(--manager-focus);outli
 .updater-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
 .updater-actions button{min-height:32px;padding:5px 12px;font-size:13px}
 #updater-install:not(:disabled){background:var(--manager-text);color:var(--manager-bg);border-color:var(--manager-text)}
+
+#list .web-row{display:flex;align-items:baseline;gap:8px;justify-content:space-between}
+.web-row span:first-child{overflow:hidden;text-overflow:ellipsis}
+.web-row span:last-child{flex:none;color:var(--manager-muted)}

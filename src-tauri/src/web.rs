@@ -215,6 +215,76 @@ pub fn entries(app: &tauri::AppHandle) -> Result<Vec<Value>, String> {
         .collect();
     ids.iter().map(|id| inspect(app, id)).collect()
 }
+// Poll only registered hosts. CLI inspect also queries the remote view, reads
+// color storage and measures geometry, none of which the manager needs.
+pub(crate) fn manager_entries(app: &tauri::AppHandle) -> Result<Vec<Value>, String> {
+    let records = app.state::<Windows>().0.lock().map_err(err)?.clone();
+    records
+        .into_iter()
+        .filter(|(_, record)| !record.session.closing())
+        .map(|(id, record)| {
+            Ok(json!({
+                "id": id, "kind": "web",
+                "title": record.url.as_deref().unwrap_or("Welcome"),
+                "visible": crate::manager::window_visible(&record.host)?
+            }))
+        })
+        .collect()
+}
+
+pub(crate) fn set_manager_visibility(
+    app: &tauri::AppHandle,
+    id: &str,
+    visible: bool,
+) -> Result<bool, String> {
+    let _activity = crate::updater::activity(app)?;
+    if crate::privacy::onboarding_required(app) {
+        return Err("약관 확인이 필요합니다".into());
+    }
+    // Look up the host at click time. A removed web session must never fall
+    // through to the ordinary open path, which can create a blank text memo.
+    let record = record(app, id)?;
+    if record.session.closing() {
+        return Err("닫는 중인 웹 창입니다".into());
+    }
+    let host = record.host;
+    if visible {
+        crate::focus::discard_restore(app, host.label());
+        if host.is_minimized().map_err(err)? {
+            restore_minimized_without_focus(&host)?;
+        }
+        show(&host)?;
+    } else {
+        hide(&host)?;
+    }
+    crate::manager::window_visible(&host)
+}
+
+#[cfg(target_os = "macos")]
+fn restore_minimized_without_focus(host: &WebviewWindow) -> Result<(), String> {
+    // The manager command runs on the main thread. Tao consults the window's
+    // focusable flag in both canBecomeKeyWindow and canBecomeMainWindow.
+    let native = unsafe { &*(host.ns_window().map_err(err)? as *const objc2_app_kit::NSWindow) };
+    if !native.canBecomeKeyWindow() {
+        return host.unminimize().map_err(err);
+    }
+    host.set_focusable(false).map_err(err)?;
+    let restored = host.unminimize().map_err(err);
+    let focusable = host.set_focusable(true).map_err(err);
+    restored.and(focusable)
+}
+#[cfg(windows)]
+use crate::windows_window::restore_minimized_without_focus;
+#[cfg(not(any(target_os = "macos", windows)))]
+fn restore_minimized_without_focus(host: &WebviewWindow) -> Result<(), String> {
+    host.unminimize().map_err(err)
+}
+
+fn hide(w: &WebviewWindow) -> Result<(), String> {
+    crate::stash::release(w)?;
+    crate::relation_prototype::changed(w.app_handle(), w.label());
+    w.hide().map_err(err)
+}
 fn show(w: &WebviewWindow) -> Result<(), String> {
     crate::stash::release(w)?;
     #[cfg(target_os = "macos")]
@@ -556,9 +626,7 @@ pub fn handle(app: &tauri::AppHandle, request: &Request) -> Result<Value, String
         }
         Action::Inspect => inspect(app, request.id()),
         Action::Close => {
-            crate::stash::release(&w)?;
-            crate::relation_prototype::changed(w.app_handle(), w.label());
-            w.hide().map_err(err)?;
+            hide(&w)?;
             inspect(app, request.id())
         }
         Action::Open => {

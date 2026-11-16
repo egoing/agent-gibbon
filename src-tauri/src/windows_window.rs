@@ -279,6 +279,7 @@ pub fn take_native_resize(window: &WebviewWindow) -> Result<bool, String> {
 
 #[link(name = "user32")]
 extern "system" {
+    fn ShowWindow(window: isize, command: i32) -> i32;
     fn GetWindowRect(window: isize, rect: *mut Rect) -> i32;
     fn GetClientRect(window: isize, rect: *mut Rect) -> i32;
     fn ClientToScreen(window: isize, point: *mut Point) -> i32;
@@ -319,6 +320,18 @@ fn extended_style(handle: isize) -> Result<i32, String> {
         }
         Ok(style)
     }
+}
+
+// Tao's unminimize uses SW_RESTORE, which activates the HWND. The manager
+// restores the selected web host without taking focus from its current owner.
+pub fn restore_minimized_without_focus(window: &WebviewWindow) -> Result<(), String> {
+    const SW_SHOWNOACTIVATE: i32 = 4;
+    on_owner_thread(window, |window| {
+        let handle = window.hwnd().map_err(|e| e.to_string())?.0 as isize;
+        // ShowWindow returns the previous visibility, not success/failure.
+        unsafe { ShowWindow(handle, SW_SHOWNOACTIVATE) };
+        Ok(())
+    })
 }
 
 pub fn show_without_focus(window: &WebviewWindow) -> Result<(), String> {

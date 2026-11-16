@@ -109,6 +109,7 @@ pub fn manager_notes(
     for agent in crate::terminal::entries(window.app_handle()) {
         rows.push(json!({"id":agent.id,"title":crate::presentation::list_title(&agent.title, &agent.id, crate::presentation::Kind::Terminal),"kind":agent.kind,"visible":visible(app, &agent.id)?}));
     }
+    rows.extend(crate::web::manager_entries(app)?);
     Ok(Value::Array(rows))
 }
 
@@ -197,11 +198,15 @@ pub fn manager_set_visibility(
     window: tauri::WebviewWindow,
     id: String,
     visible: bool,
+    kind: Option<String>,
 ) -> Result<bool, String> {
     if window.label() != LABEL {
         return Err("관리 창에서만 사용할 수 있습니다".into());
     }
     let app = window.app_handle();
+    if kind.as_deref() == Some("web") {
+        return crate::web::set_manager_visibility(app, &id, visible);
+    }
     let exists = app
         .state::<AppNotes>()
         .lock()
@@ -249,6 +254,10 @@ fn visible(app: &tauri::AppHandle, label: &str) -> Result<bool, String> {
     let Some(window) = app.get_webview_window(label) else {
         return Ok(false);
     };
+    window_visible(&window)
+}
+
+pub(crate) fn window_visible(window: &tauri::WebviewWindow) -> Result<bool, String> {
     Ok(window.is_visible().map_err(|e| e.to_string())?
         && !window.is_minimized().map_err(|e| e.to_string())?)
 }
