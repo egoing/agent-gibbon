@@ -27,13 +27,41 @@ const GWL_EXSTYLE: i32 = -20;
 const WS_EX_LAYERED: i32 = 0x0008_0000;
 const WS_EX_NOACTIVATE: i32 = 0x0800_0000;
 const LWA_ALPHA: u32 = 2;
+const WM_ENTERSIZEMOVE: u32 = 0x0231;
+const WM_EXITSIZEMOVE: u32 = 0x0232;
 const WM_SIZING: u32 = 0x0214;
 const WM_NCDESTROY: u32 = 0x0082;
 const RESIZE_OBSERVER: usize = 1;
 
 #[derive(Default)]
+pub(crate) struct MoveLoops {
+    started: AtomicU64,
+    finished: AtomicU64,
+    destroyed: AtomicBool,
+}
+impl MoveLoops {
+    fn observe(&self, message: u32) {
+        match message {
+            WM_ENTERSIZEMOVE => {
+                self.started.fetch_add(1, Ordering::Release);
+            }
+            WM_EXITSIZEMOVE => self.finished.store(self.started(), Ordering::Release),
+            WM_NCDESTROY => self.destroyed.store(true, Ordering::Release),
+            _ => {}
+        }
+    }
+    pub(crate) fn started(&self) -> u64 {
+        self.started.load(Ordering::Acquire)
+    }
+    pub(crate) fn ended_after(&self, before: u64) -> bool {
+        self.destroyed.load(Ordering::Acquire) || self.finished.load(Ordering::Acquire) > before
+    }
+}
+
+#[derive(Default)]
 struct ResizeObserver {
     resized: AtomicBool,
+    move_loops: std::sync::Arc<MoveLoops>,
     // Capture notes use client coordinates; ordinary notes retain outer anchors.
     preserve_client_rect: AtomicBool,
     // Zero disables the image constraint. Access never locks application state.
@@ -135,6 +163,10 @@ unsafe extern "system" fn observe_resize(
     id: usize,
     data: usize,
 ) -> isize {
+    // Same-thread subclass data remains live until WM_NCDESTROY below.
+    unsafe { &*(data as *const ResizeObserver) }
+        .move_loops
+        .observe(message);
     if message == WM_SIZING {
         // WM_SIZING is user-only; WM_SIZE also fires for fit/fold/placement.
         // Never call Tauri or lock app state from this reentrant native callback.
@@ -215,6 +247,18 @@ fn install_resize_observer_for_handle(window: isize) -> Result<(), String> {
 pub fn install_resize_observer(window: &WebviewWindow) -> Result<(), String> {
     on_owner_thread(window, |window| {
         install_resize_observer_for_handle(window.hwnd().map_err(|e| e.to_string())?.0 as isize)
+    })
+}
+
+pub(crate) fn move_loops(window: &WebviewWindow) -> Result<std::sync::Arc<MoveLoops>, String> {
+    on_owner_thread(window, |window| {
+        let hwnd = window.hwnd().map_err(|e| e.to_string())?.0 as isize;
+        install_resize_observer_for_handle(hwnd)?;
+        let data = resize_observer(hwnd).ok_or("창 이동 감시를 찾을 수 없습니다")?;
+        // SAFETY: the owning thread holds the HWND subclass until WM_NCDESTROY.
+        Ok(unsafe { &*(data as *const ResizeObserver) }
+            .move_loops
+            .clone())
     })
 }
 

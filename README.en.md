@@ -40,7 +40,7 @@ Give your agent the [CLI skill](.agents/skills/agent-gibbon/SKILL.md), or ask it
 
 Use the plug button in a text, capture/image, terminal, or web memo, move onto another memo, and click. Enter an optional label and choose arrows toward the clicked memo, at both ends, or none. Escape or Cancel exits without saving. No feature activation environment variable is required.
 
-Connections are stored locally. Lines appear while any memo has focus and hide during related movement or hiding. Reconnecting the same pair updates its settings. Clicking existing lines to edit and displaying on drag release are tracked as follow-up work. See the [design system](docs/design-system.md) for implementation and verification limits.
+Connections are stored locally. Lines appear while any memo has focus and hide during related movement or hiding. Reconnecting the same pair updates its settings. While a memo drag is held, its lines stay hidden even when the pointer stops. After release, they reappear once the latest endpoint positions and SVG update are confirmed. Editing existing lines by clicking them is tracked separately. See the [design system](docs/design-system.md) for implementation and verification limits.
 
 ## Build from source
 
