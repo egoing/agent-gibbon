@@ -1,6 +1,7 @@
 (() => {
   const svg=document.querySelector('svg'), path=svg.querySelector('.connector');
   const text=svg.querySelector('text'), box=svg.querySelector('rect'), group=svg.querySelector('.label');
+  const marker=svg.querySelector('marker');
   let labelKey='',sizeKey='',painted='',latestGeneration=0;
   const stats=window.relationRenderStats={updates:0,frames:0,pending:false};
   window.drawRelation=(payload,generation)=>{
@@ -23,9 +24,9 @@
       }
       path.setAttribute('marker-start',arrow==='both'?'url(#arrow)':'none');
       path.setAttribute('marker-end',arrow==='none'?'none':'url(#arrow)');
-      const [a,b,c,d]=points;
-      path.setAttribute('d',`M${a} C${b} ${c} ${d}`);
-      group.setAttribute('transform',`translate(${(a[0]+3*b[0]+3*c[0]+d[0])/8} ${(a[1]+3*b[1]+3*c[1]+d[1])/8})`);
+      const curve=window.relationCurve(points,arrow,scale,marker);
+      path.setAttribute('d',curve.d);
+      group.setAttribute('transform',`translate(${curve.center.join(' ')})`);
     }
     // Confirm DOM geometry through a one-shot microtask. A hidden native WebView
     // may stop RAF entirely, so reveal must never wait for an invisible frame.
