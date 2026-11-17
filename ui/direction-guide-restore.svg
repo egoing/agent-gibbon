@@ -21,7 +21,7 @@
 <g>
 <animateTransform attributeName="transform" type="translate" from="0 -77" to="0 0" dur=".16s" fill="freeze"/>
 <animate attributeName="opacity" from="0" to="1" dur=".16s" fill="freeze"/>
-<g xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#080808" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path stroke="white" stroke-width="11" d="M94 196Q120 169 146 196Q120 223 94 196ZM120 187a9 9 0 1 0 0 18a9 9 0 1 0 0-18" /><path d="M94 196Q120 169 146 196Q120 223 94 196ZM120 187a9 9 0 1 0 0 18a9 9 0 1 0 0-18" />
+<g id="restore" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#080808" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path stroke="white" stroke-width="11" d="M94 196Q120 169 146 196Q120 223 94 196ZM120 187a9 9 0 1 0 0 18a9 9 0 1 0 0-18" /><path d="M94 196Q120 169 146 196Q120 223 94 196ZM120 187a9 9 0 1 0 0 18a9 9 0 1 0 0-18" />
 </g>
 </g>
 </svg>
