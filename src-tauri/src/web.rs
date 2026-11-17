@@ -369,11 +369,12 @@ fn content_bounds(chrome: &tauri::Webview) -> Result<tauri::Rect, String> {
             .to_logical::<f64>(chrome.window().scale_factor().map_err(err)?),
         0.0,
     );
+    let top = inset + crate::sizing::TOOLBAR_ROW_HEIGHT;
     Ok(tauri::Rect {
-        position: tauri::LogicalPosition::new(3.0, 30.0 + inset).into(),
+        position: tauri::LogicalPosition::new(3.0, top).into(),
         size: tauri::LogicalSize::new(
             (size.width - 6.0).max(1.0),
-            (size.height - inset - 33.0).max(1.0),
+            (size.height - top - 3.0).max(1.0),
         )
         .into(),
     })
@@ -555,21 +556,18 @@ pub(crate) fn create_presented(
         })
         .on_new_window(|_, _| tauri::webview::NewWindowResponse::Deny)
         .on_download(|_, _| false);
-        let size = w
-            .inner_size()
-            .map_err(err)?
-            .to_logical::<f64>(w.scale_factor().map_err(err)?);
-        let content = match w.as_ref().window().add_child(
-            content,
-            tauri::LogicalPosition::new(0.0, 30.0),
-            tauri::LogicalSize::new(size.width, (size.height - 30.0).max(1.0)),
-        ) {
+        let content = match content_bounds(w.as_ref()).and_then(|bounds| {
+            w.as_ref()
+                .window()
+                .add_child(content, bounds.position, bounds.size)
+                .map_err(err)
+        }) {
             Ok(content) => content,
             Err(error) => {
                 if previous.is_none() {
                     let _ = w.destroy();
                 }
-                return Err(err(error));
+                return Err(error);
             }
         };
         // Reapply after attachment: Wry now resolves the child's actual parent.

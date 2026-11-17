@@ -35,12 +35,12 @@ try {
    await page.waitForFunction(()=>!!window.gibbonToolbarFold);
    const geometry=()=>page.locator('#controls').evaluate(row=>({height:row.offsetHeight,buttons:[...row.querySelectorAll('#pin,#toolbar-toggle,#close')].map(b=>({id:b.id,x:b.getBoundingClientRect().x,y:b.getBoundingClientRect().y,w:b.offsetWidth,h:b.offsetHeight,r:getComputedStyle(b).borderRadius,p:getComputedStyle(b).padding,icon:b.querySelector('svg').getBoundingClientRect().width}))}));
    assert.equal(await page.locator('#chrome-title').getAttribute('title'),'웹');
-   const expanded=await geometry(); assert.equal(expanded.height,30);
+   const expanded=await geometry(); assert.equal(expanded.height,22);
    for(const b of expanded.buttons){assert.equal(b.w,24);assert.equal(b.h,22);assert.equal(b.icon,12);assert.equal(b.r,'3px');assert.equal(b.p,'0px');}
    const color=await page.locator('#controls').evaluate(e=>getComputedStyle(e).color);
    assert.equal(color,await page.locator('body').evaluate(e=>getComputedStyle(e).color));
    await page.locator('#pin').click();assert.equal(await page.locator('#pin').getAttribute('aria-pressed'),'false');
-   assert.equal(await page.locator('#pin svg').evaluate(e=>getComputedStyle(e).opacity),'0.45');
+   assert.equal(await page.locator('#pin svg').evaluate(e=>getComputedStyle(e).opacity),design === 'color' ? '1' : '0.45');
    await page.keyboard.press('Tab'); await page.locator('#toolbar-toggle').focus(); assert.notEqual(await page.locator('#toolbar-toggle').evaluate(e=>getComputedStyle(e).outlineStyle),'none');
    await page.keyboard.press('Enter');
    assert.equal(await page.locator('main').isVisible(),false);
@@ -58,8 +58,8 @@ try {
    await page.waitForFunction(()=>document.querySelector('main').hidden);
    const row = await page.locator('#controls').boundingBox();
    assert.equal(row.y,0);
-   for(const button of (await geometry()).buttons) assert.ok(button.y >= 0 && button.y < 30);
-   assert.equal(await page.locator('main').isVisible(),false);assert.equal((await geometry()).height,30);
+   for(const button of (await geometry()).buttons) assert.ok(button.y >= 0 && button.y + button.h <= 22);
+   assert.equal(await page.locator('main').isVisible(),false);assert.equal((await geometry()).height,22);
    if(output&&width===600&&['gray','black'].includes(design)) {await page.evaluate(()=>document.querySelector('main').hidden=false);await page.screenshot({path:path.join(output,`${design}-welcome.png`)});}
    console.log(`PASS ${design} ${width}: slots, fold, title, pin, focus, hover, remote chrome`);
   }

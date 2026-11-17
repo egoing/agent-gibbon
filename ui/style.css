@@ -114,8 +114,8 @@ body.folded #toolbar-items { overflow: visible; }
   #controls button:focus-visible { outline-color: Highlight; }
 }
 
-/* Persistent toolbar row, shared by text, capture and terminal windows. */
-#controls { position: relative; top: auto; right: auto; flex: 0 0 30px; width: 100%; max-width: 100%; height: 30px; padding: 2px 3px; border-radius: 0; opacity: 1; pointer-events: auto; }
+/* Persistent toolbar row shared by all memo types. */
+#controls { position: relative; top: auto; right: auto; flex: 0 0 var(--toolbar-row-height); width: 100%; max-width: 100%; height: var(--toolbar-row-height); padding: 0 3px; border-radius: 0; opacity: 1; pointer-events: auto; }
 body #controls { opacity: 1; pointer-events: auto; }
 #chrome-title { display: none; min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
 #toolbar-items { margin-left: auto; }
@@ -167,8 +167,7 @@ body.toolbar-collapsed header { height: 22px; min-height: 22px; }
 
 body.toolbar-collapsed > #controls { margin: 1px 0; }
 
-/* Keep the collapsed bar's icon geometry in both states. The remaining 8px
-   of the expanded row belongs to the content separator, below the buttons. */
+/* Both states use the same compact icon and button geometry. */
 #controls { --icon-size: 12px; padding: 0 3px; align-items: flex-start; }
 #controls button { height: 22px; min-height: 22px; padding: 0; }
 body.toolbar-collapsed #controls { align-items: flex-start; }
@@ -176,10 +175,7 @@ body.toolbar-collapsed #controls { align-items: flex-start; }
   background: color-mix(in srgb, var(--foreground) 16%, var(--background));
 }
 
-/* Text editing and capture chrome share the compact toolbar row. */
-
 /* One permanent editable surface; dirty state never changes the layout. */
-body.text-note:not(.toolbar-collapsed) #controls { flex-basis: 22px; height: 22px; }
 body.text-note:not(.folded) #viewport { padding-top: 0; }
 #editor { display: flex; flex-direction: column; height: auto; min-height: 100%; cursor: text; user-select: text; -webkit-user-select: text; }
 #editor .milkdown { display: flex; flex-direction: column; flex: 1; }
@@ -210,8 +206,6 @@ body.dirty #save { background: var(--panel); }
 .selection-format button[data-format=emphasis] { font-style: italic; }
 .selection-format button[data-format=strike_through] { text-decoration: line-through; }
 @media (forced-colors: active) { .selection-format button:focus-visible { outline-color: Highlight; } }
-/* Capture chrome follows the text reading row; contain preserves image aspect. */
-body.image-note:not(.toolbar-collapsed):not(.folded) #controls { flex-basis:22px; height:22px; }
 
 /* The native capture window adds toolbar space outside the original image. */
 body.image-note #memo-surface { border-width:0; }

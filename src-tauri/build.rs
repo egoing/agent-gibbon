@@ -1,4 +1,16 @@
 fn main() {
+    // Native child WebViews and capture frames use the same logical row as CSS.
+    let tokens = include_str!("../ui/tokens.css");
+    let row_height = tokens
+        .lines()
+        .find_map(|line| line.trim().strip_prefix("--toolbar-row-height:"))
+        .and_then(|value| value.trim().strip_suffix("px;"))
+        .and_then(|pixels| pixels.parse::<u16>().ok())
+        .filter(|height| *height > 0)
+        .expect("--toolbar-row-height must be a positive integer in CSS pixels");
+    let out_dir = std::path::PathBuf::from(std::env::var_os("OUT_DIR").unwrap());
+    std::fs::write(out_dir.join("toolbar_height.rs"), format!("{row_height}.0")).unwrap();
+    println!("cargo:rerun-if-changed=../ui/tokens.css");
     println!("cargo:rerun-if-env-changed=TAURI_UPDATER_PUBLIC_KEY");
     println!("cargo:rerun-if-env-changed=AGENT_GIBBON_SENTRY_DSN");
     let git = |args: &[&str]| {

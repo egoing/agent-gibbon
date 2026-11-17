@@ -1,6 +1,8 @@
 use std::{collections::BTreeMap, sync::Mutex};
 use tauri::{Emitter, LogicalSize, Manager, State, WebviewWindow};
 
+pub const TOOLBAR_ROW_HEIGHT: f64 = include!(concat!(env!("OUT_DIR"), "/toolbar_height.rs"));
+
 // Logical pixels, shared by natural-content measurement and editor entry.
 pub const AUTO_HEIGHT_MAX: f64 = 420.0;
 

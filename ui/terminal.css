@@ -1,4 +1,4 @@
-html,body{width:100%;height:100%;overflow:hidden}body{cursor:default}header{height:30px;min-height:30px;display:flex;align-items:center;padding:0 8px;cursor:move;user-select:none}#title{font:var(--font-ui)/var(--line-ui) -apple-system,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:calc(100% - 110px)}#status{padding:4px 8px;white-space:pre-wrap;overflow:auto;flex-shrink:0;max-height:50%}#status:empty{display:none}#terminal{flex:1;min-height:0;padding:3px 5px 5px;overflow:hidden;letter-spacing:0;cursor:text}.xterm{height:100%}.xterm-viewport{border-radius:0}#controls{opacity:1;pointer-events:auto}
+html,body{width:100%;height:100%;overflow:hidden}body{cursor:default}header{height:var(--toolbar-row-height);min-height:var(--toolbar-row-height);display:flex;align-items:center;padding:0 8px;cursor:move;user-select:none}#title{font:var(--font-ui)/var(--line-ui) -apple-system,sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:calc(100% - 110px)}#status{padding:4px 8px;white-space:pre-wrap;overflow:auto;flex-shrink:0;max-height:50%}#status:empty{display:none}#terminal{flex:1;min-height:0;padding:3px 5px 5px;overflow:hidden;letter-spacing:0;cursor:text}.xterm{height:100%}.xterm-viewport{border-radius:0}#controls{opacity:1;pointer-events:auto}
 
 [hidden]{display:none!important}
 #welcome{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;padding:24px;box-sizing:border-box}
@@ -33,9 +33,6 @@ body.toolbar-collapsed header #controls { flex: 1; }
 
 header { align-items: flex-start; }
 
-/* Match the text reading edge without changing shared web chrome. */
-header { height:22px; min-height:22px; }
-header #controls { height:22px; flex-basis:22px; }
 #terminal { position:relative; padding:0 var(--memo-padding) var(--memo-padding); --terminal-background:#20252e; background:var(--terminal-background); }
 #terminal .xterm-viewport { background:var(--terminal-background); scrollbar-width:none; }
 #terminal .xterm-viewport::-webkit-scrollbar { width:0; height:0; }
