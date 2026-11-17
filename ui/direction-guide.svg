@@ -3,25 +3,25 @@
 <g>
 <animateTransform attributeName="transform" type="translate" from="0 77" to="0 0" dur=".16s" fill="freeze"/>
 <animate attributeName="opacity" from="0" to="1" dur=".16s" fill="freeze"/>
-<g xmlns="http://www.w3.org/2000/svg" fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><path d="M99 22h18v18H99z M123 22h18v18h-18z M99 46h18v18H99z M123 46h18v18h-18z" />
+<g id="tile" xmlns="http://www.w3.org/2000/svg" fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><path d="M99 22h18v18H99z M123 22h18v18h-18z M99 46h18v18H99z M123 46h18v18h-18z" />
 </g>
 </g>
 <g>
 <animateTransform attributeName="transform" type="translate" from="-72 0" to="0 0" dur=".16s" fill="freeze"/>
 <animate attributeName="opacity" from="0" to="1" dur=".16s" fill="freeze"/>
-<g xmlns="http://www.w3.org/2000/svg" fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><rect x="184" y="100" width="32" height="7" rx="3" /><rect x="168" y="116.5" width="48" height="7" rx="3" /><rect x="192" y="133" width="24" height="7" rx="3" />
+<g id="right" xmlns="http://www.w3.org/2000/svg" fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><rect x="184" y="100" width="32" height="7" rx="3" /><rect x="168" y="116.5" width="48" height="7" rx="3" /><rect x="192" y="133" width="24" height="7" rx="3" />
 </g>
 </g>
 <g>
 <animateTransform attributeName="transform" type="translate" from="77 0" to="0 0" dur=".16s" fill="freeze"/>
 <animate attributeName="opacity" from="0" to="1" dur=".16s" fill="freeze"/>
-<g xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#080808" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path stroke="white" stroke-width="11" d="m27 104 32 32m0-32-32 32" /><path d="m27 104 32 32m0-32-32 32" />
+<g id="cancel" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#080808" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path stroke="white" stroke-width="11" d="m27 104 32 32m0-32-32 32" /><path d="m27 104 32 32m0-32-32 32" />
 </g>
 </g>
 <g>
 <animateTransform attributeName="transform" type="translate" from="0 -77" to="0 0" dur=".16s" fill="freeze"/>
 <animate attributeName="opacity" from="0" to="1" dur=".16s" fill="freeze"/>
-<g xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#080808" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path stroke="white" stroke-width="11" d="M96 187q24 28 48 0m-39 8-5 7m17-2-2 9m15-10 4 8m5-13 5 6" /><path d="M96 187q24 28 48 0m-39 8-5 7m17-2-2 9m15-10 4 8m5-13 5 6" />
+<g id="hide" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#080808" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path stroke="white" stroke-width="11" d="M96 187q24 28 48 0m-39 8-5 7m17-2-2 9m15-10 4 8m5-13 5 6" /><path d="M96 187q24 28 48 0m-39 8-5 7m17-2-2 9m15-10 4 8m5-13 5 6" />
 </g>
 </g>
 </svg>
