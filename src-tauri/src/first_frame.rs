@@ -99,6 +99,7 @@ pub fn creating<T>(
 
 pub fn cancel(app: &tauri::AppHandle, label: &str) {
     app.state::<Pending>().cancel(label);
+    crate::layout::overview::capture_frame_finished(app, label);
 }
 
 pub fn placed(window: &WebviewWindow) -> Result<(), String> {
@@ -158,8 +159,14 @@ pub async fn region_frame_ready(window: WebviewWindow) -> Result<(), String> {
                                         completionHandler: &*completion];
             }
         })
-        .map_err(|e| e.to_string())?;
-    result.recv().await.ok_or("첫 화면 준비가 중단되었습니다")?
+        .map_err(|e| {
+            crate::layout::overview::capture_frame_finished(window.app_handle(), window.label());
+            e.to_string()
+        })?;
+    result.recv().await.ok_or_else(|| {
+        crate::layout::overview::capture_frame_finished(window.app_handle(), window.label());
+        "첫 화면 준비가 중단되었습니다".to_string()
+    })?
 }
 
 fn show_prepared(window: &WebviewWindow, generation: &Arc<()>) -> Result<(), String> {
@@ -171,7 +178,11 @@ fn show_prepared(window: &WebviewWindow, generation: &Arc<()>) -> Result<(), Str
     };
     match mode {
         SelectionMode::Text => crate::capture::show_text(window),
-        SelectionMode::Image => crate::show_without_focus(window),
+        SelectionMode::Image => {
+            let shown = crate::show_without_focus(window);
+            crate::layout::overview::capture_frame_finished(window.app_handle(), window.label());
+            shown
+        }
         SelectionMode::Terminal => crate::terminal::show(window),
         SelectionMode::Web => crate::web::show(window),
     }?;

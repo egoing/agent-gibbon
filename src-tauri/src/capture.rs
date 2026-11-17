@@ -28,6 +28,7 @@ pub enum SelectionMode {
     Web,
 }
 struct Screen {
+    generation: u64,
     mode: SelectionMode,
     ready: bool,
     image: RgbaImage,
@@ -181,8 +182,14 @@ pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
     });
 }
 fn launch(app: &tauri::AppHandle, mode: SelectionMode) {
-    if let Err(error) = begin(app, mode) {
+    let generation = NEXT_SELECTION.fetch_add(1, Ordering::Relaxed);
+    if let Err(error) = begin(app, mode, generation) {
         let _ = cleanup_before_create(app);
+        if mode == SelectionMode::Image {
+            if let Err(e) = crate::layout::overview::capture_visibility(app, generation, false) {
+                eprintln!("모아보기 재표시 실패: {e}");
+            }
+        }
         if let Some(tray) = app.tray_by_id("agent-gibbon") {
             let _ = tray.set_tooltip(Some(format!("화면 캡처 실패: {error}")));
         }
@@ -309,7 +316,7 @@ pub fn permission_guide(
     }
 }
 
-fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
+fn begin(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result<(), String> {
     let _update_activity = crate::updater::activity(app)?;
     #[cfg(not(windows))]
     let _root = crate::telemetry::Timing::new("capture.prepare");
@@ -340,12 +347,17 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
         return Ok(());
     }
     // Capture every display before creating any overlays, so dimming never enters the PNG.
+    if mode == SelectionMode::Image {
+        crate::layout::overview::capture_visibility(app, generation, true)?;
+    }
     let mut screens = BTreeMap::new();
-    let generation = NEXT_SELECTION.fetch_add(1, Ordering::Relaxed);
     let monitors = {
         let _timing = crate::telemetry::Timing::new("capture.screen.enumerate");
         xcap::Monitor::all().map_err(err)?
     };
+    if monitors.is_empty() {
+        return Err("캡처할 화면을 찾을 수 없습니다".into());
+    }
     for (index, monitor) in monitors.into_iter().enumerate() {
         let scale = if cfg!(target_os = "macos") {
             1.0
@@ -355,6 +367,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
         screens.insert(
             format!("capture-{generation}-{index}"),
             Screen {
+                generation,
                 mode,
                 ready: false,
                 image: {
@@ -488,16 +501,25 @@ fn cancel_selection(window: WebviewWindow) -> Result<(), String> {
     }
     // Delayed cancel/failure from a prior generation must not erase a newer
     // selection. Every overlay label includes its generation.
-    if !window
+    let selection = window
         .state::<Captures>()
         .0
         .lock()
         .map_err(err)?
-        .contains_key(window.label())
-    {
-        return Ok(());
+        .get(window.label())
+        .map(|screen| (screen.mode, screen.generation));
+    if let Some((mode, generation)) = selection {
+        end_selection(window.app_handle(), mode, generation)?;
     }
-    cleanup_before_create(window.app_handle())
+    Ok(())
+}
+
+fn end_selection(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result<(), String> {
+    let cleanup = cleanup_before_create(app);
+    if mode == SelectionMode::Image {
+        crate::layout::overview::capture_visibility(app, generation, false)?;
+    }
+    cleanup
 }
 #[cfg(windows)]
 #[tauri::command]
@@ -706,7 +728,7 @@ fn finish_selection(
     // Window getters can wait for the UI thread on Windows. Do not hold the
     // capture state while waiting: capture_ready/cancel use it on that thread.
     let scale = window.scale_factor().map_err(err)?;
-    let (bytes, bounds, mode) = {
+    let (bytes, bounds, mode, generation) = {
         let state = app.state::<Captures>();
         let screens = state.0.lock().map_err(err)?;
         let s = screens.get(window.label()).ok_or("캡처가 종료되었습니다")?;
@@ -735,9 +757,19 @@ fn finish_selection(
                 height,
             },
             s.mode,
+            s.generation,
         )
     };
     // Restore the previous app before the new editor deliberately takes focus.
+    if mode == SelectionMode::Image {
+        let result = cleanup_before_create(app).and_then(|()| {
+            create_note(app, bytes.ok_or("캡처 이미지가 없습니다")?, bounds, generation)
+        });
+        if result.is_err() {
+            crate::layout::overview::capture_visibility(app, generation, false)?;
+        }
+        return result;
+    }
     cleanup_before_create(app)?;
     if mode == SelectionMode::Web {
         return crate::web::create_region(app, bounds);
@@ -745,10 +777,7 @@ fn finish_selection(
     if mode == SelectionMode::Terminal {
         return crate::terminal::create_terminal(app, bounds).map(|_| ());
     }
-    match bytes {
-        Some(bytes) => create_note(app, bytes, bounds),
-        None => create_text_note(app, bounds),
-    }
+    create_text_note(app, bounds)
 }
 // Capture coordinates describe the image, not the enclosing toolbar window.
 fn image_toolbar_below(image_y: i32, work_top: i32, scale: f64) -> bool {
@@ -863,7 +892,12 @@ pub(crate) fn show_text(win: &WebviewWindow) -> Result<(), String> {
     win.show().map_err(err)?;
     win.set_focus().map_err(err)
 }
-fn create_note(app: &tauri::AppHandle, bytes: Vec<u8>, bounds: ImageNote) -> Result<(), String> {
+fn create_note(
+    app: &tauri::AppHandle,
+    bytes: Vec<u8>,
+    bounds: ImageNote,
+    generation: u64,
+) -> Result<(), String> {
     use std::time::{SystemTime, UNIX_EPOCH};
     let stamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -908,7 +942,9 @@ fn create_note(app: &tauri::AppHandle, bytes: Vec<u8>, bounds: ImageNote) -> Res
         let _ = std::fs::remove_file(&path);
         return Err(error);
     }
-    crate::first_frame::creating(app, &crate::label(&id), SelectionMode::Image, || {
+    let label = crate::label(&id);
+    crate::layout::overview::await_capture_frame(app, generation, &label);
+    crate::first_frame::creating(app, &label, SelectionMode::Image, || {
         let win = crate::create_window(app, &id, true)?;
         app.state::<crate::AppNotes>()
             .lock()

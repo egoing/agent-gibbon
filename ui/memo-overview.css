@@ -20,7 +20,14 @@ button:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
   nav, button { border: 1px solid ButtonText; }
   button:focus-visible { outline-color: Highlight; }
 }
-html[data-backdrop] { background: rgb(238 241 244 / 84%); }
-@media (prefers-color-scheme: dark) {
-  html[data-backdrop] { background: rgb(37 41 48 / 84%); }
+html[data-backdrop] { color-scheme: only light; background: transparent; }
+html[data-backdrop][data-visible] {
+  background: rgb(0 0 0 / 84%);
+  animation: backdrop-in 160ms ease-out;
+}
+@keyframes backdrop-in {
+  from { background: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-backdrop][data-visible] { animation: none; }
 }

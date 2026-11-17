@@ -375,9 +375,11 @@ fn geometry_changed(app: &tauri::AppHandle, label: &str, moved: bool) {
     }
     if let Some(state) = app.try_state::<std::sync::Mutex<Prototype>>() {
         if let Ok(mut state) = state.try_lock() {
-            if state.motion.record_change(label, Instant::now(), moved) {
-                suspend_endpoint(app, &mut state, label);
+            if !state.motion.record_change(label, Instant::now(), moved) {
+                // The drag timer already polls for release while its lines are hidden.
+                return;
             }
+            suspend_endpoint(app, &mut state, label);
         }
     }
     if let Some(tx) = WAKE.get() {
@@ -412,6 +414,10 @@ fn memo_kind(label: &str) -> Option<MemoKind<'_>> {
         .filter(|id| !id.is_empty())
         .map(MemoKind::Web)
 }
+fn focus_allows_relations(app: &tauri::AppHandle) -> bool {
+    crate::layout::overview::active(app) || memo_focused(app)
+}
+
 fn memo_focused(app: &tauri::AppHandle) -> bool {
     // AppKit can retain a key window while a different application is active.
     #[cfg(target_os = "macos")]
@@ -474,7 +480,7 @@ fn acknowledged(pending: Option<u64>, generation: u64, paused: bool) -> bool {
 #[tauri::command]
 pub fn relation_ready(window: WebviewWindow, generation: u64) -> Result<bool, String> {
     let app = window.app_handle();
-    let has_focus = memo_focused(app);
+    let focus_allowed = focus_allows_relations(app);
     let Some(index) = window
         .label()
         .strip_prefix("relation-prototype-")
@@ -505,7 +511,7 @@ pub fn relation_ready(window: WebviewWindow, generation: u64) -> Result<bool, St
     let Some(r) = state.relations.get(index) else {
         return Ok(false);
     };
-    let paused = !has_focus
+    let paused = !focus_allowed
         || state.motion.paused(
             &endpoint_label(app, &r.from),
             &endpoint_label(app, &r.to),
@@ -680,7 +686,7 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
             crate::web::managed_window(app, label).is_some()
         },
     );
-    if !memo_focused(app) {
+    if !focus_allows_relations(app) {
         for surface in state.surfaces.values_mut() {
             if surface.pending.is_some()
                 || surface.payload.is_some()
