@@ -1,0 +1,26 @@
+:root { color-scheme: light dark; --surface: #252930; --ink: #fff; }
+* { box-sizing: border-box; }
+body { height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; margin: 0; font: 14px system-ui, sans-serif; }
+nav { display: flex; gap: 4px; padding: 3px; border-radius: 12px; background: var(--surface); }
+button {
+  flex: 1 0 auto;
+  min-height: 34px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: var(--ink);
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:hover, button[data-pointer-over] { background: #424851; }
+button:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
+[role=status] { order: -1; overflow-y: auto; margin: 0 0 2px; border-radius: 6px; padding: 4px; color: var(--ink); background: var(--surface); font-size: 12px; }
+@media (forced-colors: active) {
+  nav, button { border: 1px solid ButtonText; }
+  button:focus-visible { outline-color: Highlight; }
+}
+html[data-backdrop] { background: rgb(238 241 244 / 84%); }
+@media (prefers-color-scheme: dark) {
+  html[data-backdrop] { background: rgb(37 41 48 / 84%); }
+}

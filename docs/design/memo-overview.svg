@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="312" viewBox="0 0 900 312" role="img" aria-labelledby="title desc">
+  <title id="title">메모 모아보기의 진입·자동 정렬·닫기</title>
+  <desc id="desc">위 제스처는 네 메모 뒤에 배경을 표시한다. 자동 정렬과 수동 이동 뒤 닫으면 진입 직전의 각 창 위치와 크기로 돌아간다.</desc>
+  <defs>
+    <g id="original" fill="#fff3ce" stroke="#837859">
+      <rect x="12" y="46" width="80" height="42"/><rect x="120" y="18" width="66" height="52"/>
+      <rect x="42" y="111" width="87" height="40"/><rect x="160" y="93" width="76" height="60"/>
+    </g>
+    <g id="controls" font-size="12" fill="white" text-anchor="middle">
+      <rect x="62" y="174" width="130" height="26" rx="7" fill="#252930"/>
+      <rect x="137" y="177" width="51" height="20" rx="5" fill="#424851"/><text x="101" y="192">자동 정렬</text><text x="163" y="192">닫기</text>
+    </g>
+  </defs>
+  <rect width="900" height="312" fill="white"/>
+  <g font-family="sans-serif" fill="#24313c">
+    <text x="24" y="32" font-size="21">메모 모아보기</text>
+    <g font-size="15">
+      <text x="24" y="63">위 제스처로 진입</text>
+      <text x="319" y="63">자동 정렬 후 수동 이동</text>
+      <text x="614" y="63">닫기 · 원위치로 전환</text>
+    </g>
+    <g transform="translate(24 75)">
+      <rect width="262" height="208" rx="6" fill="#eef1f4" fill-opacity=".84" stroke="#85919b"/>
+      <use href="#original"/><use href="#controls"/>
+    </g>
+    <g transform="translate(319 75)">
+      <rect width="262" height="208" rx="6" fill="#eef1f4" fill-opacity=".84" stroke="#85919b"/>
+      <g fill="#fff3ce" stroke="#837859">
+        <rect x="18" y="18" width="90" height="44"/><rect x="157" y="32" width="73" height="56"/>
+        <rect x="18" y="102" width="90" height="47"/><rect x="146" y="99" width="90" height="52"/>
+      </g><use href="#controls"/>
+    </g>
+    <g transform="translate(614 75)">
+      <rect width="262" height="208" rx="6" fill="#faf8f4" stroke="#85919b"/>
+      <use href="#original"/>
+    </g>
+  </g>
+</svg>

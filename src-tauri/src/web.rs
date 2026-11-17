@@ -305,7 +305,7 @@ fn hide(w: &WebviewWindow) -> Result<(), String> {
     crate::relation_prototype::changed(w.app_handle(), w.label());
     w.hide().map_err(err)
 }
-fn show(w: &WebviewWindow) -> Result<(), String> {
+pub(crate) fn show(w: &WebviewWindow) -> Result<(), String> {
     crate::stash::release(w)?;
     #[cfg(target_os = "macos")]
     unsafe {
@@ -369,14 +369,37 @@ fn content_bounds(chrome: &tauri::Webview) -> Result<tauri::Rect, String> {
             .to_logical::<f64>(chrome.window().scale_factor().map_err(err)?),
         0.0,
     );
+    let top = inset + crate::sizing::TOOLBAR_ROW_HEIGHT;
     Ok(tauri::Rect {
-        position: tauri::LogicalPosition::new(3.0, 30.0 + inset).into(),
+        position: tauri::LogicalPosition::new(3.0, top).into(),
         size: tauri::LogicalSize::new(
             (size.width - 6.0).max(1.0),
-            (size.height - inset - 33.0).max(1.0),
+            (size.height - top - 3.0).max(1.0),
         )
         .into(),
     })
+}
+fn new_id() -> String {
+    format!(
+        "web-{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos()
+    )
+}
+pub fn create_region(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), String> {
+    let id = new_id();
+    crate::memo_color::create(&app.state::<crate::storage::Store>().0, &id)?;
+    crate::first_frame::creating(
+        app,
+        &format!("webview-{id}"),
+        crate::capture::SelectionMode::Web,
+        || {
+            create_presented(app, Some(bounds), Some(&id), None, false)?;
+            crate::first_frame::placed(&record(app, &id)?.host)
+        },
+    )
 }
 pub fn create(
     app: &tauri::AppHandle,
@@ -400,15 +423,7 @@ pub(crate) fn create_presented(
     url: Option<&str>,
     present: bool,
 ) -> Result<Value, String> {
-    let id = id.map(str::to_owned).unwrap_or_else(|| {
-        format!(
-            "web-{}",
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap_or_default()
-                .as_nanos()
-        )
-    });
+    let id = id.map(str::to_owned).unwrap_or_else(new_id);
     let parsed = url.map(validate_url).transpose()?;
     // Restored pre-palette windows retain their legacy color. New windows get
     // a color once; navigation and recreation reuse their persistent sidecar.
@@ -460,6 +475,7 @@ pub(crate) fn create_presented(
         crate::focus::remember(app, &label);
         let window =
             tauri::WebviewWindowBuilder::new(app, &label, WebviewUrl::App("web.html".into()))
+                .accept_first_mouse(crate::memo_window_config(app).accept_first_mouse)
                 .title(host_title(&id))
                 .inner_size(600.0, 400.0)
                 .min_inner_size(240.0, 160.0)
@@ -485,15 +501,15 @@ pub(crate) fn create_presented(
                     b.y.round() as i32,
                 ))
                 .map_err(err)?;
-            #[cfg(not(windows))]
-            window
-                .set_position(tauri::LogicalPosition::new(b.x, b.y))
-                .map_err(err)?;
             window
                 .set_size(tauri::LogicalSize::new(
                     b.width.max(240.0),
                     b.height.max(160.0),
                 ))
+                .map_err(err)?;
+            #[cfg(not(windows))]
+            window
+                .set_position(tauri::LogicalPosition::new(b.x, b.y))
                 .map_err(err)?;
         }
         let handle = app.clone();
@@ -555,21 +571,18 @@ pub(crate) fn create_presented(
         })
         .on_new_window(|_, _| tauri::webview::NewWindowResponse::Deny)
         .on_download(|_, _| false);
-        let size = w
-            .inner_size()
-            .map_err(err)?
-            .to_logical::<f64>(w.scale_factor().map_err(err)?);
-        let content = match w.as_ref().window().add_child(
-            content,
-            tauri::LogicalPosition::new(0.0, 30.0),
-            tauri::LogicalSize::new(size.width, (size.height - 30.0).max(1.0)),
-        ) {
+        let content = match content_bounds(w.as_ref()).and_then(|bounds| {
+            w.as_ref()
+                .window()
+                .add_child(content, bounds.position, bounds.size)
+                .map_err(err)
+        }) {
             Ok(content) => content,
             Err(error) => {
                 if previous.is_none() {
                     let _ = w.destroy();
                 }
-                return Err(err(error));
+                return Err(error);
             }
         };
         // Reapply after attachment: Wry now resolves the child's actual parent.

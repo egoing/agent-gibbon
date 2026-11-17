@@ -75,7 +75,7 @@ struct Gesture {
 }
 #[derive(Clone, Copy, PartialEq, Debug)]
 enum Direction {
-    Cancel,
+    Left,
     Down,
     Right,
     Up,
@@ -92,7 +92,7 @@ impl Gesture {
             Some(if dx > 0.0 {
                 Direction::Right
             } else {
-                Direction::Cancel
+                Direction::Left
             })
         } else if dy.abs() >= 1.5 * dx.abs() {
             Some(if dy > 0.0 {
@@ -153,6 +153,9 @@ fn sample_pointer(app: &tauri::AppHandle) {
         dismiss_guide(app);
         return;
     }
+    if state.chord.lock().unwrap().mask != 0 {
+        return;
+    }
     if let Ok(p) = gesture_pointer(app) {
         g.track(p.x, p.y);
     }
@@ -167,9 +170,8 @@ fn sample_pointer(app: &tauri::AppHandle) {
         return;
     }
     match direction {
-        Direction::Cancel => {}
         Direction::Down => trigger(app),
-        Direction::Right | Direction::Up => {
+        Direction::Left | Direction::Right | Direction::Up => {
             let mut session = state.session.lock().unwrap();
             if let Some(s) = session.as_mut() {
                 s.after_restore = Some((direction, x, y));
@@ -188,7 +190,12 @@ fn sample_pointer(app: &tauri::AppHandle) {
     }
 }
 fn arrange_direction(app: &tauri::AppHandle, direction: Direction, x: f64, y: f64) {
-    let result = crate::layout::arrange(app, x, y, direction == Direction::Up);
+    let result = crate::layout::gesture_monitor(app, x, y).and_then(|monitor| match direction {
+        Direction::Up => crate::layout::overview::enter(app, monitor),
+        Direction::Left => crate::layout::arrange(app, monitor, crate::layout::Arrangement::Left),
+        Direction::Right => crate::layout::arrange(app, monitor, crate::layout::Arrangement::Right),
+        Direction::Down => unreachable!("숨김은 trigger에서 처리"),
+    });
     *app.state::<Stash>().last_arrangement.lock().unwrap() = Some(
         result
             .map(|_| format!("{direction:?}"))
@@ -205,7 +212,24 @@ struct Chord {
     pending: bool,
     cancelled: bool,
 }
+#[derive(Debug, PartialEq)]
+enum GuideInput {
+    Hold,
+    Cancel,
+    Open,
+}
 impl Chord {
+    fn guide_input(&mut self, mask: u8, shift: bool, used: bool) -> GuideInput {
+        let released = self.mask != 0 && mask == 0;
+        if self.sample(mask, shift, used) {
+            GuideInput::Open
+        } else if released || shift || used || self.cancelled {
+            GuideInput::Cancel
+        } else {
+            GuideInput::Hold
+        }
+    }
+
     fn sample(&mut self, mask: u8, shift: bool, used: bool) -> bool {
         if self.mask == 0 && mask != 0 {
             self.pending = false;
@@ -281,16 +305,15 @@ pub fn modifier_event(app: &tauri::AppHandle, mask: u8, shift: bool) {
         crate::opacity::reset_wheel(app);
     }
     let state = app.state::<Stash>();
-    let old = state.chord.lock().unwrap().mask;
-    if old == 0 && mask != 0 {
-        dismiss_guide(app);
+    let mut chord = state.chord.lock().unwrap();
+    let input = chord.guide_input(mask, shift, crate::stash_input::used());
+    drop(chord);
+    match input {
+        GuideInput::Hold => return,
+        GuideInput::Cancel => return dismiss_guide(app),
+        GuideInput::Open => {}
     }
-    let fire = state
-        .chord
-        .lock()
-        .unwrap()
-        .sample(mask, shift, crate::stash_input::used());
-    if !fire || !input_owned(app) || crate::updater::frozen(app) {
+    if !input_owned(app) || crate::updater::frozen(app) {
         return;
     }
     if let (Ok(p), Some(w)) = (gesture_pointer(app), app.get_webview_window(GUIDE)) {
@@ -305,12 +328,13 @@ pub fn modifier_event(app: &tauri::AppHandle, mask: u8, shift: bool) {
             .unwrap()
             .as_ref()
             .is_some_and(|s| !s.restoring);
+        let already_open = state.gesture.lock().unwrap().origin.is_some();
         if let Err(e) = position_guide(&w, p.x, p.y, scale)
             .and_then(|_| {
                 w.eval(format!("window.showDirectionGuide({restores})"))
                     .map_err(err)
             })
-            .and_then(|_| show_frame(&w))
+            .and_then(|_| if already_open { Ok(()) } else { show_frame(&w) })
         {
             eprintln!("방향 안내 표시 실패: {e}");
             return;
@@ -346,6 +370,7 @@ fn position_guide(w: &WebviewWindow, x: f64, y: f64, scale: f64) -> Result<(), S
 fn hide_guide(app: &tauri::AppHandle) {
     if let Some(w) = app.get_webview_window(GUIDE) {
         let _ = w.hide();
+        let _ = w.eval("document.body.classList.remove('open', 'closing')");
     }
 }
 fn dismiss_guide(app: &tauri::AppHandle) {
@@ -366,14 +391,15 @@ pub fn cancel_chord(app: &tauri::AppHandle) {
     dismiss_guide(app);
     let mut chord = state.chord.lock().unwrap();
     if chord.mask != 0 {
-        hide_guide(app);
         chord.cancelled = true;
         chord.pending = false;
     }
 }
 fn snapshot_candidate(label: &str) -> bool {
-    !matches!(label, ICON | GUIDE | "layout-undo")
-        && !label.starts_with("relation-prototype-")
+    !matches!(
+        label,
+        ICON | GUIDE | "layout-undo" | "memo-overview" | "memo-backdrop"
+    ) && !label.starts_with("relation-prototype-")
         && !label.starts_with("relation-pick-")
         && label != "relation-settings"
 }
@@ -549,6 +575,7 @@ pub(crate) fn forget(w: &WebviewWindow) {
 }
 // Explicit individual open/close takes ownership away from the transaction.
 pub fn release(w: &WebviewWindow) -> Result<(), String> {
+    crate::first_frame::cancel(w.app_handle(), w.label());
     let saved = w
         .state::<Stash>()
         .session
@@ -657,6 +684,7 @@ fn restore_rect(w: &WebviewWindow, s: &Saved) -> Result<Rect, String> {
 }
 pub fn toggle(app: &tauri::AppHandle) -> Result<(), String> {
     let _update_activity = crate::updater::activity(app)?;
+    crate::layout::overview::leave(app)?;
     crate::relation_prototype::transition_started(app);
     let previous = app.state::<Stash>().session.lock().unwrap().take();
     if let Some(mut s) = previous {
@@ -975,6 +1003,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
     let observed = available && crate::stash_input::install(app);
     let owned = available && observed;
     if owned {
+        crate::layout::overview::install(app)?;
         tauri::WebviewWindowBuilder::new(
             app,
             "layout-undo",
@@ -1053,6 +1082,10 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                         arrange_direction(&handle, direction, x, y);
                     }
                 }
+                #[cfg(target_os = "macos")]
+                if let Some(panel) = handle.get_webview_window("memo-overview") {
+                    let _ = crate::toolbar_pointer::sync(&panel);
+                }
                 sample_pointer(&handle);
                 if let Err(e) = tick(&handle) {
                     eprintln!("접어두기 전환 실패: {e}");
@@ -1075,7 +1108,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
 mod tests {
     use super::*;
     #[test]
-    fn left_cancels_even_if_pointer_later_crosses_right() {
+    fn left_alignment_is_latched_even_if_pointer_later_crosses_right() {
         let mut gesture = Gesture {
             origin: Some((100., 100.)),
             scale: 1.,
@@ -1083,7 +1116,7 @@ mod tests {
         };
         gesture.track(40., 105.);
         gesture.track(180., 100.);
-        assert_eq!(gesture.direction, Some(Direction::Cancel));
+        assert_eq!(gesture.direction, Some(Direction::Left));
     }
     #[test]
     fn direction_uses_screen_scale_and_locks_the_first_valid_axis() {
@@ -1100,6 +1133,23 @@ mod tests {
         assert_eq!(g.direction, Some(Direction::Right));
         g.track(-60., 0.);
         assert_eq!(g.direction, Some(Direction::Right));
+    }
+    #[test]
+    fn repeat_chord_keeps_the_guide_until_the_new_anchor_is_known() {
+        let mut chord = Chord::default();
+        for _ in 0..2 {
+            for mask in [1, 3, 7, 7, 3, 7, 1] {
+                assert_eq!(chord.guide_input(mask, false, false), GuideInput::Hold);
+            }
+            assert_eq!(chord.guide_input(0, false, false), GuideInput::Open);
+            assert_eq!(chord.guide_input(0, false, false), GuideInput::Hold);
+        }
+        assert_eq!(chord.guide_input(1, false, false), GuideInput::Hold);
+        assert_eq!(chord.guide_input(0, false, false), GuideInput::Cancel);
+        assert_eq!(chord.guide_input(7, true, false), GuideInput::Cancel);
+        assert_eq!(chord.guide_input(0, false, false), GuideInput::Cancel);
+        assert_eq!(chord.guide_input(7, false, true), GuideInput::Cancel);
+        assert_eq!(chord.guide_input(0, false, false), GuideInput::Cancel);
     }
     #[test]
     fn bare_modifier_chord_commits_once_on_complete_release() {

@@ -173,7 +173,7 @@ document.getElementById('choose-folder').onclick=async()=>{
   if(selectingFolder)return;selectingFolder=true;selectionChanged();
   try{const result=await invoke('terminal_folder',{path:null});if(result.folder_selected!==false)await welcome();status.textContent='';}catch(e){report(e);}finally{selectingFolder=false;selectionChanged();}
 };
-(async()=>{
+async function initializeTerminal() {
   const info=await invoke('terminal_info');
   if(info.kind!=='terminal')throw Error('전용 에이전트 기능은 지원하지 않습니다.');
   restoreSupported=info.restore_supported !== false;
@@ -195,7 +195,9 @@ document.getElementById('choose-folder').onclick=async()=>{
     else if(info.restored) status.textContent = `이전 터미널 프로세스는 종료되었습니다. ${info.last_command ? `마지막 명령: ${info.last_command} · 자동 실행하지 않았습니다.` : '마지막 명령은 안전한 복원을 위해 저장에서 제외되었습니다.'}`;
   }
   window.gibbonMeasure?.('terminal.ui.ready',clock());
-})().catch(report);
+}
+if (window.gibbonRegionFrame) window.gibbonRegionFrame.prepare(initializeTerminal);
+else initializeTerminal().catch(report);
 // Refresh only the current directory; never collect input, output or history.
 setInterval(()=>{if(started && !ended)invoke('terminal_info').then(setInfo).catch(report);},2000);
 

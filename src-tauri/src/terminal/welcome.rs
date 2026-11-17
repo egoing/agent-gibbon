@@ -46,7 +46,11 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
     crate::memo_color::create(&root(app), &id)?;
     state.records.insert(&root(app), agent)?;
     crate::session_restore::mark_reopened(app, &id);
-    open(app, &id)?;
+    crate::first_frame::creating(app, &id, crate::capture::SelectionMode::Terminal, || {
+        open_presented(app, &id, false)?;
+        let window = app.get_webview_window(&id).ok_or("터미널 창이 없습니다")?;
+        crate::first_frame::placed(&window)
+    })?;
     crate::tray::refresh(app)?;
     inspect(app, &id)
 }

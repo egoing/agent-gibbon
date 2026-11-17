@@ -22,10 +22,12 @@ export function installMemoSurfaceAppearance(env = window, root = document.docum
   // Only trusted chrome loads this module. No bridge is added to remote pages.
   env.__TAURI__?.event?.listen('memo-color', event => setColor(event.payload))?.catch(() => {});
   const invoke = env.__TAURI__?.core?.invoke;
+  let initialColor;
   if (invoke) {
     const web = env.location?.pathname?.endsWith('/web.html');
-    invoke(web ? 'web_chrome' : 'terminal_info', web ? {action:'inspect'} : undefined)
-      .then(info => setColor(info.color)).catch(() => {});
+    const read = () => invoke(web ? 'web_chrome' : 'terminal_info', web ? {action:'inspect'} : undefined)
+      .then(info => setColor(info.color));
+    initialColor = env.gibbonRegionFrame ? env.gibbonRegionFrame.prepare(read) : read().catch(() => {});
   }
   env.addEventListener('storage', event => {
     if (event.key !== memoDesignKey && event.key !== null) return;
@@ -33,4 +35,5 @@ export function installMemoSurfaceAppearance(env = window, root = document.docum
     apply();
   });
   env.matchMedia?.('(prefers-color-scheme: dark)').addEventListener('change', apply);
+  return initialColor;
 }

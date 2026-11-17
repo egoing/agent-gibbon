@@ -1,8 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-labelledby="title desc">
-<title id="title">보이는 네 유형의 명시적 오른쪽·바둑판 정렬</title><desc id="desc">텍스트, 이미지와 캡처, 터미널, 웹을 함께 정렬한다. 숨긴 창은 열지 않는다. 왼쪽과 Escape는 취소다.</desc>
-<rect width="900" height="360" fill="#fff"/><g font-family="sans-serif" fill="#24313c"><text x="24" y="30" font-size="20">Control Option Command · 포인터 방향</text><text x="24" y="57" font-size="14">→ 오른쪽 정렬 · ↑ 바둑판 정렬 · ↓ 숨김 / 복원 · ← 또는 Esc 취소</text></g>
+<title id="title">보이는 네 유형의 명시적 왼쪽·오른쪽 정렬</title><desc id="desc">텍스트, 이미지와 캡처, 터미널, 웹을 함께 정렬한다. 숨긴 창은 열지 않는다. 위로 메모 보기를 열고 Escape로 방향 선택을 취소한다.</desc>
+<rect width="900" height="360" fill="#fff"/><g font-family="sans-serif" fill="#24313c"><text x="24" y="30" font-size="20">Control Option Command · 포인터 방향</text><text x="24" y="57" font-size="14">← 왼쪽 정렬 · → 오른쪽 정렬 · ↑ 메모 모아보기 · ↓ 숨김 / 복원 · Esc 취소</text></g>
 <g fill="#eef1f4" stroke="#85919b"><rect x="24" y="76" width="410" height="220" rx="6"/><rect x="466" y="76" width="410" height="220" rx="6"/></g>
-<g fill="#fff3ce" stroke="#837859"><rect x="300" y="89" width="120" height="32"/><rect x="330" y="125" width="90" height="60"/><rect x="300" y="189" width="120" height="46"/><rect x="300" y="239" width="120" height="46"/><rect x="515" y="96" width="120" height="48"/><rect x="710" y="90" width="100" height="66"/><rect x="515" y="190" width="120" height="72"/><rect x="700" y="190" width="120" height="72"/></g>
-<g font-family="sans-serif" font-size="13" text-anchor="middle" fill="#24313c"><text x="360" y="110">1 텍스트</text><text x="375" y="159">2 캡처</text><text x="360" y="218">3 터미널</text><text x="360" y="268">4 웹</text><text x="575" y="126">1 텍스트</text><text x="760" y="128">2 캡처</text><text x="575" y="230">3 터미널</text><text x="760" y="230">4 웹</text></g>
-<rect x="623" y="272" width="96" height="20" rx="5" fill="#252930"/><rect x="623" y="272" width="40" height="20" rx="5" fill="#665a40"/><text x="671" y="286" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#fff">취소하기 · 5초</text>
+<g font-family="sans-serif" font-size="13" text-anchor="middle" fill="#24313c">
+<rect x="38" y="240" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="98.0" y="267.0">1 텍스트</text>
+<rect x="38" y="184" width="90" height="56" fill="#fff3ce" stroke="#837859"/><text x="83.0" y="216.0">2 캡처</text>
+<rect x="38" y="138" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="98.0" y="165.0">3 터미널</text>
+<rect x="38" y="92" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="98.0" y="119.0">4 웹</text>
+<rect x="742" y="240" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="802.0" y="267.0">1 텍스트</text>
+<rect x="772" y="184" width="90" height="56" fill="#fff3ce" stroke="#837859"/><text x="817.0" y="216.0">2 캡처</text>
+<rect x="742" y="138" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="802.0" y="165.0">3 터미널</text>
+<rect x="742" y="92" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="802.0" y="119.0">4 웹</text>
+</g>
 <g font-family="sans-serif" font-size="14" fill="#24313c"><text x="24" y="322">수동 이동·크기 변경 창도 포함 · 숨김·최소화·닫힌 창 제외 · 이미지는 비율 유지</text><text x="24" y="345">설명용 시안: 실제 크기·배치·native 검증 결과와 구분한다.</text></g></svg>

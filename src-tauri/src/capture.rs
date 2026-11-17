@@ -1,4 +1,5 @@
 //! Frozen screen selection; only app-created PNGs are exposed to note windows.
+use crate::sizing::TOOLBAR_ROW_HEIGHT;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -732,7 +733,7 @@ fn finish_selection(
     // Restore the previous app before the new editor deliberately takes focus.
     cleanup_before_create(app)?;
     if mode == SelectionMode::Web {
-        return crate::web::create(app, Some(bounds), None, None).map(|_| ());
+        return crate::web::create_region(app, bounds);
     }
     if mode == SelectionMode::Terminal {
         return crate::terminal::create_terminal(app, bounds).map(|_| ());
@@ -743,9 +744,8 @@ fn finish_selection(
     }
 }
 // Capture coordinates describe the image, not the enclosing toolbar window.
-pub const IMAGE_TOOLBAR_HEIGHT: f64 = 22.0;
 fn image_toolbar_below(image_y: i32, work_top: i32, scale: f64) -> bool {
-    f64::from(image_y) - f64::from(work_top) < IMAGE_TOOLBAR_HEIGHT * scale
+    f64::from(image_y) - f64::from(work_top) < TOOLBAR_ROW_HEIGHT * scale
 }
 pub fn image_window_bounds(bounds: &ImageNote, position_scale: f64, below: bool) -> ImageNote {
     ImageNote {
@@ -754,10 +754,10 @@ pub fn image_window_bounds(bounds: &ImageNote, position_scale: f64, below: bool)
             - if below {
                 0.0
             } else {
-                IMAGE_TOOLBAR_HEIGHT * position_scale
+                TOOLBAR_ROW_HEIGHT * position_scale
             },
         width: bounds.width,
-        height: bounds.height + IMAGE_TOOLBAR_HEIGHT,
+        height: bounds.height + TOOLBAR_ROW_HEIGHT,
     }
 }
 pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
@@ -822,31 +822,39 @@ fn create_text_note(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), Str
     let id = format!("text-{stamp}");
     let note = empty_text_note();
     app.state::<crate::storage::Store>().save(&id, &note)?;
-    let win = crate::create_window(app, &id)?;
-    app.state::<crate::AppNotes>()
-        .lock()
-        .map_err(err)?
-        .insert(id, note);
-    crate::sizing::manual_resize(win.clone(), win.state::<crate::sizing::Sizes>())?;
-    win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
-        .map_err(err)?;
-    set_position(&win, bounds.x, bounds.y)?;
+    crate::first_frame::creating(app, &crate::label(&id), SelectionMode::Text, || {
+        let win = crate::create_window(app, &id, true)?;
+        app.state::<crate::AppNotes>()
+            .lock()
+            .map_err(err)?
+            .insert(id, note);
+        crate::sizing::manual_resize(win.clone(), win.state::<crate::sizing::Sizes>())?;
+        win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
+            .map_err(err)?;
+        set_position(&win, bounds.x, bounds.y)?;
+        #[cfg(windows)]
+        crate::windows_window::set_client_rect(
+            &win,
+            tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
+            tauri::LogicalSize::new(bounds.width, bounds.height)
+                .to_physical::<u32>(win.scale_factor().map_err(err)?),
+        )?;
+        #[cfg(not(windows))]
+        win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
+            .map_err(err)?;
+        // Resizing a hidden NSWindow can shift its top edge. Reapply the
+        // selected top-left after the final size, as image placement does.
+        #[cfg(target_os = "macos")]
+        set_position(&win, bounds.x, bounds.y)?;
+        crate::first_frame::placed(&win)
+    })
+}
+pub(crate) fn show_text(win: &WebviewWindow) -> Result<(), String> {
     #[cfg(windows)]
-    crate::windows_window::set_client_rect(
-        &win,
-        tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
-        tauri::LogicalSize::new(bounds.width, bounds.height)
-            .to_physical::<u32>(win.scale_factor().map_err(err)?),
-    )?;
-    #[cfg(not(windows))]
-    win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
-        .map_err(err)?;
-    #[cfg(windows)]
-    crate::show_without_focus(&win)?;
+    crate::show_without_focus(win)?;
     #[cfg(not(windows))]
     win.show().map_err(err)?;
-    win.set_focus().map_err(err)?;
-    crate::tray::refresh(app)
+    win.set_focus().map_err(err)
 }
 fn create_note(app: &tauri::AppHandle, bytes: Vec<u8>, bounds: ImageNote) -> Result<(), String> {
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -893,14 +901,15 @@ fn create_note(app: &tauri::AppHandle, bytes: Vec<u8>, bounds: ImageNote) -> Res
         let _ = std::fs::remove_file(&path);
         return Err(error);
     }
-    let win = crate::create_window(app, &id)?;
-    app.state::<crate::AppNotes>()
-        .lock()
-        .map_err(err)?
-        .insert(id.clone(), note);
-    place(&win, &bounds)?;
-    crate::show_without_focus(&win)?;
-    crate::tray::refresh(app)
+    crate::first_frame::creating(app, &crate::label(&id), SelectionMode::Image, || {
+        let win = crate::create_window(app, &id, true)?;
+        app.state::<crate::AppNotes>()
+            .lock()
+            .map_err(err)?
+            .insert(id.clone(), note);
+        place(&win, &bounds)?;
+        crate::first_frame::placed(&win)
+    })
 }
 #[tauri::command]
 pub fn note_image(window: WebviewWindow) -> Result<String, String> {
@@ -1058,13 +1067,13 @@ mod tests {
             };
             let frame = image_window_bounds(&image, 2.0, false);
             assert_eq!(frame.x, image.x);
-            assert_eq!(frame.y + IMAGE_TOOLBAR_HEIGHT * 2.0, image.y);
+            assert_eq!(frame.y + TOOLBAR_ROW_HEIGHT * 2.0, image.y);
             assert_eq!(frame.width, image.width);
-            assert_eq!(frame.height - IMAGE_TOOLBAR_HEIGHT, image.height);
+            assert_eq!(frame.height - TOOLBAR_ROW_HEIGHT, image.height);
             let below = image_window_bounds(&image, 2.0, true);
             assert_eq!(below.y, image.y);
             assert_eq!(below.width, image.width);
-            assert_eq!(below.height - IMAGE_TOOLBAR_HEIGHT, image.height);
+            assert_eq!(below.height - TOOLBAR_ROW_HEIGHT, image.height);
         }
     }
     #[test]

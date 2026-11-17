@@ -1,0 +1,6 @@
+{
+  "identifier": "memo-overview-events",
+  "description": "Deliver native pointer hover to the local overview controls.",
+  "windows": ["memo-overview"],
+  "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
+}

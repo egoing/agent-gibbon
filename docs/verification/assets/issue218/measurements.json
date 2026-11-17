@@ -1,0 +1,219 @@
+[
+  {
+    "case": "text",
+    "id": "toolbar-218-eb0e",
+    "instance": "dev-c11bf1af1b6708ea9f381673",
+    "inspect_ok": true,
+    "body": "218 · 공통 툴바 검증",
+    "url": null,
+    "pid": 94319,
+    "binary": "/Users/egoinglee/.codex/worktrees/eb0e/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+    "window_id": 85395,
+    "window_title": "Agent Gibbon [DEV codex/38-shared-memo-toolbar · c11bf1af] — toolbar-218-eb0e",
+    "window_bounds": {
+      "X": 1748,
+      "Height": 48,
+      "Y": 1104,
+      "Width": 300
+    },
+    "toolbar": {
+      "height": 22,
+      "y": 1105,
+      "x": 1749,
+      "width": 298
+    },
+    "content": {
+      "y": 1127,
+      "width": 292,
+      "height": 21,
+      "x": 1752
+    },
+    "screenshot": "text.png"
+  },
+  {
+    "case": "image",
+    "id": "capture-218-eb0e",
+    "instance": "dev-c11bf1af1b6708ea9f381673",
+    "inspect_ok": true,
+    "body": "218 image",
+    "url": null,
+    "pid": 94319,
+    "binary": "/Users/egoinglee/.codex/worktrees/eb0e/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+    "window_id": 85392,
+    "window_title": "Agent Gibbon [DEV codex/38-shared-memo-toolbar · c11bf1af] — capture-218-eb0e",
+    "window_bounds": {
+      "X": 1748,
+      "Height": 189,
+      "Y": 915,
+      "Width": 300
+    },
+    "toolbar": {
+      "y": 915,
+      "height": 22,
+      "x": 1748,
+      "width": 300
+    },
+    "content": {
+      "y": 937,
+      "width": 300,
+      "x": 1748,
+      "height": 167
+    },
+    "screenshot": "image.png"
+  },
+  {
+    "case": "terminal",
+    "id": "terminal-218381116",
+    "instance": "dev-c11bf1af1b6708ea9f381673",
+    "inspect_ok": true,
+    "body": "218 terminal",
+    "url": null,
+    "pid": 94319,
+    "binary": "/Users/egoinglee/.codex/worktrees/eb0e/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+    "window_id": 85506,
+    "window_title": "Agent Gibbon [DEV codex/38-shared-memo-toolbar · c11bf1af] — terminal-218381116",
+    "window_bounds": {
+      "X": 150,
+      "Height": 230,
+      "Y": 180,
+      "Width": 320
+    },
+    "toolbar": {
+      "y": 181,
+      "width": 318,
+      "height": 22,
+      "x": 151
+    },
+    "content": {
+      "height": 206,
+      "y": 203,
+      "width": 318,
+      "x": 151
+    },
+    "screenshot": "terminal.png"
+  },
+  {
+    "case": "welcome",
+    "id": "web-218-eb0e",
+    "instance": "dev-c11bf1af1b6708ea9f381673",
+    "inspect_ok": true,
+    "body": "Agent Gibbon [DEV codex/38-shared-memo-toolbar · c11bf1af] — 웹 — web-218-eb0e",
+    "url": "tauri://localhost/web.html",
+    "pid": 94319,
+    "binary": "/Users/egoinglee/.codex/worktrees/eb0e/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+    "window_id": 85507,
+    "window_title": "Agent Gibbon [DEV codex/38-shared-memo-toolbar · c11bf1af] — 웹 — web-218-eb0e",
+    "window_bounds": {
+      "X": 724,
+      "Height": 400,
+      "Y": 207,
+      "Width": 600
+    },
+    "toolbar": {
+      "height": 22,
+      "y": 207,
+      "width": 600,
+      "x": 724
+    },
+    "content": {
+      "x": 724,
+      "width": 600,
+      "y": 229,
+      "height": 378
+    },
+    "screenshot": "welcome.png"
+  },
+  {
+    "case": "first",
+    "id": "web-218-nav-eb0e",
+    "instance": "dev-c11bf1af1b6708ea9f381673",
+    "inspect_ok": true,
+    "body": "Agent Gibbon [DEV codex/38-shared-memo-toolbar · c11bf1af] — 웹 — web-218-nav-eb0e",
+    "url": "http://127.0.0.1:62109/first",
+    "pid": 94319,
+    "binary": "/Users/egoinglee/.codex/worktrees/eb0e/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+    "window_id": 85551,
+    "window_title": "Agent Gibbon [DEV codex/38-shared-memo-toolbar · c11bf1af] — 웹 — web-218-nav-eb0e",
+    "window_bounds": {
+      "X": 724,
+      "Height": 400,
+      "Y": 207,
+      "Width": 600
+    },
+    "toolbar": {
+      "x": 724,
+      "y": 207,
+      "width": 600,
+      "height": 22
+    },
+    "content": {
+      "width": 594,
+      "x": 727,
+      "height": 375,
+      "y": 229
+    },
+    "screenshot": "first.png"
+  },
+  {
+    "case": "next",
+    "id": "web-218-nav-eb0e",
+    "instance": "dev-c11bf1af1b6708ea9f381673",
+    "inspect_ok": true,
+    "body": "Agent Gibbon [DEV codex/38-shared-memo-toolbar · c11bf1af] — 웹 — web-218-nav-eb0e",
+    "url": "http://127.0.0.1:62109/next",
+    "pid": 94319,
+    "binary": "/Users/egoinglee/.codex/worktrees/eb0e/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+    "window_id": 85551,
+    "window_title": "Agent Gibbon [DEV codex/38-shared-memo-toolbar · c11bf1af] — 웹 — web-218-nav-eb0e",
+    "window_bounds": {
+      "X": 724,
+      "Height": 400,
+      "Y": 207,
+      "Width": 600
+    },
+    "toolbar": {
+      "y": 207,
+      "width": 600,
+      "x": 724,
+      "height": 22
+    },
+    "content": {
+      "y": 229,
+      "x": 727,
+      "width": 594,
+      "height": 375
+    },
+    "screenshot": "next.png"
+  },
+  {
+    "case": "small",
+    "id": "web-218-nav-eb0e",
+    "instance": "dev-c11bf1af1b6708ea9f381673",
+    "inspect_ok": true,
+    "body": "Agent Gibbon [DEV codex/38-shared-memo-toolbar · c11bf1af] — 웹 — web-218-nav-eb0e",
+    "url": "http://127.0.0.1:62109/next",
+    "pid": 94319,
+    "binary": "/Users/egoinglee/.codex/worktrees/eb0e/agent-gibbon/src-tauri/target/debug/agent-gibbon",
+    "window_id": 85551,
+    "window_title": "Agent Gibbon [DEV codex/38-shared-memo-toolbar · c11bf1af] — 웹 — web-218-nav-eb0e",
+    "window_bounds": {
+      "X": 724,
+      "Height": 160,
+      "Y": 207,
+      "Width": 240
+    },
+    "toolbar": {
+      "height": 22,
+      "width": 240,
+      "y": 207,
+      "x": 724
+    },
+    "content": {
+      "x": 727,
+      "y": 229,
+      "width": 234,
+      "height": 135
+    },
+    "screenshot": "small.png"
+  }
+]

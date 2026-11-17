@@ -1,8 +1,11 @@
 //! Session-only user intent and open order. No event history or persisted geometry.
+mod arrangement;
+pub(crate) mod overview;
 use crate::{
     entrance::{self, Destination},
     placement::{self, Rect},
 };
+pub(crate) use arrangement::Arrangement;
 use std::{collections::BTreeMap, sync::Mutex};
 use tauri::{Manager, WebviewWindow};
 #[derive(Default)]
@@ -38,6 +41,7 @@ pub fn register(w: &WebviewWindow, already_open: bool) {
         .open(w.label(), already_open);
 }
 pub(crate) fn forget(w: &WebviewWindow) {
+    overview::forget(w);
     w.state::<Exclusions>().0.lock().unwrap().remove(w.label());
     w.state::<OpenOrder>()
         .0
@@ -193,6 +197,9 @@ fn created_at(app: &tauri::AppHandle, label: &str, id: &str) -> Option<std::time
 // Only ordinary hidden/new opens enter here. Finish obsolete reservations by
 // replacing their flight from the currently displayed frame, never by snapping.
 pub fn reflow(app: &tauri::AppHandle, opened: &WebviewWindow) -> Result<Destination, String> {
+    if overview::protects(opened) {
+        return overview::current_frame(opened);
+    }
     let mut windows: Vec<_> = crate::web::managed_windows(app)
         .into_values()
         .filter(|w| {
@@ -209,7 +216,7 @@ pub fn reflow(app: &tauri::AppHandle, opened: &WebviewWindow) -> Result<Destinat
     let mut obstacles = Vec::new();
     let mut targets = Vec::new();
     for w in windows {
-        if excluded(&w) {
+        if excluded(&w) || overview::protects(&w) {
             obstacles.push(window_rect(&w)?);
         } else {
             targets.push(w);
@@ -432,7 +439,7 @@ pub fn undo_arrangement(window: WebviewWindow) -> Result<(), String> {
 fn arrangement_rects(
     area: Rect,
     scale: f64,
-    center: bool,
+    arrangement: Arrangement,
     specs: &[placement::Item],
     images: &[Option<tauri::LogicalSize<f64>>],
     viewports: &[bool],
@@ -444,7 +451,7 @@ fn arrangement_rects(
         return Err("메모를 배치할 공간이 부족합니다".into());
     }
     let width = specs.iter().map(|s| s.width).max().unwrap();
-    let rects = if center {
+    let rects = if arrangement == Arrangement::Grid {
         let gap = (12.0 * scale / unit(scale)).round() as i64;
         let n = specs.len();
         let cols = ((n as f64 * area.width as f64 / area.height as f64)
@@ -493,7 +500,7 @@ fn arrangement_rects(
         }
         frames
     } else {
-        placement::stack(area, width, specs, &[])
+        arrangement.columns(area, width, specs)
     };
     if rects.len() != specs.len() {
         return Err("메모를 배치할 공간이 부족합니다".into());
@@ -501,18 +508,7 @@ fn arrangement_rects(
     Ok(rects)
 }
 
-pub fn arrange(app: &tauri::AppHandle, x: f64, y: f64, center: bool) -> Result<(), String> {
-    let _activity = crate::updater::activity(app)?;
-    let monitor = pointer_monitor(app, x, y)
-        .map_err(|e| e.to_string())?
-        .or_else(|| {
-            app.get_webview_window("direction-guide")
-                .and_then(|w| w.current_monitor().ok().flatten())
-        })
-        .ok_or("포인터 화면 없음")?;
-    let work = monitor.work_area();
-    let scale = monitor.scale_factor();
-    let area = native_rect(work.position, work.size, scale);
+fn visible_hosts(app: &tauri::AppHandle) -> Result<Vec<WebviewWindow>, String> {
     let mut windows = Vec::new();
     for w in crate::web::managed_windows(app).into_values() {
         let Some(id) = arrangement_id(w.label()) else {
@@ -528,27 +524,91 @@ pub fn arrange(app: &tauri::AppHandle, x: f64, y: f64, center: bool) -> Result<(
         windows.push((created, w));
     }
     windows.sort_by(|a, b| a.0.cmp(&b.0).then_with(|| a.1.label().cmp(b.1.label())));
-    if windows.is_empty() {
-        return Ok(());
-    }
+    Ok(windows.into_iter().map(|(_, window)| window).collect())
+}
+
+fn planned_frames(
+    windows: &[WebviewWindow],
+    area: Rect,
+    scale: f64,
+    arrangement: Arrangement,
+) -> Result<Vec<Rect>, String> {
     let specs: Vec<_> = windows
         .iter()
-        .map(|(_, w)| arrangement_item(w, area, scale))
+        .map(|w| arrangement_item(w, area, scale))
         .collect();
     let images: Vec<_> = windows
         .iter()
-        .map(|(_, w)| crate::sizing::image_size(w).filter(|_| !crate::sizing::folded(w)))
+        .map(|w| crate::sizing::image_size(w).filter(|_| !crate::sizing::folded(w)))
         .collect();
     let viewports: Vec<_> = windows
         .iter()
-        .map(|(_, w)| w.label().starts_with("terminal-") || w.label().starts_with("webview-"))
+        .map(|w| w.label().starts_with("terminal-") || w.label().starts_with("webview-"))
         .collect();
-    let rects = arrangement_rects(area, scale, center, &specs, &images, &viewports)?;
+    arrangement_rects(area, scale, arrangement, &specs, &images, &viewports)
+}
+
+fn move_hosts(
+    app: &tauri::AppHandle,
+    windows: &[WebviewWindow],
+    rects: Vec<Rect>,
+    scale: f64,
+    work_y: i32,
+) -> Result<(), String> {
+    for (w, r) in windows.iter().zip(rects) {
+        let u = unit(scale);
+        let dest = Destination {
+            position: tauri::PhysicalPosition::new(
+                (r.x as f64 * u).round() as i32,
+                (r.y as f64 * u).round() as i32,
+            ),
+            size: tauri::PhysicalSize::new(
+                (r.width as f64 * u).round() as u32,
+                (r.height as f64 * u).round() as u32,
+            ),
+            scale,
+        };
+        crate::sizing::cancel(w);
+        crate::warp::remember(app, w, dest.position.y.into(), work_y, scale)?;
+        entrance::transition(w, dest)?;
+    }
+    Ok(())
+}
+
+pub(crate) fn gesture_monitor(
+    app: &tauri::AppHandle,
+    x: f64,
+    y: f64,
+) -> Result<tauri::Monitor, String> {
+    pointer_monitor(app, x, y)
+        .map_err(|e| e.to_string())?
+        .or_else(|| {
+            app.get_webview_window("direction-guide")
+                .and_then(|w| w.current_monitor().ok().flatten())
+        })
+        .ok_or_else(|| "포인터 화면 없음".into())
+}
+
+pub(crate) fn arrange(
+    app: &tauri::AppHandle,
+    monitor: tauri::Monitor,
+    arrangement: Arrangement,
+) -> Result<(), String> {
+    let _activity = crate::updater::activity(app)?;
+    overview::leave(app)?;
+    let work = monitor.work_area();
+    let scale = monitor.scale_factor();
+    let area = native_rect(work.position, work.size, scale);
+    let windows = visible_hosts(app)?;
+    if windows.is_empty() {
+        return Ok(());
+    }
+    let rects = planned_frames(&windows, area, scale, arrangement)?;
     let panel = app
         .get_webview_window("layout-undo")
         .ok_or("정렬 취소 창 없음")?;
     let mut frames = Vec::new();
-    for (_, w) in &windows {
+    for w in &windows {
         frames.push((
             w.clone(),
             Destination {
@@ -560,23 +620,7 @@ pub fn arrange(app: &tauri::AppHandle, x: f64, y: f64, center: bool) -> Result<(
         ));
     }
     let apply = (|| -> Result<(), String> {
-        for ((_, w), r) in windows.into_iter().zip(rects) {
-            let u = unit(scale);
-            let dest = Destination {
-                position: tauri::PhysicalPosition::new(
-                    (r.x as f64 * u).round() as i32,
-                    (r.y as f64 * u).round() as i32,
-                ),
-                size: tauri::PhysicalSize::new(
-                    (r.width as f64 * u).round() as u32,
-                    (r.height as f64 * u).round() as u32,
-                ),
-                scale,
-            };
-            crate::sizing::cancel(&w);
-            crate::warp::remember(app, &w, dest.position.y.into(), work.position.y, scale)?;
-            entrance::transition(&w, dest)?;
-        }
+        move_hosts(app, &windows, rects, scale, work.position.y)?;
         let x = work.position.x as f64 + work.size.width as f64 / 2. - 72. * scale;
         let y = work.position.y as f64 + work.size.height as f64 - 56. * scale;
         panel
@@ -667,11 +711,11 @@ mod tests {
                 None,
                 None,
             ];
-            for center in [false, true] {
+            for arrangement in [Arrangement::Left, Arrangement::Right, Arrangement::Grid] {
                 let rects = arrangement_rects(
                     area,
                     scale,
-                    center,
+                    arrangement,
                     &specs,
                     &images,
                     &[false, false, true, true],
@@ -710,7 +754,7 @@ mod tests {
             min: 144,
             max: 420,
         }; 4];
-        for center in [false, true] {
+        for arrangement in [Arrangement::Left, Arrangement::Right, Arrangement::Grid] {
             assert!(arrangement_rects(
                 Rect {
                     x: -100,
@@ -719,7 +763,7 @@ mod tests {
                     height: 100
                 },
                 1.0,
-                center,
+                arrangement,
                 &specs,
                 &[None; 4],
                 &[true; 4]

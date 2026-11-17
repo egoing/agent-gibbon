@@ -98,6 +98,11 @@ impl RecoveryPoint {
         })
     }
 }
+pub(crate) fn recovery_point(w: &WebviewWindow) -> RecoveryPoint {
+    let state = w.app_handle().state::<State>();
+    let runtime = state.0.lock().unwrap();
+    RecoveryPoint(runtime.saved.records.get(w.label()).cloned())
+}
 pub fn begin_override(w: &WebviewWindow) -> Result<RecoveryPoint, String> {
     let actual = read(w)?;
     let state = w.app_handle().state::<State>();
@@ -112,6 +117,16 @@ pub fn begin_override(w: &WebviewWindow) -> Result<RecoveryPoint, String> {
 }
 pub fn restore_override(w: &WebviewWindow, previous: RecoveryPoint) -> Result<(), String> {
     let actual = read(w)?;
+    restore_frame(w, previous, actual)
+}
+pub fn restore_destination(
+    w: &WebviewWindow,
+    previous: RecoveryPoint,
+    d: crate::entrance::Destination,
+) -> Result<(), String> {
+    restore_frame(w, previous, frame(d.position, d.size, d.scale))
+}
+fn restore_frame(w: &WebviewWindow, previous: RecoveryPoint, actual: Frame) -> Result<(), String> {
     let screens = screens(w.app_handle())?;
     let state = w.app_handle().state::<State>();
     let mut s = state.0.lock().map_err(|e| e.to_string())?;
