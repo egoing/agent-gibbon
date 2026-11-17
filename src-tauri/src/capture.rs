@@ -525,17 +525,27 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
     for label in labels {
         let overlay = app.get_webview_window(&label).ok_or("캡처 창이 없습니다")?;
         #[cfg(target_os = "macos")]
-        {
+        let under_pointer = {
             let ptr = overlay.ns_window().map_err(err)?;
             // This command runs on the main thread. Order the prepared window
             // regardless of app activation, then activate only once below.
             unsafe {
-                (&*(ptr as *const objc2_app_kit::NSWindow)).orderFrontRegardless();
+                let native = &*(ptr as *const objc2_app_kit::NSWindow);
+                native.orderFrontRegardless();
+                let frame = native.frame();
+                let point = objc2_app_kit::NSEvent::mouseLocation();
+                (frame.origin.x..frame.origin.x + frame.size.width).contains(&point.x)
+                    && (frame.origin.y..frame.origin.y + frame.size.height).contains(&point.y)
             }
-        }
+        };
         #[cfg(not(target_os = "macos"))]
-        overlay.show().map_err(err)?;
-        focus_target = Some(overlay);
+        let under_pointer = {
+            overlay.show().map_err(err)?;
+            true
+        };
+        if focus_target.is_none() || under_pointer {
+            focus_target = Some(overlay);
+        }
     }
     trace("window ordered front");
     if let Some(overlay) = focus_target {
@@ -543,16 +553,19 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
         {
             let ptr = overlay.ns_window().map_err(err)?;
             // Activation must happen now, not on a subsequent input event.
-            unsafe {
-                (&*(ptr as *const objc2_app_kit::NSWindow)).makeKeyAndOrderFront(None);
-            }
             #[allow(deprecated)]
             objc2_app_kit::NSRunningApplication::currentApplication().activateWithOptions(
                 objc2_app_kit::NSApplicationActivationOptions::ActivateIgnoringOtherApps,
             );
+            unsafe {
+                (&*(ptr as *const objc2_app_kit::NSWindow)).makeKeyAndOrderFront(None);
+            }
         }
         #[cfg(not(target_os = "macos"))]
         overlay.set_focus().map_err(err)?;
+        // A key native window can still route keys to its parent view. Send the
+        // first Escape to the same WebView that would receive a pointer click.
+        overlay.as_ref().set_focus().map_err(err)?;
     }
     #[cfg(windows)]
     {
