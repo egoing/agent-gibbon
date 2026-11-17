@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="810" height="204" viewBox="0 0 810 204">
+<title>영역 선택 마스크 표시 순서</title>
+<defs><g id="desktop"><rect width="246" height="116" rx="4" fill="#669391"/><rect x="18" y="18" width="132" height="76" rx="4" fill="#e0d5b1"/><path d="M26 38h112M26 52h78M26 66h93" stroke="#8c8060" stroke-width="3"/></g><mask id="outside"><rect width="246" height="116" fill="white"/><rect x="78" y="37" width="96" height="55" fill="black"/></mask></defs>
+<rect width="810" height="204" fill="#fafafa"/>
+<g font-family="sans-serif" fill="#292929" font-size="15">
+<text x="16" y="25">표시 직후 · 바탕화면</text><text x="282" y="25">드래그 · 선택 밖 음영 25%</text><text x="548" y="25">마스크 퇴장 · 바탕화면 복귀</text>
+<g transform="translate(16 40)"><use xlink:href="#desktop"/></g>
+<g transform="translate(282 40)"><use xlink:href="#desktop"/><rect width="246" height="116" opacity=".25" mask="url(#outside)"/><rect x="78" y="37" width="96" height="55" fill="none" stroke="#75caff"/></g>
+<g transform="translate(548 40)"><use xlink:href="#desktop"/></g>
+<text x="16" y="186" font-size="13">음영 전환 중에도 드래그와 Esc를 받습니다. 마지막 화면은 Esc로 취소한 예시입니다.</text></g></svg>

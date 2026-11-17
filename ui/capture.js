@@ -2,6 +2,14 @@
 const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const selection = document.getElementById('selection');
 const hint = document.getElementById('hint');
+const shade = document.getElementById('shade');
+// Each display receives this after its own native window is ordered front.
+// Pointer and Escape handlers never wait for the visual transition.
+window.addEventListener('capture-shown', () => {
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.documentElement.classList.add('mask-shown');
+  }));
+}, { once: true });
 let start, rect, ready = false, busy = false;
 // Native pixels are already decoded. Draw once while hidden; do not wait on
 // image loading, base64 conversion, or PNG compression before showing selection.
@@ -30,7 +38,11 @@ document.addEventListener('pointermove', e => {
   const end = point(e);
   rect = { x:Math.min(start.x,end.x), y:Math.min(start.y,end.y), width:Math.abs(end.x-start.x), height:Math.abs(end.y-start.y) };
   Object.assign(selection.style,{left:`${rect.x}px`,top:`${rect.y}px`,width:`${rect.width}px`,height:`${rect.height}px`});
-  selection.hidden = false; document.getElementById('shade').hidden = true;
+  selection.hidden = false;
+  const {x, y, width, height} = rect;
+  // Cut the selected rectangle out of the existing dimming layer, retaining
+  // its current opacity even when a drag begins during the transition.
+  shade.style.clipPath = `polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, ${x}px ${y}px, ${x}px ${y+height}px, ${x+width}px ${y+height}px, ${x+width}px ${y}px, ${x}px ${y}px)`;
   hint.textContent = `${Math.round(rect.width)} × ${Math.round(rect.height)} · Escape 취소`;
 });
 document.addEventListener('pointerup', async () => {
@@ -52,7 +64,7 @@ document.addEventListener('keydown', e => {
   invoke('cancel_capture').catch(error => {
     busy = false;
     selection.hidden = true;
-    document.getElementById('shade').hidden = false;
+    shade.style.clipPath = '';
     hint.textContent = String(error);
   });
 });
