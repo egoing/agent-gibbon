@@ -412,6 +412,10 @@ fn memo_kind(label: &str) -> Option<MemoKind<'_>> {
         .filter(|id| !id.is_empty())
         .map(MemoKind::Web)
 }
+fn focus_allows_relations(app: &tauri::AppHandle) -> bool {
+    crate::layout::overview::active(app) || memo_focused(app)
+}
+
 fn memo_focused(app: &tauri::AppHandle) -> bool {
     // AppKit can retain a key window while a different application is active.
     #[cfg(target_os = "macos")]
@@ -474,7 +478,7 @@ fn acknowledged(pending: Option<u64>, generation: u64, paused: bool) -> bool {
 #[tauri::command]
 pub fn relation_ready(window: WebviewWindow, generation: u64) -> Result<bool, String> {
     let app = window.app_handle();
-    let has_focus = memo_focused(app);
+    let focus_allowed = focus_allows_relations(app);
     let Some(index) = window
         .label()
         .strip_prefix("relation-prototype-")
@@ -505,7 +509,7 @@ pub fn relation_ready(window: WebviewWindow, generation: u64) -> Result<bool, St
     let Some(r) = state.relations.get(index) else {
         return Ok(false);
     };
-    let paused = !has_focus
+    let paused = !focus_allowed
         || state.motion.paused(
             &endpoint_label(app, &r.from),
             &endpoint_label(app, &r.to),
@@ -680,7 +684,7 @@ fn tick(app: &tauri::AppHandle, state: &mut Prototype) -> Result<(), String> {
             crate::web::managed_window(app, label).is_some()
         },
     );
-    if !memo_focused(app) {
+    if !focus_allows_relations(app) {
         for surface in state.surfaces.values_mut() {
             if surface.pending.is_some()
                 || surface.payload.is_some()
