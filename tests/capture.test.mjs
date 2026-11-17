@@ -9,17 +9,18 @@ function selectionUI({ malformed = false, noCanvas = false } = {}) {
   const pixels = new Uint8Array([2,0,0,0,1,0,0,0,255,0,1,255,2,3,254,255]);
   let deliver;
   elements.screen.getContext = () => noCanvas ? null : { putImageData: (frame,x,y) => { frames.push({frame,x,y}); calls.push(['paint']); } };
-  const context = { innerWidth:1000, innerHeight:800,
+  const ticks = [], classes = new Set();
+  const context = {requestAnimationFrame: cb=>ticks.push(cb), innerWidth:1000, innerHeight:800,
     ImageData: class { constructor(data,width,height) { Object.assign(this,{data,width,height}); } },
-    window:{ __TAURI__:{ core:{ invoke:async (name,args) => {
+    window:{addEventListener:(name,fn)=>{events[name]=fn;}, __TAURI__:{ core:{ invoke:async (name,args) => {
       calls.push([name,args]);
       if (name==='capture_screen') return new Promise(resolve => { deliver=()=>resolve(malformed ? new ArrayBuffer(8) : pixels.buffer); });
     } } } },
-    document:{getElementById:id=>elements[id],body:{setPointerCapture(){},hasPointerCapture(){return true;},releasePointerCapture(id){ calls.push(['releasePointerCapture',id]); }},addEventListener:(name,fn)=>{events[name]=fn;}},
+    document:{documentElement:{classList:classes},getElementById:id=>elements[id],body:{setPointerCapture(){},hasPointerCapture(){return true;},releasePointerCapture(id){ calls.push(['releasePointerCapture',id]); }},addEventListener:(name,fn)=>{events[name]=fn;}},
   };
   vm.runInNewContext(readFileSync(new URL('../ui/capture.js',import.meta.url),'utf8'),context);
   const ready = async () => { deliver(); await flush(); };
-  return {events,calls,elements,ready,frames};
+  return {events,calls,elements,ready,frames,ticks,classes};
 }
 test('reverse drag clamps to the display and submits one selection',async()=>{
   const {events,calls,ready} = selectionUI(); await ready();
@@ -75,4 +76,22 @@ test('Escape releases an active drag before pointerup can commit it',async()=>{
   events.keydown({preventDefault(){},key:'Escape'});
   await events.pointerup();
   assert.deepEqual(calls.slice(-2),[['releasePointerCapture',7],['cancel_capture',undefined]]);
+});
+
+test('drag and Escape work between native presentation and the dimming transition', async () => {
+  const {events, ready, ticks, classes, calls, elements} = selectionUI();
+  await ready();
+  events['capture-shown']();
+  ticks.shift()();
+  assert.equal(classes.has('mask-shown'), false);
+  events.pointerdown({button:0,clientX:15,clientY:20,pointerId:1});
+  events.pointermove({clientX:40,clientY:60});
+  assert.equal(elements.selection.hidden, false);
+  assert.match(elements.shade.style.clipPath, /15px 20px/);
+  events.keydown({preventDefault(){},key:'Escape'});
+  await events.pointerup();
+  assert.equal(calls.filter(([name])=>name==='cancel_capture').length, 1);
+  assert.equal(calls.some(([name])=>name==='finish_capture'), false);
+  ticks.shift()();
+  assert.equal(classes.has('mask-shown'), true);
 });

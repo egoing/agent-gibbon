@@ -391,6 +391,8 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode) -> Result<(), String> {
             SelectionMode::Web => "웹 창 영역 선택 — Escape로 취소",
         })
         .decorations(false)
+        .transparent(true)
+        .background_color(tauri::window::Color(0, 0, 0, 0))
         .resizable(false)
         .always_on_top(true)
         .skip_taskbar(true)
@@ -428,6 +430,8 @@ fn cleanup(app: &tauri::AppHandle) {
         .values()
         .filter(|w| w.label().starts_with("capture-"))
     {
+        // Remove the native surface before its WebView backing store is dismantled.
+        let _ = win.hide();
         let _ = crate::stash::release(win);
         crate::focus::restore(win);
         let _ = win.destroy();
@@ -544,6 +548,9 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
             overlay.show().map_err(err)?;
             true
         };
+        overlay
+            .eval("window.dispatchEvent(new Event('capture-shown'))")
+            .map_err(err)?;
         if focus_target.is_none() || under_pointer {
             focus_target = Some(overlay);
         }
