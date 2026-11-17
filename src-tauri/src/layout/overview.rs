@@ -201,6 +201,10 @@ pub(crate) fn enter(app: &tauri::AppHandle, monitor: tauri::Monitor) -> Result<(
         },
         originals,
     });
+    // Clear pending idle fades only after the visit owns every participating host.
+    for window in windows {
+        crate::sync_opacity(window)?;
+    }
     Ok(())
 }
 
