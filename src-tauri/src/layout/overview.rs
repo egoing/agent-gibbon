@@ -1,7 +1,10 @@
-//! The entry snapshot belongs to one visit. Grid and drag operations only change live frames.
+//! Each visit owns its ordinary desktop snapshot. The last overview layout lives in memory.
 use super::{arrangement::Arrangement, *};
 use crate::monitor_layout::{self, RecoveryPoint};
-use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::{
+    atomic::{AtomicU32, Ordering},
+    Arc,
+};
 use tauri::{WebviewUrl, WebviewWindowBuilder};
 
 const BACKDROP: &str = "memo-backdrop";
@@ -11,9 +14,62 @@ const BAR_HEIGHT: f64 = 68.;
 
 #[derive(Clone)]
 struct Original {
+    host: Arc<HostIdentity>,
     frame: Destination,
     excluded: bool,
     recovery: RecoveryPoint,
+}
+
+// A recreated host may reuse the same label. Its WebView resource table is new.
+struct HostIdentity;
+impl tauri::Resource for HostIdentity {}
+
+fn host_identity(window: &WebviewWindow) -> Arc<HostIdentity> {
+    let mut resources = window.resources_table();
+    let existing = resources
+        .names()
+        .find(|(_, name)| name == std::any::type_name::<HostIdentity>())
+        .map(|(id, _)| id);
+    if let Some(host) = existing.and_then(|id| resources.get::<HostIdentity>(id).ok()) {
+        return host;
+    }
+    let host = Arc::new(HostIdentity);
+    resources.add_arc(host.clone());
+    host
+}
+
+#[derive(Clone)]
+struct RememberedLayout {
+    work: Destination,
+    screens: Vec<tauri::Monitor>,
+    frames: BTreeMap<String, (Arc<HostIdentity>, Destination)>,
+}
+
+fn same_screen(a: &tauri::Monitor, b: &tauri::Monitor) -> bool {
+    a.name() == b.name()
+        && a.position() == b.position()
+        && a.size() == b.size()
+        && a.work_area().position == b.work_area().position
+        && a.work_area().size == b.work_area().size
+        && a.scale_factor() == b.scale_factor()
+}
+
+impl RememberedLayout {
+    fn compatible(&self, monitor: &tauri::Monitor, screens: &[tauri::Monitor]) -> bool {
+        self.work.position == monitor.work_area().position
+            && self.work.size == monitor.work_area().size
+            && self.work.scale == monitor.scale_factor()
+            && self.screens.len() == screens.len()
+            && self
+                .screens
+                .iter()
+                .all(|old| screens.iter().any(|now| same_screen(old, now)))
+    }
+
+    fn frame(&self, label: &str, host: &Arc<HostIdentity>) -> Option<Destination> {
+        let (previous, frame) = self.frames.get(label)?;
+        Arc::ptr_eq(previous, host).then_some(*frame)
+    }
 }
 
 #[derive(Clone)]
@@ -33,6 +89,7 @@ struct Session {
 #[derive(Default)]
 pub(crate) struct Overview {
     session: Mutex<Option<Session>>,
+    remembered: Mutex<Option<RememberedLayout>>,
     sequence: AtomicU32,
 }
 
@@ -167,11 +224,26 @@ pub(crate) fn enter(app: &tauri::AppHandle, monitor: tauri::Monitor) -> Result<(
     let controls = utility(app, CONTROLS)?;
     let scale = monitor.scale_factor();
     let work = monitor.work_area();
+    let screens = backdrop.available_monitors().unwrap_or_default();
+    let previous = state.remembered.lock().unwrap().clone();
+    let remembered = previous
+        .as_ref()
+        .filter(|layout| layout.compatible(&monitor, &screens));
     let mut originals = BTreeMap::new();
     for window in &windows {
+        let host = host_identity(window);
+        // Immediate re-entry can interrupt the last close while it is still restoring.
+        if previous
+            .as_ref()
+            .and_then(|layout| layout.frame(window.label(), &host))
+            .is_some()
+        {
+            entrance::finish(window)?;
+        }
         originals.insert(
             window.label().to_owned(),
             Original {
+                host,
                 frame: current_frame(window)?,
                 excluded: excluded(window),
                 recovery: monitor_layout::recovery_point(window),
@@ -182,6 +254,7 @@ pub(crate) fn enter(app: &tauri::AppHandle, monitor: tauri::Monitor) -> Result<(
         .sequence
         .fetch_add(1, Ordering::Relaxed)
         .wrapping_add(1);
+    let mut repositioned = Vec::new();
     let show = (|| -> Result<(), String> {
         entrance::place(
             &backdrop,
@@ -214,6 +287,13 @@ pub(crate) fn enter(app: &tauri::AppHandle, monitor: tauri::Monitor) -> Result<(
         for window in &windows {
             entrance::cancel(window)?;
             crate::sizing::cancel(window);
+            let original = &originals[window.label()];
+            if let Some(frame) =
+                remembered.and_then(|layout| layout.frame(window.label(), &original.host))
+            {
+                repositioned.push((window, original.frame));
+                entrance::place(window, frame)?;
+            }
             crate::stash::show_frame(window)?;
             crate::opacity::set_native(window, 1.0)?;
         }
@@ -222,6 +302,11 @@ pub(crate) fn enter(app: &tauri::AppHandle, monitor: tauri::Monitor) -> Result<(
     if let Err(e) = show {
         let _ = controls.hide();
         let _ = hide_backdrop(&backdrop);
+        for (window, frame) in repositioned {
+            if let Err(rollback) = entrance::place(window, frame) {
+                eprintln!("모아보기 진입 위치 복구 실패: {rollback}");
+            }
+        }
         return Err(e);
     }
     *state.session.lock().unwrap() = Some(Session {
@@ -288,6 +373,9 @@ fn close(app: &tauri::AppHandle, session: &Session, animate: bool) -> Result<(),
         let Some(w) = crate::web::managed_window(app, label) else {
             continue;
         };
+        if !Arc::ptr_eq(&host_identity(&w), &original.host) {
+            continue;
+        }
         entrance::cancel(&w)?;
         crate::sizing::cancel(&w);
         let live = current_frame(&w)?;
@@ -355,11 +443,46 @@ pub(crate) fn overview_action(
     }
 }
 
+fn remember_layout(app: &tauri::AppHandle, session: &Session) -> Result<RememberedLayout, String> {
+    let screens = utility(app, BACKDROP)?
+        .available_monitors()
+        .map_err(error)?;
+    let mut frames = BTreeMap::new();
+    for window in visible_hosts(app)? {
+        let frame = current_frame(&window)?;
+        let cx = i64::from(frame.position.x) + i64::from(frame.size.width) / 2;
+        let cy = i64::from(frame.position.y) + i64::from(frame.size.height) / 2;
+        if screens.iter().any(|screen| {
+            let area = screen.work_area();
+            let x = i64::from(area.position.x);
+            let y = i64::from(area.position.y);
+            (x..x + i64::from(area.size.width)).contains(&cx)
+                && (y..y + i64::from(area.size.height)).contains(&cy)
+                && screen.scale_factor() == frame.scale
+        }) {
+            frames.insert(window.label().to_owned(), (host_identity(&window), frame));
+        }
+    }
+    Ok(RememberedLayout {
+        work: session.work,
+        screens,
+        frames,
+    })
+}
+
 fn finish_visit(app: &tauri::AppHandle, generation: u32, animate: bool) -> Result<(), String> {
     let state = app.state::<Overview>();
     let mut labels = Vec::new();
     state.finish(generation, |session| {
+        let remembered = remember_layout(app, session);
         close(app, session, animate)?;
+        match remembered {
+            Ok(layout) => *state.remembered.lock().unwrap() = Some(layout),
+            Err(e) => {
+                state.remembered.lock().unwrap().take();
+                eprintln!("모아보기 배치 기억 실패: {e}");
+            }
+        }
         labels.extend(session.originals.keys().cloned());
         Ok(())
     })?;
@@ -495,6 +618,7 @@ mod tests {
             originals: BTreeMap::from([(
                 "note-example".into(),
                 Original {
+                    host: Arc::new(HostIdentity),
                     frame,
                     excluded: true,
                     recovery: RecoveryPoint::default(),
