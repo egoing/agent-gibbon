@@ -1,4 +1,5 @@
 //! Frozen screen selection; only app-created PNGs are exposed to note windows.
+use crate::sizing::TOOLBAR_ROW_HEIGHT;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use serde::{Deserialize, Serialize};
 use std::{
@@ -743,9 +744,8 @@ fn finish_selection(
     }
 }
 // Capture coordinates describe the image, not the enclosing toolbar window.
-pub const IMAGE_TOOLBAR_HEIGHT: f64 = 22.0;
 fn image_toolbar_below(image_y: i32, work_top: i32, scale: f64) -> bool {
-    f64::from(image_y) - f64::from(work_top) < IMAGE_TOOLBAR_HEIGHT * scale
+    f64::from(image_y) - f64::from(work_top) < TOOLBAR_ROW_HEIGHT * scale
 }
 pub fn image_window_bounds(bounds: &ImageNote, position_scale: f64, below: bool) -> ImageNote {
     ImageNote {
@@ -754,10 +754,10 @@ pub fn image_window_bounds(bounds: &ImageNote, position_scale: f64, below: bool)
             - if below {
                 0.0
             } else {
-                IMAGE_TOOLBAR_HEIGHT * position_scale
+                TOOLBAR_ROW_HEIGHT * position_scale
             },
         width: bounds.width,
-        height: bounds.height + IMAGE_TOOLBAR_HEIGHT,
+        height: bounds.height + TOOLBAR_ROW_HEIGHT,
     }
 }
 pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
@@ -1058,13 +1058,13 @@ mod tests {
             };
             let frame = image_window_bounds(&image, 2.0, false);
             assert_eq!(frame.x, image.x);
-            assert_eq!(frame.y + IMAGE_TOOLBAR_HEIGHT * 2.0, image.y);
+            assert_eq!(frame.y + TOOLBAR_ROW_HEIGHT * 2.0, image.y);
             assert_eq!(frame.width, image.width);
-            assert_eq!(frame.height - IMAGE_TOOLBAR_HEIGHT, image.height);
+            assert_eq!(frame.height - TOOLBAR_ROW_HEIGHT, image.height);
             let below = image_window_bounds(&image, 2.0, true);
             assert_eq!(below.y, image.y);
             assert_eq!(below.width, image.width);
-            assert_eq!(below.height - IMAGE_TOOLBAR_HEIGHT, image.height);
+            assert_eq!(below.height - TOOLBAR_ROW_HEIGHT, image.height);
         }
     }
     #[test]
