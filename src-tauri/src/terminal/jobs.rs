@@ -81,11 +81,15 @@ impl OwnedJobs {
 
     pub(super) fn stop(self) {
         #[cfg(target_os = "macos")]
-        let signals_ok = self.tokens.iter().fold(true, |previous, token| {
-            // Attempt each independently; ESRCH can also mean exec changed
-            // the identity. Do not substitute its numeric PID.
-            (unsafe { gibbon_stop_job(token.as_ptr()) } == 0) && previous
-        });
+        let signals_ok = {
+            let mut signals_ok = true;
+            for token in &self.tokens {
+                // Attempt each independently; ESRCH can also mean exec changed
+                // the identity. Do not substitute its numeric PID.
+                signals_ok &= unsafe { gibbon_stop_job(token.as_ptr()) } == 0;
+            }
+            signals_ok
+        };
         #[cfg(not(target_os = "macos"))]
         let signals_ok = true;
         if self.unverified || !signals_ok {
