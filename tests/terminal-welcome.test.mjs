@@ -41,6 +41,7 @@ function ui({exitCode=null,grid=null,ipc=null,restoreSupported=true,plan=null,re
    context.matchMedia=()=>({matches:false});
    context.ResizeObserver=class{constructor(callback){grid.observed=callback;}observe(){}};
  }
+ vm.runInNewContext(readFileSync(new URL('../ui/content-size.js',import.meta.url),'utf8'),context);
  vm.runInNewContext(readFileSync(new URL('../ui/terminal.js',import.meta.url),'utf8'),context);return {elements,calls,intervals,info};
 }
 test('no history uses home preview and retains folder picker and shell without autostart',async()=>{const {elements,calls}=ui();await flush();assert.equal(elements['home-hint'].hidden,false);assert.equal(elements['recent-folders'].children.length,0);assert.equal(calls.some(([n])=>n==='terminal_start'),false);assert.equal(typeof elements['choose-folder'].onclick,'function');assert.ok(elements.recommendations.children.some(b=>b.dataset.choice==='shell'));assert.match(elements['command-preview'].textContent,/cd -- '\/home\/test'/);});

@@ -92,18 +92,12 @@ function contentAction() { return invoke('content_action').catch(failure); }
 
 for (const id of ['toolbar-previous', 'toolbar-next']) $(id).addEventListener('click', contentAction);
 document.addEventListener('wheel', contentAction, { passive: true });
-const fontSizes = [12, 14, 16, 18];
-let fontIndex = 0;
-$('font-size').addEventListener('click', () => {
+window.gibbonContentSize.bind('text', $('font-size'), size => {
   contentAction();
-  fontIndex = (fontIndex + 1) % fontSizes.length;
-  const size = fontSizes[fontIndex];
   document.documentElement.style.setProperty('--font-size', `${size}px`);
   needsFit = true;
   fitContent();
-  $('font-size').title = `글자 크기 ${size}px · 클릭하여 변경`;
-  $('font-size').setAttribute('aria-label', `글자 크기 ${size}px, 클릭하여 변경`);
-});
+}, failure);
 function editorChanged(state) {
   const wasDirty = editing;
   editing = state.dirty;
@@ -290,6 +284,7 @@ async function refresh(schedule = true) {
         if (editorState.conflict && editing && !notice?.text?.includes('외부')) notify(externalDraftMessage, 'error', true);
         else if (sourceProtected && !notice) notify('지원하지 않는 문법의 손실을 막기 위해 원문을 보호하고 있습니다. 원문 복사를 사용할 수 있습니다.', 'error', true);
       }
+      window.gibbonMemoToolbar.setKind(state.note.capture ? 'image' : 'text');
       $('font-size').disabled = !!state.note.capture;
       $('copy').disabled = false;
       const copyLabel = state.note.capture ? '이미지 복사' : sourceProtected ? '원문 복사' : '본문 복사';
@@ -333,7 +328,6 @@ async function refresh(schedule = true) {
         editor.focus();
       }
       $('pin').setAttribute('aria-pressed', String(state.always_on_top));
-      $('warp').setAttribute('data-direction', state.warp_right ? 'right' : 'left');
       await fitContent(flow);
       const reading = memoVisible && (state.focused || state.feedback_surface?.focused);
       if (reading && !editing && !composition && !sourceProtected) readRevision = state.note.revision;
@@ -458,20 +452,9 @@ for (const event of ['tauri://focus', 'tauri://blur']) {
   window.__TAURI__.event.listen(event, () => refresh(false), { target: { kind: 'Window', label: win.label } }).catch(failure);
 }
 
-function showWarpTip() {
-  if (isMac) notify('Option만 누른 채 메모에 포인터를 올려도 이동할 수 있습니다', 'tip');
-}
-let warping = false;
-$('warp').addEventListener('click', async () => {
-  if (warping) return;
-  warping = true;
-  try { await invoke('warp_note'); showWarpTip(); }
-  catch (error) { failure(error); }
-  finally { warping = false; }
-});
 async function pollWarp() {
   try {
-    if (!warping) await invoke('poll_warp');
+    await invoke('poll_warp');
   } catch (error) { failure(error); }
   setTimeout(pollWarp, 100);
 }

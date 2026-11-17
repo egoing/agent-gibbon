@@ -175,19 +175,24 @@ fn record(app: &tauri::AppHandle, id: &str) -> Result<Record, String> {
 // Wry 0.57 macOS url() unwraps WKWebView.URL even before a document exists.
 // Read the public nullable property directly and report unknown as null. Do not
 // confuse the last allowed navigation target with the committed/current URL.
+#[cfg(target_os = "macos")]
+fn native_page_url(platform: tauri::webview::PlatformWebview) -> Option<String> {
+    unsafe {
+        let native = &*platform.inner().cast::<objc2::runtime::AnyObject>();
+        let url: Option<objc2::rc::Retained<objc2_foundation::NSURL>> =
+            objc2::msg_send![native, URL];
+        url.and_then(|url| url.absoluteString())
+            .map(|url| url.to_string())
+    }
+}
+
 fn current_webview_url(view: &tauri::Webview, session: &Arc<Session>) -> Option<String> {
     #[cfg(target_os = "macos")]
     {
         let observed = session.urls.lock().ok()?.current.clone();
         let session = session.clone();
-        view.with_webview(move |platform| unsafe {
-            let native = &*platform.inner().cast::<objc2::runtime::AnyObject>();
-            let url: Option<objc2::rc::Retained<objc2_foundation::NSURL>> =
-                objc2::msg_send![native, URL];
-            let value = url
-                .and_then(|url| url.absoluteString())
-                .map(|s| s.to_string());
-            session.urls.lock().unwrap().current = value;
+        view.with_webview(move |platform| {
+            session.urls.lock().unwrap().current = native_page_url(platform);
         })
         .ok()?;
         // Native callbacks may be deferred. Return only an actually observed
@@ -371,12 +376,8 @@ fn content_bounds(chrome: &tauri::Webview) -> Result<tauri::Rect, String> {
     );
     let top = inset + crate::sizing::TOOLBAR_ROW_HEIGHT;
     Ok(tauri::Rect {
-        position: tauri::LogicalPosition::new(3.0, top).into(),
-        size: tauri::LogicalSize::new(
-            (size.width - 6.0).max(1.0),
-            (size.height - top - 3.0).max(1.0),
-        )
-        .into(),
+        position: tauri::LogicalPosition::new(0.0, top).into(),
+        size: tauri::LogicalSize::new(size.width.max(1.0), (size.height - top).max(1.0)).into(),
     })
 }
 fn new_id() -> String {
@@ -481,6 +482,7 @@ pub(crate) fn create_presented(
                 .min_inner_size(240.0, 160.0)
                 .always_on_top(true)
                 .decorations(false)
+                .resizable(true)
                 .visible(false)
                 .focused(false)
                 .on_navigation(|url| {
@@ -490,9 +492,12 @@ pub(crate) fn create_presented(
                         && ((url.scheme() == "tauri" && url.host_str() == Some("localhost"))
                             || (matches!(url.scheme(), "http" | "https")
                                 && url.host_str() == Some("tauri.localhost")))
-                })
-                .build()
-                .map_err(err)?;
+                });
+        // Without an undecorated shadow Tauri places a transparent native resize
+        // hit region around all four Windows client edges, above child WebViews.
+        #[cfg(windows)]
+        let window = window.shadow(false);
+        let window = window.build().map_err(err)?;
         if let Some(b) = bounds {
             #[cfg(windows)]
             window
@@ -743,8 +748,34 @@ fn end_session(id: &str, r: &Record) -> Result<(), String> {
         })
     })
 }
+// Read the attached child's current URL for this click, including redirects and
+// same-document navigation. Never copy the Welcome URL or an earlier observation.
+async fn committed_page_url(child: &tauri::Webview) -> Result<String, String> {
+    #[cfg(target_os = "macos")]
+    let url = {
+        let (tx, mut rx) = tauri::async_runtime::channel(1);
+        child
+            .with_webview(move |platform| {
+                let _ = tx.try_send(native_page_url(platform));
+            })
+            .map_err(err)?;
+        rx.recv()
+            .await
+            .flatten()
+            .ok_or("현재 페이지 주소가 없습니다")?
+    };
+    #[cfg(not(target_os = "macos"))]
+    let url = child.url().map_err(err)?.to_string();
+    validate_url(&url)?;
+    Ok(url)
+}
+
 #[tauri::command]
-pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String> {
+pub async fn web_chrome(
+    view: tauri::Webview,
+    action: String,
+    scale: Option<f64>,
+) -> Result<Value, String> {
     let id = view
         .label()
         .strip_prefix("webview-")
@@ -756,6 +787,26 @@ pub fn web_chrome(view: tauri::Webview, action: String) -> Result<Value, String>
     }
     match action.as_str() {
         "inspect" => inspect(window.app_handle(), id),
+        "copy-url" | "zoom" => {
+            use tauri_plugin_clipboard_manager::ClipboardExt;
+            let child = view
+                .app_handle()
+                .get_webview(&format!("webpage-{id}"))
+                .ok_or("열린 웹페이지가 없습니다")?;
+            if action == "copy-url" {
+                let url = committed_page_url(&child).await?;
+                if r.session.closing() {
+                    return Err("웹 창 종료 중입니다".into());
+                }
+                view.app_handle().clipboard().write_text(url).map_err(err)?;
+            } else {
+                let scale = scale
+                    .filter(|value| (0.5..=2.0).contains(value))
+                    .ok_or("지원하지 않는 페이지 배율입니다")?;
+                child.set_zoom(scale).map_err(err)?;
+            }
+            Ok(json!({"ok":true}))
+        }
         "drag" => {
             crate::monitor_layout::manual(&window);
             crate::relation_prototype::start_drag(&window)?;

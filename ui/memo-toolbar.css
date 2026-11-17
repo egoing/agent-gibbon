@@ -1,0 +1,36 @@
+/* Shared row, paging, and fold controls for all memo surfaces. */
+#controls {
+  --icon-size: var(--toolbar-icon-size);
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  flex: 0 0 var(--toolbar-row-height);
+  width: 100%;
+  height: var(--toolbar-row-height);
+  gap: 1px;
+  padding: 0 3px;
+  background: var(--background);
+}
+#controls button {
+  flex: 0 0 var(--toolbar-target);
+  height: var(--toolbar-row-height);
+  min-height: var(--toolbar-row-height);
+  padding: 0;
+}
+#toolbar-items { display: flex; align-items: center; min-width: 0; margin-left: auto; gap: 1px; overflow: hidden; }
+#controls > button[aria-disabled="true"] { opacity: .4; cursor: default; }
+#controls button:focus { outline: none; }
+#controls button:focus-visible { outline: 2px solid color-mix(in srgb, var(--foreground) 28%, transparent); outline-offset: -2px; }
+@media (forced-colors: active) {
+  #controls button:focus-visible { outline-color: Highlight; }
+}
+#controls button:is(:hover, [data-pointer-over]):not(:disabled) { background: color-mix(in srgb, var(--foreground) 16%, var(--background)); }
+#chrome-title { display: none; min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+body.toolbar-collapsed #chrome-title { display: block; align-self: center; font: 400 12px/var(--toolbar-row-height) -apple-system, BlinkMacSystemFont, sans-serif; letter-spacing: normal; }
+body.toolbar-collapsed #title { max-width: none; font: inherit; }
+body.toolbar-collapsed :is(#toolbar-items, #toolbar-previous, #toolbar-next) { display: none; }
+body.toolbar-collapsed #toolbar-toggle svg { transform: rotate(180deg); }
+body.folded #controls > :is(#toolbar-toggle, #close) { display: inline-flex !important; }
+body.toolbar-collapsed > #controls { margin: 1px 0; }

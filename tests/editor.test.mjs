@@ -90,10 +90,10 @@ test('image notes keep native copy and shortcut export with no text editor',asyn
   await app.key('s',{ctrlKey:true});assert.equal(app.calls.some(([n])=>n==='export_note'),true);
   await app.element('copy').listeners.click();assert.equal(app.calls.some(([n])=>n==='copy_note_image'),true);
 });
-test('font sizing, monitor direction and native rollover remain independent of editing',async()=>{
+test('font sizing, monitor polling and native rollover remain independent of editing',async()=>{
   const app=await setup();app.input('초안');
-  for(const size of [14,16,18,12]){app.element('font-size').listeners.click();assert.equal(app.styles['--font-size'],`${size}px`);}
-  app.state.warp_right=true;await app.refresh();assert.equal(app.element('warp').attributes['data-direction'],'right');
+  for(const size of [14,16,18,10,12]){await app.element('font-size').onclick();assert.equal(app.styles['--font-size'],`${size}px`);}
+  assert.ok(app.calls.some(([name])=>name==='poll_warp'));
   app.nativeEvents['note-pointer-over']({payload:true});assert.equal(app.classes.has('pointer-over'),true);assert.equal(app.draft(),'초안');
 });
 test('Escape flushes changes before hiding and close refuses to discard a failed save',async()=>{
@@ -152,9 +152,9 @@ test('copy ignores removed diff text and does not acknowledge a change',async()=
   await app.element('copy').listeners.click();assert.equal(app.calls.find(([n])=>n==='clipboard-text')[1],'실제 본문');
   assert.equal(app.calls.some(([n])=>n==='acknowledge_feedback'),false);
 });
-test('clipboard failure and warp failure report actual errors without erasing draft',async()=>{
+test('clipboard failure reports the actual error without erasing draft',async()=>{
   const app=await setup();app.input('초안 보존');app.failCopy('복사 실패');await app.element('copy').listeners.click();assert.equal(app.view().message,'복사 실패');
-  app.failWarp('이동 실패');await app.element('warp').listeners.click();assert.equal(app.view().message,'이동 실패');assert.equal(app.draft(),'초안 보존');
+  assert.equal(app.draft(),'초안 보존');
 });
 test('image export failures preserve state and can retry',async()=>{
   const app=await setup({capture:{width:10,height:10}});app.failExport('내보내기 실패');await app.key('s',{ctrlKey:true});assert.equal(app.view().message,'내보내기 실패');assert.equal(app.busy(),false);

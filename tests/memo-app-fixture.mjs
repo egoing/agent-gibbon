@@ -16,7 +16,7 @@ export async function setup(initial = {}, state = {}, platform = 'MacIntel') {
     return elements.get(id);
   };
   let note = { revision: 1, markdown: '# 원문', html: '<h1>원문</h1>', color: '#dfe2dd', ...initial };
-  let copyError, exportError, warpError, acknowledgementError;
+  let copyError, exportError, acknowledgementError;
   let draft, base, dirty = false, composing = false, protectedSource = false, locked = false, onChange, error, saveDelay;
   const status = () => ({dirty, composing, protected:protectedSource,revision:base?.revision});
   const adapter = {
@@ -37,7 +37,7 @@ export async function setup(initial = {}, state = {}, platform = 'MacIntel') {
       createElement:()=>({style:{},setAttribute(){},remove(){},get innerText(){return this.innerHTML.replace(/<[^>]+>/g,'').trim();}}),
       documentElement:{style:{setProperty(k,v){styles[k]=v;}},addEventListener(){}},
     },
-    window:{getSelection:()=>({toString:()=>state.selection || ''}),__TAURI__:{
+    window:{gibbonMemoToolbar:{setKind(kind){state.toolbarKind=kind;}},getSelection:()=>({toString:()=>state.selection || ''}),__TAURI__:{
       clipboardManager:{async writeText(text){if(copyError)throw copyError;calls.push(['clipboard-text',text]);}},
       window:{getCurrentWindow:()=>({label:'note-fixture',startResizeDragging:async()=>{}})},
       event:{async listen(name,fn,options){nativeEvents[name]=fn;nativeTargets[name]=options?.target;return ()=>{};}},
@@ -49,7 +49,6 @@ export async function setup(initial = {}, state = {}, platform = 'MacIntel') {
         if(name==='toggle_fold')return state.folded=!state.folded;
         if(name==='acknowledge_feedback'){if(acknowledgementError)throw acknowledgementError;return note.revision===args.revision;}
         if(name==='export_note'){if(exportError)throw exportError;return '/tmp/export.md';}
-        if(name==='warp_note'&&warpError)throw warpError;
         if(name==='save_note'){
           if(saveDelay)await saveDelay;
           if(error)throw error;
@@ -59,12 +58,13 @@ export async function setup(initial = {}, state = {}, platform = 'MacIntel') {
       }},
     }},
   });
+  vm.runInContext(readFileSync(new URL('../ui/content-size.js',import.meta.url),'utf8'),context);
   vm.runInContext(readFileSync(new URL('../ui/app.js',import.meta.url),'utf8').replace(/^import .*;$/gm,''),context);
   const settle=()=>new Promise(setImmediate);
   await settle();
   const refresh=async()=>{await timers.find(fn=>fn.name==='refresh')();await settle();};
   return {element,calls,events,nativeEvents,nativeTargets,classes,styles,adapter,state,
-    failCopy(value){copyError=value;},failExport(value){exportError=value;},failWarp(value){warpError=value;},failAcknowledgement(value){acknowledgementError=value;},
+    failCopy(value){copyError=value;},failExport(value){exportError=value;},failAcknowledgement(value){acknowledgementError=value;},
     flushAutosave:async()=>{const fn=timers.find(fn=>fn.name==='autosaveTick');if(fn){timers.splice(timers.indexOf(fn),1);await fn();await settle();}},
     refresh,settle, note:()=>note, draft:()=>draft,locked:()=>locked,
     input(value){draft=value;dirty=value!==base.markdown;element('editor').innerText=value;onChange(status());},

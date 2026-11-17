@@ -61,7 +61,7 @@ try {
      // WebView's actual bounds and IPC isolation require native verification.
      await page.evaluate(()=>{
        const frame=document.createElement('iframe');frame.srcdoc='<p>External content fixture</p>';
-       Object.assign(frame.style,{position:'fixed',left:'3px',top:'var(--toolbar-row-height)',width:'calc(100% - 6px)',height:'calc(100% - var(--toolbar-row-height) - 3px)',border:'0'});
+       Object.assign(frame.style,{position:'fixed',left:'0',top:'var(--toolbar-row-height)',width:'100%',height:'calc(100% - var(--toolbar-row-height))',border:'0'});
        document.body.append(frame);
      });
    }

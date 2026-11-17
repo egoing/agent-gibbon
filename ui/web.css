@@ -13,8 +13,7 @@ main[hidden] { display: none; }
 #status:empty { display: none; }
 @media (max-width: 420px), (max-height: 300px) { main { padding: 16px; } }
 
-/* Keep resize grips reachable when the native titlebar is removed. Remote
-   content reserves matching 3px side/bottom strips in web.rs. */
+/* Welcome retains its DOM grips. Native host edges resize over remote content. */
 #controls { cursor: move; }
 body.toolbar-collapsed .resize { display: none; }
 

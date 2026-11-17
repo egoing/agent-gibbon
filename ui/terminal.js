@@ -4,7 +4,7 @@ const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
 const win = window.__TAURI__.window.getCurrentWindow();
 const status = document.getElementById('status');
 const clock = () => window.performance?.now?.() || 0;
-const terminal = new Terminal({fontSize:13,fontFamily:'Menlo, Monaco, monospace',cursorBlink:true,scrollback:3000,allowProposedApi:false,theme:{background:'#20252e',foreground:'#f0f0f0'},screenReaderMode:false});
+const terminal = new Terminal({fontSize:window.gibbonContentSize.defaultValue('terminal'),fontFamily:'Menlo, Monaco, monospace',cursorBlink:true,scrollback:3000,allowProposedApi:false,theme:{background:'#20252e',foreground:'#f0f0f0'},screenReaderMode:false});
 const fit = new FitAddon.FitAddon();
 terminal.loadAddon(fit);
 terminal.open(document.getElementById('terminal'));
@@ -204,10 +204,7 @@ setInterval(()=>{if(started && !ended)invoke('terminal_info').then(setInfo).catc
 document.getElementById('pin').onclick=async()=>{
   try { await invoke('toggle_pin'); const button=document.getElementById('pin'); button.setAttribute('aria-pressed',String(button.getAttribute('aria-pressed')!=='true')); } catch(e){report(e);}
 };
-document.getElementById('font-size').onclick=()=>{
-  const sizes=[13,14,16,18];terminal.options.fontSize=sizes[(sizes.indexOf(terminal.options.fontSize)+1)%sizes.length];
-  const button=document.getElementById('font-size');button.title=`글자 크기 ${terminal.options.fontSize}px · 클릭하여 변경`;button.setAttribute('aria-label',button.title);scheduleMeasure();
-};
-document.getElementById('copy').onclick=()=>{
-  const text=terminal.getSelection();if(text)window.__TAURI__.clipboardManager.writeText(text).catch(report);
-};
+window.gibbonContentSize.bind('terminal', document.getElementById('font-size'), size => {
+  terminal.options.fontSize = size;
+  scheduleMeasure();
+}, report);

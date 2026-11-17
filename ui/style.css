@@ -12,15 +12,12 @@
 * { box-sizing: border-box; }
 body { user-select: none; -webkit-user-select: none; cursor: grab; margin: 0; height: 100vh; background: transparent; overflow: hidden; display: flex; flex-direction: column; }
 #viewport { flex: 1; min-height: 0; padding: var(--memo-padding); overflow: auto; overflow-wrap: anywhere; }
-/* Toolbar overlays content without participating in its layout. */
-#controls { position: absolute; top: 3px; right: 3px; z-index: 2; display: flex; gap: 1px; margin: 0; padding: 1px; background: var(--background); border-radius: var(--surface-radius); }
 #content { display: contents; }
 button { display: inline-flex; align-items: center; justify-content: center; width: var(--toolbar-target); height: var(--toolbar-target); padding: 2px; border: 0; border-radius: var(--button-radius); color: inherit; background: transparent; cursor: pointer; }
 button svg { width: var(--icon-size); height: var(--icon-size); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 button:hover { background: var(--panel); }
 button:focus-visible { background: var(--panel); outline: 1px solid var(--border); }
 #pin[aria-pressed=false] svg { opacity: .45; }
-#warp:not([data-direction=right]) .warp-right, #warp[data-direction=right] .warp-left { display: none; }
 body:active { cursor: grabbing; }
 h1, h2, h3, h4, h5, h6 { line-height: 1.3; margin: 5px 0 3px; }
 h1 { font-size: 1.25rem; } h2 { font-size: 1.167rem; } h3 { font-size: 1.083rem; }
@@ -72,7 +69,6 @@ body.folded, body.folded:active { cursor: pointer; }
 #fold-title { font-size: 10px; line-height: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
 
 body.folded #viewport { padding: 0 2px; }
-body.folded #controls { top: 0; right: 2px; padding: 0; }
 body.folded #fold-toggle { width: 12px; height: 10px; padding: 0; border-radius: 0; }
 body.folded #fold-toggle svg { width: 10px; height: 10px; }
 
@@ -84,96 +80,13 @@ body.folded #fold-toggle svg { transform: none; }
 body.image-note:not(.folded) #viewport { position: absolute; inset: 0; padding: 0; overflow: hidden; }
 body.image-note:not(.folded) #content { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
 body.image-note #content img { display: block; width: 100%; height: 100%; object-fit: contain; }
-body.image-note:not(.folded) #controls { position: absolute; top: 3px; right: 3px; z-index: 2; margin: 0; background: var(--background); border-radius: 4px; }
 body.image-note :is(#font-size, #save) { display: none; }
 
-/* Hidden at rest; native pointer tracking also supports inactive windows. */
-body #controls { opacity: 0; pointer-events: none; }
-body:hover #controls,
-body.pointer-over #controls,
-body #controls:has(:focus-visible) { opacity: 1; pointer-events: auto; }
-
-
 /* Shared compact chrome is independent of content font size. */
-#memo-surface { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; overflow: hidden; border: var(--surface-border) solid transparent; border-radius: var(--frame-corners); background: var(--background); clip-path: inset(0 round var(--frame-corners)); }
-#controls { max-width: calc(100% - 6px); flex-wrap: nowrap; justify-content: flex-end; }
-#controls button { flex: 0 0 var(--toolbar-target); }
-body.folded #controls button { flex-basis: 12px; }
-#controls button:focus { outline: none; }
-
-
-/* One row fits the 32px minimum height. Paging keeps every action reachable. */
-#toolbar-items { display: flex; gap: 1px; min-width: 0; overflow: hidden; align-items: center; }
-#controls > button { flex-shrink: 0; }
-#controls > button[aria-disabled="true"] { opacity: .4; cursor: default; }
-body.folded #toolbar-items { overflow: visible; }
-
-/* A quiet ring supplements the focus background without dimming the icon. */
-#controls button:focus-visible { outline: 2px solid color-mix(in srgb, var(--foreground) 28%, transparent); outline-offset: -2px; }
-@media (forced-colors: active) {
-  #controls button:focus-visible { outline-color: Highlight; }
-}
-
-/* Persistent toolbar row shared by all memo types. */
-#controls { position: relative; top: auto; right: auto; flex: 0 0 var(--toolbar-row-height); width: 100%; max-width: 100%; height: var(--toolbar-row-height); padding: 0 3px; border-radius: 0; opacity: 1; pointer-events: auto; }
-body #controls { opacity: 1; pointer-events: auto; }
-#chrome-title { display: none; min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
-#toolbar-items { margin-left: auto; }
-body.toolbar-collapsed #chrome-title { display: block; }
-body.toolbar-collapsed :is(#toolbar-items, #toolbar-previous, #toolbar-next) { display: none; }
-body.toolbar-collapsed #toolbar-toggle svg { transform: rotate(180deg); }
+#memo-surface { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: var(--frame-corners); background: var(--background); clip-path: inset(0 round var(--frame-corners)); }
 body.image-note:not(.folded) #viewport { position: relative; inset: auto; flex: 1; min-height: 0; }
-body.image-note:not(.folded) #controls { position: relative; top: auto; right: auto; }
-body.folded #controls { display: none; }
-
-/* Folding keeps the two rightmost controls in the same slots. */
-#toolbar-toggle, #close { flex: 0 0 var(--toolbar-target); }
-#toolbar-toggle { order: 3; }
-#close { order: 4; }
-#toolbar-items { margin-left: auto; }
-#fold-toggle { display: none !important; }
 body.toolbar-collapsed :is(#viewport, #welcome, #terminal, #status, main) { display: none !important; }
-body.folded #controls { display: flex; top: auto; right: auto; padding: 2px 3px; }
-body.folded #controls > :is(#toolbar-toggle, #close) { display: inline-flex !important; width: var(--toolbar-target); height: var(--toolbar-target); flex-basis: var(--toolbar-target); }
-body.folded #chrome-title { display: block; }
 body.folded #fold-title { display: none; }
-
-/* Match the compact collapsed Stickies bar while keeping button columns stable. */
-body.toolbar-collapsed #controls {
-  flex: 0 0 22px;
-  height: 22px;
-  min-height: 22px;
-  max-height: 22px;
-  padding: 0 3px;
-  align-items: center;
-}
-body.toolbar-collapsed #chrome-title {
-  height: 22px;
-  font: 400 12px/22px -apple-system, BlinkMacSystemFont, sans-serif;
-  letter-spacing: normal;
-  align-self: center;
-}
-body.toolbar-collapsed #title { max-width: none; font: inherit; line-height: inherit; }
-body.toolbar-collapsed #controls > :is(#toolbar-toggle, #close) {
-  width: var(--toolbar-target);
-  flex-basis: var(--toolbar-target);
-  height: 22px;
-  min-height: 22px;
-  padding: 0;
-  align-self: center;
-}
-body.toolbar-collapsed #controls > :is(#toolbar-toggle, #close) svg { width: 12px; height: 12px; }
-body.toolbar-collapsed header { height: 22px; min-height: 22px; }
-
-body.toolbar-collapsed > #controls { margin: 1px 0; }
-
-/* Both states use the same compact icon and button geometry. */
-#controls { --icon-size: 12px; padding: 0 3px; align-items: flex-start; }
-#controls button { height: 22px; min-height: 22px; padding: 0; }
-body.toolbar-collapsed #controls { align-items: flex-start; }
-#controls button:is(:hover, [data-pointer-over]):not(:disabled) {
-  background: color-mix(in srgb, var(--foreground) 16%, var(--background));
-}
 
 /* One permanent editable surface; dirty state never changes the layout. */
 body.text-note:not(.folded) #viewport { padding-top: 0; }
@@ -207,8 +120,9 @@ body.dirty #save { background: var(--panel); }
 .selection-format button[data-format=strike_through] { text-decoration: line-through; }
 @media (forced-colors: active) { .selection-format button:focus-visible { outline-color: Highlight; } }
 
-/* The native capture window adds toolbar space outside the original image. */
-body.image-note #memo-surface { border-width:0; }
+/* Reveal the desktop through contain letterboxing and transparent image pixels. */
+body.image-note:not(.folded):not(.toolbar-collapsed) #memo-surface { background: transparent; }
+body.image-note #feedback { background: var(--background); }
 
 body.image-note.capture-toolbar-below:not(.toolbar-collapsed):not(.folded) #controls { order:1; }
 
