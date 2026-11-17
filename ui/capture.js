@@ -23,7 +23,7 @@ invoke('capture_screen').then(async bytes => {
 const point = e => ({ x: Math.max(0,Math.min(innerWidth,e.clientX)), y:Math.max(0,Math.min(innerHeight,e.clientY)) });
 document.addEventListener('pointerdown', e => {
   if (!ready || busy || e.button !== 0) return;
-  start = point(e); rect = null; document.body.setPointerCapture(e.pointerId);
+  start = { ...point(e), pointerId: e.pointerId }; rect = null; document.body.setPointerCapture(e.pointerId);
 });
 document.addEventListener('pointermove', e => {
   if (!start || busy) return;
@@ -41,6 +41,19 @@ document.addEventListener('pointerup', async () => {
   catch(error) { hint.textContent = `${error} · Escape로 닫기`; busy = false; }
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && !busy) invoke('cancel_capture').catch(error => { hint.textContent = String(error); });
+  if (e.key !== 'Escape' || busy) return;
+  e.preventDefault();
+  busy = true;
+  if (start && document.body.hasPointerCapture(start.pointerId)) {
+    document.body.releasePointerCapture(start.pointerId);
+  }
+  start = null;
+  rect = null;
+  invoke('cancel_capture').catch(error => {
+    busy = false;
+    selection.hidden = true;
+    document.getElementById('shade').hidden = false;
+    hint.textContent = String(error);
+  });
 });
 document.addEventListener('contextmenu',e => e.preventDefault());

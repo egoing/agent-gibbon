@@ -15,7 +15,7 @@ function selectionUI({ malformed = false, noCanvas = false } = {}) {
       calls.push([name,args]);
       if (name==='capture_screen') return new Promise(resolve => { deliver=()=>resolve(malformed ? new ArrayBuffer(8) : pixels.buffer); });
     } } } },
-    document:{getElementById:id=>elements[id],body:{setPointerCapture(){}},addEventListener:(name,fn)=>{events[name]=fn;}},
+    document:{getElementById:id=>elements[id],body:{setPointerCapture(){},hasPointerCapture(){return true;},releasePointerCapture(id){ calls.push(['releasePointerCapture',id]); }},addEventListener:(name,fn)=>{events[name]=fn;}},
   };
   vm.runInNewContext(readFileSync(new URL('../ui/capture.js',import.meta.url),'utf8'),context);
   const ready = async () => { deliver(); await flush(); };
@@ -33,7 +33,7 @@ test('reverse drag clamps to the display and submits one selection',async()=>{
 test('click without drag creates no note; Escape cancels',async()=>{
   const {events,calls,ready} = selectionUI(); await ready();
   events.pointerdown({button:0,clientX:40,clientY:30,pointerId:1}); await events.pointerup();
-  events.keydown({key:'Escape'});
+  events.keydown({preventDefault(){},key:'Escape'});
   assert.equal(calls.filter(([name])=>name==='finish_capture').length,0);
   assert.equal(calls.filter(([name])=>name==='cancel_capture').length,1);
 });
@@ -59,4 +59,20 @@ test('the first pointer press after paint immediately starts selection',async()=
   events.pointermove({clientX:80,clientY:90}); await events.pointerup();
   const result=calls.find(([name])=>name==='finish_capture');
   assert.deepEqual(JSON.parse(JSON.stringify(result[1])),{x:10,y:20,width:70,height:70});
+});
+
+test('the first Escape cancels without a click even while shortcut modifiers are held',async()=>{
+  const {events,calls,ready} = selectionUI(); await ready();
+  events.keydown({preventDefault(){},key:'Escape',ctrlKey:true,shiftKey:true});
+  events.keydown({preventDefault(){},key:'Escape',repeat:true});
+  assert.equal(calls.filter(([name])=>name==='cancel_capture').length,1);
+});
+
+test('Escape releases an active drag before pointerup can commit it',async()=>{
+  const {events,calls,ready} = selectionUI(); await ready();
+  events.pointerdown({button:0,clientX:10,clientY:20,pointerId:7});
+  events.pointermove({clientX:80,clientY:90});
+  events.keydown({preventDefault(){},key:'Escape'});
+  await events.pointerup();
+  assert.deepEqual(calls.slice(-2),[['releasePointerCapture',7],['cancel_capture',undefined]]);
 });
