@@ -14,7 +14,7 @@ use std::{
 };
 use tauri::{ipc::Channel, Emitter, Manager, WebviewWindow};
 
-#[cfg(test)]
+#[cfg(all(test, unix))]
 use std::io::Read;
 mod jobs;
 use jobs::OwnedJobs;
