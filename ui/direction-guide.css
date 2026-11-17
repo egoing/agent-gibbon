@@ -11,9 +11,9 @@ body:not(.restoring) .restore,
 body.restoring .hide {
   visibility: hidden;
 }
-.tile   { --x: 0px;   --y: 77px; }
+.overview   { --x: 0px;   --y: 77px; }
 .right  { --x: -72px; --y: 0px; }
-.cancel { --x: 77px;  --y: 0px; }
+.left { --x: 77px;  --y: 0px; }
 .down   { --x: 0px;   --y: -77px; }
 
 @media (prefers-reduced-motion: no-preference) {

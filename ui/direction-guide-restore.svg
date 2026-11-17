@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="232" height="232" viewBox="0 0 240 240" role="img" aria-labelledby="title">
-<title id="title">위 바둑판 정렬, 오른쪽 정렬, 아래 복원, 왼쪽 또는 Esc 취소</title>
+<title id="title">위 메모 모아보기, 오른쪽 정렬, 아래 복원, 왼쪽 정렬, Esc 취소</title>
 <g>
 <animateTransform attributeName="transform" type="translate" from="0 77" to="0 0" dur=".16s" fill="freeze"/>
 <animate attributeName="opacity" from="0" to="1" dur=".16s" fill="freeze"/>
-<g xmlns="http://www.w3.org/2000/svg" fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><path d="M99 22h18v18H99z M123 22h18v18h-18z M99 46h18v18H99z M123 46h18v18h-18z" />
+<g xmlns="http://www.w3.org/2000/svg" fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><rect x="96" y="23" width="34" height="27" rx="3"/><rect x="110" y="36" width="34" height="27" rx="3" stroke-width="4"/>
 </g>
 </g>
 <g>
@@ -15,7 +15,7 @@
 <g>
 <animateTransform attributeName="transform" type="translate" from="77 0" to="0 0" dur=".16s" fill="freeze"/>
 <animate attributeName="opacity" from="0" to="1" dur=".16s" fill="freeze"/>
-<g xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#080808" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path stroke="white" stroke-width="11" d="m27 104 32 32m0-32-32 32" /><path d="m27 104 32 32m0-32-32 32" />
+<g id="left" fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><rect x="24" y="100" width="32" height="7" rx="3"/><rect x="24" y="116.5" width="48" height="7" rx="3"/><rect x="24" y="133" width="24" height="7" rx="3"/>
 </g>
 </g>
 <g>

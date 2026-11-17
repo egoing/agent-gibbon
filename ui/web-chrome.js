@@ -14,5 +14,7 @@
     event.preventDefault();
     invoke('web_chrome', { action: `resize-${handle.dataset.direction}` }).catch(report);
   }));
-  invoke('web_chrome', { action: 'inspect' }).then(apply).catch(report);
+  const initialize = () => invoke('web_chrome', { action: 'inspect' }).then(apply);
+  if (window.gibbonRegionFrame) window.gibbonRegionFrame.prepare(initialize);
+  else initialize().catch(report);
 })();

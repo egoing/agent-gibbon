@@ -305,7 +305,7 @@ fn hide(w: &WebviewWindow) -> Result<(), String> {
     crate::relation_prototype::changed(w.app_handle(), w.label());
     w.hide().map_err(err)
 }
-fn show(w: &WebviewWindow) -> Result<(), String> {
+pub(crate) fn show(w: &WebviewWindow) -> Result<(), String> {
     crate::stash::release(w)?;
     #[cfg(target_os = "macos")]
     unsafe {
@@ -379,6 +379,28 @@ fn content_bounds(chrome: &tauri::Webview) -> Result<tauri::Rect, String> {
         .into(),
     })
 }
+fn new_id() -> String {
+    format!(
+        "web-{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_nanos()
+    )
+}
+pub fn create_region(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), String> {
+    let id = new_id();
+    crate::memo_color::create(&app.state::<crate::storage::Store>().0, &id)?;
+    crate::first_frame::creating(
+        app,
+        &format!("webview-{id}"),
+        crate::capture::SelectionMode::Web,
+        || {
+            create_presented(app, Some(bounds), Some(&id), None, false)?;
+            crate::first_frame::placed(&record(app, &id)?.host)
+        },
+    )
+}
 pub fn create(
     app: &tauri::AppHandle,
     bounds: Option<ImageNote>,
@@ -401,15 +423,7 @@ pub(crate) fn create_presented(
     url: Option<&str>,
     present: bool,
 ) -> Result<Value, String> {
-    let id = id.map(str::to_owned).unwrap_or_else(|| {
-        format!(
-            "web-{}",
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap_or_default()
-                .as_nanos()
-        )
-    });
+    let id = id.map(str::to_owned).unwrap_or_else(new_id);
     let parsed = url.map(validate_url).transpose()?;
     // Restored pre-palette windows retain their legacy color. New windows get
     // a color once; navigation and recreation reuse their persistent sidecar.
@@ -461,6 +475,7 @@ pub(crate) fn create_presented(
         crate::focus::remember(app, &label);
         let window =
             tauri::WebviewWindowBuilder::new(app, &label, WebviewUrl::App("web.html".into()))
+                .accept_first_mouse(crate::memo_window_config(app).accept_first_mouse)
                 .title(host_title(&id))
                 .inner_size(600.0, 400.0)
                 .min_inner_size(240.0, 160.0)
@@ -486,15 +501,15 @@ pub(crate) fn create_presented(
                     b.y.round() as i32,
                 ))
                 .map_err(err)?;
-            #[cfg(not(windows))]
-            window
-                .set_position(tauri::LogicalPosition::new(b.x, b.y))
-                .map_err(err)?;
             window
                 .set_size(tauri::LogicalSize::new(
                     b.width.max(240.0),
                     b.height.max(160.0),
                 ))
+                .map_err(err)?;
+            #[cfg(not(windows))]
+            window
+                .set_position(tauri::LogicalPosition::new(b.x, b.y))
                 .map_err(err)?;
         }
         let handle = app.clone();

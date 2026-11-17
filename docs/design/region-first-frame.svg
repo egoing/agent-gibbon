@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="284" viewBox="0 0 780 284">
+  <title>영역 드래그로 만든 새 메모의 첫 표시</title>
+  <desc>왼쪽은 드래그를 마친 직후 메모가 준비되는 동안의 화면이며 오른쪽은 확정한 테마와 내용이 함께 보이는 첫 화면이다.</desc>
+  <rect width="780" height="284" fill="#fafafa"/>
+  <g font-family="Arial, sans-serif" fill="#252525">
+    <text x="24" y="33" font-size="20" font-weight="bold">영역 메모의 첫 표시</text>
+    <text x="24" y="68" font-size="15">드래그를 놓은 직후</text>
+    <text x="416" y="68" font-size="15">메모의 첫 화면</text>
+    <rect x="24" y="82" width="340" height="138" rx="5" fill="#d3d5d2"/>
+    <rect x="416" y="82" width="340" height="138" rx="5" fill="#d3d5d2"/>
+    <path d="M375 150h22m-7-6 7 6-7 6" fill="none" stroke="#626460" stroke-width="2"/>
+    <rect x="458" y="100" width="252" height="102" rx="4" fill="#6baa92" stroke="#557e6e"/>
+    <path d="M458 123h252" stroke="#557e6e"/>
+    <text x="469" y="116" font-size="11" fill="#172a23">메모 도구</text>
+    <path d="M470 137v15" stroke="#172a23"/>
+    <text x="24" y="246" font-size="14">선택 마스크가 닫히고 배경이 보입니다.</text>
+    <text x="416" y="246" font-size="14">선택한 위치에 준비된 메모가 나타납니다.</text>
+    <text x="416" y="267" font-size="12" fill="#51534f">예시 · 컬러 디자인의 빈 텍스트 메모</text>
+  </g>
+</svg>

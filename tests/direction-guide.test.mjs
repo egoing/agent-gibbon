@@ -24,11 +24,13 @@ test('open and repeat reuse the same icon nodes and expose the next action', () 
     window.showDirectionGuide(restoring);
     assert.match(title.textContent, restoring ? /아래로 전체 복원/ : /아래로 전체 숨기기/);
     assert.match(title.textContent, /Esc 키로 취소/);
+    assert.match(title.textContent, /위로 메모 모아보기/);
+    assert.match(title.textContent, /왼쪽으로 왼쪽 정렬/);
     assert.equal(classes.has('restoring'), restoring);
     assert.equal(classes.has('open'), true);
     assert.equal(classes.has('closing'), false);
   }
   const references = [...read('direction-guide.html').matchAll(/<use [^>]*href="([^"#]+)#([^"]+)"/g)];
-  assert.deepEqual(references.map(match => match[2]), ['tile', 'right', 'cancel', 'hide', 'restore']);
+  assert.deepEqual(references.map(match => match[2]), ['overview', 'right', 'left', 'hide', 'restore']);
   for (const [, file, id] of references) assert.ok(read(file).includes(`<g id="${id}"`));
 });

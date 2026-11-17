@@ -3,6 +3,7 @@ mod entrance;
 mod export;
 mod feedback;
 mod feedback_window;
+mod first_frame;
 mod focus;
 mod instance;
 mod ipc;
@@ -64,15 +65,24 @@ fn label(id: &str) -> String {
         format!("note-{id}")
     }
 }
-fn create_window(app: &tauri::AppHandle, id: &str) -> Result<tauri::WebviewWindow, String> {
+// The configured main memo is the template for all trusted memo hosts.
+fn memo_window_config(app: &tauri::AppHandle) -> &tauri::utils::config::WindowConfig {
+    &app.config().app.windows[0]
+}
+fn create_window(
+    app: &tauri::AppHandle,
+    id: &str,
+    region: bool,
+) -> Result<tauri::WebviewWindow, String> {
     let _timing = telemetry::Timing::new("window.create");
     telemetry::checkpoint("window.create");
-    let mut config = app.config().app.windows[0].clone();
+    let mut config = memo_window_config(app).clone();
     config.label = label(id);
     config.title = format!("{} — {id}", instance::current().title());
     focus::remember(app, &config.label);
-    let win = tauri::WebviewWindowBuilder::from_config(app, &config)
-        .map_err(|e| e.to_string())?
+    let builder =
+        tauri::WebviewWindowBuilder::from_config(app, &config).map_err(|e| e.to_string())?;
+    let win = first_frame::prepare_builder(builder, region)
         .build()
         .map_err(|e| e.to_string())?;
     // Region-created notes also have a stable place if later re-included.
@@ -150,6 +160,19 @@ fn sync_pointer(window: &tauri::WebviewWindow) -> Result<bool, String> {
 // Called by synchronous commands and the IPC main-thread handler only.
 #[tauri::command]
 fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
+    if layout::overview::protects(&window)
+        || matches!(window.label(), "memo-backdrop" | "memo-overview")
+    {
+        sync_pointer(&window)?;
+        #[cfg(any(target_os = "macos", windows))]
+        window
+            .state::<opacity::Fades>()
+            .lock()
+            .unwrap()
+            .remove(window.label());
+        opacity::set_native(&window, 1.0)?;
+        return Ok(1.0);
+    }
     if stash::owns(&window)
         || window.label() == "stash-indicator"
         || window.label().starts_with("capture-")
@@ -490,7 +513,7 @@ fn apply_with_presentation(
     let win = if let Some(win) = app.get_webview_window(&label(&id)) {
         win
     } else {
-        create_window(app, &id)?
+        create_window(app, &id, false)?
     };
     feedback::changed(&win, existing.as_ref(), &next)?;
     if matches!(request.action, Action::Open | Action::Close)
@@ -549,6 +572,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(privacy::Privacy::default())
         .manage(telemetry::Runtime::default())
         .manage(capture::Captures::default())
+        .manage(first_frame::Pending::default())
         .manage(terminal::Terminals::default())
         .manage(web::Windows::default())
         .manage(ClosedNotes::default())
@@ -573,6 +597,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             let handler: Box<dyn Fn(tauri::ipc::Invoke) -> bool + Send + Sync> =
                 Box::new(tauri::generate_handler![
                     layout::undo_arrangement,
+                    layout::overview::overview_action,
                     capture::permission_guide,
                     updater::updater_status,
                     updater::updater_check,
@@ -621,6 +646,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     feedback_window::feedback_action,
                     capture::capture_screen,
                     capture::capture_ready,
+                    first_frame::region_frame_placement,
+                    first_frame::region_frame_ready,
                     capture::capture_failed,
                     capture::finish_capture,
                     capture::cancel_capture,
@@ -687,6 +714,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         })
         .on_window_event(|win, event| {
             monitor_layout::native_event(win, event);
+            if matches!(event, tauri::WindowEvent::Destroyed) {
+                first_frame::cancel(win.app_handle(), win.label());
+            }
             if win.label() == "relation-settings" {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                     api.prevent_close();
@@ -739,7 +769,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                             let _ = terminal::request_close(&w);
                         }
                         tauri::WindowEvent::Focused(false)
-                            if !w.is_always_on_top().unwrap_or(true) =>
+                            if !w.is_always_on_top().unwrap_or(true)
+                                && !layout::overview::protects(&w) =>
                         {
                             let _ = terminal::terminal_hide(w);
                         }
@@ -818,7 +849,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             monitor_layout::initialize(app.handle());
             terminal::restore(app.handle())?;
             for id in ids {
-                let win = create_window(app.handle(), &id)?;
+                let win = create_window(app.handle(), &id, false)?;
                 let capture = app
                     .state::<AppNotes>()
                     .lock()

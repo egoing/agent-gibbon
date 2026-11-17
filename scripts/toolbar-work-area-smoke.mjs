@@ -17,7 +17,7 @@ try {
  await page.route('http://gibbon.test/**',route=>{
    const file=path.join(root,'ui',new URL(route.request().url()).pathname);
    if(file.endsWith('/terminal-scrollbar.mjs')) return route.fulfill({body:'export function installTerminalScrollbar() {}',contentType:'text/javascript'});
-   if(/\.js$/.test(file)&&!file.endsWith('/toolbar.js')&&!file.endsWith('/overlay-scrollbar.js')&&!(fullWeb&&/\/web(?:-chrome|-recent)?\.js$/.test(file))) return route.fulfill({body:'',contentType:'text/javascript'});
+   if(/\.js$/.test(file)&&!file.endsWith('/toolbar.js')&&!file.endsWith('/overlay-scrollbar.js')&&!file.endsWith('/region-frame.js')&&!(fullWeb&&/\/web(?:-chrome|-recent)?\.js$/.test(file))) return route.fulfill({body:'',contentType:'text/javascript'});
    return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.css')?'text/css':/\.m?js$/.test(file)?'text/javascript':'text/html'});
  });
  for(const kind of ['text','image','terminal','web']) {

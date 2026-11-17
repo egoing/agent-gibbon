@@ -37,6 +37,7 @@ let sourceProtected = false;
 let editor;
 let editorHeightRequested = false;
 let initialInputHandled = false;
+let firstFrameReady = false;
 let editorReady;
 function ensureEditor() { return editorReady ||= createMemoEditor($('editor'), editorChanged).then(value => { editor = value; return value; }); }
 let saving = false;
@@ -258,10 +259,14 @@ async function exportNote() {
 }
 $('export').addEventListener('click', exportNote);
 async function refresh(schedule = true) {
+  let region = false;
+  let firstFrameColor = '#20252e';
   try {
     await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('note.refresh', async flow => {
+      region = !firstFrameReady && await window.gibbonRegionFrame?.placement;
       const state = await flow.invoke('snapshot');
       flow.stage('response');
+      firstFrameColor = state.note.color;
       if (!state.note.capture) await ensureEditor();
       if (state.note.revision < revision) return;
       latestNote = state.note;
@@ -313,6 +318,7 @@ async function refresh(schedule = true) {
           const img = document.createElement('img');
           img.alt = '화면 캡처'; img.draggable = false;
           img.src = await invoke('note_image');
+          if (region) await img.decode();
           $('content').replaceChildren(img);
         }
         displayedHtml = html;
@@ -320,6 +326,8 @@ async function refresh(schedule = true) {
         editor.highlight(html);
         displayedHtml = html;
       }
+      if (region) await window.gibbonRegionFrame.ready();
+      firstFrameReady = true;
       if (!initialInputHandled && state.note.edit_on_open && !state.note.capture && memoVisible && !state.folded && !folded) {
         initialInputHandled = true;
         editor.focus();
@@ -341,7 +349,15 @@ async function refresh(schedule = true) {
         flow.frame?.();
       }
     });
-  } catch (error) { failure(error); }
+  } catch (error) {
+    if (region) {
+      // The snapshot, editor or image can fail before a hidden window has any
+      // visible feedback. Present a themed error and let normal refresh retry.
+      applyMemoAppearance(firstFrameColor);
+      renderFeedback({message: String(error), error: true, buttons: []});
+      await window.gibbonRegionFrame.ready().catch(failure);
+    } else failure(error);
+  }
   if (schedule) setTimeout(refresh, 350);
 }
 for (const grip of document.querySelectorAll('.resize')) {

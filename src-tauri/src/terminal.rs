@@ -302,49 +302,52 @@ pub(crate) fn open_presented(
         let window = {
             let _creation = crate::telemetry::Timing::new("terminal.window.create");
             crate::telemetry::checkpoint("terminal.window.create");
-            tauri::WebviewWindowBuilder::new(
+            let builder = tauri::WebviewWindowBuilder::new(
                 app,
                 id,
                 tauri::WebviewUrl::App("terminal.html".into()),
-            )
-            .on_web_resource_request(|_, response| {
-                // xterm generates cell/theme CSS at runtime. Scope this exception
-                // to terminal WebViews; script policy and memo windows stay strict.
-                if let Some(header) = response.headers_mut().get_mut("Content-Security-Policy") {
-                    if let Ok(policy) = header.to_str() {
-                        let mut directives: std::collections::HashMap<
-                            String,
-                            tauri::utils::config::CspDirectiveSources,
-                        > = tauri::utils::config::Csp::Policy(policy.into()).into();
-                        directives.insert(
-                            "style-src".into(),
-                            tauri::utils::config::CspDirectiveSources::List(vec![
-                                "'self'".into(),
-                                "'unsafe-inline'".into(),
-                            ]),
-                        );
-                        if let Ok(value) = tauri::utils::config::Csp::from(directives)
-                            .to_string()
-                            .parse()
-                        {
-                            *header = value;
+            );
+            crate::first_frame::prepare_builder(builder, !present)
+                .accept_first_mouse(crate::memo_window_config(app).accept_first_mouse)
+                .on_web_resource_request(|_, response| {
+                    // xterm generates cell/theme CSS at runtime. Scope this exception
+                    // to terminal WebViews; script policy and memo windows stay strict.
+                    if let Some(header) = response.headers_mut().get_mut("Content-Security-Policy")
+                    {
+                        if let Ok(policy) = header.to_str() {
+                            let mut directives: std::collections::HashMap<
+                                String,
+                                tauri::utils::config::CspDirectiveSources,
+                            > = tauri::utils::config::Csp::Policy(policy.into()).into();
+                            directives.insert(
+                                "style-src".into(),
+                                tauri::utils::config::CspDirectiveSources::List(vec![
+                                    "'self'".into(),
+                                    "'unsafe-inline'".into(),
+                                ]),
+                            );
+                            if let Ok(value) = tauri::utils::config::Csp::from(directives)
+                                .to_string()
+                                .parse()
+                            {
+                                *header = value;
+                            }
                         }
                     }
-                }
-            })
-            .title(format!("{} — {id}", crate::instance::current().title()))
-            .decorations(false)
-            .transparent(true)
-            .resizable(true)
-            .min_inner_size(2.0, 2.0)
-            .inner_size(agent.bounds.width, agent.bounds.height)
-            .always_on_top(true)
-            .skip_taskbar(true)
-            .visible(false)
-            .focused(false)
-            .background_throttling(tauri::utils::config::BackgroundThrottlingPolicy::Disabled)
-            .build()
-            .map_err(err)?
+                })
+                .title(format!("{} — {id}", crate::instance::current().title()))
+                .decorations(false)
+                .transparent(true)
+                .resizable(true)
+                .min_inner_size(2.0, 2.0)
+                .inner_size(agent.bounds.width, agent.bounds.height)
+                .always_on_top(true)
+                .skip_taskbar(true)
+                .visible(false)
+                .focused(false)
+                .background_throttling(tauri::utils::config::BackgroundThrottlingPolicy::Disabled)
+                .build()
+                .map_err(err)?
         };
         {
             let _position = crate::telemetry::Timing::new("terminal.window.position");
@@ -368,6 +371,10 @@ pub(crate) fn open_presented(
     if !present {
         return Ok(());
     }
+    show(&win)
+}
+pub(crate) fn show(win: &tauri::WebviewWindow) -> Result<(), String> {
+    let app = win.app_handle();
     let _show = crate::telemetry::Timing::new("terminal.window.show");
     if crate::opacity::configured(app).is_some() {
         crate::sync_opacity(win.clone())?;
@@ -379,10 +386,10 @@ pub(crate) fn open_presented(
             .orderFrontRegardless();
     }
     #[cfg(not(target_os = "macos"))]
-    crate::stash::release(&win)?;
+    crate::stash::release(win)?;
     win.show().map_err(err)?;
     #[cfg(any(target_os = "macos", windows))]
-    crate::focus::restore(&win);
+    crate::focus::restore(win);
     Ok(())
 }
 pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {

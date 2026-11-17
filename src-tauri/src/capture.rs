@@ -733,7 +733,7 @@ fn finish_selection(
     // Restore the previous app before the new editor deliberately takes focus.
     cleanup_before_create(app)?;
     if mode == SelectionMode::Web {
-        return crate::web::create(app, Some(bounds), None, None).map(|_| ());
+        return crate::web::create_region(app, bounds);
     }
     if mode == SelectionMode::Terminal {
         return crate::terminal::create_terminal(app, bounds).map(|_| ());
@@ -822,31 +822,39 @@ fn create_text_note(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), Str
     let id = format!("text-{stamp}");
     let note = empty_text_note();
     app.state::<crate::storage::Store>().save(&id, &note)?;
-    let win = crate::create_window(app, &id)?;
-    app.state::<crate::AppNotes>()
-        .lock()
-        .map_err(err)?
-        .insert(id, note);
-    crate::sizing::manual_resize(win.clone(), win.state::<crate::sizing::Sizes>())?;
-    win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
-        .map_err(err)?;
-    set_position(&win, bounds.x, bounds.y)?;
+    crate::first_frame::creating(app, &crate::label(&id), SelectionMode::Text, || {
+        let win = crate::create_window(app, &id, true)?;
+        app.state::<crate::AppNotes>()
+            .lock()
+            .map_err(err)?
+            .insert(id, note);
+        crate::sizing::manual_resize(win.clone(), win.state::<crate::sizing::Sizes>())?;
+        win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
+            .map_err(err)?;
+        set_position(&win, bounds.x, bounds.y)?;
+        #[cfg(windows)]
+        crate::windows_window::set_client_rect(
+            &win,
+            tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
+            tauri::LogicalSize::new(bounds.width, bounds.height)
+                .to_physical::<u32>(win.scale_factor().map_err(err)?),
+        )?;
+        #[cfg(not(windows))]
+        win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
+            .map_err(err)?;
+        // Resizing a hidden NSWindow can shift its top edge. Reapply the
+        // selected top-left after the final size, as image placement does.
+        #[cfg(target_os = "macos")]
+        set_position(&win, bounds.x, bounds.y)?;
+        crate::first_frame::placed(&win)
+    })
+}
+pub(crate) fn show_text(win: &WebviewWindow) -> Result<(), String> {
     #[cfg(windows)]
-    crate::windows_window::set_client_rect(
-        &win,
-        tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
-        tauri::LogicalSize::new(bounds.width, bounds.height)
-            .to_physical::<u32>(win.scale_factor().map_err(err)?),
-    )?;
-    #[cfg(not(windows))]
-    win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
-        .map_err(err)?;
-    #[cfg(windows)]
-    crate::show_without_focus(&win)?;
+    crate::show_without_focus(win)?;
     #[cfg(not(windows))]
     win.show().map_err(err)?;
-    win.set_focus().map_err(err)?;
-    crate::tray::refresh(app)
+    win.set_focus().map_err(err)
 }
 fn create_note(app: &tauri::AppHandle, bytes: Vec<u8>, bounds: ImageNote) -> Result<(), String> {
     use std::time::{SystemTime, UNIX_EPOCH};
@@ -893,14 +901,15 @@ fn create_note(app: &tauri::AppHandle, bytes: Vec<u8>, bounds: ImageNote) -> Res
         let _ = std::fs::remove_file(&path);
         return Err(error);
     }
-    let win = crate::create_window(app, &id)?;
-    app.state::<crate::AppNotes>()
-        .lock()
-        .map_err(err)?
-        .insert(id.clone(), note);
-    place(&win, &bounds)?;
-    crate::show_without_focus(&win)?;
-    crate::tray::refresh(app)
+    crate::first_frame::creating(app, &crate::label(&id), SelectionMode::Image, || {
+        let win = crate::create_window(app, &id, true)?;
+        app.state::<crate::AppNotes>()
+            .lock()
+            .map_err(err)?
+            .insert(id.clone(), note);
+        place(&win, &bounds)?;
+        crate::first_frame::placed(&win)
+    })
 }
 #[tauri::command]
 pub fn note_image(window: WebviewWindow) -> Result<String, String> {

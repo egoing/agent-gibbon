@@ -1,9 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="560" height="344" viewBox="0 0 560 344"><rect width="560" height="344" fill="#e9ecef"/><g font-family="sans-serif" fill="#24313c"><text x="24" y="29" font-size="19">방향 안내 · 아래쪽 눈은 다음 동작을 표시</text><text x="24" y="54" font-size="14">창 표시 중: 감은 눈 → 숨기기</text><text x="292" y="54" font-size="14">창 숨김 중: 뜬 눈 → 복원</text></g><g transform="translate(24,64)">
-<title id="title">위 바둑판 정렬, 오른쪽 정렬, 아래 숨기기, 왼쪽 또는 Esc 취소</title>
-<g>
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="344" viewBox="0 0 560 344"><rect width="560" height="344" fill="#e9ecef"/><g font-family="sans-serif" fill="#24313c"><text x="24" y="29" font-size="19">방향 안내 · 아래쪽 눈은 다음 동작을 표시</text><text x="24" y="54" font-size="14">창 표시 중: 감은 눈 → 숨기기</text><text x="292" y="54" font-size="14">창 숨김 중: 뜬 눈 → 복원</text></g><g transform="translate(24,64)"><g>
 
 
-<g xmlns="http://www.w3.org/2000/svg" fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><path d="M99 22h18v18H99z M123 22h18v18h-18z M99 46h18v18H99z M123 46h18v18h-18z" />
+<g xmlns="http://www.w3.org/2000/svg" fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><rect x="96" y="23" width="34" height="27" rx="3"/><rect x="110" y="36" width="34" height="27" rx="3" stroke-width="4"/>
 </g>
 </g>
 <g>
@@ -15,7 +13,7 @@
 <g>
 
 
-<g xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#080808" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path stroke="white" stroke-width="11" d="m27 104 32 32m0-32-32 32" /><path d="m27 104 32 32m0-32-32 32" />
+<g fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><rect x="24" y="100" width="32" height="7" rx="3"/><rect x="24" y="116.5" width="48" height="7" rx="3"/><rect x="24" y="133" width="24" height="7" rx="3"/>
 </g>
 </g>
 <g>
@@ -24,12 +22,10 @@
 <g xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#080808" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path stroke="white" stroke-width="11" d="M96 187q24 28 48 0m-39 8-5 7m17-2-2 9m15-10 4 8m5-13 5 6" /><path d="M96 187q24 28 48 0m-39 8-5 7m17-2-2 9m15-10 4 8m5-13 5 6" />
 </g>
 </g>
-</g><g transform="translate(292,64)">
-<title id="title">위 바둑판 정렬, 오른쪽 정렬, 아래 복원, 왼쪽 또는 Esc 취소</title>
-<g>
+</g><g transform="translate(292,64)"><g>
 
 
-<g xmlns="http://www.w3.org/2000/svg" fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><path d="M99 22h18v18H99z M123 22h18v18h-18z M99 46h18v18H99z M123 46h18v18h-18z" />
+<g xmlns="http://www.w3.org/2000/svg" fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><rect x="96" y="23" width="34" height="27" rx="3"/><rect x="110" y="36" width="34" height="27" rx="3" stroke-width="4"/>
 </g>
 </g>
 <g>
@@ -41,7 +37,7 @@
 <g>
 
 
-<g xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#080808" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"><path stroke="white" stroke-width="11" d="m27 104 32 32m0-32-32 32" /><path d="m27 104 32 32m0-32-32 32" />
+<g fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><rect x="24" y="100" width="32" height="7" rx="3"/><rect x="24" y="116.5" width="48" height="7" rx="3"/><rect x="24" y="133" width="24" height="7" rx="3"/>
 </g>
 </g>
 <g>
