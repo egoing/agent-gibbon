@@ -160,6 +160,19 @@ fn sync_pointer(window: &tauri::WebviewWindow) -> Result<bool, String> {
 // Called by synchronous commands and the IPC main-thread handler only.
 #[tauri::command]
 fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
+    if layout::overview::protects(&window)
+        || matches!(window.label(), "memo-backdrop" | "memo-overview")
+    {
+        sync_pointer(&window)?;
+        #[cfg(any(target_os = "macos", windows))]
+        window
+            .state::<opacity::Fades>()
+            .lock()
+            .unwrap()
+            .remove(window.label());
+        opacity::set_native(&window, 1.0)?;
+        return Ok(1.0);
+    }
     if stash::owns(&window)
         || window.label() == "stash-indicator"
         || window.label().starts_with("capture-")
@@ -173,19 +186,6 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
         #[cfg(windows)]
         return windows_window::opacity(&window);
         #[cfg(not(any(target_os = "macos", windows)))]
-        return Ok(1.0);
-    }
-    if layout::overview::protects(&window)
-        || matches!(window.label(), "memo-backdrop" | "memo-overview")
-    {
-        sync_pointer(&window)?;
-        #[cfg(any(target_os = "macos", windows))]
-        window
-            .state::<opacity::Fades>()
-            .lock()
-            .unwrap()
-            .remove(window.label());
-        opacity::set_native(&window, 1.0)?;
         return Ok(1.0);
     }
     if window.label() == manager::LABEL {

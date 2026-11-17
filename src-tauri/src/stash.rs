@@ -521,6 +521,11 @@ fn geometry(w: &WebviewWindow, r: Rect, scale: f64) -> Result<(), String> {
     }
 }
 fn alpha(w: &WebviewWindow, value: f64) -> Result<(), String> {
+    let value = if crate::layout::overview::protects(w) {
+        1.0
+    } else {
+        value
+    };
     #[cfg(target_os = "macos")]
     unsafe {
         (&*(w.ns_window().map_err(err)? as *const objc2_app_kit::NSWindow)).setAlphaValue(value);
