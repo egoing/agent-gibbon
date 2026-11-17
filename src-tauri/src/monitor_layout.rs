@@ -540,7 +540,12 @@ pub fn native_event(w: &tauri::Window, event: &tauri::WindowEvent) {
         };
         // Ignore display-driven events, including when the user happens to
         // have a mouse button held during a monitor transition.
-        if s.pending.is_some() || screens(app).ok().as_ref() != Some(&s.screens) {
+        // The journal consumes this flag after release. A second move
+        // cannot mark the window any further or change its recovery plan.
+        if s.manual.contains(w.label())
+            || s.pending.is_some()
+            || screens(app).ok().as_ref() != Some(&s.screens)
+        {
             return;
         }
         drop(s);

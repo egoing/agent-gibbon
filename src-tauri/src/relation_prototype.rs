@@ -375,9 +375,11 @@ fn geometry_changed(app: &tauri::AppHandle, label: &str, moved: bool) {
     }
     if let Some(state) = app.try_state::<std::sync::Mutex<Prototype>>() {
         if let Ok(mut state) = state.try_lock() {
-            if state.motion.record_change(label, Instant::now(), moved) {
-                suspend_endpoint(app, &mut state, label);
+            if !state.motion.record_change(label, Instant::now(), moved) {
+                // The drag timer already polls for release while its lines are hidden.
+                return;
             }
+            suspend_endpoint(app, &mut state, label);
         }
     }
     if let Some(tx) = WAKE.get() {
