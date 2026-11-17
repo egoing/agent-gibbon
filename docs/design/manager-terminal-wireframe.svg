@@ -11,14 +11,13 @@
 <text x="884" y="129" font-size="14" font-weight="400">설정</text>
 <path d="M280 150L280 576" stroke="#d6d6d6"/>
 <rect x="184" y="168" width="80" height="28" fill="#f8f8f8" stroke="#858585"/><text x="194" y="187" font-family="Arial, sans-serif" font-size="12">새로고침</text><text x="48" y="190" font-size="17" font-weight="600">모든 메모</text>
-<text x="40" y="220" font-size="13">메모 검색</text>
-<rect x="40" y="230" width="228" height="32" rx="4" fill="#f8f8f8" stroke="#858585"/>
-<text x="50" y="251" font-size="13" style="fill:#666666">제목 또는 본문 검색</text>
-<text x="54" y="316" font-size="16" font-weight="400">메모 관리 화면 만들기</text>
-<rect x="40" y="348" width="228" height="48" fill="#ffffff" stroke="#858585"/>
-<text x="54" y="378" font-size="16" font-weight="400">작업 폴더</text>
-<text x="54" y="440" font-size="16" font-weight="400">회의 기록</text>
-<text x="54" y="502" font-size="16">https://example.test/</text><text x="246" y="502" font-size="13">웹</text>
+<rect x="40" y="210" width="228" height="32" rx="4" fill="#f8f8f8" stroke="#858585"/>
+<text x="50" y="231" font-size="13" style="fill:#666666">제목 또는 본문 검색</text>
+<text x="54" y="296" font-size="16" font-weight="400">메모 관리 화면 만들기</text>
+<rect x="40" y="328" width="228" height="48" fill="#ffffff" stroke="#858585"/>
+<text x="54" y="358" font-size="16" font-weight="400">작업 폴더</text>
+<text x="54" y="420" font-size="16" font-weight="400">회의 기록</text>
+<text x="54" y="482" font-size="16">https://example.test/</text><text x="246" y="482" font-size="13">웹</text>
 <rect x="310" y="168" width="150" height="32" fill="#f8f8f8" stroke="#858585"/>
 <text x="325" y="190" font-size="14">화면에서 숨기기</text>
 <text x="310" y="240" font-size="21" font-weight="600">작업 폴더</text>
