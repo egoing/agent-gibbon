@@ -514,7 +514,11 @@ fn cancel_selection(window: WebviewWindow) -> Result<(), String> {
     Ok(())
 }
 
-fn end_selection(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result<(), String> {
+fn end_selection(
+    app: &tauri::AppHandle,
+    mode: SelectionMode,
+    generation: u64,
+) -> Result<(), String> {
     let cleanup = cleanup_before_create(app);
     if mode == SelectionMode::Image {
         crate::layout::overview::capture_visibility(app, generation, false)?;
@@ -763,7 +767,12 @@ fn finish_selection(
     // Restore the previous app before the new editor deliberately takes focus.
     if mode == SelectionMode::Image {
         let result = cleanup_before_create(app).and_then(|()| {
-            create_note(app, bytes.ok_or("캡처 이미지가 없습니다")?, bounds, generation)
+            create_note(
+                app,
+                bytes.ok_or("캡처 이미지가 없습니다")?,
+                bounds,
+                generation,
+            )
         });
         if result.is_err() {
             crate::layout::overview::capture_visibility(app, generation, false)?;
