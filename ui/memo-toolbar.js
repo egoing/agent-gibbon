@@ -6,9 +6,11 @@
     text: ['font-size', 'copy', 'pin'],
     image: ['export', 'copy', 'pin'],
     terminal: ['font-size', 'pin'],
-    web: ['font-size', 'copy', 'pin'],
+    web: ['web-back', 'web-reload', 'font-size', 'copy', 'pin'],
   };
   const icons = {
+    "web-reload": `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2 6M20 5v6h-6"/></svg>`,
+    "web-back": `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11 5-7 7 7 7M4 12h16"/></svg>`,
     "toolbar-previous": `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>`,
     "font-size": `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v-2h13v2" />
   <path d="M10 5v14" />
@@ -37,6 +39,8 @@
     'toolbar-previous': '이전 도구', 'toolbar-next': '다음 도구',
     'toolbar-toggle': '메모 접기', 'fold-toggle': '메모 접기',
     'font-size': kind === 'web' ? '페이지 확대/축소' : '글자 크기',
+    'web-reload': '웹페이지 새로고침',
+    'web-back': '웹페이지 뒤로',
     save: '저장 · Command S / Ctrl S', export: '파일로 저장',
     copy: kind === 'web' ? '웹 주소 복사' : '본문 복사', pin: '상단 고정',
     close: {text: '메모 창 닫기', terminal: '터미널 종료', web: '웹 창 닫기'}[kind],

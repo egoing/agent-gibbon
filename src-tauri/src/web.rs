@@ -787,6 +787,19 @@ pub async fn web_chrome(
     }
     match action.as_str() {
         "inspect" => inspect(window.app_handle(), id),
+        "back" | "reload" => {
+            let child = view
+                .app_handle()
+                .get_webview(&format!("webpage-{id}"))
+                .ok_or("열린 웹페이지가 없습니다")?;
+            if action == "back" {
+                child.eval("history.back()")
+            } else {
+                child.reload()
+            }
+            .map_err(err)?;
+            Ok(json!({"ok":true}))
+        }
         "copy-url" | "zoom" => {
             use tauri_plugin_clipboard_manager::ClipboardExt;
             let child = view
