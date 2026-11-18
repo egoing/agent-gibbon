@@ -1,5 +1,7 @@
 //! Session-only user intent and open order. No event history or persisted geometry.
 mod arrangement;
+mod free_space;
+pub(crate) use free_space::LastLayout;
 pub(crate) mod overview;
 use crate::{
     entrance::{self, Destination},
@@ -63,6 +65,9 @@ pub fn excluded(w: &WebviewWindow) -> bool {
         .unwrap_or(false)
 }
 pub fn mark(w: &WebviewWindow, geometric: bool) {
+    if geometric {
+        crate::workspace::protect(w);
+    }
     // Content edits and hidden reopens must not reflow a deliberately zoomed frame.
     if !geometric && crate::sizing::work_area_active(w) {
         return;
@@ -136,7 +141,7 @@ fn item(w: &WebviewWindow, area: Rect, scale: f64) -> placement::Item {
 
 // Explicit arrangement has a wider scope than ordinary note-open reflow.
 // Child WebViews and utility windows must never become separate targets.
-fn arrangement_id(label: &str) -> Option<&str> {
+pub(crate) fn arrangement_id(label: &str) -> Option<&str> {
     crate::memo_id_from_window(label).or_else(|| {
         ["terminal-", "webview-"]
             .iter()
@@ -387,6 +392,7 @@ fn restore_frames(frames: Frames) -> Result<(), String> {
         }
         entrance::cancel(&w)?;
         entrance::place(&w, d)?;
+        crate::workspace::remember_frame(&w, d.position, d.size);
         crate::monitor_layout::restore_override(&w, recovery)?;
         if let Some(m) = w.current_monitor().map_err(|e| e.to_string())? {
             crate::warp::remember(
@@ -556,22 +562,41 @@ fn move_hosts(
     work_y: i32,
 ) -> Result<(), String> {
     for (w, r) in windows.iter().zip(rects) {
-        let u = unit(scale);
-        let dest = Destination {
-            position: tauri::PhysicalPosition::new(
-                (r.x as f64 * u).round() as i32,
-                (r.y as f64 * u).round() as i32,
-            ),
-            size: tauri::PhysicalSize::new(
-                (r.width as f64 * u).round() as u32,
-                (r.height as f64 * u).round() as u32,
-            ),
-            scale,
-        };
-        crate::sizing::cancel(w);
-        crate::warp::remember(app, w, dest.position.y.into(), work_y, scale)?;
-        entrance::transition(w, dest)?;
+        move_host(app, w, r, scale, work_y)?;
     }
+    Ok(())
+}
+
+struct HostMove {
+    window: WebviewWindow,
+    rect: Rect,
+    scale: f64,
+    work_y: i32,
+}
+
+fn move_host(
+    app: &tauri::AppHandle,
+    w: &WebviewWindow,
+    r: Rect,
+    scale: f64,
+    work_y: i32,
+) -> Result<(), String> {
+    let u = unit(scale);
+    let dest = Destination {
+        position: tauri::PhysicalPosition::new(
+            (r.x as f64 * u).round() as i32,
+            (r.y as f64 * u).round() as i32,
+        ),
+        size: tauri::PhysicalSize::new(
+            (r.width as f64 * u).round() as u32,
+            (r.height as f64 * u).round() as u32,
+        ),
+        scale,
+    };
+    crate::sizing::cancel(w);
+    crate::warp::remember(app, w, dest.position.y.into(), work_y, scale)?;
+    entrance::transition(w, dest)?;
+    crate::workspace::remember_frame(w, dest.position, dest.size);
     Ok(())
 }
 
@@ -600,15 +625,30 @@ pub(crate) fn arrange(
     let scale = monitor.scale_factor();
     let area = native_rect(work.position, work.size, scale);
     let windows = visible_hosts(app)?;
-    if windows.is_empty() {
+    let moves = if arrangement == Arrangement::FreeSpace {
+        free_space::frames(app, windows, &monitor)?
+    } else {
+        let rects = planned_frames(&windows, area, scale, arrangement)?;
+        windows
+            .into_iter()
+            .zip(rects)
+            .map(|(window, rect)| HostMove {
+                window,
+                rect,
+                scale,
+                work_y: work.position.y,
+            })
+            .collect()
+    };
+    if moves.is_empty() {
         return Ok(());
     }
-    let rects = planned_frames(&windows, area, scale, arrangement)?;
     let panel = app
         .get_webview_window("layout-undo")
         .ok_or("정렬 취소 창 없음")?;
     let mut frames = Vec::new();
-    for w in &windows {
+    for movement in &moves {
+        let w = &movement.window;
         frames.push((
             w.clone(),
             Destination {
@@ -620,7 +660,9 @@ pub(crate) fn arrange(
         ));
     }
     let apply = (|| -> Result<(), String> {
-        move_hosts(app, &windows, rects, scale, work.position.y)?;
+        for m in moves {
+            move_host(app, &m.window, m.rect, m.scale, m.work_y)?;
+        }
         let x = work.position.x as f64 + work.size.width as f64 / 2. - 72. * scale;
         let y = work.position.y as f64 + work.size.height as f64 - 56. * scale;
         panel

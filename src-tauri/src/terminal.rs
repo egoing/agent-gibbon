@@ -16,6 +16,7 @@ use tauri::{ipc::Channel, Emitter, Manager, WebviewWindow};
 
 #[cfg(all(test, unix))]
 use std::io::Read;
+pub(crate) mod cli;
 mod jobs;
 use jobs::OwnedJobs;
 mod lifecycle;
@@ -414,7 +415,7 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
     };
     let session = slot.and_then(running);
     drop(sessions);
-    let (pid, program, size, running) = if let Some(session) = session {
+    let (pid, program, size, running, ready) = if let Some(session) = session {
         let mut s = session.lock().map_err(err)?;
         let running = observe_exit(&mut s)?;
         (
@@ -422,12 +423,13 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
             running.then(|| welcome::foreground_name(&s).unwrap_or_else(|| s.program.clone())),
             Some(s.master.get_size().map_err(err)?),
             running,
+            !welcome::busy(&mut s),
         )
     } else {
-        (None, None, None, false)
+        (None, None, None, false, false)
     };
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":bounds,"metadata_save_failed":app.state::<Terminals>().records.save_failed(id),"pid":pid,"program":program,"running":running,"exit_code":exit_status.as_ref().map(|s|s.exit_code()),"exit_signal":exit_status.as_ref().and_then(|s|s.signal()),"restored":crate::session_restore::terminal_restored(app,id),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":bounds,"metadata_save_failed":app.state::<Terminals>().records.save_failed(id),"pid":pid,"program":program,"running":running,"ready":ready,"exit_code":exit_status.as_ref().map(|s|s.exit_code()),"exit_signal":exit_status.as_ref().and_then(|s|s.signal()),"restored":crate::session_restore::terminal_restored(app,id),"focused":win.as_ref().and_then(|w|w.is_focused().ok()),"auto_layout_excluded":win.as_ref().map(crate::layout::excluded),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
     )
 }
 pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value, String> {
@@ -488,6 +490,7 @@ pub async fn terminal_start(
     choice: Option<String>,
     plan: Option<String>,
     local_flow: Option<u64>,
+    exec_request: Option<String>,
 ) -> Result<Value, String> {
     let _update_activity = crate::updater::activity(window.app_handle())?;
     let mut worker_call = {
@@ -513,11 +516,16 @@ pub async fn terminal_start(
             let end_output = output.clone();
             let events = reservation.events.take().unwrap();
             let supervisor_worker = state.workers.enter();
-            let (session, mut reader) = welcome::start(
+            let command_line = exec_request
+                .as_deref()
+                .map(|request| cli::line(&app, &id, request))
+                .transpose()?;
+            let (session, mut reader) = welcome::start_with_line(
                 &agent,
                 choice.as_deref().unwrap_or("shell"),
                 plan.as_deref(),
                 dimensions,
+                command_line,
                 move |child| {
                     std::thread::spawn(move || {
                         let _worker = supervisor_worker;
@@ -589,6 +597,11 @@ pub async fn terminal_start(
                 .map_err(err)?;
             inspect(&app, &id)
         })();
+        if result.is_err() {
+            if let Some(request) = exec_request.as_deref() {
+                cli::failed(&app, request);
+            }
+        }
         worker_call.finish(result.is_ok());
         result
     })

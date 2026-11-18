@@ -2,6 +2,7 @@ use crate::placement::{self, Item, Rect};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Arrangement {
+    FreeSpace,
     Left,
     Right,
     Grid,

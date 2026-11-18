@@ -591,7 +591,17 @@ fn tick(window: &WebviewWindow, start: Point, started: Instant) -> Result<bool, 
         "frame",
         || serde_json::json!({"flight":flight_trace(&flight),"t":t,"next":next,"actual_after":position(window).ok(),"size_after":window.outer_size().ok()}),
     );
-    flight.expected = next;
+    // AppKit can constrain an intermediate frame at a display's menu bar.
+    // Remember the native write so the next tick still detects an actual
+    // user drag between frames, without mistaking that constraint for one.
+    #[cfg(target_os = "macos")]
+    {
+        flight.expected = position(window)?;
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        flight.expected = next;
+    }
     if t >= 1.0 {
         // Start the normal fade even if the pointer stops moving at arrival.
         crate::sync_opacity(window.clone())?;

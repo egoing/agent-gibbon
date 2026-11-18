@@ -46,7 +46,7 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
     crate::memo_color::create(&root(app), &id)?;
     state.records.insert(&root(app), agent)?;
     crate::session_restore::mark_reopened(app, &id);
-    crate::first_frame::creating(app, &id, crate::capture::SelectionMode::Terminal, || {
+    crate::first_frame::creating(app, &id, crate::first_frame::Presentation::Terminal, || {
         open_presented(app, &id, false)?;
         let window = app.get_webview_window(&id).ok_or("터미널 창이 없습니다")?;
         crate::first_frame::placed(&window)
@@ -187,7 +187,7 @@ fn resolve(paths: &[PathBuf], name: &str) -> Option<PathBuf> {
         .flat_map(|p| names.iter().map(move |n| p.join(n)))
         .find(|p| executable(p))
 }
-fn quote(value: &str) -> String {
+pub(super) fn quote(value: &str) -> String {
     format!(
         "'{}'",
         value.replace('\'', if cfg!(windows) { "''" } else { "'\\''" })
@@ -705,11 +705,12 @@ fn plan_preview(line: &str) -> Option<String> {
         Some(name.into())
     }
 }
-pub(super) fn start(
+pub(super) fn start_with_line(
     agent: &Terminal,
     choice: &str,
     plan: Option<&str>,
     dimensions: PtySize,
+    command_line: Option<String>,
     spawned: impl FnOnce(OwnedChild),
 ) -> Result<(Session, PtyReader), String> {
     require_restore_support(
@@ -721,7 +722,9 @@ pub(super) fn start(
     if !cwd.is_dir() {
         return Err("마지막 폴더가 없습니다. 다른 폴더를 선택하세요".into());
     }
-    let line = if choice == "auto-monitor" {
+    let line = if command_line.is_some() {
+        command_line
+    } else if choice == "auto-monitor" {
         let path = agent
             .restore_plan
             .as_deref()
@@ -840,7 +843,7 @@ fn start_shell_supervised(
     }
     Ok((session, reader))
 }
-fn busy(session: &mut Session) -> bool {
+pub(super) fn busy(session: &mut Session) -> bool {
     if session.child.try_wait().ok().flatten().is_some() {
         // The root has exited but the pump may still be draining a background job.
         return true;

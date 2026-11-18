@@ -43,6 +43,7 @@ mod windows_contact;
 mod windows_process;
 #[cfg(windows)]
 mod windows_window;
+mod workspace;
 use model::{Action, Note, Request, MAX_REQUEST};
 use serde_json::{json, Value};
 #[cfg(unix)]
@@ -431,6 +432,9 @@ fn apply_with_presentation(
     if matches!(request.action, Action::Probe) {
         return Ok(telemetry::probe());
     }
+    if let Action::Workspace(operation) = &request.action {
+        return workspace::execute(app, operation);
+    }
     if matches!(request.action, Action::Web) || web::contains(app, request.id()) {
         if expected.is_some() {
             return Err("메모 종류가 변경되었습니다".into());
@@ -543,7 +547,8 @@ fn apply_with_presentation(
         | Action::List
         | Action::Diagnostics
         | Action::Probe
-        | Action::Web => (),
+        | Action::Web
+        | Action::Workspace(_) => (),
     }
     // Existing metadata is recollected before the next menu open. Replacing a
     // tracking native menu here would dismiss it during background updates.
@@ -572,6 +577,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(privacy::Privacy::default())
         .manage(telemetry::Runtime::default())
         .manage(capture::Captures::default())
+        .manage(workspace::Sharing::default())
+        .manage(workspace::Placements::default())
+        .manage(terminal::cli::Requests::default())
         .manage(first_frame::Pending::default())
         .manage(terminal::Terminals::default())
         .manage(web::Windows::default())
@@ -588,6 +596,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(layout::OpenOrder::default())
         .manage(sizing::Sizes::default())
         .manage(layout::Undo::default())
+        .manage(layout::LastLayout::default())
         .manage(stash::Stash::default())
         .manage(Mutex::new(BTreeMap::from([(
             "main".to_string(),
@@ -1027,7 +1036,7 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
 }
 
 fn parse(args: &[String]) -> Result<Request, String> {
-    let action = match args.first().map(String::as_str) { Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("web") => Action::Web, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon web [--id web-ID] [--url URL]; agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
+    let action = match args.first().map(String::as_str) { Some("workspace") => Action::Workspace(workspace::parse(&args[1..])?), Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("web") => Action::Web, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon web [--id web-ID] [--url URL]; agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
         url: None,
         action,
@@ -1040,7 +1049,11 @@ fn parse(args: &[String]) -> Result<Request, String> {
         status: None,
         markdown: None,
     };
-    let mut i = 1;
+    let mut i = if matches!(request.action, Action::Workspace(_)) {
+        args.len()
+    } else {
+        1
+    };
     while i < args.len() {
         let key = &args[i];
         let value = args.get(i + 1).ok_or("옵션 값이 없습니다")?;
@@ -1187,7 +1200,12 @@ fn cli(args: &[String]) -> Result<Value, String> {
     ipc::directory()?;
     let stream = match ipc::connect() {
         Ok(stream) => stream,
-        Err(_) if matches!(request.action, Action::Open | Action::Web) => {
+        Err(_)
+            if matches!(
+                request.action,
+                Action::Open | Action::Web | Action::Workspace(_)
+            ) =>
+        {
             launch_cli_server()?;
             let start = Instant::now();
             loop {
@@ -1229,6 +1247,17 @@ fn cli(args: &[String]) -> Result<Value, String> {
     Ok(response)
 }
 fn main() {
+    let helper_args: Vec<String> = std::env::args().skip(1).collect();
+    if let [mode, path] = helper_args.as_slice() {
+        if mode == "--terminal-exec" {
+            let code = terminal::cli::helper(path).unwrap_or_else(|error| {
+                eprintln!("{error}");
+                127
+            });
+            std::process::exit(code);
+        }
+    }
+
     if let Err(error) = instance::init() {
         println!("{}", ipc::error(error));
         std::process::exit(1);
@@ -1254,7 +1283,7 @@ fn main() {
         )
     } else if args == ["--help"] || args == ["-h"] {
         Ok(
-            json!({"ok":true,"usage":"agent-gibbon web [--id web-ID] [--url URL]; agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open/web은 앱을 시작하거나 창을 생성·복원합니다. web의 ID 생략은 새 웹 창, open의 ID 생략은 main이며 close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
+            json!({"ok":true,"workspace":workspace::USAGE,"usage":"agent-gibbon web [--id web-ID] [--url URL]; agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open/web은 앱을 시작하거나 창을 생성·복원합니다. web의 ID 생략은 새 웹 창, open의 ID 생략은 main이며 close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
         )
     } else {
         cli(&args)
