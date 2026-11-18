@@ -288,11 +288,13 @@ pub(crate) fn permission_status() -> (bool, bool) {
     )
 }
 
+type PermissionGuideStatus = (bool, bool, String, bool, Option<String>);
+
 #[tauri::command]
 pub fn permission_guide(
     window: tauri::WebviewWindow,
     action: String,
-) -> Result<(bool, bool, String, bool, Option<String>), String> {
+) -> Result<PermissionGuideStatus, String> {
     if window.label() != "permission-guide" {
         return Err("권한 안내 창에서 실행하세요".into());
     }
@@ -311,7 +313,9 @@ pub fn permission_guide(
         };
         if action == "access" {
             // The OS owns the prompt and trust decision for this process.
-            unsafe { gibbon_request_accessibility(); }
+            unsafe {
+                gibbon_request_accessibility();
+            }
         }
         if let Some(pane) = pane {
             let url = format!("x-apple.systempreferences:com.apple.preference.security?{pane}");
@@ -362,10 +366,13 @@ pub fn permission_guide(
         let executable = std::env::current_exe().map_err(err)?;
         // Settings registers the enclosing application bundle. The executable
         // path is diagnostic information, not the file-picker target.
-        let application = executable.ancestors().find(|path| {
-            path.extension().is_some_and(|extension| extension == "app")
-                && path.join("Contents/Info.plist").is_file()
-        }).map(|path| path.display().to_string());
+        let application = executable
+            .ancestors()
+            .find(|path| {
+                path.extension().is_some_and(|extension| extension == "app")
+                    && path.join("Contents/Info.plist").is_file()
+            })
+            .map(|path| path.display().to_string());
         Ok((
             screen,
             access,

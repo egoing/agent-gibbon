@@ -29,7 +29,7 @@ async function check(action) {
     el('application-path').hidden = !application;
     el('application-path').textContent = application || '';
     el('selection-help').textContent = application ?
-      '목록의 앱을 확인하세요. 추가가 필요하면 + 버튼을 누른 뒤 아래 .app 번들을 선택하세요. Finder에서는 응용 프로그램 폴더의 앱을 선택하면 됩니다.' :
+      '목록의 앱을 확인하세요. 추가가 필요하면 + 버튼을 누른 뒤 아래 .app 번들을 선택하세요. 앱 업데이트 후 같은 경로가 이미 켜져 있어도 확인되지 않으면 해당 앱 항목을 제거한 뒤 현재 앱을 다시 추가하고 허용하세요.' :
       '현재는 .app 번들 밖에서 실행 중입니다. 실행한 터미널이나 개발 도구의 권한을 확인하세요. 진단용 실행 파일 경로는 아래에서 확인할 수 있습니다.';
     for (const [id, allowed] of [['screen', screen], ['access', access]]) {
       el(id).textContent = allowed ? '확인됨 ✓' : '설정 열기';
