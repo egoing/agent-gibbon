@@ -481,6 +481,8 @@ fn observe_exit(session: &mut Session) -> Result<bool, String> {
     Ok(session.child.try_wait().map_err(err)?.is_none())
 }
 
+// Keep the named IPC arguments compatible with existing terminal WebViews.
+#[allow(clippy::too_many_arguments)]
 #[tauri::command]
 pub async fn terminal_start(
     window: WebviewWindow,

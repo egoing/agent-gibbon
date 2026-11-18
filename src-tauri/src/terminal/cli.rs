@@ -71,10 +71,12 @@ pub fn parse(args: &[String]) -> Result<Execution, String> {
     execution.validate()?;
     Ok(execution)
 }
+#[cfg(not(unix))]
+fn shell_line(_: &Path) -> Result<String, String> {
+    Err("구조화 실행은 현재 Unix 셸에서 지원합니다".into())
+}
+#[cfg(unix)]
 fn shell_line(file: &Path) -> Result<String, String> {
-    #[cfg(not(unix))]
-    return Err("구조화 실행은 현재 Unix 셸에서 지원합니다".into());
-    #[cfg(unix)]
     Ok(format!(
         "{} --terminal-exec {}",
         welcome::quote(&std::env::current_exe().map_err(err)?.to_string_lossy()),
@@ -82,9 +84,11 @@ fn shell_line(file: &Path) -> Result<String, String> {
     ))
 }
 pub fn helper(path: &str) -> Result<i32, String> {
-    let path = Path::new(path);
+    #[cfg(not(unix))]
+    let _ = path;
     #[cfg(unix)]
     {
+        let path = Path::new(path);
         use std::os::unix::fs::{MetadataExt, OpenOptionsExt};
         let mut file = fs::OpenOptions::new()
             .read(true)
@@ -227,6 +231,14 @@ pub fn status(app: &tauri::AppHandle, token: &str) -> Result<Value, String> {
         .ok_or("실행 요청을 찾을 수 없습니다. 앱 재시작 여부를 확인하세요")?;
     Ok(response(record, token, false))
 }
+pub fn failed(app: &tauri::AppHandle, token: &str) {
+    if let Ok(mut records) = app.state::<Requests>().0.lock() {
+        if let Some(record) = records.get_mut(token) {
+            record.failed = true;
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -277,13 +289,5 @@ mod tests {
             "0"
         );
         fs::remove_file(file.path().with_extension("status")).unwrap();
-    }
-}
-
-pub fn failed(app: &tauri::AppHandle, token: &str) {
-    if let Ok(mut records) = app.state::<Requests>().0.lock() {
-        if let Some(record) = records.get_mut(token) {
-            record.failed = true;
-        }
     }
 }
