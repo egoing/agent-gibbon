@@ -989,13 +989,11 @@ fn tick(app: &tauri::AppHandle) -> Result<(), String> {
     place_indicator(app, area, display.0, display.1)
 }
 
-pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
-    // Prepare the WebView before any shortcut, avoiding first-toggle activation.
-    let icon = indicator(app)?;
-    #[cfg(any(target_os = "macos", windows))]
-    crate::focus::restore(&icon);
-    #[cfg(not(any(target_os = "macos", windows)))]
-    let _ = icon;
+// Called on the main thread, including after an explicit permission recheck.
+pub(crate) fn refresh_input(app: &tauri::AppHandle) -> Result<(), String> {
+    if input_owned(app) {
+        return Ok(());
+    }
     let key = if cfg!(target_os = "macos") {
         "Ctrl+Alt+Cmd"
     } else {
@@ -1019,48 +1017,56 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
     let observed = available && crate::stash_input::install(app);
     let owned = available && observed;
     if owned {
-        crate::layout::overview::install(app)?;
-        tauri::WebviewWindowBuilder::new(
-            app,
-            "layout-undo",
-            tauri::WebviewUrl::App("layout-undo.html".into()),
-        )
-        .title("정렬 취소하기")
-        .accept_first_mouse(true)
-        .inner_size(144., 40.)
-        .decorations(false)
-        .transparent(true)
-        .shadow(false)
-        .resizable(false)
-        .visible(false)
-        .focused(false)
-        .focusable(false)
-        .always_on_top(true)
-        .skip_taskbar(true)
-        .build()
-        .map_err(err)?;
-        let guide = tauri::WebviewWindowBuilder::new(
-            app,
-            GUIDE,
-            tauri::WebviewUrl::App("direction-guide.html".into()),
-        )
-        .title(format!(
-            "{} — 방향 안내",
-            crate::instance::current().title()
-        ))
-        .inner_size(232., 232.)
-        .decorations(false)
-        .transparent(true)
-        .shadow(false)
-        .resizable(false)
-        .visible(false)
-        .focused(false)
-        .focusable(false)
-        .always_on_top(true)
-        .skip_taskbar(true)
-        .build()
-        .map_err(err)?;
-        guide.set_ignore_cursor_events(true).map_err(err)?;
+        if app.get_webview_window("memo-overview").is_none()
+            || app.get_webview_window("memo-backdrop").is_none()
+        {
+            crate::layout::overview::install(app)?;
+        }
+        if app.get_webview_window("layout-undo").is_none() {
+            tauri::WebviewWindowBuilder::new(
+                app,
+                "layout-undo",
+                tauri::WebviewUrl::App("layout-undo.html".into()),
+            )
+            .title("정렬 취소하기")
+            .accept_first_mouse(true)
+            .inner_size(144., 40.)
+            .decorations(false)
+            .transparent(true)
+            .shadow(false)
+            .resizable(false)
+            .visible(false)
+            .focused(false)
+            .focusable(false)
+            .always_on_top(true)
+            .skip_taskbar(true)
+            .build()
+            .map_err(err)?;
+        }
+        if app.get_webview_window(GUIDE).is_none() {
+            let guide = tauri::WebviewWindowBuilder::new(
+                app,
+                GUIDE,
+                tauri::WebviewUrl::App("direction-guide.html".into()),
+            )
+            .title(format!(
+                "{} — 방향 안내",
+                crate::instance::current().title()
+            ))
+            .inner_size(232., 232.)
+            .decorations(false)
+            .transparent(true)
+            .shadow(false)
+            .resizable(false)
+            .visible(false)
+            .focused(false)
+            .focusable(false)
+            .always_on_top(true)
+            .skip_taskbar(true)
+            .build()
+            .map_err(err)?;
+            guide.set_ignore_cursor_events(true).map_err(err)?;
+        }
         *app.state::<Stash>().lease.lock().unwrap() = Some(lease);
     }
     *app.state::<Stash>().shortcut.lock().unwrap() = if owned {
@@ -1070,6 +1076,17 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
     } else {
         format!("{key} 입력 감지 권한 필요 · 트레이로 실행")
     };
+    Ok(())
+}
+
+pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
+    // Prepare the WebView before any shortcut, avoiding first-toggle activation.
+    let icon = indicator(app)?;
+    #[cfg(any(target_os = "macos", windows))]
+    crate::focus::restore(&icon);
+    #[cfg(not(any(target_os = "macos", windows)))]
+    let _ = icon;
+    refresh_input(app)?;
     let (mask, _) = modifiers();
     *app.state::<Stash>().chord.lock().unwrap() = Chord {
         latched: mask != 0,
