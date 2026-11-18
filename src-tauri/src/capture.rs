@@ -1,4 +1,5 @@
 //! Frozen screen selection; only app-created PNGs are exposed to note windows.
+mod visibility;
 use crate::sizing::TOOLBAR_ROW_HEIGHT;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use serde::{Deserialize, Serialize};
@@ -39,7 +40,7 @@ pub struct Captures(Mutex<BTreeMap<String, Screen>>);
 fn err(e: impl std::fmt::Display) -> String {
     e.to_string()
 }
-fn png(image: &RgbaImage) -> Result<Vec<u8>, String> {
+pub(crate) fn png(image: &RgbaImage) -> Result<Vec<u8>, String> {
     let mut bytes = Cursor::new(Vec::new());
     image
         .write_to(&mut bytes, image::ImageFormat::Png)
@@ -68,6 +69,7 @@ fn trace(stage: &str) {
 }
 
 pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
+    app.manage(visibility::Visibility::default());
     use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
     app.plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .map_err(err)?;
@@ -153,6 +155,7 @@ pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
     let app = app.clone();
     std::thread::spawn(move || {
         let _sentry_scope = sentry_parent.clone().enter();
+        let generation = NEXT_SELECTION.fetch_add(1, Ordering::Relaxed);
         #[cfg(windows)]
         {
             let _root = crate::telemetry::Timing::new("capture.prepare");
@@ -161,34 +164,43 @@ pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
                 LIFECYCLE.lock()
             };
             if let Ok(_operation) = operation {
-                launch(&app, mode);
+                launch(&app, mode, generation);
             }
             LAUNCH_QUEUED.store(false, Ordering::Release);
         }
         #[cfg(not(windows))]
         {
+            // Finish hiding overview in a separate UI dispatch before acquiring
+            // the frozen preview. Keeping both in begin blocks the event loop
+            // throughout screenshot acquisition and WebView construction.
+            if !active(&app) {
+                if let Err(error) = visibility::set(&app, generation, true) {
+                    let _ = visibility::set(&app, generation, false);
+                    eprintln!("모아보기 캡처 준비 실패: {error}");
+                    LAUNCH_QUEUED.store(false, Ordering::Release);
+                    return;
+                }
+            }
             let handle = app.clone();
             if app
                 .run_on_main_thread(move || {
                     let _sentry_scope = sentry_parent.enter();
-                    launch(&handle, mode);
+                    launch(&handle, mode, generation);
                     LAUNCH_QUEUED.store(false, Ordering::Release);
                 })
                 .is_err()
             {
+                let _ = visibility::set(&app, generation, false);
                 LAUNCH_QUEUED.store(false, Ordering::Release);
             }
         }
     });
 }
-fn launch(app: &tauri::AppHandle, mode: SelectionMode) {
-    let generation = NEXT_SELECTION.fetch_add(1, Ordering::Relaxed);
+fn launch(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) {
     if let Err(error) = begin(app, mode, generation) {
         let _ = cleanup_before_create(app);
-        if mode == SelectionMode::Image {
-            if let Err(e) = crate::layout::overview::capture_visibility(app, generation, false) {
-                eprintln!("모아보기 재표시 실패: {e}");
-            }
+        if let Err(e) = visibility::set(app, generation, false) {
+            eprintln!("모아보기 재표시 실패: {e}");
         }
         if let Some(tray) = app.tray_by_id("agent-gibbon") {
             let _ = tray.set_tooltip(Some(format!("화면 캡처 실패: {error}")));
@@ -347,9 +359,8 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result
         return Ok(());
     }
     // Capture every display before creating any overlays, so dimming never enters the PNG.
-    if mode == SelectionMode::Image {
-        crate::layout::overview::capture_visibility(app, generation, true)?;
-    }
+    #[cfg(windows)]
+    visibility::set(app, generation, true)?;
     let mut screens = BTreeMap::new();
     let monitors = {
         let _timing = crate::telemetry::Timing::new("capture.screen.enumerate");
@@ -507,22 +518,16 @@ fn cancel_selection(window: WebviewWindow) -> Result<(), String> {
         .lock()
         .map_err(err)?
         .get(window.label())
-        .map(|screen| (screen.mode, screen.generation));
-    if let Some((mode, generation)) = selection {
-        end_selection(window.app_handle(), mode, generation)?;
+        .map(|screen| screen.generation);
+    if let Some(generation) = selection {
+        end_selection(window.app_handle(), generation)?;
     }
     Ok(())
 }
 
-fn end_selection(
-    app: &tauri::AppHandle,
-    mode: SelectionMode,
-    generation: u64,
-) -> Result<(), String> {
+fn end_selection(app: &tauri::AppHandle, generation: u64) -> Result<(), String> {
     let cleanup = cleanup_before_create(app);
-    if mode == SelectionMode::Image {
-        crate::layout::overview::capture_visibility(app, generation, false)?;
-    }
+    visibility::set(app, generation, false)?;
     cleanup
 }
 #[cfg(windows)]
@@ -766,27 +771,28 @@ fn finish_selection(
     };
     // Restore the previous app before the new editor deliberately takes focus.
     if mode == SelectionMode::Image {
-        let result = cleanup_before_create(app).and_then(|()| {
+        let result = end_selection(app, generation).and_then(|()| {
             create_note(
                 app,
                 bytes.ok_or("캡처 이미지가 없습니다")?,
                 bounds,
-                generation,
+                Some(generation),
             )
+            .map(|_| ())
         });
         if result.is_err() {
-            crate::layout::overview::capture_visibility(app, generation, false)?;
+            visibility::set(app, generation, false)?;
         }
         return result;
     }
-    cleanup_before_create(app)?;
+    end_selection(app, generation)?;
     if mode == SelectionMode::Web {
         return crate::web::create_region(app, bounds);
     }
     if mode == SelectionMode::Terminal {
         return crate::terminal::create_terminal(app, bounds).map(|_| ());
     }
-    create_text_note(app, bounds)
+    create_text_note(app, bounds, true).map(|_| ())
 }
 // Capture coordinates describe the image, not the enclosing toolbar window.
 fn image_toolbar_below(image_y: i32, work_top: i32, scale: f64) -> bool {
@@ -848,51 +854,61 @@ pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
         .map_err(err)?;
     set_position(win, bounds.x, bounds.y)
 }
-fn empty_text_note() -> crate::Note {
+fn empty_text_note(edit_on_open: bool) -> crate::Note {
     crate::Note {
         title: "새 메모".into(),
         markdown: String::new(),
         html: String::new(),
         change_html: String::new(),
-        edit_on_open: true,
+        edit_on_open,
         revision: 1,
         ..crate::Note::with_random_color()
     }
 }
-fn create_text_note(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), String> {
+pub(crate) fn create_text_note(
+    app: &tauri::AppHandle,
+    bounds: ImageNote,
+    edit_on_open: bool,
+) -> Result<String, String> {
     let stamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_err(err)?
         .as_nanos();
     let id = format!("text-{stamp}");
-    let note = empty_text_note();
+    let note = empty_text_note(edit_on_open);
     app.state::<crate::storage::Store>().save(&id, &note)?;
-    crate::first_frame::creating(app, &crate::label(&id), SelectionMode::Text, || {
-        let win = crate::create_window(app, &id, true)?;
-        app.state::<crate::AppNotes>()
-            .lock()
-            .map_err(err)?
-            .insert(id, note);
-        crate::sizing::manual_resize(win.clone(), win.state::<crate::sizing::Sizes>())?;
-        win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
-            .map_err(err)?;
-        set_position(&win, bounds.x, bounds.y)?;
-        #[cfg(windows)]
-        crate::windows_window::set_client_rect(
-            &win,
-            tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
-            tauri::LogicalSize::new(bounds.width, bounds.height)
-                .to_physical::<u32>(win.scale_factor().map_err(err)?),
-        )?;
-        #[cfg(not(windows))]
-        win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
-            .map_err(err)?;
-        // Resizing a hidden NSWindow can shift its top edge. Reapply the
-        // selected top-left after the final size, as image placement does.
-        #[cfg(target_os = "macos")]
-        set_position(&win, bounds.x, bounds.y)?;
-        crate::first_frame::placed(&win)
-    })
+    crate::first_frame::creating(
+        app,
+        &crate::label(&id),
+        crate::first_frame::Presentation::Text { edit_on_open },
+        || {
+            let win = crate::create_window(app, &id, true)?;
+            app.state::<crate::AppNotes>()
+                .lock()
+                .map_err(err)?
+                .insert(id.clone(), note);
+            crate::sizing::manual_resize(win.clone(), win.state::<crate::sizing::Sizes>())?;
+            win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
+                .map_err(err)?;
+            set_position(&win, bounds.x, bounds.y)?;
+            #[cfg(windows)]
+            crate::windows_window::set_client_rect(
+                &win,
+                tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
+                tauri::LogicalSize::new(bounds.width, bounds.height)
+                    .to_physical::<u32>(win.scale_factor().map_err(err)?),
+            )?;
+            #[cfg(not(windows))]
+            win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
+                .map_err(err)?;
+            // Resizing a hidden NSWindow can shift its top edge. Reapply the
+            // selected top-left after the final size, as image placement does.
+            #[cfg(target_os = "macos")]
+            set_position(&win, bounds.x, bounds.y)?;
+            crate::first_frame::placed(&win)
+        },
+    )?;
+    Ok(id)
 }
 pub(crate) fn show_text(win: &WebviewWindow) -> Result<(), String> {
     #[cfg(windows)]
@@ -901,12 +917,12 @@ pub(crate) fn show_text(win: &WebviewWindow) -> Result<(), String> {
     win.show().map_err(err)?;
     win.set_focus().map_err(err)
 }
-fn create_note(
+pub(crate) fn create_note(
     app: &tauri::AppHandle,
     bytes: Vec<u8>,
     bounds: ImageNote,
-    generation: u64,
-) -> Result<(), String> {
+    generation: Option<u64>,
+) -> Result<String, String> {
     use std::time::{SystemTime, UNIX_EPOCH};
     let stamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -952,8 +968,10 @@ fn create_note(
         return Err(error);
     }
     let label = crate::label(&id);
-    crate::layout::overview::await_capture_frame(app, generation, &label);
-    crate::first_frame::creating(app, &label, SelectionMode::Image, || {
+    if let Some(generation) = generation {
+        crate::layout::overview::await_capture_frame(app, generation, &label);
+    }
+    crate::first_frame::creating(app, &label, crate::first_frame::Presentation::Image, || {
         let win = crate::create_window(app, &id, true)?;
         app.state::<crate::AppNotes>()
             .lock()
@@ -961,7 +979,8 @@ fn create_note(
             .insert(id.clone(), note);
         place(&win, &bounds)?;
         crate::first_frame::placed(&win)
-    })
+    })?;
+    Ok(id)
 }
 #[tauri::command]
 pub fn note_image(window: WebviewWindow) -> Result<String, String> {
@@ -1073,7 +1092,8 @@ mod tests {
     }
     #[test]
     fn text_selection_creates_empty_editable_note_without_image() {
-        let note = empty_text_note();
+        assert!(!empty_text_note(false).edit_on_open);
+        let note = empty_text_note(true);
         assert!(note.capture.is_none());
         assert!(note.markdown.is_empty() && note.html.is_empty() && note.change_html.is_empty());
         assert!(note.edit_on_open);

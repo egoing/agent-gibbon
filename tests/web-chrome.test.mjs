@@ -65,3 +65,22 @@ test('a failed zoom keeps the current size and retries the same step',async()=>{
  assert.match(size.title,/100%/);
  assert.deepEqual(page.calls.filter(call=>call.action==='zoom').map(call=>call.scale),[1.15,1.15]);
 });
+
+test('reload dispatches one native request per click and skips overlapping requests', async () => {
+ const start = chrome();
+ await Promise.resolve();
+ assert.equal(start.nodes.get('web-reload').disabled, true);
+
+ const {nodes, calls} = chrome({welcome:false});
+ await Promise.resolve();
+ await nodes.get('web-back').onclick();
+ assert.equal(calls.at(-1).action, 'back');
+
+ const reload = nodes.get('web-reload');
+ const pending = reload.onclick();
+ await reload.onclick();
+ await pending;
+ assert.equal(calls.filter(call => call.action === 'reload').length, 1);
+ await reload.onclick();
+ assert.equal(calls.filter(call => call.action === 'reload').length, 2);
+});
