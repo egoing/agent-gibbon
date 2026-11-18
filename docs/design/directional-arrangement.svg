@@ -1,10 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-labelledby="title desc">
-<title id="title">보이는 네 유형의 명시적 왼쪽·오른쪽 정렬</title><desc id="desc">텍스트, 이미지와 캡처, 터미널, 웹을 함께 정렬한다. 숨긴 창은 열지 않는다. 위로 메모 보기를 열고 Escape로 방향 선택을 취소한다.</desc>
-<rect width="900" height="360" fill="#fff"/><g font-family="sans-serif" fill="#24313c"><text x="24" y="30" font-size="20">Control Option Command · 포인터 방향</text><text x="24" y="57" font-size="14">← 왼쪽 정렬 · → 오른쪽 정렬 · ↑ 메모 모아보기 · ↓ 숨김 / 복원 · Esc 취소</text></g>
+<title id="title">다중 모니터 빈자리 배치와 오른쪽 아래 대체 배치</title><desc id="desc">텍스트, 이미지와 캡처, 터미널, 웹을 함께 정렬한다. 숨긴 창은 열지 않는다. 위로 메모 보기를 열고 Escape로 방향 선택을 취소한다.</desc>
+<rect width="900" height="360" fill="#fff"/><g font-family="sans-serif" fill="#24313c"><text x="24" y="30" font-size="20">Control Option Command · 포인터 방향</text><text x="24" y="57" font-size="14">← 화면 빈자리 배치 · → 오른쪽 정렬 · ↑ 메모 모아보기 · ↓ 숨김 / 복원 · Esc 취소</text></g>
 <g fill="#eef1f4" stroke="#85919b"><rect x="24" y="76" width="410" height="220" rx="6"/><rect x="466" y="76" width="410" height="220" rx="6"/></g>
+<rect x="168" y="88" width="126" height="200" rx="3" fill="#cad4df"/><text x="231" y="158" font-family="sans-serif" font-size="14" text-anchor="middle" fill="#24313c">사용 중인 앱 창</text>
 <g font-family="sans-serif" font-size="13" text-anchor="middle" fill="#24313c">
 <rect x="38" y="240" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="98.0" y="267.0">1 텍스트</text>
-<rect x="38" y="184" width="90" height="56" fill="#fff3ce" stroke="#837859"/><text x="83.0" y="216.0">2 캡처</text>
+<rect x="300" y="184" width="90" height="56" fill="#fff3ce" stroke="#837859"/><text x="345.0" y="216.0">2 캡처</text>
 <rect x="38" y="138" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="98.0" y="165.0">3 터미널</text>
 <rect x="38" y="92" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="98.0" y="119.0">4 웹</text>
 <rect x="742" y="240" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="802.0" y="267.0">1 텍스트</text>
@@ -12,4 +13,4 @@
 <rect x="742" y="138" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="802.0" y="165.0">3 터미널</text>
 <rect x="742" y="92" width="120" height="46" fill="#fff3ce" stroke="#837859"/><text x="802.0" y="119.0">4 웹</text>
 </g>
-<g font-family="sans-serif" font-size="14" fill="#24313c"><text x="24" y="322">수동 이동·크기 변경 창도 포함 · 숨김·최소화·닫힌 창 제외 · 이미지는 비율 유지</text><text x="24" y="345">설명용 시안: 실제 크기·배치·native 검증 결과와 구분한다.</text></g></svg>
+<g font-family="sans-serif" font-size="14" fill="#24313c"><text x="24" y="322">왼쪽 그림 · 다른 앱 창 밖의 빈자리 활용　　 오른쪽 그림 · 빈자리 부족 시 오른쪽 아래부터 쌓기</text><text x="24" y="345">바탕화면이 부족하면 활성 앱에서 확인한 좌우 여백을 사용한다.</text></g></svg>

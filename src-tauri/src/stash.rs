@@ -192,7 +192,9 @@ fn sample_pointer(app: &tauri::AppHandle) {
 fn arrange_direction(app: &tauri::AppHandle, direction: Direction, x: f64, y: f64) {
     let result = crate::layout::gesture_monitor(app, x, y).and_then(|monitor| match direction {
         Direction::Up => crate::layout::overview::enter(app, monitor),
-        Direction::Left => crate::layout::arrange(app, monitor, crate::layout::Arrangement::Left),
+        Direction::Left => {
+            crate::layout::arrange(app, monitor, crate::layout::Arrangement::FreeSpace)
+        }
         Direction::Right => crate::layout::arrange(app, monitor, crate::layout::Arrangement::Right),
         Direction::Down => unreachable!("숨김은 trigger에서 처리"),
     });

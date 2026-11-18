@@ -1,6 +1,11 @@
 //! Region windows wait for placement before reading geometry and theme. Only
 //! the local document for that window can acknowledge its first layout.
-use crate::capture::SelectionMode;
+pub enum Presentation {
+    Text { edit_on_open: bool },
+    Image,
+    Terminal,
+    Web,
+}
 use std::{
     collections::BTreeMap,
     sync::{Arc, Mutex},
@@ -15,13 +20,13 @@ pub struct Pending(Mutex<BTreeMap<String, Frame>>);
 
 struct Frame {
     generation: Arc<()>,
-    mode: SelectionMode,
+    mode: Presentation,
     sender: Option<Sender<()>>,
     receiver: Option<Receiver<()>>,
 }
 
 impl Pending {
-    fn register(&self, label: &str, mode: SelectionMode) {
+    fn register(&self, label: &str, mode: Presentation) {
         let (sender, receiver) = channel(1);
         self.0.lock().unwrap().insert(
             label.into(),
@@ -54,7 +59,7 @@ impl Pending {
             .map(|f| f.generation.clone())
     }
 
-    fn take_ready(&self, label: &str, generation: &Arc<()>) -> Option<SelectionMode> {
+    fn take_ready(&self, label: &str, generation: &Arc<()>) -> Option<Presentation> {
         let mut frames = self.0.lock().unwrap();
         let frame = frames.get(label)?;
         if !Arc::ptr_eq(generation, &frame.generation)
@@ -86,7 +91,7 @@ pub fn prepare_builder<'a, M: Manager<tauri::Wry>>(
 pub fn creating<T>(
     app: &tauri::AppHandle,
     label: &str,
-    mode: SelectionMode,
+    mode: Presentation,
     build: impl FnOnce() -> Result<T, String>,
 ) -> Result<T, String> {
     app.state::<Pending>().register(label, mode);
@@ -176,15 +181,19 @@ fn show_prepared(window: &WebviewWindow, generation: &Arc<()>) -> Result<(), Str
     else {
         return Ok(());
     };
+    crate::workspace::placement_ready(window);
     match mode {
-        SelectionMode::Text => crate::capture::show_text(window),
-        SelectionMode::Image => {
+        Presentation::Text {
+            edit_on_open: false,
+        } => crate::show_without_focus(window),
+        Presentation::Text { edit_on_open: true } => crate::capture::show_text(window),
+        Presentation::Image => {
             let shown = crate::show_without_focus(window);
             crate::layout::overview::capture_frame_finished(window.app_handle(), window.label());
             shown
         }
-        SelectionMode::Terminal => crate::terminal::show(window),
-        SelectionMode::Web => crate::web::show(window),
+        Presentation::Terminal => crate::terminal::show(window),
+        Presentation::Web => crate::web::show(window),
     }?;
     crate::tray::refresh(window.app_handle())
 }
@@ -196,7 +205,7 @@ mod tests {
     fn both_orders_reveal_once_and_only_the_placed_window() {
         let frames = Pending::default();
         for placed_first in [true, false] {
-            frames.register("new", SelectionMode::Image);
+            frames.register("new", Presentation::Image);
             let generation = frames.generation("new").unwrap();
             if placed_first {
                 frames.placed("new").unwrap();
@@ -211,7 +220,7 @@ mod tests {
             assert!(frames.take_ready("other", &generation).is_none());
             assert!(matches!(
                 frames.take_ready("new", &generation),
-                Some(SelectionMode::Image)
+                Some(Presentation::Image)
             ));
             assert!(frames.take_ready("new", &generation).is_none());
         }
@@ -221,7 +230,7 @@ mod tests {
     fn hide_or_destroy_cancels_even_an_already_delivered_layout_request() {
         let frames = Pending::default();
         for placed in [false, true] {
-            frames.register("new", SelectionMode::Text);
+            frames.register("new", Presentation::Text { edit_on_open: true });
             let generation = frames.generation("new").unwrap();
             let mut placement = frames.receiver("new").unwrap();
             if placed {
@@ -231,7 +240,7 @@ mod tests {
             assert_eq!(placement.try_recv().is_ok(), placed);
             assert!(frames.take_ready("new", &generation).is_none());
             assert!(frames.receiver("restored").is_none());
-            frames.register("new", SelectionMode::Web);
+            frames.register("new", Presentation::Web);
             let mut next = frames.receiver("new").unwrap();
             frames.placed("new").unwrap();
             assert!(next.try_recv().is_ok());
@@ -239,7 +248,7 @@ mod tests {
             let current = frames.generation("new").unwrap();
             assert!(matches!(
                 frames.take_ready("new", &current),
-                Some(SelectionMode::Web)
+                Some(Presentation::Web)
             ));
         }
     }
