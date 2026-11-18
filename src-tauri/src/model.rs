@@ -28,6 +28,7 @@ pub enum Action {
     Diagnostics,
     Probe,
     Web,
+    Workspace(crate::workspace::Operation),
 }
 
 // Retired dedicated-agent IDs stay reserved, so open/update cannot turn an old

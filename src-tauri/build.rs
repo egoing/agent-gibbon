@@ -43,8 +43,10 @@ fn main() {
             .file("src/terminal/macos_jobs.c")
             .compile("terminal_jobs");
         println!("cargo:rerun-if-changed=src/permission_panel.m");
+        println!("cargo:rerun-if-changed=src/layout/app_windows.m");
         cc::Build::new()
             .file("src/permission_panel.m")
+            .file("src/layout/app_windows.m")
             .flag("-fobjc-arc")
             .compile("permission_panel");
     }

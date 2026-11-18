@@ -13,8 +13,7 @@ impl Rect {
     fn bottom(self) -> i64 {
         self.y + self.height
     }
-    #[cfg(test)]
-    fn fits(self, area: Self) -> bool {
+    pub(crate) fn fits(self, area: Self) -> bool {
         self.x >= area.x
             && self.y >= area.y
             && self.right() <= area.right()

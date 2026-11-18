@@ -13,7 +13,7 @@
 <g>
 
 
-<g fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><rect x="24" y="100" width="32" height="7" rx="3"/><rect x="24" y="116.5" width="48" height="7" rx="3"/><rect x="24" y="133" width="24" height="7" rx="3"/>
+<g fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><path d="M26 110v-9h12m16 0h12v9m0 20v9H54m-16 0H26v-9" fill="none" stroke="white" stroke-width="7"/><path d="M26 110v-9h12m16 0h12v9m0 20v9H54m-16 0H26v-9" fill="none" stroke="#080808" stroke-width="4"/><rect x="32" y="109" width="14" height="11" rx="2"/><rect x="48" y="122" width="12" height="9" rx="2"/>
 </g>
 </g>
 <g>
@@ -37,7 +37,7 @@
 <g>
 
 
-<g fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><rect x="24" y="100" width="32" height="7" rx="3"/><rect x="24" y="116.5" width="48" height="7" rx="3"/><rect x="24" y="133" width="24" height="7" rx="3"/>
+<g fill="#080808" stroke="white" stroke-width="2.8" stroke-linejoin="round" paint-order="stroke"><path d="M26 110v-9h12m16 0h12v9m0 20v9H54m-16 0H26v-9" fill="none" stroke="white" stroke-width="7"/><path d="M26 110v-9h12m16 0h12v9m0 20v9H54m-16 0H26v-9" fill="none" stroke="#080808" stroke-width="4"/><rect x="32" y="109" width="14" height="11" rx="2"/><rect x="48" y="122" width="12" height="9" rx="2"/>
 </g>
 </g>
 <g>

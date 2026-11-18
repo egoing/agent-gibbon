@@ -39,7 +39,7 @@ pub struct Captures(Mutex<BTreeMap<String, Screen>>);
 fn err(e: impl std::fmt::Display) -> String {
     e.to_string()
 }
-fn png(image: &RgbaImage) -> Result<Vec<u8>, String> {
+pub(crate) fn png(image: &RgbaImage) -> Result<Vec<u8>, String> {
     let mut bytes = Cursor::new(Vec::new());
     image
         .write_to(&mut bytes, image::ImageFormat::Png)
@@ -771,8 +771,9 @@ fn finish_selection(
                 app,
                 bytes.ok_or("캡처 이미지가 없습니다")?,
                 bounds,
-                generation,
+                Some(generation),
             )
+            .map(|_| ())
         });
         if result.is_err() {
             crate::layout::overview::capture_visibility(app, generation, false)?;
@@ -786,7 +787,7 @@ fn finish_selection(
     if mode == SelectionMode::Terminal {
         return crate::terminal::create_terminal(app, bounds).map(|_| ());
     }
-    create_text_note(app, bounds)
+    create_text_note(app, bounds, true).map(|_| ())
 }
 // Capture coordinates describe the image, not the enclosing toolbar window.
 fn image_toolbar_below(image_y: i32, work_top: i32, scale: f64) -> bool {
@@ -848,51 +849,61 @@ pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
         .map_err(err)?;
     set_position(win, bounds.x, bounds.y)
 }
-fn empty_text_note() -> crate::Note {
+fn empty_text_note(edit_on_open: bool) -> crate::Note {
     crate::Note {
         title: "새 메모".into(),
         markdown: String::new(),
         html: String::new(),
         change_html: String::new(),
-        edit_on_open: true,
+        edit_on_open,
         revision: 1,
         ..crate::Note::with_random_color()
     }
 }
-fn create_text_note(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), String> {
+pub(crate) fn create_text_note(
+    app: &tauri::AppHandle,
+    bounds: ImageNote,
+    edit_on_open: bool,
+) -> Result<String, String> {
     let stamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map_err(err)?
         .as_nanos();
     let id = format!("text-{stamp}");
-    let note = empty_text_note();
+    let note = empty_text_note(edit_on_open);
     app.state::<crate::storage::Store>().save(&id, &note)?;
-    crate::first_frame::creating(app, &crate::label(&id), SelectionMode::Text, || {
-        let win = crate::create_window(app, &id, true)?;
-        app.state::<crate::AppNotes>()
-            .lock()
-            .map_err(err)?
-            .insert(id, note);
-        crate::sizing::manual_resize(win.clone(), win.state::<crate::sizing::Sizes>())?;
-        win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
-            .map_err(err)?;
-        set_position(&win, bounds.x, bounds.y)?;
-        #[cfg(windows)]
-        crate::windows_window::set_client_rect(
-            &win,
-            tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
-            tauri::LogicalSize::new(bounds.width, bounds.height)
-                .to_physical::<u32>(win.scale_factor().map_err(err)?),
-        )?;
-        #[cfg(not(windows))]
-        win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
-            .map_err(err)?;
-        // Resizing a hidden NSWindow can shift its top edge. Reapply the
-        // selected top-left after the final size, as image placement does.
-        #[cfg(target_os = "macos")]
-        set_position(&win, bounds.x, bounds.y)?;
-        crate::first_frame::placed(&win)
-    })
+    crate::first_frame::creating(
+        app,
+        &crate::label(&id),
+        crate::first_frame::Presentation::Text { edit_on_open },
+        || {
+            let win = crate::create_window(app, &id, true)?;
+            app.state::<crate::AppNotes>()
+                .lock()
+                .map_err(err)?
+                .insert(id.clone(), note);
+            crate::sizing::manual_resize(win.clone(), win.state::<crate::sizing::Sizes>())?;
+            win.set_min_size(Some(tauri::LogicalSize::new(2.0, 2.0)))
+                .map_err(err)?;
+            set_position(&win, bounds.x, bounds.y)?;
+            #[cfg(windows)]
+            crate::windows_window::set_client_rect(
+                &win,
+                tauri::PhysicalPosition::new(bounds.x.round() as i32, bounds.y.round() as i32),
+                tauri::LogicalSize::new(bounds.width, bounds.height)
+                    .to_physical::<u32>(win.scale_factor().map_err(err)?),
+            )?;
+            #[cfg(not(windows))]
+            win.set_size(tauri::LogicalSize::new(bounds.width, bounds.height))
+                .map_err(err)?;
+            // Resizing a hidden NSWindow can shift its top edge. Reapply the
+            // selected top-left after the final size, as image placement does.
+            #[cfg(target_os = "macos")]
+            set_position(&win, bounds.x, bounds.y)?;
+            crate::first_frame::placed(&win)
+        },
+    )?;
+    Ok(id)
 }
 pub(crate) fn show_text(win: &WebviewWindow) -> Result<(), String> {
     #[cfg(windows)]
@@ -901,12 +912,12 @@ pub(crate) fn show_text(win: &WebviewWindow) -> Result<(), String> {
     win.show().map_err(err)?;
     win.set_focus().map_err(err)
 }
-fn create_note(
+pub(crate) fn create_note(
     app: &tauri::AppHandle,
     bytes: Vec<u8>,
     bounds: ImageNote,
-    generation: u64,
-) -> Result<(), String> {
+    generation: Option<u64>,
+) -> Result<String, String> {
     use std::time::{SystemTime, UNIX_EPOCH};
     let stamp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -952,8 +963,10 @@ fn create_note(
         return Err(error);
     }
     let label = crate::label(&id);
-    crate::layout::overview::await_capture_frame(app, generation, &label);
-    crate::first_frame::creating(app, &label, SelectionMode::Image, || {
+    if let Some(generation) = generation {
+        crate::layout::overview::await_capture_frame(app, generation, &label);
+    }
+    crate::first_frame::creating(app, &label, crate::first_frame::Presentation::Image, || {
         let win = crate::create_window(app, &id, true)?;
         app.state::<crate::AppNotes>()
             .lock()
@@ -961,7 +974,8 @@ fn create_note(
             .insert(id.clone(), note);
         place(&win, &bounds)?;
         crate::first_frame::placed(&win)
-    })
+    })?;
+    Ok(id)
 }
 #[tauri::command]
 pub fn note_image(window: WebviewWindow) -> Result<String, String> {
@@ -1073,7 +1087,8 @@ mod tests {
     }
     #[test]
     fn text_selection_creates_empty_editable_note_without_image() {
-        let note = empty_text_note();
+        assert!(!empty_text_note(false).edit_on_open);
+        let note = empty_text_note(true);
         assert!(note.capture.is_none());
         assert!(note.markdown.is_empty() && note.html.is_empty() && note.change_html.is_empty());
         assert!(note.edit_on_open);
