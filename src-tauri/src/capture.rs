@@ -1,4 +1,5 @@
 //! Frozen screen selection; only app-created PNGs are exposed to note windows.
+mod visibility;
 use crate::sizing::TOOLBAR_ROW_HEIGHT;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use serde::{Deserialize, Serialize};
@@ -68,6 +69,7 @@ fn trace(stage: &str) {
 }
 
 pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
+    app.manage(visibility::Visibility::default());
     use tauri_plugin_global_shortcut::{GlobalShortcutExt, ShortcutState};
     app.plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .map_err(err)?;
@@ -153,6 +155,7 @@ pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
     let app = app.clone();
     std::thread::spawn(move || {
         let _sentry_scope = sentry_parent.clone().enter();
+        let generation = NEXT_SELECTION.fetch_add(1, Ordering::Relaxed);
         #[cfg(windows)]
         {
             let _root = crate::telemetry::Timing::new("capture.prepare");
@@ -161,34 +164,43 @@ pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
                 LIFECYCLE.lock()
             };
             if let Ok(_operation) = operation {
-                launch(&app, mode);
+                launch(&app, mode, generation);
             }
             LAUNCH_QUEUED.store(false, Ordering::Release);
         }
         #[cfg(not(windows))]
         {
+            // Finish hiding overview in a separate UI dispatch before acquiring
+            // the frozen preview. Keeping both in begin blocks the event loop
+            // throughout screenshot acquisition and WebView construction.
+            if !active(&app) {
+                if let Err(error) = visibility::set(&app, generation, true) {
+                    let _ = visibility::set(&app, generation, false);
+                    eprintln!("모아보기 캡처 준비 실패: {error}");
+                    LAUNCH_QUEUED.store(false, Ordering::Release);
+                    return;
+                }
+            }
             let handle = app.clone();
             if app
                 .run_on_main_thread(move || {
                     let _sentry_scope = sentry_parent.enter();
-                    launch(&handle, mode);
+                    launch(&handle, mode, generation);
                     LAUNCH_QUEUED.store(false, Ordering::Release);
                 })
                 .is_err()
             {
+                let _ = visibility::set(&app, generation, false);
                 LAUNCH_QUEUED.store(false, Ordering::Release);
             }
         }
     });
 }
-fn launch(app: &tauri::AppHandle, mode: SelectionMode) {
-    let generation = NEXT_SELECTION.fetch_add(1, Ordering::Relaxed);
+fn launch(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) {
     if let Err(error) = begin(app, mode, generation) {
         let _ = cleanup_before_create(app);
-        if mode == SelectionMode::Image {
-            if let Err(e) = crate::layout::overview::capture_visibility(app, generation, false) {
-                eprintln!("모아보기 재표시 실패: {e}");
-            }
+        if let Err(e) = visibility::set(app, generation, false) {
+            eprintln!("모아보기 재표시 실패: {e}");
         }
         if let Some(tray) = app.tray_by_id("agent-gibbon") {
             let _ = tray.set_tooltip(Some(format!("화면 캡처 실패: {error}")));
@@ -347,9 +359,8 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result
         return Ok(());
     }
     // Capture every display before creating any overlays, so dimming never enters the PNG.
-    if mode == SelectionMode::Image {
-        crate::layout::overview::capture_visibility(app, generation, true)?;
-    }
+    #[cfg(windows)]
+    visibility::set(app, generation, true)?;
     let mut screens = BTreeMap::new();
     let monitors = {
         let _timing = crate::telemetry::Timing::new("capture.screen.enumerate");
@@ -507,22 +518,16 @@ fn cancel_selection(window: WebviewWindow) -> Result<(), String> {
         .lock()
         .map_err(err)?
         .get(window.label())
-        .map(|screen| (screen.mode, screen.generation));
-    if let Some((mode, generation)) = selection {
-        end_selection(window.app_handle(), mode, generation)?;
+        .map(|screen| screen.generation);
+    if let Some(generation) = selection {
+        end_selection(window.app_handle(), generation)?;
     }
     Ok(())
 }
 
-fn end_selection(
-    app: &tauri::AppHandle,
-    mode: SelectionMode,
-    generation: u64,
-) -> Result<(), String> {
+fn end_selection(app: &tauri::AppHandle, generation: u64) -> Result<(), String> {
     let cleanup = cleanup_before_create(app);
-    if mode == SelectionMode::Image {
-        crate::layout::overview::capture_visibility(app, generation, false)?;
-    }
+    visibility::set(app, generation, false)?;
     cleanup
 }
 #[cfg(windows)]
@@ -766,7 +771,7 @@ fn finish_selection(
     };
     // Restore the previous app before the new editor deliberately takes focus.
     if mode == SelectionMode::Image {
-        let result = cleanup_before_create(app).and_then(|()| {
+        let result = end_selection(app, generation).and_then(|()| {
             create_note(
                 app,
                 bytes.ok_or("캡처 이미지가 없습니다")?,
@@ -775,11 +780,11 @@ fn finish_selection(
             )
         });
         if result.is_err() {
-            crate::layout::overview::capture_visibility(app, generation, false)?;
+            visibility::set(app, generation, false)?;
         }
         return result;
     }
-    cleanup_before_create(app)?;
+    end_selection(app, generation)?;
     if mode == SelectionMode::Web {
         return crate::web::create_region(app, bounds);
     }
