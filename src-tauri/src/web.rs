@@ -389,6 +389,48 @@ fn new_id() -> String {
             .as_nanos()
     )
 }
+fn popup_allowed(url: &tauri::Url) -> bool {
+    url.as_str() == "about:blank" || validate_url(url.as_str()).is_ok()
+}
+
+fn popup_handler(
+    app: tauri::AppHandle,
+) -> impl Fn(
+    tauri::Url,
+    tauri::webview::NewWindowFeatures,
+) -> tauri::webview::NewWindowResponse<tauri::Wry>
+       + Send
+       + 'static {
+    move |url, features| {
+        use tauri::webview::NewWindowResponse;
+        if !popup_allowed(&url) {
+            return NewWindowResponse::Deny;
+        }
+        // Return the engine's related browsing context so opener, form POST
+        // and deferred navigation after window.open() keep their semantics.
+        let popup = tauri::WebviewWindowBuilder::new(
+            &app,
+            format!("webpage-popup-{}", new_id()),
+            WebviewUrl::External("about:blank".parse().expect("valid blank URL")),
+        )
+        .title("웹 팝업")
+        .window_features(features)
+        .user_agent(MOBILE_USER_AGENT)
+        .initialization_script(REMOTE_KEYS)
+        .on_navigation(popup_allowed)
+        .on_download(|_, _| false)
+        .on_new_window(popup_handler(app.clone()))
+        .build();
+        match popup {
+            Ok(window) => NewWindowResponse::Create { window },
+            Err(_) => NewWindowResponse::Deny,
+        }
+    }
+}
+
+const REMOTE_KEYS: &str = concat!("(() => {", include_str!("../../ui/web-navigation-keys.js"),
+    "installWebNavigationKeys(action => { if (action === 'reload') location.reload(); else history.go(action === 'back' ? -1 : 1); }); })();");
+
 pub fn create_region(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), String> {
     let id = new_id();
     crate::memo_color::create(&app.state::<crate::storage::Store>().0, &id)?;
@@ -574,7 +616,8 @@ pub(crate) fn create_presented(
             let session = session.clone();
             move |url| session.navigate(url)
         })
-        .on_new_window(|_, _| tauri::webview::NewWindowResponse::Deny)
+        .initialization_script(REMOTE_KEYS)
+        .on_new_window(popup_handler(app.clone()))
         .on_download(|_, _| false);
         let content = match content_bounds(w.as_ref()).and_then(|bounds| {
             w.as_ref()
@@ -787,15 +830,15 @@ pub async fn web_chrome(
     }
     match action.as_str() {
         "inspect" => inspect(window.app_handle(), id),
-        "back" | "reload" => {
+        "back" | "forward" | "reload" => {
             let child = view
                 .app_handle()
                 .get_webview(&format!("webpage-{id}"))
                 .ok_or("열린 웹페이지가 없습니다")?;
-            if action == "back" {
-                child.eval("history.back()")
-            } else {
-                child.reload()
+            match action.as_str() {
+                "back" => child.eval("history.back()"),
+                "forward" => child.eval("history.forward()"),
+                _ => child.reload(),
             }
             .map_err(err)?;
             Ok(json!({"ok":true}))

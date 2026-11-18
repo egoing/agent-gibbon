@@ -1,5 +1,9 @@
 (() => {
   const form=document.getElementById('web-form'),input=document.getElementById('web-url'),button=document.getElementById('run'),status=document.getElementById('status');
+  installWebNavigationKeys(action => {
+    if (!form.closest('main').hidden) return false;
+    window.__TAURI__.core.invoke('web_chrome', {action}).catch(error => { status.textContent = String(error); });
+  });
   let running=false;
   form.onsubmit=async event=>{
     event.preventDefault();if(running)return;
