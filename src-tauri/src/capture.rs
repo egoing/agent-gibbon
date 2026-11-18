@@ -292,7 +292,7 @@ pub(crate) fn permission_status() -> (bool, bool) {
 pub fn permission_guide(
     window: tauri::WebviewWindow,
     action: String,
-) -> Result<(bool, bool, String, bool), String> {
+) -> Result<(bool, bool, String, bool, Option<String>), String> {
     if window.label() != "permission-guide" {
         return Err("권한 안내 창에서 실행하세요".into());
     }
@@ -301,6 +301,7 @@ pub fn permission_guide(
         extern "C" {
             fn gibbon_show_permission_panel(screen: bool, overview: *mut std::ffi::c_void);
             fn gibbon_hide_permission_panel();
+            fn gibbon_request_accessibility() -> bool;
         }
         let pane = match action.as_str() {
             "screen" => Some("Privacy_ScreenCapture"),
@@ -308,6 +309,10 @@ pub fn permission_guide(
             "status" | "observe-screen" | "observe-access" => None,
             _ => return Err("알 수 없는 동작입니다".into()),
         };
+        if action == "access" {
+            // The OS owns the prompt and trust decision for this process.
+            unsafe { gibbon_request_accessibility(); }
+        }
         if let Some(pane) = pane {
             let url = format!("x-apple.systempreferences:com.apple.preference.security?{pane}");
             if !std::process::Command::new("/usr/bin/open")
@@ -354,11 +359,19 @@ pub fn permission_guide(
                 .run_on_main_thread(|| unsafe { gibbon_hide_permission_panel() })
                 .map_err(err)?;
         }
+        let executable = std::env::current_exe().map_err(err)?;
+        // Settings registers the enclosing application bundle. The executable
+        // path is diagnostic information, not the file-picker target.
+        let application = executable.ancestors().find(|path| {
+            path.extension().is_some_and(|extension| extension == "app")
+                && path.join("Contents/Info.plist").is_file()
+        }).map(|path| path.display().to_string());
         Ok((
             screen,
             access,
-            std::env::current_exe().map_err(err)?.display().to_string(),
+            executable.display().to_string(),
             crate::stash::input_owned(window.app_handle()),
+            application,
         ))
     }
     #[cfg(not(target_os = "macos"))]

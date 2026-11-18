@@ -1,3 +1,4 @@
+#import <ApplicationServices/ApplicationServices.h>
 #import <Cocoa/Cocoa.h>
 
 @interface GibbonFileRow : NSButton <NSDraggingSource>
@@ -102,4 +103,15 @@ void gibbon_show_permission_panel(BOOL screenCapture, NSWindow *overview) {
         }
         alignWithSettings();
     }];
+}
+
+
+// Only called after the user explicitly chooses the accessibility settings action.
+// Prompting asks macOS to handle the request; the return value remains the
+// current process trust result and never implies that permission was granted.
+BOOL gibbon_request_accessibility(void) {
+    NSDictionary *options = @{
+        (__bridge NSString *)kAXTrustedCheckOptionPrompt: @YES
+    };
+    return AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)options);
 }
