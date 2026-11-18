@@ -55,6 +55,9 @@ pub fn install(app: &tauri::AppHandle) -> bool {
         }
     }
     thread_local! { static MONITORS: RefCell<Vec<Monitor>> = const { RefCell::new(Vec::new()) }; }
+    // Retrying after a grant replaces old local-only monitors instead of
+    // delivering each key edge twice.
+    MONITORS.with(|monitors| monitors.borrow_mut().clear());
     let mask = NSEventMask::KeyDown
         | NSEventMask::LeftMouseDown
         | NSEventMask::RightMouseDown
@@ -102,7 +105,11 @@ pub fn install(app: &tauri::AppHandle) -> bool {
         m.borrow_mut()
             .extend(global.into_iter().chain(local).map(Monitor))
     });
-    ready && macos_wheel::install(app.clone())
+    static WHEEL_INSTALLED: AtomicBool = AtomicBool::new(false);
+    if ready && !WHEEL_INSTALLED.load(Ordering::Acquire) {
+        WHEEL_INSTALLED.store(macos_wheel::install(app.clone()), Ordering::Release);
+    }
+    ready && WHEEL_INSTALLED.load(Ordering::Acquire)
 }
 #[cfg(target_os = "macos")]
 mod macos_wheel;

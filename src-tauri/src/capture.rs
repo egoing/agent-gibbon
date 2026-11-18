@@ -292,7 +292,7 @@ pub(crate) fn permission_status() -> (bool, bool) {
 pub fn permission_guide(
     window: tauri::WebviewWindow,
     action: String,
-) -> Result<(bool, bool, String), String> {
+) -> Result<(bool, bool, String, bool), String> {
     if window.label() != "permission-guide" {
         return Err("권한 안내 창에서 실행하세요".into());
     }
@@ -331,6 +331,16 @@ pub fn permission_guide(
                 .map_err(err)?;
         }
         let (screen, access) = permission_status();
+        if access && !crate::stash::input_owned(window.app_handle()) {
+            let handle = window.app_handle().clone();
+            window
+                .run_on_main_thread(move || {
+                    if let Err(error) = crate::stash::refresh_input(&handle) {
+                        eprintln!("단축키 입력 감시 재설치 실패: {error}");
+                    }
+                })
+                .map_err(err)?;
+        }
         if let Err(error) =
             crate::tray::sync_permission_item(window.app_handle(), screen && access, false)
         {
@@ -348,6 +358,7 @@ pub fn permission_guide(
             screen,
             access,
             std::env::current_exe().map_err(err)?.display().to_string(),
+            crate::stash::input_owned(window.app_handle()),
         ))
     }
     #[cfg(not(target_os = "macos"))]

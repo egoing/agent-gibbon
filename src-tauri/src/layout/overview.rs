@@ -123,6 +123,9 @@ fn error(e: impl std::fmt::Display) -> String {
 pub(crate) fn install(app: &tauri::AppHandle) -> Result<(), String> {
     app.manage(Overview::default());
     for (label, title) in [(BACKDROP, "메모 배경"), (CONTROLS, "메모 모아보기")] {
+        if app.get_webview_window(label).is_some() {
+            continue;
+        }
         crate::focus::remember(app, label);
         let builder =
             WebviewWindowBuilder::new(app, label, WebviewUrl::App(format!("{label}.html").into()))
