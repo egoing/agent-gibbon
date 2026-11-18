@@ -48,15 +48,6 @@ pub fn install(app: &tauri::AppHandle) -> bool {
     use objc2::{rc::Retained, runtime::AnyObject};
     use objc2_app_kit::{NSEvent, NSEventMask};
     use std::{cell::RefCell, ptr::NonNull};
-    #[link(name = "ApplicationServices", kind = "framework")]
-    extern "C" {
-        fn AXIsProcessTrusted() -> bool;
-    }
-    // Without global key observation we cannot safely distinguish a bare chord
-    // from another app's shortcut. Leave the tray available instead.
-    if !unsafe { AXIsProcessTrusted() } {
-        return false;
-    }
     struct Monitor(Retained<AnyObject>);
     impl Drop for Monitor {
         fn drop(&mut self) {
@@ -98,7 +89,13 @@ pub fn install(app: &tauri::AppHandle) -> bool {
         observe(&handle, event);
         event.as_ptr()
     });
-    let global = NSEvent::addGlobalMonitorForEventsMatchingMask_handler(mask, &global);
+    // Local events remain observable without accessibility permission so an
+    // explicit chord inside our app can lead to the existing permission guide.
+    let global = if crate::capture::accessibility_allowed() {
+        NSEvent::addGlobalMonitorForEventsMatchingMask_handler(mask, &global)
+    } else {
+        None
+    };
     let local = unsafe { NSEvent::addLocalMonitorForEventsMatchingMask_handler(mask, &local) };
     let ready = global.is_some() && local.is_some();
     MONITORS.with(|m| {

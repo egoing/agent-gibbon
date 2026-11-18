@@ -315,6 +315,15 @@ pub fn modifier_event(app: &tauri::AppHandle, mask: u8, shift: bool) {
         GuideInput::Cancel => return dismiss_guide(app),
         GuideInput::Open => {}
     }
+    #[cfg(target_os = "macos")]
+    if !crate::capture::accessibility_allowed() {
+        if !crate::updater::frozen(app) {
+            if let Err(error) = crate::capture::show_shortcut_permission_guide(app) {
+                eprintln!("단축키 권한 안내 실패: {error}");
+            }
+        }
+        return;
+    }
     if !input_owned(app) || crate::updater::frozen(app) {
         return;
     }

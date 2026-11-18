@@ -3,6 +3,14 @@ const buttons = ['screen', 'access', 'check'].map(el);
 let pending = null;
 let timer;
 let busy = false;
+let shortcut = new URLSearchParams(location.search).has('shortcut');
+window.setPermissionScope = value => {
+  shortcut = value;
+  el('screen').closest('section').hidden = shortcut;
+  if (!busy) refresh();
+};
+el('screen').closest('section').hidden = shortcut;
+
 
 async function check(action) {
   if (busy) return;
@@ -25,6 +33,8 @@ async function check(action) {
     const confirmed = pending && (pending === 'screen' ? screen : access);
     const message = confirmed ? '선택한 권한을 확인했습니다.' :
       pending ? '시스템 설정에서 현재 실행 앱의 스위치를 켜세요. 이미 켰다면 macOS의 재실행 안내를 확인하세요.' :
+      shortcut ? (access ? '손쉬운 사용 권한을 확인했습니다. 단축키가 작동하지 않으면 앱을 다시 실행하세요.' :
+        '보조키 조합 단축키에 손쉬운 사용 권한이 필요합니다. 다른 앱에서 입력이 감지되지 않으면 Gibbon 창을 선택하거나 트레이의 권한 설정을 여세요.') :
       screen ? '화면 캡처 접근을 확인했습니다.' : '현재 앱의 화면 캡처 접근을 확인하지 못했습니다.';
     if (el('message').textContent !== message) el('message').textContent = message;
     if (confirmed && !opening) pending = null;

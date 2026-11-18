@@ -232,13 +232,34 @@ extern "C" {
 }
 #[cfg(target_os = "macos")]
 pub(crate) fn show_permission_guide(app: &tauri::AppHandle) -> Result<(), String> {
+    show_permission_scope(app, false)
+}
+
+#[cfg(target_os = "macos")]
+pub(crate) fn show_shortcut_permission_guide(app: &tauri::AppHandle) -> Result<(), String> {
+    show_permission_scope(app, true)
+}
+
+#[cfg(target_os = "macos")]
+fn show_permission_scope(app: &tauri::AppHandle, shortcut: bool) -> Result<(), String> {
     if let Some(window) = app.get_webview_window("permission-guide") {
+        // Do not interrupt a settings flow or repeatedly raise an open guide.
+        if shortcut && window.is_visible().map_err(err)? {
+            return Ok(());
+        }
+        window
+            .eval(format!("window.setPermissionScope({shortcut})"))
+            .map_err(err)?;
         return window.show().map_err(err);
     }
     tauri::WebviewWindowBuilder::new(
         app,
         "permission-guide",
-        tauri::WebviewUrl::App("permission.html".into()),
+        tauri::WebviewUrl::App(if shortcut {
+            "permission.html?shortcut=1".into()
+        } else {
+            "permission.html".into()
+        }),
     )
     .title("Agent Gibbon 권한 설정")
     .inner_size(600.0, 450.0)
@@ -251,12 +272,20 @@ pub(crate) fn show_permission_guide(app: &tauri::AppHandle) -> Result<(), String
 }
 
 #[cfg(target_os = "macos")]
-pub(crate) fn permission_status() -> (bool, bool) {
+pub(crate) fn accessibility_allowed() -> bool {
     #[link(name = "ApplicationServices", kind = "framework")]
     extern "C" {
         fn AXIsProcessTrusted() -> bool;
     }
-    unsafe { (CGPreflightScreenCaptureAccess(), AXIsProcessTrusted()) }
+    unsafe { AXIsProcessTrusted() }
+}
+
+#[cfg(target_os = "macos")]
+pub(crate) fn permission_status() -> (bool, bool) {
+    (
+        unsafe { CGPreflightScreenCaptureAccess() },
+        accessibility_allowed(),
+    )
 }
 
 #[tauri::command]
