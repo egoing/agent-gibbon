@@ -42,6 +42,11 @@ fn main() {
         cc::Build::new()
             .file("src/terminal/macos_jobs.c")
             .compile("terminal_jobs");
+        println!("cargo:rerun-if-changed=src/capture/visibility.m");
+        cc::Build::new()
+            .file("src/capture/visibility.m")
+            .flag("-fobjc-arc")
+            .compile("capture_visibility");
         println!("cargo:rerun-if-changed=src/permission_panel.m");
         println!("cargo:rerun-if-changed=src/layout/app_windows.m");
         cc::Build::new()

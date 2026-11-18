@@ -213,7 +213,7 @@ pub(super) fn current_frame(w: &WebviewWindow) -> Result<Destination, String> {
 
 pub(crate) fn enter(app: &tauri::AppHandle, monitor: tauri::Monitor) -> Result<(), String> {
     let state = app.state::<Overview>();
-    if state.session.lock().unwrap().is_some() {
+    if crate::capture::update_blocked(app) || state.session.lock().unwrap().is_some() {
         return Ok(());
     }
     let windows = visible_hosts(app)?;
@@ -432,6 +432,14 @@ pub(crate) fn overview_action(
     let app = window.app_handle();
     let _activity = crate::updater::activity(app)?;
     let state = app.state::<Overview>();
+    // A click queued just before capture hid the controls belongs to the
+    // suspended visit. Keep its layout intact until selection has ended.
+    if state
+        .current(generation)
+        .is_some_and(|s| s.paused_capture.is_some())
+    {
+        return Ok(());
+    }
     match action {
         Action::Arrange => {
             if let Some(session) = state.current(generation) {
@@ -540,8 +548,21 @@ fn set_capture_visibility(
     let backdrop = utility(app, BACKDROP)?;
     let controls = utility(app, CONTROLS)?;
     if suspend {
-        controls.hide().map_err(error)?;
-        return hide_backdrop(&backdrop);
+        for window in [&controls, &backdrop] {
+            #[cfg(target_os = "macos")]
+            {
+                // Match show_frame's native ordering. The screenshot is acquired
+                // in this same main-thread turn, before queued UI events can run.
+                let ptr = window.ns_window().map_err(error)?;
+                unsafe { (&*(ptr as *const objc2_app_kit::NSWindow)).orderOut(None) };
+            }
+            #[cfg(not(target_os = "macos"))]
+            window.hide().map_err(error)?;
+            if window.is_visible().map_err(error)? {
+                return Err("모아보기 창을 숨기지 못했습니다".into());
+            }
+        }
+        return set_backdrop_visible(&backdrop, false);
     }
     crate::stash::show_frame(&backdrop)?;
     for window in visible_hosts(app)? {
