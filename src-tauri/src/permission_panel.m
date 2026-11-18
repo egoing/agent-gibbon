@@ -1,5 +1,6 @@
 #import <ApplicationServices/ApplicationServices.h>
 #import <Cocoa/Cocoa.h>
+#import <os/log.h>
 
 @interface GibbonFileRow : NSButton <NSDraggingSource>
 @property(nonatomic, strong) NSURL *fileURL;
@@ -114,4 +115,16 @@ BOOL gibbon_request_accessibility(void) {
         (__bridge NSString *)kAXTrustedCheckOptionPrompt: @YES
     };
     return AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)options);
+}
+
+// Called on the main thread. Record only transitions in observer availability.
+void gibbon_log_input_status(bool access, bool global, bool local, bool wheel) {
+    static int previous = -1;
+    int state = access | (global << 1) | (local << 2) | (wheel << 3);
+    if (previous == state) return;
+    previous = state;
+    static os_log_t logger;
+    if (!logger) logger = os_log_create("org.egoing.floatnote", "permissions");
+    os_log(logger, "accessibility=%{public}d global_monitor=%{public}d local_monitor=%{public}d wheel_tap=%{public}d",
+           access, global, local, wheel);
 }

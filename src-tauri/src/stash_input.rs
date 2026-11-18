@@ -55,6 +55,7 @@ pub fn install(app: &tauri::AppHandle) -> bool {
         }
     }
     thread_local! { static MONITORS: RefCell<Vec<Monitor>> = const { RefCell::new(Vec::new()) }; }
+    static WHEEL_INSTALLED: AtomicBool = AtomicBool::new(false);
     // Retrying after a grant replaces old local-only monitors instead of
     // delivering each key edge twice.
     MONITORS.with(|monitors| monitors.borrow_mut().clear());
@@ -62,11 +63,18 @@ pub fn install(app: &tauri::AppHandle) -> bool {
         | NSEventMask::LeftMouseDown
         | NSEventMask::RightMouseDown
         | NSEventMask::OtherMouseDown
-        | NSEventMask::FlagsChanged;
+        | NSEventMask::FlagsChanged
+        | NSEventMask::ScrollWheel;
     fn observe(app: &tauri::AppHandle, event: NonNull<NSEvent>) {
         // Event flags preserve fast press/release order even if the run loop is
         // drawing an animation. Sampling current flags here would lose edges.
         let event = unsafe { event.as_ref() };
+        if event.r#type() == objc2_app_kit::NSEventType::ScrollWheel
+            && WHEEL_INSTALLED.load(Ordering::Acquire)
+        {
+            // The active tap already handles cancellation and opacity.
+            return;
+        }
         if event.r#type() == objc2_app_kit::NSEventType::LeftMouseDown {
             crate::layout::click_undo_if_hovered(app);
         }
@@ -82,7 +90,9 @@ pub fn install(app: &tauri::AppHandle) -> bool {
             crate::stash::modifier_event(app, mask, f.intersects(F::Shift | F::Function));
         } else {
             crate::stash::cancel_chord(app);
-            crate::opacity::reset_wheel(app);
+            if event.r#type() != objc2_app_kit::NSEventType::ScrollWheel {
+                crate::opacity::reset_wheel(app);
+            }
         }
     }
     let handle = app.clone();
@@ -100,16 +110,28 @@ pub fn install(app: &tauri::AppHandle) -> bool {
         None
     };
     let local = unsafe { NSEvent::addLocalMonitorForEventsMatchingMask_handler(mask, &local) };
-    let ready = global.is_some() && local.is_some();
+    let global_ready = global.is_some();
+    let local_ready = local.is_some();
+    let ready = global_ready && local_ready;
     MONITORS.with(|m| {
         m.borrow_mut()
             .extend(global.into_iter().chain(local).map(Monitor))
     });
-    static WHEEL_INSTALLED: AtomicBool = AtomicBool::new(false);
     if ready && !WHEEL_INSTALLED.load(Ordering::Acquire) {
         WHEEL_INSTALLED.store(macos_wheel::install(app.clone()), Ordering::Release);
     }
-    ready && WHEEL_INSTALLED.load(Ordering::Acquire)
+    extern "C" {
+        fn gibbon_log_input_status(access: bool, global: bool, local: bool, wheel: bool);
+    }
+    unsafe {
+        gibbon_log_input_status(
+            crate::capture::accessibility_allowed(),
+            global_ready,
+            local_ready,
+            WHEEL_INSTALLED.load(Ordering::Acquire),
+        );
+    }
+    ready
 }
 #[cfg(target_os = "macos")]
 mod macos_wheel;
