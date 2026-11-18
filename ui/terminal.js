@@ -86,7 +86,7 @@ function setInfo(info){
   document.getElementById('title').textContent=info.running && info.program && info.program !== 'shell' ? info.program : info.title;
 
 }
-async function start(choice, trigger, plan){
+async function start(choice, trigger, plan, execRequest){
   if(started||starting||ended)return;
   if(!restoreSupported && (plan !== undefined || choice === 'auto-monitor')){
     report('터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.');
@@ -110,7 +110,7 @@ async function start(choice, trigger, plan){
     if(selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
     await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('terminal.start', async flow => {
       const size={cols:terminal.cols,rows:terminal.rows};
-      await flow.invoke('terminal_start',{...size,output,choice,...(plan === undefined ? {} : {plan})});
+      await flow.invoke('terminal_start',{...size,output,choice,...(execRequest === undefined ? {} : {execRequest}),...(plan === undefined ? {} : {plan})});
       appliedSize=size;
       flow.stage('response');
       flow.frame?.();

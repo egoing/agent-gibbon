@@ -395,7 +395,7 @@ pub fn create_region(app: &tauri::AppHandle, bounds: ImageNote) -> Result<(), St
     crate::first_frame::creating(
         app,
         &format!("webview-{id}"),
-        crate::capture::SelectionMode::Web,
+        crate::first_frame::Presentation::Web,
         || {
             create_presented(app, Some(bounds), Some(&id), None, false)?;
             crate::first_frame::placed(&record(app, &id)?.host)

@@ -117,6 +117,19 @@ fn event_window_label(event: &str) -> Option<String> {
 
 fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     let menu = Menu::new(app).map_err(|e| e.to_string())?;
+    if let Some(display) = crate::workspace::shared_displays(app) {
+        menu.append(
+            &MenuItem::with_id(
+                app,
+                "workspace-stop",
+                format!("모니터 {}개 공유 중 · 공유 중지", display.len()),
+                true,
+                None::<&str>,
+            )
+            .map_err(|e| e.to_string())?,
+        )
+        .map_err(|e| e.to_string())?;
+    }
     if let Some(branch) = &crate::instance::current().branch {
         menu.append(
             &MenuItem::with_id(app, "dev-instance", branch, false, None::<&str>)
@@ -537,7 +550,9 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
                 app.exit(0);
                 return;
             }
-            let result = if event.id.as_ref() == "more-notes" {
+            let result = if event.id.as_ref() == "workspace-stop" {
+                crate::workspace::stop(app, None)
+            } else if event.id.as_ref() == "more-notes" {
                 crate::manager::open_list(app)
             } else if event.id.as_ref() == "open-manager" {
                 crate::manager::open(app)
