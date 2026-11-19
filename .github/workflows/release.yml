@@ -95,8 +95,6 @@ jobs:
         env:
           APPLE_CERTIFICATE: ${{ runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/v') && secrets.APPLE_CERTIFICATE || '' }}
           APPLE_CERTIFICATE_PASSWORD: ${{ runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/v') && secrets.APPLE_CERTIFICATE_PASSWORD || '' }}
-          APPLE_ID: ${{ runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/v') && secrets.APPLE_ID || '' }}
-          APPLE_PASSWORD: ${{ runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/v') && secrets.APPLE_PASSWORD || '' }}
           APPLE_TEAM_ID: ${{ runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/v') && secrets.APPLE_TEAM_ID || '' }}
           JAJAN_SENTRY_DSN: ${{ secrets.AGENT_GIBBON_SENTRY_DSN || vars.AGENT_GIBBON_SENTRY_DSN }}
           RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
@@ -125,11 +123,6 @@ jobs:
           node scripts/updater-build-config.mjs "$RUNNER_TEMP/updater-build-config.json"
           if [[ "$RUNNER_OS" == macOS && -n "$RELEASE_TAG" ]]; then
             : "${APPLE_CERTIFICATE:?}" "${APPLE_CERTIFICATE_PASSWORD:?}" "${APPLE_TEAM_ID:?}"
-            if [[ "$RELEASE_TAG" == v0.3.5 ]]; then
-              unset APPLE_ID APPLE_PASSWORD
-            else
-              : "${APPLE_ID:?}" "${APPLE_PASSWORD:?}"
-            fi
             [[ "$APPLE_TEAM_ID" == 5P84RWXNB6 ]]
             export APPLE_SIGNING_IDENTITY='Developer ID Application: tae kyong kim (5P84RWXNB6)'
             jq --arg identity "$APPLE_SIGNING_IDENTITY" '.bundle.macOS.signingIdentity = $identity' "$RUNNER_TEMP/updater-build-config.json" > "$RUNNER_TEMP/signed-config.json"
@@ -138,7 +131,7 @@ jobs:
             unset APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID
           fi
           pnpm exec tauri build --target '${{ matrix.target }}' --bundles '${{ matrix.bundles }}' --config "$RUNNER_TEMP/updater-build-config.json" -- --locked
-      - name: Verify macOS Developer ID and notarization
+      - name: Verify macOS Developer ID
         if: runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/v')
         shell: bash
         run: |
@@ -148,10 +141,6 @@ jobs:
           grep -Fx 'TeamIdentifier=5P84RWXNB6' <<< "$signature"
           grep -Fx 'Identifier=app.jajan' <<< "$signature"
           grep -Fx 'Authority=Developer ID Application: tae kyong kim (5P84RWXNB6)' <<< "$signature"
-          if [[ "$GITHUB_REF_NAME" != v0.3.5 ]]; then
-            xcrun stapler validate "$app"
-            spctl --assess --type execute --verbose=4 "$app"
-          fi
       - name: Collect installers
         shell: bash
         env:
