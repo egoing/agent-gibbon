@@ -10,7 +10,7 @@ The [design system and visual mockups](docs/design-system.md) define shared term
 
 ## Install
 
-Download the Apple Silicon (`aarch64`) or Intel (`x64`) DMG from GitHub Releases and move Jajan to Applications. Apple distribution signing and notarization are not configured; macOS may block the downloaded application.
+Download the Apple Silicon (`aarch64`) or Intel (`x64`) DMG from GitHub Releases and move Jajan to Applications. Official macOS releases starting with 0.3.4 use Developer ID signing and Apple notarization.
 
 ## Quick start
 
