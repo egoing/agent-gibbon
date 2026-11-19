@@ -23,19 +23,3 @@ body.memo-focused #memo-surface::after {
   }
 }
 
-/* Paint only: preserve capture geometry, transparent letterboxing and hit areas.
-   The light inner keyline remains visible against dark desktops; the dark
-   outer keyline separates pale captures from light desktops, even unfocused.
-   Keep the shadow inside the existing window rather than adding a gutter. */
-body.image-note:not(.folded):not(.toolbar-collapsed) #viewport::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  border-radius: inherit;
-  box-shadow:
-    inset 0 0 0 var(--surface-border) var(--capture-edge-dark),
-    inset 0 0 0 2px var(--capture-edge-light),
-    var(--capture-edge-shadow);
-}
