@@ -407,12 +407,24 @@ pub fn cancel_chord(app: &tauri::AppHandle) {
     }
 }
 fn snapshot_candidate(label: &str) -> bool {
-    !matches!(
-        label,
-        ICON | GUIDE | "layout-undo" | "memo-overview" | "memo-backdrop"
-    ) && !label.starts_with("relation-prototype-")
-        && !label.starts_with("relation-pick-")
-        && label != "relation-settings"
+    crate::layout::arrangement_id(label).is_some()
+}
+
+// AppKit's application menu and Command-H use NSApplication.hide directly.
+#[cfg(target_os = "macos")]
+pub(crate) fn configure_native_hide(window: tauri::Window) {
+    if snapshot_candidate(window.label()) {
+        return;
+    }
+    let target = window.clone();
+    if let Err(e) = window.run_on_main_thread(move || match target.ns_window() {
+        Ok(ptr) => unsafe {
+            (&*(ptr as *const objc2_app_kit::NSWindow)).setCanHide(false);
+        },
+        Err(e) => eprintln!("창 감추기 정책 적용 실패: {e}"),
+    }) {
+        eprintln!("창 감추기 정책 예약 실패: {e}");
+    }
 }
 fn compact(r: Rect, area: Rect, top: bool) -> Rect {
     let w = (r.w * 0.18).max(144.).min(r.w);
@@ -1232,23 +1244,27 @@ mod tests {
         assert!(c.sample(0, false, false));
     }
     #[test]
-    fn derived_connections_never_enter_the_memo_stash_snapshot() {
+    fn only_memo_hosts_enter_the_stash_snapshot() {
         for label in [
             "stash-indicator",
             GUIDE,
             "layout-undo",
             "relation-prototype-0",
             "relation-prototype-7",
+            "manager",
+            "permissions",
+            "capture-0",
+            "memo-overview",
+            "future-utility",
         ] {
             assert!(!snapshot_candidate(label));
         }
         for label in [
             "main",
             "note-one",
-            "capture-0",
+            "note-image-1",
             "terminal-1",
             "webview-web-one",
-            "manager",
         ] {
             assert!(snapshot_candidate(label));
         }

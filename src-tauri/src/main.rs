@@ -570,6 +570,11 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     let builder = builder
         .activate_ignoring_other_apps(false)
+        .plugin(
+            tauri::plugin::Builder::<_, ()>::new("memo-hide")
+                .on_window_ready(stash::configure_native_hide)
+                .build(),
+        )
         .manage(toolbar_pointer::Pointers::default());
     let app = builder
         .plugin(tauri_plugin_clipboard_manager::init())
