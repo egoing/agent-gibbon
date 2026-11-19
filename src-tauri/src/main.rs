@@ -1177,9 +1177,7 @@ fn launch_cli_server() -> Result<(), String> {
 fn launcher_recognizes_only_bundle_executables() {
     use std::path::Path;
     assert_eq!(
-        enclosing_app(Path::new(
-            "/Applications/Jajan.app/Contents/MacOS/jajan"
-        )),
+        enclosing_app(Path::new("/Applications/Jajan.app/Contents/MacOS/jajan")),
         Some(Path::new("/Applications/Jajan.app"))
     );
     assert_eq!(
@@ -1187,9 +1185,7 @@ fn launcher_recognizes_only_bundle_executables() {
         None
     );
     assert_eq!(
-        enclosing_app(Path::new(
-            "/Applications/Other.app/random/MacOS/jajan"
-        )),
+        enclosing_app(Path::new("/Applications/Other.app/random/MacOS/jajan")),
         None
     );
 }

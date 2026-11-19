@@ -177,8 +177,7 @@ mod tests {
     }
     #[test]
     fn independent_locks_and_stale_socket_recovery() {
-        let root =
-            std::env::temp_dir().join(format!("jajan-endpoint-test-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("jajan-endpoint-test-{}", std::process::id()));
         let a = root.join("a");
         let b = root.join("b");
         fs::create_dir_all(&a).unwrap();

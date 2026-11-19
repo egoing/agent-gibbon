@@ -74,10 +74,7 @@ mod tests {
     #[test]
     fn installed_path_is_unchanged() {
         let instance = Instance::parse(None, Some("ignored".into())).unwrap();
-        assert_eq!(
-            instance.directory(501).to_str().unwrap(),
-            "/tmp/jajan-501"
-        );
+        assert_eq!(instance.directory(501).to_str().unwrap(), "/tmp/jajan-501");
         assert_eq!(instance.title(), "Jajan");
         assert!(instance.label.is_none());
     }

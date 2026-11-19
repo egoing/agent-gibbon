@@ -11,8 +11,7 @@ fn trace(window: &WebviewWindow, event: &str, data: impl FnOnce() -> serde_json:
     use std::{io::Write, sync::OnceLock};
     static PATH: OnceLock<Option<std::path::PathBuf>> = OnceLock::new();
     static WRITER: Mutex<()> = Mutex::new(());
-    let Some(path) =
-        PATH.get_or_init(|| std::env::var_os("JAJAN_ENTRANCE_TRACE").map(Into::into))
+    let Some(path) = PATH.get_or_init(|| std::env::var_os("JAJAN_ENTRANCE_TRACE").map(Into::into))
     else {
         return;
     };
