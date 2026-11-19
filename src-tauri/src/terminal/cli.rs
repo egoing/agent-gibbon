@@ -9,6 +9,7 @@ pub struct Execution {
 }
 struct Record {
     execution: Execution,
+    new_window: bool,
     file: tempfile::NamedTempFile,
     dispatched: bool,
     failed: bool,
@@ -70,6 +71,22 @@ pub fn parse(args: &[String]) -> Result<Execution, String> {
     };
     execution.validate()?;
     Ok(execution)
+}
+pub fn parse_launch(args: &[String]) -> Result<Execution, String> {
+    let mut invocation = vec!["terminal-new".to_string()];
+    invocation.extend_from_slice(args);
+    let mode = if args.first().is_some_and(|arg| arg == "--request-id") {
+        2
+    } else {
+        0
+    };
+    if !args
+        .get(mode)
+        .is_some_and(|arg| matches!(arg.as_str(), "--" | "--shell"))
+    {
+        return Err("프로그램과 인자는 -- 또는 --shell 뒤에 지정하세요".into());
+    }
+    parse(&invocation)
 }
 #[cfg(not(unix))]
 fn shell_line(_: &Path) -> Result<String, String> {
@@ -133,14 +150,58 @@ pub fn line(app: &tauri::AppHandle, id: &str, token: &str) -> Result<String, Str
     let state = app.state::<Requests>();
     let mut records = state.0.lock().map_err(err)?;
     let record = records.get_mut(token).ok_or("실행 요청이 없습니다")?;
-    if record.execution.terminal != id || record.dispatched {
+    if record.execution.terminal != id || record.dispatched || record.failed {
         return Err("실행 요청이 이미 전달됐거나 대상이 다릅니다".into());
     }
     let line = shell_line(record.file.path())?;
     record.dispatched = true;
     Ok(line)
 }
+pub fn pending(app: &tauri::AppHandle, id: &str) -> Result<Option<String>, String> {
+    let state = app.state::<Requests>();
+    let records = state.0.lock().map_err(err)?;
+    Ok(records.iter().find_map(|(token, record)| {
+        (record.execution.terminal == id && !record.dispatched && !record.failed)
+            .then(|| token.clone())
+    }))
+}
+
+pub fn launch_retry(
+    app: &tauri::AppHandle,
+    execution: &Execution,
+) -> Result<Option<Value>, String> {
+    let Some(request_id) = &execution.request_id else {
+        return Ok(None);
+    };
+    let state = app.state::<Requests>();
+    let records = state.0.lock().map_err(err)?;
+    if let Some((token, record)) = records
+        .iter()
+        .find(|(_, record)| record.execution.request_id.as_ref() == Some(request_id))
+    {
+        if !record.new_window || record.execution.argv != execution.argv {
+            return Err("요청 ID와 실행 내용이 충돌합니다".into());
+        }
+        return Ok(Some(response(record, token, true)));
+    }
+    Ok(None)
+}
+
 pub fn run(app: &tauri::AppHandle, execution: &Execution) -> Result<Value, String> {
+    run_request(app, execution, false)
+}
+
+pub fn launch(app: &tauri::AppHandle, id: &str, execution: &Execution) -> Result<Value, String> {
+    let mut execution = execution.clone();
+    execution.terminal = id.into();
+    run_request(app, &execution, true)
+}
+
+fn run_request(
+    app: &tauri::AppHandle,
+    execution: &Execution,
+    new_window: bool,
+) -> Result<Value, String> {
     execution.validate()?;
     let state = app.state::<Requests>();
     let mut records = state.0.lock().map_err(err)?;
@@ -155,9 +216,14 @@ pub fn run(app: &tauri::AppHandle, execution: &Execution) -> Result<Value, Strin
             return Ok(response(record, token, true));
         }
     }
-    let window = app
-        .get_webview_window(&execution.terminal)
-        .ok_or("열린 터미널이 필요합니다")?;
+    let window = if new_window {
+        None
+    } else {
+        Some(
+            app.get_webview_window(&execution.terminal)
+                .ok_or("열린 터미널이 필요합니다")?,
+        )
+    };
     let terminals = app.state::<Terminals>();
     let sessions = terminals.sessions.lock().map_err(err)?;
     let mut active = match sessions.get(&execution.terminal) {
@@ -173,7 +239,7 @@ pub fn run(app: &tauri::AppHandle, execution: &Execution) -> Result<Value, Strin
     }
     if records
         .values()
-        .any(|r| r.execution.terminal == execution.terminal && !r.dispatched)
+        .any(|r| r.execution.terminal == execution.terminal && !r.dispatched && !r.failed)
     {
         return Err("터미널 시작 요청이 대기 중입니다".into());
     }
@@ -192,6 +258,7 @@ pub fn run(app: &tauri::AppHandle, execution: &Execution) -> Result<Value, Strin
     let line = shell_line(file.path())?;
     let mut record = Record {
         execution: execution.clone(),
+        new_window,
         file,
         dispatched: false,
         failed: false,
@@ -199,23 +266,34 @@ pub fn run(app: &tauri::AppHandle, execution: &Execution) -> Result<Value, Strin
     if let Some(session) = active.as_mut() {
         session.prompt.input(format!("{line}\r").as_bytes());
         record.dispatched = true;
-        records.insert(token.clone(), record);
-        session
+        let written = session
             .writer
             .write_all(format!("{line}\r").as_bytes())
-            .map_err(err)?;
-        session.writer.flush().map_err(err)?;
+            .and_then(|()| session.writer.flush());
+        record.failed = written.is_err();
+        records.insert(token.clone(), record);
+        written.map_err(err)?;
     } else {
         records.insert(token.clone(), record);
-        if let Err(error) = window.eval(format!(
-            "void start('shell', null, undefined, {})",
-            serde_json::to_string(&token).map_err(err)?
-        )) {
-            records.remove(&token);
-            return Err(err(error));
+        if let Some(window) = window {
+            if let Err(error) = window.emit_to(&execution.terminal, "terminal-execute", &token) {
+                records.remove(&token);
+                return Err(err(error));
+            }
         }
     }
     Ok(response(records.get(&token).unwrap(), &token, false))
+}
+
+pub fn cancel_pending(app: &tauri::AppHandle, id: &str) {
+    if let Ok(mut records) = app.state::<Requests>().0.lock() {
+        for record in records
+            .values_mut()
+            .filter(|record| record.execution.terminal == id && !record.dispatched)
+        {
+            record.failed = true;
+        }
+    }
 }
 impl Drop for Record {
     fn drop(&mut self) {
@@ -231,9 +309,12 @@ pub fn status(app: &tauri::AppHandle, token: &str) -> Result<Value, String> {
         .ok_or("실행 요청을 찾을 수 없습니다. 앱 재시작 여부를 확인하세요")?;
     Ok(response(record, token, false))
 }
-pub fn failed(app: &tauri::AppHandle, token: &str) {
+pub fn failed(app: &tauri::AppHandle, token: &str, id: &str) {
     if let Ok(mut records) = app.state::<Requests>().0.lock() {
-        if let Some(record) = records.get_mut(token) {
+        if let Some(record) = records
+            .get_mut(token)
+            .filter(|r| r.execution.terminal == id)
+        {
             record.failed = true;
         }
     }

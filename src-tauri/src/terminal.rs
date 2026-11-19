@@ -494,12 +494,16 @@ pub async fn terminal_start(
     local_flow: Option<u64>,
     exec_request: Option<String>,
 ) -> Result<Value, String> {
-    let _update_activity = crate::updater::activity(window.app_handle())?;
+    let id = caller(&window)?;
+    let _update_activity = crate::updater::activity(window.app_handle()).inspect_err(|_| {
+        if let Some(request) = exec_request.as_deref() {
+            cli::failed(window.app_handle(), request, &id);
+        }
+    })?;
     let mut worker_call = {
         let _scope = crate::local_trace::webview_scope(&window, local_flow);
         crate::local_trace::Call::begin("terminal.worker", crate::local_trace::Stage::UiQueue)
     };
-    let id = caller(&window)?;
     let app = window.app_handle().clone();
     let sentry_parent = crate::telemetry::TimingContext::request("terminal.request");
     tauri::async_runtime::spawn_blocking(move || {
@@ -511,6 +515,9 @@ pub async fn terminal_start(
             let dimensions = size(cols, rows)?;
             let state = app.state::<Terminals>();
             let mut reservation = Start::reserve(&state, &id)?;
+            if exec_request.is_none() && cli::pending(&app, &id)?.is_some() {
+                return Err("터미널 실행 요청이 대기 중입니다".into());
+            }
             let agent = state.records.get(&id)?;
             let token = reservation.token;
             let watched_app = app.clone();
@@ -601,7 +608,7 @@ pub async fn terminal_start(
         })();
         if result.is_err() {
             if let Some(request) = exec_request.as_deref() {
-                cli::failed(&app, request);
+                cli::failed(&app, request, &id);
             }
         }
         worker_call.finish(result.is_ok());
@@ -669,9 +676,17 @@ pub fn terminal_hide(window: WebviewWindow) -> Result<(), String> {
     window.hide().map_err(err)
 }
 #[tauri::command]
-pub fn terminal_info(window: WebviewWindow) -> Result<Value, String> {
+pub fn terminal_info(
+    window: WebviewWindow,
+    with_pending_execution: Option<bool>,
+) -> Result<Value, String> {
     let id = caller(&window)?;
-    inspect(window.app_handle(), &id)
+    let app = window.app_handle();
+    let mut info = inspect(app, &id)?;
+    if with_pending_execution.unwrap_or(false) {
+        info["pending_execution"] = json!(cli::pending(app, &id)?);
+    }
+    Ok(info)
 }
 pub fn update_blocked(app: &tauri::AppHandle) -> Result<bool, String> {
     app.state::<Terminals>().update_blocked()

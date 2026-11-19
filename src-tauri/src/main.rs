@@ -725,6 +725,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             monitor_layout::native_event(win, event);
             if matches!(event, tauri::WindowEvent::Destroyed) {
                 first_frame::cancel(win.app_handle(), win.label());
+                if win.label().starts_with("terminal-") {
+                    terminal::cli::cancel_pending(win.app_handle(), win.label());
+                }
             }
             if win.label() == "relation-settings" {
                 if let tauri::WindowEvent::CloseRequested { api, .. } = event {

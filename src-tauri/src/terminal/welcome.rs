@@ -21,6 +21,14 @@ fn latest(agents: impl Iterator<Item = Terminal>) -> Option<PathBuf> {
         .and_then(|a| a.last_path)
 }
 pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Result<Value, String> {
+    create_with_execution(app, bounds, None)
+}
+
+pub fn create_with_execution(
+    app: &tauri::AppHandle,
+    bounds: crate::capture::ImageNote,
+    execution: Option<&cli::Execution>,
+) -> Result<Value, String> {
     let state = app.state::<Terminals>();
     let last_path = latest(entries(app).into_iter());
     let id = format!(
@@ -43,16 +51,31 @@ pub fn create(app: &tauri::AppHandle, bounds: crate::capture::ImageNote) -> Resu
         restore_plan: None,
         auto_restore: false,
     };
-    crate::memo_color::create(&root(app), &id)?;
-    state.records.insert(&root(app), agent)?;
-    crate::session_restore::mark_reopened(app, &id);
-    crate::first_frame::creating(app, &id, crate::first_frame::Presentation::Terminal, || {
-        open_presented(app, &id, false)?;
-        let window = app.get_webview_window(&id).ok_or("터미널 창이 없습니다")?;
-        crate::first_frame::placed(&window)
-    })?;
-    crate::tray::refresh(app)?;
-    inspect(app, &id)
+    let request = execution
+        .map(|execution| cli::launch(app, &id, execution))
+        .transpose()?;
+    let created = (|| {
+        crate::memo_color::create(&root(app), &id)?;
+        state.records.insert(&root(app), agent)?;
+        crate::session_restore::mark_reopened(app, &id);
+        crate::first_frame::creating(app, &id, crate::first_frame::Presentation::Terminal, || {
+            open_presented(app, &id, false)?;
+            let window = app.get_webview_window(&id).ok_or("터미널 창이 없습니다")?;
+            crate::first_frame::placed(&window)
+        })?;
+        crate::tray::refresh(app)?;
+        let mut info = inspect(app, &id)?;
+        if let Some(request) = request {
+            for key in ["request_id", "token", "duplicate", "status"] {
+                info[key] = request[key].clone();
+            }
+        }
+        Ok(info)
+    })();
+    if created.is_err() && execution.is_some() {
+        cli::cancel_pending(app, &id);
+    }
+    created
 }
 
 fn default_shell() -> Result<PathBuf, String> {

@@ -1249,6 +1249,12 @@ macOS가 설정 열기 요청을 받아들이면 현재 화면 하단에 별도 
 - Welcome에서 창 제목 변경 details/form과 이벤트를 제거한다. 기존에 저장한 제목과 관리 창의 다른 기능은 변경하지 않는다.
 - [캡처 배치 SVG](design/capture-original-bounds.svg) · [PNG](design/capture-original-bounds.png), [Welcome SVG](design/terminal-welcome.svg) · [PNG](design/terminal-welcome.png). 아래 검증은 [#176 후속 검증 기록](verification/issue176-terminal-capture.md#2026-11-15-사용자-검수-후속)에서 최초 검사와 구분한다.
 
+### 작업공간 CLI 터미널 준비 표시
+
+- 프로그램을 함께 지정해 열면 첫 화면의 툴바 아래 중앙에 회전하는 원과 `터미널 준비 중…`을 표시한다. 메모의 배경색과 전경색을 쓰고, 동작 줄이기에서는 원을 정지한다. 준비 중에는 터미널 입력을 받지 않으며 기존 포커스를 보존한다.
+- PTY 시작 응답과 첫 출력 처리를 기다려 실행 화면을 표시한다. 출력이 없는 PTY도 시작 응답 후 750ms에 입력할 수 있다. PTY를 시작할 수 없으면 기존 상태 영역에 오류를 표시한다. 명령을 지정하지 않고 연 터미널은 작업 위치와 추천 작업을 표시한다.
+- [설명 시안 SVG](design/terminal-command-startup.svg) · [PNG](design/terminal-command-startup.png). 시안은 실제 앱 실행 결과와 구분한다.
+
 ### PTY 종료 후 화면 보존 — #24 검토본
 
 실행 중인 창에서는 마지막 출력까지 표시한 뒤 기존 종료 문구를 한 번 붙인다. 창을 숨겼다가 열어도 같은 xterm 버퍼를 사용한다. 종료 상태에서는 창 크기와 출력 선택을 계속 사용할 수 있고 새 입력은 전송하지 않는다. WebView 자체가 재생성되면 메모리에 남은 종료 상태로 기존 종료 문구를 표시한다. 이전 출력 원문을 디스크에 저장하거나 실행 계획을 다시 실행하지 않는다. 창을 명시적으로 종료한 뒤 다시 열 때는 기존 Welcome·복원 흐름을 따른다.
