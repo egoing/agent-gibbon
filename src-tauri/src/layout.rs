@@ -442,6 +442,24 @@ pub fn undo_arrangement(window: WebviewWindow) -> Result<(), String> {
     Ok(())
 }
 
+// Share the space evenly unless a live text window requires a larger track.
+fn grid_tracks(minima: &[i64], available: i64, gap: i64) -> Option<Vec<i64>> {
+    let mut remaining = available - gap * (minima.len() as i64 + 1);
+    if minima.iter().sum::<i64>() > remaining {
+        return None;
+    }
+    let mut sizes = minima.to_vec();
+    let mut order: Vec<_> = (0..sizes.len()).collect();
+    order.sort_unstable_by_key(|&i| std::cmp::Reverse(minima[i]));
+    let mut count = sizes.len() as i64;
+    for i in order {
+        sizes[i] = sizes[i].max(remaining / count);
+        remaining -= sizes[i];
+        count -= 1;
+    }
+    Some(sizes)
+}
+
 fn arrangement_rects(
     area: Rect,
     scale: f64,
@@ -449,6 +467,7 @@ fn arrangement_rects(
     specs: &[placement::Item],
     images: &[Option<tauri::LogicalSize<f64>>],
     viewports: &[bool],
+    fixed: &[bool],
 ) -> Result<Vec<Rect>, String> {
     if specs.is_empty() {
         return Ok(Vec::new());
@@ -460,32 +479,43 @@ fn arrangement_rects(
     let rects = if arrangement == Arrangement::Grid {
         let gap = (12.0 * scale / unit(scale)).round() as i64;
         let n = specs.len();
-        let cols = ((n as f64 * area.width as f64 / area.height as f64)
+        let preferred = ((n as f64 * area.width as f64 / area.height as f64)
             .sqrt()
             .round() as usize)
             .clamp(1, n);
-        let rows = n.div_ceil(cols);
-        let cw = (area.width - gap * (cols as i64 + 1)) / cols as i64;
-        let ch = (area.height - gap * (rows as i64 + 1)) / rows as i64;
-        if cw < (144.0 * scale / unit(scale)) as i64
-            || ch
-                < specs
-                    .iter()
-                    .enumerate()
-                    .map(|(i, s)| {
-                        if viewports[i] {
-                            s.min
-                        } else {
-                            s.min.min((48.0 * scale / unit(scale)) as i64)
-                        }
-                    })
-                    .max()
-                    .unwrap()
-        {
-            return Err("메모를 배치할 공간이 부족합니다".into());
-        }
+        let mut options: Vec<_> = (1..=n).collect();
+        options.sort_by_key(|cols| cols.abs_diff(preferred));
+        let min_width = (144.0 * scale / unit(scale)).round() as i64;
+        let min_height = (48.0 * scale / unit(scale)).round() as i64;
+        let (widths, heights) = options
+            .into_iter()
+            .find_map(|cols| {
+                let mut widths = vec![0; cols];
+                let mut heights = vec![0; n.div_ceil(cols)];
+                for (i, s) in specs.iter().enumerate() {
+                    let w = if fixed[i] { s.width } else { min_width };
+                    let h = if fixed[i] || viewports[i] {
+                        s.min
+                    } else {
+                        s.min.min(min_height)
+                    };
+                    widths[i % cols] = widths[i % cols].max(w);
+                    heights[i / cols] = heights[i / cols].max(h);
+                }
+                Some((
+                    grid_tracks(&widths, area.width, gap)?,
+                    grid_tracks(&heights, area.height, gap)?,
+                ))
+            })
+            .ok_or("메모 크기를 유지하며 배치할 공간이 부족합니다")?;
         let mut frames = Vec::new();
-        for i in 0..specs.len() {
+        let mut x = area.x + gap;
+        let mut y = area.y + gap;
+        for i in 0..n {
+            let col = i % widths.len();
+            let row = i / widths.len();
+            let cw = widths[col];
+            let ch = heights[row];
             let max_width = cw.min(specs[i].width);
             let max_height = ch.min(specs[i].max);
             let (width, height) = if let Some(img) = images[i] {
@@ -498,11 +528,16 @@ fn arrangement_rects(
                 (max_width, max_height)
             };
             frames.push(Rect {
-                x: area.x + gap + (i % cols) as i64 * (cw + gap) + (cw - width) / 2,
-                y: area.y + gap + (i / cols) as i64 * (ch + gap) + (ch - height) / 2,
+                x: x + (cw - width) / 2,
+                y: y + (ch - height) / 2,
                 width,
                 height,
             });
+            x += cw + gap;
+            if col + 1 == widths.len() {
+                x = area.x + gap;
+                y += ch + gap;
+            }
         }
         frames
     } else {
@@ -539,7 +574,7 @@ fn planned_frames(
     scale: f64,
     arrangement: Arrangement,
 ) -> Result<Vec<Rect>, String> {
-    let specs: Vec<_> = windows
+    let mut specs: Vec<_> = windows
         .iter()
         .map(|w| arrangement_item(w, area, scale))
         .collect();
@@ -551,7 +586,33 @@ fn planned_frames(
         .iter()
         .map(|w| w.label().starts_with("terminal-") || w.label().starts_with("webview-"))
         .collect();
-    arrangement_rects(area, scale, arrangement, &specs, &images, &viewports)
+    let mut fixed = vec![false; windows.len()];
+    if arrangement == Arrangement::Grid {
+        for (i, w) in windows.iter().enumerate() {
+            if crate::memo_id_from_window(w.label()).is_some()
+                && crate::sizing::image_size(w).is_none()
+            {
+                let frame = overview::current_frame(w)?;
+                let factor = scale / frame.scale / unit(scale);
+                let height = (f64::from(frame.size.height) * factor).round() as i64;
+                specs[i] = placement::Item {
+                    width: (f64::from(frame.size.width) * factor).round() as i64,
+                    min: height,
+                    max: height,
+                };
+                fixed[i] = true;
+            }
+        }
+    }
+    arrangement_rects(
+        area,
+        scale,
+        arrangement,
+        &specs,
+        &images,
+        &viewports,
+        &fixed,
+    )
 }
 
 fn move_hosts(
@@ -761,6 +822,7 @@ mod tests {
                     &specs,
                     &images,
                     &[false, false, true, true],
+                    &[false; 4],
                 )
                 .unwrap();
                 assert_eq!(rects.len(), 4);
@@ -808,7 +870,8 @@ mod tests {
                 arrangement,
                 &specs,
                 &[None; 4],
-                &[true; 4]
+                &[true; 4],
+                &[false; 4]
             )
             .is_err());
         }

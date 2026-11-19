@@ -359,9 +359,16 @@ fn arrange_session(app: &tauri::AppHandle, session: &Session) -> Result<(), Stri
 }
 
 fn set_backdrop_visible(backdrop: &WebviewWindow, visible: bool) -> Result<(), String> {
+    let generation = backdrop
+        .state::<Overview>()
+        .session
+        .lock()
+        .unwrap()
+        .as_ref()
+        .map_or(0, |s| s.id);
     backdrop
         .eval(format!(
-            "document.documentElement.toggleAttribute('data-visible', {visible})"
+            "window.overviewGeneration = {generation}; document.documentElement.toggleAttribute('data-visible', {visible})"
         ))
         .map_err(error)
 }
@@ -419,6 +426,7 @@ fn close(app: &tauri::AppHandle, session: &Session, animate: bool) -> Result<(),
 #[derive(serde::Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub(crate) enum Action {
+    ClearFocus,
     Arrange,
     Close,
 }
@@ -429,7 +437,12 @@ pub(crate) fn overview_action(
     action: Action,
     generation: u32,
 ) -> Result<(), String> {
-    if window.label() != CONTROLS {
+    let source = if matches!(action, Action::ClearFocus) {
+        BACKDROP
+    } else {
+        CONTROLS
+    };
+    if window.label() != source {
         return Err("메모 모아보기에서만 실행할 수 있습니다".into());
     }
     let app = window.app_handle();
@@ -444,6 +457,14 @@ pub(crate) fn overview_action(
         return Ok(());
     }
     match action {
+        Action::ClearFocus => {
+            if state.current(generation).is_some() && window.is_visible().map_err(error)? {
+                // Keep the backdrop below unpinned memos. The small control window can
+                // receive keyboard focus without raising the full-screen backdrop.
+                utility(app, CONTROLS)?.set_focus().map_err(error)?;
+            }
+            Ok(())
+        }
         Action::Arrange => {
             if let Some(session) = state.current(generation) {
                 arrange_session(app, &session)?;
