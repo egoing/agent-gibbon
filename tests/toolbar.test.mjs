@@ -58,7 +58,7 @@ test('toolbar waits for native fold and restores the same state on expansion', a
   // Native coordinates must work without DOM focus in either toolbar state,
   // including hits on the SVG child, gaps/drag areas, disabled and hidden tools.
   for (const collapsed of [false, true]) {
-    env.gibbonToolbarFold(collapsed);
+    env.jajanToolbarFold(collapsed);
     for (const active of [false, true]) {
       focused = active;
       for (const button of [toggle, close]) {
@@ -80,7 +80,7 @@ test('toolbar waits for native fold and restores the same state on expansion', a
       assert.equal(close.attributes['data-pointer-over'], undefined);
     }
   }
-  env.gibbonToolbarFold(false);
+  env.jajanToolbarFold(false);
   await toggle.listeners.click();
   assert.equal(classes.has('toolbar-collapsed'), true);
   assert.equal(toggle.attributes['aria-expanded'], 'false');
@@ -95,7 +95,7 @@ test('toolbar waits for native fold and restores the same state on expansion', a
   assert.equal(toggle.attributes['aria-expanded'], 'true');
   assert.equal(toggle.title, '메모 접기');
   let delegated = 0;
-  env.gibbonToggleNote = async () => { delegated++; env.gibbonToolbarFold(true); };
+  env.jajanToggleNote = async () => { delegated++; env.jajanToolbarFold(true); };
   await toggle.listeners.click();
   assert.equal(delegated, 1);
   assert.equal(calls.length, 2);

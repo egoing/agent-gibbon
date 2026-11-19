@@ -13,7 +13,7 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-CLI = ROOT / 'scripts/agent-gibbon-dev'
+CLI = ROOT / 'scripts/jajan-dev'
 
 
 def run(*args):
@@ -99,7 +99,7 @@ def main():
         # Orca list-windows can omit borderless Tauri windows. Resolve their
         # CGWindow ID by exact PID/title, then target that ID through Orca.
         listing = json.loads(run(native, args.pid))
-        title = f"Agent Gibbon [{state['dev_label']}] — {note}"
+        title = f"Jajan [{state['dev_label']}] — {note}"
         matches = [w for w in listing['windows'] if w.get('kCGWindowName') == title]
         assert len(matches) == 1, (title, listing)
         windows[note] = matches[0]['kCGWindowNumber']

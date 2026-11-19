@@ -170,7 +170,7 @@ test('More destination returns from Settings to the full list without type prefi
   app.elements.get('settings-nav').onclick();
   app.elements.get('notes-nav').onclick(); await tick();
   assert.equal(app.elements.get('list').children.length,1);
-  app.run('window.gibbonShowNotes()'); await tick();
+  app.run('window.jajanShowNotes()'); await tick();
   assert.equal(app.elements.get('notes-page').hidden,false);
   assert.equal(app.elements.get('list').children.length,31);
   assert.equal(app.elements.get('list').children[0].textContent,'제목 0');

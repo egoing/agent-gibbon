@@ -38,7 +38,7 @@ pnpm run version:check
 스크립트는 `package.json`, `src-tauri/Cargo.toml`, `src-tauri/Cargo.lock`의 앱 항목, `src-tauri/tauri.conf.json`을 함께 변경합니다. pnpm lockfile에는 앱 자체의 버전 필드가 없어 의존성 해석을 그대로 유지합니다. 현재보다 높은 안정 버전만 허용합니다. 변경을 검토하고 테스트한 뒤 버전 커밋을 push하고 그 커밋에 태그를 붙입니다.
 
 ```sh
-git tag -a v0.2.8 -m 'Agent Gibbon 0.2.8 배포'
+git tag -a v0.2.8 -m 'Jajan 0.2.8 배포'
 git push origin v0.2.8
 ```
 
@@ -61,14 +61,14 @@ git push origin v0.2.8
 
 - GitHub Actions repository variable `TAURI_UPDATER_PUBLIC_KEY`에는 앱 바이너리에 컴파일할 Tauri updater 공개 키를 둡니다. 빌드 job은 이 값을 `TAURI_UPDATER_PUBLIC_KEY` 환경변수로 전달하고 Rust backend는 `option_env!`로 포함합니다. 공개 키는 `tauri.conf.json`에 비밀로 저장하지 않습니다.
 - GitHub Actions repository secrets `TAURI_SIGNING_PRIVATE_KEY`와 `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`는 updater 번들과 `.sig`를 생성하는 데 사용합니다. 개인 키는 소스, artifact, 로그, 캐시에 넣지 않습니다. 태그 릴리스는 개인 키와 공개 키가 설정되지 않으면 실패합니다. 암호 없는 키를 사용할 때 password secret은 빈 값이어도 됩니다.
-- 장기 개인 키 생성과 보관은 릴리스 준비 작업입니다. 2026-11-07 사용자 승인으로 Mac Keychain(service `AGENT_GIBBON_TAURI_UPDATER`, account는 로컬 로그인 사용자)과 Actions secret/공개 variable에 등록했습니다. Enpass 백업 항목을 저장한 뒤 다시 열어 비밀 필드의 길이와 공개 키·복구 설명을 확인했습니다. 마스킹된 비밀 키의 원문 일치 및 실제 복구는 검증하지 않았습니다. 키를 잃으면 기존 설치본의 업데이트 서명을 만들 수 없으므로 두 백업의 접근성과 복구 가능성을 확인해야 합니다.
+- 장기 개인 키 생성과 보관은 릴리스 준비 작업입니다. 2026-11-07 사용자 승인으로 Mac Keychain(service `JAJAN_TAURI_UPDATER`, account는 로컬 로그인 사용자)과 Actions secret/공개 variable에 등록했습니다. Enpass 백업 항목을 저장한 뒤 다시 열어 비밀 필드의 길이와 공개 키·복구 설명을 확인했습니다. 마스킹된 비밀 키의 원문 일치 및 실제 복구는 검증하지 않았습니다. 키를 잃으면 기존 설치본의 업데이트 서명을 만들 수 없으므로 두 백업의 접근성과 복구 가능성을 확인해야 합니다.
 - `workflow_dispatch`는 각 플랫폼 runner에서 일회용 키를 만들고 빌드 및 manifest 검증 후 폐기합니다. 이 키는 공개되지 않고 다음 실행에도 재사용되지 않으므로 수동 실행 artifact는 실제 배포 키로 서명된 업데이트가 아닙니다.
 
 `0.2.7` 이하 설치본에는 updater 공개 키가 포함되어 있지 않습니다. `0.2.8`은 다운로드 URL 오류가 있으므로, `0.2.8` 이하 사용자는 `0.2.9` 이상을 한 번 수동 설치해야 이후 버전부터 앱 내 업데이트를 받을 수 있습니다. 새 버전 공개 후에는 이전 정상 배포판에서 확인·다운로드·설치·재시작과 실제 실행 버전을 확인하고, 수행한 플랫폼과 미검증 플랫폼을 구분해 기록합니다.
 
 ## 오류 수집과 OS 서명
 
-저장소 Actions secret 또는 variable `AGENT_GIBBON_SENTRY_DSN`에 공식 배포용 공개 수신 DSN을 설정하면 빌드 단계에만 주입합니다(secret 우선). 관리 API 토큰을 넣지 않습니다. 값이 없으면 경고를 표시하고 오류 수집이 꺼진 설치 파일을 만듭니다. 소스에는 개인 계정·서버 정보나 DSN을 넣지 않습니다.
+저장소 Actions secret 또는 variable `JAJAN_SENTRY_DSN`에 공식 배포용 공개 수신 DSN을 설정하면 빌드 단계에만 주입합니다(secret 우선). 관리 API 토큰을 넣지 않습니다. 값이 없으면 경고를 표시하고 오류 수집이 꺼진 설치 파일을 만듭니다. 소스에는 개인 계정·서버 정보나 DSN을 넣지 않습니다.
 
 오류·성능·로그·릴리스 상태·응답 감시는 별도 사용자 동의 전에는 켜지지 않는다. 운영 정보가 확정된 빌드에서 동의한 뒤에만 허용된 진단을 활성화하며, 개발 빌드는 명시적 진단 실행도 필요하다. 수집 끄기와 공헌자 빌드 경계는 [Sentry 진단 안내](diagnostics.md)를 따른다. 관리 토큰·진단 원문은 빌드 캐시나 릴리스 자산에 포함하지 않는다.
 
@@ -92,15 +92,15 @@ DSN이 있는 공식 빌드도 현재 정책에 대한 별도 전송 동의가 �
 
 ## 0.2.8 공개 후 파일명 검증과 0.2.9
 
-GitHub는 업로드 이름의 공백을 점으로 정규화했다. 0.2.8의 manifest는 공백을 인코딩한 URL을 생성해 세 플랫폼 모두 404가 발생했으며, 실제 공개 파일 다운로드 확인으로 발견했다. 기존 태그·자산을 덮어쓰지 않고 0.2.8을 사전 릴리스로 전환했다. 0.2.9부터는 `Agent.Gibbon_...` 형태를 빌드 자산·서명 trusted filename·manifest·앱 검증에 공통 적용한다. 배포할 때 GitHub에 올라간 실제 자산명과 manifest URL도 검증한다. 0.2.8을 설치한 경우에도 0.2.9를 한 번 수동 설치해야 한다.
+GitHub는 업로드 이름의 공백을 점으로 정규화했다. 0.2.8의 manifest는 공백을 인코딩한 URL을 생성해 세 플랫폼 모두 404가 발생했으며, 실제 공개 파일 다운로드 확인으로 발견했다. 기존 태그·자산을 덮어쓰지 않고 0.2.8을 사전 릴리스로 전환했다. 0.2.9부터는 `Jajan_...` 형태를 빌드 자산·서명 trusted filename·manifest·앱 검증에 공통 적용한다. 배포할 때 GitHub에 올라간 실제 자산명과 manifest URL도 검증한다. 0.2.8을 설치한 경우에도 0.2.9를 한 번 수동 설치해야 한다.
 
 ### 설치 보호 실기기 시험
 
-격리된 이전 버전과 후보를 모두 Cargo feature `verification-updater`로 빌드한다. 두 앱에 정식 배포와 다른 동일한 bundle identifier와 설치 경로를 사용한다. 이 feature는 검증용 메모 저장소와 CLI 인스턴스를 선택한다. `GIBBON_VERIFICATION_UPDATE_URL`은 빌드 시 주입하며 피드와 같은 출처에서 `v<버전>/<플랫폼 파일명>`을 제공한다. HTTP 시험은 기기 자체의 `127.0.0.1`에 한정하고 해당 검증 빌드에만 updater의 로컬 HTTP 허용 옵션을 지정한다.
+격리된 이전 버전과 후보를 모두 Cargo feature `verification-updater`로 빌드한다. 두 앱에 정식 배포와 다른 동일한 bundle identifier와 설치 경로를 사용한다. 이 feature는 검증용 메모 저장소와 CLI 인스턴스를 선택한다. `JAJAN_VERIFICATION_UPDATE_URL`은 빌드 시 주입하며 피드와 같은 출처에서 `v<버전>/<플랫폼 파일명>`을 제공한다. HTTP 시험은 기기 자체의 `127.0.0.1`에 한정하고 해당 검증 빌드에만 updater의 로컬 HTTP 허용 옵션을 지정한다.
 
 이전 버전과 후보의 `TAURI_UPDATER_PUBLIC_KEY`와 Tauri 설정의 `plugins.updater.pubkey`에 같은 일회성 공개키를 주입한다. 후보는 정식 절차와 같은 플랫폼 파일명으로 바꾼 뒤 해당 키 쌍으로 다시 서명한다. 시험 중 후보를 바꾸면 이전 검증 캐시를 격리하고, 노출할 manifest 버전과 HTTP 응답 파일의 SHA-256을 대조한다.
 
-기본 검증 간격은 최초 확인 15초, 이후 확인 60초, OS 무입력 30초, 설치 재시도 5초다. 최종 확인에도 무입력 30초를 사용한다. 배포판의 5분 대기 자체를 별도로 시험하려면 빌드 시 `GIBBON_VERIFICATION_STANDARD_TIMING=1`을 지정한다. 앱의 `diagnostics`에서 실제 시간값, 실행 버전과 설치 준비 응답을 확인한다. 이전 버전의 안정화된 메모 상태를 기록한 다음 피드에 후보 버전을 노출한다.
+기본 검증 간격은 최초 확인 15초, 이후 확인 60초, OS 무입력 30초, 설치 재시도 5초다. 최종 확인에도 무입력 30초를 사용한다. 배포판의 5분 대기 자체를 별도로 시험하려면 빌드 시 `JAJAN_VERIFICATION_STANDARD_TIMING=1`을 지정한다. 앱의 `diagnostics`에서 실제 시간값, 실행 버전과 설치 준비 응답을 확인한다. 이전 버전의 안정화된 메모 상태를 기록한 다음 피드에 후보 버전을 노출한다.
 
 정식 빌드는 시작 15초 뒤 최초 확인을 시도하고, 성공·실패 여부와 관계없이 각 자동 확인 완료 후 15분 주기로 다시 확인한다. 설치 준비 재검사는 15초 간격이고 무입력 기준은 5분이다. 검증 프로필은 60초 확인·5초 재검사·30초 무입력을 사용한다.
 

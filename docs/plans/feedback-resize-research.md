@@ -1,7 +1,7 @@
 # 피드백 바 크기 조절 가능성 조사 계획
 
 기준: 2026-11-14, origin/main `53ab3a710fb54f4702de2499fdc22b9dd8506087`.
-작업 루트: `/Users/egoinglee/.codex/worktrees/6eec/agent-gibbon`.
+작업 루트: `/Users/egoinglee/.codex/worktrees/6eec/jajan`.
 현황판 7번 독립 조사이며 제품 구현은 포함하지 않는다.
 
 ## 조사 순서

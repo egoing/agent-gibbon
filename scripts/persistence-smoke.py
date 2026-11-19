@@ -7,7 +7,7 @@ import time
 import uuid
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-CLI = ROOT / 'scripts/agent-gibbon-dev'
+CLI = ROOT / 'scripts/jajan-dev'
 
 def cli(*args, check=True):
     result = subprocess.run([str(CLI), *args], cwd=ROOT, capture_output=True, text=True)

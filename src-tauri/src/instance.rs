@@ -18,7 +18,7 @@ impl Instance {
                 .bytes()
                 .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
         {
-            return Err("FLOATNOTE_INSTANCE는 dev-와 소문자 SHA-256 앞 24자리여야 합니다".into());
+            return Err("JAJAN_INSTANCE는 dev-와 소문자 SHA-256 앞 24자리여야 합니다".into());
         }
         let name = name.unwrap_or_else(|| "worktree".into());
         let name: String = name.chars().filter(|c| !c.is_control()).take(60).collect();
@@ -36,13 +36,13 @@ impl Instance {
             .as_ref()
             .map(|id| format!("-{id}"))
             .unwrap_or_default();
-        format!("/tmp/floatnote-{uid}{suffix}").into()
+        format!("/tmp/jajan-{uid}{suffix}").into()
     }
     pub fn title(&self) -> String {
         self.label
             .as_ref()
-            .map(|label| format!("Agent Gibbon [{label}]"))
-            .unwrap_or_else(|| "Agent Gibbon".into())
+            .map(|label| format!("Jajan [{label}]"))
+            .unwrap_or_else(|| "Jajan".into())
     }
 }
 static INSTANCE: OnceLock<Instance> = OnceLock::new();
@@ -58,7 +58,7 @@ pub fn init() -> Result<(), String> {
             Some("Updater verification".into()),
         )?
     } else {
-        Instance::parse(read("FLOATNOTE_INSTANCE")?, read("FLOATNOTE_DEV_NAME")?)?
+        Instance::parse(read("JAJAN_INSTANCE")?, read("JAJAN_DEV_NAME")?)?
     };
     INSTANCE
         .set(value)
@@ -76,9 +76,9 @@ mod tests {
         let instance = Instance::parse(None, Some("ignored".into())).unwrap();
         assert_eq!(
             instance.directory(501).to_str().unwrap(),
-            "/tmp/floatnote-501"
+            "/tmp/jajan-501"
         );
-        assert_eq!(instance.title(), "Agent Gibbon");
+        assert_eq!(instance.title(), "Jajan");
         assert!(instance.label.is_none());
     }
     #[test]

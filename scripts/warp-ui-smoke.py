@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """macOS warp smoke test. Use an isolated development app and an unlocked desktop.
-Requires AGENT_GIBBON_TEST_BIN and AGENT_GIBBON_TEST_PROCESS.
+Requires JAJAN_TEST_BIN and JAJAN_TEST_PROCESS.
 Compiles a temporary Swift cursor helper; requires macOS accessibility access.
 """
 import json
@@ -12,8 +12,8 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-BIN = os.environ.get('AGENT_GIBBON_TEST_BIN', str(ROOT / 'scripts/agent-gibbon'))
-PROCESS = os.environ.get('AGENT_GIBBON_TEST_PROCESS', 'agent-gibbon')
+BIN = os.environ.get('JAJAN_TEST_BIN', str(ROOT / 'scripts/jajan'))
+PROCESS = os.environ.get('JAJAN_TEST_PROCESS', 'jajan')
 
 def apple(code):
     return subprocess.check_output(['osascript', '-e', code], text=True, timeout=15).strip()
@@ -30,8 +30,8 @@ def passed(message):
     print('PASS: ' + message, flush=True)
 
 
-assert os.environ.get('AGENT_GIBBON_TEST_BIN') and os.environ.get('AGENT_GIBBON_TEST_PROCESS'), 'Use an isolated app'
-pointer_folder = tempfile.TemporaryDirectory(prefix='agent-gibbon-warp-pointer-')
+assert os.environ.get('JAJAN_TEST_BIN') and os.environ.get('JAJAN_TEST_PROCESS'), 'Use an isolated app'
+pointer_folder = tempfile.TemporaryDirectory(prefix='jajan-warp-pointer-')
 pointer_source = Path(pointer_folder.name) / 'pointer.swift'
 pointer_source.write_text("""import CoreGraphics
 import Foundation
@@ -42,7 +42,7 @@ POINTER = str(Path(pointer_folder.name) / 'pointer')
 subprocess.run(['swiftc', str(pointer_source), '-o', POINTER], check=True)
 front = apple('tell application "System Events" to get name of first application process whose frontmost is true')
 note_id = 'warp-test-' + uuid.uuid4().hex[:8]
-window = 'window ' + json.dumps('Agent Gibbon — ' + note_id, ensure_ascii=False)
+window = 'window ' + json.dumps('Jajan — ' + note_id, ensure_ascii=False)
 def inspect(): return cli('inspect', note_id)
 def move(x, y):
     subprocess.run([POINTER, str(x), str(y)], check=True)

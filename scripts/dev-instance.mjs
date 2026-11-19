@@ -17,19 +17,19 @@ export function devInstance(root) {
   // Linked worktrees share this directory; independent repositories do not.
   // Source archives without Git retain the ordinary local Cargo layout.
   const defaultBuildDir = common.status === 0
-    ? join(realpathSync(common.stdout.trim()), 'agent-gibbon', 'build-cache')
+    ? join(realpathSync(common.stdout.trim()), 'jajan', 'build-cache')
     : join(root, 'src-tauri/target');
   const buildDir = resolve(root, process.env.CARGO_BUILD_BUILD_DIR || defaultBuildDir);
   return { root, id, name, buildDir, target: join(root, 'src-tauri/target'),
-    binary: join(root, `src-tauri/target/debug/agent-gibbon${process.platform === 'win32' ? '.exe' : ''}`) };
+    binary: join(root, `src-tauri/target/debug/jajan${process.platform === 'win32' ? '.exe' : ''}`) };
 }
 export function buildEnvironment(instance, inherited = process.env) {
   return { ...inherited, CARGO_TARGET_DIR: instance.target,
     CARGO_BUILD_BUILD_DIR: resolve(instance.root, inherited.CARGO_BUILD_BUILD_DIR || instance.buildDir) };
 }
 export function devEnvironment(instance, inherited = process.env) {
-  return { ...buildEnvironment(instance, inherited), FLOATNOTE_INSTANCE: instance.id,
-    FLOATNOTE_DEV_NAME: instance.name };
+  return { ...buildEnvironment(instance, inherited), JAJAN_INSTANCE: instance.id,
+    JAJAN_DEV_NAME: instance.name };
 }
 export function requireBuildDirSupport() {
   const result = spawnSync('cargo', ['--version'], { encoding: 'utf8' });

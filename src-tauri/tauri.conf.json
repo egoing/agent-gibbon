@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Agent Gibbon",
-  "version": "0.2.18",
-  "identifier": "org.egoing.floatnote",
+  "productName": "Jajan",
+  "version": "0.3.0",
+  "identifier": "app.jajan",
   "build": {
     "frontendDist": "../ui",
     "beforeBuildCommand": "pnpm run build:editor",
@@ -13,7 +13,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "Agent Gibbon",
+        "title": "Jajan",
         "width": 300,
         "height": 240,
         "minWidth": 144,

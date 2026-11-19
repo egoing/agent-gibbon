@@ -177,7 +177,7 @@ def verify_png(path, selection_origin, fixture_origin, fixture_size, selection_s
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 $payload = [Console]::In.ReadToEnd() | ConvertFrom-Json
-$bitmap = [Drawing.Bitmap]::FromFile($env:GIBBON_PATTERN_PNG)
+$bitmap = [Drawing.Bitmap]::FromFile($env:JAJAN_PATTERN_PNG)
 try {
   $mismatches = 0
   $examples = @()
@@ -199,7 +199,7 @@ try {
 } finally { $bitmap.Dispose() }
 '''
     result = subprocess.run(['powershell.exe', '-NoProfile', '-Command', command],
-        env={**os.environ, 'GIBBON_PATTERN_PNG': str(path)},
+        env={**os.environ, 'JAJAN_PATTERN_PNG': str(path)},
         input=json.dumps({'width': int(selection_size[0]), 'height': int(selection_size[1]), 'samples': samples}),
         capture_output=True, encoding='utf-8', timeout=30)
     assert result.returncode == 0, result.stderr

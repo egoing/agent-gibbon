@@ -1,6 +1,6 @@
 'use strict';
 
-const noticeInvoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
+const noticeInvoke = window.jajanInvoke || window.__TAURI__.core.invoke;
 const noticeEl = id => document.getElementById(id);
 let noticeStatus = null;
 let noticeBusy = false;

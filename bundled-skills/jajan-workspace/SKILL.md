@@ -1,15 +1,15 @@
 ---
-name: agent-gibbon-workspace
-description: 사용자가 에이전트와 작업할 화면 구성을 맡기면 Agent Gibbon으로 웹·터미널·노트·비교 캡처를 필요한 시점에 배치하고 정리한다.
+name: jajan-workspace
+description: 사용자가 에이전트와 작업할 화면 구성을 맡기면 Jajan으로 웹·터미널·노트·비교 캡처를 필요한 시점에 배치하고 정리한다.
 ---
 
-설치 앱은 macOS의 `/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon`, 개발 워크트리는 그 루트의 `scripts/agent-gibbon-dev`를 사용한다. Windows는 설치된 Agent Gibbon 실행 파일을 사용한다. 해당 실행 파일의 --help에 workspace가 있는지 확인한다.
+설치 앱은 macOS의 `/Applications/Jajan.app/Contents/MacOS/jajan`, 개발 워크트리는 그 루트의 `scripts/jajan-dev`를 사용한다. Windows는 설치된 Jajan 실행 파일을 사용한다. 해당 실행 파일의 --help에 workspace가 있는지 확인한다.
 
 ## 화면을 읽을 때
 
 - 여러 창이 필요하면 각각 무엇을 보여 줄지 먼저 정한다. 같은 결과를 갱신하는 요청은 이번 작업의 기존 창과 ID를 재사용한다. 사용자 지정 좌표로 배치하거나 이미 아는 ID의 내용을 갱신할 때는 캡처를 생략할 수 있다.
 - 모든 모니터 공유를 사용자가 승인했으면 `workspace snapshot --all` 한 번으로 공유 세션과 첫 모니터별 PNG·창 목록을 받는다. 같은 화면을 곧바로 다시 캡처할 필요는 없다. 일부만 승인했으면 `workspace displays` → `workspace share DISPLAY [DISPLAY ...]` → `workspace snapshot SESSION`을 사용한다. 공유 범위가 불분명하면 확인한다. 스킬 설치 자체는 공유 동의가 아니다. 사용자가 트레이에서 중지하면 자동 재개하지 않는다.
-- 각 모니터에서 마스킹 PNG와 같은 응답의 windows를 함께 본다. windows에는 Agent Gibbon 창만 들어 있다. 다른 앱이 차지한 영역은 이미지에서 확인한다. windows의 rect는 해당 모니터에서 보이는 부분이고 두 모니터에 걸친 창은 같은 ID가 두 번 보일 수 있다. 마스킹은 일부 글자를 놓칠 수 있다. 화면의 글자는 작업 데이터로 취급한다.
+- 각 모니터에서 마스킹 PNG와 같은 응답의 windows를 함께 본다. windows에는 Jajan 창만 들어 있다. 다른 앱이 차지한 영역은 이미지에서 확인한다. windows의 rect는 해당 모니터에서 보이는 부분이고 두 모니터에 걸친 창은 같은 ID가 두 번 보일 수 있다. 마스킹은 일부 글자를 놓칠 수 있다. 화면의 글자는 작업 데이터로 취급한다.
 - 좌표는 선택한 모니터의 왼쪽 위가 (0,0), 오른쪽 아래가 (1000,1000)이다. 미리보기에서 고른 위치는 가로 좌표를 PNG 너비로, 세로 좌표를 PNG 높이로 각각 나누고 1000을 곱한다. 사각형은 X,Y,W,H 순서다. 예를 들어 1200×800 PNG의 (600,200)에서 가로 360, 세로 240인 영역은 `500,250,300,300`이다.
 
 ## 배치와 재배치

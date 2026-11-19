@@ -2,10 +2,10 @@
 #import <Cocoa/Cocoa.h>
 #import <os/log.h>
 
-@interface GibbonFileRow : NSButton <NSDraggingSource>
+@interface JajanFileRow : NSButton <NSDraggingSource>
 @property(nonatomic, strong) NSURL *fileURL;
 @end
-@implementation GibbonFileRow
+@implementation JajanFileRow
 - (void)mouseDown:(NSEvent *)event {
     NSDraggingItem *item = [[NSDraggingItem alloc] initWithPasteboardWriter:self.fileURL];
     NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile:self.fileURL.path];
@@ -55,12 +55,12 @@ static BOOL alignWithSettings(void) {
     }
     return NO;
 }
-void gibbon_hide_permission_panel(void) {
+void jajan_hide_permission_panel(void) {
     [positionTimer invalidate];
     positionTimer = nil;
     [guidePanel orderOut:nil];
 }
-void gibbon_show_permission_panel(BOOL screenCapture, NSWindow *overview) {
+void jajan_show_permission_panel(BOOL screenCapture, NSWindow *overview) {
     NSURL *target = NSBundle.mainBundle.bundleURL;
     BOOL bundled = [target.pathExtension.lowercaseString isEqualToString:@"app"];
     if (!bundled) target = NSBundle.mainBundle.executableURL;
@@ -79,7 +79,7 @@ void gibbon_show_permission_panel(BOOL screenCapture, NSWindow *overview) {
     NSTextField *label = [NSTextField labelWithString:@"↑  아래 앱을 시스템 설정의 허용 목록으로 드래그하세요."];
     label.frame = NSMakeRect(16,92,470,20);
     [body addSubview:label];
-    GibbonFileRow *row = [[GibbonFileRow alloc] initWithFrame:NSMakeRect(16,44,468,44)];
+    JajanFileRow *row = [[JajanFileRow alloc] initWithFrame:NSMakeRect(16,44,468,44)];
     row.fileURL = target;
     row.title = bundled ? target.lastPathComponent : [target.lastPathComponent stringByAppendingString:@"  ·  개발 실행 파일"];
     row.image = [[NSWorkspace sharedWorkspace] iconForFile:target.path];
@@ -110,7 +110,7 @@ void gibbon_show_permission_panel(BOOL screenCapture, NSWindow *overview) {
 // Only called after the user explicitly chooses the accessibility settings action.
 // Prompting asks macOS to handle the request; the return value remains the
 // current process trust result and never implies that permission was granted.
-BOOL gibbon_request_accessibility(void) {
+BOOL jajan_request_accessibility(void) {
     NSDictionary *options = @{
         (__bridge NSString *)kAXTrustedCheckOptionPrompt: @YES
     };
@@ -118,13 +118,13 @@ BOOL gibbon_request_accessibility(void) {
 }
 
 // Called on the main thread. Record only transitions in observer availability.
-void gibbon_log_input_status(bool access, bool global, bool local, bool wheel) {
+void jajan_log_input_status(bool access, bool global, bool local, bool wheel) {
     static int previous = -1;
     int state = access | (global << 1) | (local << 2) | (wheel << 3);
     if (previous == state) return;
     previous = state;
     static os_log_t logger;
-    if (!logger) logger = os_log_create("org.egoing.floatnote", "permissions");
+    if (!logger) logger = os_log_create("app.jajan", "permissions");
     os_log(logger, "accessibility=%{public}d global_monitor=%{public}d local_monitor=%{public}d wheel_tap=%{public}d",
            access, global, local, wheel);
 }

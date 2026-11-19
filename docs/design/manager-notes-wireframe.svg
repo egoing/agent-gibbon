@@ -4,7 +4,7 @@
 <text x="28" y="68" font-size="14" font-weight="400">최소 구현 와이어프레임 · 화면 구조만 표현 · 예시 데이터</text>
 <rect x="28" y="96" width="944" height="480" fill="#f8f8f8" stroke="#858585"/>
 <path d="M28 150L972 150" stroke="#d6d6d6"/>
-<text x="48" y="130" font-size="18" font-weight="600">Agent Gibbon</text>
+<text x="48" y="130" font-size="18" font-weight="600">Jajan</text>
 <rect x="700" y="108" width="140" height="30" fill="#ffffff" stroke="#858585"/>
 <text x="728" y="129" font-size="14" font-weight="400">모든 메모</text>
 <rect x="852" y="108" width="96" height="30" fill="#f8f8f8" stroke="#858585"/>

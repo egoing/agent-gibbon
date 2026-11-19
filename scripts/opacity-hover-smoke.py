@@ -18,10 +18,10 @@ import uuid
 assert sys.platform == 'darwin', 'macOS native check only'
 ROOT = Path(__file__).resolve().parents[1]
 INFO = json.loads(subprocess.check_output(['node', str(ROOT / 'scripts/dev.mjs'), 'info'], text=True))
-BIN = str(ROOT / 'scripts/agent-gibbon-dev')
+BIN = str(ROOT / 'scripts/jajan-dev')
 EXPECTED = INFO['binary'] + ' --serve'
 OUTPUT = ROOT / 'docs/verification/hover-opacity'
-SETTING = Path.home() / 'Library/Application Support/org.egoing.floatnote/appearance' / INFO['id'] / 'opacity.json'
+SETTING = Path.home() / 'Library/Application Support/app.jajan/appearance' / INFO['id'] / 'opacity.json'
 PREFIX = 'hover-opacity-' + uuid.uuid4().hex[:8]
 IDS = [PREFIX + '-a', PREFIX + '-b']
 
@@ -49,7 +49,7 @@ def cli(action, note_id, *args):
     return data
 
 
-with tempfile.TemporaryDirectory(prefix='gibbon-opacity-hover-') as folder:
+with tempfile.TemporaryDirectory(prefix='jajan-opacity-hover-') as folder:
     helper = Path(folder) / 'native'
     source = helper.with_suffix('.swift')
     source.write_text(r'''
@@ -90,7 +90,7 @@ if a[1] == "pointer" {
         return json.loads(native('windows', pid))
 
     def window(note_id, feedback=False):
-        title = f"Agent Gibbon [{label}] — {note_id}" + (' · Feedback' if feedback else '')
+        title = f"Jajan [{label}] — {note_id}" + (' · Feedback' if feedback else '')
         matches = [w for w in windows() if w['title'] == title]
         assert len(matches) == 1, (title, windows())
         return matches[0]
@@ -139,7 +139,7 @@ if a[1] == "pointer" {
         # Automatic placement is adjacent: the first note's Feedback can overlap
         # the second memo. Put this test-only peer elsewhere so pointer contact
         # has one unambiguous owner when checking isolation.
-        peer_title = f"Agent Gibbon [{label}] — {IDS[1]}"
+        peer_title = f"Jajan [{label}] — {IDS[1]}"
         subprocess.run([str(ax_helper), str(pid), peer_title, 'position', '60', '160'], check=True)
         time.sleep(.3)
         for note_id in IDS:

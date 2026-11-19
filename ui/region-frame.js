@@ -6,14 +6,14 @@
   // Its regular refresh must still work after the user completes onboarding.
   // Keep a queued WebKit paint of the unthemed document transparent.
   // Set this in the head, before the parser creates the memo surface.
-  const rootStyle = window.gibbonPreparingRegion && document.documentElement.style;
+  const rootStyle = window.jajanPreparingRegion && document.documentElement.style;
   if (rootStyle) rootStyle.opacity = '0';
   const revealContent = () => { if (rootStyle) rootStyle.removeProperty('opacity'); };
   const placement = invoke('region_frame_placement').catch(() => false);
   if (rootStyle) placement.then(pending => { if (!pending) revealContent(); });
   const initialContent = [];
   let showing;
-  window.gibbonRegionFrame = {
+  window.jajanRegionFrame = {
     placement,
     prepare(work) {
       // A failed Welcome request is also a drawable state. Settle the task

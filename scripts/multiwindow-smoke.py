@@ -8,7 +8,7 @@ import subprocess
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-BIN = str(ROOT / 'scripts/agent-gibbon')
+BIN = str(ROOT / 'scripts/jajan')
 
 
 def call(*args, ok=True):
@@ -22,7 +22,7 @@ def call(*args, ok=True):
 def raw(request):
     with socket.socket(socket.AF_UNIX) as stream:
         stream.settimeout(10)
-        stream.connect(f'/tmp/floatnote-{os.getuid()}/app.sock')
+        stream.connect(f'/tmp/jajan-{os.getuid()}/app.sock')
         stream.sendall(json.dumps(request).encode())
         stream.shutdown(socket.SHUT_WR)
         data = bytearray()

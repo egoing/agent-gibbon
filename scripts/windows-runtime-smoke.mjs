@@ -20,8 +20,8 @@ if (peers[0]) instances.push(devInstance(peers[0]));
 assert.equal(new Set(instances.map(i => i.id)).size, instances.length);
 function processes(instance) {
   const result = spawnSync('powershell.exe', ['-NoProfile', '-Command',
-    "@(Get-CimInstance Win32_Process -Filter \"name = 'agent-gibbon.exe'\" | Where-Object { $_.ExecutablePath -eq $env:GIBBON_SMOKE_BINARY } | ForEach-Object { $_.ProcessId }) | ConvertTo-Json -Compress"],
-  { env: { ...process.env, GIBBON_SMOKE_BINARY: instance.binary }, encoding: 'utf8' });
+    "@(Get-CimInstance Win32_Process -Filter \"name = 'jajan.exe'\" | Where-Object { $_.ExecutablePath -eq $env:JAJAN_SMOKE_BINARY } | ForEach-Object { $_.ProcessId }) | ConvertTo-Json -Compress"],
+  { env: { ...process.env, JAJAN_SMOKE_BINARY: instance.binary }, encoding: 'utf8' });
   assert.ifError(result.error);
   assert.equal(result.status, 0, result.stderr);
   const value = result.stdout.trim() ? JSON.parse(result.stdout) : [];

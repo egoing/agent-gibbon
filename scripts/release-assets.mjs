@@ -6,34 +6,34 @@ import { fileURLToPath } from 'node:url';
 const platforms = [
   {
     target: 'darwin-aarch64',
-    archive: version => `Agent.Gibbon_${version}_darwin-aarch64.app.tar.gz`,
-    signature: version => `Agent.Gibbon_${version}_darwin-aarch64.app.tar.gz.sig`,
+    archive: version => `Jajan_${version}_darwin-aarch64.app.tar.gz`,
+    signature: version => `Jajan_${version}_darwin-aarch64.app.tar.gz.sig`,
   },
   {
     target: 'darwin-x86_64',
-    archive: version => `Agent.Gibbon_${version}_darwin-x86_64.app.tar.gz`,
-    signature: version => `Agent.Gibbon_${version}_darwin-x86_64.app.tar.gz.sig`,
+    archive: version => `Jajan_${version}_darwin-x86_64.app.tar.gz`,
+    signature: version => `Jajan_${version}_darwin-x86_64.app.tar.gz.sig`,
   },
   {
     target: 'windows-x86_64',
-    archive: version => `Agent.Gibbon_${version}_x64-setup.exe`,
-    signature: version => `Agent.Gibbon_${version}_x64-setup.exe.sig`,
+    archive: version => `Jajan_${version}_x64-setup.exe`,
+    signature: version => `Jajan_${version}_x64-setup.exe.sig`,
   },
 ];
 
 function installerNames(version) {
   return [
-    `Agent Gibbon_${version}_aarch64.dmg`,
-    `Agent Gibbon_${version}_x64.dmg`,
-    `Agent Gibbon_${version}_x64-setup.exe`,
+    `Jajan_${version}_aarch64.dmg`,
+    `Jajan_${version}_x64.dmg`,
+    `Jajan_${version}_x64-setup.exe`,
   ];
 }
 
 function canonicalInstallerNames(version) {
   return [
-    `Agent.Gibbon_${version}_aarch64.dmg`,
-    `Agent.Gibbon_${version}_x64.dmg`,
-    `Agent.Gibbon_${version}_x64-setup.exe`,
+    `Jajan_${version}_aarch64.dmg`,
+    `Jajan_${version}_x64.dmg`,
+    `Jajan_${version}_x64-setup.exe`,
   ];
 }
 

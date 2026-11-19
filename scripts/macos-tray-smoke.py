@@ -11,7 +11,7 @@ INFO = json.loads(subprocess.check_output(['node',str(ROOT/'scripts/dev.mjs'),'i
 
 
 def cli(*args):
-    d = json.loads(subprocess.check_output([str(ROOT / 'scripts/agent-gibbon-dev'), *args], text=True, timeout=25))
+    d = json.loads(subprocess.check_output([str(ROOT / 'scripts/jajan-dev'), *args], text=True, timeout=25))
     assert d['ok'], d
     return d
 

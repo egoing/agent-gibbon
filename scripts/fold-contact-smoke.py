@@ -11,8 +11,8 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-CLI = str(ROOT / 'scripts/agent-gibbon-dev')
-BINARY = str(ROOT / 'src-tauri/target/debug/agent-gibbon')
+CLI = str(ROOT / 'scripts/jajan-dev')
+BINARY = str(ROOT / 'src-tauri/target/debug/jajan')
 
 def pids():
     lines = subprocess.check_output(['ps', '-axo', 'pid=,comm='], text=True).splitlines()
@@ -29,7 +29,7 @@ def cli(action, *args):
     assert data['ok'], data
     return data
 
-with tempfile.TemporaryDirectory(prefix='gibbon-fold-') as temp:
+with tempfile.TemporaryDirectory(prefix='jajan-fold-') as temp:
     source = Path(temp) / 'input.swift'
     helper = Path(temp) / 'input'
     source.write_text(r'''

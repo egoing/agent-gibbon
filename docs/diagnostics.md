@@ -11,17 +11,17 @@
 | DSN·개발 진단 플래그만 존재 | 동의를 대체하지 않음, 전송 없음 |
 | debug 개발 인스턴스의 약관 확인 생략 | 기능 진입만 허용; 실제 수락·별도 전송 동의가 없으면 SDK 초기화·전송 없음 |
 | 현재 문서에 대한 약관 및 별도 전송 동의 + 확정된 운영 정보 + 유효 DSN | 허용된 진단만 전송; 개발 빌드는 명시적 진단 실행도 필요 |
-| `AGENT_GIBBON_TELEMETRY=off` | 동의가 있어도 모두 차단 |
+| `JAJAN_TELEMETRY=off` | 동의가 있어도 모두 차단 |
 
 첫 실행의 필수 약관과 선택적 전송을 구분하며 전송은 기본 해제다. [약관·개인정보 안내](legal/README.md)과 관리 창의 Privacy & Diagnostics에서 범위를 확인한다. 정책 해시는 약관·개인정보 안내·운영 정보에 연결돼 문서가 달라지면 과거 동의로 전송하지 않는다. 로컬 동의 파일은 instance별 `privacy/<instance>/consent.json`이며 계정·장치 식별자를 만들지 않는다.
 
-debug 개발 인스턴스는 약관 확인을 기본 생략하되 동의 파일을 만들거나 변경하지 않는다. `diagnostics.privacy`는 실제 `terms_accepted`와 `terms_skipped`·`onboarding_required`를 구분한다. 사용자가 약관 검증을 요청하면 앱 시작 전에 `AGENT_GIBBON_REQUIRE_TERMS=1`을 지정한다. 설정에서 최초 진단 전송을 저장하려는 경우에는 기존 약관·선택 동의 화면에서 명시적으로 확인한다. [개발 약관 검증 기록](verification/dev-terms-skip-20261106.md)에 실행 범위와 한계를 남긴다.
+debug 개발 인스턴스는 약관 확인을 기본 생략하되 동의 파일을 만들거나 변경하지 않는다. `diagnostics.privacy`는 실제 `terms_accepted`와 `terms_skipped`·`onboarding_required`를 구분한다. 사용자가 약관 검증을 요청하면 앱 시작 전에 `JAJAN_REQUIRE_TERMS=1`을 지정한다. 설정에서 최초 진단 전송을 저장하려는 경우에는 기존 약관·선택 동의 화면에서 명시적으로 확인한다. [개발 약관 검증 기록](verification/dev-terms-skip-20261106.md)에 실행 범위와 한계를 남긴다.
 
 SDK 초기화 전과 최종 HTTP 요청 직전에 동의를 확인한다. 전송 큐는 최대 64개 envelope, 각 직렬화 payload는 최대 512KiB이고 HTTP 요청 제한 시간은 3초다. 철회는 새 요청을 차단하고 이미 시작한 요청의 종료를 기다린 뒤 완료되며, 이전 동의 세대의 queue/log/session은 다시 동의해도 재전송되지 않는다. SDK 종료 시 flush도 이 경계를 우회하지 않는다. 과거 서버 데이터와 로컬 자료는 자동 삭제되지 않는다.
 
 현재 공식 운영 고지는 원본 최대 30일·별도 백업/오류 누적 통계 기준으로 확정되어 첫 실행과 설정에서 진단 동의를 선택할 수 있다. 기본값은 해제이며 DSN이나 개발 플래그만으로 전송하지 않는다. 재시작 없이 설정에서 철회할 수 있고, 진단 모드 변경 이벤트는 프런트 측정 타이머와 관찰자도 정리한다.
 
-자신의 Sentry 프로젝트를 쓰는 공헌자는 `AGENT_GIBBON_SENTRY_DSN`을 **빌드 프로세스의 환경변수**로 제공하고 다음 명령을 실행한다. `.env`는 자동으로 읽지 않는다.
+자신의 Sentry 프로젝트를 쓰는 공헌자는 `JAJAN_SENTRY_DSN`을 **빌드 프로세스의 환경변수**로 제공하고 다음 명령을 실행한다. `.env`는 자동으로 읽지 않는다.
 
 ```sh
 pnpm run diagnostics:build
@@ -36,7 +36,7 @@ pnpm run diagnostics:probe
 pnpm run diagnostics:build --official
 ```
 
-Windows는 `pnpm.cmd`를 사용한다. `gh api`를 지원하는 인증된 GitHub CLI가 필요하다. 설치 앱이나 다른 개발 앱이 이미 실행 중이면 새 진단 환경이 기존 프로세스에 소급 적용되지 않는다. 대상 앱의 PID·바이너리 경로를 확인해 해당 앱만 재실행한다. 일반 `scripts/agent-gibbon-dev`는 계속 현재 워크트리의 debug 바이너리만 사용한다.
+Windows는 `pnpm.cmd`를 사용한다. `gh api`를 지원하는 인증된 GitHub CLI가 필요하다. 설치 앱이나 다른 개발 앱이 이미 실행 중이면 새 진단 환경이 기존 프로세스에 소급 적용되지 않는다. 대상 앱의 PID·바이너리 경로를 확인해 해당 앱만 재실행한다. 일반 `scripts/jajan-dev`는 계속 현재 워크트리의 debug 바이너리만 사용한다.
 
 `diagnostics`는 현재 서버의 로컬 진단 상태를 읽는 CLI 명령이고, `diagnostics-probe`는 명시적인 확인용 고정 이벤트·span·로그를 보낸다. probe의 `queue_flushed:true`는 서버 수신 증거가 아니므로 Sentry에서 반환 event ID를 따로 조회해야 한다.
 
@@ -55,19 +55,19 @@ Windows는 `pnpm.cmd`를 사용한다. `gh api`를 지원하는 인증된 GitHub
 
 ### Windows 행 조사용 로컬 단계 기록 — #66
 
-`AGENT_GIBBON_LOCAL_TRACE=1`을 **앱 시작 전** 설정하면 Sentry와 독립적인 로컬 단계 기록을 켠다. 기본은 꺼짐이며 외부 전송 동의·SDK·watchdog를 활성화하지 않는다. `AGENT_GIBBON_TELEMETRY=off`와 함께 사용할 수 있다. 이는 원인 확정이나 행 해결 표시가 아니다.
+`JAJAN_LOCAL_TRACE=1`을 **앱 시작 전** 설정하면 Sentry와 독립적인 로컬 단계 기록을 켠다. 기본은 꺼짐이며 외부 전송 동의·SDK·watchdog를 활성화하지 않는다. `JAJAN_TELEMETRY=off`와 함께 사용할 수 있다. 이는 원인 확정이나 행 해결 표시가 아니다.
 
 ```powershell
-$env:AGENT_GIBBON_LOCAL_TRACE = '1'
-$env:AGENT_GIBBON_TELEMETRY = 'off'
-.\scripts\agent-gibbon-dev.cmd open --id issue66-test --markdown 'LOCAL-TRACE-TEST'
-.\scripts\agent-gibbon-dev.cmd diagnostics
+$env:JAJAN_LOCAL_TRACE = '1'
+$env:JAJAN_TELEMETRY = 'off'
+.\scripts\jajan-dev.cmd open --id issue66-test --markdown 'LOCAL-TRACE-TEST'
+.\scripts\jajan-dev.cmd diagnostics
 powershell -NoProfile -File scripts/windows-hang-evidence.ps1
 ```
 
 이미 실행 중인 앱에는 환경변수가 소급 적용되지 않는다. 기존 사용자 프로세스는 임의 종료하지 않는다. debug 개발 인스턴스의 기본 생략은 동의 기록을 만들지 않으며, 약관 검증 모드와 배포 앱에서는 사용자가 검토하고 점검 도구가 대신 동의하지 않는다.
 
-- 파일: Tauri 앱 데이터의 `diagnostics/<instance>/local-stages.json`. Windows에서는 `%APPDATA%\org.egoing.floatnote\diagnostics\<instance>\local-stages.json`이다. 재시작 시 이전 실행 파일을 덮어쓰므로 멈춘 앱을 재시작하기 **전에** 사본을 남긴다.
+- 파일: Tauri 앱 데이터의 `diagnostics/<instance>/local-stages.json`. Windows에서는 `%APPDATA%\app.jajan\diagnostics\<instance>\local-stages.json`이다. 재시작 시 이전 실행 파일을 덮어쓰므로 멈춘 앱을 재시작하기 **전에** 사본을 남긴다.
 - 내용: 실행 PID·시작 시각·빌드 표식, 실행 내 숫자 호출 번호, 고정 작업/단계 이름, 프로세스 시작 후 단조 증가 마이크로초만 기록한다. 창 ID·메모·제목·경로·명령·출력·화면·장치 식별자를 입력받지 않으며 Sentry 경로와 연결하지 않는다.
 - 메모 `snapshot`: Rust command 진입(`dispatch`), `notes_wait`, `notes_copy`, 잠금 해제 후 `opacity`·`feedback`·`position`·`size`·`visibility`·`focus`·`pin`, `response`, `complete`/`aborted`를 기록한다. `opacity`와 `feedback`은 여러 하위 조회를 포함하며 단일 Win32 함수 이름을 뜻하지 않는다. `response`도 다른 상태 잠금과 JSON 값 생성을 포함한다. Tauri가 반환값을 직렬화·전달하는 시간은 포함하지 않는다.
 - CLI: 고정 작업명 `ipc`로 UI 실행 큐 진입(`ui_queue`)·실행(`ui_execute`)·종료를 기록한다. 메모 `inspect`의 내부 조회는 별도 호출 번호로 기록한다. 이 큐·작업 관계는 아래 #64의 실행 내 부모 연결로 보강한다. 모든 비동기 callback에 자동 전파되지는 않는다.
@@ -94,9 +94,9 @@ powershell -NoProfile -File scripts/windows-hang-evidence.ps1
 
 `window.create`, `terminal.window.create`, `terminal.process.spawn`, `capture.cleanup.request`, `capture.cleanup.wait`에는 시작 시 고정 stage 로그를 남긴다. 구간이 영원히 끝나지 않아 span이 전송되지 않아도 마지막 시작 지점을 찾기 위한 로그이며 기존 분당 120개 한도 안에서만 전송한다. 현재 Rust trace가 있으면 structured log의 `trace_id`로 연결한다. 로그/trace 샘플링이 다르므로 모든 로그에 인덱싱된 trace가 반드시 존재하는 것은 아니다.
 
-Sentry로 보내는 WebView 측정은 기존 2초 집계 경로를 유지하며, 상세 모드가 꺼지면 `gibbonMeasure` 자체를 설치하지 않는다. 숨긴 창의 측정과 임의 이름·무한값은 제외한다. 이 확장은 #19/#64의 단계별 계측 부분이며, 1·5·10개 창의 p50/p95 부하 기준과 Rust·WebView 함수별 로컬 프로파일링 완료를 의미하지 않는다.
+Sentry로 보내는 WebView 측정은 기존 2초 집계 경로를 유지하며, 상세 모드가 꺼지면 `jajanMeasure` 자체를 설치하지 않는다. 숨긴 창의 측정과 임의 이름·무한값은 제외한다. 이 확장은 #19/#64의 단계별 계측 부분이며, 1·5·10개 창의 p50/p95 부하 기준과 Rust·WebView 함수별 로컬 프로파일링 완료를 의미하지 않는다.
 
-진단 모드의 일반 trace 기본 샘플링은 100%, 높은 빈도의 snapshot/inspect/list/터미널 쓰기·출력·조회는 최대 1%다. `AGENT_GIBBON_TRACE_SAMPLE_RATE`를 0~1로 지정하면 일반 구간을 낮출 수 있다. 시작·probe는 상세 모드에서 항상 측정한다. 오류·진단 로그는 trace 샘플링과 별도로 제한한다: 분당 WebView 오류 20개, 작업 로그 120개, 중단/복구 알림 10개, probe 2개. 이는 프로세스별 한도이며 여러 앱의 합산 한도는 아니다. Sentry 측 요금·프로젝트 할당량도 별도로 적용된다.
+진단 모드의 일반 trace 기본 샘플링은 100%, 높은 빈도의 snapshot/inspect/list/터미널 쓰기·출력·조회는 최대 1%다. `JAJAN_TRACE_SAMPLE_RATE`를 0~1로 지정하면 일반 구간을 낮출 수 있다. 시작·probe는 상세 모드에서 항상 측정한다. 오류·진단 로그는 trace 샘플링과 별도로 제한한다: 분당 WebView 오류 20개, 작업 로그 120개, 중단/복구 알림 10개, probe 2개. 이는 프로세스별 한도이며 여러 앱의 합산 한도는 아니다. Sentry 측 요금·프로젝트 할당량도 별도로 적용된다.
 
 전송 경계는 SDK의 `before_send`만으로 보호하지 않는다. 오류·transaction·로그 envelope를 허용 목록으로 재구성하고 session·session 집계와 알 수 없는 항목, 첨부파일·replay를 차단한다. 메모 본문·제목·상태·연결 경로, 명령/출력/입력 키, clipboard, DOM, 화면, 사용자명·장치명, IP 필드는 보내지 않는다. 네트워크 서버는 연결 IP 주소를 볼 수 있다.
 
@@ -104,7 +104,7 @@ Sentry로 보내는 WebView 측정은 기존 2초 집계 경로를 유지하며,
 
 ## 빌드와 운영
 
-Actions의 `AGENT_GIBBON_SENTRY_DSN` secret/variable을 공식 release 빌드에서만 주입한다. 기본 수집 모드와 자세한 공지 내용은 [README](../README.md)의 Sentry 절을 따른다. 이번 변경은 공개 버전 태그나 설치 앱 자동 업데이트를 수행하지 않는다.
+Actions의 `JAJAN_SENTRY_DSN` secret/variable을 공식 release 빌드에서만 주입한다. 기본 수집 모드와 자세한 공지 내용은 [README](../README.md)의 Sentry 절을 따른다. 이번 변경은 공개 버전 태그나 설치 앱 자동 업데이트를 수행하지 않는다.
 
 현재 동의·철회·loopback 전송 경계와 macOS 무전송 검증은 [동의 검증 기록](verification/privacy-consent-20261106.md)을 따른다. [이전 Sentry 수신 검증](verification/sentry-observability-20261106.md)은 동의 정책 변경 전의 기록이며, 현재 동의 정책 빌드의 실제 전송 근거로 사용하지 않는다.
 
@@ -117,7 +117,7 @@ Actions의 `AGENT_GIBBON_SENTRY_DSN` secret/variable을 공식 release 빌드에
 
 ### #64 로컬 흐름 연결과 개별 snapshot
 
-`AGENT_GIBBON_LOCAL_TRACE=1`일 때만 `local-stages.json` format 2를 기록한다. 이 로컬 opt-in은 전송 동의와 독립적이며, 꺼져 있으면 새 WebView 흐름을 시작하거나 상관 ID를 붙이지 않는다. 기존 Sentry 상세 모드·동의·철회·전송 필터 경계는 유지한다. 로컬 단계/상관 ID를 heartbeat나 Sentry envelope에 넣지 않는다.
+`JAJAN_LOCAL_TRACE=1`일 때만 `local-stages.json` format 2를 기록한다. 이 로컬 opt-in은 전송 동의와 독립적이며, 꺼져 있으면 새 WebView 흐름을 시작하거나 상관 ID를 붙이지 않는다. 기존 Sentry 상세 모드·동의·철회·전송 필터 경계는 유지한다. 로컬 단계/상관 ID를 heartbeat나 Sentry envelope에 넣지 않는다.
 
 - `call`은 프로세스 실행 내 발급 번호, `parent`는 명시적으로 전달한 상위 실행 번호, `cause`는 snapshot이 복사한 메모의 마지막 CLI/저장 갱신 실행 번호다. 이름·창 ID·본문·경로·명령을 파일에 넣지 않는다. 메모의 갱신 번호는 메모리에서만 유지하고 저장 파일/일반 메모 JSON에는 직렬화하지 않는다. 중간 갱신을 건너뛴 snapshot은 실제 복사한 최신 갱신만 가리킨다.
 - CLI의 `ipc.wait → ipc(UI queue/execute) → ipc.open/update/inspect → Markdown/저장/창 조회`를 연결한다. WebView의 `note.refresh → snapshot.request → 조회 단계`와 `note.save → save_note → Markdown/저장`, `webview.terminal.start → terminal.worker(queue/execute) → terminal.start → PTY/spawn/attach`도 연결한다. 터미널 reader는 각 출력 처리 시 시작 작업 번호를 명시적으로 받으며, reader의 대기 전체를 활성 span으로 유지하지 않는다.

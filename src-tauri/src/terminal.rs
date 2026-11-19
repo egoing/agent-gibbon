@@ -222,7 +222,7 @@ fn root(app: &tauri::AppHandle) -> PathBuf {
     app.state::<crate::storage::Store>().0.clone()
 }
 fn metadata(root: &Path) -> PathBuf {
-    root.join(".agent-gibbon-terminals")
+    root.join(".jajan-terminals")
 }
 pub(crate) fn valid_id(id: &str) -> bool {
     id.strip_prefix("terminal-")

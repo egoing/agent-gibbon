@@ -37,7 +37,7 @@ export async function setup(initial = {}, state = {}, platform = 'MacIntel') {
       createElement:()=>({style:{},setAttribute(){},remove(){},get innerText(){return this.innerHTML.replace(/<[^>]+>/g,'').trim();}}),
       documentElement:{style:{setProperty(k,v){styles[k]=v;}},addEventListener(){}},
     },
-    window:{gibbonMemoToolbar:{setKind(kind){state.toolbarKind=kind;}},getSelection:()=>({toString:()=>state.selection || ''}),__TAURI__:{
+    window:{jajanMemoToolbar:{setKind(kind){state.toolbarKind=kind;}},getSelection:()=>({toString:()=>state.selection || ''}),__TAURI__:{
       clipboardManager:{async writeText(text){if(copyError)throw copyError;calls.push(['clipboard-text',text]);}},
       window:{getCurrentWindow:()=>({label:'note-fixture',startResizeDragging:async()=>{}})},
       event:{async listen(name,fn,options){nativeEvents[name]=fn;nativeTargets[name]=options?.target;return ()=>{};}},
@@ -74,7 +74,7 @@ export async function setup(initial = {}, state = {}, platform = 'MacIntel') {
     action:async action=>{await nativeEvents['feedback-action']({payload:{owner:'note-fixture',action}});await settle();},
     key:async(key,props={})=>{events.keydown({key,preventDefault(){},...props});await settle();},
     view:()=>calls.filter(([name])=>name==='present_feedback').at(-1)?.[1].view,
-    busy:()=>context.window.gibbonUpdateBusy(),
+    busy:()=>context.window.jajanUpdateBusy(),
     leave:async()=>{state.focused=true;await refresh();state.focused=false;await refresh();},
     pollFold:async()=>{await timers.find(fn=>fn.name==='pollFold')();await settle();},
   };

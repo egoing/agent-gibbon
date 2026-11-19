@@ -5,7 +5,7 @@
 <text x="32" y="63" font-size="13" font-weight="400">제안 시안 · 앱 구현 전 · 예시 경로와 앱 · 2026-11-13</text>
 <text x="32" y="104" font-size="16" font-weight="600">① 마지막 실행 정보가 있는 경우</text>
 <rect x="32" y="124" width="512" height="692" rx="4" fill="#f8f8f8" stroke="#2d2d2d"/>
-<text x="48" y="149" font-size="13" font-weight="400">agent-gibbon</text>
+<text x="48" y="149" font-size="13" font-weight="400">jajan</text>
 <text x="414" y="149" font-size="14" font-weight="400">aA   ◇   ×</text>
 <text x="56" y="194" font-size="14" font-weight="600">이전 터미널 프로세스는 종료되었습니다.</text>
 <text x="56" y="219" font-size="13" font-weight="400">자동 실행하지 않았습니다.</text>
@@ -14,7 +14,7 @@
 <text x="56" y="326" font-size="13" font-weight="600">작업 위치</text>
 <text x="56" y="358" font-size="14" font-weight="400">폴더 열기…</text>
 <rect x="56" y="374" width="464" height="40" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
-<text x="68" y="399" font-size="14" font-weight="600">agent-gibbon</text>
+<text x="68" y="399" font-size="14" font-weight="600">jajan</text>
 <text x="214" y="399" font-size="12" font-weight="400">~/dev/project</text>
 <text x="56" y="442" font-size="13" font-weight="600">추천 작업</text>
 <rect x="56" y="454" width="464" height="34" rx="4" fill="#e5e5e5" stroke="#2d2d2d"/>
@@ -26,12 +26,12 @@
 <rect x="56" y="637" width="154" height="36" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
 <text x="71" y="660" font-size="14" font-weight="600">Codex 새로 실행</text>
 <rect x="56" y="689" width="464" height="62" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
-<text x="68" y="711" font-size="12" font-weight="400">cd -- &#x27;/Users/demo/dev/project/agent-gibbon&#x27;</text>
+<text x="68" y="711" font-size="12" font-weight="400">cd -- &#x27;/Users/demo/dev/project/jajan&#x27;</text>
 <text x="68" y="735" font-size="12" font-weight="400">&#x27;/usr/local/bin/codex&#x27;</text>
 <text x="56" y="778" font-size="13" font-weight="400">▸ 창 제목 변경</text>
 <text x="576" y="104" font-size="16" font-weight="600">② 실행 폴더가 없어진 경우</text>
 <rect x="576" y="124" width="512" height="692" rx="4" fill="#f8f8f8" stroke="#2d2d2d"/>
-<text x="592" y="149" font-size="13" font-weight="400">agent-gibbon</text>
+<text x="592" y="149" font-size="13" font-weight="400">jajan</text>
 <text x="958" y="149" font-size="14" font-weight="400">aA   ◇   ×</text>
 <text x="600" y="194" font-size="14" font-weight="600">이전 터미널 프로세스는 종료되었습니다.</text>
 <text x="600" y="219" font-size="13" font-weight="400">자동 실행하지 않았습니다.</text>
@@ -40,7 +40,7 @@
 <text x="600" y="326" font-size="13" font-weight="600">작업 위치</text>
 <text x="600" y="358" font-size="14" font-weight="400">폴더 열기…</text>
 <rect x="600" y="374" width="464" height="40" rx="4" fill="#ffffff" stroke="#2d2d2d"/>
-<text x="612" y="399" font-size="14" font-weight="600">agent-gibbon</text>
+<text x="612" y="399" font-size="14" font-weight="600">jajan</text>
 <text x="758" y="399" font-size="12" font-weight="400">~/dev/project</text>
 <text x="600" y="443" font-size="14" font-weight="600">이 폴더를 찾을 수 없습니다.</text>
 <text x="600" y="469" font-size="13" font-weight="400">실행할 폴더를 선택해 주세요.</text>

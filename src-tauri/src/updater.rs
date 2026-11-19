@@ -9,7 +9,7 @@ use std::{
 use tauri::{Emitter, Manager, WebviewWindow, WebviewWindowBuilder};
 use tauri_plugin_updater::{Update, UpdaterExt};
 #[cfg(feature = "verification-updater")]
-const ENDPOINT: &str = env!("GIBBON_VERIFICATION_UPDATE_URL");
+const ENDPOINT: &str = env!("JAJAN_VERIFICATION_UPDATE_URL");
 #[cfg(not(feature = "verification-updater"))]
 const ENDPOINT: &str =
     "https://github.com/egoing/agent-gibbon/releases/latest/download/latest.json";
@@ -37,7 +37,7 @@ const fn timing_profile(verification: bool, standard_timing: bool) -> TimingProf
 }
 const TIMING: TimingProfile = timing_profile(
     VERIFICATION,
-    option_env!("GIBBON_VERIFICATION_STANDARD_TIMING").is_some(),
+    option_env!("JAJAN_VERIFICATION_STANDARD_TIMING").is_some(),
 );
 const IDLE_SECONDS: f64 = TIMING.idle_seconds;
 const CHECK_SECONDS: u64 = TIMING.check_seconds;
@@ -323,9 +323,9 @@ fn platform() -> &'static str {
 }
 fn package_name(version: &str, target: &str) -> String {
     if target == "windows-x86_64" {
-        format!("Agent.Gibbon_{version}_x64-setup.exe")
+        format!("Jajan_{version}_x64-setup.exe")
     } else {
-        format!("Agent.Gibbon_{version}_{target}.app.tar.gz")
+        format!("Jajan_{version}_{target}.app.tar.gz")
     }
 }
 fn validate_download(update: &Update) -> Result<(), String> {
@@ -589,7 +589,7 @@ fn show_ready_notice(app: &tauri::AppHandle) -> Result<(), String> {
                 NOTICE_LABEL,
                 tauri::WebviewUrl::App("updater-notice.html".into()),
             )
-            .title("Agent Gibbon · 업데이트")
+            .title("Jajan · 업데이트")
             .inner_size(360., 140.)
             .min_inner_size(320., 140.)
             .decorations(true)
@@ -1113,7 +1113,7 @@ mod tests {
     use tauri::test::{mock_builder, mock_context, noop_assets};
     #[test]
     fn active_profile_checks_every_fifteen_minutes_in_production() {
-        let fast = VERIFICATION && option_env!("GIBBON_VERIFICATION_STANDARD_TIMING").is_none();
+        let fast = VERIFICATION && option_env!("JAJAN_VERIFICATION_STANDARD_TIMING").is_none();
         assert_eq!(CHECK_SECONDS, if fast { 60 } else { 15 * 60 });
         assert_eq!(IDLE_SECONDS, if fast { 30. } else { 300. });
         assert_eq!(RETRY_SECONDS, if fast { 5 } else { 15 });
@@ -1290,11 +1290,11 @@ mod tests {
     fn package_names_match_github_release_asset_normalization() {
         assert_eq!(
             package_name("0.2.9", "darwin-aarch64"),
-            "Agent.Gibbon_0.2.9_darwin-aarch64.app.tar.gz"
+            "Jajan_0.2.9_darwin-aarch64.app.tar.gz"
         );
         assert_eq!(
             package_name("0.2.9", "windows-x86_64"),
-            "Agent.Gibbon_0.2.9_x64-setup.exe"
+            "Jajan_0.2.9_x64-setup.exe"
         );
     }
     #[test]

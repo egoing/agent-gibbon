@@ -83,6 +83,6 @@
     controls.dataset.kind = value;
     for (const el of buttons) el.hidden = !actions[value].includes(el.id);
   }
-  window.gibbonMemoToolbar = {setKind};
+  window.jajanMemoToolbar = {setKind};
   setKind(kind);
 })();

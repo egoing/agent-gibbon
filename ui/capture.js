@@ -1,5 +1,5 @@
 'use strict';
-const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
+const invoke = window.jajanInvoke || window.__TAURI__.core.invoke;
 const selection = document.getElementById('selection');
 const hint = document.getElementById('hint');
 const shade = document.getElementById('shade');

@@ -2,7 +2,7 @@
 
 현재 개발 명령은 pnpm 11.25.0을 사용한다. [이번 측정·검증 기록](verification/shared-build-cache-pnpm-20261114.md)과 [개발 실행 안내](../README.md)를 따른다. 아래의 과거 실행 증거에 남은 npm 명령은 당시 기록이다.
 
-# Floatnote 검증 기록
+# Jajan 검증 기록
 
 ## 외부 웹 콘텐츠의 IPC 거절 — #98 (2026-11-16)
 
@@ -49,10 +49,10 @@ macOS 개발 앱에서 외부 페이지의 앱 명령과 이벤트 등록이 모
 
 ## 워크트리별 개발 인스턴스 분리 (2026-10-25)
 
-- 후속 `main` 통합 검증: Agent Gibbon 이름 전환과 v0.2.6 접촉 닫기 기능을 모두 보존했습니다. 개발 실행 파일·문서는 `agent-gibbon`으로 맞췄고 `scripts/floatnote-dev`는 호환 래퍼로 유지했습니다. 통합 상태에서 Rust 42개·Node 18개, Clippy, debug·release 빌드와 두 워크트리 실제 동시 실행·포커스·설치 앱 불변 검증을 다시 통과했습니다.
+- 후속 `main` 통합 검증: Jajan 이름 전환과 v0.2.6 접촉 닫기 기능을 모두 보존했습니다. 개발 실행 파일·문서는 `jajan`으로 맞췄고 `scripts/jajan-dev`는 호환 래퍼로 유지했습니다. 통합 상태에서 Rust 42개·Node 18개, Clippy, debug·release 빌드와 두 워크트리 실제 동시 실행·포커스·설치 앱 불변 검증을 다시 통과했습니다.
 
 - 환경: macOS arm64, Rust/Cargo 1.91.1, Node 24.21.0, npm 11.19.0, Tauri CLI 2.12.1. Intel Mac 실행은 이번에 검증하지 않았습니다.
-- 실제 절대 경로의 SHA-256 앞 24자리를 사용하는 개발 실행기를 추가했습니다. 개발 CLI는 debug 바이너리의 빌드 출처를 확인하며, release·설치본으로 대체하지 않습니다. 환경변수 미지정 설치 앱의 `/tmp/floatnote-{uid}` 경로는 유지됩니다.
+- 실제 절대 경로의 SHA-256 앞 24자리를 사용하는 개발 실행기를 추가했습니다. 개발 CLI는 debug 바이너리의 빌드 출처를 확인하며, release·설치본으로 대체하지 않습니다. 환경변수 미지정 설치 앱의 `/tmp/jajan-{uid}` 경로는 유지됩니다.
 - `npm test`: Rust 42개와 Node 18개 통과. 기존 Sentry 실전송 테스트 1개는 의도적인 ignore 상태로 실행하지 않았습니다. Rustfmt·Clippy(`-D warnings`)·diff 공백 검사 통과. 두 워크트리의 debug 빌드와 release macOS 앱 번들 빌드 통과. 배포 서명·공증은 이번 검증 범위에 포함하지 않았습니다.
 - 현재 워크트리와 HEAD에서 만든 임시 detached 워크트리에 동일 변경을 적용하고 각각 빌드했습니다. `scripts/isolation-smoke.py`로 A는 개발 CLI 자동 시작, B는 `npm run dev -- --no-watch`로 동시에 실행했습니다. 같은 메모 ID의 서로 다른 내용, 부분 갱신, 숨김 유지, 별도 원본 파일 연결, 독립 중복 실행 잠금, A 종료·재시작 후 B 유지, 기본 앱의 모든 메모 내용·위치·크기·숨김·포커스·핀 보존을 확인했습니다. `/` 디렉터리에서 개발 CLI를 호출해 호출 위치 독립성도 검증했습니다.
 - 네이티브 활성 앱 확인을 추가해 CLI 자동 시작·npm 개발 실행·새 창 생성·갱신에서 이전 앱이 유지됨을 검증했습니다. 현재 Wry의 WKWebView 생성 경로는 앱 활성화를 요청하므로, 첫 표시 시점에 이전 앱을 복원하도록 보완했습니다. 창 생성 도중 사용자가 제3의 앱으로 이동했으면 덮어쓰지 않습니다. 별도 실환경 반복 확인에서 보이는 메모의 메타데이터 갱신 시 위치·크기·포커스 유지도 통과했습니다. 이 검증은 명령 완료 후 상태를 확인하며, 생성 도중의 순간적인 활성화 전환을 완전히 없앤다는 보장은 아닙니다.
@@ -88,7 +88,7 @@ macOS 개발 앱에서 외부 페이지의 앱 명령과 이벤트 등록이 모
 - 행 첫머리의 `[ ]`, `[x]`, `[X]` 뒤에 공백 또는 줄 끝이 오면 목록 기호 누락으로 감지합니다. CLI와 서버 모두 수정 전에 검증하며 `MARKDOWN_TASK_MARKER`·행 번호·수정 예시를 JSON error 문자열로 반환합니다. 코드 블록·인라인 코드·정상 링크·이스케이프는 제외합니다.
 - Rust 19개 + Node 2개, Clippy, release 빌드, JS/Python 문법, 스킬 검증 통과. 스킬 검증기의 PyYAML 누락은 격리된 임시 가상 환경에 설치해 해결했습니다.
 - `scripts/markdown-validation-smoke.py`: 실제 CLI 종료 코드 1, 행 번호·교정 예시, raw Unix socket 요청 거부, 모든 메모 필드 보존, 수정 후 성공, 코드 블록 허용 통과.
-- macOS 창 전체의 네이티브 alpha를 사용합니다. `scripts/macos-opacity-smoke.swift 'Floatnote — markdown-opacity-plan'`에서 실제 포인터를 창 밖→안→밖으로 이동하고 CoreGraphics 창 정보로 alpha `0.5 → 1.0 → 0.5`를 확인했습니다. 테스트 후 포인터를 원래 위치로 복원합니다.
+- macOS 창 전체의 네이티브 alpha를 사용합니다. `scripts/macos-opacity-smoke.swift 'Jajan — markdown-opacity-plan'`에서 실제 포인터를 창 밖→안→밖으로 이동하고 CoreGraphics 창 정보로 alpha `0.5 → 1.0 → 0.5`를 확인했습니다. 테스트 후 포인터를 원래 위치로 복원합니다.
 - 새 release 실행 시 기존 메모 30개의 위치·크기·핀·숨김을 복원했습니다. 다른 호출자가 다시 입력했던 목록 기호 없는 체크 항목도 발견해 복원 과정에서 표준 체크리스트 문법으로 정정했습니다.
 - `scripts/multiwindow-ui-smoke.py`도 최신 빌드에서 통과했습니다. 실제 전체 창 드래그·복사·클립보드 복원·핀·숨김·크기 조절·포커스 보존에 회귀가 없었습니다.
 - 기본 사용 스킬에 올바른 문법, 오류 후 수정·재시도, 반복 실패 시 중단 절차를 추가했습니다. 이 검증은 Markdown 전체의 문법 검사가 아니라 실제 발생한 체크리스트 실수에 한정합니다.
@@ -136,7 +136,7 @@ macOS 개발 앱에서 외부 페이지의 앱 명령과 이벤트 등록이 모
 
 처음 실환경 검사에서 신규 창의 `open` 응답이 네이티브 이동 이벤트 처리 전의 좌표를 반환하는 문제를 발견했습니다. 실제 배치는 올바르지만 JSON 좌표가 이전 값이었으며, `open` 성공 후 별도 IPC 차례에서 실제 프레임을 다시 조회하도록 고쳐 회귀 테스트를 통과했습니다. UI 테스트는 변경된 접근성 계층에 맞게 본문 그룹에서 버튼을 찾고, 메뉴 막대는 실제 마우스 입력으로 검증합니다. 입력 후 포인터와 원래 앱 포커스를 복원합니다. 메뉴는 창 생성 또는 제목 변경 때만 갱신해 백그라운드 조회·상태 갱신이 사용자가 연 메뉴를 닫지 않도록 했습니다.
 
-새 창은 보이는 Floatnote 창만 피합니다. 현재 모니터부터 각 모니터 작업 영역을 검사하고 8 논리 픽셀 간격을 확보하며, 공간이 부족하면 오류를 반환합니다. 기존 창 복원은 위치를 보존합니다. 다른 앱의 창은 배치 장애물에 포함하지 않습니다. 다중 모니터·서로 다른 DPI는 좌표 단위 테스트 및 구현 검토를 했으나 실제 다중 모니터 환경에서는 검증하지 않았습니다.
+새 창은 보이는 Jajan 창만 피합니다. 현재 모니터부터 각 모니터 작업 영역을 검사하고 8 논리 픽셀 간격을 확보하며, 공간이 부족하면 오류를 반환합니다. 기존 창 복원은 위치를 보존합니다. 다른 앱의 창은 배치 장애물에 포함하지 않습니다. 다중 모니터·서로 다른 DPI는 좌표 단위 테스트 및 구현 검토를 했으나 실제 다중 모니터 환경에서는 검증하지 않았습니다.
 
 - Conf 5: 이 Intel Mac에서 실제 앱·CLI·WebView·메뉴·포인터 입력으로 확인했습니다.
 - Risk Medium: 다중 창 배치·CLI 응답·앱 상태에 영향을 주며 로컬에서 되돌릴 수 있습니다.
@@ -144,7 +144,7 @@ macOS 개발 앱에서 외부 페이지의 앱 명령과 이벤트 등록이 모
 
 ## 다중 창·색상 최초 제출 시점 — 이슈 #3
 
-현재 Floatnote 폴더의 `3-multiwindow-color` 브랜치에서 구현했습니다. 아래 초기 프로토타입 기록과 구분합니다.
+현재 Jajan 폴더의 `3-multiwindow-color` 브랜치에서 구현했습니다. 아래 초기 프로토타입 기록과 구분합니다.
 
 | 검증 | 결과 |
 |---|---|
@@ -152,7 +152,7 @@ macOS 개발 앱에서 외부 페이지의 앱 명령과 이벤트 등록이 모
 | `npm test` | Rust 9개 + Node 2개 통과. ID/색상 검증, 거부 시 원자성, 기본 창 호환, 중복 옵션, 라벨 충돌 및 4,096개 RGB 샘플의 본문·코드/버튼 배경 대비 검사 |
 | `npm run check` | Clippy 모든 타깃, 경고를 오류로 처리하여 통과 |
 | Rustfmt / JS / Python 문법 / diff 공백 | 통과 |
-| `npm run build` | Intel x86_64 release 실행 파일과 Floatnote.app 생성 성공 |
+| `npm run build` | Intel x86_64 release 실행 파일과 Jajan.app 생성 성공 |
 | `python3 scripts/smoke.py` | 기존 기본 창 CLI 회귀 통과 |
 | `python3 scripts/multiwindow-smoke.py` | 실제 창 2개의 독립 내용·색상·목록·반복 갱신·숨김·재열기·위치/크기/포커스 상태 보존, 잘못된 raw IPC 거부, 기본 창 호환 통과 |
 | `python3 scripts/multiwindow-ui-smoke.py` | 실행했으나 미완료: macOS 화면 잠금으로 System Events가 창을 조회하지 못함(exit 1, -1728). 버튼 격리와 실제 렌더링은 미검증 |
@@ -183,7 +183,7 @@ macOS 개발 앱에서 외부 페이지의 앱 명령과 이벤트 등록이 모
 | Tauri Rust / CLI | 2.12.2 / 2.12.1 |
 | 개발 도구 | Command Line Tools와 macOS SDK 설치됨 |
 | 전체 Xcode | 미설치 (`xcodebuild -version` 실패) |
-| origin | egoing/floatnote, private 확인 |
+| origin | egoing/agent-gibbon, private 확인 |
 
 전체 Xcode 없이 설치된 CLT/SDK로 데스크톱 release 빌드와 `.app` 번들 생성에 성공했습니다. CLT 경로는 `/Library/Developer/CommandLineTools`입니다. Clippy는 누락되어 rustup으로 설치한 뒤 사용했습니다.
 
@@ -237,7 +237,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 접촉 상태: Alt 없는 접촉 무시, 이동 직후 반복 방지, 실제 포인터 이탈 후 재진입·Alt 재입력으로 재실행 테스트 통과.
 - UI: 아이콘·접촉 후 안내 표시, 닫기·다시 보지 않기, 다른 노트/재로딩에서 설정 유지, 실패 시 초안 유지 테스트 통과. Rust 23개 + Node 7개, Clippy 경고 없음, 릴리스 app 빌드 성공.
 - 실제 Intel macOS에서 별도 식별자·소켓을 가진 QA 앱으로 아이콘 좌우 왕복, 수동 이동 후 최초 높이 복원, 다른 앱 포커스 중 Alt 접촉, 반복 접촉, 연속 튕김 방지, 초안·크기·고정·본문 유지, 숨긴 노트 미이동을 확인했다. 실제 QA 앱 종료·재실행 후에도 ‘다시 보지 않기’가 유지됨을 확인했다.
-- `scripts/warp-ui-smoke.py`: 새 테스트 프로필의 격리 앱에 `FLOATNOTE_TEST_BIN`과 `FLOATNOTE_TEST_PROCESS`를 지정한다. macOS 접근성 권한과 Swift 컴파일러가 필요하다. 고유 테스트 노트만 만들고 종료 시 숨기며 Option 키를 해제하고 이전 앱 포커스를 복원한다. 안내 설정을 변경하므로 사용자 앱에서 실행하지 않는다.
+- `scripts/warp-ui-smoke.py`: 새 테스트 프로필의 격리 앱에 `JAJAN_TEST_BIN`과 `JAJAN_TEST_PROCESS`를 지정한다. macOS 접근성 권한과 Swift 컴파일러가 필요하다. 고유 테스트 노트만 만들고 종료 시 숨기며 Option 키를 해제하고 이전 앱 포커스를 복원한다. 안내 설정을 변경하므로 사용자 앱에서 실행하지 않는다.
 - 기존 편집 UI 실환경 회귀 검증도 전체 통과했다(글자 크기·파일 저장·초안·충돌·검증 오류 교정·파일 연결 해제).
 - 워프는 다른 노트와의 겹침을 허용한다. 여러 DPI/모니터 간 실제 이동과 화면보다 큰 창의 GUI 오류는 실기기에서 재현하지 않았으며 계산 테스트로 검증했다. 일반 실행 중인 사용자 앱과 메모는 재시작하지 않았다.
 - API 근거: [Tauri Monitor 작업 영역](https://docs.rs/tauri/latest/tauri/window/struct.Monitor.html), [NSEvent modifierFlags 바인딩](https://docs.rs/objc2-app-kit/latest/src/objc2_app_kit/generated/NSEvent.rs.html).
@@ -246,7 +246,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 ## 2026-10-14 v0.1.0 Intel Mac 배포판
 
 - `npm test`(Rust 23 + Node 7), `npm run check`, Rust 포맷·JS 문법·diff 검사 통과.
-- `npm run build:release`로 app과 `Floatnote_0.1.0_x64.dmg` 생성. DMG 약 3.60 MiB, Apple Developer ID 서명·공증 미설정.
+- `npm run build:release`로 app과 `Jajan_0.1.0_x64.dmg` 생성. DMG 약 3.60 MiB, Apple Developer ID 서명·공증 미설정.
 - `hdiutil verify` 통과 후 읽기 전용 마운트하여 버전 0.1.0, x86_64 실행 파일, Applications 링크 확인. 마운트된 앱 내부 CLI `--help` 정상 실행 후 볼륨 해제.
 - 다운로드·격리 속성이 붙은 다른 Mac에서의 최초 실행 및 Apple Silicon 실행은 검증하지 않았다. 체크섬은 배포 자산 `SHA256SUMS.txt`에 제공한다.
 
@@ -300,7 +300,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 별도 IPC의 실제 테스트 앱에서 짧고 긴 본문 모두 폭 600 물리 픽셀(배율 2에서 300 논리 픽셀), 중앙 대기 중 위치 불변과 opacity 1.0, 이동 후 연속 재열기 비중첩을 확인했다.
 - 개발 빌드·Clippy·JavaScript 문법·diff 검사 통과. 검증 후 로컬 설치 앱을 교체했다. 커밋·GitHub 배포는 하지 않았다.
 
-- 로컬 앱 빌드·애드혹 서명 후 /Applications/Floatnote.app을 교체하고 재실행했다. 직전 메모 72개의 내용·원본 파일 연결·숨김 상태를 복원·대조했으며 설치 앱과 빌드 바이너리 SHA-256 일치를 확인했다. 이전 앱과 메모 백업은 ~/Library/Application Support/Floatnote/backups/restart-20261025-012550/에 보존했다.
+- 로컬 앱 빌드·애드혹 서명 후 /Applications/Jajan.app을 교체하고 재실행했다. 직전 메모 72개의 내용·원본 파일 연결·숨김 상태를 복원·대조했으며 설치 앱과 빌드 바이너리 SHA-256 일치를 확인했다. 이전 앱과 메모 백업은 ~/Library/Application Support/Jajan/backups/restart-20261025-012550/에 보존했다.
 
 ### v0.2.1 배포 준비
 
@@ -312,22 +312,22 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 
 - 기준 `ff0712c4421364ff9a60ce132123ddafb01be8d8`, red `cd2b6a2a930b1eeda2519ae2e15b18629ead9d82`. 최초 기준 트리에서 회귀·타입·린트·빌드를 실행했고 모두 통과했습니다. 기존 실패 제외는 0건입니다.
 - 환경: Apple Silicon arm64, Rust/Cargo 1.91.1, Node 24.21.0, npm 11.19.0, Tauri CLI 2.12.1. 기존 사용자 앱은 종료·교체하지 않았습니다.
-- 요구사항 테스트 4개가 `change_html`/삭제 표시 부재로 실제 실패한 뒤 테스트 전용 red 커밋을 push했습니다. 원본 `/tmp/floatnote-is2-5/red.log`. 기존 red 테스트의 assertion은 유지했습니다.
+- 요구사항 테스트 4개가 `change_html`/삭제 표시 부재로 실제 실패한 뒤 테스트 전용 red 커밋을 push했습니다. 원본 `/tmp/jajan-is2-5/red.log`. 기존 red 테스트의 assertion은 유지했습니다.
 - 신규 게이트: `cargo test --manifest-path src-tauri/Cargo.toml feedback` 및 `node --test --test-name-pattern=feedback tests/editor.test.mjs`. 회귀: `npm test`. 타입: `cargo check --manifest-path src-tauri/Cargo.toml --all-targets`. 린트: `npm run check`, Rustfmt, JS/Python 문법, diff 공백. 빌드: `npm run build`.
 - 단위 검증: 변경 행·분리된 변경 사이 유지 행, 체크리스트·표·여러 줄 코드, 삭제-only·빈 본문·초기 표시, 메타데이터·동일 본문, HTML 안전성, 편집 저장, 큰 본문의 제한된 비교, 창별 기한·연속 갱신·만료, revision 변경 없는 강조 해제와 초안 유지.
-- 실환경 격리: 작업 경로의 `src-tauri/target/is2-instance`에 현재 소스를 복사하고 **IPC 디렉터리와 앱 식별자만** 변경해 별도 debug 실행 파일을 빌드했습니다. 기존 앱의 IPC `/tmp/floatnote-<uid>`와 구분되는 `/tmp/floatnote-is2-5-<uid>`를 사용했습니다. UI와 기능 소스는 같으며 이 격리 변경은 배포 소스에 포함하지 않습니다.
-- 실제 macOS/CLI 통과: CoreGraphics PID·좌표로 테스트 창을 식별하여 전면 순서와 alpha 확인, 다른 앱 포커스·좌표·크기·핀 유지, 다른 창 alpha 불변, 마지막 실제 변경부터 3초 복귀, 오래된 기한이 새 알림을 끊지 않음, 메타데이터/동일 본문 무연장, 숨김 중 갱신·재열기에서 이전 효과 없음, 빈 본문 삭제 효과 만료. 원본 `/tmp/floatnote-is2-5/native-feedback-cli.log`.
-- UI 한계: osascript 접근성 권한 오류(-1728), CoreGraphics 창 제목 비공개, Orca 연결에서도 해당 프로세스 창 목록이 비어 있어 **강조 색상/삭제 안내의 실제 화면·복사 버튼·편집/워프/수동 크기 UI·핀 해제 상태의 전면 순서**는 이번 환경에서 확인하지 못했습니다. 초기 UI 실행 실패 로그는 `/tmp/floatnote-is2-5/native-feedback.log`. 제목 대신 PID·좌표로 native 순서를 검증했으며 UI assertion은 `FLOATNOTE_TEST_UI=1`로 별도 보존했습니다. UI 미검증을 통과로 계산하지 않습니다.
-- 재현: 격리 인스턴스에 `FLOATNOTE_TEST_BIN`, `FLOATNOTE_TEST_PROCESS`, 필요시 `FLOATNOTE_TEST_PID`를 지정하고 `python3 scripts/update-feedback-smoke.py`를 실행합니다. 접근성 권한이 있는 환경은 `FLOATNOTE_TEST_UI=1`, 스크린샷 권한도 있으면 `FLOATNOTE_TEST_SCREENSHOT=/tmp/feedback.png`를 지정합니다. 기존 `editor-ui-smoke.py`, `warp-ui-smoke.py`도 같은 격리 바이너리 환경변수로 실행할 수 있습니다.
-- 원본 baseline/final 명령·종료 코드는 `/tmp/floatnote-is2-5/baseline.json`, `final.json`, 각 `baseline-*.log`, `final-*.log`에 있습니다. 최초 baseline은 덮어쓰지 않았습니다.
+- 실환경 격리: 작업 경로의 `src-tauri/target/is2-instance`에 현재 소스를 복사하고 **IPC 디렉터리와 앱 식별자만** 변경해 별도 debug 실행 파일을 빌드했습니다. 기존 앱의 IPC `/tmp/jajan-<uid>`와 구분되는 `/tmp/jajan-is2-5-<uid>`를 사용했습니다. UI와 기능 소스는 같으며 이 격리 변경은 배포 소스에 포함하지 않습니다.
+- 실제 macOS/CLI 통과: CoreGraphics PID·좌표로 테스트 창을 식별하여 전면 순서와 alpha 확인, 다른 앱 포커스·좌표·크기·핀 유지, 다른 창 alpha 불변, 마지막 실제 변경부터 3초 복귀, 오래된 기한이 새 알림을 끊지 않음, 메타데이터/동일 본문 무연장, 숨김 중 갱신·재열기에서 이전 효과 없음, 빈 본문 삭제 효과 만료. 원본 `/tmp/jajan-is2-5/native-feedback-cli.log`.
+- UI 한계: osascript 접근성 권한 오류(-1728), CoreGraphics 창 제목 비공개, Orca 연결에서도 해당 프로세스 창 목록이 비어 있어 **강조 색상/삭제 안내의 실제 화면·복사 버튼·편집/워프/수동 크기 UI·핀 해제 상태의 전면 순서**는 이번 환경에서 확인하지 못했습니다. 초기 UI 실행 실패 로그는 `/tmp/jajan-is2-5/native-feedback.log`. 제목 대신 PID·좌표로 native 순서를 검증했으며 UI assertion은 `JAJAN_TEST_UI=1`로 별도 보존했습니다. UI 미검증을 통과로 계산하지 않습니다.
+- 재현: 격리 인스턴스에 `JAJAN_TEST_BIN`, `JAJAN_TEST_PROCESS`, 필요시 `JAJAN_TEST_PID`를 지정하고 `python3 scripts/update-feedback-smoke.py`를 실행합니다. 접근성 권한이 있는 환경은 `JAJAN_TEST_UI=1`, 스크린샷 권한도 있으면 `JAJAN_TEST_SCREENSHOT=/tmp/feedback.png`를 지정합니다. 기존 `editor-ui-smoke.py`, `warp-ui-smoke.py`도 같은 격리 바이너리 환경변수로 실행할 수 있습니다.
+- 원본 baseline/final 명령·종료 코드는 `/tmp/jajan-is2-5/baseline.json`, `final.json`, 각 `baseline-*.log`, `final-*.log`에 있습니다. 최초 baseline은 덮어쓰지 않았습니다.
 - 사전/최종 Risk Medium: 창 순서와 native/UI 상태 상호작용. 자동 병합하지 않고 사전 리뷰로 제출합니다. Conf 5는 위에 명시한 실제 네이티브 동작 범위에 한정하며 UI 미검증 범위는 별도입니다.
 - 공식 API 근거: [Tauri WebviewWindow](https://docs.rs/tauri/latest/tauri/webview/struct.WebviewWindow.html), [NSWindow orderFrontRegardless](https://developer.apple.com/documentation/appkit/nswindow/orderfrontregardless()). 기존 포커스 비탈취 전면 배치 경로를 재사용했습니다.
 
 ### is2 커버리지 대조
 
-2026-10-25 실사용, egoing/floatnote #5 / PR #6, Codex CLI 0.164.0(현재 담당 세션), Orca 1.4.239. 스킬 커버리지 표와 대조한 이번 실행의 증거는 **Medium 프런트엔드·백엔드 작업 → 자동 병합 보류 → Ready PR** 경로입니다. red/green·5종 게이트·실제 native 검증·독립 감사의 결과를 PR에 기록합니다. 새 터미널 준비는 반복하지 않았고 기존 base ref를 유지했습니다. 권한 제한 UI는 미검증입니다. 독립 감사가 동일 본문 저장 시 만료된 강조가 재등장하는 결함을 발견했고, 재현 테스트를 추가해 실패를 기록한 뒤 1회 수정 재시도를 수행했습니다. mock은 실제 모델의 동일 본문 저장 동작에 맞게 보완했고 기존 assertion은 유지했습니다. 의심 발동·rebase 충돌·자동 병합·롤백 경로는 이번에 검증하지 않았습니다. 공유 스킬 원본의 유지보수는 작업 범위가 아니므로 원본 표를 수정하지 않고 이 프로젝트 기록을 남깁니다.
+2026-10-25 실사용, egoing/agent-gibbon #5 / PR #6, Codex CLI 0.164.0(현재 담당 세션), Orca 1.4.239. 스킬 커버리지 표와 대조한 이번 실행의 증거는 **Medium 프런트엔드·백엔드 작업 → 자동 병합 보류 → Ready PR** 경로입니다. red/green·5종 게이트·실제 native 검증·독립 감사의 결과를 PR에 기록합니다. 새 터미널 준비는 반복하지 않았고 기존 base ref를 유지했습니다. 권한 제한 UI는 미검증입니다. 독립 감사가 동일 본문 저장 시 만료된 강조가 재등장하는 결함을 발견했고, 재현 테스트를 추가해 실패를 기록한 뒤 1회 수정 재시도를 수행했습니다. mock은 실제 모델의 동일 본문 저장 동작에 맞게 보완했고 기존 assertion은 유지했습니다. 의심 발동·rebase 충돌·자동 병합·롤백 경로는 이번에 검증하지 않았습니다. 공유 스킬 원본의 유지보수는 작업 범위가 아니므로 원본 표를 수정하지 않고 이 프로젝트 기록을 남깁니다.
 
-- 감사 후 보완: 저장 직후에는 원본 렌더링을 표시하고, 다음 snapshot의 실제 효과 상태로 강조 여부를 결정합니다. 추가 테스트가 실제 실패한 원본은 `/tmp/floatnote-is2-5/audit-red.log`, 보완 후 5종 게이트 원본은 `retry1.json`, `retry1-*.log`입니다. 앞선 final 로그는 이전 시도 증거로 그대로 보존했습니다.
+- 감사 후 보완: 저장 직후에는 원본 렌더링을 표시하고, 다음 snapshot의 실제 효과 상태로 강조 여부를 결정합니다. 추가 테스트가 실제 실패한 원본은 `/tmp/jajan-is2-5/audit-red.log`, 보완 후 5종 게이트 원본은 `retry1.json`, `retry1-*.log`입니다. 앞선 final 로그는 이전 시도 증거로 그대로 보존했습니다.
 
 ## 2026-10-25 후속 요청 — 커서 확인까지 변경 강조 유지
 
@@ -337,7 +337,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 다음 실제 본문 변경은 직전 본문과의 비교 결과로 강조를 교체합니다. 메타데이터/동일 본문은 유지합니다. 숨김은 불투명 기한만 종료하고 미확인 강조는 유지하며, 숨긴 상태의 변경도 새 강조로 교체하되 창은 열지 않습니다.
 - 확인 명령은 창·변경 revision에 묶여 늦게 도착한 이전 확인이 새 변경을 지우지 않습니다. UI는 이미 확인한 revision의 늦은 snapshot도 무시합니다. 확인은 불투명 기한을 줄이지 않습니다.
 - 후속 기준은 검증된 `141c6acbff193a150c21ed51fb92e1d5e68c4b89`이며 최초 is2 base/red/attempts ref와 baseline을 보존합니다. `3ef1700`에서 변경된 요구사항의 실제 red를 기록했습니다. 기존 3초 후 강조 해제 assertion을 사용자 요청에 맞게 커서 확인 방식으로 교체했고 초안·메타데이터 보존 assertion은 유지했습니다.
-- 5종 게이트 PASS: 원본 `/tmp/floatnote-is2-5/persistent.json`, `persistent-{new,regression,typecheck,lint,build}.log`. Rust 30개, Node 10개. 추가 stale snapshot assertion 및 스모크 문법도 재확인합니다.
+- 5종 게이트 PASS: 원본 `/tmp/jajan-is2-5/persistent.json`, `persistent-{new,regression,typecheck,lint,build}.log`. Rust 30개, Node 10개. 추가 stale snapshot assertion 및 스모크 문법도 재확인합니다.
 - 새 IPC `/tmp/fn-persist-5-<uid>`와 앱 식별자로 검증 인스턴스를 분리했습니다. 기존 사용자 앱 및 앞선 시연 노트는 종료하지 않았습니다.
 - 실환경 커서 입력 시도는 실패했습니다. `CGEvent.post`로 좌표 (5,40)을 요청했으나 실제 (1123,669)가 유지되어 입력 미전달을 확인했습니다. `persistent-native.log`의 커서 확인 실패는 이 환경 제한이며 실제 커서 확인 통과로 보고하지 않습니다. 스모크는 이후 요청/실제 좌표를 비교하여 미전달만 SKIP으로 분리하고, 입력이 전달되면 강조 해제 assertion을 반드시 실행합니다.
 - 실제 창 순서·3초 alpha 및 강조 상태 유지·숨김/재열기/빈 본문은 `persistent-native-partial.log`에 기록합니다. 강조 색상/커서 접촉/편집·복사·워프 UI 실환경 제한은 남아 있습니다. 후속 변경의 Conf 3(기능 경계조건 단위 검증), Risk Medium이며 자동 병합하지 않습니다.
@@ -347,7 +347,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 기준 SHA `ff0712c4421364ff9a60ce132123ddafb01be8d8`에서 baseline을 캡처했다. `npm test`(Rust 23 + Node 7), `cargo check --all-targets`, Clippy·Rustfmt·JS 문법·diff 검사, `npm run build` 모두 통과했으며 제외한 기존 실패는 없다.
 - 환경: Apple Silicon arm64, Rust/Cargo 1.91.1, Node 24.21.0, npm 11.19.0, Tauri Rust 2.12.2.
 - TDD red: `scripts/entrance-smoke.py`를 실제 기준 release 앱의 격리 사본에서 실행했다. `open`이 3.589초 동안 대기하여 2.5초 반환 상한 assertion이 실패했다. red ref는 `refs/is2/red/7`에 보존한다.
-- 실제 앱 검증은 release 실행 파일 사본의 IPC 디렉터리 문자열만 같은 길이의 `/tmp/floatnot7-`로 교체하고 애드혹 서명한 `floatnote-qa7` 프로세스에서 수행했다. 테스트가 만든 프로세스만 종료하며 사용자 앱을 재시작·교체하지 않았다. 테스트는 고유 ID 메모만 만들고 커서·전면 앱을 복원한다.
+- 실제 앱 검증은 release 실행 파일 사본의 IPC 디렉터리 문자열만 같은 길이의 `/tmp/floatnot7-`로 교체하고 애드혹 서명한 `jajan-qa7` 프로세스에서 수행했다. 테스트가 만든 프로세스만 종료하며 사용자 앱을 재시작·교체하지 않았다. 테스트는 고유 ID 메모만 만들고 커서·전면 앱을 복원한다.
 - 최초 green: Rust 27 + Node 7, 타입·린트·빌드 통과. 실제 커서 오른쪽 하단에서 왼쪽 위 여백, 3.6초 이상 위치 불변과 opacity 1.0, 즉시 CLI 반환, 이미 보이는 창의 open/갱신 유지, 마우스 이동 후 목적지 이동·opacity 0.5, 지연된 자동 크기 적용, 숨김/복원/취소/창 독립성 통과.
 - 추가 드래그 검증은 최초 AppleScript Unicode escape 오류, 1차 교정 후 접근성 권한 거부(-1728), CLI 프레임 조회로 바꾼 2차 실행에서는 드래그 최종 위치 assertion 실패를 기록했다. assertion을 약화하지 않았으며 별도 작업자에게 에스컬레이션했다.
 - 독립 감사에서 테스트 완화·실행 결과 퇴행·스코프 이탈은 미발동이었다. 다른 배율의 모니터에서 대기하는 창의 목적지 예약 크기 결함(P2)을 발견해 보완 대상으로 기록했다.
@@ -375,7 +375,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - package.json·npm lock·Cargo package/lock·Tauri 버전을 0.2.2로 맞췄다.
 - Rust 29 + Node 9, Clippy·Rustfmt·JS·diff 검사와 `npm run build:release`(arm64 app·DMG) 통과.
 - DMG 무결성 검사, 읽기 전용 마운트 앱의 `codesign --verify --deep --strict`, 버전 0.2.2, arm64, 빌드 앱과 바이너리 바이트 일치, CLI `--help`를 확인했다. 검증 후 마운트를 해제했다.
-- DMG와 SHA256SUMS.txt, 검증 메타데이터를 로컬 `~/Library/Application Support/Floatnote/releases/v0.2.2/`에 보관한다. 코드·게이트 원본 로그는 `~/Library/Logs/floatnote-is2-7/`에 보관한다.
+- DMG와 SHA256SUMS.txt, 검증 메타데이터를 로컬 `~/Library/Application Support/Jajan/releases/v0.2.2/`에 보관한다. 코드·게이트 원본 로그는 `~/Library/Logs/jajan-is2-7/`에 보관한다.
 - 애드혹 서명이며 Developer ID·공증 및 다른 Mac의 최초 설치는 미검증이다. 자동화 드래그·실제 다중 모니터 미검증 한계는 이전 기록과 같다.
 
 ## v0.2.3 통합·릴리스
@@ -386,7 +386,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 앱 및 DMG 내부 앱의 애드혹 서명, DMG 무결성, 내부 버전 0.2.3, 바이너리 바이트 일치와 CLI --help를 확인했다. Developer ID·공증은 제공하지 않는다.
 - 최종 release 실행 파일에서 IPC 문자열만 같은 길이의 별도 namespace로 교체·애드혹 서명하여 native 격리 검증했다. 최소 1초 대기와 등장 회귀 모두 PASS. 등장 중 본문 변경은 독립적인 3초 불투명을 유지해야 하므로 기존 스모크의 즉시 0.5 기대를 1.0 및 기한 후 0.5 검사로 교체했다.
 - `CGWarpMouseCursorPosition`은 실제 커서 위치를 이동시킬 수 있지만, `CGPreflightPostEventAccess`가 false이면 WebView에 합성 pointer 이벤트를 전달하지 못한다. 좌표 일치만으로 이벤트 전달을 단정했던 검사 실패를 보존했고, 권한 확인을 추가하여 이 경우만 SKIP한다. 실제 커서 접촉·강조 색상·편집/복사/워프/수동 크기 UI 한계는 남아 있다.
-- 검증 로그는 `/tmp/floatnote-is2-5/release-*`, `entrance-hold-smoke-release.log`, `entrance-smoke-release.log`, `update-feedback-smoke-release.log`에 있으며 삭제 전 `~/Library/Logs/floatnote-is2-5/`로 보존한다. 원본 감사 ref와 시도 이력도 번들로 보존한다.
+- 검증 로그는 `/tmp/jajan-is2-5/release-*`, `entrance-hold-smoke-release.log`, `entrance-smoke-release.log`, `update-feedback-smoke-release.log`에 있으며 삭제 전 `~/Library/Logs/jajan-is2-5/`로 보존한다. 원본 감사 ref와 시도 이력도 번들로 보존한다.
 - 로컬 배포는 기존 메모·초안·위치·숨김 보존을 위해 앱 설치 파일을 교체하되 실행 중인 기존 프로세스는 재시작하지 않는다. 설치 버전은 다음 앱 재시작부터 적용된다. 이전 앱과 메모 snapshot을 로컬 private 백업에 남긴다.
 
 ## Sentry 오류 수집 (2026-10-25)
@@ -396,7 +396,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - `npm run check`, Rustfmt, JavaScript 문법 검사, `git diff --check` 통과.
 - `npm run build`: macOS 앱 번들 생성 및 새 release CLI `--help` JSON 응답 확인.
 - 오류 수집 프로젝트를 생성하고 공개 수신 DSN을 기본값으로 연결했습니다.
-- 명시적 실제 전송 테스트 `telemetry::tests::live_sentry_delivery` 1개 통과. Sentry에서 테스트 이벤트 수신을 직접 확인했습니다(릴리스 `floatnote@0.2.3`, environment `development`).
+- 명시적 실제 전송 테스트 `telemetry::tests::live_sentry_delivery` 1개 통과. Sentry에서 테스트 이벤트 수신을 직접 확인했습니다(릴리스 `jajan@0.2.3`, environment `development`).
 - DSN 반영 후 일반 테스트 50개 통과(실제 전송 테스트 1개는 기본 생략), Clippy·Rustfmt·앱 빌드를 다시 통과했습니다. 기존 앱 프로세스와 사용자 메모는 유지했으며, 새 번들은 빌드 산출물 경로에 생성했습니다.
 - Conf 5(실제 SDK 전송·수신) / Risk Medium: 외부 서비스로 진단 이벤트를 전송합니다. 실제 WebView에서 오류를 유발하는 E2E는 수행하지 않았습니다.
 
@@ -409,7 +409,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 접근성 UI를 통한 핀 버튼·편집·복사 및 색상/취소선 픽셀 검증은 미실행이다. 다른 Mac·Intel·다중 모니터 검증은 수행하지 않았다.
 - DMG 무결성, 내부 앱 애드혹 서명, 버전 0.2.4, 빌드 앱과 내부 바이너리 바이트 일치, CLI --help 통과. Developer ID 서명·공증은 제공하지 않는다.
 - 사용자 승인으로 PR 병합·비공개 GitHub 릴리즈·로컬 설치를 진행한다. 실행 중인 기존 앱은 메모 보존을 위해 재시작하지 않으며 새 버전은 다음 시작부터 적용된다. 설치 전 메모 snapshot·이전 앱과 릴리즈 파일은 로컬 private 백업에 보존한다.
-- 검증 로그: ~/Library/Logs/floatnote-v0.2.4/. 릴리즈·백업: ~/Library/Application Support/Floatnote/releases/v0.2.4/.
+- 검증 로그: ~/Library/Logs/jajan-v0.2.4/. 릴리즈·백업: ~/Library/Application Support/Jajan/releases/v0.2.4/.
 
 ### Sentry 병합 검증
 
@@ -423,7 +423,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - Control + 포인터 접촉으로 창별 접기·펼치기를 전환한다. 원래 논리 크기를 저장·복원하고 접힌 동안 자동 맞춤과 가장자리 크기 조절을 막는다. 본문·편집 초안은 유지한다.
 - 포인터가 밖에 있을 때 접힘 불투명도 0.8, 펼침 0.5이며 기존 포인터 접촉·등장·변경 알림의 1.0 우선 규칙을 유지한다.
 - Rust 36 + Node 13 테스트, Clippy, Rustfmt, JS 문법 및 app 빌드를 통과했다. Node 회귀 테스트는 접힘 중 CLI 갱신과 편집 초안·제목 표시·펼치기 버튼 복원을 확인한다.
-- 소스 사본의 IPC 디렉터리만 별도로 지정한 임시 debug 앱에서 실제 macOS 입력으로 접기·펼치기, 중복 토글 방지, 12px 높이, 0.8/0.5 불투명도, 이전 크기 복원, 접힘 중 갱신, 펼치기 버튼 클릭과 다른 메모의 독립 상태를 확인했다. 임시 앱은 검증 후 종료했다. 검증 도구와 로그는 `/tmp/floatnote-fold-validation/`에 있다.
+- 소스 사본의 IPC 디렉터리만 별도로 지정한 임시 debug 앱에서 실제 macOS 입력으로 접기·펼치기, 중복 토글 방지, 12px 높이, 0.8/0.5 불투명도, 이전 크기 복원, 접힘 중 갱신, 펼치기 버튼 클릭과 다른 메모의 독립 상태를 확인했다. 임시 앱은 검증 후 종료했다. 검증 도구와 로그는 `/tmp/jajan-fold-validation/`에 있다.
 - 검증 입력 도구의 초기 시도는 등장 이동 중 좌표와 합성 Control 해제 플래그 때문에 실패했다. 등장 완료 후 좌표를 다시 읽고 해제 이벤트의 플래그를 비운 뒤 검증했다. 제품 코드의 성공으로 오인하지 않았다.
 - 기존 설치 앱과 실행 중 메모는 보존했다. 실제 다중 모니터 배율 변경 중 접기·펼치기는 미검증이다. Conf 4 / Risk Low.
 
@@ -432,7 +432,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 
 - 펼친 상태의 도구 모음에 위쪽 화살표 접기 버튼을 추가했다. 접히면 같은 버튼이 오른쪽 아래쪽 화살표와 ‘메모 펼치기’로 전환된다. 롤오버에는 Control을 누른 채 메모에 포인터를 올리는 단축키를 기본 툴팁으로 표시한다.
 - Rust 36 + Node 14 테스트, Clippy·Rustfmt·JS 문법·diff 및 app 빌드 통과. Node 테스트는 버튼의 양방향 전환·접근성 이름·펼침 상태·단축키 툴팁 문구를 검증했다.
-- `/tmp/floatnote-fold-buttons/`의 격리 앱에서 펼친 상태의 접기 버튼과 접힌 상태의 펼치기 버튼을 실제 클릭해 전환을 확인했다. 이전 크기 복원·12px 높이·불투명도·Control 전환 검증도 통과했다. 툴팁의 실제 화면 출현은 별도로 자동 검증하지 않았다.
+- `/tmp/jajan-fold-buttons/`의 격리 앱에서 펼친 상태의 접기 버튼과 접힌 상태의 펼치기 버튼을 실제 클릭해 전환을 확인했다. 이전 크기 복원·12px 높이·불투명도·Control 전환 검증도 통과했다. 툴팁의 실제 화면 출현은 별도로 자동 검증하지 않았다.
 - 새 미리보기 창을 실행하고 이전 미리보기만 숨겼다. 기존 설치본과 다른 사용자 메모는 유지했다.
 
 
@@ -444,20 +444,20 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 최종 release 바이너리 사본에서 IPC 경로만 같은 길이의 별도 namespace로 바꾸고 애드혹 서명하여 격리 검증했다. 실제 접기/펼치기 버튼 클릭과 Control 접촉 전환·중복 토글 방지·12px 높이·0.8/0.5 불투명도·이전 크기 복원·접힘 중 갱신·창별 독립 상태를 확인했다.
 - DMG 무결성, 내부 앱 서명·버전 0.2.5·빌드 바이너리 일치 및 CLI --help를 확인했다. 검증용 마운트는 해제했다. Developer ID 서명·공증·Intel·다중 모니터 배율 변경 및 툴팁 픽셀 자동 검증은 미수행이다.
 - 설치는 기존 앱과 메모 snapshot을 로컬 private 경로에 백업하고 앱 파일을 교체한다. 기존 프로세스는 초안·위치·숨김 보존을 위해 유지하며 새 버전은 다음 재시작부터 적용한다.
-- 릴리스 파일·이전 앱·메모 snapshot은 `~/Library/Application Support/Floatnote/releases/v0.2.5/`, 테스트 로그·격리 검증 도구는 `~/Library/Logs/floatnote-v0.2.5/`에 보존한다. 설치와 게시 확인 후 Orca CLI로 이번 folding 워크스페이스만 삭제한다.
+- 릴리스 파일·이전 앱·메모 snapshot은 `~/Library/Application Support/Jajan/releases/v0.2.5/`, 테스트 로그·격리 검증 도구는 `~/Library/Logs/jajan-v0.2.5/`에 보존한다. 설치와 게시 확인 후 Orca CLI로 이번 folding 워크스페이스만 삭제한다.
 - Conf 4 / Risk Medium: main에서 통합한 기존 Sentry 외부 오류 수집을 포함한다. 접기 기능 자체는 국소적이며 복구 가능하다.
 
 
-## Agent Gibbon 이름 전환 (2026-10-25)
+## Jajan 이름 전환 (2026-10-25)
 
-- 앱 표시명은 Agent Gibbon, 저장소·CLI·스킬 이름은 agent-gibbon으로 전환했다. GitHub 저장소의 private 상태를 확인했다. 이전 scripts/floatnote는 새 CLI로 연결하는 호환 진입점이다.
+- 앱 표시명은 Jajan, 저장소·CLI·스킬 이름은 jajan으로 전환했다. GitHub 저장소의 private 상태를 확인했다. 이전 scripts/jajan는 새 CLI로 연결하는 호환 진입점이다.
 - 기존 메모와 설정을 위해 앱 식별자, Unix socket 디렉터리와 UI 설정 키를 유지했다. 새 Sentry 환경변수를 우선하고 이전 환경변수도 지원한다.
 - Apple Silicon MacBook(Cargo 1.91.1)과 Intel iMac Pro(Cargo 1.97.1)에서 각각 Rust 38개 및 Node 15개 테스트, Clippy와 앱 빌드를 통과했다. 실제 Sentry 전송 테스트 1개는 기본 생략했다. 최신 Clippy가 발견한 기존 오류 전파 구문은 동작이 같은 `?` 구문으로 정리했다.
 - 두 컴퓨터에서 release 바이너리 사본의 IPC 경로만 같은 길이의 별도 경로로 바꾸고 애드혹 서명하여 격리 검증했다. 새 프로세스 실행, 두 메모의 독립 내용, 숨김 갱신과 위치 보존, CLI 도움말을 확인했다. 검증 프로세스만 종료했다.
-- 각 컴퓨터의 /Applications/Agent Gibbon.app을 설치하고 서명 검사 및 빌드 번들 내부 바이너리와 바이트 일치를 확인했다. 새 CLI와 호환 CLI의 도움말, 기존 프로세스 메모 조회도 통과했다. 기존 앱은 실행 상태로 보존했고 새 UI 이름은 다음 앱 시작부터 적용된다.
-- 두 컴퓨터의 소스 파일 해시가 일치함을 확인했다. 저장소 실경로와 새 Orca 등록 경로는 ~/dev/project/agent-gibbon, 새 워크트리 기본 경로는 ~/orca/workspaces/agent-gibbon이다. Agents·Codex·Claude의 설치 스킬은 새 저장소의 스킬을 가리킨다.
-- Orca 기존 등록은 'Agent Gibbon · 이전 대화'로 보존했다. 이전 경로는 호환 심볼릭 링크로 유지한다. 이전 대화 로그의 경로를 다시 쓰거나 기존 세션 등록을 삭제하지 않았다.
-- 이번 검증에서 전체 버튼·트레이·접기·워프 UI 회귀 및 Developer ID 서명·공증, 새 DMG 배포는 수행하지 않았다. 로그는 각 컴퓨터의 ~/Library/Logs/agent-gibbon-rename-20261025/에 있다.
+- 각 컴퓨터의 /Applications/Jajan.app을 설치하고 서명 검사 및 빌드 번들 내부 바이너리와 바이트 일치를 확인했다. 새 CLI와 호환 CLI의 도움말, 기존 프로세스 메모 조회도 통과했다. 기존 앱은 실행 상태로 보존했고 새 UI 이름은 다음 앱 시작부터 적용된다.
+- 두 컴퓨터의 소스 파일 해시가 일치함을 확인했다. 저장소 실경로와 새 Orca 등록 경로는 ~/dev/project/jajan, 새 워크트리 기본 경로는 ~/orca/workspaces/jajan이다. Agents·Codex·Claude의 설치 스킬은 새 저장소의 스킬을 가리킨다.
+- Orca 기존 등록은 'Jajan · 이전 대화'로 보존했다. 이전 경로는 호환 심볼릭 링크로 유지한다. 이전 대화 로그의 경로를 다시 쓰거나 기존 세션 등록을 삭제하지 않았다.
+- 이번 검증에서 전체 버튼·트레이·접기·워프 UI 회귀 및 Developer ID 서명·공증, 새 DMG 배포는 수행하지 않았다. 로그는 각 컴퓨터의 ~/Library/Logs/jajan-rename-20261025/에 있다.
 - Conf 4 / Risk Medium: 두 CPU 환경에서 실제 앱 검증을 수행했으며 경로·설치·Orca 등록 변경은 호환 경로와 기존 등록을 통해 복구 가능하다.
 
 
@@ -474,8 +474,8 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 이름 전환을 main에 통합한 뒤 다른 작업에서 게시한 v0.2.6 접촉 닫기와 워크트리 개발 인스턴스 분리 변경도 보존했다. 버전 충돌을 피하기 위해 이번 Apple Silicon·Intel 통합 배포는 v0.2.7로 올렸다.
 - 두 CPU에서 Rust 42개·Node 18개 테스트, Clippy, 앱 빌드와 격리 CLI 검증을 통과했다. 실제 Sentry 전송 테스트 1개는 생략했다. 격리 검증은 최종 release 바이너리 원본을 서로 다른 개발 인스턴스로 실행해 앱 시작·도움말·같은 ID 메모의 독립 내용·숨김 갱신·위치 보존을 확인했다.
 - 두 DMG의 hdiutil 무결성, 내부 앱 버전 0.2.7·CPU 종류·애드혹 서명·빌드 번들과 바이너리 일치·CLI 도움말을 확인했다. 검증 마운트는 해제했다. Intel은 Finder 자동화가 대기하여 bundle_dmg.sh의 --skip-jenkins 옵션으로 아이콘 자동 배치를 생략했고 앱과 Applications 바로가기를 포함했다.
-- 두 Mac에 /Applications/Agent Gibbon.app을 설치하고 설치본 서명·버전·바이너리 일치·기존 메모 CLI 조회를 확인했다. 덮어쓰기 뒤 macOS 서명 캐시로 실행이 종료되는 현상을 해결하기 위해 새 번들을 별도 경로에 준비한 뒤 기존 앱을 백업 경로로 이동하고 교체했다. 기존 프로세스를 종료하지 않아 메모·초안·숨김을 보존했으며 새 버전은 다음 앱 실행부터 적용된다.
-- 기존 앱과 메모 snapshot·설치 자산은 ~/Library/Application Support/Agent Gibbon/releases/v0.2.7/, 검증 로그는 ~/Library/Logs/agent-gibbon-v0.2.7/에 보존한다.
+- 두 Mac에 /Applications/Jajan.app을 설치하고 설치본 서명·버전·바이너리 일치·기존 메모 CLI 조회를 확인했다. 덮어쓰기 뒤 macOS 서명 캐시로 실행이 종료되는 현상을 해결하기 위해 새 번들을 별도 경로에 준비한 뒤 기존 앱을 백업 경로로 이동하고 교체했다. 기존 프로세스를 종료하지 않아 메모·초안·숨김을 보존했으며 새 버전은 다음 앱 실행부터 적용된다.
+- 기존 앱과 메모 snapshot·설치 자산은 ~/Library/Application Support/Jajan/releases/v0.2.7/, 검증 로그는 ~/Library/Logs/jajan-v0.2.7/에 보존한다.
 - Developer ID 서명·공증 및 전체 UI 회귀는 이번 배포에서 수행하지 않았다. Conf 4 / Risk Medium.
 
 ## 2026-10-25 열린 메모 메뉴 표시
@@ -502,7 +502,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 
 ### 노트별 폴더 구조 후속 검증
 
-- 설치 경로: 문서 폴더의 `agent-gibbon/docs/<ID>/index.md`. 개발 경로: 앱 데이터의 `notes/dev-<해시>/docs/<ID>/index.md`. 대문자만 이스케이프하여 소문자 ID의 가독성과 대소문자 구분을 유지.
+- 설치 경로: 문서 폴더의 `jajan/docs/<ID>/index.md`. 개발 경로: 앱 데이터의 `notes/dev-<해시>/docs/<ID>/index.md`. 대문자만 이스케이프하여 소문자 ID의 가독성과 대소문자 구분을 유지.
 - 이전 평면 파일을 원본 보존 복사하며 기존 대상은 덮어쓰지 않는 이관 테스트 통과. 같은 폴더에 다른 파일이 있어도 메모 복원 성공.
 - `npm run dev:build`, `npm test`(Rust 44 통과/1 무시, JS 18 통과), `npm run check`, 실제 `scripts/persistence-smoke.py` 통과. smoke에서 `docs/<ID>/index.md`와 개발 인스턴스 경로를 검증.
 - 이미지 기능 및 날짜 메타데이터 추가 없음. 설치 앱 교체 및 실제 사용자 Documents 경로 쓰기는 수행하지 않음. Conf 5는 개발 앱의 저장/재실행 경로 기준, Risk Medium.
@@ -528,7 +528,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - 환경: macOS 15.6.1 arm64, rustc/cargo 1.91.1, Node v24.21.0, npm 11.19.0, tauri-cli 2.12.1. 런타임 tauri 2.12.2.
 - 통과: `npm test`(Rust 49 통과/외부 전송 테스트 1 무시, Node 18 통과), `npm run check`, Rustfmt, `node --check ui/app.js`, Python 문법 검사, `git diff --check`, `npm run dev:build`.
 - `python3 scripts/entrance-direction-smoke.py` 최종 통과: 실제 개발 CLI와 macOS 포인터 이동으로 네 방향, 1초 대기 중 정지, 첫 방향 반전 무시, 1초 이후 미세 떨림 대기, 420ms 동작 종료, 포커스 비탈취, 반복 open 무동작, 숨김 갱신·복원, 접힌 채 재열기·위 방향 재실행·펼치기, 실제 드래그 취소, 네이티브 수동 크기 조절 후 접기/펼치기 크기 복원 확인. 입력 도구는 드래그 시작 전 포인터도 해당 좌표로 옮겨 합성 이벤트와 실제 커서 좌표를 일치시킨다.
-- smoke는 이 워크트리의 `scripts/agent-gibbon-dev`만 호출하며 고유 테스트 노트를 숨기고 포인터를 복원한다. 자신이 시작한 정확한 개발 바이너리의 PID만 종료한다. 설치 앱·다른 워크트리 프로세스와 원래 세션 작업 파일은 변경하지 않았다. 작업 시작부터 있던 `package-lock.json` 변경도 보존했다.
+- smoke는 이 워크트리의 `scripts/jajan-dev`만 호출하며 고유 테스트 노트를 숨기고 포인터를 복원한다. 자신이 시작한 정확한 개발 바이너리의 PID만 종료한다. 설치 앱·다른 워크트리 프로세스와 원래 세션 작업 파일은 변경하지 않았다. 작업 시작부터 있던 `package-lock.json` 변경도 보존했다.
 - 한계: 실제 입력 검증은 기본 모니터에서 수행했다. 음수 좌표·혼합 배율 변환은 Rust 테스트로 확인했으나 서로 다른 배율의 실제 모니터를 오가는 등장, 모니터 연결 해제, Intel 실행, 편집 초안 UI·워프 버튼 전체 회귀 및 두 워크트리 동시 격리 검증은 미실행이다. 방향을 명시한 가장자리 이동은 다른 노트와 겹칠 수 있다. 커밋·병합·배포는 수행하지 않았다.
 - Conf 4 / Risk Low: 개발 앱의 실제 입력 회귀 통과, 변경은 로컬 창 동작이며 쉽게 복구 가능.
 
@@ -536,14 +536,14 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 
 - 제공된 스티커 메뉴 이미지의 RGB 표본으로 노랑·파랑·초록·분홍·보라·회색 순환을 추가했다. 저장된 노트 수를 기준으로 하며 시작 시 빈 main 자리표시는 제외한다. 명시 색상은 우선하고 기존 노트는 변경하지 않는다.
 - 환경: arm64 macOS, Node v24.21.0, Rust 1.91.1. `npm test`: Rust 47 통과·외부 전송 테스트 1 무시, JavaScript 18 통과. `npm run check`, `npm run dev:build`, `git diff --check` 통과.
-- 실제 `scripts/agent-gibbon-dev` CLI로 7개 생성 후 여섯 색상과 반복 확인, 숨긴 상태의 본문 갱신과 색상 유지, 재열기 색상 유지, 명시 색상 정규화, 개발 앱 종료·재실행 후 저장 색상·숨김 복원과 다음 순환 색상 확인. 검증에서 시작한 정확한 개발 바이너리 PID만 종료했다.
+- 실제 `scripts/jajan-dev` CLI로 7개 생성 후 여섯 색상과 반복 확인, 숨긴 상태의 본문 갱신과 색상 유지, 재열기 색상 유지, 명시 색상 정규화, 개발 앱 종료·재실행 후 저장 색상·숨김 복원과 다음 순환 색상 확인. 검증에서 시작한 정확한 개발 바이너리 PID만 종료했다.
 - Conf 5(실제 개발 앱 CLI 검증), Risk Low. 설치 앱은 교체하지 않았다. 육안 색상 비교와 두 워크트리 격리 회귀는 이번에 수행하지 않았다.
 
 ## 공식 배포 빌드에만 Sentry 수집 허용 (2026-10-25)
 
-- 기본 DSN 파일과 런타임 DSN 재지정/구형 환경변수 호환을 제거했다. release 빌드에 `AGENT_GIBBON_SENTRY_DSN`을 주입한 경우만 SDK를 초기화하며, debug 및 test 빌드는 항상 초기화를 건너뛴다. 유효한 내장 DSN이 없으면 `sentry::init`을 호출하지 않아 SDK의 일반 `SENTRY_DSN` 자동 적용도 차단한다.
+- 기본 DSN 파일과 런타임 DSN 재지정/구형 환경변수 호환을 제거했다. release 빌드에 `JAJAN_SENTRY_DSN`을 주입한 경우만 SDK를 초기화하며, debug 및 test 빌드는 항상 초기화를 건너뛴다. 유효한 내장 DSN이 없으면 `sentry::init`을 호출하지 않아 SDK의 일반 `SENTRY_DSN` 자동 적용도 차단한다.
 - Apple Silicon arm64, Rust/Cargo 1.91.1, Node 26.0.0, npm 11.12.1, Tauri CLI 2.12.1에서 Rust 44개 및 Node 18개 테스트, Clippy, Rustfmt, diff 검사를 통과했다. 기존 실제 전송 테스트는 테스트 빌드 수집 금지 정책에 따라 전송 없는 조건 검증으로 교체했다.
-- `npm run dev:build` 및 DSN 환경변수를 제거한 `npm run build`의 release 앱 번들 생성을 통과했다. `scripts/agent-gibbon-dev`로 테스트 노트의 open/update/close/inspect 및 숨김·본문을 확인했다. 실행 환경에는 실제 서비스가 아닌 example.invalid 테스트 DSN을 제공했다. 직접 시작한 개발 앱 PID만 종료했으며 설치 앱은 변경하지 않았다.
+- `npm run dev:build` 및 DSN 환경변수를 제거한 `npm run build`의 release 앱 번들 생성을 통과했다. `scripts/jajan-dev`로 테스트 노트의 open/update/close/inspect 및 숨김·본문을 확인했다. 실행 환경에는 실제 서비스가 아닌 example.invalid 테스트 DSN을 제공했다. 직접 시작한 개발 앱 PID만 종료했으며 설치 앱은 변경하지 않았다.
 - 유효한 release DSN 조건은 단위 테스트로 확인했다. 공식 DSN을 주입한 배포판의 실제 Sentry 수신 및 네트워크 캡처 검증, Intel 빌드, 앱 공증은 수행하지 않았다. 배포 담당자는 다음 공식 빌드에 DSN을 주입하고 실제 수신을 별도로 확인해야 한다. 이번 결과물은 설치·배포하지 않았다.
 - Conf 3 / Risk Low: 수집 조건은 단위 테스트로 검증했고 개발 CLI의 실제 실행도 확인했지만 공식 서비스 전송은 미검증이다.
 
@@ -591,7 +591,7 @@ UI 검증은 macOS 자동화/손쉬운 사용 권한이 필요하며 실행 중 
 - `scripts/diff-action-layout-smoke.py` 통과: 실제 Chromium CSS로 300×240, 144×160(18px 본문), 300×80에서 버튼 hit-test, 본문과 메뉴 비겹침, 마지막 줄 스크롤, 메뉴 제거 후 공간 회복, 접힌 상태, 개발 도구 모음 hit-test를 확인했다.
 - 누적 비교는 마지막 확인 본문을 기준으로 계산한다. `A → B → C`는 `A → C`, 확인 후 `D`는 `C → D`다. 중간 버전은 이력으로 남기지 않으며, 기준으로 되돌린 부분은 표시에서 빠진다. 전체 복귀 시 메뉴도 사라진다.
 - 비교 기준을 선택적 로컬 저장 메타데이터로 보관하며 기존 파일도 읽는다. 저장된 기준은 HTML로 재계산하고, 재시작 시 미확인 상태를 복원하되 창을 열거나 불투명 알림을 시작하지 않는다. 확인 저장에 실패하면 기준과 강조를 유지하고 재시도할 수 있다. 본문 revision은 확인 자체로 증가시키지 않는다.
-- Rust 누적 diff 테스트의 기존 구현 실패를 확인한 뒤 구현했다(`/tmp/gibbon-cumulative-red.log`). Rust 57개, Node 21개 테스트와 Clippy·개발 빌드 통과. 저장 실패, 기준 전환, 부분·전체 복귀, 메타데이터·동일 본문, 메모별 독립성, 오래된 클릭, 저장·복원을 검증했다.
+- Rust 누적 diff 테스트의 기존 구현 실패를 확인한 뒤 구현했다(`/tmp/jajan-cumulative-red.log`). Rust 57개, Node 21개 테스트와 Clippy·개발 빌드 통과. 저장 실패, 기준 전환, 부분·전체 복귀, 메타데이터·동일 본문, 메모별 독립성, 오래된 클릭, 저장·복원을 검증했다.
 - 실앱 확인: 비활성 개발 창에서 실제 좌표 클릭으로 diff와 메뉴가 사라지고 본문·위치가 유지됨을 CLI와 WebView 접근성 트리로 확인했다. Orca 도구가 클릭 후 창 축소에 따른 포커스 확인 오류를 보고한 시도도 재클릭하지 않고 CLI와 새 화면을 읽어 성공 여부를 검증했다.
 - 실제 개발 CLI로 A→B→C, 숨김·메타데이터 갱신, 프로세스 재시작 후 기준 유지, 실제 버튼 클릭 후 C→D, C로 복귀 시 diff 제거, 다시 C→D→E 누적을 모두 확인했다. 직접 시작한 정확한 워크트리 PID만 재시작했다. 최종 테스트 메모는 사용자가 확인할 수 있도록 개발 앱에 남겼으며 위치를 이전 테스트 위치로 복원했다.
 - 기존 feedback smoke의 롤오버·삭제 기준 assertion도 새 요구사항에 맞췄다. 해당 전체 스크립트, 설치 앱 교체, 두 워크트리 격리 회귀는 이번에 실행하지 않았다. Conf 5(실앱 클릭·누적·재시작), Risk Medium(확인 기준 저장과 상태 관리).
@@ -610,7 +610,7 @@ npm.cmd run dev:build
 node scripts/windows-smoke.mjs
 npm.cmd run build:windows
 # 생성한 설치 파일을 설치한 뒤 실제 실행 파일 경로를 지정합니다.
-node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
+node scripts/windows-smoke.mjs '<설치 경로>\jajan.exe'
 ```
 
 ### 결과
@@ -717,13 +717,13 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - 환경: Apple Silicon arm64, Node v24.21.0, Cargo 1.91.1.
 - macOS activation policy를 Regular로 변경하여 Dock에 앱 아이콘 표시. Reopen 이벤트에서 열린 메모만 앞으로 가져오고, 모두 숨겨졌으면 main 메모를 복원.
 - `npm run dev:build`, `npm run build`, `npm test` (Rust 63 + UI 33), `npm run check`, `git diff --check` 통과. 설치 앱의 `codesign --verify --deep --strict` 통과(로컬 ad-hoc 서명, 공증 아님).
-- 격리된 개발 앱에서 실제 Dock AXPress로 main 복원, 반복 클릭 시 위치·크기·핀 보존, 다른 숨긴 메모의 숨김 유지 확인. 개발 CLI는 `scripts/agent-gibbon-dev` 사용. 이번 검증에서 시작한 개발 프로세스만 종료.
-- 기존 설치 앱을 로컬 백업한 뒤 `/Applications/Agent Gibbon.app`에 새 빌드 설치. Dock의 ‘Dock에 유지’를 선택하고 persistent-apps의 경로 확인. 이번 작업에서 시작한 설치 앱을 종료한 상태에서 고정된 Dock 아이콘 클릭으로 새 프로세스 실행 및 main 표시 확인.
+- 격리된 개발 앱에서 실제 Dock AXPress로 main 복원, 반복 클릭 시 위치·크기·핀 보존, 다른 숨긴 메모의 숨김 유지 확인. 개발 CLI는 `scripts/jajan-dev` 사용. 이번 검증에서 시작한 개발 프로세스만 종료.
+- 기존 설치 앱을 로컬 백업한 뒤 `/Applications/Jajan.app`에 새 빌드 설치. Dock의 ‘Dock에 유지’를 선택하고 persistent-apps의 경로 확인. 이번 작업에서 시작한 설치 앱을 종료한 상태에서 고정된 Dock 아이콘 클릭으로 새 프로세스 실행 및 main 표시 확인.
 - Windows 실행 검증과 macOS 공증은 수행하지 않음. 배포 태그·릴리스 및 저장소 커밋은 생성하지 않음.
 
 ## 2026-10-26 · 메뉴 막대의 앱 종료
 
-- 메뉴 막대 아이콘의 메모 목록 뒤에 구분선과 `Agent Gibbon 종료` 추가. Tauri `AppHandle::exit(0)`으로 현재 인스턴스를 종료하며, 기존 메모 닫기/숨기기 동작은 유지.
+- 메뉴 막대 아이콘의 메모 목록 뒤에 구분선과 `Jajan 종료` 추가. Tauri `AppHandle::exit(0)`으로 현재 인스턴스를 종료하며, 기존 메모 닫기/숨기기 동작은 유지.
 - `npm run dev:build`, `npm run build`, `npm run check`, Rustfmt 검사 통과.
 - 개발 인스턴스의 실제 메뉴를 클릭하여 종료 항목 존재, 해당 프로세스 소멸, 개발 CLI list 실패 확인. 개발 CLI로 재실행 후 저장된 검증 메모 본문 복원 확인.
 - 기존 설치본을 백업하고 새 앱을 설치·실행. Windows 실환경 종료 검증은 미수행. 저장하지 않은 편집 초안은 기존 종료 동작처럼 유지되지 않음.
@@ -749,7 +749,7 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 
 ## 2026-10-26 · 최종 실행 상태 및 병합 전 확인
 
-- 사용자 요청으로 기존 Agent Gibbon 인스턴스를 종료하고 최신 개발 인스턴스 하나만 다시 실행했다. 직접 저장 diff 제거와 편집·변경 알림 UI를 포함한 빌드가 실행 중임을 프로세스 경로와 개발 CLI로 확인했다.
+- 사용자 요청으로 기존 Jajan 인스턴스를 종료하고 최신 개발 인스턴스 하나만 다시 실행했다. 직접 저장 diff 제거와 편집·변경 알림 UI를 포함한 빌드가 실행 중임을 프로세스 경로와 개발 CLI로 확인했다.
 - 노트가 사라진다는 제보를 점검하는 동안 생성된 노트의 숨김 상태와 개발 앱 연결 종료를 관찰했으나 원인은 확정하지 못했다. 사용자 요청으로 단일 인스턴스로 정리한 뒤 재확인하도록 했으며, 이 증상을 수정·해결했다고 판정하지 않는다.
 - 최종 Rust 65개·UI 36개 테스트, Clippy, Rustfmt, 버전 일치, diff 검사 수행. 개발 빌드는 앞선 UI 변경 후 통과했으며 실행 앱 보존을 위해 동일 빌드를 다시 덮어쓰지 않는다.
 
@@ -811,7 +811,7 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - 조사 범위: 개발 실행기·인스턴스 생성·CLI 응답·창 제목·현재 화면 배지 및 프로젝트 에이전트 정책. 앱 코드는 변경하지 않았다.
 - 근거: `scripts/dev-instance.mjs`는 실제 워크트리 경로의 해시로 인스턴스를 구분한다. `scripts/dev.mjs`는 CLI 바이너리의 인스턴스와 빌드 원본 경로를 검사한다. 이는 통신 대상의 격리를 돕지만 에이전트가 선택한 화면의 출처까지 보증하지 않는다.
 - `src-tauri/src/main.rs`의 `inspect` 응답에는 `instance`와 `dev_label`이 있으나 `list` 응답에는 인스턴스가 없다. 네이티브 창 제목에는 개발 라벨과 메모 ID가 포함된다. `ui/app.js`의 펼친 창 배지는 공통 문자열 `DEV`이며 전체 라벨은 tooltip·접근성 이름에 있다. 따라서 앱 이름·배지만으로 GUI 대상을 고르면 다른 워크트리의 결과를 오인할 여지가 있다. 실제 오인 사례를 재현한 것은 아니다.
-- 실환경 조회: Node v24.21.0. 작업 루트 `/Users/egoinglee/dev/project/agent-gibbon`, 예상 인스턴스 `dev-a5210ae16e79437d38490c8f`, 실행 파일 `src-tauri/target/debug/agent-gibbon`. `lsof`로 PID 17459의 실제 실행 파일과 PID 17143 개발 감시 실행의 작업 경로를 확인했다. 다른 경로의 개발 앱 프로세스도 동시에 관찰됐다.
+- 실환경 조회: Node v24.21.0. 작업 루트 `/Users/egoinglee/dev/project/jajan`, 예상 인스턴스 `dev-a5210ae16e79437d38490c8f`, 실행 파일 `src-tauri/target/debug/jajan`. `lsof`로 PID 17459의 실제 실행 파일과 PID 17143 개발 감시 실행의 작업 경로를 확인했다. 다른 경로의 개발 앱 프로세스도 동시에 관찰됐다.
 - 해당 루트의 절대 경로 개발 CLI로 `list`를 실행했으나 종료 코드 1, `ok: false`, `앱 응답 시간이 초과되었습니다`를 반환했다. 개발 감시 실행이 이미 있으므로 중복 실행·기존 앱 종료·다른 앱으로의 대체를 하지 않았다. 진행 메모도 표시하지 못했다. 시간 초과의 원인은 이번 정책 조사에서 확정하지 않았다.
 - 반영: `AGENTS.md`에 예상 인스턴스와 실제 `inspect` 응답 대조, GUI PID·창 식별 또는 동등한 표식 대조, 재시작 후 재확인, 출처 불명 결과의 통과 보고 금지를 추가했다. 기존 미커밋 정책 변경은 보존했다. 정책 준수로 오인 위험을 줄일 수 있으나 강제적인 런타임 차단은 아니다.
 - 검증: 정책의 명령·필드를 실제 소스와 대조하고 `git diff --check`를 수행했다. 앱 빌드·테스트·GUI 캡처·두 워크트리 격리 회귀는 실행하지 않았다. Conf 1 / Risk Low (문서 정책 변경).
@@ -822,22 +822,22 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 - Toolbar를 한 줄로 제한하고 너비 초과 시 이전·다음 버튼으로 탐색한다. DEV Badge의 소수점 너비로 버튼이 일부 잘리지 않도록 스크롤 좌표를 방향별로 반올림한다. Tab·Shift+Tab은 포커스된 버튼 전체를 노출한다. 본문·네이티브 창 크기를 변경하는 경로는 추가하지 않았다.
 - `npm run test:ui`: 기존 UI 테스트 50개 통과. `npm run dev:build`: 통과. Rust 코드·의존성은 변경하지 않았으며 Rust 테스트·Clippy는 이번 작업에서 실행하지 않았다.
 - `scripts/toolbar-layout-smoke.mjs`: Chromium에서 144×32·144×48·300×80 × DEV Badge 유무의 6개 조합 통과. 포인터 페이지 전환으로 기능 8개 전체 노출, Tab·Shift+Tab, 기본 숨김과 클릭 비활성화, 본문 영역 크기 보존, 접힘·이미지 상태 배치를 확인한다. Tauri와 telemetry 스크립트는 제외하고 실제 Toolbar 모듈·HTML·CSS를 읽는다. Playwright와 Chromium이 필요하며 저장소 의존성은 추가하지 않았다. 예: `PLAYWRIGHT_MODULE=/절대경로/playwright/index.mjs node scripts/toolbar-layout-smoke.mjs`.
-- 실제 개발 앱: 이 워크트리의 `scripts/agent-gibbon-dev`로 만든 테스트 메모만 사용했다. macOS Accessibility로 144×32·144×48·300×80을 설정하고 실제 포인터 이벤트로 이전·다음 탐색과 고정 버튼을 조작했다. 세 크기에서 기능 8개의 클릭 위치에 접근하고 고정 상태 전환 및 창 크기·위치 보존을 확인했다. 144×32 실제 화면 캡처에서 한 줄 배치를 확인했다. AX가 접기 버튼의 SVG를 포함한 큰 경계를 반환하므로 세로 판정은 CSS의 24px 클릭 영역과 실제 캡처를 함께 사용했다. 테스트 메모는 숨겼으며 직접 시작한 개발 프로세스만 종료했다.
+- 실제 개발 앱: 이 워크트리의 `scripts/jajan-dev`로 만든 테스트 메모만 사용했다. macOS Accessibility로 144×32·144×48·300×80을 설정하고 실제 포인터 이벤트로 이전·다음 탐색과 고정 버튼을 조작했다. 세 크기에서 기능 8개의 클릭 위치에 접근하고 고정 상태 전환 및 창 크기·위치 보존을 확인했다. 144×32 실제 화면 캡처에서 한 줄 배치를 확인했다. AX가 접기 버튼의 SVG를 포함한 큰 경계를 반환하므로 세로 판정은 CSS의 24px 클릭 영역과 실제 캡처를 함께 사용했다. 테스트 메모는 숨겼으며 직접 시작한 개발 프로세스만 종료했다.
 - SVG·PNG [작은 창 시안](design/toolbar-compact.svg)을 함께 작성하고 렌더링 결과를 확인했다. 기준은 [디자인 시스템](design-system.md#작은-창-toolbar--이슈-14-2026-10-30)에 정리했다.
 - 한계: 실제 macOS 앱의 키보드 탐색·VoiceOver 전체 검수, DEV Badge 없는 설치/배포 앱, Windows·Intel 실화면은 미검증이다. Playwright WebKit은 로컬 실행 파일이 없어 실행하지 못했다. 이미지·편집 상태는 브라우저 배치만 확인했고 각 기능의 실제 앱 전체 회귀는 실행하지 않았다. Conf 4 / Risk Low.
 
-- 실행 출처: 작업 루트 `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/issue-14`, `npm run dev:info`의 ID `dev-891816675f30ffa97abd5f0b`, 바이너리 `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/issue-14/src-tauri/target/debug/agent-gibbon`. 해당 개발 CLI의 `inspect --id issue14-check`가 `ok: true`, 같은 `instance`, 본문 `작은 창 Toolbar 검증`을 반환했다. 최종 GUI 검증은 정확한 바이너리 경로의 서버 PID `44416`과 그 PID에 속한 창 제목 `Agent Gibbon [DEV egoing/oystercatcher · 89181667] — issue14-check`를 함께 특정했다. 실제 크기별 포인터 검증은 `/tmp/gibbon-toolbar-native.py`로 수행했고 144×32 캡처는 `/tmp/gibbon-toolbar-native.png`에서 확인했다. 이 임시 파일은 저장소에 포함하지 않는다.
+- 실행 출처: 작업 루트 `/Users/egoinglee/orca/workspaces/jajan/jajan/issue-14`, `npm run dev:info`의 ID `dev-891816675f30ffa97abd5f0b`, 바이너리 `/Users/egoinglee/orca/workspaces/jajan/jajan/issue-14/src-tauri/target/debug/jajan`. 해당 개발 CLI의 `inspect --id issue14-check`가 `ok: true`, 같은 `instance`, 본문 `작은 창 Toolbar 검증`을 반환했다. 최종 GUI 검증은 정확한 바이너리 경로의 서버 PID `44416`과 그 PID에 속한 창 제목 `Jajan [DEV egoing/oystercatcher · 89181667] — issue14-check`를 함께 특정했다. 실제 크기별 포인터 검증은 `/tmp/jajan-toolbar-native.py`로 수행했고 144×32 캡처는 `/tmp/jajan-toolbar-native.png`에서 확인했다. 이 임시 파일은 저장소에 포함하지 않는다.
 
-- 병합 검증: 기본 브랜치의 기존 출처 정책·스킬 변경을 보존해 통합한 후 `/Users/egoinglee/dev/project/agent-gibbon`에서 UI 테스트 50개와 Chromium 6개 조합을 다시 통과했다. 이 실행은 브라우저 배치 검증이며 위 워크트리의 실제 개발 앱 검증과 구분한다.
+- 병합 검증: 기본 브랜치의 기존 출처 정책·스킬 변경을 보존해 통합한 후 `/Users/egoinglee/dev/project/jajan`에서 UI 테스트 50개와 Chromium 6개 조합을 다시 통과했다. 이 실행은 브라우저 배치 검증이며 위 워크트리의 실제 개발 앱 검증과 구분한다.
 
 ## 편집 시작 Feedback 표시 (2026-10-30)
 
 - 증상: 편집 시작 후 Feedback이 보이지 않다가 메모를 이동하면 표시되는 경우가 있다는 사용자 보고.
 - 코드 확인: `present_feedback`은 상태 저장·창 생성만 하고 실제 표시는 숨겨진 WebView의 100ms 타이머에 의존했다. 반면 이동·크기 변경은 네이티브 `sync`에서 직접 표시했다. 숨긴 WebView의 타이머 지연이 표시를 막을 수 있는 경로를 제거하여 상태 전달 뒤 메인 스레드에서 `sync`를 실행한다. 기존 숨김·접힘·최소화 조건과 포커스 보존을 재사용한다.
-- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/display-feedback-bar`
-- `npm run dev:info`: root는 위 경로, instance `dev-3dc07a98a5ddf93db177d66c`, binary는 위 루트의 `src-tauri/target/debug/agent-gibbon`.
+- 작업 루트: `/Users/egoinglee/orca/workspaces/jajan/jajan/display-feedback-bar`
+- `npm run dev:info`: root는 위 경로, instance `dev-3dc07a98a5ddf93db177d66c`, binary는 위 루트의 `src-tauri/target/debug/jajan`.
 - 환경: macOS 15.6.1 / arm64, Node v24.21.0, Rust 1.91.1. `npm run dev:build` 후 해당 루트의 개발 CLI로 새 프로세스 실행.
-- 실제 검증: `python3 scripts/design-system-smoke.py` 통과. PID `24163`의 실행 파일 절대 경로를 대조하고, 메모 `feedback-smoke-1b64c38e`의 `inspect.ok`, instance, ID, 원문을 확인했다. Accessibility는 해당 PID와 `Agent Gibbon [DEV egoing/booby · 3dc07a98] — feedback-smoke-1b64c38e` 제목으로 창을 특정했다.
+- 실제 검증: `python3 scripts/design-system-smoke.py` 통과. PID `24163`의 실행 파일 절대 경로를 대조하고, 메모 `feedback-smoke-1b64c38e`의 `inspect.ok`, instance, ID, 원문을 확인했다. Accessibility는 해당 PID와 `Jajan [DEV egoing/booby · 3dc07a98] — feedback-smoke-1b64c38e` 제목으로 창을 특정했다.
 - 새 회귀: 첫 편집, 취소 후 15초 숨김, 다시 취소 후 1초 숨김의 세 경우에 편집 요청 후 3초 이내 실제 가시성과 취소·저장 구성을 확인했다. 메모 위치·크기 불변, Feedback 비포커스, Accessibility의 저장 버튼도 확인했다. 검증 중 표시를 유도하는 이동·리사이즈는 하지 않았다(반복 시작 전에만 고정 크기 설정).
 - 기존 회귀: 외부 오른쪽 정렬·36px 높이·포커스 비탈취·변경 확인, 초안 저장·Toast 전환, 144px 오류 줄바꿈·초안 보존·핀 동기화, 접기·펼치기·숨긴 상태 갱신 통과. 테스트 메모는 마지막에 숨겼다.
 - 로그: `/tmp/display-feedback-bar-smoke.log` (로컬 임시 기록). 이번 검증은 CLI와 Accessibility 기준이며 화면 캡처는 생성하지 않았다.
@@ -846,8 +846,8 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 
 ## 트레이 메모 유형 실행 확인 (2026-10-30)
 
-- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/classify-text-image`.
-- `npm run dev:info`: instance `dev-2aefd51f2a4b38e297900e00`, binary는 위 루트의 `src-tauri/target/debug/agent-gibbon`.
+- 작업 루트: `/Users/egoinglee/orca/workspaces/jajan/jajan/classify-text-image`.
+- `npm run dev:info`: instance `dev-2aefd51f2a4b38e297900e00`, binary는 위 루트의 `src-tauri/target/debug/jajan`.
 - 기존 실행 PID 24163은 다른 워크트리(display-feedback-bar)의 앱이었다. 종료하거나 변경하지 않았다.
 - 개발 CLI `open` 및 `inspect --id tray-type-check-1030`: ok true, instance 일치, 검증 본문 일치. 실행 PID 34236의 절대 경로 확인.
 - `orca computer get-app-state --app pid:34236`: 네이티브 창 제목에 해당 메모 ID와 DEV 식별자가 일치함을 확인.
@@ -872,9 +872,9 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 
 ## 관리 창 최소 구현 (2026-11-04)
 
-- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/manager`
+- 작업 루트: `/Users/egoinglee/orca/workspaces/jajan/jajan/manager`
 - `npm run dev:info` instance: `dev-982ea77b921faa21fd43bf4d`
-- binary: 위 루트의 `src-tauri/target/debug/agent-gibbon`
+- binary: 위 루트의 `src-tauri/target/debug/jajan`
 - `npm test`: Rust 69개, UI 51개 통과. `npm run dev:build`, `node --check ui/manager.js`, Rustfmt 통과.
 - 개발 CLI의 `open / close / inspect / update / inspect`로 `manager-smoke-1104` 검증. 응답 `ok: true`와 instance 일치, 본문 갱신, 숨김과 위치 보존 확인. 검증 메모는 숨김 상태로 남김.
 - GUI 조작과 캡처는 미실행. 관리 창 선택·설정 복귀는 mock DOM 검사이며 실제 WebView 실행 검증으로 간주하지 않는다. Windows·Intel 미검증.
@@ -885,20 +885,20 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 ### 관리 창 제목·불투명 보정
 
 - 같은 루트·instance에서 Rust 70개, UI 51개, 개발 빌드, Clippy 통과.
-- `orca computer list-windows --app pid:52970 --json`에서 window 29645, 제목 `Agent Gibbon [DEV egoing/manager · 982ea77b] — 메모 관리`, native alpha 0.5로 수정 전 문제 확인.
+- `orca computer list-windows --app pid:52970 --json`에서 window 29645, 제목 `Jajan [DEV egoing/manager · 982ea77b] — 메모 관리`, native alpha 0.5로 수정 전 문제 확인.
 - 현재 프로세스는 수정 전 빌드다. 사용자 메모가 표시 중이므로 자동 종료하지 않았다. 수정 후 실제 alpha·GUI는 미검증.
 
 - 재실행 검증: 사용자 요청으로 기존 개발 PID 52970만 종료하고 같은 워크트리 개발 CLI로 재실행했다. inspect instance `dev-982ea77b921faa21fd43bf4d` 확인. 새 PID 62385, 관리 창 ID 29698의 native alpha 1 확인. 접근성 트리에서 본문 첫 텍스트 기반 목록 제목과 선택한 상세 헤더, 새로고침 버튼을 확인했다. 이미지·Windows 검증은 미실행이다.
 
 ## 화면 가장자리·메모 간격 0px (2026-11-04)
 
-- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/position`
-- `npm run dev:info`: instance `dev-f2b87d7d25433895e0fea8ff`, binary `<작업 루트>/src-tauri/target/debug/agent-gibbon`. macOS ARM64, Rust 1.91.1, Node v24.21.0.
+- 작업 루트: `/Users/egoinglee/orca/workspaces/jajan/jajan/position`
+- `npm run dev:info`: instance `dev-f2b87d7d25433895e0fea8ff`, binary `<작업 루트>/src-tauri/target/debug/jajan`. macOS ARM64, Rust 1.91.1, Node v24.21.0.
 - `npm run dev:build` 성공, `cargo test --manifest-path src-tauri/Cargo.toml` 70개, `npm run test:ui` 50개 통과. Rustfmt·`git diff --check` 통과. 0px 가로·세로 슬롯을 빈틈없이 채우는 회귀 테스트 포함.
 - 사용자의 기존 앱 종료 요청에 따라 `classify-text-image` 워크트리 바이너리 경로를 재확인한 PID 71421만 SIGTERM으로 종료. 현재 워크트리 개발 CLI로 새 앱 실행(PID 21410).
 - `position-zero-1`~`position-zero-6`을 개발 CLI로 생성하고 각각 inspect의 `ok`, instance, 본문 고유 표식 `POSITION-ZERO-N`, visible, animating=false 확인. 마우스 이동 후 원래 위치 복원.
 - Retina 물리 좌표: 각 창 600×630, 위치 (3512,444), (3512,1246), (3512,1944), (2912,1584), (2912,518), (2312,286). 6개 창 쌍별 겹침 없음. 작업 영역 오른쪽 경계 x=4112와 창 오른쪽이 일치하며 인접 열 간격 0.
-- GUI 출처: `ps`의 정확한 바이너리 경로/PID 및 CGWindowList의 owner PID 21410·창 제목 `Agent Gibbon [DEV egoing/position · f2b87d7d] — position-zero-N`을 대조. Orca list-windows는 빈 목록을 반환해 macOS System Events와 CGWindowList로 확인했다.
+- GUI 출처: `ps`의 정확한 바이너리 경로/PID 및 CGWindowList의 owner PID 21410·창 제목 `Jajan [DEV egoing/position · f2b87d7d] — position-zero-N`을 대조. Orca list-windows는 빈 목록을 반환해 macOS System Events와 CGWindowList로 확인했다.
 - 실제 Toolbar의 ‘반대편으로 워프’를 AX로 실행한 `position-zero-6`의 inspect 위치 (0,286), 크기 600×630 확인. 왼쪽 여백 0px.
 - 캡처 `/tmp/position-live.png`, `/tmp/position-warp.png` 육안 확인. CLI 원본 `/tmp/position-live.json`, `/tmp/position-warp.json`. 캡처에는 사용자 배경 화면이 포함되어 저장소에 넣지 않는다.
 - 세로 최소 간격 0px은 Rust 회귀 테스트로 확인. 실제 무작위 세로 배치는 빈 공간을 남기므로 세로 밀착 자체는 실화면에서 재현하지 않았다. Windows·Intel·다중 모니터 실환경 검증은 미실행. 개발 앱과 확인용 메모는 실행 상태로 유지.
@@ -918,10 +918,10 @@ node scripts/windows-smoke.mjs '<설치 경로>\agent-gibbon.exe'
 
 ### 출처와 실행 환경
 
-- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/memo-auto-layout`
-- `npm run dev:info`: instance `dev-3a00beb5ec408d9ff88dc157`, binary `src-tauri/target/debug/agent-gibbon`(위 루트 기준 절대 경로 확인).
+- 작업 루트: `/Users/egoinglee/orca/workspaces/jajan/jajan/memo-auto-layout`
+- `npm run dev:info`: instance `dev-3a00beb5ec408d9ff88dc157`, binary `src-tauri/target/debug/jajan`(위 루트 기준 절대 경로 확인).
 - macOS Apple Silicon, Rust 1.91.1, Node v24.21.0, Tauri 2.12.2. 실제 Retina 단일 화면 2056×1329 논리 px, 작업 영역 `(0,44)–(2056,1329)`, 배율 2.
-- 일반 조작 회귀 PID **97243**, 최종 영역·이미지 및 화면 캡처 PID **11188**. 각 실행에서 `ps`의 실행 파일 절대 경로를 대조하고 CLI `inspect.ok`·instance·메모 ID·본문 표식을 확인했다. GUI는 해당 PID의 `Agent Gibbon [DEV egoing/memo-auto-layout · 3a00beb5] — <ID>` 제목으로 접근했다.
+- 일반 조작 회귀 PID **97243**, 최종 영역·이미지 및 화면 캡처 PID **11188**. 각 실행에서 `ps`의 실행 파일 절대 경로를 대조하고 CLI `inspect.ok`·instance·메모 ID·본문 표식을 확인했다. GUI는 해당 PID의 `Jajan [DEV egoing/memo-auto-layout · 3a00beb5] — <ID>` 제목으로 접근했다.
 - 재시작은 이 작업에서 실행한 해당 PID만 종료했다. 기존 설치 앱과 다른 워크트리 프로세스는 종료하거나 조작하지 않았다. 사용자 승인에 따라 개발 메모 백업·복원 절차는 추가하지 않았다.
 - [정량 검증 JSON](verification/auto-layout-20261104.json): 일반 메모·전환 중간 프레임·영역 메모·캡처의 좌표, 크기, 콘텐츠 상한, 제외 플래그, native window ID 및 화면 범위.
 
@@ -960,15 +960,15 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 
 ## 영역 에이전트 터미널 MVP — 2026-11-04
 
-- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/agent-terminal-mvp`
-- `npm run dev:info`: id `dev-fdef84af36acd888fa9b71b0`, binary `<작업 루트>/src-tauri/target/debug/agent-gibbon`, root는 위 절대 경로와 일치.
+- 작업 루트: `/Users/egoinglee/orca/workspaces/jajan/jajan/agent-terminal-mvp`
+- `npm run dev:info`: id `dev-fdef84af36acd888fa9b71b0`, binary `<작업 루트>/src-tauri/target/debug/jajan`, root는 위 절대 경로와 일치.
 - 호스트 arm64, Node v24.21.0, npm 11.19.0, rustc/cargo 1.91.1. xterm 6.0.0, addon-fit 0.11.0, portable-pty 0.9.0.
 - `npm run dev:build` 성공. `npm test`: Rust 71개, UI 52개 통과. `npm run check` Clippy 통과. `cargo fmt --manifest-path src-tauri/Cargo.toml --check` 통과.
 - 개발 CLI `agent`로 생성한 ID `agent-1793789403647383000`. `inspect`의 ok=true, instance 일치, program=codex, PID=12565, PTY=89×28, running=true 확인. cwd는 저장 루트 바로 아래 해당 agent-ID 폴더.
 - 앱 PID 11986의 실제 실행 경로가 위 binary와 일치. CoreGraphics로 창 30148의 네이티브 제목에 해당 agent-ID를 확인하고 Orca computer로 그 창만 조회·캡처. Codex v0.166.0 화면과 전용 cwd를 확인. [캡처](design/agent-terminal-macos.png).
 - 개발 CLI `close` 후 visible=false, `open` 후 visible=true이며 PID=12565 유지. 유료 모델 작업은 제출하지 않았다.
 - 미검증: 실제 영역 드래그 생성, 단축키 충돌, 한글 IME 조합, 입력·Ctrl+C·복사/붙여넣기, GUI 리사이즈, 앱 종료 자식 프로세스 정리 및 재시작 복원. 백그라운드 GUI 입력은 computer-use 도구가 background_unavailable로 거부했으며 사용자 포커스를 가져오는 재시도는 하지 않았다. Windows 터미널 미지원, Intel 미검증.
-- 저장 설계: agent-ID 폴더는 프로젝트 전용, `.agent-gibbon-terminals/ID.json`은 앱 메타데이터. 메모 로더는 등록된 에이전트 폴더를 건너뛰므로 사용자 index.md를 읽거나 덮어쓰지 않는다.
+- 저장 설계: agent-ID 폴더는 프로젝트 전용, `.jajan-terminals/ID.json`은 앱 메타데이터. 메모 로더는 등록된 에이전트 폴더를 건너뛰므로 사용자 index.md를 읽거나 덮어쓰지 않는다.
 - 공식 근거: https://docs.rs/portable-pty/0.9.0/portable_pty/ , https://v2.tauri.app/develop/calling-rust/ , https://xtermjs.org/docs/api/terminal/classes/terminal/
 
 ### 한글 입력 보고 후 보완
@@ -997,10 +997,10 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 
 ### 환경과 출처
 
-- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle`
-- `npm run dev:info`: ID `dev-c0cc1b2099c4aae773649d36`, binary `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon`.
+- 작업 루트: `/Users/egoinglee/orca/workspaces/jajan/jajan/window-stash-toggle`
+- `npm run dev:info`: ID `dev-c0cc1b2099c4aae773649d36`, binary `/Users/egoinglee/orca/workspaces/jajan/jajan/window-stash-toggle/src-tauri/target/debug/jajan`.
 - macOS 15.6.1, Apple Silicon `arm64`; Node v24.21.0, npm 11.19.0, rustc/cargo 1.91.1, Tauri CLI 2.12.1 / Rust Tauri 2.12.2. 실제 화면 3개, 모두 배율 2.
-- 최종 회귀 PID **13437**의 실행 명령을 위 binary의 `--serve`와 정확히 비교했다. 검증 메모 `stash-smoke-f3b54121-{edit,fold,hidden,new}`의 `inspect.ok`, `instance`, ID·고유 본문을 확인했다. GUI는 해당 PID의 `Agent Gibbon [DEV egoing/window-stash-toggle · c0cc1b20] — <ID>` 네이티브 제목과 창 번호로 연결했다.
+- 최종 회귀 PID **13437**의 실행 명령을 위 binary의 `--serve`와 정확히 비교했다. 검증 메모 `stash-smoke-f3b54121-{edit,fold,hidden,new}`의 `inspect.ok`, `instance`, ID·고유 본문을 확인했다. GUI는 해당 PID의 `Jajan [DEV egoing/window-stash-toggle · c0cc1b20] — <ID>` 네이티브 제목과 창 번호로 연결했다.
 - [일반 메모 최종 실행 기록](verification/stash-smoke-f3b54121/report.json), [캡처·트레이 최종 기록](verification/stash-capture-c816783b/report.json), [종료·재실행 기록](verification/stash-exit-20261104.json). 재실행 후 PID는 종료 기록에 별도로 남겼으며 이전 PID의 GUI 근거를 새 프로세스의 근거로 사용하지 않는다.
 
 ### 실행과 결과
@@ -1041,22 +1041,22 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 
 - 요청 반영: Ctrl+Alt+Cmd(macOS)/Ctrl+Alt+Win(Windows)를 함께 눌렀다가 **모두 놓으면** 한 번 토글한다. 다른 키(Shift 포함), 클릭, 휠이 섞이면 해당 입력 주기를 취소한다. 입력 이벤트를 가로막거나 키 내용을 저장하지 않는다. 기존 세 보조키 접촉 숨김을 제거하고 전체 토글 중 포인터 배치 동작을 억제했다.
 - 복원도 현재 아이콘 위치에서 420ms 이동·확대·페이드로 진행한다. 중간 토글은 현재 프레임에서 반전하고, 최종 프레임에는 저장한 위치·크기를 직접 적용하여 보간 반올림 오차를 없앴다.
-- 출처: root `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle`, instance `dev-c0cc1b2099c4aae773649d36`, binary `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon`, 최종 GUI PID **12503**. `npm run dev:info`, 개발 CLI `inspect`의 instance/고유 본문, 정확한 실행 파일 경로와 PID별 네이티브 창 제목을 대조했다. 설치 앱·다른 워크트리 프로세스는 종료하지 않았다.
+- 출처: root `/Users/egoinglee/orca/workspaces/jajan/jajan/window-stash-toggle`, instance `dev-c0cc1b2099c4aae773649d36`, binary `/Users/egoinglee/orca/workspaces/jajan/jajan/window-stash-toggle/src-tauri/target/debug/jajan`, 최종 GUI PID **12503**. `npm run dev:info`, 개발 CLI `inspect`의 instance/고유 본문, 정확한 실행 파일 경로와 PID별 네이티브 창 제목을 대조했다. 설치 앱·다른 워크트리 프로세스는 종료하지 않았다.
 - 환경: macOS 15.6.1 ARM64, 실제 화면 3개(모두 2x), Node 24.21.0/npm 11.19.0/Rust·Cargo 1.91.1/Tauri CLI 2.12.1·Rust 2.12.2. 공식 [Tauri 전역 단축키](https://v2.tauri.app/plugin/global-shortcut/), [WebviewWindow](https://docs.rs/tauri/2.12.2/tauri/webview/struct.WebviewWindow.html), [Apple 이벤트 관찰](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/EventOverview/MonitoringEvents/MonitoringEvents.html)을 기준으로 보조키 단독 입력 관찰을 분리했다.
 - `cargo fmt --manifest-path src-tauri/Cargo.toml -- --check`, `cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings`, `npm test`(Rust **74**, UI **52**), `npm run dev:build` 통과. Windows 전용 Shift 취소 분기는 Mac 빌드에서 컴파일·실행 검증하지 않았다.
 - `python3 scripts/stash-smoke.py`: [최종 보고서](verification/stash-smoke-15f6c92f/report.json). 메모 `stash-smoke-15f6c92f-{edit,fold,hidden,new}`. 실제 전역 키 입력, 이동·축소·투명도·숨김, 반대 방향 복원 프레임, 정확한 원래 위치·크기·접힘·편집 초안, CLI 갱신/새 창, 개별 open/close, 3회 빠른 반전, 혼합 키 취소, 길게 누르기/해제, 화면 3개, 아이콘 회피·쿨다운·6초 안내·포커스 보존 통과. [복원 프레임](verification/stash-smoke-15f6c92f/restore-animation.json), [실제 안내 캡처](verification/stash-smoke-15f6c92f/indicator-tip.png)와 같은 폴더의 PID별 출처 기록을 남겼다.
 - `python3 scripts/stash-capture-smoke.py image-1793792069082211000`: [최종 보고서](verification/stash-capture-5878c5b9/report.json). PID를 지정한 실제 트레이 메뉴, 화면 3개의 캡처 선택 창 네이티브 ID/전체 화면 크기 보존, 이전에 이 작업에서 만든 캡처 이미지의 크기·비율·내용 복원 통과. 선택 화면은 명시적 Escape로 끝내고 검증 메모만 숨겼다.
-- [인스턴스 잠금 검증](verification/stash-modifier-lease-20261104.json): 실행 중인 앱이 점유한 파일의 경쟁 독점 잠금이 거부됨을 확인했다. 동일 기능을 지원하는 Agent Gibbon 인스턴스끼리만 조정하며, 다른 앱의 동일한 보조키 단독 해제 감지까지 독점 차단할 수는 없다. 안전한 전역 입력 관찰 권한/훅이 없으면 단축키를 끄고 트레이를 제공한다.
+- [인스턴스 잠금 검증](verification/stash-modifier-lease-20261104.json): 실행 중인 앱이 점유한 파일의 경쟁 독점 잠금이 거부됨을 확인했다. 동일 기능을 지원하는 Jajan 인스턴스끼리만 조정하며, 다른 앱의 동일한 보조키 단독 해제 감지까지 독점 차단할 수는 없다. 안전한 전역 입력 관찰 권한/훅이 없으면 단축키를 끄고 트레이를 제공한다.
 - 중간 검증에서는 합성 보조키 이벤트의 전달 간격, 트레이 클릭 전 포인터 위치, 네이티브 창 변경 완료 대기의 영향을 확인해 테스트 입력과 완료 관찰을 보완했다. 빠른 반복에서 발생한 위치 오차는 최종 프레임 직접 적용 후 전체 회귀에서 재현되지 않았다. 중간 실패를 통과로 집계하지 않았다.
 - [SVG](design/window-stash.svg)/[PNG](design/window-stash.png)를 새 단축키·양방향 애니메이션에 맞춰 갱신하고 렌더 및 실제 안내 캡처를 시각 확인했다. 기준은 [디자인 시스템](design-system.md#단축키-충돌-방지와-양방향-전환--후속-적용)에 있다.
-- 미검증: Windows 실행/빌드·훅, Intel, 혼합 DPI, 물리 모니터 분리, 타사 앱의 동일 보조키 전용 바인딩, 권한 거부 실환경, 복수 Gibbon 실제 동시 입력(경쟁 파일 잠금은 검증). 이전 종료 검증은 이전 빌드의 기록이며 이번 후속 변경의 종료 재검증으로 간주하지 않는다. **Conf 5(macOS 확인 범위) / Risk Medium(창 상태·전역 입력)**. 커밋·병합·배포하지 않았다.
+- 미검증: Windows 실행/빌드·훅, Intel, 혼합 DPI, 물리 모니터 분리, 타사 앱의 동일 보조키 전용 바인딩, 권한 거부 실환경, 복수 Jajan 실제 동시 입력(경쟁 파일 잠금은 검증). 이전 종료 검증은 이전 빌드의 기록이며 이번 후속 변경의 종료 재검증으로 간주하지 않는다. **Conf 5(macOS 확인 범위) / Risk Medium(창 상태·전역 입력)**. 커밋·병합·배포하지 않았다.
 
 
 ## 긴팔원숭이 말풍선과 회피 이동 (2026-11-04)
 
 - 변경: archive를 눈을 두 손으로 가린 긴팔원숭이 SVG로 교체했다. 아이콘은 40px 고정 영역, 말풍선은 별도 좌측 영역과 꼬리로 구성해 텍스트 길이가 아이콘의 배치에 영향을 주지 않도록 했다. 최초 접어두기 완료와 도망 이동 완료 때 각각 6초 표시한다. 이동 중에는 안내를 숨기고 420ms smoothstep ease-in-out으로 이동하며, 최종 네이티브 이동 다음 틱에 안내를 표시한다. 전환 방향 변경은 진행 중인 아이콘 이동을 취소한다.
 - 원인 조사 한계: 사용자가 보고한 ‘툴팁 표시 시 아이콘 누락’은 기존 성공 캡처와 이번 재현에서 확인하지 못했다. 이전 CSS는 flex 한 줄에 아이콘과 안내를 함께 배치했다. 이번 변경에서는 그 배치 의존성을 제거했지만, 이것을 확정 원인이라고 주장하지 않는다. 네이티브 창 경계·표시 타이밍 문제 여부도 최초 현상 재현 없이 확정할 수 없다.
-- 최종 개발 실행 출처: root `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle`, instance `dev-c0cc1b2099c4aae773649d36`, binary `/Users/egoinglee/orca/workspaces/agent-gibbon/floatnote/window-stash-toggle/src-tauri/target/debug/agent-gibbon`, PID **50159**, 메모 `stash-indicator-0bbcb75d`. 개발 CLI inspect의 instance와 고유 본문, PID별 네이티브 제목·실행 파일 경로를 대조했다. 해당 워크트리 앱만 재시작했다.
+- 최종 개발 실행 출처: root `/Users/egoinglee/orca/workspaces/jajan/jajan/window-stash-toggle`, instance `dev-c0cc1b2099c4aae773649d36`, binary `/Users/egoinglee/orca/workspaces/jajan/jajan/window-stash-toggle/src-tauri/target/debug/jajan`, PID **50159**, 메모 `stash-indicator-0bbcb75d`. 개발 CLI inspect의 instance와 고유 본문, PID별 네이티브 제목·실행 파일 경로를 대조했다. 해당 워크트리 앱만 재시작했다.
 - `python3 scripts/stash-indicator-smoke.py` 최종 성공: [보고서](verification/stash-indicator-0bbcb75d/report.json). [최초 말풍선](verification/stash-indicator-0bbcb75d/initial.png), [도착 후 말풍선](verification/stash-indicator-0bbcb75d/arrived.png)을 직접 시각 확인했다. 각 이미지의 `*-source.json`에 PID·창 제목·네이티브 창 ID를 기록했다. [이동 프레임](verification/stash-indicator-0bbcb75d/flight.json)으로 중간 위치와 이동 중 안내 비표시를 확인했고, 도착 후 표시·쿨다운·앞 앱 포커스 보존·같은 키 복원을 확인했다.
 - `cargo fmt --manifest-path src-tauri/Cargo.toml -- --check`, Clippy `--all-targets -- -D warnings`, `npm test`(Rust 74/UI 52), `npm run dev:build` 통과. 시안 SVG를 rsvg-convert로 PNG 렌더하고 시각 확인했다.
 - 전체 네이티브 회귀 재실행 `stash-smoke-c72d2c61`은 새 아이콘·이징·말풍선·초안·빠른 반전까지 통과했으나 마지막 화면별 배치 검사에서 이전 화면 위치를 읽어 실패했다. 후속 `stash-smoke-29119f9a`는 숨김 중간 프레임 샘플에 크기 변화가 포착되지 않아 실패했다. 이 두 실행은 전체 통과로 보고하지 않는다. 최종 빌드의 이번 UI 요청 범위는 위 별도 실제 창 검사로 검증했으며, 전체 다중 화면·캡처 회귀 완료를 뜻하지 않는다.
@@ -1093,10 +1093,10 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 
 ### 출처와 수정 전 재현
 
-- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order`.
+- 작업 루트: `/Users/egoinglee/orca/workspaces/jajan/jajan/issue-34-open-order`.
 - 기준 HEAD: `f9fb944c4e3f039b9bbed0ea7a25a913dba96f2c`. 시작 시 미커밋 변경 없음. 아래 통합 전 검증은 해당 기준 위의 이번 변경으로 수행했다.
-- `npm run dev:info`: root는 위 경로, instance `dev-5a3840c5cf7b0e9d4b92dbc0`, binary는 위 루트의 `src-tauri/target/debug/agent-gibbon` 절대 경로. macOS arm64, Rust 1.91.1, Node v24.21.0, Tauri 2.12.2, 단일 Retina 2560×1440 논리 px(배율 2).
-- 모든 앱 통신은 이 루트의 `scripts/agent-gibbon-dev`로 실행했다. `inspect.ok=true`, 응답 instance 일치, ID와 본문 고유 표식을 확인하고 `ps -p <PID> -o comm=`의 절대 바이너리 경로를 대조했다.
+- `npm run dev:info`: root는 위 경로, instance `dev-5a3840c5cf7b0e9d4b92dbc0`, binary는 위 루트의 `src-tauri/target/debug/jajan` 절대 경로. macOS arm64, Rust 1.91.1, Node v24.21.0, Tauri 2.12.2, 단일 Retina 2560×1440 논리 px(배율 2).
+- 모든 앱 통신은 이 루트의 `scripts/jajan-dev`로 실행했다. `inspect.ok=true`, 응답 instance 일치, ID와 본문 고유 표식을 확인하고 `ps -p <PID> -o comm=`의 절대 바이너리 경로를 대조했다.
 - 수정 전 자체 시작 PID **23841**에서 `issue34-z-first` → `issue34-m-second` → `issue34-a-third`를 순서대로 열었다. 최종 물리 좌표는 모두 x=4520, y가 각각 **480 / 148 / 50**으로 새 A가 앞에 삽입됐다. 진행 메모가 함께 표시 중이었지만 세 검증 창 사이의 역전은 명확하다.
 - `orca computer get-app-state --app pid:23841 --window-id 32441 --json`과 새 창 ID **32445**의 제목·본문 `OPEN34 BEFORE 1 Z` / `OPEN34 BEFORE 3 A`를 대조했다. [첫 창 캡처](verification/open-order-20261105/before-first.png) · [새 창 캡처](verification/open-order-20261105/before-third.png). 캡처는 개별 창이며 전체 화면 합성으로 배치를 주장하지 않는다. 실제 위치는 JSON/네이티브 창 좌표와 함께 확인한다.
 
@@ -1113,16 +1113,16 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 | `npm run check` | Clippy, 경고 오류 처리 통과 |
 | `cargo fmt --manifest-path src-tauri/Cargo.toml --check` | 통과 |
 | `npm run version:check` / Python 구문 / `git diff --check` | 0.2.7 일치 / 통과 / 통과 |
-| `python3 scripts/open-order-smoke.py --pid 31059 --report-dir /tmp/gibbon-issue34/after-retry` | 역순 순차 열기·왼쪽 열 넘김·연속 열기·가시 창 갱신/재열기 불변·숨김 갱신 보존/복원 마지막 합류·실제 드래그 제외/장애물 보존 통과 |
+| `python3 scripts/open-order-smoke.py --pid 31059 --report-dir /tmp/jajan-issue34/after-retry` | 역순 순차 열기·왼쪽 열 넘김·연속 열기·가시 창 갱신/재열기 불변·숨김 갱신 보존/복원 마지막 합류·실제 드래그 제외/장애물 보존 통과 |
 | 포커스 | 외부 앱 PID 16242 유지, 실제 드래그 후에는 검증 메모의 키보드 포커스를 이후 새 열기가 보존. 검사 종료 후 원래 포인터/앱 복원 |
 | 시안 | `rsvg-convert docs/design/placement-zero-gap.svg -o docs/design/placement-zero-gap.png`, 렌더링 육안 확인 |
 
-[정량 증거 JSON](verification/open-order-20261105/report.json)에 수정 전후 root/instance/binary/PID/창 ID/본문 표식·좌표·크기·포커스·검사 결과를 보관했다. [수정 후 첫 창](verification/open-order-20261105/opened-z.png) · [연속 열기의 마지막 창](verification/open-order-20261105/after-last.png) · [복원된 마지막 창](verification/open-order-20261105/restored-tail.png) · [수동 배치 보존](verification/open-order-20261105/manual-preserved.png). 원본 로그는 `/tmp/gibbon-issue34/`에 있으며 재실행 시 같은 폴더를 덮어쓰지 않는다.
+[정량 증거 JSON](verification/open-order-20261105/report.json)에 수정 전후 root/instance/binary/PID/창 ID/본문 표식·좌표·크기·포커스·검사 결과를 보관했다. [수정 후 첫 창](verification/open-order-20261105/opened-z.png) · [연속 열기의 마지막 창](verification/open-order-20261105/after-last.png) · [복원된 마지막 창](verification/open-order-20261105/restored-tail.png) · [수동 배치 보존](verification/open-order-20261105/manual-preserved.png). 원본 로그는 `/tmp/jajan-issue34/`에 있으며 재실행 시 같은 폴더를 덮어쓰지 않는다.
 
 ### 추가 발견·후속 #43
 
 - **다중 창 재포함 후 전환 중단 의심**: 추가한 12개 가시 창 검사에서 첫 창을 실제 드래그→다음 창 열기→첫 창 내용 갱신으로 재포함→새 창 열기 했을 때 한 번 최종 좌표 순서가 어긋났다. 새 창 `open34-935442-o`도 커서 인근 물리 좌표 (1324,1324), `animating=false`로 관측됐다. 원인은 확정하지 않았으며 순서 기록 결함/기존 전환 처리/검사 부하 중 어느 것인지 단정하지 않는다.
-- 실패 원본: `/tmp/gibbon-issue34/after-final/live.json`, `/tmp/gibbon-issue34/live-after-final.log`; 핵심 상태와 실패 내용은 위 정량 증거 JSON의 `additional_stress_failure`에 남겼다. 별도 5창 격리 실험(`/tmp/gibbon-issue34/debug-reinclude.json`)에서는 재포함된 첫 창이 정상 첫 위치로 돌아갔다. 실패를 통과로 집계하거나 비재현으로 종결하지 않았다.
+- 실패 원본: `/tmp/jajan-issue34/after-final/live.json`, `/tmp/jajan-issue34/live-after-final.log`; 핵심 상태와 실패 내용은 위 정량 증거 JSON의 `additional_stress_failure`에 남겼다. 별도 5창 격리 실험(`/tmp/jajan-issue34/debug-reinclude.json`)에서는 재포함된 첫 창이 정상 첫 위치로 돌아갔다. 실패를 통과로 집계하거나 비재현으로 종결하지 않았다.
 - 영향: 여러 메모가 보이는 상태에서 자동 배치 복귀가 중간 프레임에 남을 가능성. 후속 완료 기준: 12창 이상의 재포함·연속 열기에서 실제 최종 좌표가 계산 목적지와 일치하고 전체 상대 순서·겹침 없음·포커스를 보존하며, 전환 중단 원인을 판별하는 증거를 확보한다. 감독자가 [후속 #43](https://github.com/egoing/agent-gibbon/issues/43)을 #34의 실제 자식으로 등록했으며 다음 순차 작업으로 추적한다.
 
 ### 범위와 남은 검증
@@ -1134,12 +1134,12 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 
 - 감독자 승인으로 구현 커밋 `00a0db6` 뒤에 `origin/main` **661d834a9f09d8d3f5800474d12ab4f48ebeee0e**를 병합했다. `sizing.rs` 충돌은 접어두기가 활성화됐을 때의 원위치 표시 분기를 먼저 보존하고, 일반 준비 경로에서만 열기 순서를 예약하도록 해결했다. 검증 문서 충돌은 양쪽 기록을 모두 보존했다.
 - 통합한 소스로 `npm run test` **Rust 80개 / UI 53개**, `npm run dev:build`, `npm run check`, Rustfmt, 버전 일치(0.2.7), Python 구문, `git diff --check`가 통과했다.
-- 자체 PID 31059만 종료하고 이번 작업이 만든 검증 메모 폴더 43개를 `/tmp/gibbon-issue34/test-storage-before-integration/`로 보관했다. 진행 메모와 사용자 저장 데이터는 변경하지 않았다. 정리 기록은 `/tmp/gibbon-issue34/test-storage-cleanup.json`에 있다.
+- 자체 PID 31059만 종료하고 이번 작업이 만든 검증 메모 폴더 43개를 `/tmp/jajan-issue34/test-storage-before-integration/`로 보관했다. 진행 메모와 사용자 저장 데이터는 변경하지 않았다. 정리 기록은 `/tmp/jajan-issue34/test-storage-cleanup.json`에 있다.
 - 새 **PID 77460**과 동일 root/instance/binary 경로를 다시 확인했다. `inspect`에는 통합 main의 `stash` 필드도 포함된다. `open34-07e400-*` 고유 본문·정확한 제목으로 GUI를 연결했다. 예: 첫 Z 창 **32596**, 마지막 Q 창 **32623** 등 실제 값은 정량 JSON의 `integration.captures`를 기준으로 한다.
-- `python3 scripts/open-order-smoke.py --pid 77460 --report-dir /tmp/gibbon-issue34/integrated` 종료 **0**, **7개 검사 통과**: 역순 ID 순차 열기/왼쪽 열 넘김/겹침 없음, 가시 재열기·갱신 불변, 숨김 갱신·마지막 복원, 전환 중 연속 열기, 실제 드래그 제외·장애물 보존, 내용 갱신으로 재포함 시 기존 상대 순서 복귀, 이후 열기에서도 다른 숨긴 창·포커스 보존. 외부 앱뿐 아니라 기존 메모의 `focused` 값을 새 열기 전후 비교했다.
-- [통합 첫 창](verification/open-order-20261105/integrated-opened-z.png) · [통합 마지막 창](verification/open-order-20261105/integrated-after-last.png) · [통합 숨김 복원](verification/open-order-20261105/integrated-restored-tail.png) · [통합 수동 배치 보존](verification/open-order-20261105/integrated-manual-preserved.png). 실제 캡처의 본문과 렌더링을 육안 확인했다. 좌표·창 ID·본문 표식·포커스와 각 상태는 [정량 JSON](verification/open-order-20261105/report.json)의 `integration`에 있으며 원본은 `/tmp/gibbon-issue34/integrated/live.json`이다.
+- `python3 scripts/open-order-smoke.py --pid 77460 --report-dir /tmp/jajan-issue34/integrated` 종료 **0**, **7개 검사 통과**: 역순 ID 순차 열기/왼쪽 열 넘김/겹침 없음, 가시 재열기·갱신 불변, 숨김 갱신·마지막 복원, 전환 중 연속 열기, 실제 드래그 제외·장애물 보존, 내용 갱신으로 재포함 시 기존 상대 순서 복귀, 이후 열기에서도 다른 숨긴 창·포커스 보존. 외부 앱뿐 아니라 기존 메모의 `focused` 값을 새 열기 전후 비교했다.
+- [통합 첫 창](verification/open-order-20261105/integrated-opened-z.png) · [통합 마지막 창](verification/open-order-20261105/integrated-after-last.png) · [통합 숨김 복원](verification/open-order-20261105/integrated-restored-tail.png) · [통합 수동 배치 보존](verification/open-order-20261105/integrated-manual-preserved.png). 실제 캡처의 본문과 렌더링을 육안 확인했다. 좌표·창 ID·본문 표식·포커스와 각 상태는 [정량 JSON](verification/open-order-20261105/report.json)의 `integration`에 있으며 원본은 `/tmp/jajan-issue34/integrated/live.json`이다.
 - 앞서 실패했던 12창 재포함 흐름도 이번 통합 실행에서는 통과했다. main 통합과 검증 파일 보관·재시작이 함께 있었으므로 어느 조치가 영향을 줬는지 확정하지 않으며, 최초 실패를 해결됐다고 종결하지 않는다. [후속 #43](https://github.com/egoing/agent-gibbon/issues/43)에서 원인 규명을 계속한다.
-- 최종 정리: 자체 PID **77460**의 정확한 바이너리 경로를 다시 대조한 후 SIGTERM으로 종료하고 프로세스 소멸을 확인했다. 통합 검사 메모 13개는 `/tmp/gibbon-issue34/test-storage-after-integration/`에 보관했고 진행 메모의 완료 기록은 유지했다. 최초 포인터 위치와 전면 앱 PID 16242를 복원했다. 설치 앱·다른 워크트리 프로세스는 종료하지 않았으며 직접 PR 병합은 수행하지 않았다. 정리 상세는 정량 JSON의 `cleanup`에 있다.
+- 최종 정리: 자체 PID **77460**의 정확한 바이너리 경로를 다시 대조한 후 SIGTERM으로 종료하고 프로세스 소멸을 확인했다. 통합 검사 메모 13개는 `/tmp/jajan-issue34/test-storage-after-integration/`에 보관했고 진행 메모의 완료 기록은 유지했다. 최초 포인터 위치와 전면 앱 PID 16242를 복원했다. 설치 앱·다른 워크트리 프로세스는 종료하지 않았으며 직접 PR 병합은 수행하지 않았다. 정리 상세는 정량 JSON의 `cleanup`에 있다.
 
 - 감독 최종 판정: #34 핵심 수정과 최신 main 통합 검증은 인정하되 간헐적 [#43](https://github.com/egoing/agent-gibbon/issues/43)의 원인이 미확정이므로 **병합 보류**. 변경·보고서를 로컬 한국어 커밋으로 보존하고 원격 push·PR·병합은 하지 않았다. #43은 다음 dispatch에서 순차 처리하며 이번 작업에서는 추가 착수하지 않는다.
 
@@ -1149,10 +1149,10 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 
 12창 재포함 뒤 커서 근처에 멈추는 현상을 다시 재현했다. **macOS 비동기 위치·크기 쓰기를 완료로 취급한 기대 좌표 판정**이 실제 이동을 잘못 취소했고, **1초 프레임 응답 제한**도 늦은 콜백을 남겨둔 채 작업 스레드를 끝낼 수 있었다. 일반 배치 순서와 사용자 조작 취소 규칙은 유지하면서 프레임 적용·응답 수명을 보완했다. 대량 저장 메모 재시작의 CLI 지연은 [별도 #44](https://github.com/egoing/agent-gibbon/issues/44)로 남긴다.
 
-- 작업 루트: `/Users/egoinglee/orca/workspaces/agent-gibbon/agent-gibbon/issue-34-open-order`, 기준 HEAD `d686db349558b90c3b12df747589a432d6554805`(시작 시 clean).
-- `npm run dev:info`의 root는 위 경로, instance **dev-5a3840c5cf7b0e9d4b92dbc0**, binary는 위 루트의 **src-tauri/target/debug/agent-gibbon** 절대 경로다. macOS arm64, 단일 2560×1440 논리 px Retina 화면, 배율 2.
-- 모든 메모 통신은 이 루트의 `scripts/agent-gibbon-dev`만 사용했다. 매 실제 검사에서 `inspect.ok=true`·instance·ID·고유 본문을 대조하고 `ps`의 정확한 실행 파일 경로/PID를 확인했다. GUI는 `auto-layout-native.swift`의 PID/정확한 제목/CGWindow ID와 `orca computer get-app-state --app pid:<PID> --window-id <ID> --json`을 연결했다.
-- [정량·인과 증거](verification/entrance-stop-20261105/report.json)에 상태·목적지·취소 이유·프레임 수·native 창/본문 표식·검사 실패와 성공을 구분해 보관한다. 원본은 `/tmp/gibbon-issue43/`이며 [수정 전 관측 패치](verification/entrance-stop-20261105/observer-only.patch.gz)와 바이너리 해시도 기록했다.
+- 작업 루트: `/Users/egoinglee/orca/workspaces/jajan/jajan/issue-34-open-order`, 기준 HEAD `d686db349558b90c3b12df747589a432d6554805`(시작 시 clean).
+- `npm run dev:info`의 root는 위 경로, instance **dev-5a3840c5cf7b0e9d4b92dbc0**, binary는 위 루트의 **src-tauri/target/debug/jajan** 절대 경로다. macOS arm64, 단일 2560×1440 논리 px Retina 화면, 배율 2.
+- 모든 메모 통신은 이 루트의 `scripts/jajan-dev`만 사용했다. 매 실제 검사에서 `inspect.ok=true`·instance·ID·고유 본문을 대조하고 `ps`의 정확한 실행 파일 경로/PID를 확인했다. GUI는 `auto-layout-native.swift`의 PID/정확한 제목/CGWindow ID와 `orca computer get-app-state --app pid:<PID> --window-id <ID> --json`을 연결했다.
+- [정량·인과 증거](verification/entrance-stop-20261105/report.json)에 상태·목적지·취소 이유·프레임 수·native 창/본문 표식·검사 실패와 성공을 구분해 보관한다. 원본은 `/tmp/jajan-issue43/`이며 [수정 전 관측 패치](verification/entrance-stop-20261105/observer-only.patch.gz)와 바이너리 해시도 기록했다.
 
 ### 수정 전 제품 결함과 검사 결함
 
@@ -1171,14 +1171,14 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 2. 첫 동기화 시도 **PID 45482**에서는 1초를 넘은 응답 뒤 작업 스레드가 종료해 T 창만 `animating=true`로 남는 별도 경로도 관측했다. CLI는 응답했고 다른 창은 도착했다. 프레임은 작업자별 하나만 대기시키며, 1초가 지나면 지연을 기록하고 같은 응답을 계속 기다리도록 바꿨다. 세대 교체/직접 조작 취소와 채널 단절의 종료 정책은 유지한다. 늦은 응답 후 계속하기/완료·단절 종료를 단위 테스트로 확인했다.
 3. 최초 observer는 백그라운드 시간초과와 메인 프레임의 포맷 쓰기가 섞여 JSONL을 손상시켰다. 완전한 JSON 버퍼를 직렬화해 한 번에 쓰고, 실시간 읽기는 아직 쓰는 마지막 행만 기다리도록 보완했다. 손상된 첫 after trace는 성공 게이트로 사용하지 않았다. [당시 T 창](verification/entrance-stop-20261105/driver-timeout.png) · [GUI 원본](verification/entrance-stop-20261105/driver-timeout-gui.json).
 4. `open-order-smoke.py --trace-file`은 PID/instance가 일치하는 계산 목적지와 실제 좌표·크기를 비교한다. `--diagnostic-continue`는 실패를 기록하고 다음 단계까지 관측할 수 있지만 실패 종료를 유지한다. 합성 입력 간격은 조절 가능하고 실제 이동을 읽어 확인한다. 정리 IPC 실패도 원래 실패와 함께 보존한다.
-5. `AGENT_GIBBON_ENTRANCE_TRACE=/로컬/파일.jsonl`은 선택적 진단이다. 기본값은 꺼져 있으며 본문·비밀정보는 기록하지 않는다. `check-entrance-trace.py`는 반영 직후 위치/마지막 크기와 취소 이유를 검사한다. 프레임 검사만으로 전체 완주를 주장하지 않고 목적지 검사와 함께 사용한다. 일반 앱의 사용자 작업 이력 저장은 추가하지 않았다.
+5. `JAJAN_ENTRANCE_TRACE=/로컬/파일.jsonl`은 선택적 진단이다. 기본값은 꺼져 있으며 본문·비밀정보는 기록하지 않는다. `check-entrance-trace.py`는 반영 직후 위치/마지막 크기와 취소 이유를 검사한다. 프레임 검사만으로 전체 완주를 주장하지 않고 목적지 검사와 함께 사용한다. 일반 앱의 사용자 작업 이력 저장은 추가하지 않았다.
 
 ### 실패 실행과 독립 #44
 
 - 첫 동기화 after PID 45482의 완료되지 않은 검사와 손상 로그를 통과로 집계하지 않았다. 작업자 프로세스가 끊긴 뒤 남은 활성 전환은 위의 별도 receiver 수명 문제로 추적했다.
-- 반복 검사로 저장 **82개 + main placeholder 1개 = CLI 83항목**이 된 상태의 재시작 **PID 65167**에서는 초기 `inspect`와 smoke의 `inspect`가 시간초과로 실패했다. 같은 PID/instance의 후속 `inspect`는 정상 회복했다. `/tmp/gibbon-issue43/after-final.log`, `origin-after-final.json`, `origin-after-final-revalidated.json`, `after-final-sample.txt`가 원본이다.
+- 반복 검사로 저장 **82개 + main placeholder 1개 = CLI 83항목**이 된 상태의 재시작 **PID 65167**에서는 초기 `inspect`와 smoke의 `inspect`가 시간초과로 실패했다. 같은 PID/instance의 후속 `inspect`는 정상 회복했다. `/tmp/jajan-issue43/after-final.log`, `origin-after-final.json`, `origin-after-final-revalidated.json`, `after-final-sample.txt`가 원본이다.
 - 당시 약 81% CPU를 관측했고 2초 sample의 메인 스레드에는 WebKit IPC/URLSchemeTask 처리 경로가 있었다. 전체 교착이나 특정 성능 원인을 확정하지 않는다. 이 실행은 E2E 통과로 집계하지 않으며 [#44](https://github.com/egoing/agent-gibbon/issues/44)에서 조사한다. 수정한 receiver가 늦은 응답 뒤 같은 세대의 후속 프레임을 처리한 부분 기록은 있으나 이 실행의 최종 완주는 미검증이다.
-- 본 작업이 추가한 중간 테스트 메모 43개만 `/tmp/gibbon-issue43/intermediate-test-notes/`로 보관해 원래 **43개 테스트 메모 + 진행 메모 2개 = 저장 45개** 조건으로 맞췄다. 기존 사용자의 메모를 삭제하거나 다른 인스턴스로 전환하지 않았다.
+- 본 작업이 추가한 중간 테스트 메모 43개만 `/tmp/jajan-issue43/intermediate-test-notes/`로 보관해 원래 **43개 테스트 메모 + 진행 메모 2개 = 저장 45개** 조건으로 맞췄다. 기존 사용자의 메모를 삭제하거나 다른 인스턴스로 전환하지 않았다.
 
 ### 최종 실제 검증
 
@@ -1189,15 +1189,15 @@ Conf **5** (위 macOS 단일 화면 경로), Risk **Medium** (다중 창 위치�
 | `npm run test` | Rust **84개**, UI **53개** 통과. native 좌표 변환·지연 응답 수명 회귀 포함 |
 | `npm run dev:build`, `npm run check` | 개발 빌드·Clippy 통과 |
 | Rustfmt / Python 구문 / 버전 / diff | 통과 / 통과 / 0.2.7 일치 / 통과 |
-| `python3 scripts/open-order-smoke.py --pid 73759 --trace-file /tmp/gibbon-issue43/trace-after-controlled.jsonl --report-dir /tmp/gibbon-issue43/after-controlled` | **exit 0, 7개 검사, 45개 계산 목적지와 실제 좌표·크기 일치** |
-| `python3 scripts/check-entrance-trace.py /tmp/gibbon-issue43/trace-after-controlled.jsonl --report /tmp/gibbon-issue43/trace-after-controlled-summary.json` | **exit 0, 613프레임, 중단 0·위치 미반영 0·마지막 크기 미반영 0**. 유효한 전체 JSONL로 검사 |
+| `python3 scripts/open-order-smoke.py --pid 73759 --trace-file /tmp/jajan-issue43/trace-after-controlled.jsonl --report-dir /tmp/jajan-issue43/after-controlled` | **exit 0, 7개 검사, 45개 계산 목적지와 실제 좌표·크기 일치** |
+| `python3 scripts/check-entrance-trace.py /tmp/jajan-issue43/trace-after-controlled.jsonl --report /tmp/jajan-issue43/trace-after-controlled-summary.json` | **exit 0, 613프레임, 중단 0·위치 미반영 0·마지막 크기 미반영 0**. 유효한 전체 JSONL로 검사 |
 | 보존 | 역순 ID·열 넘김·전환 중 연속 열기·숨김 갱신/복원·수동 드래그 제외/재포함·다른 숨김 창·기존 메모 키보드 포커스·외부 앱 포커스 보존 |
 
 [수정 후 O 창](verification/entrance-stop-20261105/after-o.png) · [정확한 native 창·본문 GUI](verification/entrance-stop-20261105/after-o-gui.json) · [수동 배치 보존](verification/entrance-stop-20261105/after-manual-preserved.png). 이미지와 본문 렌더링을 육안 확인했다. 좌표·목적지·원본 명령과 단계별 상태는 [정량 JSON](verification/entrance-stop-20261105/report.json)에 있다. 최종 코드 검토에서 macOS 밖을 기존 물리 좌표 경로로 명시적으로 격리했고, 검증한 macOS 실행 분기는 변경하지 않았다.
 
 **Conf 5 / Risk Medium**: 단일 macOS arm64 실환경의 위 조건에서 실제 원인·전후 동작을 확인했다. Windows·Intel·실제 복수 모니터/혼합 DPI·이미지/접힘/워프 전체 GUI 회귀는 이번 범위에서 재실행하지 않았다. 대량 저장 메모 재시작/CLI 시간초과 #44는 미해결이며 이 검증으로 해결됐다고 보지 않는다. 420ms 전환·300px/콘텐츠 상한·제외·순서 등 기존 시각 기준은 유지해 SVG/PNG 시안은 변경하지 않았다. [디자인 시스템](design-system.md#메모-자동-배치--확정-2026-11-04)의 적용·검증 상태를 함께 갱신했다.
 
-- 최종 정리: 자체 앱 PID 2329·5061·45482·65167·73759만 종료했고 현재 이 워크트리 바이너리의 실행 프로세스는 0개다. 중간 테스트 폴더 43개와 마지막 복원 부하/검사 폴더 56개를 `/tmp/gibbon-issue43/`에 보관해 원래 앱 저장 상태를 복구했으며 진행 메모는 남겼다. 원래 포인터·전면 앱을 복원했다. 정량 JSON `cleanup`에 정확한 ID/경로가 있다.
+- 최종 정리: 자체 앱 PID 2329·5061·45482·65167·73759만 종료했고 현재 이 워크트리 바이너리의 실행 프로세스는 0개다. 중간 테스트 폴더 43개와 마지막 복원 부하/검사 폴더 56개를 `/tmp/jajan-issue43/`에 보관해 원래 앱 저장 상태를 복구했으며 진행 메모는 남겼다. 원래 포인터·전면 앱을 복원했다. 정량 JSON `cleanup`에 정확한 ID/경로가 있다.
 - 최종 검증 뒤 감독자가 #34·#43의 원격 브랜치·PR·CI 확인 후 병합을 명시적으로 승인했다. 아래 작업의 원격 결과는 Orca 완료 보고에 기록하며 #44는 닫지 않는다.
 
 ### PR47 main 통합 후 검증

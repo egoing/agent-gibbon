@@ -53,8 +53,8 @@ fn take_budget(bucket: usize) -> bool {
 const MESSAGES: &[&str] = &[
     "WebView uncaught error",
     "WebView unhandled promise rejection",
-    "Agent Gibbon internal error",
-    "Agent Gibbon diagnostic probe",
+    "Jajan internal error",
+    "Jajan diagnostic probe",
     "Updater check failed",
     "Updater acknowledgement timeout",
     "Updater repeated pending request",
@@ -171,10 +171,10 @@ fn dsn(
     embedded?.trim().parse().ok()
 }
 fn diagnostic_mode() -> bool {
-    cfg!(debug_assertions) && std::env::var("AGENT_GIBBON_DIAGNOSTICS").as_deref() == Ok("1")
+    cfg!(debug_assertions) && std::env::var("JAJAN_DIAGNOSTICS").as_deref() == Ok("1")
 }
 fn sample_rate() -> f32 {
-    std::env::var("AGENT_GIBBON_TRACE_SAMPLE_RATE")
+    std::env::var("JAJAN_TRACE_SAMPLE_RATE")
         .ok()
         .and_then(|v| v.parse::<f32>().ok())
         .filter(|v| v.is_finite() && (0.0..=1.0).contains(v))
@@ -186,9 +186,9 @@ fn options(dsn: sentry::types::Dsn, detailed: bool) -> sentry::ClientOptions {
         dsn: Some(dsn),
         release: Some(
             format!(
-                "agent-gibbon@{}+{}",
+                "jajan@{}+{}",
                 env!("CARGO_PKG_VERSION"),
-                env!("AGENT_GIBBON_BUILD_REVISION")
+                env!("JAJAN_BUILD_REVISION")
             )
             .into(),
         ),
@@ -202,7 +202,7 @@ fn options(dsn: sentry::types::Dsn, detailed: bool) -> sentry::ClientOptions {
         ),
         send_default_pii: false,
         attach_stacktrace: true,
-        in_app_include: vec!["agent_gibbon"],
+        in_app_include: vec!["jajan"],
         enable_logs: detailed,
         // Release Health stays off until its aggregate retention is confirmed.
         auto_session_tracking: false,
@@ -246,14 +246,14 @@ pub fn init(consented: bool) -> Option<sentry::ClientInitGuard> {
     if !consented {
         return None;
     }
-    if std::env::var("AGENT_GIBBON_TELEMETRY").as_deref() == Ok("off") {
+    if std::env::var("JAJAN_TELEMETRY").as_deref() == Ok("off") {
         return None;
     }
     let dsn = dsn(
         cfg!(test),
         cfg!(debug_assertions),
         diagnostic_mode(),
-        option_env!("AGENT_GIBBON_SENTRY_DSN"),
+        option_env!("JAJAN_SENTRY_DSN"),
     )?;
     let guard = sentry::Hub::run(sentry::Hub::main(), || sentry::init(options(dsn, true)));
     ENABLED.store(true, Ordering::Relaxed);
@@ -262,7 +262,7 @@ pub fn init(consented: bool) -> Option<sentry::ClientInitGuard> {
         sentry::configure_scope(|s| {
             s.set_tag("app.arch", std::env::consts::ARCH);
             s.set_tag("app.os", std::env::consts::OS);
-            s.set_tag("app.build", env!("AGENT_GIBBON_BUILD_REVISION"));
+            s.set_tag("app.build", env!("JAJAN_BUILD_REVISION"));
         })
     });
     log("app.ready", 0.0);
@@ -286,7 +286,7 @@ pub fn revoke(app: &tauri::AppHandle) {
 }
 pub fn refresh(app: &tauri::AppHandle) {
     let allowed = crate::privacy::sharing(app)
-        && std::env::var("AGENT_GIBBON_TELEMETRY").as_deref() != Ok("off");
+        && std::env::var("JAJAN_TELEMETRY").as_deref() != Ok("off");
     if !allowed {
         revoke(app);
         return;
@@ -524,7 +524,7 @@ fn log_for(op: &str, ms: f64, parent: Option<&Arc<TimingSpan>>) {
     sentry::Hub::run(hub, || {
         sentry::Hub::current().capture_log(p::Log {
             level: p::LogLevel::Info,
-            body: "Agent Gibbon operation".into(),
+            body: "Jajan operation".into(),
             trace_id: parent.map(|p| p.span.get_trace_context().trace_id),
             timestamp: SystemTime::now(),
             severity_number: None,
@@ -591,7 +591,7 @@ pub fn telemetry_status() -> Value {
     status()
 }
 pub fn status() -> Value {
-    json!({"enabled":enabled(),"detailed":detailed(),"environment":if cfg!(debug_assertions){"development"}else{"production"},"traces_sample_rate":if detailed(){sample_rate()}else{0.0},"logs":detailed(),"release_health":false,"revision":env!("AGENT_GIBBON_BUILD_REVISION"),"operations":OPERATIONS.load(Ordering::Relaxed),"heartbeats":HEARTBEATS.load(Ordering::Relaxed),"frontend_errors":ERRORS.load(Ordering::Relaxed),"diagnostic_limit":MAX_DIAGNOSTICS,"watchdog":watchdog::status(),"journal":journal::status()})
+    json!({"enabled":enabled(),"detailed":detailed(),"environment":if cfg!(debug_assertions){"development"}else{"production"},"traces_sample_rate":if detailed(){sample_rate()}else{0.0},"logs":detailed(),"release_health":false,"revision":env!("JAJAN_BUILD_REVISION"),"operations":OPERATIONS.load(Ordering::Relaxed),"heartbeats":HEARTBEATS.load(Ordering::Relaxed),"frontend_errors":ERRORS.load(Ordering::Relaxed),"diagnostic_limit":MAX_DIAGNOSTICS,"watchdog":watchdog::status(),"journal":journal::status()})
 }
 #[tauri::command]
 pub fn telemetry_heartbeat(
@@ -708,7 +708,7 @@ pub fn probe() -> Value {
     bind_client();
     let t = Timing::new("diagnostic.probe");
     log("diagnostic.probe", 0.0);
-    let event = sentry::capture_message("Agent Gibbon diagnostic probe", sentry::Level::Info);
+    let event = sentry::capture_message("Jajan diagnostic probe", sentry::Level::Info);
     drop(t);
     // This proves queue drain only, never claim server ingestion from flush alone.
     let flushed = sentry::Hub::current()

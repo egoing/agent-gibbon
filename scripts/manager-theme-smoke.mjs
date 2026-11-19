@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
 const {default:puppeteer}=await import(process.env.PUPPETEER_MODULE || 'puppeteer-core');
 const root=fileURLToPath(new URL('..',import.meta.url));
-const out=process.env.THEME_OUTPUT || '/tmp/gibbon-theme';fs.mkdirSync(out,{recursive:true});
+const out=process.env.THEME_OUTPUT || '/tmp/jajan-theme';fs.mkdirSync(out,{recursive:true});
 const browser=await puppeteer.launch({executablePath:process.env.CHROME_BIN || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 const contrast=(a,b)=>{
  const lum=rgb=>rgb.map(c=>c/255).map(c=>c<=.04045?c/12.92:((c+.055)/1.055)**2.4).reduce((n,c,i)=>n+c*[.2126,.7152,.0722][i],0);
@@ -15,7 +15,7 @@ const results=[];
 try {
  const page=await browser.newPage(),errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));
  await page.setRequestInterception(true);
- page.on('request',r=>{const u=new URL(r.url());if(u.hostname!=='gibbon.test'){external.push(r.url());return r.abort();}const f=root+'ui'+u.pathname;if(!fs.existsSync(f))return r.respond({status:404,body:''});r.respond({status:200,contentType:/\.(m?js)$/.test(f)?'text/javascript':f.endsWith('.css')?'text/css':'text/html',body:fs.readFileSync(f)});});
+ page.on('request',r=>{const u=new URL(r.url());if(u.hostname!=='jajan.test'){external.push(r.url());return r.abort();}const f=root+'ui'+u.pathname;if(!fs.existsSync(f))return r.respond({status:404,body:''});r.respond({status:200,contentType:/\.(m?js)$/.test(f)?'text/javascript':f.endsWith('.css')?'text/css':'text/html',body:fs.readFileSync(f)});});
  await page.evaluateOnNewDocument(()=>{
   window.calls=[];window.onboarding=false;
   window.__TAURI__={core:{invoke:async(name,args)=>{window.calls.push({name,args});
@@ -27,11 +27,11 @@ try {
    throw Error('Unexpected IPC '+name);
   }}};
  });
- const start=async()=>{await page.goto('http://gibbon.test/manager.html');await page.waitForFunction(()=>!document.getElementById('manager-navigation').hidden);};
+ const start=async()=>{await page.goto('http://jajan.test/manager.html');await page.waitForFunction(()=>!document.getElementById('manager-navigation').hidden);};
  await page.emulateMediaFeatures([{name:'prefers-color-scheme',value:'light'}]);await start();
  assert.equal(await page.$eval('html',e=>e.dataset.managerTheme),'gray');
  await page.emulateMediaFeatures([{name:'prefers-color-scheme',value:'dark'}]);await page.waitForFunction(()=>document.documentElement.dataset.managerTheme==='black');assert.equal(await page.$eval('html',e=>e.dataset.managerTheme),'black');
- assert.equal(await page.evaluate(()=>localStorage.getItem('agent-gibbon.manager-theme')),null);
+ assert.equal(await page.evaluate(()=>localStorage.getItem('jajan.manager-theme')),null);
  for(const [width,height] of [[944,480],[600,360]]) {
   await page.setViewport({width,height});
   for(const theme of ['white','gray','black']) {
@@ -39,7 +39,7 @@ try {
    await page.focus(`input[value="${theme}"]`);await page.keyboard.press('Space');
    assert.equal(await page.$eval('html',e=>e.dataset.managerTheme),theme);
    assert.equal(await page.evaluate(()=>document.activeElement.value),theme);
-   assert.equal(await page.evaluate(()=>localStorage.getItem('agent-gibbon.manager-theme')),theme);
+   assert.equal(await page.evaluate(()=>localStorage.getItem('jajan.manager-theme')),theme);
    await page.emulateMediaFeatures([{name:'prefers-color-scheme',value:theme==='black'?'light':'dark'}]);assert.equal(await page.$eval('html',e=>e.dataset.managerTheme),theme);
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
    assert(await page.$eval('.settings-content',e=>e.scrollWidth<=e.clientWidth));
@@ -52,20 +52,20 @@ try {
    await page.click('#list button');await page.screenshot({path:`${out}/notes-${theme}-${width}.png`});
    await page.click('#settings-nav');await page.click('#settings-skills-nav');await page.waitForSelector('.skill-item');await page.click('.skill-item summary');await page.screenshot({path:`${out}/skills-${theme}-${width}.png`});
    await page.click('#settings-privacy-nav');await page.click('#privacy-settings-terms');await page.screenshot({path:`${out}/document-${theme}-${width}.png`});await page.click('#privacy-document-close');
-   await page.evaluate(async()=>{window.onboarding=true;await window.gibbonPrivacy.refresh();});
+   await page.evaluate(async()=>{window.onboarding=true;await window.jajanPrivacy.refresh();});
    assert.equal(await page.$eval('#privacy-terms',e=>e.checked),false);assert.equal(await page.$eval('#privacy-share',e=>e.checked),false);
    assert.equal(await page.$eval('#privacy-continue',e=>e.disabled),true);
    await page.screenshot({path:`${out}/welcome-${theme}-${width}.png`});await start();
   }
  }
  await page.click('#settings-nav');await page.click('#settings-appearance-nav');await page.click('input[name="manager-theme"][value="system"]');
- assert.equal(await page.evaluate(()=>localStorage.getItem('agent-gibbon.manager-theme')),null);
+ assert.equal(await page.evaluate(()=>localStorage.getItem('jajan.manager-theme')),null);
  await page.emulateMediaFeatures([{name:'prefers-color-scheme',value:'dark'}]);await page.waitForFunction(()=>document.documentElement.dataset.managerTheme==='black');assert.equal(await page.$eval('html',e=>e.dataset.managerTheme),'black');
  await page.emulateMediaFeatures([{name:'prefers-color-scheme',value:'light'}]);await page.waitForFunction(()=>document.documentElement.dataset.managerTheme==='gray');assert.equal(await page.$eval('html',e=>e.dataset.managerTheme),'gray');
  // Selecting the current system color is an explicit choice too.
- await page.click('input[value=gray]');assert.equal(await page.evaluate(()=>localStorage.getItem('agent-gibbon.manager-theme')),'gray');
+ await page.click('input[value=gray]');assert.equal(await page.evaluate(()=>localStorage.getItem('jajan.manager-theme')),'gray');
  await page.focus('input[value=gray]');await page.keyboard.press('ArrowRight');assert.equal(await page.$eval('html',e=>e.dataset.managerTheme),'black');
- assert.equal(await page.evaluate(()=>localStorage.getItem('agent-gibbon.manager-theme')),'black');
+ assert.equal(await page.evaluate(()=>localStorage.getItem('jajan.manager-theme')),'black');
  await page.click('input[name="manager-theme"][value="system"]');
  // Real browser storage denial must keep the old selected radio and report failure.
  await page.evaluate(()=>{Storage.prototype.setItem=()=>{throw Error('blocked');};});

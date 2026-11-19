@@ -7,7 +7,7 @@ import { checkVersion, setVersion } from '../scripts/release-version.mjs';
 import { prepareAssets } from '../scripts/release-assets.mjs';
 
 function fixture(t) {
-  const root = mkdtempSync(join(tmpdir(), 'gibbon-release-'));
+  const root = mkdtempSync(join(tmpdir(), 'jajan-release-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   mkdirSync(join(root, 'src-tauri'));
   for (const p of ['package.json', 'pnpm-lock.yaml', 'src-tauri/tauri.conf.json', 'src-tauri/Cargo.toml', 'src-tauri/Cargo.lock']) {
@@ -39,9 +39,9 @@ test('version drift blocks release and bump without writing files', t => {
 });
 
 test('release assets require all three platforms and contain independently checkable hashes', t => {
-  const root = mkdtempSync(join(tmpdir(), 'gibbon-assets-'));
+  const root = mkdtempSync(join(tmpdir(), 'jajan-assets-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  const names = ['Agent Gibbon_9.0.0_aarch64.dmg', 'Agent Gibbon_9.0.0_x64.dmg', 'Agent Gibbon_9.0.0_x64-setup.exe'];
+  const names = ['Jajan_9.0.0_aarch64.dmg', 'Jajan_9.0.0_x64.dmg', 'Jajan_9.0.0_x64-setup.exe'];
   assert.throws(() => prepareAssets(root, '9.0.0'));
   for (const name of names) writeFileSync(join(root, name), 'abc');
   writeFileSync(join(root, names[0]), '');

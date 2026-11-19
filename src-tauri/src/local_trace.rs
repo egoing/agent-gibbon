@@ -367,7 +367,7 @@ fn expire(r: &Recorder, state: &mut Evidence) {
 }
 
 pub fn start(app: &tauri::AppHandle) {
-    if std::env::var("AGENT_GIBBON_LOCAL_TRACE").as_deref() != Ok("1") {
+    if std::env::var("JAJAN_LOCAL_TRACE").as_deref() != Ok("1") {
         return;
     }
     let Ok(root) = app.path().app_data_dir() else {
@@ -398,7 +398,7 @@ pub fn start(app: &tauri::AppHandle) {
                 s.clone()
             });
             if let Some(evidence) = evidence {
-                let value = serde_json::json!({"format":2,"pid":std::process::id(),"started_at_ms":started_at,"build":env!("AGENT_GIBBON_BUILD_REVISION"),"lost":recorder.lost.load(Ordering::Relaxed),"evidence":evidence});
+                let value = serde_json::json!({"format":2,"pid":std::process::id(),"started_at_ms":started_at,"build":env!("JAJAN_BUILD_REVISION"),"lost":recorder.lost.load(Ordering::Relaxed),"evidence":evidence});
                 let _ = persist(&path, &value);
             }
             std::thread::sleep(Duration::from_millis(500));

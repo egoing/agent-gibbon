@@ -22,9 +22,9 @@ struct Skill {
 }
 fn catalog() -> [Skill; 3] {
     [
-        Skill { id: "agent-gibbon", name: "메모 관리", description: "Agent Gibbon의 메모 생성·조회·갱신·숨기기를 사용합니다. 기존 창의 위치와 포커스, 숨김 상태를 유지합니다.", markdown: include_str!("../../.agents/skills/agent-gibbon/SKILL.md") },
-        Skill { id: "agent-gibbon-progress", name: "작업 진행 표시", description: "작업 계획과 진행상황을 플로팅 체크리스트 메모로 표시합니다. 실제로 끝난 단계와 미검증 범위를 구분하며 같은 메모를 갱신합니다.", markdown: include_str!("../../bundled-skills/agent-gibbon-progress/SKILL.md") },
-        Skill { id: "agent-gibbon-workspace", name: "작업 공간 구성", description: "작업에 필요한 웹·터미널·노트·캡처를 적절한 위치에 띄우고 임시 창을 정리합니다.", markdown: include_str!("../../bundled-skills/agent-gibbon-workspace/SKILL.md") },
+        Skill { id: "jajan", name: "메모 관리", description: "Jajan의 메모 생성·조회·갱신·숨기기를 사용합니다. 기존 창의 위치와 포커스, 숨김 상태를 유지합니다.", markdown: include_str!("../../.agents/skills/jajan/SKILL.md") },
+        Skill { id: "jajan-progress", name: "작업 진행 표시", description: "작업 계획과 진행상황을 플로팅 체크리스트 메모로 표시합니다. 실제로 끝난 단계와 미검증 범위를 구분하며 같은 메모를 갱신합니다.", markdown: include_str!("../../bundled-skills/jajan-progress/SKILL.md") },
+        Skill { id: "jajan-workspace", name: "작업 공간 구성", description: "작업에 필요한 웹·터미널·노트·캡처를 적절한 위치에 띄우고 임시 창을 정리합니다.", markdown: include_str!("../../bundled-skills/jajan-workspace/SKILL.md") },
     ]
 }
 fn revision() -> String {
@@ -265,9 +265,9 @@ impl Service {
 }
 fn owned(path: &Path) -> bool {
     fs::symlink_metadata(path).is_ok_and(|m| m.is_dir() && !m.file_type().is_symlink())
-        && fs::symlink_metadata(path.join(".agent-gibbon-managed"))
+        && fs::symlink_metadata(path.join(".jajan-managed"))
             .is_ok_and(|m| m.is_file() && !m.file_type().is_symlink())
-        && fs::read(path.join(".agent-gibbon-managed")).is_ok_and(|v| v == b"1\n")
+        && fs::read(path.join(".jajan-managed")).is_ok_and(|v| v == b"1\n")
 }
 fn service(app: &tauri::AppHandle) -> Result<Service> {
     let home = app
@@ -281,7 +281,7 @@ fn service(app: &tauri::AppHandle) -> Result<Service> {
         .join("skills");
     // Debug-only fixture boundary for native verification. Release ignores it.
     #[cfg(debug_assertions)]
-    if let Some(fixture) = std::env::var_os("AGENT_GIBBON_SKILLS_TEST_ROOT") {
+    if let Some(fixture) = std::env::var_os("JAJAN_SKILLS_TEST_ROOT") {
         let fixture = PathBuf::from(fixture);
         if !fixture.is_absolute() {
             return Err("스킬 검증 경로는 절대 경로여야 합니다".into());

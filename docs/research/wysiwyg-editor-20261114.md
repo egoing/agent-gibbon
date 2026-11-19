@@ -12,7 +12,7 @@
 
 ## 현재 앱에서 지켜야 하는 계약
 
-기준 루트 `/Users/egoinglee/.codex/worktrees/0ae9/agent-gibbon`, 제품 코드 기준 `91b17516f02df817abf2a21a04894f3ddcd6aaec`. Node `v24.21.0`, pnpm `11.25.0`, 앱 `0.2.11`, Tauri 2. `package.json`의 pnpm 고정값을 확인했다. 프론트엔드 번들러 없이 `ui/`가 `frontendDist`이며 bare npm import를 현재 HTML에 바로 추가할 수 있는 구조는 아니다.
+기준 루트 `/Users/egoinglee/.codex/worktrees/0ae9/jajan`, 제품 코드 기준 `91b17516f02df817abf2a21a04894f3ddcd6aaec`. Node `v24.21.0`, pnpm `11.25.0`, 앱 `0.2.11`, Tauri 2. `package.json`의 pnpm 고정값을 확인했다. 프론트엔드 번들러 없이 `ui/`가 `frontendDist`이며 bare npm import를 현재 HTML에 바로 추가할 수 있는 구조는 아니다.
 
 | 계약 | 실제 근거 | 위지윅 전환의 영향 |
 |---|---|---|
@@ -24,7 +24,7 @@
 | 저장은 메모 revision과 연결 파일 원문을 확인 | `model.rs::save_edit`, `src-tauri/src/source.rs::save` | stale revision은 거절하고 파일의 외부 수정·삭제·readonly를 확인한다. 같은 디렉터리 임시 파일+rename이며 파일 write 실패 전 note를 교체하지 않는다. 다만 다른 프로그램의 write와 완전한 OS 수준 CAS는 아니다. |
 | diff/quiet replace/새 완료 강조가 별개 | `model.rs`의 `change_base`, `rebase_quiet`, `completion_html`; `ui/app.js`의 표시 우선순위 | 새 완료 강조와 미확인 변경을 문서 본문·저장 원문에 섞지 않는다. 삭제 표시를 편집 가능한 텍스트로 import하면 삭제한 문장이 되살아날 수 있다. |
 | 읽은 변경 자동 확인 | `ui/app.js`의 readRevision/acknowledge, 현재 편집 중 확인 차단 | 항상 편집 가능한 표면에서 기존 `editing` boolean을 그대로 true로 두면 확인이 막힌다. 초안 dirty/조합 중/실제 관찰 revision을 분리해야 한다. |
-| 저장·내보내기·취소·업데이트 보호가 화면 모드에 결합 | `ui/app.js`, `ui/feedback-state.mjs`, `window.gibbonUpdateActivity` | 현재 Cmd/Ctrl+S는 편집 중 저장, 그 밖에는 내보내기이며 Esc는 편집 취소/숨김으로 나뉜다. `editing` 상시 true면 자동 업데이트의 busy도 계속 참이 된다. 단순 UI 제거로 끝나지 않는다. |
+| 저장·내보내기·취소·업데이트 보호가 화면 모드에 결합 | `ui/app.js`, `ui/feedback-state.mjs`, `window.jajanUpdateActivity` | 현재 Cmd/Ctrl+S는 편집 중 저장, 그 밖에는 내보내기이며 Esc는 편집 취소/숨김으로 나뉜다. `editing` 상시 true면 자동 업데이트의 busy도 계속 참이 된다. 단순 UI 제거로 끝나지 않는다. |
 | 본문 선택은 현재 이동과 충돌 | `ui/style.css` body user-select:none/cursor:grab; `ui/app.js` 문서 mousedown의 preventDefault+drag_note | contenteditable만 추가해도 전역 핸들러가 native 이동을 시작할 수 있다. 본문을 선택 가능한 영역으로 만들고 이동 hit-test를 툴바로 좁혀야 한다. |
 | native 이동과 자동 배치 제외 | `src-tauri/src/entrance.rs::drag_note` | 기존 start_dragging과 layout mark를 재사용하는 방향이 적절하다. 별도 JS 좌표 이동 루프는 제안하지 않는다. |
 | 접힘·숨김·수동 크기·포커스 보존 | `ui/app.js`, `src-tauri/src/focus.rs`, `src-tauri/src/sizing.rs`, `src-tauri/src/session_restore.rs` 및 디자인 시스템 | 숨김 복원·외부 갱신이 입력 focus를 빼앗지 않아야 한다. 편집기 mount/update로 창을 다시 만들거나 자동 fit을 매 입력마다 강제하지 않는다. |

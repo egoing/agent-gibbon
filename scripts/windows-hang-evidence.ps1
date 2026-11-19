@@ -1,18 +1,18 @@
 # Read-only, content-free evidence. Does not suspend, terminate or activate windows.
 [CmdletBinding()]
-param([string]$OutputDirectory = (Join-Path $env:TEMP ('gibbon-hang-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))))
+param([string]$OutputDirectory = (Join-Path $env:TEMP ('jajan-hang-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))))
 $ErrorActionPreference = 'Stop'
 $taskRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $info = (& node (Join-Path $PSScriptRoot 'dev.mjs') info | ConvertFrom-Json)
 if ($LASTEXITCODE -ne 0 -or $info.root -ne $taskRoot) { throw 'Cannot verify worktree identity' }
-$targets = @(Get-CimInstance Win32_Process -Filter "Name = 'agent-gibbon.exe'" | Where-Object { $_.ExecutablePath -eq $info.binary })
+$targets = @(Get-CimInstance Win32_Process -Filter "Name = 'jajan.exe'" | Where-Object { $_.ExecutablePath -eq $info.binary })
 if ($targets.Count -ne 1) { throw "Expected one process at the worktree binary; found $($targets.Count)" }
 $targetProcessId = [int]$targets[0].ProcessId
 Add-Type -TypeDefinition @'
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-public static class GibbonHangProbe {
+public static class JajanHangProbe {
     public delegate bool EnumCallback(IntPtr hwnd, IntPtr data);
     [DllImport("user32.dll")] static extern bool EnumWindows(EnumCallback cb, IntPtr data);
     [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint pid);
@@ -36,7 +36,7 @@ public static class GibbonHangProbe {
 $before = Get-Process -Id $targetProcessId
 $cpuBefore = $before.TotalProcessorTime.TotalMilliseconds
 $sampleStart = [DateTime]::UtcNow
-$windows = [GibbonHangProbe]::Probe($targetProcessId)
+$windows = [JajanHangProbe]::Probe($targetProcessId)
 Start-Sleep -Milliseconds 1000
 $after = Get-Process -Id $targetProcessId
 if ($after.Path -ne $info.binary -or $after.StartTime -ne $before.StartTime) { throw 'Process identity changed during sampling' }

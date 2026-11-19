@@ -1,3 +1,0 @@
-#!/bin/sh
-# Compatibility entry point; use agent-gibbon for new integrations.
-exec "$(dirname -- "$0")/agent-gibbon" "$@"

@@ -11,7 +11,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 INFO = json.loads(subprocess.check_output(['node', str(ROOT / 'scripts/dev.mjs'), 'info'], text=True))
 assert INFO['root'] == str(ROOT)
-BIN = ROOT / 'scripts/agent-gibbon-dev'
+BIN = ROOT / 'scripts/jajan-dev'
 ID = 'milkdown174-cli-' + uuid.uuid4().hex[:8]
 
 def pids():
@@ -30,7 +30,7 @@ def cli(action, *args):
     return value
 
 try:
-    with tempfile.TemporaryDirectory(prefix='gibbon174-' + INFO['id'] + '-') as folder:
+    with tempfile.TemporaryDirectory(prefix='jajan174-' + INFO['id'] + '-') as folder:
         source = Path(folder) / 'source.md'
         original = '# ' + ID + '\n\n- [ ] 전용 CLI 검증\n'
         source.write_text(original)

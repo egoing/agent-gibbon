@@ -5,7 +5,7 @@ use portable_pty::{Child, ChildKiller, ExitStatus};
 use std::{io, sync::atomic::AtomicUsize, thread};
 
 const FIXTURE: &str = "terminal::lifecycle_tests::owned_fixture_child";
-const MODE: &str = "GIBBON_OWNED_PTY_TEST";
+const MODE: &str = "JAJAN_OWNED_PTY_TEST";
 const TRAILER: &[u8] = b"end-of-owned-output";
 
 #[test]

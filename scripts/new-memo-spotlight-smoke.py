@@ -30,7 +30,7 @@ def main():
     args = parser.parse_args()
     root, output = args.root.resolve(), args.report_dir.resolve()
     info = json.loads(run('node', root / 'scripts/dev.mjs', 'info'))
-    cli_path = root / 'scripts/agent-gibbon-dev'
+    cli_path = root / 'scripts/jajan-dev'
     expected_process = info['binary'] + ' --serve'
 
     def processes():
@@ -39,12 +39,12 @@ def main():
 
     assert not processes(), 'Existing dev apps are never stopped; use a separate source snapshot'
     output.mkdir(parents=True, exist_ok=True)
-    setting = Path.home() / 'Library/Application Support/org.egoing.floatnote/appearance' / info['id'] / 'opacity.json'
+    setting = Path.home() / 'Library/Application Support/app.jajan/appearance' / info['id'] / 'opacity.json'
     original_setting = setting.read_bytes() if setting.exists() else None
     evidence = {'origin': info, 'cases': [], 'passed': False, 'alpha_mismatches': []}
     pid = None
     original_pointer = None
-    with tempfile.TemporaryDirectory(prefix='gibbon-spotlight-native-') as folder:
+    with tempfile.TemporaryDirectory(prefix='jajan-spotlight-native-') as folder:
         helper = Path(folder) / 'native'
         source = helper.with_suffix('.swift')
         source.write_text(r'''
@@ -125,7 +125,7 @@ if a[1] == "pointer" {
                     case['samples'].append(sample)
                     for note, alpha in expected.items():
                         state = cli('inspect', note)
-                        title = f"Agent Gibbon [{state['dev_label']}] — {note}"
+                        title = f"Jajan [{state['dev_label']}] — {note}"
                         matches = [w for w in windows if w['title'] == title]
                         assert len(matches) == 1, (title, windows)
                         sample['notes'].append({k: state[k] for k in (
@@ -164,7 +164,7 @@ if a[1] == "pointer" {
                 opened('b')
                 b = ids[-1]
                 shown = snapshot('new-opaque-existing-reflow-dim', {a: idle, b: 1.0})
-                title = f"Agent Gibbon [{cli('inspect', b)['dev_label']}] — {b}"
+                title = f"Jajan [{cli('inspect', b)['dev_label']}] — {b}"
                 window = next(w for w in shown['windows'] if w['title'] == title)
                 capture = output / ('auto-new.png' if manual is None else 'manual-new.png')
                 subprocess.run(['screencapture', '-x', '-l', str(window['id']), str(capture)], check=True)

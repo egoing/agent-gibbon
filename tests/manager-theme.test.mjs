@@ -10,7 +10,7 @@ function setup(saved=null, {dark=false, failRead=false, failWrite=false, nativeI
   const memoRadios=['white','gray','black','color','system'].map(value=>({value,checked:false,addEventListener(_,fn){this.click=fn;}}));
   const ids=Object.fromEntries(['theme-mode','theme-result','theme-native-status'].map(id=>[id,{dataset:{},setAttribute(k,v){this[k]=v;}}]));
   const doc={readyState:'loading',documentElement:{dataset:{}},getElementById:id=>ids[id],querySelectorAll:selector=>selector.includes('memo-design')?memoRadios:radios,addEventListener(_,fn){this.ready=fn;}};
-  const storage={getItem(k){if(failRead)throw Error();return k==='agent-gibbon.memo-design'?memoValue:value;},setItem(k,v){if(failWrite)throw Error();if(k==='agent-gibbon.memo-design')memoValue=v;else value=v;},removeItem(){if(failWrite)throw Error();value=null;}};
+  const storage={getItem(k){if(failRead)throw Error();return k==='jajan.memo-design'?memoValue:value;},setItem(k,v){if(failWrite)throw Error();if(k==='jajan.memo-design')memoValue=v;else value=v;},removeItem(){if(failWrite)throw Error();value=null;}};
   const listeners={};
   vm.runInNewContext(source,{document:doc,window:{__TAURI__:nativeInvoke?{core:{invoke:nativeInvoke}}:undefined,matchMedia:()=>media,localStorage:storage,addEventListener:(name,fn)=>listeners[name]=fn}});
   const first=doc.documentElement.dataset.managerTheme;
@@ -34,7 +34,7 @@ test('corrupt or inaccessible storage follows system; write failures retain prev
   const locked=setup('white',{failWrite:true});locked.choose('system');assert.equal(locked.theme(),'white');
 });
 test('other manager windows update or reset preference; unrelated storage is ignored',()=>{
-  const app=setup();const event=newValue=>app.listeners.storage({key:'agent-gibbon.manager-theme',newValue,storageArea:app.storage});
+  const app=setup();const event=newValue=>app.listeners.storage({key:'jajan.manager-theme',newValue,storageArea:app.storage});
   event('white');app.system(true);assert.equal(app.theme(),'white');event(null);assert.equal(app.theme(),'black');
   app.listeners.storage({key:'other',newValue:'gray',storageArea:app.storage});assert.equal(app.theme(),'black');
 });
@@ -66,9 +66,9 @@ test('five memo designs persist independently of manager selection and default t
  const failed=setup('gray',{failWrite:true});failed.chooseDesign('color');assert.equal(failed.memoRadios.find(r=>r.checked).value,'gray');assert.equal(failed.ids['theme-result'].dataset.error,'true');
 });
 test('storage changes update memo design without changing manager selection; invalid values reset only memo design',()=>{
- const app=setup('white');app.listeners.storage({key:'agent-gibbon.memo-design',newValue:'black',storageArea:app.storage});
+ const app=setup('white');app.listeners.storage({key:'jajan.memo-design',newValue:'black',storageArea:app.storage});
  assert.equal(app.theme(),'white');assert.equal(app.memoRadios.find(r=>r.checked).value,'black');
- app.listeners.storage({key:'agent-gibbon.memo-design',newValue:'invalid',storageArea:app.storage});assert.equal(app.theme(),'white');assert.equal(app.memoRadios.find(r=>r.checked).value,'gray');
+ app.listeners.storage({key:'jajan.memo-design',newValue:'invalid',storageArea:app.storage});assert.equal(app.theme(),'white');assert.equal(app.memoRadios.find(r=>r.checked).value,'gray');
 });
 
 test('manager system is a radio selection and saved colors remain explicit choices',()=>{

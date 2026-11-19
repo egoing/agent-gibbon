@@ -85,7 +85,7 @@ fn write(path: &std::path::Path, history: &VecDeque<Value>) -> std::io::Result<(
     Ok(())
 }
 pub fn record(message: &str, kind: &str, elapsed_ms: f64) {
-    let v = json!({"message":message,"kind":kind,"duration_ms":elapsed_ms.min(600_000.),"timestamp":SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap_or_default().as_secs(),"build":env!("AGENT_GIBBON_BUILD_REVISION")});
+    let v = json!({"message":message,"kind":kind,"duration_ms":elapsed_ms.min(600_000.),"timestamp":SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap_or_default().as_secs(),"build":env!("JAJAN_BUILD_REVISION")});
     if valid(&v) && detailed() {
         if let (Some(s), Some(epoch)) = (SENDER.get(), super::transport::epoch()) {
             if s.try_send((epoch, v)).is_err() {

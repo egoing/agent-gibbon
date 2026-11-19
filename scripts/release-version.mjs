@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('..', import.meta.url));
 const semver = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const paths = ['package.json', 'src-tauri/tauri.conf.json', 'src-tauri/Cargo.toml', 'src-tauri/Cargo.lock'];
-const cargoPattern = /(^\[package\]\s*\nname = "agent-gibbon"\s*\nversion = ")([^"]+)(")/m;
-const lockPattern = /(^\[\[package\]\]\s*\nname = "agent-gibbon"\s*\nversion = ")([^"]+)(")/m;
+const cargoPattern = /(^\[package\]\s*\nname = "jajan"\s*\nversion = ")([^"]+)(")/m;
+const lockPattern = /(^\[\[package\]\]\s*\nname = "jajan"\s*\nversion = ")([^"]+)(")/m;
 
 export function versions(base = root) {
   const texts = paths.map(p => readFileSync(resolve(base, p), 'utf8'));

@@ -48,7 +48,7 @@ try {
 } catch (error) { results.push({error: error.message}); }
 const output = document.createElement('pre'); output.id = 'layout-result'; output.textContent = JSON.stringify(results); document.body.append(output);
 '''
-with tempfile.TemporaryDirectory(prefix='gibbon-diff-layout-') as temp:
+with tempfile.TemporaryDirectory(prefix='jajan-diff-layout-') as temp:
     page = Path(temp) / 'layout.html'
     page.write_text(source.replace('</body>', '<script>' + checks + '</script></body>'))
     run = subprocess.run([CHROME, '--headless', '--disable-gpu', '--no-first-run', '--user-data-dir=' + temp + '/profile', '--window-size=640,480', '--dump-dom', page.as_uri()], text=True, capture_output=True, check=True, timeout=30)

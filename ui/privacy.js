@@ -1,9 +1,9 @@
 'use strict';
 (() => {
-  const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
+  const invoke = window.jajanInvoke || window.__TAURI__.core.invoke;
   const el = id => document.getElementById(id);
   let state = null, busy = false;
-  const api = window.gibbonPrivacy = {
+  const api = window.jajanPrivacy = {
     accepted: () => Boolean(state?.terms_accepted || state?.terms_skipped),
     onAccepted: null,
     updateBusy: () => busy || !state || el("privacy-setting-share").checked !== Boolean(state.allowed ?? state.sharing),

@@ -13,9 +13,9 @@ def control_rect(handle, name):
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName UIAutomationClient
 Add-Type -AssemblyName UIAutomationTypes
-$root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]([long]$env:GIBBON_UIA_HWND))
+$root = [System.Windows.Automation.AutomationElement]::FromHandle([IntPtr]([long]$env:JAJAN_UIA_HWND))
 $condition = [System.Windows.Automation.PropertyCondition]::new(
-    [System.Windows.Automation.AutomationElement]::NameProperty, $env:GIBBON_UIA_NAME)
+    [System.Windows.Automation.AutomationElement]::NameProperty, $env:JAJAN_UIA_NAME)
 $element = $root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
 if ($null -eq $element) { throw 'Test control not found' }
 $rect = $element.Current.BoundingRectangle
@@ -24,7 +24,7 @@ $rect = $element.Current.BoundingRectangle
 '''
     result = subprocess.run(
         ['powershell.exe', '-NoProfile', '-Command', command],
-        env={**os.environ, 'GIBBON_UIA_HWND': str(int(handle)), 'GIBBON_UIA_NAME': name},
+        env={**os.environ, 'JAJAN_UIA_HWND': str(int(handle)), 'JAJAN_UIA_NAME': name},
         capture_output=True, encoding='utf-8', timeout=20,
     )
     assert result.returncode == 0, result.stderr

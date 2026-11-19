@@ -52,7 +52,7 @@ async function run() {
 }
 run();
 '''
-with tempfile.TemporaryDirectory(prefix='gibbon-copy-layout-') as temp:
+with tempfile.TemporaryDirectory(prefix='jajan-copy-layout-') as temp:
     page = Path(temp) / 'copy.html'
     # Declarations precede the extracted production copy functions.
     declarations, execution = checks.split('async function run()', 1)

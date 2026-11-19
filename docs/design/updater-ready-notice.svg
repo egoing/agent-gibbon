@@ -15,7 +15,7 @@
 <rect x="646" y="372" width="360" height="162" rx="5" fill="#f8f8f8" stroke="#b9b9b9"/>
 <path d="M651 372H1001Q1006 372 1006 377V394H646V377Q646 372 651 372" fill="#efefef"/>
 <circle cx="658" cy="383" r="3" fill="#c6c6c6"/><circle cx="669" cy="383" r="3" fill="#d6d6d6"/><circle cx="680" cy="383" r="3" fill="#d6d6d6"/>
-<text x="710" y="387" font-size="10" class="muted">Agent Gibbon · 업데이트</text>
+<text x="710" y="387" font-size="10" class="muted">Jajan · 업데이트</text>
 <text x="662" y="424" font-size="16" font-weight="600">새 버전이 준비됐습니다</text>
 <text x="662" y="446" font-size="12" class="muted">새 버전 0.2.12</text>
 <rect x="772" y="488" width="64" height="32" rx="4" fill="#fff" stroke="#858585"/>

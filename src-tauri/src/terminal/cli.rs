@@ -178,7 +178,7 @@ pub fn run(app: &tauri::AppHandle, execution: &Execution) -> Result<Value, Strin
         return Err("터미널 시작 요청이 대기 중입니다".into());
     }
     let mut file = tempfile::Builder::new()
-        .prefix("gibbon-exec-")
+        .prefix("jajan-exec-")
         .tempfile()
         .map_err(err)?;
     serde_json::to_writer(&mut file, execution).map_err(err)?;

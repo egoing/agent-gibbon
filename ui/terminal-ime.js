@@ -19,7 +19,7 @@ window.installTerminalIme = function (terminal, send) {
     const characters = Array.from(pending);
     preview.replaceChildren(...characters.map((character, index) => {
       const cell = document.createElement('span');
-      cell.className = 'gibbon-ime-cell' + (index === characters.length - 1 ? ' gibbon-ime-current' : '');
+      cell.className = 'jajan-ime-cell' + (index === characters.length - 1 ? ' jajan-ime-current' : '');
       cell.textContent = character;
       // Match xterm's default Unicode 6 widths for the Hangul ranges handled
       // by this adapter (modern syllables/compatibility jamo are two cells).
@@ -28,7 +28,7 @@ window.installTerminalIme = function (terminal, send) {
       cell.style.width = `${columns * cellWidth}px`;
       return cell;
     }));
-    preview.classList.toggle('gibbon-ime-fallback', !!pending);
+    preview.classList.toggle('jajan-ime-fallback', !!pending);
     preview.classList.toggle('active', !!pending);
     const row = terminal.buffer.active.cursorY;
     Object.assign(preview.style, {

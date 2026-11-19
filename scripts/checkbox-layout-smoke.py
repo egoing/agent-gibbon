@@ -50,7 +50,7 @@ try {
  document.body.innerHTML='<pre id="result">'+JSON.stringify({ok:true,rows}).replaceAll('<','&lt;')+'</pre>';
 } catch(e) {document.body.innerHTML='<pre id="result">'+JSON.stringify({error:e.message})+'</pre>';}
 '''.replace('FIXTURE', json.dumps(fixture))
-with tempfile.TemporaryDirectory(prefix='gibbon140-layout-') as temp:
+with tempfile.TemporaryDirectory(prefix='jajan140-layout-') as temp:
     page=Path(temp)/'check.html'
     page.write_text(source.replace('</body>','<script>'+copy+checks+'</script></body>'))
     result=subprocess.run([CHROME,'--headless','--disable-gpu','--no-first-run','--user-data-dir='+temp+'/profile','--dump-dom',page.as_uri()],text=True,capture_output=True,timeout=30)

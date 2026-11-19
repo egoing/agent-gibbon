@@ -28,7 +28,7 @@ pub fn save(path: &str, expected: &str, replacement: &str) -> Result<(), String>
     let metadata = check()?;
     let parent = path.parent().ok_or("원본 파일의 디렉터리가 없습니다")?;
     let temporary = parent.join(format!(
-        ".agent-gibbon-{}-{}.tmp",
+        ".jajan-{}-{}.tmp",
         std::process::id(),
         SERIAL.fetch_add(1, Ordering::Relaxed)
     ));

@@ -777,14 +777,14 @@ fn start_shell_supervised(
     cmd.env_remove("NO_COLOR");
     #[cfg(unix)]
     let setup = match shell.file_name().and_then(|name| name.to_str()) {
-        Some("zsh") => Some("autoload -Uz add-zsh-hook; add-zsh-hook preexec _gibbon_record"),
+        Some("zsh") => Some("autoload -Uz add-zsh-hook; add-zsh-hook preexec _jajan_record"),
         Some("bash") => Some(include_str!("restore-bash-hook.sh")),
         _ => None,
     };
     #[cfg(unix)]
     if let Some(hook) = setup {
-        let definitions = include_str!("restore-hook.sh").replace("GIBBON_TOKEN", &prompt.token);
-        cmd.env("AGENT_GIBBON_SHELL_SETUP", format!("{definitions}\n{hook}"));
+        let definitions = include_str!("restore-hook.sh").replace("JAJAN_TOKEN", &prompt.token);
+        cmd.env("JAJAN_SHELL_SETUP", format!("{definitions}\n{hook}"));
     }
     #[cfg(unix)]
     {
@@ -792,13 +792,13 @@ fn start_shell_supervised(
         // A shell which replaces PS1 remains unknown and asks before closing.
         cmd.env(
             "PS1",
-            format!("\x1b]777;gibbon-ready;{}\x07$ ", prompt.token),
+            format!("\x1b]777;jajan-ready;{}\x07$ ", prompt.token),
         );
     }
     #[cfg(windows)]
     {
         cmd.args(["-NoLogo", "-NoExit", "-Command"]);
-        let prompt_script = r#"function global:prompt { $entry = Get-History -Count 1; if ($entry -and $global:gibbonLastId -ne $entry.Id) { $global:gibbonLastId = $entry.Id; $name = ''; if ($entry.CommandLine -match '^\s*([A-Za-z][A-Za-z0-9._-]{0,79})(?:\s|$)') { $name = $Matches[1] }; [Console]::Write(([char]27 + ']777;gibbon-plan;TOKEN;' + $name + [char]7)) }; [Console]::Write(([char]27 + ']777;gibbon-cwd;' + (Get-Location).Path + [char]7)); [Console]::Write(([char]27 + ']777;gibbon-ready;TOKEN' + [char]7)); 'PS> ' }; "#;
+        let prompt_script = r#"function global:prompt { $entry = Get-History -Count 1; if ($entry -and $global:jajanLastId -ne $entry.Id) { $global:jajanLastId = $entry.Id; $name = ''; if ($entry.CommandLine -match '^\s*([A-Za-z][A-Za-z0-9._-]{0,79})(?:\s|$)') { $name = $Matches[1] }; [Console]::Write(([char]27 + ']777;jajan-plan;TOKEN;' + $name + [char]7)) }; [Console]::Write(([char]27 + ']777;jajan-cwd;' + (Get-Location).Path + [char]7)); [Console]::Write(([char]27 + ']777;jajan-ready;TOKEN' + [char]7)); 'PS> ' }; "#;
         cmd.arg(format!(
             "{}{}",
             prompt_script.replace("TOKEN", &prompt.token),
@@ -829,7 +829,7 @@ fn start_shell_supervised(
         // Keep the initial PTY input short, so startup can finish before output draining begins.
         session
             .writer
-            .write_all(b" eval \"$AGENT_GIBBON_SHELL_SETUP\"; unset AGENT_GIBBON_SHELL_SETUP\r")
+            .write_all(b" eval \"$JAJAN_SHELL_SETUP\"; unset JAJAN_SHELL_SETUP\r")
             .map_err(err)?;
     }
     #[cfg(unix)]
@@ -1302,15 +1302,15 @@ impl DirectoryReport {
                 continue;
             }
             if byte == 7 {
-                if let Some(raw) = self.frame.strip_prefix(b"]777;gibbon-cwd;") {
+                if let Some(raw) = self.frame.strip_prefix(b"]777;jajan-cwd;") {
                     if let Ok(path) = std::str::from_utf8(raw) {
                         paths.push(PathBuf::from(path));
                     }
                 }
-                if let Some(raw) = self.frame.strip_prefix(b"]777;gibbon-plan;") {
+                if let Some(raw) = self.frame.strip_prefix(b"]777;jajan-plan;") {
                     self.plan = std::str::from_utf8(raw).ok().map(str::to_owned);
                 }
-                if let Some(raw) = self.frame.strip_prefix(b"]777;gibbon-ready;") {
+                if let Some(raw) = self.frame.strip_prefix(b"]777;jajan-ready;") {
                     self.prompt = std::str::from_utf8(raw).ok().map(str::to_owned);
                 }
                 self.frame.clear();
@@ -1318,9 +1318,9 @@ impl DirectoryReport {
             } else if self.frame.len() < 32768 {
                 self.frame.push(byte);
                 let prefixes: [&[u8]; 3] = [
-                    b"]777;gibbon-plan;",
-                    b"]777;gibbon-cwd;",
-                    b"]777;gibbon-ready;",
+                    b"]777;jajan-plan;",
+                    b"]777;jajan-cwd;",
+                    b"]777;jajan-ready;",
                 ];
                 if !prefixes
                     .iter()
@@ -1346,7 +1346,7 @@ mod report_tests {
         let mut parser = DirectoryReport::default();
         assert!(parser.feed(b"private output and commands").is_empty());
         assert!(parser.frame.is_empty());
-        assert!(parser.feed(b"\x1b]777;gibbon-cwd;C:\\work").is_empty());
+        assert!(parser.feed(b"\x1b]777;jajan-cwd;C:\\work").is_empty());
         assert_eq!(
             parser.feed(b"\\project\x07other text"),
             vec![PathBuf::from("C:\\work\\project")]

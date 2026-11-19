@@ -14,7 +14,7 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = Path(os.environ.get('GIBBON_SMOKE_OUTPUT', '/tmp/gibbon159-native'))
+OUT = Path(os.environ.get('JAJAN_SMOKE_OUTPUT', '/tmp/jajan159-native'))
 OUT.mkdir(parents=True, exist_ok=True)
 info = json.loads(subprocess.check_output(['node', 'scripts/dev.mjs', 'info'], cwd=ROOT, text=True))
 assert info['root'] == str(ROOT)
@@ -28,7 +28,7 @@ def run(*args):
     return subprocess.check_output(list(map(str, args)), text=True, timeout=30).strip()
 
 def cli(action, *args):
-    value = json.loads(run(ROOT / 'scripts/agent-gibbon-dev', action, '--id', ID, *args))
+    value = json.loads(run(ROOT / 'scripts/jajan-dev', action, '--id', ID, *args))
     assert value['ok'], value
     if action == 'inspect':
         assert value['instance'] == info['id'] and value['id'] == ID, value
@@ -77,7 +77,7 @@ front = int(run('swift', ROOT / 'scripts/frontmost.swift'))
 try:
     for source, name in [('design-system-ax.swift', 'ax'), ('auto-layout-native.swift', 'native')]:
         subprocess.run(['swiftc', str(ROOT / 'scripts' / source), '-o', str(OUT / name)], check=True)
-    with tempfile.TemporaryDirectory(prefix='gibbon159-source-') as folder:
+    with tempfile.TemporaryDirectory(prefix='jajan159-source-') as folder:
         source = Path(folder) / 'source.md'
         source.write_text(MARKER)
         opened = cli('open', '--file', source, '--title', '편집 높이 검증')
@@ -87,7 +87,7 @@ try:
                    if line.strip().split(None, 1)[-1] == expected]
         assert len(matches) == 1, matches
         pid = matches[0]
-        title = f"Agent Gibbon [{opened['dev_label']}] — {ID}"
+        title = f"Jajan [{opened['dev_label']}] — {ID}"
         state = wait(lambda s: s['visible'] and s['note']['markdown'] == MARKER)
         native = json.loads(run(OUT / 'native', pid))
         screens = native['screens']

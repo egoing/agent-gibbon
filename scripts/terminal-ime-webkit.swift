@@ -25,7 +25,7 @@ class Check: NSObject, WKNavigationDelegate {
           const input=value=>{terminal.textarea.value=value;terminal.textarea.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertReplacementText',data:value}));};
           for(const value of ['ㅎ','하','한','한ㄱ','한그','한글'])input(value);
           const preview=terminal.element.querySelector('.composition-view');
-          window.commitCheck=()=>{input('한글 ');return sent.length===1&&sent[0]==='한글 '&&!preview.classList.contains('active')&&!preview.classList.contains('gibbon-ime-fallback');};
+          window.commitCheck=()=>{input('한글 ');return sent.length===1&&sent[0]==='한글 '&&!preview.classList.contains('active')&&!preview.classList.contains('jajan-ime-fallback');};
           window.spacingCheck=async()=>{
             const results=[];
             const frame=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
@@ -40,7 +40,7 @@ class Check: NSObject, WKNavigationDelegate {
                 const screen=terminal.element.querySelector('.xterm-screen');
                 const cellWidth=screen.getBoundingClientRect().width/terminal.cols;
                 const beforeWidth=preview.getBoundingClientRect().width;
-                const beforeCurrentX=preview.querySelector('.gibbon-ime-current').getBoundingClientRect().left-screen.getBoundingClientRect().left;
+                const beforeCurrentX=preview.querySelector('.jajan-ime-current').getBoundingClientRect().left-screen.getBoundingClientRect().left;
                 const start=terminal.buffer.active.cursorX;
                 input(word+' ');
                 await write(sent.at(-1));await frame();
@@ -76,7 +76,7 @@ class Check: NSObject, WKNavigationDelegate {
     func capture(_ webView: WKWebView) {
         // Let the fixture's two animation frames settle before inspecting and capturing.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            webView.evaluateJavaScript("JSON.stringify({buffered:window.imeSent?.length===0,text:document.querySelector('.composition-view').textContent,background:getComputedStyle(document.querySelector('.composition-view')).backgroundColor,current:document.querySelector('.gibbon-ime-current')?.textContent,currentBackground:document.querySelector('.gibbon-ime-current')?getComputedStyle(document.querySelector('.gibbon-ime-current')).backgroundColor:null})") { value,error in
+            webView.evaluateJavaScript("JSON.stringify({buffered:window.imeSent?.length===0,text:document.querySelector('.composition-view').textContent,background:getComputedStyle(document.querySelector('.composition-view')).backgroundColor,current:document.querySelector('.jajan-ime-current')?.textContent,currentBackground:document.querySelector('.jajan-ime-current')?getComputedStyle(document.querySelector('.jajan-ime-current')).backgroundColor:null})") { value,error in
                 guard error == nil, let json = value as? String else { fputs("WebKit fixture failed\n",stderr);exit(1) }
                 print(json)
                 let data = json.data(using:.utf8)!

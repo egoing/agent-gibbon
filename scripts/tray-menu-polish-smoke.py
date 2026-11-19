@@ -6,7 +6,7 @@ Requires the built dev app and a baseline of fewer than 30 saved entries.
 import json, subprocess, tempfile, time, uuid
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-CLI=ROOT/'scripts/agent-gibbon-dev'
+CLI=ROOT/'scripts/jajan-dev'
 OUT=ROOT/'docs/verification/tray-menu-polish-20261106'
 OUT.mkdir(parents=True,exist_ok=True)
 def run(*args): return subprocess.check_output(list(map(str,args)),text=True,timeout=30).strip()
@@ -28,7 +28,7 @@ def wait(test):
     raise AssertionError('condition timed out')
 def check(text): REPORT['checks'].append(text); print('PASS: '+text,flush=True)
 def apple(script): return run('osascript','-e',script)
-with tempfile.TemporaryDirectory(prefix='gibbon-tray76-') as temp:
+with tempfile.TemporaryDirectory(prefix='jajan-tray76-') as temp:
     temp=Path(temp)
     for src,name in [('tray-menu-ax.swift','menu'),('macos-input.swift','mouse'),('entrance-pointer.swift','pointer'),('auto-layout-native.swift','native')]:
         subprocess.run(['swiftc',str(ROOT/'scripts'/src),'-o',str(temp/name)],check=True)

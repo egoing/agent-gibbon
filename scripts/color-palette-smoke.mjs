@@ -13,7 +13,7 @@ try {
  for(const kind of ['text','image','terminal','web']) {
   const page=await browser.newPage({viewport:{width:320,height:300}});page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(10000);
   await page.addInitScript(({kind,color})=>{
-   localStorage.setItem('agent-gibbon.memo-design','color');window.listeners={};
+   localStorage.setItem('jajan.memo-design','color');window.listeners={};
    const info={kind:'terminal',color,title:'컬러 테마 예제',last_path:'/tmp/palette',welcome:true,always_on_top:false};
    window.note={color,title:info.title,revision:1,markdown:'# 컬러 메모\n\n본문과 링크 · 기본 글자\n\n- [ ] 할 일',html:'<h1>컬러 메모</h1><p>본문과 링크 · 기본 글자</p>',capture:kind==='image'?{width:200,height:100}:null};
    window.__TAURI__={window:{getCurrentWindow:()=>({label:'note-palette',startResizeDragging:async()=>{},startDragging:async()=>{}})},webviewWindow:{getCurrentWebviewWindow:()=>({listen:async()=>()=>{}})},clipboardManager:{writeText:async()=>{throw Error('예제 피드백 · 원문은 유지됩니다');}},event:{listen:async(name,fn)=>{window.listeners[name]=fn;return()=>{};}},core:{Channel:class{},invoke:async(name,args)=>{
@@ -29,12 +29,12 @@ try {
     if(name==='note_image')return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="100"%3E%3Crect width="200" height="100" fill="%2335688a"/%3E%3C/svg%3E';
    }}};
   },{kind,color:colorPalette[0].background});
-  await page.route('http://gibbon.test/**',route=>{
+  await page.route('http://jajan.test/**',route=>{
    const name=new URL(route.request().url()).pathname.slice(1);
    if(['telemetry.js','updater-guard.js','memo-focus.js'].includes(name))return route.fulfill({body:'',contentType:'text/javascript'});
    const file=path.join(root,name);return route.fulfill({body:fs.readFileSync(file),contentType:/\.m?js$/.test(name)?'text/javascript':name.endsWith('.css')?'text/css':'text/html'});
   });
-  await page.goto('http://gibbon.test/'+(kind==='terminal'?'terminal.html':kind==='web'?'web.html':'index.html'));
+  await page.goto('http://jajan.test/'+(kind==='terminal'?'terminal.html':kind==='web'?'web.html':'index.html'));
   if(kind==='text')await page.waitForSelector('#memo-editor[aria-readonly]');
   if(kind==='image')await page.waitForSelector('#content img');
   if(kind==='terminal')await page.waitForSelector('#recommendations button');

@@ -9,7 +9,7 @@ OUT=ROOT/'docs/verification'/ID;OUT.mkdir()
 report={'instance':INFO,'id':ID,'checks':[]}
 def run(*args):return subprocess.check_output(list(map(str,args)),text=True)
 def cli(action):
-    r=json.loads(run(ROOT/'scripts/agent-gibbon-dev',action,'--id',ID));assert r['ok'] and r['instance']==INFO['id'];return r
+    r=json.loads(run(ROOT/'scripts/jajan-dev',action,'--id',ID));assert r['ok'] and r['instance']==INFO['id'];return r
 def wait(predicate):
     end=time.monotonic()+10
     while time.monotonic()<end:
@@ -24,11 +24,11 @@ with tempfile.TemporaryDirectory() as tmp:
         subprocess.run(['swiftc',str(ROOT/'scripts'/src),'-o',str(tmp/name)],check=True)
     def helper(name,*args):return run(tmp/name,*args)
     pointer=json.loads(helper('pointer'))
-    r=json.loads(run(ROOT/'scripts/agent-gibbon-dev','open','--id',ID,'--markdown',ID));assert r['instance']==INFO['id']
+    r=json.loads(run(ROOT/'scripts/jajan-dev','open','--id',ID,'--markdown',ID));assert r['instance']==INFO['id']
     expected=INFO['binary']+' --serve'
     pid=next(int(p[0]) for l in run('ps','-axo','pid=,command=').splitlines() if len(p:=l.strip().split(maxsplit=1))==2 and p[1]==expected)
     report.update(pid=pid,executable=expected)
-    title='Agent Gibbon ['+r['dev_label']+'] — stash-indicator'
+    title='Jajan ['+r['dev_label']+'] — stash-indicator'
     def native():return json.loads(helper('native',pid))
     def shot(name):
         w=next(w for w in native()['windows'] if w.get('kCGWindowName')==title)

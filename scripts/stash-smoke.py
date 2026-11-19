@@ -5,13 +5,13 @@ Only creates unique notes through this worktree's dev CLI. Never stops any app.
 import json, subprocess, tempfile, time, uuid
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-CLI=str(ROOT/'scripts/agent-gibbon-dev')
+CLI=str(ROOT/'scripts/jajan-dev')
 INFO=json.loads(subprocess.check_output(['node',str(ROOT/'scripts/dev.mjs'),'info'],text=True))
 assert INFO['root']==str(ROOT)
 PREFIX='stash-smoke-'+uuid.uuid4().hex[:8]
 OUT=ROOT/'docs/verification'/PREFIX
 OUT.mkdir(parents=True)
-TMP=tempfile.TemporaryDirectory(prefix='gibbon-stash-test-')
+TMP=tempfile.TemporaryDirectory(prefix='jajan-stash-test-')
 TEMP=Path(TMP.name)
 for src,name in [('design-system-ax.swift','ax'),('entrance-pointer.swift','pointer'),('auto-layout-native.swift','native'),('frontmost.swift','front'),('stash-key.swift','key')]:
     subprocess.run(['swiftc',str(ROOT/'scripts'/src),'-o',str(TEMP/name)],check=True)
@@ -52,7 +52,7 @@ try:
     matches=[int(line.strip().split(maxsplit=1)[0]) for line in processes if line.strip().split(maxsplit=1)[-1]==expected]
     assert len(matches)==1,matches
     PID=matches[0];report['pid']=PID;report['executable']=expected
-    TITLE='Agent Gibbon ['+inspect(a)['dev_label']+'] — '
+    TITLE='Jajan ['+inspect(a)['dev_label']+'] — '
     assert inspect(a)['stash']['shortcut']=='Ctrl+Alt+Cmd','Key is owned elsewhere; do not send it'
     if inspect(a)['stash']['active']:key();wait(a,lambda s:not s['stash']['active'])
     cli('open',b,'--markdown',f'# {PREFIX} folded\n접힘 보존')

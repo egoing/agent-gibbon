@@ -17,7 +17,7 @@
   back.onclick = () => invoke('web_chrome', { action: 'back' }).catch(report);
   copy.disabled = size.disabled = back.disabled = reload.disabled = true;
   copy.onclick = () => invoke('web_chrome', { action: 'copy-url' }).catch(report);
-  window.gibbonContentSize.bind('web', size,
+  window.jajanContentSize.bind('web', size,
     scale => invoke('web_chrome', { action: 'zoom', scale }), report);
   const apply = info => {
     copy.disabled = size.disabled = back.disabled = reload.disabled = info.welcome;
@@ -25,7 +25,7 @@
     document.getElementById('pin').setAttribute('aria-pressed', String(info.always_on_top));
     document.querySelector('main').hidden = !info.welcome;
   };
-  window.gibbonWebChrome = { apply };
+  window.jajanWebChrome = { apply };
   document.getElementById('pin').onclick = () => invoke('web_chrome', { action: 'pin' }).then(apply).catch(report);
   document.getElementById('close').onclick = () => invoke('web_chrome', { action: 'close' }).catch(report);
   document.querySelectorAll('.resize').forEach(handle => handle.addEventListener('pointerdown', event => {
@@ -34,6 +34,6 @@
     invoke('web_chrome', { action: `resize-${handle.dataset.direction}` }).catch(report);
   }));
   const initialize = () => invoke('web_chrome', { action: 'inspect' }).then(apply);
-  if (window.gibbonRegionFrame) window.gibbonRegionFrame.prepare(initialize);
+  if (window.jajanRegionFrame) window.jajanRegionFrame.prepare(initialize);
   else initialize().catch(report);
 })();

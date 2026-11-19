@@ -20,9 +20,9 @@ npm.cmd install -g pnpm@11.25.0
 pnpm.cmd install --frozen-lockfile
 pnpm.cmd run dev:info
 pnpm.cmd run dev:build
-.\scripts\agent-gibbon-dev.cmd open --id windows-test --markdown '# Windows 메모'
-.\scripts\agent-gibbon-dev.cmd inspect --id windows-test
-.\scripts\agent-gibbon-dev.cmd close --id windows-test
+.\scripts\jajan-dev.cmd open --id windows-test --markdown '# Windows 메모'
+.\scripts\jajan-dev.cmd inspect --id windows-test
+.\scripts\jajan-dev.cmd close --id windows-test
 ```
 
 개발 실행기는 현재 워크트리에서 빌드한 debug 실행 파일만 사용합니다. 개발 인스턴스의 소켓과 저장소는 설치 앱과 분리됩니다. 숨긴 메모를 변경할 때는 `open` 대신 `update`를 사용합니다.
@@ -38,8 +38,8 @@ pnpm.cmd run build:windows
 ## 플랫폼 차이
 
 - Windows에서도 HTTP 서버 없이 로컬 Unix domain socket으로 CLI와 앱이 통신합니다. Windows 10 1803 이상의 AF_UNIX 기능을 사용합니다.
-- 소켓·중복 실행 잠금은 `%LOCALAPPDATA%\AgentGibbon\installed` 또는 개발 인스턴스 디렉터리에 둡니다. 사용자 프로필의 기본 접근 권한을 사용합니다. 긴 프로필 경로는 Windows Unix socket 경로 제한에 걸릴 수 있습니다.
-- 메모는 Windows 문서 폴더의 `agent-gibbon\docs`에 보관합니다. 개발 메모는 Tauri 앱 데이터 폴더 아래 개발 인스턴스로 분리합니다.
+- 소켓·중복 실행 잠금은 `%LOCALAPPDATA%\Jajan\installed` 또는 개발 인스턴스 디렉터리에 둡니다. 사용자 프로필의 기본 접근 권한을 사용합니다. 긴 프로필 경로는 Windows Unix socket 경로 제한에 걸릴 수 있습니다.
+- 메모는 Windows 문서 폴더의 `jajan\docs`에 보관합니다. 개발 메모는 Tauri 앱 데이터 폴더 아래 개발 인스턴스로 분리합니다.
 - `con`, `nul`, `com1` 같은 예약 이름도 메모 ID로 사용할 수 있도록 폴더명을 인코딩합니다.
 - 편집 저장 단축키는 Ctrl+S입니다. Windows의 Ctrl+포인터 접촉 접기, Alt+포인터 접촉 이동과 전체 창 반투명 효과를 지원하는 코드를 통합했습니다. 포커스된 메모에서는 접촉 동작을 실행하지 않으며 세 보조키 조합은 최신 전체 접어두기에 예약합니다. 이번 통합의 실제 GUI 검증 범위는 [선별 통합 기록](verification/windows-selective-20261106.md)을 따릅니다.
 - 서명 인증서는 아직 구성하지 않았습니다. 배포용 서명 여부는 릴리스 안내에서 명시해야 합니다.

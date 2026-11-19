@@ -2,7 +2,7 @@
 """PID-bound real tray + capture selection / image stash regression on macOS."""
 import json,subprocess,tempfile,time,uuid,sys
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1];CLI=ROOT/'scripts/agent-gibbon-dev'
+ROOT=Path(__file__).resolve().parents[1];CLI=ROOT/'scripts/jajan-dev'
 INFO=json.loads(subprocess.check_output(['node',str(ROOT/'scripts/dev.mjs'),'info'],text=True))
 ID='stash-capture-'+uuid.uuid4().hex[:8];OUT=ROOT/'docs/verification'/ID;OUT.mkdir(parents=True)
 REPORT={'instance':INFO,'id':ID,'checks':[]};created=[ID]
@@ -19,7 +19,7 @@ def wait(test):
         time.sleep(.1)
     raise AssertionError('timed out')
 def check(s):REPORT['checks'].append(s);print(s,flush=True)
-with tempfile.TemporaryDirectory(prefix='gibbon-stash-capture-') as tmp:
+with tempfile.TemporaryDirectory(prefix='jajan-stash-capture-') as tmp:
     tmp=Path(tmp)
     for src,name in [('macos-input.swift','mouse'),('entrance-pointer.swift','pointer'),('auto-layout-native.swift','native'),('stash-key.swift','key'),('design-system-ax.swift','ax')]:
         subprocess.run(['swiftc',str(ROOT/'scripts'/src),'-o',str(tmp/name)],check=True)
@@ -44,7 +44,7 @@ with tempfile.TemporaryDirectory(prefix='gibbon-stash-capture-') as tmp:
         select('숨김\tCtrl Opt ⌘');wait(lambda:inspect()['visible'] and not inspect()['stash']['active'])
         assert inspect()['position']==before['position'] and inspect()['size']==before['size']
         check('actual PID-specific tray item toggles and restores exact geometry')
-        state=inspect();title='Agent Gibbon ['+state['dev_label']+'] — '+ID
+        state=inspect();title='Jajan ['+state['dev_label']+'] — '+ID
         run(tmp/'ax',PID,title,'position',500,350);time.sleep(.2);before=inspect()
         select('영역 캡처\tCtrl ⇧ 1')
         def overlays():return [w for w in native()['windows'] if '영역 캡처' in w.get('kCGWindowName','')]

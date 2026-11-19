@@ -1036,7 +1036,7 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
 }
 
 fn parse(args: &[String]) -> Result<Request, String> {
-    let action = match args.first().map(String::as_str) { Some("workspace") => Action::Workspace(workspace::parse(&args[1..])?), Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("web") => Action::Web, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: agent-gibbon web [--id web-ID] [--url URL]; agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
+    let action = match args.first().map(String::as_str) { Some("workspace") => Action::Workspace(workspace::parse(&args[1..])?), Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("web") => Action::Web, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: jajan web [--id web-ID] [--url URL]; jajan diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
         url: None,
         action,
@@ -1178,17 +1178,17 @@ fn launcher_recognizes_only_bundle_executables() {
     use std::path::Path;
     assert_eq!(
         enclosing_app(Path::new(
-            "/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon"
+            "/Applications/Jajan.app/Contents/MacOS/jajan"
         )),
-        Some(Path::new("/Applications/Agent Gibbon.app"))
+        Some(Path::new("/Applications/Jajan.app"))
     );
     assert_eq!(
-        enclosing_app(Path::new("/work/src-tauri/target/debug/agent-gibbon")),
+        enclosing_app(Path::new("/work/src-tauri/target/debug/jajan")),
         None
     );
     assert_eq!(
         enclosing_app(Path::new(
-            "/Applications/Other.app/random/MacOS/agent-gibbon"
+            "/Applications/Other.app/random/MacOS/jajan"
         )),
         None
     );
@@ -1213,7 +1213,7 @@ fn cli(args: &[String]) -> Result<Value, String> {
                     break stream;
                 }
                 if start.elapsed() > Duration::from_secs(15) {
-                    return Err("앱 시작에 실패했습니다. agent-gibbon --serve로 진단하세요".into());
+                    return Err("앱 시작에 실패했습니다. jajan --serve로 진단하세요".into());
                 }
                 std::thread::sleep(Duration::from_millis(100));
             }
@@ -1283,7 +1283,7 @@ fn main() {
         )
     } else if args == ["--help"] || args == ["-h"] {
         Ok(
-            json!({"ok":true,"workspace":workspace::USAGE,"usage":"agent-gibbon web [--id web-ID] [--url URL]; agent-gibbon diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; agent-gibbon close|inspect [--id ID]; agent-gibbon list","note":"open/web은 앱을 시작하거나 창을 생성·복원합니다. web의 ID 생략은 새 웹 창, open의 ID 생략은 main이며 close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
+            json!({"ok":true,"workspace":workspace::USAGE,"usage":"jajan web [--id web-ID] [--url URL]; jajan diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; jajan close|inspect [--id ID]; jajan list","note":"open/web은 앱을 시작하거나 창을 생성·복원합니다. web의 ID 생략은 새 웹 창, open의 ID 생략은 main이며 close는 숨기기입니다. 색상은 #RRGGBB입니다."}),
         )
     } else {
         cli(&args)

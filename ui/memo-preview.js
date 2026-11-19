@@ -10,7 +10,7 @@ function render(design = readMemoAppearance(window).design) {
     sample.style.colorScheme = theme.scheme;
   }
 }
-window.gibbonMemoPreview = render;
+window.jajanMemoPreview = render;
 window.addEventListener('storage', () => render());
 media.addEventListener('change', () => render());
 render();

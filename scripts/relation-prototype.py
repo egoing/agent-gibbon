@@ -18,7 +18,7 @@ if not args.clear and (not args.from_id or not args.to_id):
     parser.error('from_id와 to_id 또는 --clear가 필요합니다')
 instance = 'dev-' + hashlib.sha256(str(root).encode()).hexdigest()[:24]
 # Match the existing per-worktree local IPC directory. No installed endpoint fallback.
-folder = Path('/tmp') / f'floatnote-{os.getuid()}-{instance}'
+folder = Path('/tmp') / f'jajan-{os.getuid()}-{instance}'
 if not folder.is_dir():
     parser.error('해당 워크트리의 개발 앱을 먼저 실행하세요')
 relations = [] if args.clear else [{'from': args.from_id, 'to': args.to_id, 'label': args.label}]

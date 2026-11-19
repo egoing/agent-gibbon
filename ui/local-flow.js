@@ -7,9 +7,9 @@
   const operations = new Set(['note.refresh', 'note.save', 'terminal.start']);
   const commands = new Set(['snapshot', 'save_note', 'fit_note', 'terminal_start']);
   const stages = new Set(['dom', 'measure', 'fit', 'frame_ready', 'response']);
-  const invoke = (command, args) => (window.gibbonInvoke || raw)(command, args);
+  const invoke = (command, args) => (window.jajanInvoke || raw)(command, args);
   const empty = {invoke, stage: () => {}, measure: (_stage, work) => work()};
-  window.gibbonLocalFlow = async (operation, work) => {
+  window.jajanLocalFlow = async (operation, work) => {
     const now = window.performance.now();
     if (!enabled || !operations.has(operation) || window.document.visibilityState !== 'visible'
         || (operation === 'note.refresh' && now < refreshAfter)) return work(empty);

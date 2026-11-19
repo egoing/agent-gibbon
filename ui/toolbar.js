@@ -7,7 +7,7 @@ const toggle = document.getElementById('toolbar-toggle');
 const title = document.getElementById('chrome-title');
 const sourceTitle = document.getElementById('fold-title');
 function updateTitle() {
-  title.textContent = sourceTitle?.textContent || window.gibbonToolbarTitle || '메모';
+  title.textContent = sourceTitle?.textContent || window.jajanToolbarTitle || '메모';
   title.title = title.textContent;
 }
 if (sourceTitle) new MutationObserver(updateTitle).observe(sourceTitle, { childList: true, characterData: true, subtree: true });
@@ -23,12 +23,12 @@ function displayFold(collapsed) {
   toggle.title = collapsed ? '메모 펼치기' : '메모 접기';
   refresh();
 }
-window.gibbonToolbarFold = displayFold;
+window.jajanToolbarFold = displayFold;
 toggle.addEventListener('click', async () => {
   if (changingFold) return;
   changingFold = true;
   try {
-    if (window.gibbonToggleNote) await window.gibbonToggleNote();
+    if (window.jajanToggleNote) await window.jajanToggleNote();
     else displayFold(await window.__TAURI__.core.invoke('chrome_fold'));
   } catch (error) {
     const status = document.getElementById('status');
@@ -146,7 +146,7 @@ controls.addEventListener('dblclick', async event => {
   changingWorkArea = true;
   try {
     const collapsed = await window.__TAURI__.core.invoke('chrome_work_area');
-    if (window.gibbonApplyFold) window.gibbonApplyFold(collapsed);
+    if (window.jajanApplyFold) window.jajanApplyFold(collapsed);
     else displayFold(collapsed);
   } catch (error) { toolbarError(error); }
   finally { changingWorkArea = false; }

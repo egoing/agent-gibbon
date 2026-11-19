@@ -86,7 +86,7 @@ impl HttpTransport {
         let auth = options
             .dsn
             .as_ref()
-            .map(|d| d.to_auth(Some("agent-gibbon")).to_string());
+            .map(|d| d.to_auth(Some("jajan")).to_string());
         std::thread::spawn(move || {
             // Construct/drop the blocking HTTP client on this dedicated thread.
             let builder = reqwest::blocking::Client::builder();
@@ -258,7 +258,7 @@ mod tests {
         let event = || {
             let mut e = Envelope::new();
             e.add_item(p::Event {
-                message: Some("Agent Gibbon diagnostic probe".into()),
+                message: Some("Jajan diagnostic probe".into()),
                 ..Default::default()
             });
             e

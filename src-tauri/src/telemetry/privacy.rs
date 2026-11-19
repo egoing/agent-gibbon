@@ -6,7 +6,7 @@ fn safe_tags(tags: &mut p::Map<String, String>) {
     tags.retain(|k, v| match k.as_str() {
         "app.arch" => matches!(v.as_str(), "aarch64" | "x86_64" | "x86"),
         "app.os" => matches!(v.as_str(), "macos" | "windows" | "linux"),
-        "app.build" => v == env!("AGENT_GIBBON_BUILD_REVISION"),
+        "app.build" => v == env!("JAJAN_BUILD_REVISION"),
         "measurement.origin" => matches!(v.as_str(), "rust" | "webview" | "webview.aggregate"),
         "window.kind" => matches!(
             v.as_str(),
@@ -53,7 +53,7 @@ pub fn breadcrumb(mut b: p::Breadcrumb) -> Option<p::Breadcrumb> {
     Some(b)
 }
 pub fn log(mut l: p::Log) -> Option<p::Log> {
-    if l.body != "Agent Gibbon operation" {
+    if l.body != "Jajan operation" {
         return None;
     }
     l.attributes.retain(|k, v| match k.as_str() {
@@ -70,9 +70,9 @@ pub fn log(mut l: p::Log) -> Option<p::Log> {
     l.attributes.insert(
         "sentry.release".into(),
         p::LogAttribute(json!(format!(
-            "agent-gibbon@{}+{}",
+            "jajan@{}+{}",
             env!("CARGO_PKG_VERSION"),
-            env!("AGENT_GIBBON_BUILD_REVISION")
+            env!("JAJAN_BUILD_REVISION")
         ))),
     );
     l.attributes.insert(
@@ -98,7 +98,7 @@ pub fn event(mut e: p::Event<'static>) -> Option<p::Event<'static>> {
         if MESSAGES.contains(&s.as_str()) {
             s
         } else {
-            "Agent Gibbon internal error".into()
+            "Jajan internal error".into()
         }
     });
     for exception in e.exception.values.iter_mut() {
@@ -153,7 +153,7 @@ fn platform_tags(tags: &mut p::Map<String, String>) {
     tags.insert("app.arch".into(), std::env::consts::ARCH.into());
     tags.insert(
         "app.build".into(),
-        env!("AGENT_GIBBON_BUILD_REVISION").into(),
+        env!("JAJAN_BUILD_REVISION").into(),
     );
 }
 fn transaction(mut t: p::Transaction<'static>) -> Option<p::Transaction<'static>> {

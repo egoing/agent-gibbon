@@ -1,41 +1,41 @@
 ---
-name: agent-gibbon
-description: macOS 또는 Windows에 설치된 Agent Gibbon 앱으로 플로팅 Markdown 메모를 만들고 조회·갱신·숨긴다. 사용자가 화면 위 메모나 기존 메모 변경을 요청할 때 사용한다.
+name: jajan
+description: macOS 또는 Windows에 설치된 Jajan 앱으로 플로팅 Markdown 메모를 만들고 조회·갱신·숨긴다. 사용자가 화면 위 메모나 기존 메모 변경을 요청할 때 사용한다.
 ---
 
-# Agent Gibbon 사용
+# Jajan 사용
 
 ## 시작하기
 
-[홈페이지](https://agentgibbon.com/)와 [설치·CLI 안내](https://agentgibbon.com/guide/)를 참고한다. 앱은 [GitHub Releases](https://github.com/egoing/agent-gibbon/releases/latest)에서 내려받아 Applications 폴더에 설치한다. Apple Silicon은 `aarch64`, Intel Mac은 `x64` DMG를 사용한다. 배포판은 Apple 배포 서명·공증이 없어 macOS에서 실행이 차단될 수 있다.
+[홈페이지](https://jajan.app/)와 [설치·CLI 안내](https://jajan.app/guide/)를 참고한다. 앱은 [GitHub Releases](https://github.com/egoing/agent-gibbon/releases/latest)에서 내려받아 Applications 폴더에 설치한다. Apple Silicon은 `aarch64`, Intel Mac은 `x64` DMG를 사용한다. 배포판은 Apple 배포 서명·공증이 없어 macOS에서 실행이 차단될 수 있다.
 
-설치 앱의 실행 파일은 `/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon`이다. 경로를 따옴표로 감싸 호출한다. 호출 전에 실행 파일의 존재와 실행 가능 여부를 확인한다. 앱이 없으면 메모 작업을 조용히 건너뛰고 본 작업을 계속한다. 오류·설치 안내·음성 안내·재시도는 하지 않으며, 사용자가 설치나 문제 진단을 요청한 경우에만 설명한다. 메모 사용 요청만으로 소스를 빌드하거나 개발 앱을 실행하지 않는다.
+설치 앱의 실행 파일은 `/Applications/Jajan.app/Contents/MacOS/jajan`이다. 경로를 따옴표로 감싸 호출한다. 호출 전에 실행 파일의 존재와 실행 가능 여부를 확인한다. 앱이 없으면 메모 작업을 조용히 건너뛰고 본 작업을 계속한다. 오류·설치 안내·음성 안내·재시도는 하지 않으며, 사용자가 설치나 문제 진단을 요청한 경우에만 설명한다. 메모 사용 요청만으로 소스를 빌드하거나 개발 앱을 실행하지 않는다.
 
 ```sh
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" list
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" open --id my-note --title '메모' --markdown '# 메모'
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" update --id my-note --markdown '내용을 갱신했습니다.'
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" update --id my-note --color '#dcecff'
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" inspect --id my-note
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" close --id my-note
+"/Applications/Jajan.app/Contents/MacOS/jajan" list
+"/Applications/Jajan.app/Contents/MacOS/jajan" open --id my-note --title '메모' --markdown '# 메모'
+"/Applications/Jajan.app/Contents/MacOS/jajan" update --id my-note --markdown '내용을 갱신했습니다.'
+"/Applications/Jajan.app/Contents/MacOS/jajan" update --id my-note --color '#dcecff'
+"/Applications/Jajan.app/Contents/MacOS/jajan" inspect --id my-note
+"/Applications/Jajan.app/Contents/MacOS/jajan" close --id my-note
 ```
 
 설치 버전에 따라 제공 기능이 다를 수 있다. 명령 옵션은 해당 실행 파일의 `--help`, 결과 필드는 실제 JSON 응답으로 확인한다. 최신 소스에만 있는 기능을 설치 앱도 지원한다고 가정하지 않는다.
 
 ## 설치 앱과 개발 앱 선택
 
-- 기본값은 설치 앱이다. 현재 디렉터리가 Agent Gibbon 저장소라는 이유만으로 개발 앱을 선택하지 않는다.
-- 개발자가 특정 워크트리의 개발 앱 사용을 명시하면 지정한 워크트리를 사용한다. Agent Gibbon 자체의 개발·검증 작업 중에는 그 작업이 속한 워크트리를 사용한다.
-- 개발 모드의 모든 메모 명령은 해당 워크트리 절대 경로의 `scripts/agent-gibbon-dev`(Windows는 `scripts/agent-gibbon-dev.cmd`)를 호출한다. 설치 앱이나 debug 바이너리를 직접 호출하지 않는다. 별도 HTTP 서버는 추가하지 않는다.
+- 기본값은 설치 앱이다. 현재 디렉터리가 Jajan 저장소라는 이유만으로 개발 앱을 선택하지 않는다.
+- 개발자가 특정 워크트리의 개발 앱 사용을 명시하면 지정한 워크트리를 사용한다. Jajan 자체의 개발·검증 작업 중에는 그 작업이 속한 워크트리를 사용한다.
+- 개발 모드의 모든 메모 명령은 해당 워크트리 절대 경로의 `scripts/jajan-dev`(Windows는 `scripts/jajan-dev.cmd`)를 호출한다. 설치 앱이나 debug 바이너리를 직접 호출하지 않는다. 별도 HTTP 서버는 추가하지 않는다.
 - 개발 실행기가 없거나 개발 바이너리가 없으면 조용히 메모 작업을 건너뛴다. 존재 여부는 해당 워크트리의 `pnpm run dev:info`가 알려 주는 `binary`로 확인한다. 메모 표시를 위해 자동 빌드하거나 다른 워크트리·설치 앱으로 전환하지 않는다. 사용자가 개발 앱 빌드·실행 자체를 요청한 경우에는 그 작업을 수행한다.
 - 앱이 존재하지만 통신 시간 초과·인스턴스 불일치·명령 실패가 발생하면 앱 부재로 취급해 숨기지 않는다. 실패를 알리고 다른 인스턴스로 자동 전환하지 않는다. 개발 검증은 해당 워크트리의 프로젝트 지침에 따라 응답의 인스턴스 출처까지 확인한다.
 - 아래 설치 앱 호출 예제는 설치 모드용이다. 개발 모드에서는 실행 경로만 선택한 워크트리의 개발 스크립트로 바꾸고 같은 명령과 상태 보존 규칙을 적용한다.
 
 ## Windows
 
-Windows 설치 파일과 개발 절차는 저장소의 `docs/windows.md`를 참고합니다. 설치한 `agent-gibbon.exe`의 실제 경로를 확인해 PowerShell에서 `& '실행 파일 절대 경로' list`처럼 호출합니다. 앱이 없으면 macOS와 같이 조용히 메모 작업을 건너뜁니다. CLI 명령과 창 상태 보존 규칙은 macOS와 같습니다. 설치 위치를 추측해 다른 실행 파일을 호출하지 않습니다.
+Windows 설치 파일과 개발 절차는 저장소의 `docs/windows.md`를 참고합니다. 설치한 `jajan.exe`의 실제 경로를 확인해 PowerShell에서 `& '실행 파일 절대 경로' list`처럼 호출합니다. 앱이 없으면 macOS와 같이 조용히 메모 작업을 건너뜁니다. CLI 명령과 창 상태 보존 규칙은 macOS와 같습니다. 설치 위치를 추측해 다른 실행 파일을 호출하지 않습니다.
 
-개발 테스트는 해당 워크트리의 `scripts/agent-gibbon-dev.cmd`를 사용합니다. 파일 내보내기는 Ctrl+S이며 macOS 전용 보조키·포인터 접촉 기능 대신 화면 버튼을 사용합니다.
+개발 테스트는 해당 워크트리의 `scripts/jajan-dev.cmd`를 사용합니다. 파일 내보내기는 Ctrl+S이며 macOS 전용 보조키·포인터 접촉 기능 대신 화면 버튼을 사용합니다.
 
 ## 창과 상태 보존
 
@@ -66,7 +66,7 @@ Windows 설치 파일과 개발 절차는 저장소의 `docs/windows.md`를 참�
 긴 내용은 파일 또는 표준입력으로 전달한다. 셸이 본문의 `$`나 백틱을 실행하지 않도록 따옴표로 감싼 heredoc 구분자를 사용한다.
 
 ```sh
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" update --id my-note --file - <<'MD'
+"/Applications/Jajan.app/Contents/MacOS/jajan" update --id my-note --file - <<'MD'
 # 현재 작업
 - [x] 내용 확인
 - [ ] 결과 검토
@@ -101,19 +101,19 @@ MD
 
 앱 자체에는 AI 대화 모델·계정·클라우드 동기화가 없다. 에이전트가 로컬 CLI를 호출해 메모를 관리한다.
 
-앱 소스 개발·테스트를 요청받은 경우에만 [개발 문서](https://github.com/egoing/agent-gibbon#빌드와-실행)를 읽는다. 개발 테스트에는 해당 워크트리의 `scripts/agent-gibbon-dev`를 사용해 설치 앱의 메모와 분리한다.
+앱 소스 개발·테스트를 요청받은 경우에만 [개발 문서](https://github.com/egoing/agent-gibbon#빌드와-실행)를 읽는다. 개발 테스트에는 해당 워크트리의 `scripts/jajan-dev`를 사용해 설치 앱의 메모와 분리한다.
 
 ## 웹 창
 
-지원 버전에서 `web [--id web-ID] [--url URL]`로 웹 Welcome 또는 지정한 HTTP(S) 페이지를 Agent Gibbon 웹 창에 연다. 실행 파일의 `--help`로 지원 여부를 확인한다. ID 생략은 새 창 생성이고 지정 ID는 `web-`로 시작해야 한다.
+지원 버전에서 `web [--id web-ID] [--url URL]`로 웹 Welcome 또는 지정한 HTTP(S) 페이지를 Jajan 웹 창에 연다. 실행 파일의 `--help`로 지원 여부를 확인한다. ID 생략은 새 창 생성이고 지정 ID는 `web-`로 시작해야 한다.
 
 ```sh
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" web --id web-reference
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" web --id web-reference --url 'https://example.com/'
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" inspect --id web-reference
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" close --id web-reference
+"/Applications/Jajan.app/Contents/MacOS/jajan" web --id web-reference
+"/Applications/Jajan.app/Contents/MacOS/jajan" web --id web-reference --url 'https://example.com/'
+"/Applications/Jajan.app/Contents/MacOS/jajan" inspect --id web-reference
+"/Applications/Jajan.app/Contents/MacOS/jajan" close --id web-reference
 ```
 
-개발 작업은 지정 워크트리의 `scripts/agent-gibbon-dev`를 사용한다. `web`은 필요하면 앱을 시작한다. URL을 생략한 기존 ID의 `web` 또는 `open`은 현재 페이지를 복원하며 CLI `close`는 숨기기다. 웹 툴바 X와 OS 닫기는 해당 웹 세션을 종료하며 재시작 때 복원하지 않는다. 웹 창은 `list`에도 포함되고 앱 재시작 후에는 직전 HTTP(S) URL과 배치·표시 상태를 로컬 파일에서 복원한다. 다른 메모와 충돌하는 ID를 덮어쓰지 않는다. 웹 창에 메모 본문·색상·상태·제목 옵션을 보내지 않는다.
+개발 작업은 지정 워크트리의 `scripts/jajan-dev`를 사용한다. `web`은 필요하면 앱을 시작한다. URL을 생략한 기존 ID의 `web` 또는 `open`은 현재 페이지를 복원하며 CLI `close`는 숨기기다. 웹 툴바 X와 OS 닫기는 해당 웹 세션을 종료하며 재시작 때 복원하지 않는다. 웹 창은 `list`에도 포함되고 앱 재시작 후에는 직전 HTTP(S) URL과 배치·표시 상태를 로컬 파일에서 복원한다. 다른 메모와 충돌하는 ID를 덮어쓰지 않는다. 웹 창에 메모 본문·색상·상태·제목 옵션을 보내지 않는다.
 
 Ctrl+Shift+4/트레이의 영역 웹 창은 영역 선택 뒤 URL 입력과 명시적인 실행을 제공한다. HTTP(S) 주소만 허용하고 앱 내부 주소·자격증명 포함 주소·제어문자를 거절한다. 팝업·다운로드와 외부 웹 콘텐츠의 앱 특권 IPC 접근은 차단한다. 새 서버를 실행하지 않는다. 웹페이지 자체의 로그인·정보 전송·버튼 조작을 웹 창 열기 요청만으로 대신 수행하지 않는다.

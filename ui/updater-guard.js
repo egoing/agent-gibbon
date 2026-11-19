@@ -3,7 +3,7 @@
 (() => {
   const tauri = window.__TAURI__;
   if (!tauri?.core || !tauri.event) return;
-  const raw = (window.gibbonInvoke || tauri.core.invoke).bind(tauri.core);
+  const raw = (window.jajanInvoke || tauri.core.invoke).bind(tauri.core);
   const pending = new Map();
   const known = new Set(['snapshot', 'manager_notes', 'fit_note', 'save_note', 'export_note', 'terminal_info', 'poll_fold', 'poll_warp', 'present_feedback']);
   const background = new Set(['snapshot', 'poll_warp', 'poll_fold', 'manager_notes', 'terminal_info']);
@@ -17,7 +17,7 @@
     clearTimeout(drainTimer);
     acknowledgeDrained = null;
   }
-  window.gibbonInvoke = (command, ...args) => {
+  window.jajanInvoke = (command, ...args) => {
     if (command.startsWith('updater_')) return raw(command, ...args);
     if (frozenEpoch !== null) return Promise.reject('업데이트 설치를 준비하고 있습니다');
     const request = Symbol();
@@ -40,12 +40,12 @@
   function activity() {
     return {
       editing: false, saving: false, exporting: false,
-      ...window.gibbonUpdateActivity?.(),
-      privacy: window.gibbonPrivacy?.updateBusy?.() === true,
+      ...window.jajanUpdateActivity?.(),
+      privacy: window.jajanPrivacy?.updateBusy?.() === true,
     };
   }
   function busy(state) {
-    return state.editing || state.saving || state.exporting || state.privacy || window.gibbonUpdateBusy?.() === true;
+    return state.editing || state.saving || state.exporting || state.privacy || window.jajanUpdateBusy?.() === true;
   }
   function acknowledge(epoch) {
     if (epoch !== frozenEpoch) return;

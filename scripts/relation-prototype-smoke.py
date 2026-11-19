@@ -9,7 +9,7 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = Path(os.environ.get('GIBBON_RELATION_SMOKE_OUTPUT','/tmp/gibbon168-native'))
+OUT = Path(os.environ.get('JAJAN_RELATION_SMOKE_OUTPUT','/tmp/jajan168-native'))
 OUT.mkdir(exist_ok=True)
 def run(*args):
     return subprocess.check_output(list(map(str,args)),cwd=ROOT,text=True,timeout=30).strip()
@@ -21,7 +21,7 @@ ids=['relation-'+uuid.uuid4().hex[:8]+suffix for suffix in ['-a','-b']]
 records=[]
 front=run('swift',ROOT/'scripts/frontmost.swift')
 created=[]
-config=Path('/tmp')/f"floatnote-{os.getuid()}-{info['id']}"/'relation-prototype.json'
+config=Path('/tmp')/f"jajan-{os.getuid()}-{info['id']}"/'relation-prototype.json'
 original=config.read_bytes() if config.exists() else b'[]'
 def restore_relations():
     import tempfile
@@ -29,7 +29,7 @@ def restore_relations():
     with os.fdopen(fd,'wb') as f:f.write(original)
     os.replace(name,config)
 def cli(action,id):
-    args=[ROOT/'scripts/agent-gibbon-dev',action,'--id',id]
+    args=[ROOT/'scripts/jajan-dev',action,'--id',id]
     if action=='open': args+=['--markdown','관계 검증 '+id]
     value=json.loads(run(*args)); assert value['ok'],value
     if action=='inspect': assert value['instance']==info['id'] and value['id']==id
@@ -51,7 +51,7 @@ try:
         candidate=int(line);buf=ctypes.create_string_buffer(4096)
         if lib.proc_pidpath(candidate,buf,len(buf))>0 and buf.value.decode()==info['binary']:matches.append(candidate)
     assert len(matches)==1,matches
-    pid=int(matches[0]);titles=[f"Agent Gibbon [{opened['dev_label']}] — {id}" for id in ids]
+    pid=int(matches[0]);titles=[f"Jajan [{opened['dev_label']}] — {id}" for id in ids]
     for index,id in enumerate(ids):
         state=cli('inspect',id); assert state['note']['markdown']=='관계 검증 '+id
         ax(index,'position',80+index*580,160+index*100)
@@ -102,7 +102,7 @@ try:
 finally:
     restore_relations()
     for id in created:
-        subprocess.run([str(ROOT/'scripts/agent-gibbon-dev'),'close','--id',id],cwd=ROOT,capture_output=True)
+        subprocess.run([str(ROOT/'scripts/jajan-dev'),'close','--id',id],cwd=ROOT,capture_output=True)
     if run('swift',ROOT/'scripts/frontmost.swift')!=front:
         run('swift','-e','import AppKit; let pid=pid_t(CommandLine.arguments.last!)!; if let app=NSRunningApplication(processIdentifier:pid) { app.activate(options:[]) }',front)
         time.sleep(.3)

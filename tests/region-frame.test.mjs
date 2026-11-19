@@ -15,8 +15,8 @@ for (const condition of ['restored', 'onboarding']) {
     }}}};
     vm.runInNewContext(source, {window});
     let initialized = false;
-    await window.gibbonRegionFrame.prepare(() => { initialized = true; });
-    await window.gibbonRegionFrame.ready();
+    await window.jajanRegionFrame.prepare(() => { initialized = true; });
+    await window.jajanRegionFrame.ready();
     assert.equal(initialized, true);
     assert.deepEqual(commands, ['region_frame_placement']);
   });
@@ -36,7 +36,7 @@ test('a rejected Welcome task presents its error after all initial tasks settle'
     order.push('show');
   }}}};
   vm.runInNewContext(source, {window, document});
-  const frame = window.gibbonRegionFrame;
+  const frame = window.jajanRegionFrame;
   await frame.prepare(async () => { throw new Error('Welcome 조회 실패'); });
   let applyTheme;
   frame.prepare(() => new Promise(resolve => { applyTheme = resolve; }));
@@ -55,14 +55,14 @@ test('a newly drawn surface stays transparent until its themed paint is prepared
     documentElement: {style},
     body: {getBoundingClientRect() { assert.equal(style.opacity, undefined); }},
   };
-  const window = {gibbonPreparingRegion: true, __TAURI__: {core: {async invoke(command) {
+  const window = {jajanPreparingRegion: true, __TAURI__: {core: {async invoke(command) {
     if (command === 'region_frame_placement') return true;
     assert.equal(command, 'region_frame_ready');
     assert.equal(style.opacity, undefined);
   }}}};
   vm.runInNewContext(source, {window, document});
   assert.equal(style.opacity, '0');
-  await window.gibbonRegionFrame.placement;
+  await window.jajanRegionFrame.placement;
   assert.equal(style.opacity, '0');
-  await window.gibbonRegionFrame.ready();
+  await window.jajanRegionFrame.ready();
 });

@@ -1000,7 +1000,7 @@ pub(crate) fn refresh_input(app: &tauri::AppHandle) -> Result<(), String> {
         "Ctrl+Alt+Win"
     };
     // Modifier-only chords cannot be registered with RegisterHotKey/global-hotkey.
-    // Coordinate participating Gibbon instances using one per-user lease.
+    // Coordinate participating Jajan instances using one per-user lease.
     let directory = app.path().app_data_dir().map_err(err)?;
     std::fs::create_dir_all(&directory).map_err(err)?;
     let mut options = std::fs::OpenOptions::new();

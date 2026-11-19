@@ -202,7 +202,7 @@ fn launch(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) {
         if let Err(e) = visibility::set(app, generation, false) {
             eprintln!("모아보기 재표시 실패: {e}");
         }
-        if let Some(tray) = app.tray_by_id("agent-gibbon") {
+        if let Some(tray) = app.tray_by_id("jajan") {
             let _ = tray.set_tooltip(Some(format!("화면 캡처 실패: {error}")));
         }
         eprintln!("화면 캡처 실패: {error}");
@@ -261,7 +261,7 @@ fn show_permission_scope(app: &tauri::AppHandle, shortcut: bool) -> Result<(), S
             "permission.html".into()
         }),
     )
-    .title("Agent Gibbon 권한 설정")
+    .title("Jajan 권한 설정")
     .inner_size(600.0, 450.0)
     .min_inner_size(380.0, 320.0)
     .focused(false)
@@ -301,9 +301,9 @@ pub fn permission_guide(
     #[cfg(target_os = "macos")]
     {
         extern "C" {
-            fn gibbon_show_permission_panel(screen: bool, overview: *mut std::ffi::c_void);
-            fn gibbon_hide_permission_panel();
-            fn gibbon_request_accessibility() -> bool;
+            fn jajan_show_permission_panel(screen: bool, overview: *mut std::ffi::c_void);
+            fn jajan_hide_permission_panel();
+            fn jajan_request_accessibility() -> bool;
         }
         let pane = match action.as_str() {
             "screen" => Some("Privacy_ScreenCapture"),
@@ -314,7 +314,7 @@ pub fn permission_guide(
         if action == "access" {
             // The OS owns the prompt and trust decision for this process.
             unsafe {
-                gibbon_request_accessibility();
+                jajan_request_accessibility();
             }
         }
         if let Some(pane) = pane {
@@ -333,7 +333,7 @@ pub fn permission_guide(
                 .run_on_main_thread(move || {
                     if let Ok(pointer) = overview.ns_window() {
                         unsafe {
-                            gibbon_show_permission_panel(screen, pointer);
+                            jajan_show_permission_panel(screen, pointer);
                         }
                     }
                 })
@@ -360,7 +360,7 @@ pub fn permission_guide(
             || (action == "observe-access" && access)
         {
             window
-                .run_on_main_thread(|| unsafe { gibbon_hide_permission_panel() })
+                .run_on_main_thread(|| unsafe { jajan_hide_permission_panel() })
                 .map_err(err)?;
         }
         let executable = std::env::current_exe().map_err(err)?;
@@ -699,7 +699,7 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
 }
 fn failed_selection(window: WebviewWindow) -> Result<(), String> {
     cancel_selection(window.clone())?;
-    if let Some(tray) = window.app_handle().tray_by_id("agent-gibbon") {
+    if let Some(tray) = window.app_handle().tray_by_id("jajan") {
         let _ = tray.set_tooltip(Some("화면 이미지 로딩 실패. 캡처를 다시 실행하세요."));
     }
     Ok(())

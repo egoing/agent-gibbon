@@ -26,7 +26,7 @@
 
 ## 현재 코드와 인접 작업의 근거
 
-기준 root `/Users/egoinglee/.codex/worktrees/bb80/agent-gibbon`, origin/main `9904f10770d552b8f90ceb8073415d9875c09062`, 조사 브랜치 `codex/terminal-relaunch-research`, 첫 계획 HEAD `b3c06a2cbd6f84c0392621175af6714bbc874981`.
+기준 root `/Users/egoinglee/.codex/worktrees/bb80/jajan`, origin/main `9904f10770d552b8f90ceb8073415d9875c09062`, 조사 브랜치 `codex/terminal-relaunch-research`, 첫 계획 HEAD `b3c06a2cbd6f84c0392621175af6714bbc874981`.
 
 - `src-tauri/src/terminal.rs`: `Terminal`은 ID·배치·종류·마지막 경로·최근 경로·시각·제목을 직렬화한다. 명령/대화/앱 ID/세션 ID는 저장하지 않는다. 테스트 `welcome_metadata_preserves_only_last_path_title_and_geometry`도 history/commands 부재를 확인한다. 메모리의 `Session.program`은 셸로 설정되어 있어 추천 앱 식별 근거가 아니다.
 - `src-tauri/src/terminal/welcome.rs`: `command`는 앱 ID allowlist를 고정 명령으로 매핑하고 PATH/설치 경로에서 실행 파일 존재를 확인한다. `start`는 cwd 유효성을 검사하고 `start_shell`은 새 PTY·대화형 셸을 만든다. Unix에서는 인용된 고정 명령을 셸 입력으로 전달하며 Windows에서는 PowerShell 명령 인수에 포함한다. 앱 종료 뒤 셸 유지라는 현재 계약을 바꾸지 않고 이 지점에 명시 실행 메타데이터를 추가하는 것은 가능하다.
@@ -42,7 +42,7 @@
 | [#118](https://github.com/egoing/agent-gibbon/issues/118) | 열림, 업데이트 후 URL·마지막 명령 표시, 자동 실행 금지 | 표시와 실행을 분리하는 선행 정책 |
 | [#150](https://github.com/egoing/agent-gibbon/issues/150) / [Draft #151](https://github.com/egoing/agent-gibbon/pull/151) | 열림, 일반 시작의 창 복원 구현 승인 대기 | 창 복원 기반과 명령 표시의 통합 지점. 이번 조사와 별도 |
 
-`/Users/egoinglee/.codex/worktrees/af67/agent-gibbon`의 미커밋 `session_restore.rs`, `terminal.rs`, `ui/terminal.js`를 **읽기만** 했다(2026-11-13 관측, 다른 작업이 변경할 수 있는 잠정 코드). 고정 허용 목록은 `pwd`, `ls`, `git status`, `git diff`, `git log`, `whoami`, `date`, `clear`다. 입력 중 허용 접두사를 벗어나면 버리고, 편집 제어문자·인수·다른 명령은 저장하지 않으며 다음 입력 때 이전 미리보기를 지운다. 복원 snapshot은 허용된 문자열만 검증하며 UI는 이전 프로세스 종료와 자동 실행하지 않았음을 안내한다.
+`/Users/egoinglee/.codex/worktrees/af67/jajan`의 미커밋 `session_restore.rs`, `terminal.rs`, `ui/terminal.js`를 **읽기만** 했다(2026-11-13 관측, 다른 작업이 변경할 수 있는 잠정 코드). 고정 허용 목록은 `pwd`, `ls`, `git status`, `git diff`, `git log`, `whoami`, `date`, `clear`다. 입력 중 허용 접두사를 벗어나면 버리고, 편집 제어문자·인수·다른 명령은 저장하지 않으며 다음 입력 때 이전 미리보기를 지운다. 복원 snapshot은 허용된 문자열만 검증하며 UI는 이전 프로세스 종료와 자동 실행하지 않았음을 안내한다.
 
 이 값은 PTY 입력에서 얻은 **안전한 텍스트 후보**이지 셸이 명령을 실행·완료했다는 증거가 아니다. Codex/Claude 대화 입력의 `pwd` 같은 문자열과도 구별할 수 없다. 따라서 앱 ID나 재실행 명령의 근거로 승격해서는 안 된다. 자유 명령을 저장하도록 허용 목록을 넓히는 대신, 추천 실행 시 백엔드가 이미 알고 있는 정형 앱 ID와 실행 cwd를 별도 필드로 저장하는 것이 맞다. #150 병합 이후 저장 스키마·삭제·복원 안내를 통합 검토하되 이 워크트리에서 구현/빌드/앱을 공유하지 않는다.
 

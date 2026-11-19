@@ -9,8 +9,8 @@ pub(super) struct OwnedJobs {
 
 #[cfg(target_os = "macos")]
 unsafe extern "C" {
-    fn gibbon_job_token(owner: i32, candidate: i32, token: *mut u32) -> i32;
-    fn gibbon_stop_job(token: *const u32) -> i32;
+    fn jajan_job_token(owner: i32, candidate: i32, token: *mut u32) -> i32;
+    fn jajan_stop_job(token: *const u32) -> i32;
 }
 
 #[cfg(target_os = "macos")]
@@ -60,7 +60,7 @@ impl OwnedJobs {
         let mut unverified = false;
         for pid in pids {
             let mut token = [0; 8];
-            match unsafe { gibbon_job_token(owner, pid, token.as_mut_ptr()) } {
+            match unsafe { jajan_job_token(owner, pid, token.as_mut_ptr()) } {
                 1 => tokens.push(token),
                 0 => (),
                 _ => unverified = true,
@@ -86,7 +86,7 @@ impl OwnedJobs {
             for token in &self.tokens {
                 // Attempt each independently; ESRCH can also mean exec changed
                 // the identity. Do not substitute its numeric PID.
-                signals_ok &= unsafe { gibbon_stop_job(token.as_ptr()) } == 0;
+                signals_ok &= unsafe { jajan_stop_job(token.as_ptr()) } == 0;
             }
             signals_ok
         };

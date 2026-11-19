@@ -27,7 +27,7 @@ export function installMemoSurfaceAppearance(env = window, root = document.docum
     const web = env.location?.pathname?.endsWith('/web.html');
     const read = () => invoke(web ? 'web_chrome' : 'terminal_info', web ? {action:'inspect'} : undefined)
       .then(info => setColor(info.color));
-    initialColor = env.gibbonRegionFrame ? env.gibbonRegionFrame.prepare(read) : read().catch(() => {});
+    initialColor = env.jajanRegionFrame ? env.jajanRegionFrame.prepare(read) : read().catch(() => {});
   }
   env.addEventListener('storage', event => {
     if (event.key !== memoDesignKey && event.key !== null) return;

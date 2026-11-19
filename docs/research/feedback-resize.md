@@ -17,9 +17,9 @@
 
 ## 조사 기준과 현재 구현
 
-- 작업 루트 `/Users/egoinglee/.codex/worktrees/6eec/agent-gibbon`, 브랜치 `codex/feedback-resize-research`.
+- 작업 루트 `/Users/egoinglee/.codex/worktrees/6eec/jajan`, 브랜치 `codex/feedback-resize-research`.
 - 조사 기준 origin/main `53ab3a710fb54f4702de2499fdc22b9dd8506087`; 계획 커밋 `eb404cfd3acfb8cb59ebd13e18ab8b5b9554b28b`.
-- `npm run dev:info`: instance `dev-8d425074f682041f2185812f`, binary `/Users/egoinglee/.codex/worktrees/6eec/agent-gibbon/src-tauri/target/debug/agent-gibbon`.
+- `npm run dev:info`: instance `dev-8d425074f682041f2185812f`, binary `/Users/egoinglee/.codex/worktrees/6eec/jajan/src-tauri/target/debug/jajan`.
 - 실행 호스트 `arm64`, Node v24.21.0, npm 11.19.0, rustc 1.91.1, gh 2.89.0. Cargo.lock과 로컬 registry source: Tauri 2.12.2, tauri-runtime-wry 2.12.1, Tao 0.37.1, Wry 0.57.0.
 
 위 두 항목의 의미: 개발 정보는 설정상 경로이며 실행 중인 서버를 확인한 증거가 아니다. 앱·서버는 실행하지 않았다.

@@ -8,7 +8,7 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-BIN = str(ROOT / 'scripts/agent-gibbon')
+BIN = str(ROOT / 'scripts/jajan')
 
 def call(*args, ok=True):
     result = subprocess.run([BIN, *args], capture_output=True, text=True, timeout=25)
@@ -41,7 +41,7 @@ assert reopened['visible'] and reopened['position'] == closed['position'] and re
 assert reopened['note']['html'] == updated['note']['html']
 # Malformed socket clients must not kill the listener.
 with socket.socket(socket.AF_UNIX) as stream:
-    stream.connect(f'/tmp/floatnote-{os.getuid()}/app.sock')
+    stream.connect(f'/tmp/jajan-{os.getuid()}/app.sock')
     stream.sendall(b'{bad json')
     stream.shutdown(socket.SHUT_WR)
     response = bytearray()

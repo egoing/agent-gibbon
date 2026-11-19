@@ -13,7 +13,7 @@ import uuid
 assert sys.platform == 'darwin'
 ROOT = Path(__file__).resolve().parents[1]
 INFO = json.loads(subprocess.check_output(['node', str(ROOT / 'scripts/dev.mjs'), 'info'], text=True))
-CLI = str(ROOT / 'scripts/agent-gibbon-dev')
+CLI = str(ROOT / 'scripts/jajan-dev')
 EXPECTED = INFO['binary'] + ' --serve'
 OUTPUT = ROOT / 'docs/verification/issue65-focus'
 IDS = ['updates-' + uuid.uuid4().hex[:8] + suffix for suffix in ('-a', '-b')]
@@ -49,7 +49,7 @@ def wait_for(note_id, check):
         time.sleep(.15)
 
 
-with tempfile.TemporaryDirectory(prefix='gibbon-updates-') as folder:
+with tempfile.TemporaryDirectory(prefix='jajan-updates-') as folder:
     helper = Path(folder) / 'native'
     source = helper.with_suffix('.swift')
     source.write_text(r'''
@@ -108,7 +108,7 @@ if a[1] == "pointer" {
         return subprocess.check_output([str(helper), *map(str, args)], text=True).strip()
 
     def window(note_id):
-        title = f"Agent Gibbon [{label}] — {note_id}"
+        title = f"Jajan [{label}] — {note_id}"
         matches = [w for w in json.loads(native('windows', pid)) if w['title'] == title]
         assert len(matches) == 1, matches
         return matches[0]

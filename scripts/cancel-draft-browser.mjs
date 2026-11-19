@@ -1,6 +1,6 @@
 // Actual bundled editor, app and Feedback DOM. Native IPC is simulated; native IME is separate.
 // Build first: npm run build:editor. Optional PLAYWRIGHT_MODULE and PLAYWRIGHT_CHROMIUM_EXECUTABLE locate external browser tooling.
-// GIBBON_BASELINE=1 is intentionally only for the pre-fix implementation; it proves cancel destroys native editor undo history.
+// JAJAN_BASELINE=1 is intentionally only for the pre-fix implementation; it proves cancel destroys native editor undo history.
 // Regression mode uses real editor input, real Feedback clicks and explicit stale native-action events.
 import fs from 'node:fs';
 import { build } from 'esbuild';
@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('../ui/', import.meta.url));
-const output = process.env.GIBBON_SMOKE_OUTPUT || '/tmp/gibbon15-cancel-browser';
+const output = process.env.JAJAN_SMOKE_OUTPUT || '/tmp/jajan15-cancel-browser';
 const stamp = () => ({root:process.cwd(),time:new Date().toISOString(),kst:new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Seoul',dateStyle:'short',timeStyle:'medium'}).format(new Date())+' KST'});
 fs.mkdirSync(output, { recursive: true });
 const browser = await chromium.launch({ headless: true, ...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE } : {}) });
@@ -40,7 +40,7 @@ async function historyProbeBundle() {
 async function open(markdown, size = { width: 300, height: 240 }, probeHistory = false) {
   const page = await browser.newPage({ viewport: size });
   page.on('pageerror', e => errors.push(e.message));
-  page.on('request', r => { if (!r.url().startsWith('http://gibbon.test/')) requests.push(r.url()); });
+  page.on('request', r => { if (!r.url().startsWith('http://jajan.test/')) requests.push(r.url()); });
   await page.addInitScript(({ markdown }) => {
     window.testNote = { title: 'Milkdown 검증', markdown, html: '<p>원문</p>', revision: 1, color: '#dfe2dd' };
     window.testState = { visible: true, focused: false, folded: false, always_on_top: true };
@@ -70,7 +70,7 @@ async function open(markdown, size = { width: 300, height: 240 }, probeHistory =
       } },
     };
   }, { markdown });
-  await page.route('http://gibbon.test/**', async route => {
+  await page.route('http://jajan.test/**', async route => {
     const name = new URL(route.request().url()).pathname.slice(1);
     if (['telemetry.js', 'updater-guard.js', 'memo-focus.js'].includes(name)) return route.fulfill({ body: '', contentType: 'text/javascript' });
     if (probeHistory && name === 'generated/milkdown.js') {
@@ -79,7 +79,7 @@ async function open(markdown, size = { width: 300, height: 240 }, probeHistory =
     const file = path.join(root, name);
     return route.fulfill({ body: fs.readFileSync(file), contentType: /\.m?js$/.test(name) ? 'text/javascript' : name.endsWith('.css') ? 'text/css' : 'text/html' });
   });
-  await page.goto('http://gibbon.test/index.html');
+  await page.goto('http://jajan.test/index.html');
   await page.waitForSelector('#memo-editor[aria-readonly]');
   return page;
 }
@@ -87,7 +87,7 @@ const tick = page => page.waitForTimeout(450);
 const save = page => page.keyboard.press('Control+s');
 const undo = page => page.keyboard.press(process.platform === 'darwin' ? 'Meta+z' : 'Control+z');
 const text = page => page.locator('#memo-editor').innerText();
-const busy = page => page.evaluate(() => window.gibbonUpdateBusy());
+const busy = page => page.evaluate(() => window.jajanUpdateBusy());
 const token = page => page.evaluate(() => window.testCalls.filter(c=>c.name==='present_feedback').at(-1)?.args.view.buttons.find(button=>button.id==='restore_draft')?.revision ?? window.testCalls.filter(c=>c.name==='present_feedback').at(-1)?.args.view.revision);
 async function dispatchRestore(page,revision) { await page.evaluate(revision=>window.testListeners['feedback-action']({payload:{owner:'note-milkdown-browser',action:'restore_draft',revision}}),revision); }
 const restoreButton = page => page.getByRole('button', {name:'초안 복구',exact:true});
@@ -109,7 +109,7 @@ async function remote(page, markdown, color) {
 async function scenario(name, fn, size, probeHistory = false) {
  const page=await open('원문\n',size,probeHistory);
  try { await fn(page); results.push(name);if(name.startsWith('integration '))fs.writeFileSync(path.join(output,`integration-dom-${results.length}.json`),JSON.stringify({name,trace:await page.evaluate(()=>window.integrationTrace)},null,2));console.log('PASS',name); }
- catch(error) { await page.screenshot({path:path.join(output,`failure-${results.length}.png`)}); fs.writeFileSync(path.join(output,'failure.json'),JSON.stringify({...stamp(),name,completed:results,error:error.stack,state:await page.evaluate(()=>({note:window.testNote,calls:window.testCalls,body:document.body.innerText,activity:window.gibbonUpdateActivity()}))},null,2));throw new Error(`${name}: ${error.stack}`); }
+ catch(error) { await page.screenshot({path:path.join(output,`failure-${results.length}.png`)}); fs.writeFileSync(path.join(output,'failure.json'),JSON.stringify({...stamp(),name,completed:results,error:error.stack,state:await page.evaluate(()=>({note:window.testNote,calls:window.testCalls,body:document.body.innerText,activity:window.jajanUpdateActivity()}))},null,2));throw new Error(`${name}: ${error.stack}`); }
  finally { await page.close(); }
 }
 // Integration-only additions: invoke the actual selection menu, never synthetic schema changes.
@@ -142,7 +142,7 @@ async function formattedCancel(page,label) {
  await page.waitForSelector('#actions button[data-action="cancel"]');
 }
 try {
- if(process.env.GIBBON_BASELINE === '1') {
+ if(process.env.JAJAN_BASELINE === '1') {
   await scenario('baseline cancel loses undo draft',async page=>{
    const before=await draft(page,' 잃어버릴 초안'); await cancel(page); const cancelled=await text(page);
    await page.locator('#memo-editor p').click(); await undo(page);
@@ -165,7 +165,7 @@ try {
     await cancel(page);
     await page.evaluate(() => { window.testFailure = null; });
     await restore(page);
-    await page.waitForFunction(() => window.testNote.revision === 2 && !window.gibbonUpdateBusy());
+    await page.waitForFunction(() => window.testNote.revision === 2 && !window.jajanUpdateBusy());
     assert.equal((await page.evaluate(() => window.testNote.markdown)).trimEnd(), before);
     assert.equal(await page.evaluate(() => window.testCalls.filter(c => c.name === 'save_note').length), 2);
   });
@@ -295,8 +295,8 @@ try {
   await scenario('exporting rejects delayed recovery action and retains candidate',async page=>{
    const before=await draft(page);await cancel(page);const revision=await token(page);await page.evaluate(()=>{window.testExportDelay=900;});
    await page.evaluate(()=>{window.testListeners['feedback-action']({payload:{owner:'note-milkdown-browser',action:'export'}});});
-   await page.waitForFunction(()=>window.gibbonUpdateActivity().exporting);await dispatchRestore(page,revision);assert.equal(await text(page),'원문');
-   await page.waitForFunction(()=>!window.gibbonUpdateActivity().exporting);await restore(page);assert.equal(await text(page),before);
+   await page.waitForFunction(()=>window.jajanUpdateActivity().exporting);await dispatchRestore(page,revision);assert.equal(await text(page),'원문');
+   await page.waitForFunction(()=>!window.jajanUpdateActivity().exporting);await restore(page);assert.equal(await text(page),before);
   });
   await scenario('Escape saves and hides without creating recovery',async page=>{
    await page.locator('#memo-editor p').click();await page.keyboard.press('End');await page.keyboard.insertText(' Escape 저장');await page.keyboard.press('Escape');
@@ -323,10 +323,10 @@ try {
   await scenario('saving ignores stale restore without overwriting newer typing',async page=>{
    await draft(page);await cancel(page);const revision=await token(page);await page.evaluate(()=>{window.testFailure=null;window.testSaveDelay=900;});
    await page.locator('#memo-editor p').click();await page.keyboard.press('End');await page.keyboard.insertText(' 새 저장');
-   await save(page);await page.waitForFunction(()=>window.gibbonUpdateActivity().saving);
+   await save(page);await page.waitForFunction(()=>window.jajanUpdateActivity().saving);
    await page.keyboard.insertText(' 후속 입력');const before=await text(page);
    await dispatchRestore(page,revision);
-   assert.equal(await text(page),before);await page.waitForFunction(()=>!window.gibbonUpdateBusy());assert.match(await page.evaluate(()=>window.testNote.markdown),/후속 입력/);
+   assert.equal(await text(page),before);await page.waitForFunction(()=>!window.jajanUpdateBusy());assert.match(await page.evaluate(()=>window.testNote.markdown),/후속 입력/);
   });
   // #183 + #15 integration scenarios; all 23 original regression cases above are retained.
   const formatCases=[
@@ -342,7 +342,7 @@ try {
     await undo(page);await formatCheckpoint(page,'undo-clean');assert.equal(await page.locator('#memo-editor p').textContent(),'원문');assert.equal(await busy(page),false);
     await redoKeyboard(page);await formatCheckpoint(page,'redo-restored',item.label==='코드');assert.equal(await page.locator('#memo-editor '+item.selector).textContent(),'원문');
     await page.evaluate(()=>{window.testFailure=null;});await formatSelection(page,item.next);await formatCheckpoint(page,'after-next-menu',item.label==='코드'||item.next==='코드');
-    await page.waitForFunction(()=>window.testNote.revision===2 && !window.gibbonUpdateBusy());
+    await page.waitForFunction(()=>window.testNote.revision===2 && !window.jajanUpdateBusy());
     const written=await page.evaluate(()=>window.testCalls.filter(c=>c.name==='save_note').at(-1));
     assert.equal(written.args.expectedRevision,1);assert.equal(written.args.markdown,item.serialized);
     assert.equal(await restoreButton(page).count(),0);

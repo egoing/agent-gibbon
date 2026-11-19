@@ -82,7 +82,7 @@ pub fn prepare_builder<'a, M: Manager<tauri::Wry>>(
     region: bool,
 ) -> tauri::WebviewWindowBuilder<'a, tauri::Wry, M> {
     if region {
-        builder.initialization_script("window.gibbonPreparingRegion = true")
+        builder.initialization_script("window.jajanPreparingRegion = true")
     } else {
         builder
     }

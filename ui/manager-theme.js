@@ -2,8 +2,8 @@
 // Loaded synchronously in the manager head so the first paint uses the preference.
 // Only a fixed theme name crosses local IPC; memo content is never read.
 (() => {
-  const key = 'agent-gibbon.manager-theme';
-  const memoDesignKey = 'agent-gibbon.memo-design';
+  const key = 'jajan.manager-theme';
+  const memoDesignKey = 'jajan.memo-design';
   const validDesign = value => ['white', 'gray', 'black', 'system', 'color'].includes(value);
   let memoDesign = 'gray';
   try { const value = window.localStorage.getItem(memoDesignKey); if (validDesign(value)) memoDesign = value; } catch {}
@@ -39,7 +39,7 @@
     renderNativeStatus();
     for (const radio of document.querySelectorAll('input[name="memo-design"]')) radio.checked = radio.value === memoDesign;
     document.getElementById('theme-mode').textContent = selected ? '선택한 테마를 사용 중입니다.' : '시스템 테마를 따르는 중입니다.';
-    window.gibbonMemoPreview?.(memoDesign);
+    window.jajanMemoPreview?.(memoDesign);
   }
   function choose(value) {
     const result = document.getElementById('theme-result');

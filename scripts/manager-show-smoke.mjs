@@ -6,16 +6,16 @@ import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('..', import.meta.url));
-const output = process.env.GIBBON_SMOKE_OUTPUT || '/tmp/gibbon-issue68-label-browser';
+const output = process.env.JAJAN_SMOKE_OUTPUT || '/tmp/jajan-issue68-label-browser';
 fs.mkdirSync(output, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage(), errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.route('http://gibbon.test/**', route => {
+  await page.route('http://jajan.test/**', route => {
     const name = new URL(route.request().url()).pathname;
     const body = name === '/privacy.js'
-      ? `window.gibbonPrivacy={accepted:()=>true,ready:Promise.resolve(),refresh:async()=>{}};
+      ? `window.jajanPrivacy={accepted:()=>true,ready:Promise.resolve(),refresh:async()=>{}};
          document.addEventListener('DOMContentLoaded',()=>{
            document.getElementById('privacy-welcome').hidden=true;
            document.getElementById('manager-navigation').hidden=false;
@@ -47,7 +47,7 @@ try {
   let combinations = 0;
   for (const [width,height] of [[944,480],[600,360]]) {
     await page.setViewportSize({width,height});
-    await page.goto('http://gibbon.test/manager.html');
+    await page.goto('http://jajan.test/manager.html');
     await page.locator('#list button').first().waitFor();
     assert.equal(await page.getByRole('button',{name:'화면에 띄우기',exact:true}).count(),0);
     for (const id of ['text','plain','empty','image','terminal','agent']) {

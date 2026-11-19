@@ -4,7 +4,7 @@ Uses a unique prefix and only hides notes created by this run. Does not quit app
 """
 import json, subprocess, tempfile, time, uuid
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[1]; CLI=ROOT/'scripts/agent-gibbon-dev'
+ROOT=Path(__file__).resolve().parents[1]; CLI=ROOT/'scripts/jajan-dev'
 INFO=json.loads(subprocess.check_output(['node',str(ROOT/'scripts/dev.mjs'),'info'],text=True))
 FRONT=subprocess.check_output(['osascript','-e','tell application "System Events" to get unix id of first application process whose frontmost is true'],text=True).strip()
 PREFIX='region-proof-'+uuid.uuid4().hex[:6]; created=[]; LOG={'origin':INFO,'checks':[]}
@@ -17,7 +17,7 @@ def inspect(n):return cli('inspect',n)
 def frame(v):return (v['position'],v['size'])
 def check(s):LOG['checks'].append(s);print('PASS:',s,flush=True)
 def apple(script):return run(['osascript','-e',script]).strip()
-with tempfile.TemporaryDirectory(prefix='gibbon-regions-') as folder:
+with tempfile.TemporaryDirectory(prefix='jajan-regions-') as folder:
     folder=Path(folder)
     for source,name in [('design-system-ax.swift','ax'),('entrance-pointer.swift','pointer'),('macos-input.swift','mouse'),('auto-layout-native.swift','native')]:
         subprocess.run(['swiftc',str(ROOT/'scripts'/source),'-o',str(folder/name)],check=True)
@@ -33,7 +33,7 @@ with tempfile.TemporaryDirectory(prefix='gibbon-regions-') as folder:
         n=PREFIX+'-'+suffix;created.append(n);move(600,650)
         cli('open',n,'--markdown',body);move(650,650);wait(n);return n
     def ui(n,label,feedback=False,*args):
-        s=inspect(n);title=f"Agent Gibbon [{s['dev_label']}] — {n}"+(' · Feedback' if feedback else '')
+        s=inspect(n);title=f"Jajan [{s['dev_label']}] — {n}"+(' · Feedback' if feedback else '')
         command='draft' if label=='draft' else 'click'
         for _ in range(30):
             r=subprocess.run([str(folder/'ax'),str(pid),title,command,*((list(args)) if command=='draft' else [label])],capture_output=True,text=True)
@@ -105,7 +105,7 @@ with tempfile.TemporaryDirectory(prefix='gibbon-regions-') as folder:
         restored=wait(extra);assert not restored['focused']
         check('native tray hidden-note restore uses direct layout and preserves focus')
     finally:
-        Path('/tmp/gibbon-auto-regions-live.json').write_text(json.dumps(LOG,ensure_ascii=False,indent=2))
+        Path('/tmp/jajan-auto-regions-live.json').write_text(json.dumps(LOG,ensure_ascii=False,indent=2))
         for n in created:cli('close',n)
         move(original['x'],original['y'])
         subprocess.run(['osascript','-e',f'tell application "System Events" to set frontmost of (first application process whose unix id is {FRONT}) to true'],capture_output=True)

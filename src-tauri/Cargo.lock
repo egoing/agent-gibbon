@@ -165,37 +165,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 
 [[package]]
-name = "agent-gibbon"
-version = "0.2.18"
-dependencies = [
- "ammonia",
- "base64 0.22.1",
- "block2",
- "cc",
- "fs2",
- "libc",
- "objc2",
- "objc2-app-kit",
- "objc2-foundation",
- "portable-pty",
- "pulldown-cmark",
- "reqwest 0.12.28",
- "sentry",
- "serde",
- "serde_json",
- "sha2",
- "tauri",
- "tauri-build",
- "tauri-plugin-clipboard-manager",
- "tauri-plugin-dialog",
- "tauri-plugin-global-shortcut",
- "tauri-plugin-updater",
- "tempfile",
- "uds_windows",
- "xcap",
-]
-
-[[package]]
 name = "aho-corasick"
 version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2521,6 +2490,37 @@ name = "itoa"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
+
+[[package]]
+name = "jajan"
+version = "0.3.0"
+dependencies = [
+ "ammonia",
+ "base64 0.22.1",
+ "block2",
+ "cc",
+ "fs2",
+ "libc",
+ "objc2",
+ "objc2-app-kit",
+ "objc2-foundation",
+ "portable-pty",
+ "pulldown-cmark",
+ "reqwest 0.12.28",
+ "sentry",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-clipboard-manager",
+ "tauri-plugin-dialog",
+ "tauri-plugin-global-shortcut",
+ "tauri-plugin-updater",
+ "tempfile",
+ "uds_windows",
+ "xcap",
+]
 
 [[package]]
 name = "javascriptcore-rs"

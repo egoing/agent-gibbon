@@ -10,7 +10,7 @@ const root=fileURLToPath(new URL('..',import.meta.url));
 const browser=await chromium.launch({headless:true});
 try{
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.route('http://gibbon.test/**',route=>{const f=path.join(root,'ui',new URL(route.request().url()).pathname);return route.fulfill({body:fs.readFileSync(f),contentType:f.endsWith('.css')?'text/css':f.endsWith('.js')?'text/javascript':'text/html'});});
+ await page.route('http://jajan.test/**',route=>{const f=path.join(root,'ui',new URL(route.request().url()).pathname);return route.fulfill({body:fs.readFileSync(f),contentType:f.endsWith('.css')?'text/css':f.endsWith('.js')?'text/javascript':'text/html'});});
  await page.addInitScript(()=>{
   const scenario=new URL(location.href).searchParams.get('scenario');
   const folder=path=>({path,name:path.split('/').at(-1),parent:path.slice(0,path.lastIndexOf('/')),command:`cd -- '${path}'`});
@@ -32,14 +32,14 @@ try{
  });
  const noStart=async()=>assert.equal(await page.evaluate(()=>window.calls.some(c=>c.name==='terminal_start')),false);
  const noOverflow=async()=>assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.getElementById('welcome').scrollWidth<=document.getElementById('welcome').clientWidth));
- const open=async scenario=>{await page.goto('http://gibbon.test/terminal.html?scenario='+scenario);await page.getByRole('heading',{name:'작업 위치'}).waitFor();await page.waitForFunction(()=>document.querySelectorAll('#recommendations button').length>0);};
+ const open=async scenario=>{await page.goto('http://jajan.test/terminal.html?scenario='+scenario);await page.getByRole('heading',{name:'작업 위치'}).waitFor();await page.waitForFunction(()=>document.querySelectorAll('#recommendations button').length>0);};
  for(const [width,height] of [[720,460],[320,240]]){
   await page.setViewportSize({width,height});await open('recent');
   assert.equal(await page.locator('#recent-folders button').count(),3);
   assert.equal(await page.locator('#recommendations button').count(),5);
   assert.equal(await page.locator('#title-details').getAttribute('open'),null);
   await noStart();await noOverflow();
-  fs.mkdirSync('/tmp/gibbon-wireframe',{recursive:true});await page.screenshot({path:`/tmp/gibbon-wireframe/welcome-${width}.png`});
+  fs.mkdirSync('/tmp/jajan-wireframe',{recursive:true});await page.screenshot({path:`/tmp/jajan-wireframe/welcome-${width}.png`});
   await page.locator('#choose-folder').focus();await page.keyboard.press('Tab');
   assert.equal(await page.evaluate(()=>document.activeElement.dataset.path),'/Users/demo/project/website');
   await page.keyboard.press('Tab');await page.keyboard.press('Space');
@@ -104,6 +104,6 @@ try{
  assert.equal(centered.scroll,false);assert(centered.gapTop>24);assert(Math.abs(centered.gapTop-centered.gapBottom)<=2,JSON.stringify(centered));
  const rowStyle=await page.getByRole('button',{name:'Claude Code',exact:true}).evaluate(el=>({align:getComputedStyle(el).justifyContent,weight:getComputedStyle(el).fontWeight}));
  assert.deepEqual(rowStyle,{align:'flex-start',weight:'400'});
- await page.screenshot({path:'/tmp/gibbon-wireframe/welcome-tall.png'});
+ await page.screenshot({path:'/tmp/jajan-wireframe/welcome-tall.png'});
  assert.deepEqual(errors,[]);console.log('PASS: approved wireframe at 720×460 / 320×240; recent 3/more, selection + preview without start, Run, shell/home, keyboard/scroll/long path, delayed failure focus');
 }finally{await browser.close();}

@@ -5,11 +5,11 @@ Uses the saved journal to simulate recovery on startup, never real display chang
 """
 import json, subprocess, pathlib, time, os, signal
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-CLI=ROOT/'scripts/agent-gibbon-dev'
+CLI=ROOT/'scripts/jajan-dev'
 INFO=json.loads(subprocess.check_output(['node','scripts/dev.mjs','info'],cwd=ROOT,text=True))
 BINARY=INFO['binary'];ID='monitor20-20261115-check';LABEL='note-'+ID
 BODY='MONITOR20-NATIVE-20261115 검증 전용 메모';COLOR='#a1b2c3'
-STORE=pathlib.Path.home()/'Library/Application Support/org.egoing.floatnote/notes'/INFO['id']/'docs'
+STORE=pathlib.Path.home()/'Library/Application Support/app.jajan/notes'/INFO['id']/'docs'
 JOURNAL=STORE/'.session-windows.json'
 OUT=ROOT/'docs/verification/monitor-layout/native-results.json'
 result={'root':str(ROOT),'instance':INFO['id'],'binary':BINARY,'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'test_id':ID,'test_body':BODY,'physical_monitor_changes':False,'phases':[]}

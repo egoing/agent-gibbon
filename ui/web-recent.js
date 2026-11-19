@@ -63,6 +63,6 @@
     for (const button of list.querySelectorAll('button')) button.disabled = busy() || deleting;
   }).observe(form, {attributes: true, attributeFilter: ['aria-busy']});
   window.addEventListener('focus', refresh);
-  if (window.gibbonRegionFrame) window.gibbonRegionFrame.prepare(refresh);
+  if (window.jajanRegionFrame) window.jajanRegionFrame.prepare(refresh);
   else refresh();
 })();

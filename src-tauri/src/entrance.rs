@@ -12,7 +12,7 @@ fn trace(window: &WebviewWindow, event: &str, data: impl FnOnce() -> serde_json:
     static PATH: OnceLock<Option<std::path::PathBuf>> = OnceLock::new();
     static WRITER: Mutex<()> = Mutex::new(());
     let Some(path) =
-        PATH.get_or_init(|| std::env::var_os("AGENT_GIBBON_ENTRANCE_TRACE").map(Into::into))
+        PATH.get_or_init(|| std::env::var_os("JAJAN_ENTRANCE_TRACE").map(Into::into))
     else {
         return;
     };
