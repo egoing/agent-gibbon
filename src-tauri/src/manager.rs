@@ -35,10 +35,12 @@ pub fn open(app: &tauri::AppHandle) -> Result<(), String> {
 
 fn focus(window: &tauri::WebviewWindow) -> Result<(), String> {
     window.set_focus().map_err(|e| e.to_string())?;
+    #[cfg(target_os = "macos")]
+    crate::app_activation::focus_manager(window)?;
     // macOS deminiaturization is animated. Tao's set_focus is a no-op while
     // isMiniaturized is still true, even after unminimize/show were requested.
-    // Activate only for this explicit manager open, without a delayed retry
-    // that could steal focus after the user has switched to another app.
+    // The native completion above is canceled by input or app deactivation;
+    // there is no timer retry that could steal focus after switching away.
     #[cfg(target_os = "macos")]
     objc2_app_kit::NSRunningApplication::currentApplication()
         .activateWithOptions(objc2_app_kit::NSApplicationActivationOptions::empty());

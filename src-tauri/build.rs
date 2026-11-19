@@ -52,8 +52,10 @@ fn main() {
         cc::Build::new()
             .file("src/permission_panel.m")
             .file("src/layout/app_windows.m")
+            .file("src/app_activation.m")
             .flag("-fobjc-arc")
             .compile("permission_panel");
+        println!("cargo:rerun-if-changed=src/app_activation.m");
     }
     tauri_build::build()
 }

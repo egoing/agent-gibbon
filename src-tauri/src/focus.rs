@@ -28,6 +28,8 @@ impl Targets {
         targets
     }
     fn remember(&self, label: &str) {
+        #[cfg(target_os = "macos")]
+        crate::app_activation::preserve_focus();
         let previous = frontmost();
         #[cfg(target_os = "macos")]
         let previous = previous.filter(|pid| *pid != std::process::id() as i64);
@@ -46,6 +48,8 @@ pub fn discard_restore(app: &tauri::AppHandle, label: &str) {
 }
 #[cfg(any(target_os = "macos", windows))]
 pub fn restore(window: &tauri::WebviewWindow) {
+    #[cfg(target_os = "macos")]
+    crate::app_activation::preserve_focus();
     let previous = window
         .state::<Targets>()
         .0
