@@ -3,15 +3,19 @@ const { Channel } = window.__TAURI__.core;
 const invoke = window.jajanInvoke || window.__TAURI__.core.invoke;
 const win = window.__TAURI__.window.getCurrentWindow();
 const status = document.getElementById('status');
+const terminalHost = document.getElementById('terminal');
+const loading = document.getElementById('terminal-loading');
+const welcomeSurface = document.getElementById('welcome');
 const clock = () => window.performance?.now?.() || 0;
 const terminal = new Terminal({fontSize:window.jajanContentSize.defaultValue('terminal'),fontFamily:'Menlo, Monaco, monospace',cursorBlink:true,scrollback:3000,allowProposedApi:false,theme:{background:'#20252e',foreground:'#f0f0f0'},screenReaderMode:false});
 const fit = new FitAddon.FitAddon();
 terminal.loadAddon(fit);
-terminal.open(document.getElementById('terminal'));
+terminal.open(terminalHost);
 let homePath=null, selectedFolder=null, selectedChoice=null, availableChoices=[], folders=[], expandedFolders=false, selectingFolder=false;
 let restoreSupported=true;
 let ended=false;
 let started=false, starting=false, input=Promise.resolve(), resizeTimer;
+let presented=false, pendingExecution, lastExecution;
 function report(e){status.textContent=String(e);}
 // A successful terminal_start creates the PTY at the supplied cell size. Only
 // one subsequent resize may be in flight; xterm holds the latest desired grid.
@@ -92,22 +96,30 @@ async function start(choice, trigger, plan, execRequest){
     report('터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.');
     return;
   }
+  const automated = execRequest !== undefined;
   starting=true;
-  status.textContent=`${trigger?.dataset?.label||'터미널'} 시작 중…`;
-  document.getElementById('welcome').setAttribute('aria-busy','true');
-  document.getElementById('welcome').hidden=true;
-  document.getElementById('terminal').hidden=false;measure();
+  status.textContent=automated ? '' : `${trigger?.dataset?.label||'터미널'} 시작 중…`;
+  welcomeSurface.setAttribute('aria-busy','true');
+  welcomeSurface.hidden=true;
+  terminalHost.hidden=false;
+  terminalHost.inert=automated;
+  measure();
   const startedAt=clock(); let firstOutput=true;
+  let outputParsed;
+  const firstFrame = new Promise(resolve => { outputParsed=resolve; });
   const output=new Channel();output.onmessage=bytes=>{
     const measure=window.jajanMeasure;
-    if(firstOutput){firstOutput=false;measure?.('terminal.first_output',clock()-startedAt);}
-    if(measure){
-      const receivedAt=clock();
-      terminal.write(new Uint8Array(bytes),()=>measure('terminal.output.parse',clock()-receivedAt));
-    }else terminal.write(new Uint8Array(bytes));
+    const first=firstOutput;
+    const receivedAt=clock();
+    firstOutput=false;
+    if(first)measure?.('terminal.first_output',receivedAt-startedAt);
+    terminal.write(new Uint8Array(bytes),()=>{
+      if(first)outputParsed();
+      measure?.('terminal.output.parse',clock()-receivedAt);
+    });
   };
   try{
-    if(selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
+    if(!automated && selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
     await (window.jajanLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('terminal.start', async flow => {
       const size={cols:terminal.cols,rows:terminal.rows};
       await flow.invoke('terminal_start',{...size,output,choice,...(execRequest === undefined ? {} : {execRequest}),...(plan === undefined ? {} : {plan})});
@@ -115,13 +127,45 @@ async function start(choice, trigger, plan, execRequest){
       flow.stage('response');
       flow.frame?.();
     });
-    started=true;status.textContent='';measure();
+    started=true;
+    if(automated){
+      // A quiet shell can be ready for input before it writes anything.
+      let timeout;
+      await Promise.race([firstFrame, new Promise(resolve => { timeout=setTimeout(resolve, 750); })]);
+      clearTimeout(timeout);
+    }
+    loading.hidden=true;
+    terminalHost.inert=false;
+    status.textContent='';measure();
     if(trigger && document.hasFocus() && (document.activeElement===trigger || document.activeElement===document.body))terminal.focus();
   }catch(e){
     const restoreFocus=trigger && document.hasFocus() && (document.activeElement===trigger || document.activeElement===document.body);
-    report(e);{document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;if(restoreFocus)trigger.focus({preventScroll:true});}
+    loading.hidden=true;
+    terminalHost.hidden=true;
+    welcomeSurface.hidden=automated || Boolean(pendingExecution);
+    report(e);
+    if(restoreFocus && !welcomeSurface.hidden)trigger.focus({preventScroll:true});
   }
-  finally{starting=false;document.getElementById('welcome').setAttribute('aria-busy','false');}
+  finally{starting=false;welcomeSurface.setAttribute('aria-busy','false');startQueuedExecution();}
+}
+function startQueuedExecution(){
+  if(!presented || !pendingExecution || starting || started || ended)return;
+  lastExecution=pendingExecution;
+  pendingExecution=undefined;
+  void start('shell', null, undefined, lastExecution);
+}
+function queueExecution(token){
+  if(typeof token!=='string' || token===lastExecution || started || ended)return;
+  pendingExecution=token;
+  welcomeSurface.hidden=true;
+  terminalHost.inert=true;
+  status.textContent='';
+  loading.hidden=false;
+  startQueuedExecution();
+}
+function terminalPresented(){
+  presented=true;
+  startQueuedExecution();
 }
 function selectionChanged(){
   document.getElementById('home-hint').hidden=selectedFolder?.path!==homePath;
@@ -174,20 +218,30 @@ document.getElementById('choose-folder').onclick=async()=>{
   try{const result=await invoke('terminal_folder',{path:null});if(result.folder_selected!==false)await welcome();status.textContent='';}catch(e){report(e);}finally{selectingFolder=false;selectionChanged();}
 };
 async function initializeTerminal() {
-  const info=await invoke('terminal_info');
+  // An event registered before the snapshot covers commands arriving after it.
+  const webview=window.__TAURI__.webviewWindow?.getCurrentWebviewWindow();
+  await webview?.listen('terminal-execute', ({payload}) => queueExecution(payload));
+  const info=await invoke('terminal_info',{withPendingExecution:true});
   if(info.kind!=='terminal')throw Error('전용 에이전트 기능은 지원하지 않습니다.');
   restoreSupported=info.restore_supported !== false;
   setInfo(info);
   {
     const close=document.getElementById('close');close.title='터미널 종료';close.setAttribute('aria-label','터미널 종료');
     if(ended){
-      document.getElementById('welcome').hidden=true;
-      document.getElementById('terminal').hidden=false;
+      loading.hidden=true;
+      welcomeSurface.hidden=true;
+      terminalHost.hidden=false;
+      terminalHost.inert=false;
       terminal.write('\r\n[PTY 세션 종료]\r\n');
       return;
     }
-    document.getElementById('welcome').hidden=false;document.getElementById('terminal').hidden=true;
+    queueExecution(info.pending_execution);
+    if(pendingExecution)return;
     await welcome();
+    // The original two-command CLI can queue execution while Welcome loads.
+    if(pendingExecution)return;
+    terminalHost.hidden=true;
+    welcomeSurface.hidden=false;
     if(info.restore_plan && !info.running){planInput.value=info.restore_plan;restorePanel.hidden=false;welcomePanel.hidden=true;
       if(!restoreSupported)report('터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.');
       else if(info.restored && info.auto_restore) await start('auto-monitor', null);

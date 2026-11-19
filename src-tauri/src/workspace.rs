@@ -154,7 +154,7 @@ pub(crate) fn stop(app: &tauri::AppHandle, token: Option<&str>) -> Result<(), St
     crate::tray::refresh(app)
 }
 
-pub const USAGE: &str = "workspace run TERMINAL_ID [--request-id ID] -- PROGRAM ARGS | run TERMINAL_ID [--request-id ID] --shell SCRIPT | run-status TOKEN | displays | share DISPLAY... | stop SESSION | snapshot --all | snapshot SESSION | snapshot DISPLAY SESSION | move ID DISPLAY X,Y [--automatic] | fit ID DISPLAY X,Y,W,H [--automatic] | note|terminal DISPLAY X,Y,W,H | web DISPLAY X,Y,W,H URL | capture DISPLAY SESSION SOURCE_RECT DEST_RECT (rect units 0..1000)";
+pub const USAGE: &str = "workspace run TERMINAL_ID [--request-id ID] {-- PROGRAM ARGS | --shell SCRIPT} | run-status TOKEN | displays | share DISPLAY... | stop SESSION | snapshot --all | snapshot SESSION | snapshot DISPLAY SESSION | move ID DISPLAY X,Y [--automatic] | fit ID DISPLAY X,Y,W,H [--automatic] | note DISPLAY X,Y,W,H | terminal DISPLAY X,Y,W,H [[--request-id ID] {-- PROGRAM ARGS | --shell SCRIPT}] | web DISPLAY X,Y,W,H URL | capture DISPLAY SESSION SOURCE_RECT DEST_RECT (rect units 0..1000)";
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum Operation {
     Run(crate::terminal::cli::Execution),
@@ -171,6 +171,7 @@ pub enum Operation {
     Terminal(u32, Rect),
     Web(u32, Rect, String),
     Capture(u32, String, Rect, Rect),
+    LaunchTerminal(u32, Rect, crate::terminal::cli::Execution),
 }
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Rect([u32; 4]);
@@ -238,6 +239,11 @@ pub fn parse(args: &[String]) -> Result<Operation, String> {
         }
         ["note", d, r] => Operation::Note(d.parse().map_err(err)?, rect(r)?),
         ["terminal", d, r] => Operation::Terminal(d.parse().map_err(err)?, rect(r)?),
+        ["terminal", d, r, ..] => Operation::LaunchTerminal(
+            d.parse().map_err(err)?,
+            rect(r)?,
+            crate::terminal::cli::parse_launch(&args[3..])?,
+        ),
         ["web", d, r, url] => {
             crate::web::validate_url(url)?;
             Operation::Web(d.parse().map_err(err)?, rect(r)?, url.to_string())
@@ -259,6 +265,11 @@ pub fn execute(app: &tauri::AppHandle, op: &Operation) -> Result<Value, String> 
     }
     if let RunStatus(token) = op {
         return crate::terminal::cli::status(app, token);
+    }
+    if let LaunchTerminal(_, _, execution) = op {
+        if let Some(result) = crate::terminal::cli::launch_retry(app, execution)? {
+            return Ok(result);
+        }
     }
     let displays = Monitor::all().map_err(err)?;
     let all = matches!(op, AllSnapshots);
@@ -337,6 +348,7 @@ pub fn execute(app: &tauri::AppHandle, op: &Operation) -> Result<Value, String> 
         | Fit(_, d, _, _)
         | Note(d, _)
         | Terminal(d, _)
+        | LaunchTerminal(d, _, _)
         | Web(d, _, _)
         | Capture(d, _, _, _) => *d,
     };
@@ -382,6 +394,10 @@ pub fn execute(app: &tauri::AppHandle, op: &Operation) -> Result<Value, String> 
         Terminal(_, r) => {
             record_placement(app, crate::terminal::create_terminal(app, bounds(*r)?)?)
         }
+        LaunchTerminal(_, r, execution) => record_placement(
+            app,
+            crate::terminal::welcome::create_with_execution(app, bounds(*r)?, Some(execution))?,
+        ),
         Capture(_, token, source, dest) => {
             let state = app.state::<Sharing>();
             let guard = state.0.lock().map_err(err)?;

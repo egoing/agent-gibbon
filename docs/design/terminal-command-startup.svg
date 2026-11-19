@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="850" height="340" viewBox="0 0 850 340">
+  <rect width="850" height="340" fill="#e6e8eb" />
+  <g font-family="Apple SD Gothic Neo, AppleGothic, sans-serif" fill="#20252e">
+    <text x="24" y="32" font-size="16" font-weight="600">작업공간 CLI 터미널 · 설명용 시안</text>
+    <text x="24" y="67" font-size="13">PTY 시작 중</text>
+    <text x="446" y="67" font-size="13">출력 표시</text>
+  </g>
+  <defs>
+    <rect id="surface" width="380" height="232" rx="4" fill="#6baa92" />
+    <g id="toolbar" fill="#172a23" font-family="Apple SD Gothic Neo, AppleGothic, sans-serif" font-size="12">
+      <text x="283" y="15">aA</text>
+      <path d="M316 9l4 4 4-4m14-2h8l-2 5v2h-4v-2zm4 7v3m17-10 7 7m0-7-7 7" stroke="#172a23" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+  </defs>
+  <g transform="translate(24 84)">
+    <use href="#surface" />
+    <use href="#toolbar" />
+    <circle cx="190" cy="114" r="11" stroke="#172a23" stroke-opacity=".24" stroke-width="2" fill="none" />
+    <path d="M182.2 106.2a11 11 0 0 1 15.6 0" stroke="#172a23" stroke-width="2" fill="none" />
+    <text x="190" y="148" fill="#172a23" font-family="Apple SD Gothic Neo, AppleGothic, sans-serif" font-size="13" font-weight="600" text-anchor="middle">터미널 준비 중…</text>
+  </g>
+  <g transform="translate(446 84)">
+    <use href="#surface" />
+    <path d="M0 22h380v206a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4z" fill="#20252e" />
+    <use href="#toolbar" />
+    <g fill="#f0f0f0" font-family="Menlo, monospace" font-size="12">
+      <text x="4" y="35">$ du -sh .</text>
+      <text x="4" y="50">128M  .</text>
+      <text x="4" y="65">$</text>
+      <rect x="19" y="55" width="6" height="12" fill="none" stroke="#f0f0f0" />
+    </g>
+  </g>
+</svg>
