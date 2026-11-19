@@ -8,12 +8,10 @@ import { prepareAssets } from '../scripts/release-assets.mjs';
 
 // Signed updater releases must fail closed before a manifest/checksum can be published.
 // Platform selection is deliberately not assumed by these negative cases.
-function installers(t, canonical = false) {
+function installers(t) {
   const directory = mkdtempSync(join(tmpdir(), 'jajan-updater-assets-'));
   t.after(() => rmSync(directory, { recursive: true, force: true }));
-  const names = canonical
-    ? ['Jajan_9.0.0_aarch64.dmg', 'Jajan_9.0.0_x64.dmg', 'Jajan_9.0.0_x64-setup.exe']
-    : ['Jajan_9.0.0_aarch64.dmg', 'Jajan_9.0.0_x64.dmg', 'Jajan_9.0.0_x64-setup.exe'];
+  const names = ['Jajan_9.0.0_aarch64.dmg', 'Jajan_9.0.0_x64.dmg', 'Jajan_9.0.0_x64-setup.exe'];
   for (const name of names) {
     writeFileSync(join(directory, name), 'fixture installer');
   }
@@ -63,7 +61,7 @@ test('failed updater preparation preserves an existing manifest instead of publi
 });
 
 test('updater preparation emits a target-specific manifest with encoded release URLs and signed versions', t => {
-  const directory = installers(t, true);
+  const directory = installers(t);
   signedAssets(directory, '9.0.0');
 
   prepareAssets(directory, '9.0.0', { updater: true, repository: 'egoing/agent-gibbon' });
@@ -95,7 +93,7 @@ test('updater preparation emits a target-specific manifest with encoded release 
 });
 
 test('updater preparation rejects signatures that do not bind the published stable version', t => {
-  const directory = installers(t, true);
+  const directory = installers(t);
   signedAssets(directory, '9.0.0');
   const signaturePath = join(directory, 'Jajan_9.0.0_darwin-aarch64.app.tar.gz.sig');
   const decodedSignature = Buffer.from(readFileSync(signaturePath, 'utf8'), 'base64').toString('utf8');
@@ -119,7 +117,7 @@ test('updater preparation only accepts stable semver versions', t => {
 
 test('damaged payload, wrong signing key and swapped platforms never publish a manifest', t => {
   for (const mutation of ['payload', 'key', 'platform']) {
-    const directory = installers(t, true); signedAssets(directory, '9.0.0');
+    const directory = installers(t); signedAssets(directory, '9.0.0');
     const arm = join(directory,'Jajan_9.0.0_darwin-aarch64.app.tar.gz');
     const intel = join(directory,'Jajan_9.0.0_darwin-x86_64.app.tar.gz');
     if (mutation === 'payload') writeFileSync(arm,'tampered');
@@ -134,7 +132,7 @@ test('damaged payload, wrong signing key and swapped platforms never publish a m
 });
 
 test('Tauri CLI signatures verify with the release verifier without private keys', t => {
-  const directory = installers(t, true);
+  const directory = installers(t);
   const fixture = new URL('./fixtures/updater/', import.meta.url);
   for (const [target, name] of [
     ['darwin-aarch64','Jajan_9.0.0_darwin-aarch64.app.tar.gz'],
@@ -150,9 +148,10 @@ test('Tauri CLI signatures verify with the release verifier without private keys
   assert.throws(()=>prepareAssets(directory,'9.0.0',{updater:true,expectedPublicKey:'wrong release trust root'}),/trust root/);
 });
 
-test('updater release rejects space-normalized legacy filenames before creating a manifest', t => {
+test('updater release rejects legacy product filenames before creating a manifest', t => {
   const directory = installers(t);
   signedAssets(directory, '9.0.0');
+  writeFileSync(join(directory, 'Agent.Gibbon_9.0.0_aarch64.dmg'), 'legacy installer');
 
   assert.throws(() => prepareAssets(directory, '9.0.0', { updater: true }), /exactly three installers and signed updater assets/);
   assert.equal(existsSync(join(directory, 'latest.json')), false);

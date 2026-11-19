@@ -29,14 +29,6 @@ function installerNames(version) {
   ];
 }
 
-function canonicalInstallerNames(version) {
-  return [
-    `Jajan_${version}_aarch64.dmg`,
-    `Jajan_${version}_x64.dmg`,
-    `Jajan_${version}_x64-setup.exe`,
-  ];
-}
-
 // Minisign's Ed25519 prehash format, also used by Tauri's Rust verifier.
 // Validate both the payload signature and its authenticated trusted comment.
 function verifySignature(encodedSignature, encodedPublicKey, payload, version, filename) {
@@ -72,7 +64,7 @@ function atomicWrite(path, contents) {
 
 export function prepareAssets(directory, version, options = {}) {
   if (!/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(version)) throw new Error('Invalid release version');
-  const installers = options.updater ? canonicalInstallerNames(version) : installerNames(version);
+  const installers = installerNames(version);
   const found = readdirSync(directory).sort();
 
   if (!options.updater) {
