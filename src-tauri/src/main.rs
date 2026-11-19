@@ -86,6 +86,12 @@ fn create_window(
     let win = first_frame::prepare_builder(builder, region)
         .build()
         .map_err(|e| e.to_string())?;
+    // Use the same OS-owned external shadow for text and capture memo hosts.
+    // No CSS gutter/paint may cover image pixels or transparent letterboxing.
+    // Limit this explicit setting to macOS: Windows adds a white 1px border
+    // when set_shadow(true) is called on an undecorated window.
+    #[cfg(target_os = "macos")]
+    win.set_shadow(true).map_err(|e| e.to_string())?;
     // Region-created notes also have a stable place if later re-included.
     #[cfg(windows)]
     {
@@ -838,6 +844,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Regular);
             if let Some(win) = app.get_webview_window("main") {
+                #[cfg(target_os = "macos")]
+                win.set_shadow(true)?;
                 #[cfg(windows)]
                 windows_window::install_resize_observer(&win)?;
                 win.set_title(&format!("{} — main", instance::current().title()))?;
