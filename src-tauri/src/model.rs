@@ -1034,8 +1034,7 @@ mod tests {
     }
     #[test]
     fn editor_saves_source_and_rejects_stale_or_invalid_changes() {
-        let folder =
-            std::env::temp_dir().join(format!("jajan-edit-test-{}", std::process::id()));
+        let folder = std::env::temp_dir().join(format!("jajan-edit-test-{}", std::process::id()));
         std::fs::create_dir(&folder).unwrap();
         let path = folder.join("note.md");
         std::fs::write(&path, "원문").unwrap();

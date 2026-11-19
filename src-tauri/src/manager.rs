@@ -251,8 +251,7 @@ mod tests {
 
     #[test]
     fn capture_file_replacement_changes_image_stamp() {
-        let path =
-            std::env::temp_dir().join(format!("jajan-manager-image-{}", std::process::id()));
+        let path = std::env::temp_dir().join(format!("jajan-manager-image-{}", std::process::id()));
         std::fs::write(&path, b"one").unwrap();
         let old = image_token(&path).unwrap();
         std::fs::write(&path, b"another").unwrap();

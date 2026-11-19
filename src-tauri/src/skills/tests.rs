@@ -123,10 +123,7 @@ fn off_removes_only_receipted_copies_and_never_reactivates_on_upgrade() {
     f.service.set("jajan-progress", true).unwrap();
     f.service.set("jajan", false).unwrap();
     assert!(!installer::exists(&f.installed("jajan")));
-    assert!(f
-        .installed("jajan-progress")
-        .join("SKILL.md")
-        .exists());
+    assert!(f.installed("jajan-progress").join("SKILL.md").exists());
     f.service.revision = "release-2".into();
     f.service.list().unwrap();
     assert!(!f.config().skills["jajan"].enabled);

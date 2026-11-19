@@ -151,10 +151,7 @@ pub fn event(mut e: p::Event<'static>) -> Option<p::Event<'static>> {
 fn platform_tags(tags: &mut p::Map<String, String>) {
     tags.insert("app.os".into(), std::env::consts::OS.into());
     tags.insert("app.arch".into(), std::env::consts::ARCH.into());
-    tags.insert(
-        "app.build".into(),
-        env!("JAJAN_BUILD_REVISION").into(),
-    );
+    tags.insert("app.build".into(), env!("JAJAN_BUILD_REVISION").into());
 }
 fn transaction(mut t: p::Transaction<'static>) -> Option<p::Transaction<'static>> {
     if !t.name.as_deref().is_some_and(allowed) {

@@ -285,8 +285,8 @@ pub fn revoke(app: &tauri::AppHandle) {
     let _ = app.emit("privacy-changed", status());
 }
 pub fn refresh(app: &tauri::AppHandle) {
-    let allowed = crate::privacy::sharing(app)
-        && std::env::var("JAJAN_TELEMETRY").as_deref() != Ok("off");
+    let allowed =
+        crate::privacy::sharing(app) && std::env::var("JAJAN_TELEMETRY").as_deref() != Ok("off");
     if !allowed {
         revoke(app);
         return;
