@@ -12,7 +12,7 @@ fn main() {
     std::fs::write(out_dir.join("toolbar_height.rs"), format!("{row_height}.0")).unwrap();
     println!("cargo:rerun-if-changed=../ui/tokens.css");
     println!("cargo:rerun-if-env-changed=TAURI_UPDATER_PUBLIC_KEY");
-    println!("cargo:rerun-if-env-changed=AGENT_GIBBON_SENTRY_DSN");
+    println!("cargo:rerun-if-env-changed=JAJAN_SENTRY_DSN");
     let git = |args: &[&str]| {
         std::process::Command::new("git")
             .args(args)
@@ -25,7 +25,7 @@ fn main() {
     let revision = git(&["rev-parse", "--short=12", "HEAD"])
         .filter(|s| s.len() == 12 && s.bytes().all(|b| b.is_ascii_hexdigit()))
         .unwrap_or_else(|| "unknown".into());
-    println!("cargo:rustc-env=AGENT_GIBBON_BUILD_REVISION={revision}");
+    println!("cargo:rustc-env=JAJAN_BUILD_REVISION={revision}");
     for name in ["HEAD", "refs/heads/main"] {
         if let Some(path) = git(&["rev-parse", "--git-path", name]) {
             println!("cargo:rerun-if-changed={path}");

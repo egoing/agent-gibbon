@@ -17,9 +17,9 @@ import uuid
 assert sys.platform == 'darwin'
 ROOT = Path(__file__).resolve().parents[1]
 INFO = json.loads(subprocess.check_output(['node', str(ROOT / 'scripts/dev.mjs'), 'info'], text=True))
-BIN = str(ROOT / 'scripts/agent-gibbon-dev')
+BIN = str(ROOT / 'scripts/jajan-dev')
 EXPECTED = INFO['binary'] + ' --serve'
-SETTING = Path.home() / 'Library/Application Support/org.egoing.floatnote/appearance' / INFO['id'] / 'opacity.json'
+SETTING = Path.home() / 'Library/Application Support/app.jajan/appearance' / INFO['id'] / 'opacity.json'
 OUTPUT = ROOT / 'docs/verification/hover-opacity/scroll-evidence.json'
 NOTE = 'opacity-scroll-' + uuid.uuid4().hex[:8]
 CHORD = (1 << 18) | (1 << 19) | (1 << 20)
@@ -47,7 +47,7 @@ def cli(action, *args):
     return data
 
 
-with tempfile.TemporaryDirectory(prefix='gibbon-scroll-probe-') as folder:
+with tempfile.TemporaryDirectory(prefix='jajan-scroll-probe-') as folder:
     folder = Path(folder)
     helper = folder / 'probe'
     source = helper.with_suffix('.swift')
@@ -87,7 +87,7 @@ if a[1] == "pointer" {
   }
  }
  let window = NSPanel(contentRect:NSRect(x:100,y:250,width:500,height:400), styleMask:[.titled,.nonactivatingPanel], backing:.buffered, defer:false)
- window.title = "Agent Gibbon separate scroll receiver"
+ window.title = "Jajan separate scroll receiver"
  window.isReleasedWhenClosed = false
  let probe = Probe(frame:NSRect(x:0,y:0,width:500,height:400))
  probe.hasVerticalScroller = true

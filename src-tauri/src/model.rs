@@ -182,7 +182,7 @@ impl Default for Note {
             local_mutation: None,
             edit_on_open: false,
             capture: None,
-            title: "Agent Gibbon".into(),
+            title: "Jajan".into(),
             color: "#20252e".into(),
             html: html.clone(),
             manager_body_token: Default::default(),
@@ -1035,7 +1035,7 @@ mod tests {
     #[test]
     fn editor_saves_source_and_rejects_stale_or_invalid_changes() {
         let folder =
-            std::env::temp_dir().join(format!("agent-gibbon-edit-test-{}", std::process::id()));
+            std::env::temp_dir().join(format!("jajan-edit-test-{}", std::process::id()));
         std::fs::create_dir(&folder).unwrap();
         let path = folder.join("note.md");
         std::fs::write(&path, "원문").unwrap();

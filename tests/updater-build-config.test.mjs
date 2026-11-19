@@ -14,7 +14,7 @@ test('updater build overlay enables signed artifacts and embeds the exact public
     plugins: { updater: { pubkey: publicKey } },
   });
 
-  const directory = mkdtempSync(join(tmpdir(), 'gibbon-updater-config-'));
+  const directory = mkdtempSync(join(tmpdir(), 'jajan-updater-config-'));
   t.after(() => rmSync(directory, { recursive: true, force: true }));
   const outputPath = join(directory, 'tauri.conf.json');
   writeUpdaterBuildConfig(outputPath, publicKey);

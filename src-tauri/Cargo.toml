@@ -1,9 +1,9 @@
 [package]
-name = "agent-gibbon"
-version = "0.2.18"
+name = "jajan"
+version = "0.3.0"
 edition = "2021"
 license = "MIT"
-default-run = "agent-gibbon"
+default-run = "jajan"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

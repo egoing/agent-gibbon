@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://agentgibbon.com/sitemap.xml
+Sitemap: https://jajan.app/sitemap.xml

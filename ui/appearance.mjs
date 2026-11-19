@@ -1,6 +1,6 @@
 // Memo display is independent of manager theme; OS is used only for system.
 // This preference never changes stored memo colors or content.
-export const memoDesignKey = 'agent-gibbon.memo-design';
+export const memoDesignKey = 'jajan.memo-design';
 const queries = new WeakMap();
 export function readMemoAppearance(env = globalThis) {
   let design = 'gray';

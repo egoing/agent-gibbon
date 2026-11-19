@@ -5,13 +5,13 @@ import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=fileURLToPath(new URL('..',import.meta.url));
-const out=process.env.SURFACE_OUTPUT||'/tmp/gibbon176';fs.mkdirSync(out,{recursive:true});
+const out=process.env.SURFACE_OUTPUT||'/tmp/jajan176';fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({channel:"chrome"});
 const reports=[],errors=[];
 try {
  for(const scale of [1,2]) {
  const context=await browser.newContext({deviceScaleFactor:scale});
- await context.route('http://gibbon.test/**',r=>{const f=path.join(root,'ui',new URL(r.request().url()).pathname);return fs.existsSync(f)?r.fulfill({body:fs.readFileSync(f),contentType:/\.(m?js)$/.test(f)?'text/javascript':f.endsWith('.css')?'text/css':'text/html'}):r.fulfill({status:404,body:''});});
+ await context.route('http://jajan.test/**',r=>{const f=path.join(root,'ui',new URL(r.request().url()).pathname);return fs.existsSync(f)?r.fulfill({body:fs.readFileSync(f),contentType:/\.(m?js)$/.test(f)?'text/javascript':f.endsWith('.css')?'text/css':'text/html'}):r.fulfill({status:404,body:''});});
  await context.addInitScript(()=>{
   const info={id:'terminal-176',kind:'terminal',title:'176 surface',last_path:'/tmp'};
   if(location.search.includes('restore'))info.restore_plan='echo restored';
@@ -26,8 +26,8 @@ try {
  });
  const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
  for(const [width,height] of [[320,180],[640,400],[421,263]])for(const theme of ['gray','white','black']){
- await page.setViewportSize({width,height});await page.goto('http://gibbon.test/terminal.html');
- await page.evaluate(theme=>{localStorage.setItem('agent-gibbon.memo-design',theme);location.reload();},theme);
+ await page.setViewportSize({width,height});await page.goto('http://jajan.test/terminal.html');
+ await page.evaluate(theme=>{localStorage.setItem('jajan.memo-design',theme);location.reload();},theme);
  await page.waitForSelector('#run-task');
  assert.equal(await page.locator('#rename-form').count(),0);
  if(height===180){
@@ -105,7 +105,7 @@ try {
  reports.push({width,height,theme,scale,...g,image});
  }
  await page.setViewportSize({width:320,height:180});
- await page.goto('http://gibbon.test/terminal.html?restore');
+ await page.goto('http://jajan.test/terminal.html?restore');
  await page.waitForSelector('#restore-panel:not([hidden])');
  await page.waitForFunction(()=>document.querySelector('#welcome-scrollbar').hidden);
  await page.locator('#restore-cancel').click();

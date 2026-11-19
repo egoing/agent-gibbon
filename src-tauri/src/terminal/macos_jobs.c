@@ -8,7 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 
-int gibbon_job_token(pid_t owner, pid_t candidate, unsigned int words[8]) {
+int jajan_job_token(pid_t owner, pid_t candidate, unsigned int words[8]) {
     if (owner <= 1 || candidate <= 1 || candidate == owner ||
         candidate == getpid() || getsid(candidate) != owner)
         return 0;
@@ -26,7 +26,7 @@ int gibbon_job_token(pid_t owner, pid_t candidate, unsigned int words[8]) {
     return 1;
 }
 
-int gibbon_stop_job(const unsigned int words[8]) {
+int jajan_stop_job(const unsigned int words[8]) {
     // Older macOS versions may lack version-checked signalling. Never fall
     // back to kill(pid) when the kernel cannot verify this exact identity.
     typedef int (*signal_fn)(audit_token_t *, int);

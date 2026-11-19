@@ -93,14 +93,14 @@ jobs:
       - name: Build installers
         shell: bash
         env:
-          AGENT_GIBBON_SENTRY_DSN: ${{ secrets.AGENT_GIBBON_SENTRY_DSN || vars.AGENT_GIBBON_SENTRY_DSN }}
+          JAJAN_SENTRY_DSN: ${{ secrets.AGENT_GIBBON_SENTRY_DSN || vars.AGENT_GIBBON_SENTRY_DSN }}
           RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
           RELEASE_VERSION: ${{ needs.validate.outputs.version }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           TAURI_UPDATER_PUBLIC_KEY: ${{ vars.TAURI_UPDATER_PUBLIC_KEY }}
         run: |
-          if [ -z "$AGENT_GIBBON_SENTRY_DSN" ]; then
+          if [ -z "$JAJAN_SENTRY_DSN" ]; then
             echo '::warning::Sentry DSN is not configured; these binaries will not send diagnostics.'
           fi
           if [ -n "$RELEASE_TAG" ]; then
@@ -156,14 +156,14 @@ jobs:
               echo 'Expected exactly one macOS DMG installer.'
               exit 1
             fi
-            if [ '${{ matrix.target }}' = 'aarch64-apple-darwin' ]; then installer_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_aarch64.dmg"; else installer_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_x64.dmg"; fi
+            if [ '${{ matrix.target }}' = 'aarch64-apple-darwin' ]; then installer_name="Jajan_${{ needs.validate.outputs.version }}_aarch64.dmg"; else installer_name="Jajan_${{ needs.validate.outputs.version }}_x64.dmg"; fi
             cp "${dmgs[0]}" "release-assets/$installer_name"
             bundles=(src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app.tar.gz)
             if [ "${#bundles[@]}" -ne 1 ] || [ ! -f "${bundles[0]}.sig" ]; then
               echo 'Expected exactly one signed macOS updater archive.'
               exit 1
             fi
-            if [ '${{ matrix.target }}' = 'aarch64-apple-darwin' ]; then updater_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_darwin-aarch64.app.tar.gz"; else updater_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_darwin-x86_64.app.tar.gz"; fi
+            if [ '${{ matrix.target }}' = 'aarch64-apple-darwin' ]; then updater_name="Jajan_${{ needs.validate.outputs.version }}_darwin-aarch64.app.tar.gz"; else updater_name="Jajan_${{ needs.validate.outputs.version }}_darwin-x86_64.app.tar.gz"; fi
             cp "${bundles[0]}" "release-assets/$updater_name"
             pnpm exec tauri signer sign --app-version "$RELEASE_VERSION" "release-assets/$updater_name" >/dev/null 2>&1
             if [ '${{ matrix.target }}' = 'aarch64-apple-darwin' ]; then public_key_name='darwin-aarch64.pub'; else public_key_name='darwin-x86_64.pub'; fi
@@ -174,7 +174,7 @@ jobs:
               echo 'Expected exactly one signed Windows NSIS updater installer.'
               exit 1
             fi
-            installer_name="Agent.Gibbon_${{ needs.validate.outputs.version }}_x64-setup.exe"
+            installer_name="Jajan_${{ needs.validate.outputs.version }}_x64-setup.exe"
             cp "${installers[0]}" "release-assets/$installer_name"
             updater_name="$installer_name"
             pnpm exec tauri signer sign --app-version "$RELEASE_VERSION" "release-assets/$updater_name" >/dev/null 2>&1
@@ -240,7 +240,7 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
           # A failed upload leaves a draft for inspection. Never replace an existing release.
-          gh release create "$RELEASE_TAG" --verify-tag --draft --title "Agent Gibbon $RELEASE_TAG" --generate-notes
+          gh release create "$RELEASE_TAG" --verify-tag --draft --title "Jajan $RELEASE_TAG" --generate-notes
           gh release upload "$RELEASE_TAG" release-assets/*
           expected_assets="$(find release-assets -maxdepth 1 -type f -exec basename {} \; | LC_ALL=C sort)"
           actual_assets="$(gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | LC_ALL=C sort)"
@@ -260,7 +260,7 @@ jobs:
           for (const target of expectedTargets) {
             const url = new URL(manifest.platforms[target].url);
             const filename = decodeURIComponent(url.pathname.split('/').at(-1));
-            if (!filename.startsWith('Agent.Gibbon_') || filename.includes(' ') || !localNames.has(filename)) {
+            if (!filename.startsWith('Jajan_') || filename.includes(' ') || !localNames.has(filename)) {
               throw new Error(`Updater manifest asset name is not present with its canonical filename: ${target}`);
             }
             if (url.origin !== 'https://github.com' || url.pathname !== `/${process.env.GH_REPO}/releases/download/${process.env.RELEASE_TAG}/${filename}`) {

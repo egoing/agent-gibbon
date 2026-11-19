@@ -1,5 +1,5 @@
 // The second step preserves the original size of each content surface.
-window.gibbonContentSize = (() => {
+window.jajanContentSize = (() => {
   const steps = [
     { text: 10, terminal: 11, web: 0.85 },
     { text: 12, terminal: 13, web: 1 },

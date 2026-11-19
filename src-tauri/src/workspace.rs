@@ -288,7 +288,7 @@ pub fn execute(app: &tauri::AppHandle, op: &Operation) -> Result<Value, String> 
             return Err("다른 화면 공유가 진행 중입니다".into());
         }
         let files = tempfile::Builder::new()
-            .prefix("agent-gibbon-share-")
+            .prefix("jajan-share-")
             .tempdir()
             .map_err(err)?;
         let share = self::Share {

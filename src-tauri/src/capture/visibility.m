@@ -2,7 +2,7 @@
 
 // Query WindowServer, not NSWindow's local visibility flag. Hidden windows must
 // be absent from the same on-screen window list used by Quartz screen capture.
-bool gibbon_capture_windows_hidden(const int64_t *ids, size_t count) {
+bool jajan_capture_windows_hidden(const int64_t *ids, size_t count) {
     @autoreleasepool {
         NSArray *windows = CFBridgingRelease(CGWindowListCopyWindowInfo(
             kCGWindowListOptionOnScreenOnly, kCGNullWindowID));

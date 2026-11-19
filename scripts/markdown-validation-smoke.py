@@ -8,7 +8,7 @@ import os
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-BIN = str(ROOT / 'scripts/agent-gibbon')
+BIN = str(ROOT / 'scripts/jajan')
 note_id = 'validation-' + uuid.uuid4().hex[:8]
 
 def cli(*args):
@@ -28,7 +28,7 @@ try:
     request = {'action': 'update', 'id': note_id, 'color': '#abcdef', 'markdown': '[ ] 잘못된 항목'}
     with socket.socket(socket.AF_UNIX) as client:
         client.settimeout(10)
-        client.connect(f'/tmp/floatnote-{os.getuid()}/app.sock')
+        client.connect(f'/tmp/jajan-{os.getuid()}/app.sock')
         client.sendall(json.dumps(request).encode() + b'\n')
         client.shutdown(socket.SHUT_WR)
         raw = client.makefile('rb').readline()

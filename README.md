@@ -1,6 +1,6 @@
-# Agent Gibbon
+# Jajan
 
-[English](README.en.md) · [홈페이지](https://agentgibbon.com/) · [다운로드](https://github.com/egoing/agent-gibbon/releases/latest) · [설치와 CLI 안내](https://agentgibbon.com/guide/)
+[English](README.en.md) · [홈페이지](https://jajan.app/) · [다운로드](https://github.com/egoing/agent-gibbon/releases/latest) · [설치와 CLI 안내](https://jajan.app/guide/)
 
 에이전트가 CLI로 갱신하는 작은 플로팅 Markdown 메모. Tauri 2 + Rust + 시스템 WebView로 동작하며 웹 서버 없이 동작합니다. 공식 배포판은 Sentry로 앱 오류 진단 정보를 전송합니다. 개발·테스트 및 DSN 없이 빌드한 앱은 전송하지 않습니다. 메모는 로컬에 유지됩니다.
 
@@ -22,7 +22,7 @@
 - 관리 창 테마와 독립적인 메모 흰색·회색·검정·컬러·시스템 디자인, 창별 색상 값 보관
 - 상단 툴바의 글자 크기·복사·이동·고정·닫기 버튼과 본문 자동저장, 제목바·하단바 없는 슬림 화면
 - 메뉴 막대의 메모 아이콘에서 열린 메모를 앞으로 가져오거나 개별 메모 복원
-- 메뉴 막대 아이콘의 맨 아래 **Agent Gibbon 종료**로 앱 전체 종료. 메모의 닫기 버튼은 해당 창을 종료하며 저장된 메모는 목록에 남습니다. Esc와 CLI `close`는 숨기기입니다. 종료 전 편집 중인 내용은 저장하세요.
+- 메뉴 막대 아이콘의 맨 아래 **Jajan 종료**로 앱 전체 종료. 메모의 닫기 버튼은 해당 창을 종료하며 저장된 메모는 목록에 남습니다. Esc와 CLI `close`는 숨기기입니다. 종료 전 편집 중인 내용은 저장하세요.
 - 트레이는 최근 메모·캡처·터미널를 표시하며, 더보기에서 전체 관리 목록을 엽니다. 표시와 정렬 기준은 [디자인 시스템](docs/design-system.md#최근-트레이-목록표시용-단축키--76-2026-11-06)을 따릅니다.
 - 버튼과 크기 조절 가장자리를 제외한 창 전체를 드래그하여 이동, 복사 버튼 또는 ⌘C/Ctrl+C로 최신 렌더링 본문 전체 복사(변경 표시의 이전·삭제 내용 제외)
 - 일반 메모 생성·숨김 복원 시 자동 재배치: 기본 너비 300px, 콘텐츠 높이를 상한으로 한 48~420px 높이. 본문 12px 기본값과 14·16·18px 전환·여백 3px
@@ -46,7 +46,7 @@
 
 같은 키를 다시 누르면 이번 동작으로 숨긴 창만 아이콘 위치에서 커지고 선명해지며 원래 위치·크기·접힘 상태로 복원합니다(420ms). 원래 숨겨진 창은 열지 않으며 포커스·편집 초안·진행 중 작업을 유지합니다. 모니터가 해제되면 남은 화면 안으로 보정합니다. 숨김은 프로세스 종료가 아닙니다.
 
-접어둔 동안에도 CLI 갱신이 가능합니다. 개별 `close`는 전체 복원 대상에서 제외하며, 명시적 `open`과 새 메모는 바로 표시하고 기존 창의 자동 배치를 변경하지 않습니다. 일반 키·Shift·클릭·휠을 섞으면 토글하지 않습니다. 투명도 조절에 쓰는 휠을 제외한 입력은 다른 앱에 그대로 전달됩니다. 안전한 입력 감지 권한이 없거나 다른 Agent Gibbon 인스턴스가 사용 중이면 트레이로 실행합니다. OS 파일 대화상자는 지원 대상에 포함되지 않습니다.
+접어둔 동안에도 CLI 갱신이 가능합니다. 개별 `close`는 전체 복원 대상에서 제외하며, 명시적 `open`과 새 메모는 바로 표시하고 기존 창의 자동 배치를 변경하지 않습니다. 일반 키·Shift·클릭·휠을 섞으면 토글하지 않습니다. 투명도 조절에 쓰는 휠을 제외한 입력은 다른 앱에 그대로 전달됩니다. 안전한 입력 감지 권한이 없거나 다른 Jajan 인스턴스가 사용 중이면 트레이로 실행합니다. OS 파일 대화상자는 지원 대상에 포함되지 않습니다.
 
 구체적인 상호작용·초기 수치와 지원 검증 범위는 [디자인 시스템](docs/design-system.md#전체-창-접어두기--복원--2026-11-04)과 [검증 기록](docs/verification.md#전체-창-접어두기복원-2026-11-04)을 따릅니다.
 
@@ -126,40 +126,40 @@ macOS에서 Rust 1.91+ stable, Node.js 22.13+/pnpm 11.25.0, Xcode Command Line T
 npm install -g pnpm@11.25.0
 pnpm install --frozen-lockfile
 pnpm run build
-./scripts/agent-gibbon open --title '현재 작업' --status '진행 중' --file examples/progress.md
+./scripts/jajan open --title '현재 작업' --status '진행 중' --file examples/progress.md
 ```
 
-앱 번들: `src-tauri/target/release/bundle/macos/Agent Gibbon.app`
+앱 번들: `src-tauri/target/release/bundle/macos/Jajan.app`
 
-macOS에서는 빌드한 **Agent Gibbon.app**을 **응용 프로그램** 폴더로 복사하고 아이콘을 더블 클릭하면 실행됩니다. 실행 중에는 Dock에 앱 아이콘이 표시됩니다. 계속 사용하려면 Dock 아이콘의 **옵션 → Dock에 유지**를 선택하세요. 실행 중 아이콘을 다시 누르면 열린 메모만 앞으로 가져오며, 모든 메모가 숨겨져 있으면 기본 메모를 엽니다. 다른 숨긴 메모는 메뉴 막대에서 개별 복원할 수 있습니다.
+macOS에서는 빌드한 **Jajan.app**을 **응용 프로그램** 폴더로 복사하고 아이콘을 더블 클릭하면 실행됩니다. 실행 중에는 Dock에 앱 아이콘이 표시됩니다. 계속 사용하려면 Dock 아이콘의 **옵션 → Dock에 유지**를 선택하세요. 실행 중 아이콘을 다시 누르면 열린 메모만 앞으로 가져오며, 모든 메모가 숨겨져 있으면 기본 메모를 엽니다. 다른 숨긴 메모는 메뉴 막대에서 개별 복원할 수 있습니다.
 
-CLI 실행 파일: `src-tauri/target/release/agent-gibbon`
+CLI 실행 파일: `src-tauri/target/release/jajan`
 
-프로젝트의 `scripts/agent-gibbon`는 release 실행 파일을 우선 사용하고 없으면 debug 실행 파일을 사용합니다. 다른 디렉터리에서도 절대 경로로 호출할 수 있습니다. Apple 배포 서명·공증은 설정하지 않았습니다. 다운로드한 배포판은 macOS 보안 확인에서 차단될 수 있습니다.
+프로젝트의 `scripts/jajan`는 release 실행 파일을 우선 사용하고 없으면 debug 실행 파일을 사용합니다. 다른 디렉터리에서도 절대 경로로 호출할 수 있습니다. Apple 배포 서명·공증은 설정하지 않았습니다. 다운로드한 배포판은 macOS 보안 확인에서 차단될 수 있습니다.
 
 ```sh
 # 워크트리별 개발 앱 (프론트엔드 서버 없이 Rust 변경 감시)
 pnpm run dev
 # 또는 실행 파일만 빌드한 뒤 CLI open으로 해당 개발 앱 시작
 pnpm run dev:build
-./scripts/agent-gibbon-dev open --id sample --markdown '이 워크트리의 메모'
-./scripts/agent-gibbon-dev inspect --id sample
+./scripts/jajan-dev open --id sample --markdown '이 워크트리의 메모'
+./scripts/jajan-dev inspect --id sample
 pnpm run dev:info
 ```
 
-개발 실행과 `scripts/agent-gibbon-dev`는 실제 워크트리 절대 경로(심볼릭 링크 해소)의 SHA-256 앞 24자리로 같은 `dev-…` ID를 계산합니다. 호출한 현재 디렉터리나 브랜치 이름에는 의존하지 않습니다. 경로를 옮기면 ID도 달라집니다. 소켓과 중복 실행 잠금은 `/tmp/floatnote-{uid}-{개발ID}/`로 분리됩니다. 개발 인스턴스는 창 제목과 메뉴 및 CLI 응답으로 구분하며, 메모 툴바에는 개발 배지를 표시하지 않습니다.
+개발 실행과 `scripts/jajan-dev`는 실제 워크트리 절대 경로(심볼릭 링크 해소)의 SHA-256 앞 24자리로 같은 `dev-…` ID를 계산합니다. 호출한 현재 디렉터리나 브랜치 이름에는 의존하지 않습니다. 경로를 옮기면 ID도 달라집니다. 소켓과 중복 실행 잠금은 `/tmp/jajan-{uid}-{개발ID}/`로 분리됩니다. 개발 인스턴스는 창 제목과 메뉴 및 CLI 응답으로 구분하며, 메모 툴바에는 개발 배지를 표시하지 않습니다.
 
-debug 개발 인스턴스는 기본적으로 첫 실행 약관 확인을 건너뜁니다. 약관 수락·진단 전송 동의 기록을 자동 생성하지 않으며, 진단은 별도 동의 없이는 전송하지 않습니다. 사용자가 약관 흐름 검증을 요청한 경우 `AGENT_GIBBON_REQUIRE_TERMS=1 pnpm run dev` 또는 `AGENT_GIBBON_REQUIRE_TERMS=1 ./scripts/agent-gibbon-dev open --id sample`로 시작합니다(Windows PowerShell: `$env:AGENT_GIBBON_REQUIRE_TERMS='1'`). 이미 실행 중인 인스턴스에는 소급 적용되지 않으며, 현재 정책을 수락한 기록이 있으면 기존 수락을 유지합니다. 설치 앱·기본 인스턴스·release 빌드는 생략 대상이 아닙니다. [동의 경계와 검증](docs/verification/dev-terms-skip-20261106.md)을 참고하세요.
+debug 개발 인스턴스는 기본적으로 첫 실행 약관 확인을 건너뜁니다. 약관 수락·진단 전송 동의 기록을 자동 생성하지 않으며, 진단은 별도 동의 없이는 전송하지 않습니다. 사용자가 약관 흐름 검증을 요청한 경우 `JAJAN_REQUIRE_TERMS=1 pnpm run dev` 또는 `JAJAN_REQUIRE_TERMS=1 ./scripts/jajan-dev open --id sample`로 시작합니다(Windows PowerShell: `$env:JAJAN_REQUIRE_TERMS='1'`). 이미 실행 중인 인스턴스에는 소급 적용되지 않으며, 현재 정책을 수락한 기록이 있으면 기존 수락을 유지합니다. 설치 앱·기본 인스턴스·release 빌드는 생략 대상이 아닙니다. [동의 경계와 검증](docs/verification/dev-terms-skip-20261106.md)을 참고하세요.
 
 개발 표시의 브랜치명은 앱 시작 시 읽습니다. 브랜치를 전환하면 앱을 다시 시작해야 표시가 바뀝니다. Detached HEAD에서는 `detached@커밋해시`, Git 정보를 읽을 수 없으면 작업 폴더명을 표시합니다.
 
-개발 CLI는 해당 워크트리의 `src-tauri/target/debug/agent-gibbon`만 사용하고, 빌드 출처를 확인합니다. release·설치본으로 대체하지 않습니다. 개발 실행기는 `CARGO_TARGET_DIR`를 해당 워크트리로 고정하며 `FLOATNOTE_INSTANCE`·`FLOATNOTE_DEV_NAME`을 자동 전달합니다. 이 변수는 직접 지정할 필요가 없습니다. 로컬 통신 호환성을 위해 내부 변수 이름은 `FLOATNOTE_`를 유지하며, 이전 `scripts/floatnote-dev`는 개발 CLI의 호환 진입점입니다. 기본 호스트 debug 빌드를 지원하며 `pnpm run dev --no-watch`로 감시를 끌 수 있습니다. 다른 프로필·타깃·runner 옵션은 지원하지 않습니다.
+개발 CLI는 해당 워크트리의 `src-tauri/target/debug/jajan`만 사용하고, 빌드 출처를 확인합니다. release·설치본으로 대체하지 않습니다. 개발 실행기는 `CARGO_TARGET_DIR`를 해당 워크트리로 고정하며 `JAJAN_INSTANCE`·`JAJAN_DEV_NAME`을 자동 전달합니다. 이 변수는 직접 지정할 필요가 없습니다. 로컬 통신 호환성을 위해 내부 변수 이름은 `JAJAN_`를 유지하며, 이전 `scripts/jajan-dev`는 개발 CLI의 호환 진입점입니다. 기본 호스트 debug 빌드를 지원하며 `pnpm run dev --no-watch`로 감시를 끌 수 있습니다. 다른 프로필·타깃·runner 옵션은 지원하지 않습니다.
 
-개발·빌드·검사 package 스크립트는 중간 산출물을 `git rev-parse --path-format=absolute --git-common-dir` 아래 `agent-gibbon/build-cache`에 모읍니다. 같은 저장소의 워크트리는 이 캐시를 공유하고 최종 실행 파일은 각 `src-tauri/target`에 유지합니다. `pnpm run dev:info`의 `buildDir`·`binary`로 경로를 확인하세요. Git 정보가 없는 소스 배포본은 로컬 target을 사용합니다. 직접 실행하는 Cargo 명령에는 이 실행기 정책이 자동 적용되지 않습니다.
+개발·빌드·검사 package 스크립트는 중간 산출물을 `git rev-parse --path-format=absolute --git-common-dir` 아래 `jajan/build-cache`에 모읍니다. 같은 저장소의 워크트리는 이 캐시를 공유하고 최종 실행 파일은 각 `src-tauri/target`에 유지합니다. `pnpm run dev:info`의 `buildDir`·`binary`로 경로를 확인하세요. Git 정보가 없는 소스 배포본은 로컬 target을 사용합니다. 직접 실행하는 Cargo 명령에는 이 실행기 정책이 자동 적용되지 않습니다.
 
 새 워크트리의 의존성 재컴파일은 줄지만, 워크트리 전환 시 앱 build script의 경로 의존성 때문에 앱 자체를 다시 컴파일할 수 있고 동시 빌드는 공유 폴더 잠금을 기다립니다. 독립 캐시가 필요하면 `CARGO_BUILD_BUILD_DIR="$PWD/src-tauri/target/build-cache" pnpm run dev:build`처럼 지정하세요(Windows PowerShell은 `$env:CARGO_BUILD_BUILD_DIR` 사용). 기존 target·캐시는 자동 삭제하거나 옮기지 않습니다. pnpm은 표준 사용자 store를 사용하고 실행 파일의 Codex 런타임 절대 경로에는 의존하지 않습니다. [실측과 한계](docs/verification/shared-build-cache-pnpm-20261114.md)를 참고하세요.
 
-기존 `scripts/agent-gibbon`과 환경변수 없이 실행한 설치 앱은 기본 `/tmp/floatnote-{uid}/` 통신 경로를 유지합니다. 개발 검증에는 반드시 `scripts/agent-gibbon-dev`를 사용하세요. `close`는 해당 메모를 숨길 뿐이며, `pnpm run dev`의 종료는 그 실행에서 시작한 개발 앱에만 적용됩니다. CLI가 자동 시작한 앱은 개발 바이너리 경로로 프로세스를 식별해 종료하세요. 이름만으로 모든 앱을 일괄 종료하지 마세요.
+기존 `scripts/jajan`과 환경변수 없이 실행한 설치 앱은 기본 `/tmp/jajan-{uid}/` 통신 경로를 유지합니다. 개발 검증에는 반드시 `scripts/jajan-dev`를 사용하세요. `close`는 해당 메모를 숨길 뿐이며, `pnpm run dev`의 종료는 그 실행에서 시작한 개발 앱에만 적용됩니다. CLI가 자동 시작한 앱은 개발 바이너리 경로로 프로세스를 식별해 종료하세요. 이름만으로 모든 앱을 일괄 종료하지 마세요.
 
 메모·창 상태는 프로세스별로 독립적이지만, `--file`로 같은 원본 파일을 연결하면 파일 자체는 공유됩니다. 동시에 편집할 테스트 파일도 워크트리별로 준비하세요. 두 워크트리를 각각 빌드하고 개발 앱이 실행되지 않은 상태에서 `python3 scripts/isolation-smoke.py --peer /절대경로/다른워크트리`로 동시 실행 회귀를 확인할 수 있습니다. 기존 기본 앱은 실행 중이어야 하며 검증은 기존 앱을 종료하지 않습니다.
 
@@ -170,26 +170,26 @@ debug 개발 인스턴스는 기본적으로 첫 실행 약관 확인을 건너�
 ## CLI
 
 ```sh
-./scripts/agent-gibbon open --title '구현 작업' --status '진행 중' --file examples/progress.md
-./scripts/agent-gibbon update --status '검증 중'
-printf '# 결과\n- [x] 구현 완료\n- [ ] 리뷰\n' | ./scripts/agent-gibbon update --file -
-./scripts/agent-gibbon close
+./scripts/jajan open --title '구현 작업' --status '진행 중' --file examples/progress.md
+./scripts/jajan update --status '검증 중'
+printf '# 결과\n- [x] 구현 완료\n- [ ] 리뷰\n' | ./scripts/jajan update --file -
+./scripts/jajan close
 # 숨긴 상태에서 내용만 변경합니다.
-./scripts/agent-gibbon update --markdown '검증이 끝났습니다.' --status '완료'
-./scripts/agent-gibbon open
-./scripts/agent-gibbon inspect
-./scripts/agent-gibbon --help
+./scripts/jajan update --markdown '검증이 끝났습니다.' --status '완료'
+./scripts/jajan open
+./scripts/jajan inspect
+./scripts/jajan --help
 ```
 
 여러 창은 ID로 구분합니다. ID를 생략하면 기존과 같은 기본 창 `main`을 사용합니다.
 
 ```sh
-./scripts/agent-gibbon open --id research --title '자료' --color '#fff1b8' --markdown '# 조사 메모'
-./scripts/agent-gibbon open --id build --title '구현' --color '#18304a' --markdown '# 구현 메모'
-./scripts/agent-gibbon update --id research --color '#dcecff'
-./scripts/agent-gibbon inspect --id build
-./scripts/agent-gibbon close --id research
-./scripts/agent-gibbon list
+./scripts/jajan open --id research --title '자료' --color '#fff1b8' --markdown '# 조사 메모'
+./scripts/jajan open --id build --title '구현' --color '#18304a' --markdown '# 구현 메모'
+./scripts/jajan update --id research --color '#dcecff'
+./scripts/jajan inspect --id build
+./scripts/jajan close --id research
+./scripts/jajan list
 ```
 
 - ID는 영문·숫자·하이픈·밑줄 1~64자이며 대소문자를 구분합니다. 같은 ID의 `open`은 기존 창을 복원하고 다른 ID는 새 창을 만듭니다.
@@ -208,11 +208,11 @@ macOS에서는 마우스 포인터가 노트 밖에 있으면 창 전체가 50% 
 
 `inspect`는 실제 창의 가시성·포커스·위치·크기·상단 고정과 현재 메모를 JSON으로 반환합니다. 좌표와 크기는 물리 픽셀입니다. 성공 응답은 네이티브 처리 완료를 뜻하며 화면은 최대 약 350ms 뒤 갱신됩니다. 갱신 시각은 Unix epoch 밀리초로 반환하며 CLI 메타데이터에만 보관합니다. 제목·상태·시각은 본문 공간을 차지하지 않으며 필요한 제목은 Markdown 본문에 작성합니다.
 
-앱이 실행되지 않았다면 `update`, `close`, `inspect`, `list`는 실패합니다. 자동 실행은 `open`만 수행합니다. 닫기 버튼·Escape·네이티브 닫기 요청은 프로세스를 종료하지 않고 창만 숨깁니다. 숨긴 뒤에도 메모 내용을 갱신할 수 있습니다. 직접 앱 번들을 실행하는 것도 명시적인 열기로 취급합니다. 메뉴 막대의 Agent Gibbon 아이콘에서 개별 메모를 선택하면 숨긴 창도 복원합니다. 고정 상태를 유지하며 일반 메모의 숨김 복원은 자동 배치 대상 전체를 재배치합니다.
+앱이 실행되지 않았다면 `update`, `close`, `inspect`, `list`는 실패합니다. 자동 실행은 `open`만 수행합니다. 닫기 버튼·Escape·네이티브 닫기 요청은 프로세스를 종료하지 않고 창만 숨깁니다. 숨긴 뒤에도 메모 내용을 갱신할 수 있습니다. 직접 앱 번들을 실행하는 것도 명시적인 열기로 취급합니다. 메뉴 막대의 Jajan 아이콘에서 개별 메모를 선택하면 숨긴 창도 복원합니다. 고정 상태를 유지하며 일반 메모의 숨김 복원은 자동 배치 대상 전체를 재배치합니다.
 
 메모는 생성·CLI 갱신·연필 저장 즉시 Markdown 파일로 보관합니다. 본문과 제목·상태·색상·원본 파일 연결·갱신 시각을 복원하며, 재실행 시 마지막 위치·크기·핀·접힘·표시 상태도 복원합니다. 숨긴 메모는 숨긴 상태, 닫힌 메모는 닫힌 상태로 유지하며 포커스를 가져오지 않습니다. 메뉴 또는 `open --id ID`로 필요한 메모를 엽니다. 글자 크기·미저장 초안은 세션에만 유지됩니다. [복원 동작과 제한](docs/design-system.md#앱-시작-시-창-복원--150)을 참고하세요. `close`는 숨기기이며 저장 파일을 삭제하지 않습니다. 재부팅 후 자동 실행하지 않습니다.
 
-설치 앱은 `~/Documents/agent-gibbon/docs/<노트 ID>/index.md`에 저장합니다. 실제 문서 폴더는 [Tauri 문서 경로](https://docs.rs/tauri/latest/tauri/path/struct.PathResolver.html#method.document_dir)를 사용합니다. 개발 앱은 `~/Library/Application Support/org.egoing.floatnote/notes/dev-<워크트리 해시>/docs/<노트 ID>/index.md`로 분리합니다. `inspect.storage_path`에서 파일 절대 경로를 확인할 수 있습니다. 소문자 ID는 폴더명으로 그대로 사용하고 대문자는 `~`와 16진수로 표현합니다(예: `Ab` → `~41b`). macOS에서도 대소문자만 다른 ID가 충돌하지 않습니다.
+설치 앱은 `~/Documents/jajan/docs/<노트 ID>/index.md`에 저장합니다. 실제 문서 폴더는 [Tauri 문서 경로](https://docs.rs/tauri/latest/tauri/path/struct.PathResolver.html#method.document_dir)를 사용합니다. 개발 앱은 `~/Library/Application Support/app.jajan/notes/dev-<워크트리 해시>/docs/<노트 ID>/index.md`로 분리합니다. `inspect.storage_path`에서 파일 절대 경로를 확인할 수 있습니다. 소문자 ID는 폴더명으로 그대로 사용하고 대문자는 `~`와 16진수로 표현합니다(예: `Ab` → `~41b`). macOS에서도 대소문자만 다른 ID가 충돌하지 않습니다.
 
 각 노트 폴더 안의 `index.md`만 읽고 갱신합니다. 다른 파일은 그대로 보존하며 이미지 캡처·렌더링 기능은 이번 변경에 포함하지 않습니다. 문서 첫 HTML 주석은 기존 복원용 JSON 메타데이터이고 이후는 Markdown 본문 원문입니다. 날짜 추적을 위한 추가 메타데이터는 만들지 않습니다. 파일시스템의 생성일·수정일을 확인할 수 있지만, 원자적 교체·복사·복원으로 생성일이 달라질 수 있으므로 최초 노트 작성일로 보장하지 않습니다.
 
@@ -235,9 +235,9 @@ macOS에서는 마우스 포인터가 노트 밖에 있으면 창 전체가 50% 
 ### 조용한 교체와 최신 완료 강조
 
 ```sh
-agent-gibbon update --id task --file plan.md --change-mode diff
-agent-gibbon update --id task --file plan.md --change-mode replace --highlight newly-completed
-agent-gibbon update --id task --file plan.md --change-mode replace
+jajan update --id task --file plan.md --change-mode diff
+jajan update --id task --file plan.md --change-mode replace --highlight newly-completed
+jajan update --id task --file plan.md --change-mode replace
 ```
 
 옵션 생략은 diff, replace의 강조 기본값은 none입니다. 모드·강조 옵션은 본문이 있는 update에만 허용하며 highlight는 replace와 함께 사용합니다. 잘못된 값·중복 옵션은 오류입니다. replace는 새 diff·전면 배치·불투명 알림을 만들지 않습니다. 새로 미완료→완료가 된 항목만 강조하고 다음 실제 본문 갱신에서 이전 강조를 교체합니다. 동일 본문 재전송·메타데이터 갱신에는 기존 강조를 유지하며 새 알림을 만들지 않습니다. 강조는 읽은 뒤 포커스를 떠날 때 해제하지 않고 재실행 때 복원하지 않습니다.
@@ -248,7 +248,7 @@ agent-gibbon update --id task --file plan.md --change-mode replace
 
 ## 로컬 통신과 안전한 렌더링
 
-동일 사용자 전용 `/tmp/floatnote-<uid>/` 디렉터리(0700)의 Unix socket으로 요청을 전달합니다. 파일 잠금으로 중복 앱을 막고, 잠금을 획득한 프로세스만 이전 socket을 정리합니다. 별도 HTTP 서버나 포트는 없습니다. 같은 사용자 계정의 다른 프로세스는 CLI와 동일한 권한으로 메모에 접근할 수 있습니다. 모든 메모를 로컬 Markdown 저장소에 보관하며, 본문 자동저장에서는 연결된 `--file` 원본도 갱신합니다.
+동일 사용자 전용 `/tmp/jajan-<uid>/` 디렉터리(0700)의 Unix socket으로 요청을 전달합니다. 파일 잠금으로 중복 앱을 막고, 잠금을 획득한 프로세스만 이전 socket을 정리합니다. 별도 HTTP 서버나 포트는 없습니다. 같은 사용자 계정의 다른 프로세스는 CLI와 동일한 권한으로 메모에 접근할 수 있습니다. 모든 메모를 로컬 Markdown 저장소에 보관하며, 본문 자동저장에서는 연결된 `--file` 원본도 갱신합니다.
 
 Rust에서 Markdown을 HTML로 변환하고 정리한 뒤 WebView에 전달합니다. HTML 입력을 실행하지 않으며 체크리스트는 ☑/☐로 표시합니다. 이미지와 링크 이동은 지원하지 않습니다. CSP와 최소 창 조작 권한을 적용했습니다.
 
@@ -260,7 +260,7 @@ Rust에서 Markdown을 HTML로 변환하고 정리한 뒤 WebView에 전달합�
 
 ## 에이전트용 사용 스킬
 
-[Agent Gibbon 사용 스킬](.agents/skills/agent-gibbon/SKILL.md)은 설치된 macOS 앱의 실행 경로와 메모 생성·조회·갱신·색상 지정·숨김 보존 규칙을 담고 있습니다. 일반 메모는 설치 앱을 사용하며, 앱이 없으면 조용히 건너뜁니다. 특정 워크트리의 개발 앱 사용을 명시했거나 Agent Gibbon 자체를 개발·검증하는 작업에서는 해당 워크트리의 개발 스크립트를 사용합니다. 개발 실행 절차는 위의 빌드와 실행 절을 따릅니다. 작업계획 표시 같은 운영 정책은 사용자 `AGENTS.md`에서 정합니다. 예제는 [examples/progress.md](examples/progress.md)입니다.
+[Jajan 사용 스킬](.agents/skills/jajan/SKILL.md)은 설치된 macOS 앱의 실행 경로와 메모 생성·조회·갱신·색상 지정·숨김 보존 규칙을 담고 있습니다. 일반 메모는 설치 앱을 사용하며, 앱이 없으면 조용히 건너뜁니다. 특정 워크트리의 개발 앱 사용을 명시했거나 Jajan 자체를 개발·검증하는 작업에서는 해당 워크트리의 개발 스크립트를 사용합니다. 개발 실행 절차는 위의 빌드와 실행 절을 따릅니다. 작업계획 표시 같은 운영 정책은 사용자 `AGENTS.md`에서 정합니다. 예제는 [examples/progress.md](examples/progress.md)입니다.
 
 작업계획을 표시하는 경우에는 순서와 단계를 유연하게 바꾸되, 기존 미완료 항목의 유지·대체·보류·제외 이유와 미검증 범위를 이어서 표시합니다. 구현 완료와 동작 검증 완료를 구분하며, 완료된 이력은 요약할 수 있습니다. 특정 작업 순서나 계획 형식을 강제하지 않습니다.
 
@@ -311,14 +311,14 @@ python3 scripts/macos-tray-smoke.py
 pnpm run build:release
 ```
 
-호스트 CPU용 앱과 DMG를 `src-tauri/target/release/bundle/`에 만듭니다. v0.2.7은 Apple Silicon용 `Agent Gibbon_0.2.7_aarch64.dmg`와 Intel용 `Agent Gibbon_0.2.7_x64.dmg`를 제공합니다.
+호스트 CPU용 앱과 DMG를 `src-tauri/target/release/bundle/`에 만듭니다. v0.2.7은 Apple Silicon용 `Jajan_0.2.7_aarch64.dmg`와 Intel용 `Jajan_0.2.7_x64.dmg`를 제공합니다.
 
-새 빌드의 **Agent Gibbon.app을 Applications로 복사**한 후 실행합니다. 기존 v0.2.5 이하 릴리스 자산은 당시 이름인 Floatnote를 유지합니다. 이 배포판은 Apple Developer ID 서명·공증을 하지 않았습니다. 신뢰하는 출처에서 받은 파일인지 확인한 후 macOS의 **시스템 설정 → 개인정보 보호 및 보안 → 그래도 열기** 절차가 필요할 수 있습니다.
+새 빌드의 **Jajan.app을 Applications로 복사**한 후 실행합니다. 기존 v0.2.5 이하 릴리스 자산은 당시 이름인 Jajan를 유지합니다. 이 배포판은 Apple Developer ID 서명·공증을 하지 않았습니다. 신뢰하는 출처에서 받은 파일인지 확인한 후 macOS의 **시스템 설정 → 개인정보 보호 및 보안 → 그래도 열기** 절차가 필요할 수 있습니다.
 
 설치된 앱에 포함된 CLI도 사용할 수 있습니다.
 
 ```sh
-'/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon' open --markdown '# 안녕하세요'
+'/Applications/Jajan.app/Contents/MacOS/jajan' open --markdown '# 안녕하세요'
 ```
 
 새 버전으로 교체하기 전 필요한 메모를 저장하고 실행 중인 앱을 종료하세요. 새 버전의 저장된 메모는 재실행 시 마지막 창 배치와 표시 상태를 복원합니다.
@@ -339,28 +339,28 @@ pnpm run build:release
 
 운영자는 egoing, 개인정보 문의는 egoing+support@gmail.com이며 Sentry 저장 지역은 미국 아이오와입니다. **첫 실행과 설정에서 선택적으로 동의하거나 철회할 수 있습니다.** 진단 원본은 최대 30일이며 백업과 오류 누적 통계는 별도 기준을 적용합니다. Release Health 세션 수집은 보유기간 확인 전 비활성화합니다. [약관](docs/legal/terms.md), [개인정보·국외 이전 안내](docs/legal/privacy.md), [와이어프레임](docs/design/privacy-onboarding.png)을 확인하세요. 문서 버전이 바뀌면 과거 동의를 자동 승계하지 않습니다.
 
-DSN이나 `AGENT_GIBBON_DIAGNOSTICS=1`은 동의를 대신하지 않습니다. 개발 빌드는 자신의 DSN과 진단 실행 조건에 더해 같은 명시적 동의가 필요합니다. `AGENT_GIBBON_TELEMETRY=off`는 항상 전송을 차단합니다. 설정에서 철회하면 새 전송을 막고 과거 동의 세대의 대기 자료는 재전송하지 않습니다. 이미 시작한 요청과 이미 수신된 자료의 삭제는 별도로 구분합니다. [진단 안내](docs/diagnostics.md)를 참고하세요.
+DSN이나 `JAJAN_DIAGNOSTICS=1`은 동의를 대신하지 않습니다. 개발 빌드는 자신의 DSN과 진단 실행 조건에 더해 같은 명시적 동의가 필요합니다. `JAJAN_TELEMETRY=off`는 항상 전송을 차단합니다. 설정에서 철회하면 새 전송을 막고 과거 동의 세대의 대기 자료는 재전송하지 않습니다. 이미 시작한 요청과 이미 수신된 자료의 삭제는 별도로 구분합니다. [진단 안내](docs/diagnostics.md)를 참고하세요.
 
 메모·제목·연결 경로·명령·터미널 출력·화면·clipboard·사용자/장치 식별자를 전송하지 않습니다. Rust 스택과 안전한 앱 JS 파일명·행·열, 고정 작업명·시간·횟수, 버전·커밋·OS·아키텍처만 진단에 사용합니다. 오류 문구·소스 문맥·로컬 절대 경로를 제거하고 모든 전송 항목에 필터를 적용합니다. 서버는 네트워크 연결의 IP 주소를 볼 수 있습니다. replay·첨부·메모리 덤프·함수별 CPU 프로파일링은 추가하지 않았습니다.
 
-공식 배포 DSN은 Actions secret/variable `AGENT_GIBBON_SENTRY_DSN`으로 빌드 시 주입합니다. 관리 API 토큰을 앱에 포함하지 않으며 `.env`는 자동 로드하지 않습니다. 원문 없는 로컬 중단/복구 기록은 상세 모드에서만 최대 64개 보관합니다. 끄기 설정은 이미 전송한 데이터나 기존 로컬 기록을 삭제하지 않습니다. 이 변경은 이전 설치 파일의 수집 방식을 바꾸지 않습니다.
+공식 배포 DSN은 Actions secret/variable `JAJAN_SENTRY_DSN`으로 빌드 시 주입합니다. 관리 API 토큰을 앱에 포함하지 않으며 `.env`는 자동 로드하지 않습니다. 원문 없는 로컬 중단/복구 기록은 상세 모드에서만 최대 64개 보관합니다. 끄기 설정은 이미 전송한 데이터나 기존 로컬 기록을 삭제하지 않습니다. 이 변경은 이전 설치 파일의 수집 방식을 바꾸지 않습니다.
 
-## Agent Gibbon 이름 전환
+## Jajan 이름 전환
 
-앱 표시 이름은 **Agent Gibbon**, 저장소·CLI·스킬 이름은 `agent-gibbon`입니다. 기존 `scripts/floatnote`는 새 CLI로 연결하는 호환 진입점입니다.
+앱 표시 이름은 **Jajan**, 저장소·CLI·스킬 이름은 `jajan`입니다. 기존 `scripts/jajan`는 새 CLI로 연결하는 호환 진입점입니다.
 
-기존 메모와 설정을 보존하기 위해 앱 식별자 `org.egoing.floatnote`, Unix socket 디렉터리 `/tmp/floatnote-<uid>`, 안내 숨김 설정 키는 유지합니다. 실행 중인 Floatnote에도 새 CLI로 접근할 수 있습니다. 설치 파일을 교체해도 실행 중인 앱은 자동 종료하지 않으며, 새 표시 이름과 기능은 다음 앱 시작부터 적용됩니다. 구버전의 메모리는 복원되지 않으므로 교체 전 필요한 내용을 먼저 저장하세요.
+기존 메모와 설정을 보존하기 위해 앱 식별자 `app.jajan`, Unix socket 디렉터리 `/tmp/jajan-<uid>`, 안내 숨김 설정 키는 유지합니다. 실행 중인 Jajan에도 새 CLI로 접근할 수 있습니다. 설치 파일을 교체해도 실행 중인 앱은 자동 종료하지 않으며, 새 표시 이름과 기능은 다음 앱 시작부터 적용됩니다. 구버전의 메모리는 복원되지 않으므로 교체 전 필요한 내용을 먼저 저장하세요.
 
-Sentry DSN은 빌드 시 `AGENT_GIBBON_SENTRY_DSN`만 사용합니다. 기존 `FLOATNOTE_SENTRY_DSN` 호환과 실행 시 DSN 재지정은 지원하지 않습니다. 과거 검증 로그·릴리스 이름과 Sentry 프로젝트 이름은 이전 기록과의 연결을 위해 보존합니다.
+Sentry DSN은 빌드 시 `JAJAN_SENTRY_DSN`만 사용합니다. 기존 `JAJAN_SENTRY_DSN` 호환과 실행 시 DSN 재지정은 지원하지 않습니다. 과거 검증 로그·릴리스 이름과 Sentry 프로젝트 이름은 이전 기록과의 연결을 위해 보존합니다.
 
 
 ## 라이선스
 
-Agent Gibbon의 소스 코드는 [MIT 라이선스](LICENSE)로 공개합니다. 저작권 및 라이선스 고지를 유지하는 조건으로 사용·수정·재배포·상업적 활용이 가능합니다. 포함되거나 연결된 외부 라이브러리에는 각 프로젝트의 라이선스가 별도로 적용됩니다.
+Jajan의 소스 코드는 [MIT 라이선스](LICENSE)로 공개합니다. 저작권 및 라이선스 고지를 유지하는 조건으로 사용·수정·재배포·상업적 활용이 가능합니다. 포함되거나 연결된 외부 라이브러리에는 각 프로젝트의 라이선스가 별도로 적용됩니다.
 
 ## 홈페이지 운영
 
-[공식 홈페이지](https://agentgibbon.com/)는 Vercel에서 `website/dist/`의 정적 파일을 배포합니다. Cloudflare는 DNS를 관리합니다. 배포 설정·검색 등록 상태·검증 기록은 [홈페이지 운영 문서](website/README.md)를 참고하세요. 데스크톱 앱 빌드와 홈페이지 배포는 별개입니다.
+[공식 홈페이지](https://jajan.app/)는 Vercel에서 `website/dist/`의 정적 파일을 배포합니다. Cloudflare는 DNS를 관리합니다. 배포 설정·검색 등록 상태·검증 기록은 [홈페이지 운영 문서](website/README.md)를 참고하세요. 데스크톱 앱 빌드와 홈페이지 배포는 별개입니다.
 
 ## 범용 터미널
 
@@ -370,17 +370,17 @@ Ctrl+Shift+3 또는 트레이의 **영역 터미널**에서 위치를 선택하�
 
 ## 웹 창
 
-`Ctrl+Shift+4` 또는 트레이 **영역 웹 창**에서 영역을 선택하면 웹 시작 화면이 열립니다. HTTP(S) 주소를 입력하고 **실행**하거나 Enter를 누르면 Agent Gibbon 웹 창에서 표시합니다. 기존 메모와 터미널 단축키는 유지합니다.
+`Ctrl+Shift+4` 또는 트레이 **영역 웹 창**에서 영역을 선택하면 웹 시작 화면이 열립니다. HTTP(S) 주소를 입력하고 **실행**하거나 Enter를 누르면 Jajan 웹 창에서 표시합니다. 기존 메모와 터미널 단축키는 유지합니다.
 
 ```sh
-./scripts/agent-gibbon web --id web-reference
-./scripts/agent-gibbon web --id web-reference --url 'https://example.com/'
-./scripts/agent-gibbon inspect --id web-reference
-./scripts/agent-gibbon close --id web-reference
-./scripts/agent-gibbon web --id web-reference
+./scripts/jajan web --id web-reference
+./scripts/jajan web --id web-reference --url 'https://example.com/'
+./scripts/jajan inspect --id web-reference
+./scripts/jajan close --id web-reference
+./scripts/jajan web --id web-reference
 ```
 
-개발 테스트는 위 명령의 실행기를 `./scripts/agent-gibbon-dev`로 바꿉니다. ID를 생략하면 새 웹 창을 만들며, 지정할 때는 `web-`로 시작하는 고유 ID를 사용합니다. `web`의 URL 생략과 기존 ID의 `open`은 현재 페이지를 유지하며 복원하고, CLI `close`는 숨깁니다. 툴바 X와 운영체제의 닫기는 해당 웹 세션을 종료하며, 종료한 웹 창은 재시작 때 복원하지 않습니다. `list`는 웹 창도 포함합니다. 웹 창은 직전 HTTP(S) URL과 배치·표시 상태로 복원합니다. URL은 로컬 복원 파일에만 저장합니다. 터미널은 이전 프로세스 종료를 안내하는 시작 화면으로 복원하며 명령을 자동 실행하지 않습니다.
+개발 테스트는 위 명령의 실행기를 `./scripts/jajan-dev`로 바꿉니다. ID를 생략하면 새 웹 창을 만들며, 지정할 때는 `web-`로 시작하는 고유 ID를 사용합니다. `web`의 URL 생략과 기존 ID의 `open`은 현재 페이지를 유지하며 복원하고, CLI `close`는 숨깁니다. 툴바 X와 운영체제의 닫기는 해당 웹 세션을 종료하며, 종료한 웹 창은 재시작 때 복원하지 않습니다. `list`는 웹 창도 포함합니다. 웹 창은 직전 HTTP(S) URL과 배치·표시 상태로 복원합니다. URL은 로컬 복원 파일에만 저장합니다. 터미널은 이전 프로세스 종료를 안내하는 시작 화면으로 복원하며 명령을 자동 실행하지 않습니다.
 
 로컬 개발 페이지의 HTTP 주소도 허용합니다. 앱 내부 주소·자격증명 포함 주소·HTTP(S) 이외의 스킴은 거절하며 이후 페이지 이동에도 적용합니다. 외부 웹 콘텐츠는 앱 특권 IPC에 접근할 수 없으며 팝업·다운로드는 차단합니다. 별도 웹 서버는 추가하지 않습니다. 화면·동작 기준은 [디자인 시스템](docs/design-system.md#web-welcome--92-2026-11-07)을 따릅니다.
 

@@ -39,7 +39,7 @@ began = time.monotonic()
 
 
 def cli(action, *values):
-    result = json.loads(run(ROOT / 'scripts/agent-gibbon-dev', action, '--id', id, *values))
+    result = json.loads(run(ROOT / 'scripts/jajan-dev', action, '--id', id, *values))
     assert result['ok'] and result['instance'] == info['id'], result
     return result
 
@@ -61,7 +61,7 @@ def wait(predicate, label, timeout=5):
     raise AssertionError((label, current))
 
 
-with tempfile.TemporaryDirectory(prefix='gibbon-issue54-') as directory:
+with tempfile.TemporaryDirectory(prefix='jajan-issue54-') as directory:
     temp = Path(directory)
     for source, name in [('entrance-pointer.swift', 'pointer'), ('auto-layout-native.swift', 'native'),
                          ('macos-input.swift', 'mouse'),
@@ -89,7 +89,7 @@ with tempfile.TemporaryDirectory(prefix='gibbon-issue54-') as directory:
         matches = [int(row[0]) for row in processes if len(row) == 2 and row[1] == info['binary'] + ' --serve']
         assert len(matches) == 1, matches
         pid = matches[0]
-        title = 'Agent Gibbon [' + proof['dev_label'] + '] — '
+        title = 'Jajan [' + proof['dev_label'] + '] — '
         report.update(pid=pid, executable=info['binary'], proof=proof)
 
         def native():

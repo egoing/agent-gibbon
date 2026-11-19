@@ -1,6 +1,6 @@
 'use strict';
 
-const updaterInvoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
+const updaterInvoke = window.jajanInvoke || window.__TAURI__.core.invoke;
 const updaterEl = id => document.getElementById(id);
 const phaseText = {
   disabled: '자동 업데이트를 사용할 수 없습니다.',
@@ -62,7 +62,7 @@ async function runUpdaterAction(command) {
 
 updaterEl('updater-check').onclick = () => runUpdaterAction('updater_check');
 updaterEl('updater-install').onclick = () => runUpdaterAction('updater_install');
-window.gibbonUpdater = { refresh: refreshUpdater };
+window.jajanUpdater = { refresh: refreshUpdater };
 
 setInterval(() => {
   if (!document.hidden && !updaterEl('settings-page').hidden && !updaterEl('settings-updater').hidden) refreshUpdater();

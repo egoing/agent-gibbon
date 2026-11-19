@@ -9,7 +9,7 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-BIN = str(ROOT / 'scripts/agent-gibbon-dev')
+BIN = str(ROOT / 'scripts/jajan-dev')
 ID = 'feedback-smoke-' + uuid.uuid4().hex[:8]
 INSTANCE = json.loads(subprocess.check_output(['node', str(ROOT / 'scripts/dev.mjs'), 'info'], text=True))
 assert INSTANCE['root'] == str(ROOT)
@@ -35,7 +35,7 @@ def apple(script):
     return subprocess.check_output(['osascript', '-e', script], text=True, stderr=subprocess.PIPE, timeout=20).strip()
 
 def ui(action, *args, feedback=False):
-    title = f"Agent Gibbon [{label}] — {ID}" + (' · Feedback' if feedback else '')
+    title = f"Jajan [{label}] — {ID}" + (' · Feedback' if feedback else '')
     command = [str(helper), str(pid), title, action, *args]
     for attempt in range(30):
         result = subprocess.run(command, text=True, capture_output=True)
@@ -52,7 +52,7 @@ def draft(text):
     assert ui('draft', text).rstrip('\n') == text
 
 import tempfile
-helper_folder = tempfile.TemporaryDirectory(prefix='gibbon-feedback-ax-')
+helper_folder = tempfile.TemporaryDirectory(prefix='jajan-feedback-ax-')
 helper = Path(helper_folder.name) / 'feedback-ax'
 subprocess.run(['swiftc', str(ROOT / 'scripts/design-system-ax.swift'), '-o', str(helper)], check=True)
 
@@ -62,12 +62,12 @@ try:
     state = cli('open', '--title', 'Feedback 검증', '--color', '#fff5cf', '--markdown', '# 원본\n본문')
     created = True
     label = state['dev_label']
-    expected = str(ROOT / 'src-tauri/target/debug/agent-gibbon') + ' --serve'
+    expected = str(ROOT / 'src-tauri/target/debug/jajan') + ' --serve'
     processes = subprocess.check_output(['ps', '-axo', 'pid=,command='], text=True).splitlines()
     matches = [int(line.strip().split(None, 1)[0]) for line in processes if line.strip().split(None, 1)[-1] == expected]
     assert len(matches) == 1, matches
     pid = matches[0]
-    print(f'PID={pid}; note={ID}; native title=Agent Gibbon [{label}] — {ID}', flush=True)
+    print(f'PID={pid}; note={ID}; native title=Jajan [{label}] — {ID}', flush=True)
     state = cli('inspect')
     assert state['note']['markdown'] == '# 원본\n본문', state
     # First creation and reuse after hidden WebView timers have gone idle must

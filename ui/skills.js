@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
+  const invoke = window.jajanInvoke || window.__TAURI__.core.invoke;
   const el = id => document.getElementById(id);
   const rows = new Map();
   let state = [], busy = false, loaded = false;
@@ -62,5 +62,5 @@
       feedback(String(error));
     } finally { busy = false; render(); }
   }
-  window.gibbonSkills = { refresh };
+  window.jajanSkills = { refresh };
 })();

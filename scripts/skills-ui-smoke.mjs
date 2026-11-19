@@ -8,9 +8,9 @@ const browser=await puppeteer.launch({executablePath:process.env.CHROME_BIN||'/A
 try {
  const page=await browser.newPage();const errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));
  await page.setRequestInterception(true);
- page.on('request',r=>{const url=new URL(r.url());if(url.hostname!=='gibbon.test'){external.push(r.url());return r.abort();}const file=root+'ui'+url.pathname;if(!fs.existsSync(file))return r.respond({status:404,body:''});return r.respond({status:200,contentType:file.endsWith('.css')?'text/css':/\.(m?js)$/.test(file)?'text/javascript':'text/html',body:fs.readFileSync(file)});});
+ page.on('request',r=>{const url=new URL(r.url());if(url.hostname!=='jajan.test'){external.push(r.url());return r.abort();}const file=root+'ui'+url.pathname;if(!fs.existsSync(file))return r.respond({status:404,body:''});return r.respond({status:200,contentType:file.endsWith('.css')?'text/css':/\.(m?js)$/.test(file)?'text/javascript':'text/html',body:fs.readFileSync(file)});});
  await page.evaluateOnNewDocument(()=>{
-  let skills=[{id:'agent-gibbon',name:'메모 관리',description:'Agent Gibbon의 메모 생성·조회·갱신·숨기기를 사용합니다. 기존 창의 위치와 포커스, 숨김 상태를 유지합니다.',enabled:false},{id:'agent-gibbon-progress',name:'작업 진행 표시',description:'작업 계획과 진행상황을 플로팅 체크리스트 메모로 표시합니다. 실제로 끝난 단계와 미검증 범위를 구분하며 같은 메모를 갱신합니다.',enabled:false}];
+  let skills=[{id:'jajan',name:'메모 관리',description:'Jajan의 메모 생성·조회·갱신·숨기기를 사용합니다. 기존 창의 위치와 포커스, 숨김 상태를 유지합니다.',enabled:false},{id:'jajan-progress',name:'작업 진행 표시',description:'작업 계획과 진행상황을 플로팅 체크리스트 메모로 표시합니다. 실제로 끝난 단계와 미검증 범위를 구분하며 같은 메모를 갱신합니다.',enabled:false}];
   window.calls=[];window.__TAURI__={core:{invoke:async(name,args)=>{
    window.calls.push({name,args});
    if(name==='privacy_status')return {terms_accepted:true,sharing:false,notice_ready:true};
@@ -25,7 +25,7 @@ try {
  });
  const toggle=()=>page.$$('.skill-switch');
  for(const [width,height] of [[944,480],[600,360]]) {
-  await page.setViewport({width,height});await page.goto('http://gibbon.test/manager.html');await page.waitForFunction(()=>!document.getElementById('manager-navigation').hidden);
+  await page.setViewport({width,height});await page.goto('http://jajan.test/manager.html');await page.waitForFunction(()=>!document.getElementById('manager-navigation').hidden);
   await page.click('#settings-nav');await page.click('#settings-skills-nav');await page.waitForSelector('.skill-item');
   assert.equal((await page.$$('.skill-item')).length,2);
   assert.equal(await page.$eval('#settings-skills',e=>e.querySelectorAll('input,select,textarea').length),0);
@@ -57,9 +57,9 @@ try {
   const cdp=await page.createCDPSession();const {nodes}=await cdp.send('Accessibility.getFullAXTree');const switches=nodes.filter(n=>n.role?.value==='switch');
   assert.equal(switches.length,2);assert(switches.some(n=>n.name.value==='작업 진행 표시'&&n.properties.some(p=>p.name==='checked'&&p.value.value==='true')));await cdp.detach();
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert(await page.$eval('.settings-content',e=>e.scrollWidth<=e.clientWidth));
-  await page.$eval('.settings-content',e=>e.scrollTop=0);fs.mkdirSync('/tmp/gibbon-skills-ui',{recursive:true});await page.screenshot({path:`/tmp/gibbon-skills-ui/expanded-${width}.png`});
+  await page.$eval('.settings-content',e=>e.scrollTop=0);fs.mkdirSync('/tmp/jajan-skills-ui',{recursive:true});await page.screenshot({path:`/tmp/jajan-skills-ui/expanded-${width}.png`});
   for(const s of await page.$$('.skill-item summary')){const open=await s.evaluate(e=>e.parentElement.open);if(open)await s.click();}
-  await page.$eval('.settings-content',e=>e.scrollTop=0);await page.screenshot({path:`/tmp/gibbon-skills-ui/collapsed-${width}.png`});
+  await page.$eval('.settings-content',e=>e.scrollTop=0);await page.screenshot({path:`/tmp/jajan-skills-ui/collapsed-${width}.png`});
  }
  assert.deepEqual(errors,[]);assert.deepEqual(external,[]);console.log('PASS: skills accordion, keyboard, accessible switch state, independent toggles, no optimistic install, error recovery, two viewports, no JS errors/external requests.');
 }finally{await browser.close();}

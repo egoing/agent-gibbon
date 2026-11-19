@@ -9,11 +9,11 @@ import { prepareAssets } from '../scripts/release-assets.mjs';
 // Signed updater releases must fail closed before a manifest/checksum can be published.
 // Platform selection is deliberately not assumed by these negative cases.
 function installers(t, canonical = false) {
-  const directory = mkdtempSync(join(tmpdir(), 'gibbon-updater-assets-'));
+  const directory = mkdtempSync(join(tmpdir(), 'jajan-updater-assets-'));
   t.after(() => rmSync(directory, { recursive: true, force: true }));
   const names = canonical
-    ? ['Agent.Gibbon_9.0.0_aarch64.dmg', 'Agent.Gibbon_9.0.0_x64.dmg', 'Agent.Gibbon_9.0.0_x64-setup.exe']
-    : ['Agent Gibbon_9.0.0_aarch64.dmg', 'Agent Gibbon_9.0.0_x64.dmg', 'Agent Gibbon_9.0.0_x64-setup.exe'];
+    ? ['Jajan_9.0.0_aarch64.dmg', 'Jajan_9.0.0_x64.dmg', 'Jajan_9.0.0_x64-setup.exe']
+    : ['Jajan_9.0.0_aarch64.dmg', 'Jajan_9.0.0_x64.dmg', 'Jajan_9.0.0_x64-setup.exe'];
   for (const name of names) {
     writeFileSync(join(directory, name), 'fixture installer');
   }
@@ -21,19 +21,19 @@ function installers(t, canonical = false) {
 }
 
 const updaterFiles = version => [
-  `Agent.Gibbon_${version}_darwin-aarch64.app.tar.gz`,
-  `Agent.Gibbon_${version}_darwin-x86_64.app.tar.gz`,
-  `Agent.Gibbon_${version}_aarch64.dmg`,
-  `Agent.Gibbon_${version}_x64.dmg`,
-  `Agent.Gibbon_${version}_x64-setup.exe`,
+  `Jajan_${version}_darwin-aarch64.app.tar.gz`,
+  `Jajan_${version}_darwin-x86_64.app.tar.gz`,
+  `Jajan_${version}_aarch64.dmg`,
+  `Jajan_${version}_x64.dmg`,
+  `Jajan_${version}_x64-setup.exe`,
 ];
 
 function signedAssets(directory, version) {
   for (const name of updaterFiles(version)) writeFileSync(join(directory, name), `payload ${name}`);
   for (const [target, filename] of [
-    ['darwin-aarch64', `Agent.Gibbon_${version}_darwin-aarch64.app.tar.gz`],
-    ['darwin-x86_64', `Agent.Gibbon_${version}_darwin-x86_64.app.tar.gz`],
-    ['windows-x86_64', `Agent.Gibbon_${version}_x64-setup.exe`],
+    ['darwin-aarch64', `Jajan_${version}_darwin-aarch64.app.tar.gz`],
+    ['darwin-x86_64', `Jajan_${version}_darwin-x86_64.app.tar.gz`],
+    ['windows-x86_64', `Jajan_${version}_x64-setup.exe`],
   ]) {
     const {privateKey, publicKey} = generateKeyPairSync('ed25519');
     const id = Buffer.alloc(8, 1);
@@ -72,22 +72,22 @@ test('updater preparation emits a target-specific manifest with encoded release 
   assert.equal(manifest.version, '9.0.0');
   assert.equal(manifest.notes, '');
   assert.deepEqual(Object.keys(manifest.platforms).sort(), ['darwin-aarch64', 'darwin-x86_64', 'windows-x86_64']);
-  assert.equal(manifest.platforms['darwin-aarch64'].url, 'https://github.com/egoing/agent-gibbon/releases/download/v9.0.0/Agent.Gibbon_9.0.0_darwin-aarch64.app.tar.gz');
-  assert.equal(manifest.platforms['darwin-aarch64'].signature, readFileSync(join(directory, 'Agent.Gibbon_9.0.0_darwin-aarch64.app.tar.gz.sig'), 'utf8'));
+  assert.equal(manifest.platforms['darwin-aarch64'].url, 'https://github.com/egoing/agent-gibbon/releases/download/v9.0.0/Jajan_9.0.0_darwin-aarch64.app.tar.gz');
+  assert.equal(manifest.platforms['darwin-aarch64'].signature, readFileSync(join(directory, 'Jajan_9.0.0_darwin-aarch64.app.tar.gz.sig'), 'utf8'));
   assert.match(Buffer.from(manifest.platforms['darwin-aarch64'].signature, 'base64').toString('utf8'), /version:9\.0\.0/);
-  assert.equal(manifest.platforms['darwin-x86_64'].url, 'https://github.com/egoing/agent-gibbon/releases/download/v9.0.0/Agent.Gibbon_9.0.0_darwin-x86_64.app.tar.gz');
-  assert.equal(manifest.platforms['windows-x86_64'].url, 'https://github.com/egoing/agent-gibbon/releases/download/v9.0.0/Agent.Gibbon_9.0.0_x64-setup.exe');
-  assert.equal(manifest.platforms['windows-x86_64'].signature, readFileSync(join(directory, 'Agent.Gibbon_9.0.0_x64-setup.exe.sig'), 'utf8'));
+  assert.equal(manifest.platforms['darwin-x86_64'].url, 'https://github.com/egoing/agent-gibbon/releases/download/v9.0.0/Jajan_9.0.0_darwin-x86_64.app.tar.gz');
+  assert.equal(manifest.platforms['windows-x86_64'].url, 'https://github.com/egoing/agent-gibbon/releases/download/v9.0.0/Jajan_9.0.0_x64-setup.exe');
+  assert.equal(manifest.platforms['windows-x86_64'].signature, readFileSync(join(directory, 'Jajan_9.0.0_x64-setup.exe.sig'), 'utf8'));
   assert.equal(readFileSync(join(directory, 'SHA256SUMS.txt'), 'utf8').trim().split('\n').length, 11);
   assert.deepEqual(readFileSync(join(directory, 'SHA256SUMS.txt'), 'utf8').trim().split('\n').map(line => line.slice(66)).sort(), [
-    'Agent.Gibbon_9.0.0_aarch64.dmg',
-    'Agent.Gibbon_9.0.0_darwin-aarch64.app.tar.gz',
-    'Agent.Gibbon_9.0.0_darwin-aarch64.app.tar.gz.sig',
-    'Agent.Gibbon_9.0.0_darwin-x86_64.app.tar.gz',
-    'Agent.Gibbon_9.0.0_darwin-x86_64.app.tar.gz.sig',
-    'Agent.Gibbon_9.0.0_x64-setup.exe',
-    'Agent.Gibbon_9.0.0_x64-setup.exe.sig',
-    'Agent.Gibbon_9.0.0_x64.dmg',
+    'Jajan_9.0.0_aarch64.dmg',
+    'Jajan_9.0.0_darwin-aarch64.app.tar.gz',
+    'Jajan_9.0.0_darwin-aarch64.app.tar.gz.sig',
+    'Jajan_9.0.0_darwin-x86_64.app.tar.gz',
+    'Jajan_9.0.0_darwin-x86_64.app.tar.gz.sig',
+    'Jajan_9.0.0_x64-setup.exe',
+    'Jajan_9.0.0_x64-setup.exe.sig',
+    'Jajan_9.0.0_x64.dmg',
     'darwin-aarch64.pub',
     'darwin-x86_64.pub',
     'windows-x86_64.pub',
@@ -97,7 +97,7 @@ test('updater preparation emits a target-specific manifest with encoded release 
 test('updater preparation rejects signatures that do not bind the published stable version', t => {
   const directory = installers(t, true);
   signedAssets(directory, '9.0.0');
-  const signaturePath = join(directory, 'Agent.Gibbon_9.0.0_darwin-aarch64.app.tar.gz.sig');
+  const signaturePath = join(directory, 'Jajan_9.0.0_darwin-aarch64.app.tar.gz.sig');
   const decodedSignature = Buffer.from(readFileSync(signaturePath, 'utf8'), 'base64').toString('utf8');
   writeFileSync(signaturePath, Buffer.from(decodedSignature.replace('version:9.0.0', 'version:8.0.0')).toString('base64'));
   const manifest = join(directory, 'latest.json');
@@ -120,8 +120,8 @@ test('updater preparation only accepts stable semver versions', t => {
 test('damaged payload, wrong signing key and swapped platforms never publish a manifest', t => {
   for (const mutation of ['payload', 'key', 'platform']) {
     const directory = installers(t, true); signedAssets(directory, '9.0.0');
-    const arm = join(directory,'Agent.Gibbon_9.0.0_darwin-aarch64.app.tar.gz');
-    const intel = join(directory,'Agent.Gibbon_9.0.0_darwin-x86_64.app.tar.gz');
+    const arm = join(directory,'Jajan_9.0.0_darwin-aarch64.app.tar.gz');
+    const intel = join(directory,'Jajan_9.0.0_darwin-x86_64.app.tar.gz');
     if (mutation === 'payload') writeFileSync(arm,'tampered');
     if (mutation === 'key') writeFileSync(join(directory,'darwin-aarch64.pub'), readFileSync(join(directory,'windows-x86_64.pub')));
     if (mutation === 'platform') {
@@ -137,9 +137,9 @@ test('Tauri CLI signatures verify with the release verifier without private keys
   const directory = installers(t, true);
   const fixture = new URL('./fixtures/updater/', import.meta.url);
   for (const [target, name] of [
-    ['darwin-aarch64','Agent.Gibbon_9.0.0_darwin-aarch64.app.tar.gz'],
-    ['darwin-x86_64','Agent.Gibbon_9.0.0_darwin-x86_64.app.tar.gz'],
-    ['windows-x86_64','Agent.Gibbon_9.0.0_x64-setup.exe'],
+    ['darwin-aarch64','Jajan_9.0.0_darwin-aarch64.app.tar.gz'],
+    ['darwin-x86_64','Jajan_9.0.0_darwin-x86_64.app.tar.gz'],
+    ['windows-x86_64','Jajan_9.0.0_x64-setup.exe'],
   ]) {
     writeFileSync(join(directory,name),readFileSync(new URL('payload',fixture)));
     writeFileSync(join(directory,`${name}.sig`),readFileSync(new URL(`${target}.sig`,fixture)));

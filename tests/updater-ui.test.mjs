@@ -36,20 +36,20 @@ test('manager exposes updater settings navigation and panel without a modal', ()
 
 test('status renders version and download progress, and installs only when ready', async () => {
   const app = setup({ phase: 'downloading', version: '1.3.0', current_version: '1.2.3', downloaded: 40, total: 100, message: '다운로드 중' });
-  await app.run('window.gibbonUpdater.refresh()');
+  await app.run('window.jajanUpdater.refresh()');
   assert.equal(app.requests[0].name, 'updater_status');
   assert.match(app.elements.get('updater-status').textContent, /다운로드/);
   assert.equal(app.elements.get('updater-version').textContent, '현재 버전 1.2.3 · 새 버전 1.3.0');
   assert.equal(app.elements.get('updater-progress').value, 40);
   assert.equal(app.elements.get('updater-install').disabled, true);
   app.setStatus({ phase: 'ready', version: '1.3.0', current_version: '1.2.3', downloaded: 100, total: 100, message: '안전하게 설치할 수 있습니다.' });
-  await app.run('window.gibbonUpdater.refresh()');
+  await app.run('window.jajanUpdater.refresh()');
   assert.equal(app.elements.get('updater-install').disabled, false);
 });
 
 test('debug disabled status explains that automatic updates are unavailable', async () => {
   const app = setup({ phase: 'disabled', version: null, current_version: '0.0.0-dev', downloaded: 0, total: null, message: 'debug 빌드에서는 자동 업데이트를 사용할 수 없습니다.' });
-  await app.run('window.gibbonUpdater.refresh()');
+  await app.run('window.jajanUpdater.refresh()');
   assert.match(app.elements.get('updater-message').textContent, /debug 빌드/);
   assert.equal(app.elements.get('updater-check').disabled, true);
   assert.equal(app.elements.get('updater-install').disabled, true);
@@ -57,7 +57,7 @@ test('debug disabled status explains that automatic updates are unavailable', as
 
 test('check and install reject duplicate clicks and show returned safe-condition message', async () => {
   const app = setup({ phase: 'idle', version: null, current_version: '1.2.3', downloaded: 0, total: null, message: '' });
-  await app.run('window.gibbonUpdater.refresh()');
+  await app.run('window.jajanUpdater.refresh()');
   let resolveCheck;
   app.setCheck(() => new Promise(resolve => { resolveCheck = resolve; }));
   const check = app.elements.get('updater-check').onclick();
@@ -100,20 +100,20 @@ test('request errors use safe text and expose an alert', async () => {
 
 test('compact settings hide unavailable installation and empty detail', async () => {
   const app = setup();
-  await app.run('window.gibbonUpdater.refresh()');
+  await app.run('window.jajanUpdater.refresh()');
   assert.equal(app.elements.get('updater-install').hidden, true);
   assert.equal(app.elements.get('updater-message').hidden, true);
   app.setStatus({ phase: 'ready', current_version: '1.2.3', version: '1.3.0', message: '편집을 저장한 뒤 다시 시도하세요.' });
-  await app.run('window.gibbonUpdater.refresh()');
+  await app.run('window.jajanUpdater.refresh()');
   assert.equal(app.elements.get('updater-install').hidden, false);
   assert.equal(app.elements.get('updater-message').hidden, false);
   assert.equal(app.elements.get('updater-install').disabled, false);
   app.setStatus({ phase: 'preparing', version: '1.3.0', message: '작업 상태 확인 중' });
-  await app.run('window.gibbonUpdater.refresh()');
+  await app.run('window.jajanUpdater.refresh()');
   assert.equal(app.elements.get('updater-install').hidden, false);
   assert.equal(app.elements.get('updater-install').disabled, true);
   app.setStatus({ phase: 'error', message: '서명 검증 실패' });
-  await app.run('window.gibbonUpdater.refresh()');
+  await app.run('window.jajanUpdater.refresh()');
   assert.equal(app.elements.get('updater-install').hidden, true);
   assert.equal(app.elements.get('updater-message').attrs.role, 'alert');
 });

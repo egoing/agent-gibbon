@@ -18,7 +18,7 @@ test('terminal Welcome starts with the saved independent design and a safe gray 
 test('cross-document changes update color roles and scheme without invoking terminal state',()=>{
  const app=setup();app.change('black');assert.equal(app.styles.get('--background'),'#262627');assert.equal(app.root.style.colorScheme,'dark');
  app.change('white');assert.equal(app.styles.get('--foreground'),'#2d2d2d');assert.equal(app.root.style.colorScheme,'light');
- app.event({key:'agent-gibbon.manager-theme',storageArea:app.storage});assert.equal(app.styles.get('--background'),'#f8f8f8');
+ app.event({key:'jajan.manager-theme',storageArea:app.storage});assert.equal(app.styles.get('--background'),'#f8f8f8');
  app.event({key:memoDesignKey,storageArea:{getItem(){return 'black';}}});assert.equal(app.styles.get('--background'),'#f8f8f8');
  app.env.localStorage.getItem=()=>null;app.event({key:null,storageArea:app.storage});assert.equal(app.styles.get('--background'),'#dfe2dd');
 });

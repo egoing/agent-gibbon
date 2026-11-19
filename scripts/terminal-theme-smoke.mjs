@@ -5,15 +5,15 @@ import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'playwright');
 const root=fileURLToPath(new URL('..',import.meta.url));
-const out=process.env.TERMINAL_THEME_OUTPUT||'/tmp/gibbon-terminal-themes';fs.mkdirSync(out,{recursive:true});
+const out=process.env.TERMINAL_THEME_OUTPUT||'/tmp/jajan-terminal-themes';fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({headless:true,channel:'chrome'});const errors=[],external=[];
 try {
  const context=await browser.newContext();
- await context.route('http://gibbon.test/**',route=>{
+ await context.route('http://jajan.test/**',route=>{
   const f=path.join(root,'ui',new URL(route.request().url()).pathname);
   return fs.existsSync(f)?route.fulfill({body:fs.readFileSync(f),contentType:/\.(m?js)$/.test(f)?'text/javascript':f.endsWith('.css')?'text/css':'text/html'}):route.fulfill({status:404,body:''});
  });
- await context.route(/^(?!http:\/\/gibbon\.test\/).*/,route=>{external.push(route.request().url());return route.abort();});
+ await context.route(/^(?!http:\/\/jajan\.test\/).*/,route=>{external.push(route.request().url());return route.abort();});
  await context.addInitScript(()=>{
   const folder=path=>({path,name:path.split('/').at(-1),parent:'/Users/demo',command:`cd -- '${path}'`});
   const info={id:'terminal-93001',kind:'terminal',title:'테마 대비 검증',last_path:'/Users/demo/project'};window.calls=[];
@@ -24,7 +24,7 @@ try {
    return info;
   }}};
  });
- const writer=await context.newPage();await writer.goto('http://gibbon.test/tokens.css');
+ const writer=await context.newPage();await writer.goto('http://jajan.test/tokens.css');
  const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
  async function inspect(){return page.evaluate(()=>{
   function bg(el){const s=getComputedStyle(el);return s.backgroundColor==='rgba(0, 0, 0, 0)'&&el.parentElement?bg(el.parentElement):s.backgroundColor;}
@@ -37,11 +37,11 @@ try {
  });}
  const reports=[];
  for(const [width,height] of [[720,700],[320,240]]){
-  await page.setViewportSize({width,height});await page.goto('http://gibbon.test/terminal.html');await page.waitForFunction(()=>document.querySelectorAll('#recommendations button').length===2);
+  await page.setViewportSize({width,height});await page.goto('http://jajan.test/terminal.html');await page.waitForFunction(()=>document.querySelectorAll('#recommendations button').length===2);
   await page.locator('#recommendations button').nth(1).click();
   await page.evaluate(()=>{window.savedNodes=[document.querySelector('#choose-folder'),document.querySelector('#recommendations button')];});
   for(const [design,dark,expected] of [['gray',false,'#dfe2dd'],['white',false,'#f8f8f8'],['black',false,'#262627'],['color',false,'#20252e'],['system',true,'#262627'],['system',false,'#dfe2dd'],['gray',true,'#dfe2dd']]){
-   await page.emulateMedia({colorScheme:dark?'dark':'light'});await writer.evaluate(design=>localStorage.setItem('agent-gibbon.memo-design',design),design);
+   await page.emulateMedia({colorScheme:dark?'dark':'light'});await writer.evaluate(design=>localStorage.setItem('jajan.memo-design',design),design);
    // Wait for actual cross-document storage/media updates, not a manual style injection.
    if(design==='gray'&&reports.length===0){}else await page.waitForFunction(expected=>getComputedStyle(document.documentElement).getPropertyValue('--background').trim()===expected,expected);
    const report=await inspect();for(const result of report.results)assert(result.contrast>=4.5,JSON.stringify({design,width,...result}));assert.equal(report.overflow,false);assert.equal(report.background,expected);

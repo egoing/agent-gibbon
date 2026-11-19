@@ -7,7 +7,7 @@ import json, subprocess, time, tempfile, uuid
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 INFO=json.loads(subprocess.check_output(['node',str(ROOT/'scripts/dev.mjs'),'info'],text=True))
-CLI=str(ROOT/'scripts/agent-gibbon-dev')
+CLI=str(ROOT/'scripts/jajan-dev')
 LOG={'origin':INFO,'checks':[],'states':[]}
 FRONT=subprocess.check_output(['osascript','-e','tell application "System Events" to get unix id of first application process whose frontmost is true'],text=True).strip()
 PREFIX='auto-proof-'+uuid.uuid4().hex[:6]
@@ -29,7 +29,7 @@ def wait(note):
 def overlap(a,b):
     x,y,w,h=frame(a); X,Y,W,H=frame(b)
     return x<X+W and X<x+w and y<Y+H and Y<y+h
-with tempfile.TemporaryDirectory(prefix='gibbon-auto-') as folder:
+with tempfile.TemporaryDirectory(prefix='jajan-auto-') as folder:
     helper=Path(folder)/'ax'; pointer=Path(folder)/'pointer'; mouse=Path(folder)/'mouse'
     for src,out in [('design-system-ax.swift',helper),('entrance-pointer.swift',pointer),('macos-input.swift',mouse)]:
         subprocess.run(['swiftc',str(ROOT/'scripts'/src),'-o',str(out)],check=True)
@@ -43,7 +43,7 @@ with tempfile.TemporaryDirectory(prefix='gibbon-auto-') as folder:
         move(650,650); return note
     def ui(note,action,*args,feedback=False):
         state=inspect(note)
-        title=f"Agent Gibbon [{state['dev_label']}] — {note}"+(' · Feedback' if feedback else '')
+        title=f"Jajan [{state['dev_label']}] — {note}"+(' · Feedback' if feedback else '')
         for _ in range(30):
             p=subprocess.run([str(helper),str(pid),title,action,*args],text=True,capture_output=True)
             if p.returncode==0: return p.stdout
@@ -130,7 +130,7 @@ with tempfile.TemporaryDirectory(prefix='gibbon-auto-') as folder:
         LOG['states'].append({'final':states})
         check('rapid opens replace active animation destinations without final overlap')
     finally:
-        Path('/tmp/gibbon-auto-layout-live.json').write_text(json.dumps(LOG,ensure_ascii=False,indent=2))
+        Path('/tmp/jajan-auto-layout-live.json').write_text(json.dumps(LOG,ensure_ascii=False,indent=2))
         for note in IDS: cli('close',note)
         move(original['x'],original['y'])
         subprocess.run(['osascript','-e',f'tell application "System Events" to set frontmost of (first application process whose unix id is {FRONT}) to true'],capture_output=True)

@@ -20,7 +20,7 @@
 
 ## 읽기 전용 조사와 검증
 
-작업 루트: `/Users/egoinglee/.codex/worktrees/02ec/agent-gibbon`.
+작업 루트: `/Users/egoinglee/.codex/worktrees/02ec/jajan`.
 
 `ui/style.css`의 `#viewport`는 flex 본문이며 `overflow: auto`, 3px padding을 사용한다. 툴바 최종 규칙은 행 30px·버튼 22px다. 따라서 본문 확장과 오버레이 표시를 프론트엔드에서 구성할 여지는 확인했다. 네이티브 스크롤바 숨김의 WKWebView/Windows 호환성과 실제 입력 동작은 이번에 검증하지 않았다. 외부 WebView·터미널·편집기·코드 블록까지 일괄 적용하는 범위는 이번 승인 대상에 포함하지 않는다.
 

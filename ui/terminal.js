@@ -1,10 +1,10 @@
 'use strict';
 const { Channel } = window.__TAURI__.core;
-const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
+const invoke = window.jajanInvoke || window.__TAURI__.core.invoke;
 const win = window.__TAURI__.window.getCurrentWindow();
 const status = document.getElementById('status');
 const clock = () => window.performance?.now?.() || 0;
-const terminal = new Terminal({fontSize:window.gibbonContentSize.defaultValue('terminal'),fontFamily:'Menlo, Monaco, monospace',cursorBlink:true,scrollback:3000,allowProposedApi:false,theme:{background:'#20252e',foreground:'#f0f0f0'},screenReaderMode:false});
+const terminal = new Terminal({fontSize:window.jajanContentSize.defaultValue('terminal'),fontFamily:'Menlo, Monaco, monospace',cursorBlink:true,scrollback:3000,allowProposedApi:false,theme:{background:'#20252e',foreground:'#f0f0f0'},screenReaderMode:false});
 const fit = new FitAddon.FitAddon();
 terminal.loadAddon(fit);
 terminal.open(document.getElementById('terminal'));
@@ -99,7 +99,7 @@ async function start(choice, trigger, plan, execRequest){
   document.getElementById('terminal').hidden=false;measure();
   const startedAt=clock(); let firstOutput=true;
   const output=new Channel();output.onmessage=bytes=>{
-    const measure=window.gibbonMeasure;
+    const measure=window.jajanMeasure;
     if(firstOutput){firstOutput=false;measure?.('terminal.first_output',clock()-startedAt);}
     if(measure){
       const receivedAt=clock();
@@ -108,7 +108,7 @@ async function start(choice, trigger, plan, execRequest){
   };
   try{
     if(selectedFolder)await invoke('terminal_folder',{path:selectedFolder.path});
-    await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('terminal.start', async flow => {
+    await (window.jajanLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('terminal.start', async flow => {
       const size={cols:terminal.cols,rows:terminal.rows};
       await flow.invoke('terminal_start',{...size,output,choice,...(execRequest === undefined ? {} : {execRequest}),...(plan === undefined ? {} : {plan})});
       appliedSize=size;
@@ -194,9 +194,9 @@ async function initializeTerminal() {
     }
     else if(info.restored) status.textContent = `이전 터미널 프로세스는 종료되었습니다. ${info.last_command ? `마지막 명령: ${info.last_command} · 자동 실행하지 않았습니다.` : '마지막 명령은 안전한 복원을 위해 저장에서 제외되었습니다.'}`;
   }
-  window.gibbonMeasure?.('terminal.ui.ready',clock());
+  window.jajanMeasure?.('terminal.ui.ready',clock());
 }
-if (window.gibbonRegionFrame) window.gibbonRegionFrame.prepare(initializeTerminal);
+if (window.jajanRegionFrame) window.jajanRegionFrame.prepare(initializeTerminal);
 else initializeTerminal().catch(report);
 // Refresh only the current directory; never collect input, output or history.
 setInterval(()=>{if(started && !ended)invoke('terminal_info').then(setInfo).catch(report);},2000);
@@ -204,7 +204,7 @@ setInterval(()=>{if(started && !ended)invoke('terminal_info').then(setInfo).catc
 document.getElementById('pin').onclick=async()=>{
   try { await invoke('toggle_pin'); const button=document.getElementById('pin'); button.setAttribute('aria-pressed',String(button.getAttribute('aria-pressed')!=='true')); } catch(e){report(e);}
 };
-window.gibbonContentSize.bind('terminal', document.getElementById('font-size'), size => {
+window.jajanContentSize.bind('terminal', document.getElementById('font-size'), size => {
   terminal.options.fontSize = size;
   scheduleMeasure();
 }, report);

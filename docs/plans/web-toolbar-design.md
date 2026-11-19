@@ -1,7 +1,7 @@
 # 브라우저 툴바 공통 디자인 적용
 
 - 이슈: #152. 기준 origin/main `9904f10770d552b8f90ceb8073415d9875c09062`.
-- 작업 루트: `/Users/egoinglee/.codex/worktrees/e864/agent-gibbon`.
+- 작업 루트: `/Users/egoinglee/.codex/worktrees/e864/jajan`.
 - 브랜치: `codex/web-toolbar-design`.
 
 ## 범위와 판단

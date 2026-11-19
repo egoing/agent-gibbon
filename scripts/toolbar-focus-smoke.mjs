@@ -6,19 +6,19 @@ import {fileURLToPath} from 'node:url';
 import {memoThemeFor} from '../ui/theme.mjs';
 const {chromium} = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('..', import.meta.url));
-const output = process.env.GIBBON_SCREENSHOTS;
+const output = process.env.JAJAN_SCREENSHOTS;
 if (output) fs.mkdirSync(output, {recursive:true});
 const browser = await chromium.launch({headless:true});
 try {
  const page = await browser.newPage({viewport:{width:600,height:160}});
- await page.route('http://gibbon.test/**', route=>{
+ await page.route('http://jajan.test/**', route=>{
   const file=path.join(root,'ui',new URL(route.request().url()).pathname);
   if (/\.m?js$/.test(file)) return route.fulfill({body:'',contentType:'text/javascript'});
   return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.css')?'text/css':'text/html'});
  });
  for (const kind of ['text','image','terminal','web']) {
   for (const design of ['white','gray','black']) {
-   await page.goto(`http://gibbon.test/${kind==='terminal'?'terminal':kind==='web'?'web':'index'}.html`);
+   await page.goto(`http://jajan.test/${kind==='terminal'?'terminal':kind==='web'?'web':'index'}.html`);
    await page.evaluate(({theme,kind})=>{
     for(const [key,value] of Object.entries(theme))document.documentElement.style.setProperty(`--${key}`,value);
     if(kind==='image')document.body.classList.add('image-note');

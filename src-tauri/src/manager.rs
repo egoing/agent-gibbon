@@ -85,7 +85,7 @@ pub fn open_list(app: &tauri::AppHandle) -> Result<(), String> {
     open(app)?;
     if let Some(window) = app.get_webview_window(LABEL) {
         window
-            .eval("window.gibbonShowNotes?.()")
+            .eval("window.jajanShowNotes?.()")
             .map_err(|e| e.to_string())?;
     }
     Ok(())
@@ -252,7 +252,7 @@ mod tests {
     #[test]
     fn capture_file_replacement_changes_image_stamp() {
         let path =
-            std::env::temp_dir().join(format!("gibbon-manager-image-{}", std::process::id()));
+            std::env::temp_dir().join(format!("jajan-manager-image-{}", std::process::id()));
         std::fs::write(&path, b"one").unwrap();
         let old = image_token(&path).unwrap();
         std::fs::write(&path, b"another").unwrap();

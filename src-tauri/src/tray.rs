@@ -258,7 +258,7 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         }
     }
     menu.append(
-        &MenuItem::with_id(app, "quit-app", "Agent Gibbon 종료", true, None::<&str>)
+        &MenuItem::with_id(app, "quit-app", "Jajan 종료", true, None::<&str>)
             .map_err(|e| e.to_string())?,
     )
     .map_err(|e| e.to_string())?;
@@ -333,7 +333,7 @@ pub(crate) fn sync_permission_item(
 }
 
 pub fn refresh(app: &tauri::AppHandle) -> Result<(), String> {
-    if let Some(tray) = app.tray_by_id("agent-gibbon") {
+    if let Some(tray) = app.tray_by_id("jajan") {
         let menu = menu(app)?;
         tray.set_menu(Some(menu.clone()))
             .map_err(|e| e.to_string())?;
@@ -519,7 +519,7 @@ fn icon() -> tauri::image::Image<'static> {
 pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
     let initial_menu = menu(app)?;
     app.manage(TrayMenu::new(Some(initial_menu.clone())));
-    TrayIconBuilder::with_id("agent-gibbon")
+    TrayIconBuilder::with_id("jajan")
         .icon(icon())
         .icon_as_template(true)
         .tooltip(format!(
@@ -596,8 +596,8 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             // Visibility is the source of truth for the textual open-state mark.
             let result = result.and(sync_visibility(app));
             if let Err(error) = result {
-                if let Some(tray) = app.tray_by_id("agent-gibbon") {
-                    let _ = tray.set_tooltip(Some(format!("Agent Gibbon: {error}")));
+                if let Some(tray) = app.tray_by_id("jajan") {
+                    let _ = tray.set_tooltip(Some(format!("Jajan: {error}")));
                 }
             }
         })

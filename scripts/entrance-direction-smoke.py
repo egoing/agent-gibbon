@@ -13,7 +13,7 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-CLI = str(ROOT / 'scripts/agent-gibbon-dev')
+CLI = str(ROOT / 'scripts/jajan-dev')
 INFO = json.loads(subprocess.check_output(['node', str(ROOT / 'scripts/dev.mjs'), 'info'], text=True))
 
 def pids():
@@ -27,7 +27,7 @@ def cli(action, note, *args):
     assert value['ok'], value
     return value
 
-with tempfile.TemporaryDirectory(prefix='gibbon-direction-') as temp:
+with tempfile.TemporaryDirectory(prefix='jajan-direction-') as temp:
     helper = str(Path(temp) / 'pointer')
     subprocess.run(['swiftc', str(ROOT / 'scripts/entrance-pointer.swift'), '-o', helper], check=True)
     input_helper = str(Path(temp) / 'input')

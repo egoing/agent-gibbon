@@ -69,7 +69,7 @@ fn whole_envelope_scrubs_error_trace_log_and_denies_sessions_and_attachments() {
     });
     let log = p::Log {
         level: p::LogLevel::Info,
-        body: "Agent Gibbon operation".into(),
+        body: "Jajan operation".into(),
         trace_id: None,
         timestamp: SystemTime::now(),
         severity_number: None,
@@ -690,7 +690,7 @@ fn every_child_span_gets_trusted_platform_build_metadata_at_final_egress() {
         );
         assert_eq!(
             child.tags.get("app.build").map(String::as_str),
-            Some(env!("AGENT_GIBBON_BUILD_REVISION"))
+            Some(env!("JAJAN_BUILD_REVISION"))
         );
         assert!(!child.tags.contains_key("private"));
     }

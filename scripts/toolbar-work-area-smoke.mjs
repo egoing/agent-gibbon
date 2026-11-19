@@ -14,15 +14,15 @@ try {
    window.testCalls=[];
    window.__TAURI__={core:{invoke:async name=>{window.testCalls.push(name);if(name==='web_recent')return [];if(name==='web_chrome')return {url:null,welcome:true,always_on_top:true};return false;}},webviewWindow:{getCurrentWebviewWindow:()=>({listen(){}})}};
  });
- await page.route('http://gibbon.test/**',route=>{
+ await page.route('http://jajan.test/**',route=>{
    const file=path.join(root,'ui',new URL(route.request().url()).pathname);
    if(file.endsWith('/terminal-scrollbar.mjs')) return route.fulfill({body:'export function installTerminalScrollbar() {}',contentType:'text/javascript'});
    if(/\.js$/.test(file)&&!file.endsWith('/toolbar.js')&&!file.endsWith('/overlay-scrollbar.js')&&!file.endsWith('/region-frame.js')&&!(fullWeb&&/\/web(?:-chrome|-recent)?\.js$/.test(file))) return route.fulfill({body:'',contentType:'text/javascript'});
    return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.css')?'text/css':/\.m?js$/.test(file)?'text/javascript':'text/html'});
  });
  for(const kind of ['text','image','terminal','web']) {
-   await page.goto(`http://gibbon.test/${kind==='web'?'web':kind==='terminal'?'terminal':'index'}.html`);
-   await page.waitForFunction(()=>typeof window.gibbonToolbarFold==='function');
+   await page.goto(`http://jajan.test/${kind==='web'?'web':kind==='terminal'?'terminal':'index'}.html`);
+   await page.waitForFunction(()=>typeof window.jajanToolbarFold==='function');
    if(kind==='image') await page.evaluate(()=>document.body.classList.add('image-note'));
    const row=await page.locator('#controls').boundingBox();
    const point=await page.evaluate(()=>{
@@ -45,13 +45,13 @@ try {
    assert.deepEqual(await page.evaluate(()=>testCalls.filter(n=>n==='chrome_work_area'||n==='chrome_drag')),['chrome_work_area','chrome_drag']);
    const before=await page.evaluate(()=>testCalls.filter(n=>n==='chrome_work_area'||n==='chrome_drag').length);
    await page.locator('#close').dblclick();assert.equal(await page.evaluate(()=>testCalls.filter(n=>n==='chrome_work_area'||n==='chrome_drag').length),before);
-   await page.evaluate(()=>gibbonToolbarFold(true));
+   await page.evaluate(()=>jajanToolbarFold(true));
    await page.locator('#chrome-title').dblclick();assert.equal(await page.evaluate(()=>testCalls.filter(n=>n==='chrome_work_area'||n==='chrome_drag').length),before);
    console.log(`PASS ${kind}: actual stationary click/dblclick/drag/buttons/title`);
  }
  fullWeb=true;
- await page.goto('http://gibbon.test/web.html');
- await page.waitForFunction(()=>window.testCalls.includes('web_chrome')&&typeof window.gibbonToolbarFold==='function');
+ await page.goto('http://jajan.test/web.html');
+ await page.waitForFunction(()=>window.testCalls.includes('web_chrome')&&typeof window.jajanToolbarFold==='function');
  for(const state of ['welcome','external-content']) {
    if(state==='external-content') {
      await page.locator('#web-url').fill('https://example.com/');

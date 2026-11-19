@@ -1,6 +1,6 @@
-# Agent Gibbon
+# Jajan
 
-[한국어](README.md) · [Website](https://agentgibbon.com/en/) · [Download](https://github.com/egoing/agent-gibbon/releases/latest)
+[한국어](README.md) · [Website](https://jajan.app/en/) · [Download](https://github.com/egoing/agent-gibbon/releases/latest)
 
 An open-source floating Markdown note app for macOS, created and updated by AI agents through a local CLI. Keep coding progress, checklists, and research notes beside your work without moving keyboard focus away from your editor.
 
@@ -10,20 +10,20 @@ The [design system and visual mockups](docs/design-system.md) define shared term
 
 ## Install
 
-Download the Apple Silicon (`aarch64`) or Intel (`x64`) DMG from GitHub Releases and move Agent Gibbon to Applications. Apple distribution signing and notarization are not configured; macOS may block the downloaded application.
+Download the Apple Silicon (`aarch64`) or Intel (`x64`) DMG from GitHub Releases and move Jajan to Applications. Apple distribution signing and notarization are not configured; macOS may block the downloaded application.
 
 ## Quick start
 
 ```sh
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" open --id work --markdown '# Current task'
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" update --id work --markdown 'Review complete.'
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" inspect --id work
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" close --id work
+"/Applications/Jajan.app/Contents/MacOS/jajan" open --id work --markdown '# Current task'
+"/Applications/Jajan.app/Contents/MacOS/jajan" update --id work --markdown 'Review complete.'
+"/Applications/Jajan.app/Contents/MacOS/jajan" inspect --id work
+"/Applications/Jajan.app/Contents/MacOS/jajan" close --id work
 ```
 
 `open` creates or shows a note. `update` preserves focus and hidden state. `close` hides the note rather than terminating the app. The CLI returns JSON with `ok` indicating success.
 
-Give your agent the [CLI skill](.agents/skills/agent-gibbon/SKILL.md), or ask it: “Use Agent Gibbon to keep a checklist in note ID work. Update it when a step finishes. Do not reopen a note I have hidden.” The agent needs permission to run local shell commands; the app does not include an AI model.
+Give your agent the [CLI skill](.agents/skills/jajan/SKILL.md), or ask it: “Use Jajan to keep a checklist in note ID work. Update it when a step finishes. Do not reopen a note I have hidden.” The agent needs permission to run local shell commands; the app does not include an AI model.
 
 ## Features and scope
 
@@ -48,11 +48,11 @@ Requires macOS, Rust 1.91+ stable, Node.js 22.13+/pnpm 11.25.0, Xcode Command Li
 
 ```sh
 git clone https://github.com/egoing/agent-gibbon.git
-cd agent-gibbon
+cd jajan
 npm install -g pnpm@11.25.0
 pnpm install --frozen-lockfile
 pnpm run build
-./scripts/agent-gibbon open --id sample --markdown '# Hello'
+./scripts/jajan open --id sample --markdown '# Hello'
 ```
 
 The app uses Tauri 2, Rust, and the system WebView. See the [Korean README](README.md) for full CLI behavior, development instance isolation, local storage, and verification details.
@@ -69,4 +69,4 @@ Official release builds may send application error diagnostics through Sentry. C
 
 See the [Windows development and build guide](docs/windows.md) for prerequisites, isolated development CLI, NSIS packaging, and platform limitations. Validation evidence is recorded in [verification](docs/verification.md).
 
-Package build/dev/check scripts share intermediate Cargo artifacts under the Git common directory (`agent-gibbon/build-cache`) while keeping final binaries in each worktree’s `src-tauri/target`. `pnpm run dev:info` reports both paths. Set `CARGO_BUILD_BUILD_DIR` for an isolated cache. Direct Cargo commands do not apply this launcher policy. Cross-worktree build scripts can recompile the application and concurrent builds can wait on the shared lock; see the [measurements and limits](docs/verification/shared-build-cache-pnpm-20261114.md).
+Package build/dev/check scripts share intermediate Cargo artifacts under the Git common directory (`jajan/build-cache`) while keeping final binaries in each worktree’s `src-tauri/target`. `pnpm run dev:info` reports both paths. Set `CARGO_BUILD_BUILD_DIR` for an isolated cache. Direct Cargo commands do not apply this launcher policy. Cross-worktree build scripts can recompile the application and concurrent builds can wait on the shared lock; see the [measurements and limits](docs/verification/shared-build-cache-pnpm-20261114.md).

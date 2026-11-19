@@ -5,14 +5,14 @@ import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('../ui/', import.meta.url));
-const output = process.env.GIBBON_SMOKE_OUTPUT || '/tmp/gibbon174-browser';
+const output = process.env.JAJAN_SMOKE_OUTPUT || '/tmp/jajan174-browser';
 fs.mkdirSync(output, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 const errors = [], requests = [], results = [];
 async function open(markdown, size = { width: 300, height: 240 }) {
   const page = await browser.newPage({ viewport: size });
   page.on('pageerror', e => errors.push(e.message));
-  page.on('request', r => { if (!r.url().startsWith('http://gibbon.test/')) requests.push(r.url()); });
+  page.on('request', r => { if (!r.url().startsWith('http://jajan.test/')) requests.push(r.url()); });
   await page.addInitScript(({ markdown }) => {
     window.testNote = { title: 'Milkdown 검증', markdown, html: '<p>원문</p>', revision: 1, color: '#dfe2dd' };
     window.testState = { visible: true, focused: false, folded: false, always_on_top: true };
@@ -41,13 +41,13 @@ async function open(markdown, size = { width: 300, height: 240 }) {
       } },
     };
   }, { markdown });
-  await page.route('http://gibbon.test/**', route => {
+  await page.route('http://jajan.test/**', route => {
     const name = new URL(route.request().url()).pathname.slice(1);
     if (['telemetry.js', 'updater-guard.js', 'memo-focus.js'].includes(name)) return route.fulfill({ body: '', contentType: 'text/javascript' });
     const file = path.join(root, name);
     return route.fulfill({ body: fs.readFileSync(file), contentType: /\.m?js$/.test(name) ? 'text/javascript' : name.endsWith('.css') ? 'text/css' : 'text/html' });
   });
-  await page.goto('http://gibbon.test/index.html');
+  await page.goto('http://jajan.test/index.html');
   await page.waitForSelector('#memo-editor[aria-readonly]');
   return page;
 }
@@ -88,23 +88,23 @@ async function testEditor() {
   assert.equal(await page.locator('#memo-editor').getAttribute('aria-readonly'), 'false');
   assert.equal(await page.locator('#edit').count(), 0);
   await page.screenshot({ path: path.join(output, 'clean-300.png') });
-  assert.equal(await page.evaluate(() => window.gibbonUpdateBusy()), false);
+  assert.equal(await page.evaluate(() => window.jajanUpdateBusy()), false);
   await page.locator('#memo-editor p').first().click();
   await save(page); await tick(page);
   assert.equal(await page.evaluate(() => window.testCalls.filter(c => c.name === 'save_note').length), 0);
   assert.equal(await page.evaluate(() => window.testNote.markdown), original);
   await page.keyboard.press('End'); await page.keyboard.insertText(' 수정');
-  assert.equal(await page.evaluate(() => window.gibbonUpdateBusy()), true);
+  assert.equal(await page.evaluate(() => window.jajanUpdateBusy()), true);
   assert.equal(await page.locator('#save').isDisabled(), false);
   await page.screenshot({ path: path.join(output, 'dirty-300.png') });
   await save(page); await tick(page);
   assert.match(await page.evaluate(() => window.testNote.markdown), /본문 한글 수정/);
-  assert.equal(await page.evaluate(() => window.gibbonUpdateBusy()), false);
+  assert.equal(await page.evaluate(() => window.jajanUpdateBusy()), false);
   assert.equal(await page.locator('#memo-editor').getAttribute('contenteditable'), 'true');
   await page.keyboard.press(process.platform === 'darwin' ? 'Meta+z' : 'Control+z');
-  assert.equal(await page.evaluate(() => window.gibbonUpdateBusy()), true);
+  assert.equal(await page.evaluate(() => window.jajanUpdateBusy()), true);
   await page.keyboard.press(process.platform === 'darwin' ? 'Meta+Shift+Z' : 'Control+Shift+Z');
-  assert.equal(await page.evaluate(() => window.gibbonUpdateBusy()), false);
+  assert.equal(await page.evaluate(() => window.jajanUpdateBusy()), false);
   await page.getByRole('checkbox').first().click();
   await save(page); await tick(page);
   assert.match(await page.evaluate(() => window.testNote.markdown), /[-*] \[x\] 할 일/);
@@ -198,7 +198,7 @@ async function testFormatMenu() {
   await format.waitForFunction(() => /^# /.test(window.testNote.markdown));
   await toolbar.getByRole('button', { name: '작은제목' }).click();
   assert.equal(await format.locator('#memo-editor h2').textContent(), selected);
-  assert.equal(await format.evaluate(() => window.gibbonUpdateBusy()), true);
+  assert.equal(await format.evaluate(() => window.jajanUpdateBusy()), true);
   await save(format);
   await format.waitForFunction(() => /^## /.test(window.testNote.markdown));
   await toolbar.getByRole('button', { name: '본문' }).click();
@@ -250,7 +250,7 @@ async function testAutosaveAndDocuments() {
   assert.equal(await automatic.locator('#save').isVisible(), false);
   await automatic.locator('#memo-editor p').click(); await automatic.keyboard.press('End');
   await automatic.keyboard.insertText(' 추가');
-  await automatic.waitForFunction(() => window.testNote.markdown.includes('추가') && !window.gibbonUpdateBusy());
+  await automatic.waitForFunction(() => window.testNote.markdown.includes('추가') && !window.jajanUpdateBusy());
   assert.equal(await automatic.evaluate(() => window.testCalls.filter(c => c.name === 'save_note').length), 1);
   // A deliberately slow IPC write must not block or acknowledge newer typing.
   await automatic.evaluate(() => { window.testSaveDelay = 700; });
@@ -258,7 +258,7 @@ async function testAutosaveAndDocuments() {
   await automatic.waitForFunction(() => window.testCalls.filter(c => c.name === 'save_note').length === 2);
   assert.equal(await automatic.locator('#memo-editor').getAttribute('contenteditable'), 'true');
   await automatic.keyboard.insertText(' B');
-  await automatic.waitForFunction(() => window.testNote.markdown.includes('A B') && !window.gibbonUpdateBusy());
+  await automatic.waitForFunction(() => window.testNote.markdown.includes('A B') && !window.jajanUpdateBusy());
   assert.equal(await automatic.evaluate(() => window.testCalls.filter(c => c.name === 'save_note').length), 3);
   await automatic.evaluate(() => { window.testSaveDelay = 0; window.testFailure = '원본 파일 외부 변경'; });
   await automatic.keyboard.insertText(' 충돌 초안');
@@ -269,7 +269,7 @@ async function testAutosaveAndDocuments() {
   assert.match(await automatic.locator('#memo-editor').textContent(), /충돌 초안 추가 초안/);
   await automatic.evaluate(() => { window.testFailure = null; });
   await automatic.getByRole('button', {name:'저장 ·',exact:false}).click();
-  await automatic.waitForFunction(() => window.testNote.markdown.includes('추가 초안') && !window.gibbonUpdateBusy());
+  await automatic.waitForFunction(() => window.testNote.markdown.includes('추가 초안') && !window.jajanUpdateBusy());
   await automatic.screenshot({path:path.join(output,'autosave-300.png')});
   await automatic.close();
   const imeAutomatic = await open('조합 자동 저장\n');
@@ -279,7 +279,7 @@ async function testAutosaveAndDocuments() {
   await imeAutomatic.waitForTimeout(850);
   assert.equal(await imeAutomatic.evaluate(() => window.testCalls.filter(c => c.name === 'save_note').length), 0);
   await imeAutomatic.locator('#memo-editor').dispatchEvent('compositionend');
-  await imeAutomatic.waitForFunction(() => window.testNote.markdown.includes('한글') && !window.gibbonUpdateBusy());
+  await imeAutomatic.waitForFunction(() => window.testNote.markdown.includes('한글') && !window.jajanUpdateBusy());
   await imeAutomatic.close();
   results.push('600ms autosave, no save button, concurrent input during slow save, next revision, paused retry after failure, composition deferral');
 

@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root=fileURLToPath(new URL('..',import.meta.url));
-const out=process.env.GIBBON_SCREENSHOTS;
+const out=process.env.JAJAN_SCREENSHOTS;
 if(out)fs.mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({headless:true});
 try {
@@ -22,7 +22,7 @@ try {
   return false;
  });
  await page.addInitScript(()=>{window.__TAURI__={core:{invoke:(name,args)=>window.mockNative(name,args)},webviewWindow:{getCurrentWebviewWindow:()=>({listen:()=>{}})}};});
- await page.route('http://gibbon.test/**',route=>{
+ await page.route('http://jajan.test/**',route=>{
   const file=path.join(root,'ui',new URL(route.request().url()).pathname);
   return route.fulfill({body:fs.readFileSync(file),contentType:file.endsWith('.css')?'text/css':/\.m?js$/.test(file)?'text/javascript':'text/html'});
  });
@@ -30,7 +30,7 @@ try {
  for(const [width,height] of [[240,160],[320,240],[600,400]]) {
   urls=Array.from({length:10},(_,i)=>`https://example.com/${i}/`);
   urls[1]='https://example.com/a-very-long-path-to-check-ellipsis?value=%3Cimg%3E';calls=[];
-  await page.setViewportSize({width,height});await page.goto('http://gibbon.test/web.html');await settle();
+  await page.setViewportSize({width,height});await page.goto('http://jajan.test/web.html');await settle();
   assert.equal(await page.getByRole('textbox',{name:'웹 주소',exact:true}).count(),1);
   assert.equal(await page.getByRole('button',{name:'이동',exact:true}).count(),1);
   assert.equal(await page.locator('label,#hint').count(),0);

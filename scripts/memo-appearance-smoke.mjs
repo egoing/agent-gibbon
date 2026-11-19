@@ -4,14 +4,14 @@ import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
 const {default:puppeteer}=await import(process.env.PUPPETEER_MODULE || 'puppeteer-core');
 const root=fileURLToPath(new URL('..',import.meta.url));
-const out=process.env.APPEARANCE_OUTPUT || '/tmp/gibbon-appearance';fs.mkdirSync(out,{recursive:true});
+const out=process.env.APPEARANCE_OUTPUT || '/tmp/jajan-appearance';fs.mkdirSync(out,{recursive:true});
 const browser=await puppeteer.launch({executablePath:process.env.CHROME_BIN || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 const errors=[],external=[],pages=[];
 async function pageFor(path,width,height){
  const page=await browser.newPage();pages.push(page);page.setDefaultTimeout(10000);
  for(const method of ['click','focus','screenshot']){const raw=page[method].bind(page);page[method]=async(...args)=>{await page.bringToFront();return raw(...args);};}await page.setViewport({width,height});page.on('pageerror',e=>errors.push(e.message));
  await page.setRequestInterception(true);
- page.on('request',r=>{const u=new URL(r.url());if(u.hostname!=='gibbon.test'){external.push(r.url());return r.abort();}const f=root+'ui'+u.pathname;if(!fs.existsSync(f))return r.respond({status:404,body:''});r.respond({status:200,contentType:/\.(m?js)$/.test(f)?'text/javascript':f.endsWith('.css')?'text/css':'text/html',body:fs.readFileSync(f)});});
+ page.on('request',r=>{const u=new URL(r.url());if(u.hostname!=='jajan.test'){external.push(r.url());return r.abort();}const f=root+'ui'+u.pathname;if(!fs.existsSync(f))return r.respond({status:404,body:''});r.respond({status:200,contentType:/\.(m?js)$/.test(f)?'text/javascript':f.endsWith('.css')?'text/css':'text/html',body:fs.readFileSync(f)});});
  await page.evaluateOnNewDocument(()=>{
   window.calls=[];window.noteColor='#ffeeaa';
   window.__TAURI__={webviewWindow:{getCurrentWebviewWindow:()=>({listen:async()=>()=>{}})},window:{getCurrentWindow:()=>({label:'note-appearance-probe',startResizeDragging:async()=>{}})},event:{listen:async()=>()=>{}},clipboardManager:{writeText:async()=>{}},core:{invoke:async(name,args)=>{
@@ -29,7 +29,7 @@ async function pageFor(path,width,height){
    throw Error('Unexpected IPC '+name);
   }}};
  });
- await page.emulateMediaFeatures([{name:'prefers-color-scheme',value:'light'}]);await page.goto('http://gibbon.test/'+path);return page;
+ await page.emulateMediaFeatures([{name:'prefers-color-scheme',value:'light'}]);await page.goto('http://jajan.test/'+path);return page;
 }
 async function color(page,expected){await page.waitForFunction(x=>getComputedStyle(document.documentElement).getPropertyValue('--background').trim()===x,{polling:100},expected);}
 async function systemAlignment(page){

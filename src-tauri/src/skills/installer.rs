@@ -61,12 +61,12 @@ struct Journal {
     operations: Vec<Operation>,
 }
 fn workspace(dest: &Path) -> Option<PathBuf> {
-    Some(dest.parent()?.parent()?.join(".agent-gibbon-transactions"))
+    Some(dest.parent()?.parent()?.join(".jajan-transactions"))
 }
 fn sibling(path: &Path, kind: &str) -> bool {
     path.file_name()
         .and_then(|n| n.to_str())
-        .is_some_and(|n| n.starts_with(&format!(".gibbon-{kind}-")))
+        .is_some_and(|n| n.starts_with(&format!(".jajan-{kind}-")))
 }
 fn validate(j: &Journal) -> Result<()> {
     j.before.validate()?;
@@ -150,14 +150,14 @@ fn prepare(dest: &Path, markdown: Option<&str>) -> Result<Operation> {
     fs::create_dir_all(&work).map_err(|_| "스킬 작업 폴더를 만들지 못했습니다")?;
     let parent = work.as_path();
     let backup = tempfile::Builder::new()
-        .prefix(".gibbon-backup-")
+        .prefix(".jajan-backup-")
         .tempdir_in(parent)
         .map_err(|_| "스킬 백업 경로를 만들지 못했습니다")?;
     let backup_path = backup.path().to_path_buf();
     backup.close().map_err(|_| "스킬 백업 경로 준비 실패")?;
     let stage = if let Some(markdown) = markdown {
         let stage = tempfile::Builder::new()
-            .prefix(".gibbon-stage-")
+            .prefix(".jajan-stage-")
             .tempdir_in(parent)
             .map_err(|_| "스킬 배포본 준비 실패")?;
         let mut file =
@@ -165,7 +165,7 @@ fn prepare(dest: &Path, markdown: Option<&str>) -> Result<Operation> {
         file.write_all(markdown.as_bytes())
             .and_then(|_| file.sync_all())
             .map_err(|_| "스킬 배포본 기록 실패")?;
-        fs::write(stage.path().join(".agent-gibbon-managed"), b"1\n")
+        fs::write(stage.path().join(".jajan-managed"), b"1\n")
             .map_err(|_| "스킬 소유권 기록 실패")?;
         Some(stage.keep())
     } else {
@@ -239,14 +239,14 @@ mod tests {
             let dir = tempfile::tempdir().unwrap();
             let root = dir.path().join("state");
             fs::create_dir(&root).unwrap();
-            let dest = dir.path().join("skills/agent-gibbon");
+            let dest = dir.path().join("skills/jajan");
             fs::create_dir_all(&dest).unwrap();
             fs::write(dest.join("SKILL.md"), "old").unwrap();
             let op = prepare(&dest, Some("new")).unwrap();
             let before = Config::default();
             let mut after = before.clone();
             after.skills.insert(
-                "agent-gibbon".into(),
+                "jajan".into(),
                 Entry {
                     enabled: true,
                     revision: "new".into(),
@@ -276,12 +276,12 @@ mod tests {
     #[test]
     fn interrupted_first_install_is_removed_when_choice_was_not_committed() {
         let dir = tempfile::tempdir().unwrap();
-        let dest = dir.path().join("skills/agent-gibbon");
+        let dest = dir.path().join("skills/jajan");
         let op = prepare(&dest, Some("new")).unwrap();
         let before = Config::default();
         let mut after = before.clone();
         after.skills.insert(
-            "agent-gibbon".into(),
+            "jajan".into(),
             Entry {
                 enabled: true,
                 revision: "new".into(),

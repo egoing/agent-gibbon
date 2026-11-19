@@ -41,7 +41,7 @@
     if(item.count<10000){item.count++;if(failed)item.failure_count++;}
     if(queue.size<32 || queue.has(op))queue.set(op,item);
   }
-  window.gibbonInvoke=(command,...args)=>{
+  window.jajanInvoke=(command,...args)=>{
     const op=operations.get(command);
     if(!active || !op)return raw(command,...args);
     const started=now(),session=generation;
@@ -63,11 +63,11 @@
     active=enabled;generation++;inFlight=false;interactionPending=false;queue.clear();
     for(const id of timers)window.clearInterval?.(id);timers.length=0;
     for(const observer of observers)observer.disconnect?.();observers.length=0;
-    delete window.gibbonMeasure;
+    delete window.jajanMeasure;
     if(!active)return;
     const session=generation;
     const stages=new Set(['terminal.ui.ready','terminal.first_output','terminal.output.parse']);
-    window.gibbonMeasure=(op,duration)=>{
+    window.jajanMeasure=(op,duration)=>{
       if(session===generation && stages.has(op) && window.document.visibilityState==='visible')record(op,duration);
     };
     function beat() {

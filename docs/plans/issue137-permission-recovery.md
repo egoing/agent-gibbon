@@ -1,6 +1,6 @@
 # #137 권한 복구 안내 시안 계획
 
-기준 커밋: 53ab3a7. 전용 작업 루트: /Users/egoinglee/.codex/worktrees/0bd1/agent-gibbon.
+기준 커밋: 53ab3a7. 전용 작업 루트: /Users/egoinglee/.codex/worktrees/0bd1/jajan.
 
 목표는 화면 캡처 접근 확인 실패를 사용자가 이해하고 현재 실행 앱의 설정을 찾을 수 있는 검토용 시안을 만드는 것이다. 제품 구현·OS 권한 변경·권한 실패 재현은 하지 않는다.
 

@@ -38,8 +38,8 @@ async function check(action) {
     const confirmed = pending && (pending === 'screen' ? screen : access);
     const message = confirmed ? '선택한 권한을 확인했습니다.' :
       pending ? 'macOS에서 현재 실행 앱의 권한이 아직 확인되지 않습니다. 설정이 켜져 있다면 아래 앱 경로와 등록된 앱이 일치하는지 확인하세요.' :
-      shortcut ? (access ? (inputReady ? '손쉬운 사용 권한과 단축키 입력 감시를 확인했습니다.' : '손쉬운 사용 권한을 확인했습니다. 입력 감시를 연결 중입니다. 계속 작동하지 않으면 다른 Gibbon 실행 여부를 확인하세요.') :
-        '보조키 조합 단축키에 손쉬운 사용 권한이 필요합니다. 다른 앱에서 입력이 감지되지 않으면 Gibbon 창을 선택하거나 트레이의 권한 설정을 여세요.') :
+      shortcut ? (access ? (inputReady ? '손쉬운 사용 권한과 단축키 입력 감시를 확인했습니다.' : '손쉬운 사용 권한을 확인했습니다. 입력 감시를 연결 중입니다. 계속 작동하지 않으면 다른 Jajan 실행 여부를 확인하세요.') :
+        '보조키 조합 단축키에 손쉬운 사용 권한이 필요합니다. 다른 앱에서 입력이 감지되지 않으면 Jajan 창을 선택하거나 트레이의 권한 설정을 여세요.') :
       !access ? 'macOS에서 현재 실행 앱의 손쉬운 사용 권한이 확인되지 않습니다. 이미 허용했다면 설정에 등록된 앱과 아래 앱 경로를 확인하세요.' :
       screen ? '손쉬운 사용과 화면 캡처 접근을 확인했습니다.' : '손쉬운 사용은 확인됐으며 화면 캡처 접근은 아직 확인되지 않습니다.';
     if (el('message').textContent !== message) el('message').textContent = message;

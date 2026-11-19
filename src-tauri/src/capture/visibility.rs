@@ -22,11 +22,11 @@ pub(super) fn set(app: &tauri::AppHandle, generation: u64, hide: bool) -> Result
         // This function is called from the launch worker. Let AppKit process
         // ordering changes while WindowServer confirms their actual removal.
         unsafe extern "C" {
-            fn gibbon_capture_windows_hidden(ids: *const i64, count: usize) -> bool;
+            fn jajan_capture_windows_hidden(ids: *const i64, count: usize) -> bool;
         }
         let deadline = std::time::Instant::now() + std::time::Duration::from_secs(2);
         loop {
-            if unsafe { gibbon_capture_windows_hidden(ids.as_ptr(), ids.len()) } {
+            if unsafe { jajan_capture_windows_hidden(ids.as_ptr(), ids.len()) } {
                 return Ok(());
             }
             if std::time::Instant::now() >= deadline {

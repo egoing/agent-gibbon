@@ -121,10 +121,10 @@ pub fn install(app: &tauri::AppHandle) -> bool {
         WHEEL_INSTALLED.store(macos_wheel::install(app.clone()), Ordering::Release);
     }
     extern "C" {
-        fn gibbon_log_input_status(access: bool, global: bool, local: bool, wheel: bool);
+        fn jajan_log_input_status(access: bool, global: bool, local: bool, wheel: bool);
     }
     unsafe {
-        gibbon_log_input_status(
+        jajan_log_input_status(
             crate::capture::accessibility_allowed(),
             global_ready,
             local_ready,

@@ -44,4 +44,4 @@
 
 ## 작업 경로 변경
 
-사용자 요청에 따라 작업 루트를 `/Users/egoinglee/.codex/worktrees/toolbar-reserved-space/agent-gibbon`으로 변경했다. 브랜치 `codex/toolbar-reserved-space`와 초기 계획 커밋 `02f7ead`를 유지한다. Orca의 구현 파일 31개를 원본과 바이트 단위 대조 후 반영했고 현재 폴더의 기존 `package-lock.json` 변경은 이전 시 보존했고, 이후 사용자 승인에 따라 JSON 내용이 동일한 속성 순서 변경임을 확인해 취소했다. 이전 확인 뒤 사용자 요청으로 Orca 폴더와 워크트리 등록을 삭제했다. 이후 작업은 현재 Codex 폴더에서만 진행한다. 기존 실행 검증 기록의 Orca 경로는 과거 출처이며 현재 실행의 검증 근거로 대체하지 않는다.
+사용자 요청에 따라 작업 루트를 `/Users/egoinglee/.codex/worktrees/toolbar-reserved-space/jajan`으로 변경했다. 브랜치 `codex/toolbar-reserved-space`와 초기 계획 커밋 `02f7ead`를 유지한다. Orca의 구현 파일 31개를 원본과 바이트 단위 대조 후 반영했고 현재 폴더의 기존 `package-lock.json` 변경은 이전 시 보존했고, 이후 사용자 승인에 따라 JSON 내용이 동일한 속성 순서 변경임을 확인해 취소했다. 이전 확인 뒤 사용자 요청으로 Orca 폴더와 워크트리 등록을 삭제했다. 이후 작업은 현재 Codex 폴더에서만 진행한다. 기존 실행 검증 기록의 Orca 경로는 과거 출처이며 현재 실행의 검증 근거로 대체하지 않는다.

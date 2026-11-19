@@ -77,7 +77,7 @@ static void visitGutters(pid_t pid, CGRect bounds, NSArray<NSValue *> *above,
 }
 
 // Quartz coordinates use the same top-left desktop space as xcap on macOS.
-bool gibbon_visit_app_windows(void *context, VisitRect visit) {
+bool jajan_visit_app_windows(void *context, VisitRect visit) {
     NSArray *windows = CFBridgingRelease(CGWindowListCopyWindowInfo(
         kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements, kCGNullWindowID));
     if (!windows) return false;

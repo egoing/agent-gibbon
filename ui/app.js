@@ -4,7 +4,7 @@ import { memoThemeFor } from './theme.mjs';
 import { readMemoAppearance } from './appearance.mjs';
 import { feedbackView, durations } from './feedback-state.mjs';
 import { createFeedback } from './feedback.js';
-const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
+const invoke = window.jajanInvoke || window.__TAURI__.core.invoke;
 const win = window.__TAURI__.window.getCurrentWindow();
 const $ = (id) => document.getElementById(id);
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
@@ -51,8 +51,8 @@ function restoredConflict() {
   const origin = editor?.status().draftRevision;
   return editing && origin != null && origin !== latestNote?.revision;
 }
-window.gibbonUpdateActivity = () => ({ editing: editing || composition, saving, exporting });
-window.gibbonUpdateBusy = () => editing || composition || saving || exporting;
+window.jajanUpdateActivity = () => ({ editing: editing || composition, saving, exporting });
+window.jajanUpdateBusy = () => editing || composition || saving || exporting;
 let exporting = false;
 let needsFit = true;
 let fitting = false;
@@ -92,7 +92,7 @@ function contentAction() { return invoke('content_action').catch(failure); }
 
 for (const id of ['toolbar-previous', 'toolbar-next']) $(id).addEventListener('click', contentAction);
 document.addEventListener('wheel', contentAction, { passive: true });
-window.gibbonContentSize.bind('text', $('font-size'), size => {
+window.jajanContentSize.bind('text', $('font-size'), size => {
   contentAction();
   document.documentElement.style.setProperty('--font-size', `${size}px`);
   needsFit = true;
@@ -173,7 +173,7 @@ async function performSave() {
   $('save').disabled = true;
   try {
     const snapshot = editor.capture();
-    await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('note.save', async flow => {
+    await (window.jajanLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('note.save', async flow => {
       const savedNote = await flow.invoke('save_note', { markdown: snapshot.markdown, expectedRevision: snapshot.revision });
       if (!latestNote || savedNote.revision >= latestNote.revision) latestNote = savedNote;
       editor.saved(savedNote, snapshot);
@@ -256,8 +256,8 @@ async function refresh(schedule = true) {
   let region = false;
   let firstFrameColor = '#20252e';
   try {
-    await (window.gibbonLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('note.refresh', async flow => {
-      region = !firstFrameReady && await window.gibbonRegionFrame?.placement;
+    await (window.jajanLocalFlow || ((_op, work) => work({invoke, stage:()=>{}})))('note.refresh', async flow => {
+      region = !firstFrameReady && await window.jajanRegionFrame?.placement;
       const state = await flow.invoke('snapshot');
       flow.stage('response');
       firstFrameColor = state.note.color;
@@ -284,7 +284,7 @@ async function refresh(schedule = true) {
         if (editorState.conflict && editing && !notice?.text?.includes('외부')) notify(externalDraftMessage, 'error', true);
         else if (sourceProtected && !notice) notify('지원하지 않는 문법의 손실을 막기 위해 원문을 보호하고 있습니다. 원문 복사를 사용할 수 있습니다.', 'error', true);
       }
-      window.gibbonMemoToolbar.setKind(state.note.capture ? 'image' : 'text');
+      window.jajanMemoToolbar.setKind(state.note.capture ? 'image' : 'text');
       $('font-size').disabled = !!state.note.capture;
       $('copy').disabled = false;
       const copyLabel = state.note.capture ? '이미지 복사' : sourceProtected ? '원문 복사' : '본문 복사';
@@ -321,7 +321,7 @@ async function refresh(schedule = true) {
         editor.highlight(html);
         displayedHtml = html;
       }
-      if (region) await window.gibbonRegionFrame.ready();
+      if (region) await window.jajanRegionFrame.ready();
       firstFrameReady = true;
       if (!initialInputHandled && state.note.edit_on_open && !state.note.capture && memoVisible && !state.folded && !folded) {
         initialInputHandled = true;
@@ -349,7 +349,7 @@ async function refresh(schedule = true) {
       // visible feedback. Present a themed error and let normal refresh retry.
       applyMemoAppearance(firstFrameColor);
       renderFeedback({message: String(error), error: true, buttons: []});
-      await window.gibbonRegionFrame.ready().catch(failure);
+      await window.jajanRegionFrame.ready().catch(failure);
     } else failure(error);
   }
   if (schedule) setTimeout(refresh, 350);
@@ -466,7 +466,7 @@ function displayFold(value) {
   if (folded === value) return;
   folded = value;
   feedbackSignature = undefined;
-  window.gibbonToolbarFold?.(folded);
+  window.jajanToolbarFold?.(folded);
   document.body.classList.toggle('folded', folded);
   $('fold-toggle').setAttribute('aria-expanded', String(!folded));
   $('fold-toggle').setAttribute('aria-label', folded ? '메모 펼치기' : '메모 접기');
@@ -493,8 +493,8 @@ document.addEventListener('click', (event) => {
   return toggleFold();
 }, true);
 $('fold-toggle').addEventListener('click', toggleFold);
-window.gibbonToggleNote = toggleFold;
-window.gibbonApplyFold = displayFold;
+window.jajanToggleNote = toggleFold;
+window.jajanApplyFold = displayFold;
 async function pollFold() {
   try { displayFold(await invoke('poll_fold')); }
   catch (error) { failure(error); }

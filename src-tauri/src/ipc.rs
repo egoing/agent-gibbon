@@ -38,7 +38,7 @@ pub fn directory() -> Result<PathBuf, String> {
 #[cfg(windows)]
 pub fn directory() -> Result<PathBuf, String> {
     let root = std::env::var_os("LOCALAPPDATA").ok_or("LOCALAPPDATA is unavailable")?;
-    let path = PathBuf::from(root).join("AgentGibbon").join(
+    let path = PathBuf::from(root).join("Jajan").join(
         crate::instance::current()
             .id
             .as_deref()
@@ -178,7 +178,7 @@ mod tests {
     #[test]
     fn independent_locks_and_stale_socket_recovery() {
         let root =
-            std::env::temp_dir().join(format!("floatnote-endpoint-test-{}", std::process::id()));
+            std::env::temp_dir().join(format!("jajan-endpoint-test-{}", std::process::id()));
         let a = root.join("a");
         let b = root.join("b");
         fs::create_dir_all(&a).unwrap();

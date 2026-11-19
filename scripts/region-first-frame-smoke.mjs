@@ -18,7 +18,7 @@ try {
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.addInitScript(({kind, design, color, failFirst}) => {
-        localStorage.setItem('agent-gibbon.memo-design', design);
+        localStorage.setItem('jajan.memo-design', design);
         let failed = false;
         const placement = new Promise(resolve => { window.place = () => resolve(true); });
         const content = new Promise(resolve => { window.prepareContent = resolve; });
@@ -68,14 +68,14 @@ try {
           }},
         };
       }, {kind, design, color, failFirst});
-      await page.route('http://gibbon.test/**', async route => {
+      await page.route('http://jajan.test/**', async route => {
         const path = new URL(route.request().url()).pathname;
         const contentType = /\.m?js$/.test(path) ? 'text/javascript' : path.endsWith('.css') ? 'text/css' : 'text/html';
         await route.fulfill({contentType, body: await readFile(new URL('../ui' + path, import.meta.url))});
       });
       const entry = ['text', 'image'].includes(kind) ? 'index' : kind;
-      await page.goto('http://gibbon.test/' + entry + '.html', {waitUntil: 'commit'});
-      await page.waitForFunction(() => window.gibbonRegionFrame);
+      await page.goto('http://jajan.test/' + entry + '.html', {waitUntil: 'commit'});
+      await page.waitForFunction(() => window.jajanRegionFrame);
       assert.equal(await page.evaluate(() => window.framesAtReveal.length), 0);
       await page.evaluate(() => window.place());
       // The document can lay out freely while the content request remains pending.
@@ -83,7 +83,7 @@ try {
       assert.equal(await page.evaluate(() => window.framesAtReveal.length), 0);
       await page.evaluate(() => window.prepareContent());
       await page.waitForFunction(() => window.framesAtReveal.length > 0, undefined, {timeout: 10000});
-      await page.evaluate(() => window.gibbonRegionFrame.ready());
+      await page.evaluate(() => window.jajanRegionFrame.ready());
       const expected = memoThemeFor(color, {design}).background;
       const frames = await page.evaluate(() => window.framesAtReveal);
       const error = failFirst ? 'Error: ' + (kind === 'image' ? '첫 이미지 조회 실패' : '첫 터미널 준비 실패') : '';

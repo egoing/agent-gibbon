@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readMemoAppearance,memoDesignKey} from '../ui/appearance.mjs';
 import {memoThemeFor,themeFor} from '../ui/theme.mjs';
 test('memo defaults to gray regardless of manager selection, old color mode or OS appearance',()=>{
- const data=new Map([['agent-gibbon.manager-theme','black'],['agent-gibbon.memo-color-mode','on']]);
+ const data=new Map([['jajan.manager-theme','black'],['jajan.memo-color-mode','on']]);
  const env={localStorage:{getItem:k=>data.get(k)},matchMedia:()=>({matches:true})};
  assert.deepEqual(readMemoAppearance(env),{design:'gray'});
  for(const design of ['white','gray','black','color']){data.set(memoDesignKey,design);assert.equal(readMemoAppearance(env).design,design);}
@@ -23,8 +23,8 @@ test('independent theme roles and color mode display preserve the individual col
 });
 
 test('only the independent system memo choice follows day/night appearance',()=>{
- const media={matches:false};const data=new Map([[memoDesignKey,'system'],['agent-gibbon.manager-theme','white']]);const env={localStorage:{getItem:k=>data.get(k)},matchMedia:()=>media};
+ const media={matches:false};const data=new Map([[memoDesignKey,'system'],['jajan.manager-theme','white']]);const env={localStorage:{getItem:k=>data.get(k)},matchMedia:()=>media};
  assert.equal(memoThemeFor('#ffeeaa',readMemoAppearance(env)).background,'#dfe2dd');media.matches=true;assert.equal(memoThemeFor('#ffeeaa',readMemoAppearance(env)).background,'#262627');
- data.set('agent-gibbon.manager-theme','gray');assert.equal(memoThemeFor('#ffeeaa',readMemoAppearance(env)).background,'#262627');
+ data.set('jajan.manager-theme','gray');assert.equal(memoThemeFor('#ffeeaa',readMemoAppearance(env)).background,'#262627');
  data.set(memoDesignKey,'gray');assert.equal(memoThemeFor('#ffeeaa',readMemoAppearance(env)).background,'#dfe2dd');
 });

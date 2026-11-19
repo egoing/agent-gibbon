@@ -12,7 +12,7 @@ try {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(() => { const listen = () => Promise.resolve(() => {}); window.__TAURI__ = { event: {listen}, core: { invoke: async () => true }, webviewWindow: {getCurrentWebviewWindow: () => ({listen})}, window: {getCurrentWindow: () => ({listen, isFocused: async () => false})} }; });
-  await page.route('http://gibbon.test/**', route => {
+  await page.route('http://jajan.test/**', route => {
     let file = path.join(root, 'ui', new URL(route.request().url()).pathname);
     if (file.endsWith('/')) file += 'index.html';
     if (file.endsWith('/terminal-scrollbar.mjs')) return route.fulfill({ body: 'export function installTerminalScrollbar() {}', contentType: 'text/javascript' });
@@ -26,8 +26,8 @@ try {
   ]) {
     for (const [width, height] of [[144, 80], [300, 100]]) {
       await page.setViewportSize({ width, height });
-      await page.goto(`http://gibbon.test/${filename}`);
-      await page.waitForFunction(() => typeof window.gibbonToolbarFold === 'function');
+      await page.goto(`http://jajan.test/${filename}`);
+      await page.waitForFunction(() => typeof window.jajanToolbarFold === 'function');
       if (filename === 'index.html') await page.evaluate(kind => document.body.classList.add(kind + '-note'), kind);
       assert.equal(await page.locator('#dev-instance').count(), 0);
       assert.equal(await page.locator('#controls').evaluate(e => getComputedStyle(e).opacity), '1');
@@ -45,7 +45,7 @@ try {
       await page.waitForFunction(() => document.body.classList.contains('toolbar-collapsed'));
       assert.equal(await page.locator('#toolbar-items').isVisible(), false);
       assert.equal(await page.locator('#toolbar-toggle').getAttribute('aria-expanded'), 'false');
-      await page.evaluate(() => window.gibbonToolbarFold(false));
+      await page.evaluate(() => window.jajanToolbarFold(false));
       assert.equal(await page.locator('#toolbar-toggle').getAttribute('aria-expanded'), 'true');
       console.log(`PASS ${kind} ${width}×${height}: row y=${row.y} h=${row.height}, body y=${content}, controls and fold`);
     }

@@ -18,7 +18,7 @@ function mount(kind) {
   controls.dataset.kind = kind;
   const window = {};
   vm.runInNewContext(script, {document: {createElement, currentScript: {parentElement: controls}}, window});
-  return {nodes, api: window.gibbonMemoToolbar};
+  return {nodes, api: window.jajanMemoToolbar};
 }
 
 test('all memo types share accessible controls and retain their supported actions', () => {

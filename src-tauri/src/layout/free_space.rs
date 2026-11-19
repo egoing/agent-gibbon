@@ -62,7 +62,7 @@ fn busy_tiles(image: &RgbaImage, screen: Rect, step: i64) -> Vec<Rect> {
 fn app_windows() -> Result<(Vec<Rect>, Vec<Rect>), String> {
     use std::ffi::c_void;
     extern "C" {
-        fn gibbon_visit_app_windows(
+        fn jajan_visit_app_windows(
             context: *mut c_void,
             visit: extern "C" fn(*mut c_void, f64, f64, f64, f64, bool),
         ) -> bool;
@@ -93,7 +93,7 @@ fn app_windows() -> Result<(Vec<Rect>, Vec<Rect>), String> {
     }
     let mut windows = (Vec::new(), Vec::new());
     if unsafe {
-        gibbon_visit_app_windows(
+        jajan_visit_app_windows(
             (&mut windows as *mut (Vec<Rect>, Vec<Rect>)).cast(),
             collect,
         )

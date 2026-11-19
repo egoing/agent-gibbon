@@ -17,7 +17,7 @@ function setup() {
   const applied=[];
   vm.runInNewContext(readFileSync(new URL('../ui/toolbar.js', import.meta.url), 'utf8'), {
     document: {getElementById: id => id === 'fold-title' ? null : node(id), body: {classList: {contains: () => false, toggle(){}}}},
-    window: {gibbonApplyFold: value => applied.push(value), __TAURI__: {
+    window: {jajanApplyFold: value => applied.push(value), __TAURI__: {
       webviewWindow: {getCurrentWebviewWindow: () => ({listen(name, fn) { native[name]=fn; }})},
       core: {invoke: async name => { calls.push(name); if(fail) throw Error('native failed'); return pending ? await pending : false; }},
     }}, ResizeObserver: class {observe(){}}, MutationObserver: class {observe(){}},

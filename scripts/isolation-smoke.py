@@ -46,14 +46,14 @@ def live(path):
 
 
 def call(root, *args, ok=True, cwd="/"):
-    result = subprocess.run([str(root / 'scripts/agent-gibbon-dev'), *args], cwd=cwd, capture_output=True, text=True, timeout=30)
+    result = subprocess.run([str(root / 'scripts/jajan-dev'), *args], cwd=cwd, capture_output=True, text=True, timeout=30)
     data = json.loads(result.stdout)
     assert data['ok'] is ok and (result.returncode == 0) is ok, (result.stderr, data)
     return data
 
 
 def pid_for(binary):
-    # Cargo runs target/debug/agent-gibbon with a relative argv[0]. Resolve by the
+    # Cargo runs target/debug/jajan with a relative argv[0]. Resolve by the
     # executable vnode, not a process-name match that could select another app.
     result = subprocess.run(['lsof', '-t', binary], capture_output=True, text=True)
     pids = sorted({int(pid) for pid in result.stdout.split()})
@@ -74,10 +74,10 @@ def state_only(state):
 
 ia, ib = info(ROOT), info(PEER)
 assert ia['id'] != ib['id']
-sa, sb = [Path(f'/tmp/floatnote-{os.getuid()}-{i["id"]}/app.sock') for i in (ia, ib)]
+sa, sb = [Path(f'/tmp/jajan-{os.getuid()}-{i["id"]}/app.sock') for i in (ia, ib)]
 # Refuse to assume ownership of any existing development process.
 assert not live(sa) and not live(sb), '개발 앱이 이미 실행 중입니다. 별도의 검증 워크트리를 사용하세요.'
-default = Path(f'/tmp/floatnote-{os.getuid()}/app.sock')
+default = Path(f'/tmp/jajan-{os.getuid()}/app.sock')
 if args.without_default:
     assert not live(default), '--without-default는 기본 앱이 미실행일 때만 사용하세요.'
     installed, baseline = None, {}
@@ -95,7 +95,7 @@ def check_installed():
     for key, before in baseline.items():
         assert state_only(raw(default, {'action': 'inspect', 'id': key})) == before, f'설치 앱 상태 변경: {key}'
 
-probe_dir = tempfile.TemporaryDirectory(prefix='floatnote-focus-')
+probe_dir = tempfile.TemporaryDirectory(prefix='jajan-focus-')
 probe = str(Path(probe_dir.name) / 'frontmost')
 subprocess.run(['swiftc', str(ROOT / 'scripts/frontmost.swift'), '-o', probe], check=True)
 def frontmost():

@@ -1,5 +1,5 @@
 'use strict';
-const invoke = window.gibbonInvoke || window.__TAURI__.core.invoke;
+const invoke = window.jajanInvoke || window.__TAURI__.core.invoke;
 const el = id => document.getElementById(id);
 let notes = new Map(), selected = null, displayed, busy = false, detailVersion = 0;
 let query = '', composing = false, retryFull = false;
@@ -29,27 +29,27 @@ function settingsSection(selectedSection) {
     el(`settings-${section}`).hidden = !active;
     el(`settings-${section}-nav`).setAttribute('aria-current', active ? 'page' : 'false');
   }
-  if (selectedSection === 'updater') window.gibbonUpdater?.refresh();
+  if (selectedSection === 'updater') window.jajanUpdater?.refresh();
 }
 for (const section of settingsSections) {
   el(`settings-${section}-nav`).onclick = () => {
     settingsSection(section);
-    if (section === 'skills') window.gibbonSkills?.refresh();
+    if (section === 'skills') window.jajanSkills?.refresh();
   };
 }
 function page(settings) {
-  if(window.gibbonPrivacy && !window.gibbonPrivacy.accepted()){window.gibbonPrivacy.showWelcome();return;}
+  if(window.jajanPrivacy && !window.jajanPrivacy.accepted()){window.jajanPrivacy.showWelcome();return;}
   el('notes-page').hidden = settings;
   el('settings-page').hidden = !settings;
   el('notes-nav').setAttribute('aria-pressed', String(!settings));
   el('settings-nav').setAttribute('aria-pressed', String(settings));
   if (!settings) refresh();
-  else if (selectedSettingsSection === 'skills') window.gibbonSkills?.refresh();
-  else if (selectedSettingsSection === 'updater') window.gibbonUpdater?.refresh();
-  else window.gibbonPrivacy?.refresh().catch(()=>{});
+  else if (selectedSettingsSection === 'skills') window.jajanSkills?.refresh();
+  else if (selectedSettingsSection === 'updater') window.jajanUpdater?.refresh();
+  else window.jajanPrivacy?.refresh().catch(()=>{});
 }
 // The tray's More action always opens the full list. In-window navigation keeps its filter.
-window.gibbonShowNotes = () => {
+window.jajanShowNotes = () => {
   search.value = '';
   composing = false;
   applyQuery();
@@ -261,7 +261,7 @@ search.addEventListener('keydown', event => {
   }
 });
 async function refresh(force = false) {
-  if(window.gibbonPrivacy && !window.gibbonPrivacy.accepted())return;
+  if(window.jajanPrivacy && !window.jajanPrivacy.accepted())return;
   if (busy || visibilityPending.size) { if (force) retryFull = true; return; }
   busy = true;
   const version = visibilityVersion;
@@ -285,7 +285,7 @@ async function refresh(force = false) {
 el('detail').addEventListener('click', event => { if (event.target.closest('a')) event.preventDefault(); });
 window.addEventListener('focus', () => refresh());
 setInterval(() => { if (!document.hidden && !el('notes-page').hidden) refresh(); }, 2000);
-if(window.gibbonPrivacy){
-  window.gibbonPrivacy.onAccepted=()=>page(false);
-  window.gibbonPrivacy.ready.then(()=>{if(window.gibbonPrivacy.accepted())page(false);}).catch(()=>{});
+if(window.jajanPrivacy){
+  window.jajanPrivacy.onAccepted=()=>page(false);
+  window.jajanPrivacy.ready.then(()=>{if(window.jajanPrivacy.accepted())page(false);}).catch(()=>{});
 }else refresh();

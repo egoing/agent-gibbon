@@ -31,12 +31,12 @@ struct Metadata {
     change_base: Option<String>,
 }
 static SERIAL: AtomicU64 = AtomicU64::new(0);
-const PREFIX: &str = "<!-- agent-gibbon-v1\n";
+const PREFIX: &str = "<!-- jajan-v1\n";
 impl Store {
     pub fn new(root: PathBuf, instance: Option<&str>) -> Self {
         Self(match instance {
             Some(id) => root.join("notes").join(id).join("docs"),
-            None => root.join("agent-gibbon").join("docs"),
+            None => root.join("jajan").join("docs"),
         })
     }
     pub fn path(&self, id: &str) -> PathBuf {
@@ -178,7 +178,7 @@ impl Store {
             // Agent project files are not application-owned Markdown records.
             if path.file_name().is_some_and(|name| {
                 self.0
-                    .join(".agent-gibbon-terminals")
+                    .join(".jajan-terminals")
                     .join(name)
                     .with_extension("json")
                     .is_file()
@@ -318,12 +318,12 @@ mod tests {
             fs::read_to_string(index).unwrap(),
             "user project without application metadata"
         );
-        assert!(!dir.path().join(".agent-gibbon-terminals").exists());
+        assert!(!dir.path().join(".jajan-terminals").exists());
     }
 
     #[test]
     fn cumulative_baseline_survives_restart_and_confirmation_is_transactional() {
-        let root = std::env::temp_dir().join(format!("gibbon-baseline-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("jajan-baseline-{}", std::process::id()));
         let store = Store(root.clone());
         let mut note = Note::default();
         for body in ["원본\n", "중간\n", "최종\n"] {
@@ -361,7 +361,7 @@ mod tests {
 
     #[test]
     fn direct_save_confirms_pending_diff_even_when_text_is_unchanged() {
-        let root = std::env::temp_dir().join(format!("gibbon-direct-edit-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("jajan-direct-edit-{}", std::process::id()));
         let store = Store(root.clone());
         let mut note = Note::default();
         for body in ["원본", "외부 변경"] {
@@ -393,7 +393,7 @@ mod tests {
 
     #[test]
     fn windows_reserved_ids_roundtrip_without_case_collisions() {
-        let root = std::env::temp_dir().join(format!("gibbon-reserved-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("jajan-reserved-{}", std::process::id()));
         let store = Store(root.clone());
         let ids = ["con", "CON", "Con", "aux", "nul", "prn", "com1", "lpt9"];
         for id in ids {
@@ -413,7 +413,7 @@ mod tests {
     }
     #[test]
     fn roundtrip_and_isolation() {
-        let root = std::env::temp_dir().join(format!("gibbon-store-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("jajan-store-{}", std::process::id()));
         let store = Store::new(root.clone(), None);
         let mut note = Note {
             markdown: "# 한글\n- [x] 저장\n<!-- 본문 -->\n".into(),
@@ -421,7 +421,7 @@ mod tests {
             ..Note::default()
         };
         store.save("Ab", &note).unwrap();
-        assert_eq!(store.path("ab"), root.join("agent-gibbon/docs/ab/index.md"));
+        assert_eq!(store.path("ab"), root.join("jajan/docs/ab/index.md"));
         assert_ne!(store.path("Ab"), store.path("ab"));
         fs::write(
             store.path("Ab").parent().unwrap().join("asset.png"),
@@ -482,7 +482,7 @@ mod failure_tests {
     use super::*;
     #[test]
     fn edit_persists_and_failed_store_rolls_back_source_and_memory() {
-        let root = std::env::temp_dir().join(format!("gibbon-edit-{}", std::process::id()));
+        let root = std::env::temp_dir().join(format!("jajan-edit-{}", std::process::id()));
         fs::create_dir_all(&root).unwrap();
         let source = root.join("source.md");
         fs::write(&source, "old").unwrap();

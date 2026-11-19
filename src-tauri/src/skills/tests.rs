@@ -54,15 +54,15 @@ impl Fixture {
 fn default_is_off_and_enabling_installs_all_detected_agents_without_execution() {
     let f = Fixture::new();
     assert!(f.service.list().unwrap().skills.iter().all(|s| !s.enabled));
-    assert!(f.service.set("agent-gibbon", true).is_err());
+    assert!(f.service.set("jajan", true).is_err());
     f.agent("codex");
     f.agent("claude");
-    let snapshot = f.service.set("agent-gibbon", true).unwrap();
+    let snapshot = f.service.set("jajan", true).unwrap();
     assert!(snapshot.skills[0].enabled);
     assert!(!snapshot.skills[1].enabled);
     for root in [
-        f.installed("agent-gibbon"),
-        f.service.environment.claude_root.join("agent-gibbon"),
+        f.installed("jajan"),
+        f.service.environment.claude_root.join("jajan"),
     ] {
         assert_eq!(
             fs::read_to_string(root.join("SKILL.md")).unwrap(),
@@ -70,29 +70,29 @@ fn default_is_off_and_enabling_installs_all_detected_agents_without_execution() 
         );
         assert!(owned(&root));
     }
-    assert_eq!(f.config().skills["agent-gibbon"].placements.len(), 2);
+    assert_eq!(f.config().skills["jajan"].placements.len(), 2);
 }
 #[test]
 fn explicit_on_overwrites_local_changes_but_ordinary_start_does_not() {
     let f = Fixture::new();
     f.agent("codex");
-    f.service.set("agent-gibbon", true).unwrap();
-    let path = f.installed("agent-gibbon").join("SKILL.md");
+    f.service.set("jajan", true).unwrap();
+    let path = f.installed("jajan").join("SKILL.md");
     fs::write(&path, "local edits").unwrap();
     f.service.list().unwrap();
     assert_eq!(fs::read_to_string(&path).unwrap(), "local edits");
-    f.service.set("agent-gibbon", true).unwrap();
+    f.service.set("jajan", true).unwrap();
     assert_eq!(fs::read_to_string(path).unwrap(), catalog()[0].markdown);
 }
 #[test]
 fn upgrade_overwrites_only_on_skills_preserves_choices_and_retries_failures() {
     let mut f = Fixture::new();
     f.agent("codex");
-    f.service.set("agent-gibbon", true).unwrap();
-    let off = f.installed("agent-gibbon-progress");
+    f.service.set("jajan", true).unwrap();
+    let off = f.installed("jajan-progress");
     fs::create_dir_all(&off).unwrap();
     fs::write(off.join("SKILL.md"), "user owned off skill").unwrap();
-    fs::write(f.installed("agent-gibbon").join("SKILL.md"), "local edits").unwrap();
+    fs::write(f.installed("jajan").join("SKILL.md"), "local edits").unwrap();
     f.service.revision = "release-2".into();
     let root = f.service.environment.home.join(".agents/skills");
     let moved = f.service.environment.home.join("old-root");
@@ -101,13 +101,13 @@ fn upgrade_overwrites_only_on_skills_preserves_choices_and_retries_failures() {
     let failed = f.service.list().unwrap();
     assert!(failed.skills[0].enabled);
     assert!(failed.feedback.is_some());
-    assert_eq!(f.config().skills["agent-gibbon"].revision, "release-1");
+    assert_eq!(f.config().skills["jajan"].revision, "release-1");
     fs::remove_file(&root).unwrap();
     fs::rename(moved, &root).unwrap();
     assert!(f.service.list().unwrap().feedback.is_none());
-    assert_eq!(f.config().skills["agent-gibbon"].revision, "release-2");
+    assert_eq!(f.config().skills["jajan"].revision, "release-2");
     assert_eq!(
-        fs::read_to_string(f.installed("agent-gibbon").join("SKILL.md")).unwrap(),
+        fs::read_to_string(f.installed("jajan").join("SKILL.md")).unwrap(),
         catalog()[0].markdown
     );
     assert_eq!(
@@ -119,48 +119,48 @@ fn upgrade_overwrites_only_on_skills_preserves_choices_and_retries_failures() {
 fn off_removes_only_receipted_copies_and_never_reactivates_on_upgrade() {
     let mut f = Fixture::new();
     f.agent("codex");
-    f.service.set("agent-gibbon", true).unwrap();
-    f.service.set("agent-gibbon-progress", true).unwrap();
-    f.service.set("agent-gibbon", false).unwrap();
-    assert!(!installer::exists(&f.installed("agent-gibbon")));
+    f.service.set("jajan", true).unwrap();
+    f.service.set("jajan-progress", true).unwrap();
+    f.service.set("jajan", false).unwrap();
+    assert!(!installer::exists(&f.installed("jajan")));
     assert!(f
-        .installed("agent-gibbon-progress")
+        .installed("jajan-progress")
         .join("SKILL.md")
         .exists());
     f.service.revision = "release-2".into();
     f.service.list().unwrap();
-    assert!(!f.config().skills["agent-gibbon"].enabled);
-    assert!(!installer::exists(&f.installed("agent-gibbon")));
-    assert!(f.config().skills["agent-gibbon-progress"].enabled);
+    assert!(!f.config().skills["jajan"].enabled);
+    assert!(!installer::exists(&f.installed("jajan")));
+    assert!(f.config().skills["jajan-progress"].enabled);
 }
 #[test]
 fn new_agent_receives_on_skills_on_next_reconciliation() {
     let f = Fixture::new();
     f.agent("codex");
-    f.service.set("agent-gibbon", true).unwrap();
+    f.service.set("jajan", true).unwrap();
     f.agent("claude");
     f.service.list().unwrap();
     assert!(f
         .service
         .environment
         .claude_root
-        .join("agent-gibbon/SKILL.md")
+        .join("jajan/SKILL.md")
         .exists());
-    assert_eq!(f.config().skills["agent-gibbon"].placements.len(), 2);
+    assert_eq!(f.config().skills["jajan"].placements.len(), 2);
 }
 #[test]
 fn corrupt_state_and_unowned_off_fail_without_deleting_user_data() {
     let f = Fixture::new();
     f.agent("codex");
-    f.service.set("agent-gibbon", true).unwrap();
-    fs::remove_file(f.installed("agent-gibbon").join(".agent-gibbon-managed")).unwrap();
-    assert!(f.service.set("agent-gibbon", false).is_err());
-    assert!(f.config().skills["agent-gibbon"].enabled);
-    let before = fs::read(f.installed("agent-gibbon").join("SKILL.md")).unwrap();
+    f.service.set("jajan", true).unwrap();
+    fs::remove_file(f.installed("jajan").join(".jajan-managed")).unwrap();
+    assert!(f.service.set("jajan", false).is_err());
+    assert!(f.config().skills["jajan"].enabled);
+    let before = fs::read(f.installed("jajan").join("SKILL.md")).unwrap();
     fs::write(f.service.root.join("settings.json"), b"bad config").unwrap();
     assert!(f.service.list().is_err());
     assert_eq!(
-        fs::read(f.installed("agent-gibbon").join("SKILL.md")).unwrap(),
+        fs::read(f.installed("jajan").join("SKILL.md")).unwrap(),
         before
     );
     assert_eq!(
@@ -173,14 +173,14 @@ fn state_write_failure_rolls_back_every_agent_copy() {
     let f = Fixture::new();
     f.agent("codex");
     f.agent("claude");
-    f.service.set("agent-gibbon", true).unwrap();
+    f.service.set("jajan", true).unwrap();
     let before = f.config();
     let mut after = before.clone();
-    after.skills.get_mut("agent-gibbon").unwrap().revision = "new".into();
+    after.skills.get_mut("jajan").unwrap().revision = "new".into();
     let state = f.service.root.join("settings.json");
     fs::remove_file(&state).unwrap();
     fs::create_dir(&state).unwrap();
-    let dests = &before.skills["agent-gibbon"].placements;
+    let dests = &before.skills["jajan"].placements;
     for p in dests {
         fs::write(p.join("SKILL.md"), "keep my edits").unwrap();
     }
@@ -205,10 +205,10 @@ fn on_replaces_symlink_entry_without_modifying_its_shared_source() {
     let source = f._tempdir.path().join("shared-skill");
     fs::create_dir_all(&source).unwrap();
     fs::write(source.join("SKILL.md"), "shared original").unwrap();
-    let dest = f.installed("agent-gibbon");
+    let dest = f.installed("jajan");
     fs::create_dir_all(dest.parent().unwrap()).unwrap();
     std::os::unix::fs::symlink(&source, &dest).unwrap();
-    f.service.set("agent-gibbon", true).unwrap();
+    f.service.set("jajan", true).unwrap();
     assert!(!fs::symlink_metadata(&dest)
         .unwrap()
         .file_type()
@@ -217,7 +217,7 @@ fn on_replaces_symlink_entry_without_modifying_its_shared_source() {
         fs::read_to_string(source.join("SKILL.md")).unwrap(),
         "shared original"
     );
-    f.service.set("agent-gibbon", false).unwrap();
+    f.service.set("jajan", false).unwrap();
     assert_eq!(
         fs::read_to_string(source.join("SKILL.md")).unwrap(),
         "shared original"
@@ -238,7 +238,7 @@ fn catalog_is_real_self_contained_resources_and_does_not_ship_example_capabiliti
         assert_eq!(s.markdown.lines().next(), Some("---"));
         assert!(s.markdown.contains(&format!("name: {}", s.id)));
         assert!(!s.markdown.contains("TODO"));
-        assert!(!s.markdown.contains("AGENT_GIBBON_SKILLS_TEST_ROOT"));
+        assert!(!s.markdown.contains("JAJAN_SKILLS_TEST_ROOT"));
     }
     assert!(catalog()[0].markdown.contains("워크플로우"));
 }

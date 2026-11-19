@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 const {chromium} = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('..', import.meta.url));
 const browser = await chromium.launch({headless:true});
-const output = process.env.GIBBON_SCREENSHOTS;
+const output = process.env.JAJAN_SCREENSHOTS;
 if (output) fs.mkdirSync(output, {recursive:true});
 try {
  const page = await browser.newPage(); const errors=[];
@@ -20,7 +20,7 @@ try {
    if(name==='web_run') return {};
   }},event:{listen:()=>Promise.resolve(()=>{})},window:{getCurrentWindow:()=>({label:'test'})},webviewWindow:{getCurrentWebviewWindow:()=>({listen:()=>{}})}};
  });
- await page.route('http://gibbon.test/**', route=>{
+ await page.route('http://jajan.test/**', route=>{
   const file=path.join(root,'ui',new URL(route.request().url()).pathname);
   // This test compares terminal CSS only; no terminal runtime is started.
   if(file.endsWith('/terminal-scrollbar.mjs')) return route.fulfill({body:'export function installTerminalScrollbar() {}',contentType:'text/javascript'});
@@ -30,9 +30,9 @@ try {
  for(const design of ['gray','white','black','color','system']) {
   for(const width of [144,240,600]) {
    await page.setViewportSize({width,height:400});
-   await page.goto('http://gibbon.test/web.html');
-   await page.evaluate(design=>{localStorage.setItem('agent-gibbon.memo-design',design);dispatchEvent(new StorageEvent('storage',{key:'agent-gibbon.memo-design',storageArea:localStorage}));},design);
-   await page.waitForFunction(()=>!!window.gibbonToolbarFold);
+   await page.goto('http://jajan.test/web.html');
+   await page.evaluate(design=>{localStorage.setItem('jajan.memo-design',design);dispatchEvent(new StorageEvent('storage',{key:'jajan.memo-design',storageArea:localStorage}));},design);
+   await page.waitForFunction(()=>!!window.jajanToolbarFold);
    const geometry=()=>page.locator('#controls').evaluate(row=>({height:row.offsetHeight,buttons:[...row.querySelectorAll('#pin,#toolbar-toggle,#close')].map(b=>({id:b.id,x:b.getBoundingClientRect().x,y:b.getBoundingClientRect().y,w:b.offsetWidth,h:b.offsetHeight,r:getComputedStyle(b).borderRadius,p:getComputedStyle(b).padding,icon:b.querySelector('svg').getBoundingClientRect().width}))}));
    assert.equal(await page.locator('#chrome-title').getAttribute('title'),'웹');
    const expanded=await geometry(); assert.equal(expanded.height,22);
@@ -65,9 +65,9 @@ try {
   }
  }
  // Compare all common button geometry directly with the terminal toolbar.
- await page.goto('http://gibbon.test/terminal.html');
+ await page.goto('http://jajan.test/terminal.html');
  const terminal=await page.locator('#close').evaluate(e=>[e.offsetWidth,e.offsetHeight,getComputedStyle(e).borderRadius]);
- await page.goto('http://gibbon.test/web.html');
+ await page.goto('http://jajan.test/web.html');
  assert.deepEqual(await page.locator('#close').evaluate(e=>[e.offsetWidth,e.offsetHeight,getComputedStyle(e).borderRadius]),terminal);
  assert.deepEqual(errors,[]);
 } finally {await browser.close();}

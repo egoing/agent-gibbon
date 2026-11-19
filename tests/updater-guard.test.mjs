@@ -12,8 +12,8 @@ function setup({ busy = () => false, failListen = null } = {}) {
   const listeners = new Map(), domListeners = new Map(), requests = [];
   let handleInvoke = async () => ({ ok: true });
   const window = {
-    gibbonUpdateBusy: busy,
-    gibbonUpdateActivity: () => ({ editing: busy() }),
+    jajanUpdateBusy: busy,
+    jajanUpdateActivity: () => ({ editing: busy() }),
     addEventListener(name, callback, capture) {
       const entries = domListeners.get(name) || [];
       entries.push({ callback, capture }); domListeners.set(name, entries);
@@ -40,7 +40,7 @@ test('prepare acknowledges safe=false while a write command is pending', async (
     if (command === 'save_note') return new Promise(resolve => { started = true; resolveCommand = resolve; });
     return { ok: true };
   });
-  const command = held.window.gibbonInvoke('save_note');
+  const command = held.window.jajanInvoke('save_note');
   await tick();
   assert.equal(started, true);
   held.fire('updater-prepare', 1);
@@ -64,7 +64,7 @@ test('prepare acknowledges safe=true when no command or editing work is active',
 test('frozen state rejects new commands and captures input until release', async () => {
   const app = setup();
   app.fire('updater-prepare', 3); await tick();
-  await assert.rejects(app.window.gibbonInvoke('manager_notes'), /업데이트 설치를 준비하고 있습니다/);
+  await assert.rejects(app.window.jajanInvoke('manager_notes'), /업데이트 설치를 준비하고 있습니다/);
   const inputNames = ['pointerdown', 'keydown', 'beforeinput', 'click', 'drop'];
   for (const name of inputNames) {
     let prevented = 0, stopped = 0;
@@ -73,7 +73,7 @@ test('frozen state rejects new commands and captures input until release', async
     assert.equal(stopped, 1, `${name} stopped while frozen`);
   }
   app.fire('updater-release', 3);
-  await app.window.gibbonInvoke('manager_notes');
+  await app.window.jajanInvoke('manager_notes');
   assert.equal(app.requests.at(-1).command, 'manager_notes');
   let prevented = 0, stopped = 0;
   app.domListeners.get('click')[0].callback({ preventDefault() { prevented++; }, stopImmediatePropagation() { stopped++; } });
@@ -88,11 +88,11 @@ test('updater status and install commands do not count as pending manager work',
     if (command === 'updater_install') return new Promise(resolve => { resolveInstall = resolve; });
     return { ok: true };
   });
-  const status = app.window.gibbonInvoke('updater_status');
+  const status = app.window.jajanInvoke('updater_status');
   await tick();
   app.fire('updater-prepare', 4); await tick();
   assert.deepEqual(plain(app.requests.at(-1)), { command: 'updater_ack', args: { epoch: 4, safe: true, report: idleReport } });
-  const install = app.window.gibbonInvoke('updater_install');
+  const install = app.window.jajanInvoke('updater_install');
   await tick();
   app.fire('updater-prepare', 5); await tick();
   assert.deepEqual(plain(app.requests.at(-1)), { command: 'updater_ack', args: { epoch: 5, safe: true, report: idleReport } });
@@ -112,7 +112,7 @@ test('unknown command names and request arguments are absent from the installati
   let finish;
   app.setInvoke(command => command === 'private-title'
     ? new Promise(resolve => { finish = resolve; }) : {});
-  const pending = app.window.gibbonInvoke('private-title', { markdown: 'private-body' });
+  const pending = app.window.jajanInvoke('private-title', { markdown: 'private-body' });
   await tick();
   app.fire('updater-prepare', 2);
   await tick();
@@ -132,7 +132,7 @@ function heldRequests(commands) {
   const completions = new Map();
   app.setInvoke(command => commands.includes(command)
     ? new Promise(resolve => completions.set(command, resolve)) : {});
-  const work = commands.map(command => app.window.gibbonInvoke(command));
+  const work = commands.map(command => app.window.jajanInvoke(command));
   const acks = () => app.requests.filter(request => request.command === 'updater_ack').map(request => request.args);
   return { app, completions, work, acks };
 }
@@ -142,7 +142,7 @@ test('background polls settle before acknowledgement, with new work frozen', asy
   const { app, completions, work, acks } = heldRequests(commands);
   await tick();
   app.fire('updater-prepare', 1);
-  await assert.rejects(app.window.gibbonInvoke('save_note'), /업데이트 설치/);
+  await assert.rejects(app.window.jajanInvoke('save_note'), /업데이트 설치/);
   assert.equal(acks().length, 0);
   for (const complete of completions.values()) complete({});
   await Promise.all(work);
@@ -182,8 +182,8 @@ test('a released epoch cannot acknowledge later work or unfreeze a newer epoch',
   app.fire('updater-prepare', 2);
   app.fire('updater-release', 1);
   app.fire('updater-prepare', 1);
-  await assert.rejects(app.window.gibbonInvoke('save_note'), /업데이트 설치/);
-  app.window.gibbonUpdateActivity = () => ({ exporting: true });
+  await assert.rejects(app.window.jajanInvoke('save_note'), /업데이트 설치/);
+  app.window.jajanUpdateActivity = () => ({ exporting: true });
   completions.get('snapshot')({});
   await Promise.all(work);
   await new Promise(resolve => setTimeout(resolve, 5));

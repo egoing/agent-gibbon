@@ -1,6 +1,6 @@
 ---
-name: agent-gibbon-progress
-description: 사용자가 요청한 작업의 계획과 진행상황을 Agent Gibbon의 플로팅 체크리스트 메모로 표시하고 갱신한다.
+name: jajan-progress
+description: 사용자가 요청한 작업의 계획과 진행상황을 Jajan의 플로팅 체크리스트 메모로 표시하고 갱신한다.
 ---
 
 # 작업 진행 표시
@@ -9,9 +9,9 @@ description: 사용자가 요청한 작업의 계획과 진행상황을 Agent Gi
 
 ## 앱 선택
 
-macOS 설치 앱은 `/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon`이다. 실행 가능 여부를 먼저 확인한다. Windows에서는 사용자가 설치한 `agent-gibbon.exe`의 실제 경로를 확인한다. 앱이 없으면 본 작업을 계속하며 메모만 생략한다. 앱 설치·소스 빌드는 별도 요청이 있을 때 한다.
+macOS 설치 앱은 `/Applications/Jajan.app/Contents/MacOS/jajan`이다. 실행 가능 여부를 먼저 확인한다. Windows에서는 사용자가 설치한 `jajan.exe`의 실제 경로를 확인한다. 앱이 없으면 본 작업을 계속하며 메모만 생략한다. 앱 설치·소스 빌드는 별도 요청이 있을 때 한다.
 
-특정 워크트리의 개발 앱을 지정했거나 Agent Gibbon을 개발·검증하는 작업에서는 해당 워크트리의 `scripts/agent-gibbon-dev`를 사용한다. 다른 개발 인스턴스나 설치 앱으로 바꾸지 않는다. 명령 옵션은 실제 `--help`로 확인한다.
+특정 워크트리의 개발 앱을 지정했거나 Jajan을 개발·검증하는 작업에서는 해당 워크트리의 `scripts/jajan-dev`를 사용한다. 다른 개발 인스턴스나 설치 앱으로 바꾸지 않는다. 명령 옵션은 실제 `--help`로 확인한다.
 
 ## 한 작업에 한 메모
 
@@ -26,7 +26,7 @@ macOS 설치 앱은 `/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon`
 CLI의 종료 코드와 JSON `ok`를 확인한다. 실패한 갱신을 성공으로 표시하지 않고 본 작업은 계속한다. 체크리스트는 목록 기호를 포함한다. 긴 내용은 인용한 heredoc 또는 파일로 보내 셸이 원문의 백틱·달러 기호를 실행하지 않게 한다.
 
 ```sh
-"/Applications/Agent Gibbon.app/Contents/MacOS/agent-gibbon" open --id project-progress --file - <<'MD'
+"/Applications/Jajan.app/Contents/MacOS/jajan" open --id project-progress --file - <<'MD'
 # 현재 작업
 - [ ] 구현
 - [ ] 실행 검증

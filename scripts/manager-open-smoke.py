@@ -13,7 +13,7 @@ import time
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
-CLI = ROOT / 'scripts/agent-gibbon-dev'
+CLI = ROOT / 'scripts/jajan-dev'
 
 
 def run(*args):

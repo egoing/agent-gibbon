@@ -22,8 +22,8 @@ from windows_uia import control_center
 from windows_capture_pattern import add_pattern, calibrate_palette, expected_color, verify_png
 
 ROOT = Path(__file__).resolve().parents[1]
-BINARY = ROOT / 'src-tauri/target/debug/agent-gibbon.exe'
-CLI = ROOT / 'scripts/agent-gibbon-dev.cmd'
+BINARY = ROOT / 'src-tauri/target/debug/jajan.exe'
+CLI = ROOT / 'scripts/jajan-dev.cmd'
 
 
 class Keyboard(C.Structure):
@@ -84,7 +84,7 @@ def fixture(token):
         C.c_int, C.c_int, C.c_int, C.c_int, W.HWND, W.HMENU, W.HINSTANCE, C.c_void_p]
     user.CreateWindowExW.restype = W.HWND
     # SS_WHITERECT + WS_POPUP + WS_VISIBLE; no text or private content is drawn.
-    hwnd = user.CreateWindowExW(8, 'STATIC', 'Gibbon capture fixture ' + token,
+    hwnd = user.CreateWindowExW(8, 'STATIC', 'Jajan capture fixture ' + token,
         0x90000006, 0, 0, user.GetSystemMetrics(0), user.GetSystemMetrics(1), None, None, None, None)
     assert hwnd, C.get_last_error()
     add_pattern(user, hwnd, user.GetSystemMetrics(0), user.GetSystemMetrics(1))
@@ -96,10 +96,10 @@ def fixture(token):
 
 def processes():
     result = subprocess.run(['powershell', '-NoProfile', '-Command',
-        "@(Get-CimInstance Win32_Process -Filter \"Name = 'agent-gibbon.exe'\" | "
-        "Where-Object { $_.ExecutablePath -eq $env:GIBBON_CAPTURE_BINARY } | "
+        "@(Get-CimInstance Win32_Process -Filter \"Name = 'jajan.exe'\" | "
+        "Where-Object { $_.ExecutablePath -eq $env:JAJAN_CAPTURE_BINARY } | "
         'ForEach-Object { $_.ProcessId }) | ConvertTo-Json -Compress'],
-        env={**os.environ, 'GIBBON_CAPTURE_BINARY': str(BINARY)}, capture_output=True,
+        env={**os.environ, 'JAJAN_CAPTURE_BINARY': str(BINARY)}, capture_output=True,
         text=True, timeout=20, check=True)
     value = json.loads(result.stdout) if result.stdout.strip() else []
     return set(value if isinstance(value, list) else [value])
@@ -141,7 +141,7 @@ def main():
     assert user.GetCursorPos(C.byref(original_cursor))
     token = uuid.uuid4().hex
     seed = 'capture-smoke-' + token
-    fixture_title = 'Gibbon capture fixture ' + token
+    fixture_title = 'Jajan capture fixture ' + token
     child = None
     fixture_hwnd = None
     owned_pid = None
@@ -223,7 +223,7 @@ def main():
         return origin.x, origin.y, rect.right, rect.bottom
 
     def geometry(stage, state):
-        hwnd = user.FindWindowW(None, f"Agent Gibbon [{state['dev_label']}] — {state['id']}")
+        hwnd = user.FindWindowW(None, f"Jajan [{state['dev_label']}] — {state['id']}")
         assert hwnd and pid_of(hwnd) == owned_pid
         outer = W.RECT()
         assert user.GetWindowRect(hwnd, C.byref(outer))
@@ -262,7 +262,7 @@ def main():
             time.sleep(.1)
 
     def note_window(state):
-        hwnd = user.FindWindowW(None, f"Agent Gibbon [{state['dev_label']}] — {state['id']}")
+        hwnd = user.FindWindowW(None, f"Jajan [{state['dev_label']}] — {state['id']}")
         identity(hwnd)
         return hwnd
 

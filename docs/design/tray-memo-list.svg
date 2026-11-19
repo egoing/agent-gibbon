@@ -33,7 +33,7 @@
 <text x="84" y="398" fill="#68727d">… 최근 30개를 같은 목록에 표시</text>
 <text x="48" y="430">더보기(12)</text>
 <path d="M36 446H644" stroke="#ddd" />
-<text x="48" y="472">Agent Gibbon 종료</text>
+<text x="48" y="472">Jajan 종료</text>
 <text x="624" y="148" text-anchor="end" opacity="0.55">Ctrl ⇧ 1</text><text x="624" y="180" text-anchor="end" opacity="0.55">Ctrl ⇧ 2</text><text x="624" y="212" text-anchor="end" opacity="0.55">Ctrl ⇧ 3</text><text x="624" y="244" text-anchor="end" opacity="0.55">Ctrl Opt ⌘</text></g><g font-size="12">
 <text x="24" y="515">설명용 macOS 시안 · 본문 예시는 일부 생략 · 하위 메뉴 없음</text>
 <text x="24" y="537">실제 창 보임 100% / 숨김 45% · 숨김 항목도 선택 가능 · PTY 상태와 독립</text>
@@ -41,6 +41,6 @@
 <text x="24" y="592">macOS · 종료 위 메뉴의 두 상태</text>
 <rect x="24" y="604" width="300" height="90" rx="6" fill="white" stroke="#ccc"/>
 <rect x="340" y="604" width="316" height="90" rx="6" fill="white" stroke="#ccc"/>
-<text x="40" y="625">첫 설정 전 또는 권한 부족으로 캡처 차단</text><text x="40" y="654" font-size="15">권한 설정</text><text x="40" y="680" font-size="15">Agent Gibbon 종료</text>
-<text x="356" y="625">설정 완료 후 · 권한 회수만으로는 숨김 유지</text><text x="356" y="654" font-size="15">Agent Gibbon 종료</text>
+<text x="40" y="625">첫 설정 전 또는 권한 부족으로 캡처 차단</text><text x="40" y="654" font-size="15">권한 설정</text><text x="40" y="680" font-size="15">Jajan 종료</text>
+<text x="356" y="625">설정 완료 후 · 권한 회수만으로는 숨김 유지</text><text x="356" y="654" font-size="15">Jajan 종료</text>
 </g></g></svg>

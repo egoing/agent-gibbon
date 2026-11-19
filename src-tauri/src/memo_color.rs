@@ -17,7 +17,7 @@ fn path(root: &Path, id: &str) -> Result<std::path::PathBuf, String> {
     {
         return Err("잘못된 메모 색상 ID".into());
     }
-    Ok(root.join(".agent-gibbon-colors").join(format!("{id}.json")))
+    Ok(root.join(".jajan-colors").join(format!("{id}.json")))
 }
 pub fn read(root: &Path, id: &str) -> Result<String, String> {
     let path = path(root, id)?;

@@ -119,7 +119,7 @@ pub fn terms_skipped() -> bool {
     skip_terms(
         cfg!(debug_assertions),
         crate::instance::current().id.is_some(),
-        std::env::var_os("AGENT_GIBBON_REQUIRE_TERMS").as_deref(),
+        std::env::var_os("JAJAN_REQUIRE_TERMS").as_deref(),
     )
 }
 pub fn onboarding_required(app: &tauri::AppHandle) -> bool {
