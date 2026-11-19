@@ -135,7 +135,7 @@ macOS에서는 빌드한 **Jajan.app**을 **응용 프로그램** 폴더로 복�
 
 CLI 실행 파일: `src-tauri/target/release/jajan`
 
-프로젝트의 `scripts/jajan`는 release 실행 파일을 우선 사용하고 없으면 debug 실행 파일을 사용합니다. 다른 디렉터리에서도 절대 경로로 호출할 수 있습니다. 0.3.4부터 공식 macOS 배포판에 Developer ID 서명과 Apple 공증을 적용합니다.
+프로젝트의 `scripts/jajan`는 release 실행 파일을 우선 사용하고 없으면 debug 실행 파일을 사용합니다. 다른 디렉터리에서도 절대 경로로 호출할 수 있습니다. 0.3.5는 Developer ID로 서명했으며 Apple 미공증으로 첫 실행이 차단될 수 있습니다.
 
 ```sh
 # 워크트리별 개발 앱 (프론트엔드 서버 없이 Rust 변경 감시)
@@ -313,7 +313,7 @@ pnpm run build:release
 
 호스트 CPU용 앱과 DMG를 `src-tauri/target/release/bundle/`에 만듭니다. v0.2.7은 Apple Silicon용 `Jajan_0.2.7_aarch64.dmg`와 Intel용 `Jajan_0.2.7_x64.dmg`를 제공합니다.
 
-새 빌드의 **Jajan.app을 Applications로 복사**한 후 실행합니다. 기존 v0.2.5 이하 릴리스 자산은 당시 이름인 Jajan를 유지합니다. 0.3.4부터 공식 macOS 배포판에 Developer ID 서명과 Apple 공증을 적용합니다.
+새 빌드의 **Jajan.app을 Applications로 복사**한 후 실행합니다. 기존 v0.2.5 이하 릴리스 자산은 당시 이름인 Jajan를 유지합니다. 0.3.5는 Developer ID로 서명했으며 Apple 미공증으로 첫 실행이 차단될 수 있습니다.
 
 설치된 앱에 포함된 CLI도 사용할 수 있습니다.
 
