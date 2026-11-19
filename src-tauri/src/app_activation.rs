@@ -1,0 +1,43 @@
+//! App-level activation opens the singleton manager; passive windows opt out.
+use std::sync::OnceLock;
+
+static APP: OnceLock<tauri::AppHandle> = OnceLock::new();
+
+extern "C" {
+    fn jajan_activation_install(callback: extern "C" fn());
+    fn jajan_activation_preserve_focus();
+    fn jajan_activation_focus_manager(window: *mut std::ffi::c_void);
+}
+
+pub fn install(app: &tauri::AppHandle) {
+    if APP.set(app.clone()).is_ok() {
+        // SAFETY: RunEvent::Ready runs on the AppKit main thread. The callback
+        // and cloned handle live until process exit; native code calls on main.
+        unsafe { jajan_activation_install(open_manager) };
+    }
+}
+
+pub fn preserve_focus() {
+    // SAFETY: focus transactions and native window operations run on main.
+    unsafe { jajan_activation_preserve_focus() };
+}
+
+pub fn focus_manager(window: &tauri::WebviewWindow) -> Result<(), String> {
+    let pointer = window.ns_window().map_err(|e| e.to_string())?;
+    // SAFETY: Tauri owns the NSWindow; the native completion uses a weak
+    // reference and is canceled by input/deactivation. Called on main only.
+    unsafe { jajan_activation_focus_manager(pointer) };
+    Ok(())
+}
+
+extern "C" fn open_manager() {
+    let Some(app) = APP.get() else {
+        return;
+    };
+    let Ok(_activity) = crate::updater::activity(app) else {
+        return;
+    };
+    if let Err(error) = crate::manager::open(app) {
+        eprintln!("앱 전환으로 관리 창을 열지 못했습니다: {error}");
+    }
+}

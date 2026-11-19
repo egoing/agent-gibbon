@@ -1,3 +1,5 @@
+#[cfg(target_os = "macos")]
+mod app_activation;
 mod capture;
 mod entrance;
 mod export;
@@ -992,6 +994,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             if let Some(main) = _app.get_webview_window("main") {
                 focus::restore(&main);
             }
+            #[cfg(target_os = "macos")]
+            app_activation::install(_app);
         }
         if matches!(_event, tauri::RunEvent::ExitRequested { .. }) {
             session_restore::checkpoint(_app);
