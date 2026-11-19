@@ -2,7 +2,23 @@ body {
   --frame-corners: var(--surface-radius);
 }
 
-/* Keep native focus visible inside the toolbar even when it sits below a capture. */
-body.memo-focused #controls {
-  box-shadow: inset 0 var(--memo-focus-width) color-mix(in srgb, var(--foreground) 65%, var(--background));
+/* Paint above content, toolbar hover and scrollbars without changing geometry
+   or intercepting clicks, dragging and the native resize hit areas. The surface
+   owns the bounds even when capture chrome is ordered below the image. */
+body.memo-focused #memo-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--memo-focus-width) color-mix(in srgb, var(--foreground) 65%, var(--background));
+  pointer-events: none;
+}
+
+@media (forced-colors: active) {
+  body.memo-focused #memo-surface::after {
+    box-shadow: none;
+    outline: var(--memo-focus-width) solid Highlight;
+    outline-offset: calc(-1 * var(--memo-focus-width));
+  }
 }

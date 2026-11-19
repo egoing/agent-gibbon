@@ -2,7 +2,7 @@
 <rect width="760" height="332" fill="#f6f6f4"/>
 <g font-family="Apple SD Gothic Neo, sans-serif" fill="#282a54">
 <text x="24" y="26" font-size="17">텍스트</text><text x="24" y="49" font-size="13">본문 복사 · 글자 크기</text><rect x="24" y="61" width="342" height="22" fill="#dfe2dd"/>
-<path d="M24 62h342" stroke="#73748e" stroke-width="2"/>
+
 <svg x="244" y="66" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7v-2h13v2" />
   <path d="M10 5v14" />
   <path d="M12 19h-4" />
@@ -27,6 +27,7 @@
   <path d="M12 14l-4 -4" /></svg>
 <svg x="635" y="66" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z" />
   <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1" /></svg>
+<rect x="656" y="61" width="24" height="22" rx="3" fill="#cdd0d3"/>
 <svg x="660" y="66" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-8 4l8 4l8 -4l-8 -4" fill="currentColor" />
   <path d="M8 14l-4 2l8 4l8 -4l-4 -2" />
   <path d="M8 10l-4 2l8 4l8 -4l-4 -2" /></svg>
@@ -70,4 +71,6 @@
 <svg x="710" y="211" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6l-12 12" />
   <path d="M6 6l12 12" /></svg>
 <rect x="390" y="228" width="342" height="45" fill="#ffffff"/>
+<g fill="none" stroke="#73748e" stroke-width="2"><rect x="25" y="62" width="340" height="65" rx="3"/><rect x="391" y="62" width="340" height="65" rx="3"/><rect x="25" y="207" width="340" height="65" rx="3"/></g>
+<text x="390" y="292" font-size="11">웹 외부 페이지: 별도 네이티브 WebView</text>
 <text x="24" y="312" font-size="13">툴바 22px · 버튼 24×22px · 아이콘 12px · 접힌 창 24px</text></g></svg>
