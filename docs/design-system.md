@@ -1425,3 +1425,11 @@ macOS에서 앱 소유 메모 WebView는 기본 메모 구성의 첫 클릭 정�
 포커스 중 네 변에 그리는 기존 2px 내부 포커스 표시는 별도 규칙으로 유지하며, 비활성 상태의 상시 경계로 사용하지 않는다. 접힘·툴바 상하 배치·숨김·사용자 포커스 동작은 변경하지 않는다.
 
 [밝고 어두운 배경 시안 SVG](design/capture-inactive-edge.svg) · [PNG](design/capture-inactive-edge.png). 시안의 흐림은 외부 그림자 의도만 설명하며 OS의 픽셀·강도 보장이 아니다. [정정 후 구현·검증 범위](verification/capture-native-shadow-20261119.md). [이전 구현 기록](verification/capture-inactive-edge-20261119.md)은 대체된 이중 경계의 과거 기록이다.
+
+## 닫기 버튼의 오른쪽 끝 강조 — 2026-11-19
+
+- **확정 기준:** 닫기 버튼의 hover·native pointer 강조 배경은 창 포커스 유무와 관계없이 오른쪽 끝까지 채운다. 버튼 오른쪽 자체 라운드로 틈을 만들지 않고 창 표면의 4px 모서리 클리핑을 따른다. 활성 창의 2px 포커스 테두리는 강조 배경 위에서 연속해서 보인다.
+- **구현:** 공통 툴바의 기존 오른쪽 3px 패딩을 닫기 버튼의 실제 너비에 포함한다(24→27px). 버튼 안쪽 오른쪽 패딩 3px로 아이콘과 다른 버튼의 위치·간격을 유지한다. 내부 버튼의 3px 반경·키보드 포커스선은 유지한다. 레이아웃을 벗어나는 가상 강조 영역을 추가하지 않는다.
+- 창 모서리와 외곽 3px/6px의 기존 resize hit area는 유지하며, 그 영역은 닫기보다 크기 조절을 우선한다. 포커스 overlay는 기존 pointer-events:none과 z-index:20을 유지한다. 이미지 하단 툴바·접힌 툴바에도 같은 오른쪽 끝 기준을 적용한다. 웹의 별도 네이티브 프레임에는 메모용 포커스선을 추가하지 않는다.
+- [상태별 시안 SVG](design/toolbar-close-edge.svg) · [PNG](design/toolbar-close-edge.png)는 설명용이다. 구현과 미실행 범위는 [작업 기록](verification/toolbar-close-edge-20261119.md)을 따른다.
+

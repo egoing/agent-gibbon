@@ -10,7 +10,7 @@
   width: 100%;
   height: var(--toolbar-row-height);
   gap: 1px;
-  padding: 0 3px;
+  padding: 0 0 0 3px;
   background: var(--background);
 }
 #controls button {
@@ -18,6 +18,16 @@
   height: var(--toolbar-row-height);
   min-height: var(--toolbar-row-height);
   padding: 0;
+}
+/* Absorb the former right gutter into the real button target. Keep the icon
+   and preceding controls in place; the surface clips the outer window corner
+   and its pointer-transparent focus overlay paints above this background. */
+#controls > #close {
+  flex-basis: calc(var(--toolbar-target) + 3px);
+  width: calc(var(--toolbar-target) + 3px);
+  padding-right: 3px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 #toolbar-items { display: flex; align-items: center; min-width: 0; margin-left: auto; gap: 1px; overflow: hidden; }
 #controls > button[aria-disabled="true"] { opacity: .4; cursor: default; }
