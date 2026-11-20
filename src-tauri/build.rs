@@ -56,6 +56,13 @@ fn main() {
             .flag("-fobjc-arc")
             .compile("permission_panel");
         println!("cargo:rerun-if-changed=src/app_activation.m");
+        println!("cargo:rerun-if-changed=src/autostart/macos.m");
+        cc::Build::new()
+            .file("src/autostart/macos.m")
+            .flag("-fobjc-arc")
+            .compile("autostart");
+        println!("cargo:rustc-link-lib=framework=ServiceManagement");
+        println!("cargo:rustc-link-lib=framework=Carbon");
     }
     tauri_build::build()
 }

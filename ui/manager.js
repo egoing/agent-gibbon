@@ -20,7 +20,7 @@ function syncVisibility() {
   if (visibilityView.button.disabled !== pending) visibilityView.button.disabled = pending;
 }
 // Register settings destinations here; navigation preserves each panel's DOM.
-const settingsSections = ['privacy', 'skills', 'appearance', ...(el('settings-updater') ? ['updater'] : [])];
+const settingsSections = ['privacy', 'skills', 'appearance', ...(el('settings-updater') ? ['updater'] : []), ...(el('settings-autostart') ? ['autostart'] : [])];
 let selectedSettingsSection = 'privacy';
 function settingsSection(selectedSection) {
   selectedSettingsSection = selectedSection;
@@ -30,6 +30,7 @@ function settingsSection(selectedSection) {
     el(`settings-${section}-nav`).setAttribute('aria-current', active ? 'page' : 'false');
   }
   if (selectedSection === 'updater') window.jajanUpdater?.refresh();
+  if (selectedSection === 'autostart') window.jajanAutostart?.refresh();
 }
 for (const section of settingsSections) {
   el(`settings-${section}-nav`).onclick = () => {
@@ -46,6 +47,7 @@ function page(settings) {
   if (!settings) refresh();
   else if (selectedSettingsSection === 'skills') window.jajanSkills?.refresh();
   else if (selectedSettingsSection === 'updater') window.jajanUpdater?.refresh();
+  else if (selectedSettingsSection === 'autostart') window.jajanAutostart?.refresh();
   else window.jajanPrivacy?.refresh().catch(()=>{});
 }
 // The tray's More action always opens the full list. In-window navigation keeps its filter.

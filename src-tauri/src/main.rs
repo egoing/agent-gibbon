@@ -1,5 +1,6 @@
 #[cfg(target_os = "macos")]
 mod app_activation;
+mod autostart;
 mod capture;
 mod entrance;
 mod export;
@@ -425,7 +426,7 @@ fn apply_with_presentation(
     // Read-only diagnostics must remain observable during the installation handshake.
     if matches!(request.action, Action::Diagnostics) {
         return Ok(
-            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"updater":updater::diagnostics(app),"monitor_layout":monitor_layout::inspect(app),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
+            json!({"ok":true,"instance":instance::current().id,"diagnostics":telemetry::status(),"updater":updater::diagnostics(app),"autostart":autostart::diagnostics(app),"monitor_layout":monitor_layout::inspect(app),"privacy":{"terms_accepted":privacy::accepted(app),"terms_skipped":privacy::terms_skipped(),"onboarding_required":privacy::onboarding_required(app),"sharing_allowed":privacy::sharing(app),"notice_ready":privacy::notice_ready()}}),
         );
     }
     let _activity = updater::activity(app)?;
@@ -588,6 +589,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_dialog::init())
         .manage(privacy::Privacy::default())
+        .manage(autostart::Autostart::default())
         .manage(telemetry::Runtime::default())
         .manage(capture::Captures::default())
         .manage(workspace::Sharing::default())
@@ -632,6 +634,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     skills::skills_list,
                     skills::skills_set,
                     privacy::privacy_status,
+                    autostart::autostart_status,
+                    autostart::autostart_save,
+                    autostart::autostart_open_settings,
                     privacy::privacy_save,
                     privacy::privacy_quit,
                     local_trace::local_flow_status,
@@ -719,6 +724,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                         | "privacy_status"
                         | "privacy_save"
                         | "privacy_quit"
+                        | "autostart_status"
+                        | "autostart_save"
+                        | "autostart_open_settings"
                         | "telemetry_status"
                         | "report_frontend_error"
                 );
@@ -920,7 +928,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::install_contact_monitor(app.handle());
             #[cfg(windows)]
             windows_contact::install(app.handle());
-            if initial_open && !restored_update && !restored_session {
+            if initial_open && !autostart::login_launch() && !restored_update && !restored_session {
                 apply_direct(
                     app.handle(),
                     Request {
@@ -938,7 +946,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 )?;
             }
             telemetry::install(app.handle());
-            if privacy::onboarding_required(app.handle()) {
+            if privacy::onboarding_required(app.handle()) && !autostart::login_launch() {
                 manager::open(app.handle())?;
             }
             let handle = app.handle().clone();
@@ -1006,8 +1014,10 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         }
         #[cfg(target_os = "macos")]
         if let tauri::RunEvent::Reopen { .. } = _event {
-            if let Err(error) = reopen_from_icon(_app) {
-                eprintln!("앱 아이콘으로 메모를 열지 못했습니다: {error}");
+            if !autostart::current_login_event() {
+                if let Err(error) = reopen_from_icon(_app) {
+                    eprintln!("앱 아이콘으로 메모를 열지 못했습니다: {error}");
+                }
             }
         }
     });
@@ -1286,7 +1296,22 @@ fn main() {
     } else {
         args
     };
-    let result = if args.is_empty() || args == ["--serve"] {
+    let result = if args == ["--login-startup"] {
+        // No CLI open request, new document, or manager focus at login.
+        #[cfg(windows)]
+        unsafe {
+            #[link(name = "kernel32")]
+            extern "system" {
+                fn FreeConsole() -> i32;
+            }
+            FreeConsole();
+        }
+        match ipc::Endpoint::bind() {
+            Ok(Some(endpoint)) => serve(endpoint, false).map(|_| json!({"ok":true})),
+            Ok(None) => Ok(json!({"ok":true,"already_running":true})),
+            Err(e) => Err(e),
+        }
+    } else if args.is_empty() || args == ["--serve"] {
         match ipc::Endpoint::bind() {
             Ok(Some(endpoint)) => serve(endpoint, args.is_empty()).map(|_| json!({"ok":true})),
             Ok(None) if args.is_empty() => cli(&["open".into()]),

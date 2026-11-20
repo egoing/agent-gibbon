@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="730" viewBox="0 0 1000 730">
+<style>text{font-family:'Malgun Gothic',Arial,sans-serif;fill:#272727;font-size:14px}.title{font-size:22px;font-weight:600}.muted{fill:#646464}.small{font-size:13px}</style>
+<rect width="1000" height="730" fill="#f8f8f8"/>
+<text x="28" y="40" class="title">로그인 자동 실행 · 앱 선택과 OS 상태</text>
+<text x="28" y="68" class="muted">설명용 시안 · OS 등록/로그인 실기기 검증과 구분</text>
+<rect x="28" y="96" width="944" height="480" fill="#f8f8f8" stroke="#858585"/>
+<path d="M28 150H972 M248 150V576" stroke="#d6d6d6"/>
+<text x="48" y="130" font-size="18">Jajan</text><text x="748" y="130">모든 메모</text><text x="884" y="130">설정</text>
+<text x="44" y="187" font-size="17">설정</text>
+<text x="44" y="229">스킬</text><text x="44" y="275">테마</text><text x="44" y="319">자동 업데이트</text>
+<rect x="40" y="337" width="196" height="40" fill="#ececec" stroke="#858585"/>
+<text x="52" y="363">로그인 자동 실행</text><text x="44" y="411">Privacy &amp; Diagnostics</text>
+<text x="276" y="193" class="title">로그인 자동 실행</text>
+<text x="276" y="230">로그인 후 메모와 단축키를 바로 사용할 수 있습니다.</text><text x="276" y="255">설정에서 언제든 끌 수 있습니다.</text>
+<rect x="276" y="283" width="18" height="18" rx="2" fill="#2d2d2d"/><path d="M280 292l4 4 7-9" stroke="#fff" fill="none" stroke-width="2"/>
+<text x="306" y="298">로그인 시 자잔 자동 실행</text>
+<text x="276" y="338">앱 선택: 켜기</text>
+<text x="276" y="368">등록됨 · Windows 허용 여부 미확인.</text>
+<text x="276" y="393" class="muted">Windows 시작 앱에서 Jajan의 켜짐/꺼짐을 확인하세요.</text>
+<text x="276" y="435" class="small">관리 창을 앞에 띄우지 않으며 메모의 표시·숨김 상태를 복원합니다.</text>
+<text x="276" y="459" class="small">터미널 명령을 자동으로 다시 실행하지 않습니다.</text>
+<rect x="276" y="490" width="168" height="34" fill="#f8f8f8" stroke="#858585"/><text x="288" y="512">OS 시작 설정 열기</text>
+<text x="28" y="613">macOS: 미등록 / 허용 / OS 승인 필요를 구분 · 승인 필요는 ‘활성’으로 표시하지 않음</text>
+<text x="28" y="643">Windows: Run 등록만으로 실제 OS 허용을 단정하지 않음 · OS 비활성 상태를 덮어쓰지 않음</text>
+<text x="28" y="673">미선택·오류·개발/검증 앱: 자동 등록 없음 · 명시 선택과 OS 처리 실패를 별도로 안내</text>
+<text x="28" y="706" class="small muted">체크 변경 즉시 적용 · 조회 실패 시에만 재시도 · OS 승인 필요/허용 미확인일 때만 설정 버튼 표시</text>
+</svg>

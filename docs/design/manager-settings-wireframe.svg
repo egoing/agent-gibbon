@@ -11,10 +11,12 @@
 <rect x="852" y="108" width="96" height="30" fill="#ffffff" stroke="#858585"/>
 <text x="884" y="129" font-size="14">설정</text>
 <text x="40" y="184" font-size="17" font-weight="600">설정</text>
-<text x="52" y="227" font-size="16">Privacy &amp; Diagnostics</text>
-<rect x="40" y="248" width="196" height="42" fill="#ffffff" stroke="#858585"/>
-<text x="52" y="275" font-size="16">스킬</text>
-<text x="52" y="318" font-size="16">테마</text>
+<rect x="40" y="201" width="196" height="42" fill="#ffffff" stroke="#858585"/>
+<text x="52" y="227" font-size="16">스킬</text>
+<text x="52" y="275" font-size="16">테마</text>
+<text x="52" y="318" font-size="16">자동 업데이트</text>
+<text x="52" y="362" font-size="16">로그인 자동 실행</text>
+<text x="52" y="406" font-size="16">Privacy &amp; Diagnostics</text>
 <text x="276" y="191" font-size="21" font-weight="600">스킬</text>
 <rect x="276" y="215" width="656" height="144" fill="#f8f8f8" stroke="#d6d6d6"/>
 <path d="M276 267H932" stroke="#d6d6d6"/>

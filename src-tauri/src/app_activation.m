@@ -1,4 +1,11 @@
 #import <Cocoa/Cocoa.h>
+#import <Carbon/Carbon.h>
+
+static BOOL loginEvent(void) {
+    NSAppleEventDescriptor *event = NSAppleEventManager.sharedAppleEventManager.currentAppleEvent;
+    return event.eventID == kAEOpenApplication &&
+        [event paramDescriptorForKeyword:keyAEPropData].enumCodeValue == keyAELaunchedAsLogInItem;
+}
 
 // AppKit does not expose a Command-Tab-specific activation notification. Treat
 // non-mouse activation as an app-level selection, excluding our passive shows.
@@ -71,10 +78,10 @@ void jajan_activation_install(void (*callback)(void)) {
     activeObserver = [center addObserverForName:NSApplicationDidBecomeActiveNotification
         object:NSApp queue:nil usingBlock:^(NSNotification *notification) {
             (void)notification;
-            if (passiveTurn || NSEvent.pressedMouseButtons != 0) return;
+            if (passiveTurn || loginEvent() || NSEvent.pressedMouseButtons != 0) return;
             NSUInteger ticket = generation;
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (ticket != generation || passiveTurn || !NSApp.active ||
+                if (ticket != generation || passiveTurn || loginEvent() || !NSApp.active ||
                     NSEvent.pressedMouseButtons != 0 || NSApp.modalWindow) return;
                 openManager();
             });

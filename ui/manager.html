@@ -1,16 +1,26 @@
 <!doctype html>
-<html lang="ko"><head><script src="telemetry.js"></script><script src="updater-guard.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>메모 관리</title><link rel="stylesheet" href="manager.css"><script src="manager-theme.js"></script><script type="module" src="memo-preview.js"></script><script src="privacy.js" defer></script><script src="skills.js" defer></script><script src="manager.js" defer></script><script src="updater.js" defer></script></head>
+<html lang="ko"><head><script src="telemetry.js"></script><script src="updater-guard.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>메모 관리</title><link rel="stylesheet" href="manager.css"><script src="manager-theme.js"></script><script type="module" src="memo-preview.js"></script><script src="autostart.js" defer></script><script src="privacy.js" defer></script><script src="skills.js" defer></script><script src="manager.js" defer></script><script src="updater.js" defer></script></head>
 <body><header><strong>Jajan</strong><nav id="manager-navigation" aria-label="관리 탐색" hidden><button id="notes-nav" aria-pressed="true">모든 메모</button><button id="settings-nav" aria-pressed="false">설정</button></nav></header>
 <div id="error" role="alert" hidden>메모를 읽지 못했습니다. <button id="retry">다시 시도</button></div>
 <main id="notes-page" hidden><aside aria-label="메모 목록"><div class="list-heading"><h2>모든 메모</h2><button id="refresh" aria-label="메모 목록 새로고침">새로고침</button></div><input id="memo-search" type="search" aria-label="메모 검색" placeholder="제목 또는 본문 검색" aria-controls="list" autocomplete="off"><div class="memo-results"><div id="list"></div><p id="list-status" role="status"></p></div></aside><section id="detail" aria-label="메모 상세" tabindex="0"><p>메모를 선택하세요.</p></section></main>
 <section id="settings-page" aria-label="설정" hidden>
 <aside class="settings-sidebar"><h1>설정</h1><nav aria-label="설정 항목">
-<button id="settings-privacy-nav" type="button" aria-current="page" aria-controls="settings-privacy">Privacy &amp; Diagnostics</button>
 <button id="settings-skills-nav" type="button" aria-controls="settings-skills">스킬</button>
 <button id="settings-appearance-nav" type="button" aria-controls="settings-appearance">테마</button>
 <button id="settings-updater-nav" type="button" aria-current="false" aria-controls="settings-updater">자동 업데이트</button>
+<button id="settings-autostart-nav" type="button" aria-current="false" aria-controls="settings-autostart">로그인 자동 실행</button>
+<button id="settings-privacy-nav" type="button" aria-current="page" aria-controls="settings-privacy">Privacy &amp; Diagnostics</button>
 </nav></aside>
 <div class="settings-content">
+<section id="settings-autostart" aria-labelledby="settings-autostart-title" hidden>
+<h2 id="settings-autostart-title">로그인 자동 실행</h2>
+<p id="autostart-help">로그인 후 메모와 단축키를 바로 사용할 수 있습니다. 설정에서 언제든 끌 수 있습니다.</p>
+<label class="privacy-choice"><input id="autostart-setting" type="checkbox" aria-describedby="autostart-help" disabled>로그인 시 자잔 자동 실행</label>
+<p id="autostart-choice" role="status"></p><p id="autostart-status" role="status" aria-live="polite">상태를 확인하는 중입니다.</p>
+<p>관리 창을 앞에 띄우지 않으며 메모는 기존 표시·숨김 상태로 복원합니다. 터미널 명령을 자동으로 다시 실행하지 않습니다.</p>
+<div class="updater-actions"><button id="autostart-retry" type="button" hidden>다시 시도</button><button id="autostart-os-settings" type="button" hidden>OS 시작 설정 열기</button></div>
+<p id="autostart-error" role="alert" hidden></p>
+</section>
 <section id="settings-appearance" aria-labelledby="settings-appearance-title" hidden>
 <h2 id="settings-appearance-title">테마</h2><p>관리 창 테마를 선택하세요. 선택은 이 기기에 자동 저장됩니다.</p>
 <fieldset class="theme-options"><legend>관리 창 테마</legend>
@@ -74,6 +84,12 @@
       <button id="privacy-read-notice" type="button">Privacy Notice</button>
       <p id="privacy-draft" class="privacy-notice">Sharing is unavailable until all privacy details are published. Read the Privacy Notice for the current details. You can continue without sharing.</p>
       <label class="privacy-choice privacy-agreement"><input id="privacy-share" type="checkbox" aria-describedby="privacy-draft" disabled><span class="privacy-choice-label">I agree to diagnostic sharing <span>(optional)</span></span></label>
+    </div>
+    <div class="privacy-box" role="group" aria-labelledby="autostart-welcome-title">
+      <h3 id="autostart-welcome-title">로그인 자동 실행</h3>
+      <label class="privacy-choice"><input id="autostart-welcome" type="checkbox" checked disabled aria-describedby="autostart-welcome-help">로그인 시 자잔 자동 실행</label>
+      <p id="autostart-welcome-help">로그인 후 메모와 단축키를 바로 사용할 수 있습니다. 설정에서 언제든 끌 수 있습니다.</p>
+      <p id="autostart-welcome-status" role="status">Continue를 눌러 확인하기 전에는 등록하지 않습니다.</p>
     </div>
     <p>You can use every feature without sharing diagnostics.</p>
     <div class="privacy-actions"><button id="privacy-exit" type="button">Exit</button><button id="privacy-continue" type="button" disabled>Continue</button></div>

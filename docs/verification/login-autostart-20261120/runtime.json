@@ -1,0 +1,448 @@
+{
+  "root": "C:\\Users\\egoin\\.codex\\worktrees\\login-autostart\\agent-gibbon\\",
+  "branch": "codex/login-autostart",
+  "instance": "dev-9ef74ed7f8f96bcad543b8f4",
+  "binary": "C:\\Users\\egoin\\.codex\\worktrees\\login-autostart\\agent-gibbon\\src-tauri\\target\\debug\\jajan.exe",
+  "startMode": "--login-startup",
+  "runBefore": null,
+  "foregroundBefore": 15664,
+  "firstPid": 532,
+  "firstWindows": [
+    {
+      "pid": 532,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — 방향 안내",
+      "visible": false
+    },
+    {
+      "pid": 532,
+      "title": "정렬 취소하기",
+      "visible": false
+    },
+    {
+      "pid": 532,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — 메모 모아보기",
+      "visible": false
+    },
+    {
+      "pid": 532,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — stash-indicator",
+      "visible": false
+    },
+    {
+      "pid": 532,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — autostart-visible-1795157087655",
+      "visible": true
+    },
+    {
+      "pid": 532,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — autostart-visible-1795157175393",
+      "visible": false
+    },
+    {
+      "pid": 532,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — autostart-hidden-1795157175394",
+      "visible": false
+    },
+    {
+      "pid": 532,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — autostart-hidden-1795157087655",
+      "visible": false
+    },
+    {
+      "pid": 532,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — main",
+      "visible": false
+    },
+    {
+      "pid": 532,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — 메모 배경",
+      "visible": false
+    },
+    {
+      "pid": 532,
+      "title": "MSCTFIME UI",
+      "visible": false
+    },
+    {
+      "pid": 532,
+      "title": "Default IME",
+      "visible": false
+    }
+  ],
+  "foregroundAfter": 15664,
+  "autostart": {
+    "available": false,
+    "os_status": "unavailable",
+    "reason": "개발·검증 앱은 로그인 자동 실행에 등록하지 않습니다.",
+    "selected": null
+  },
+  "inspectBefore": [
+    {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": false,
+      "capture_toolbar_below": false,
+      "content_height_cap": 48,
+      "dev_label": "DEV codex/login-autostart · 9ef74ed7",
+      "feedback_active": false,
+      "feedback_surface": {
+        "focused": false,
+        "mode": "inline",
+        "view": {
+          "buttons": [],
+          "color": "#db704f",
+          "error": false,
+          "message": "",
+          "revision": null
+        },
+        "visible": false
+      },
+      "focused": false,
+      "folded": false,
+      "global_opacity": null,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "autostart-visible-1795157458992",
+      "instance": "dev-9ef74ed7f8f96bcad543b8f4",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "capture": null,
+        "change_html": "<p>로그인 복원 검증 0 · dev-9ef74ed7f8f96bcad543b8f4</p>\n",
+        "color": "#db704f",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<p>로그인 복원 검증 0 · dev-9ef74ed7f8f96bcad543b8f4</p>\n",
+        "markdown": "로그인 복원 검증 0 · dev-9ef74ed7f8f96bcad543b8f4",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 1,
+        "source_path": null,
+        "status": "대기",
+        "title": "Jajan",
+        "updated_at": 1795157466447
+      },
+      "ok": true,
+      "opacity": 1,
+      "position": {
+        "x": 3390,
+        "y": 1944
+      },
+      "size": {
+        "height": 72,
+        "width": 450
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 72,
+          "width": 480,
+          "x": 114,
+          "y": 114
+        },
+        "indicator_moving": false,
+        "last_arrangement": null,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Win",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "C:\\Users\\egoin\\AppData\\Roaming\\app.jajan\\notes\\dev-9ef74ed7f8f96bcad543b8f4\\docs\\autostart-visible-1795157458992\\index.md",
+      "visible": true,
+      "warp_right": false
+    },
+    {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": false,
+      "capture_toolbar_below": false,
+      "content_height_cap": 48,
+      "dev_label": "DEV codex/login-autostart · 9ef74ed7",
+      "feedback_active": false,
+      "feedback_surface": {
+        "focused": false,
+        "mode": "inline",
+        "view": {
+          "buttons": [],
+          "color": "#6baa92",
+          "error": false,
+          "message": "",
+          "revision": null
+        },
+        "visible": false
+      },
+      "focused": false,
+      "folded": false,
+      "global_opacity": null,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "autostart-hidden-1795157458992",
+      "instance": "dev-9ef74ed7f8f96bcad543b8f4",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "capture": null,
+        "change_html": "<p>로그인 복원 검증 1 · dev-9ef74ed7f8f96bcad543b8f4</p>\n",
+        "color": "#6baa92",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<p>로그인 복원 검증 1 · dev-9ef74ed7f8f96bcad543b8f4</p>\n",
+        "markdown": "로그인 복원 검증 1 · dev-9ef74ed7f8f96bcad543b8f4",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 1,
+        "source_path": null,
+        "status": "대기",
+        "title": "Jajan",
+        "updated_at": 1795157467627
+      },
+      "ok": true,
+      "opacity": 1,
+      "position": {
+        "x": 3390,
+        "y": 1872
+      },
+      "size": {
+        "height": 72,
+        "width": 450
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 72,
+          "width": 480,
+          "x": 114,
+          "y": 114
+        },
+        "indicator_moving": false,
+        "last_arrangement": null,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Win",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "C:\\Users\\egoin\\AppData\\Roaming\\app.jajan\\notes\\dev-9ef74ed7f8f96bcad543b8f4\\docs\\autostart-hidden-1795157458992\\index.md",
+      "visible": false,
+      "warp_right": false
+    }
+  ],
+  "journal": "C:\\Users\\egoin\\AppData\\Roaming\\app.jajan\\notes\\dev-9ef74ed7f8f96bcad543b8f4\\docs\\.session-windows.json",
+  "secondPid": 28880,
+  "inspectAfter": [
+    {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": false,
+      "capture_toolbar_below": false,
+      "content_height_cap": 48,
+      "dev_label": "DEV codex/login-autostart · 9ef74ed7",
+      "feedback_active": false,
+      "feedback_surface": {
+        "focused": false,
+        "mode": "inline",
+        "view": {
+          "buttons": [],
+          "color": "#db704f",
+          "error": false,
+          "message": "",
+          "revision": null
+        },
+        "visible": false
+      },
+      "focused": false,
+      "folded": false,
+      "global_opacity": null,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "autostart-visible-1795157458992",
+      "instance": "dev-9ef74ed7f8f96bcad543b8f4",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "capture": null,
+        "change_html": "<p>로그인 복원 검증 0 · dev-9ef74ed7f8f96bcad543b8f4</p>\n",
+        "color": "#db704f",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<p>로그인 복원 검증 0 · dev-9ef74ed7f8f96bcad543b8f4</p>\n",
+        "markdown": "로그인 복원 검증 0 · dev-9ef74ed7f8f96bcad543b8f4",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 1,
+        "source_path": null,
+        "status": "대기",
+        "title": "Jajan",
+        "updated_at": 1795157466447
+      },
+      "ok": true,
+      "opacity": 0.999509909844944,
+      "position": {
+        "x": 3390,
+        "y": 1944
+      },
+      "size": {
+        "height": 72,
+        "width": 450
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 72,
+          "width": 480,
+          "x": 228,
+          "y": 228
+        },
+        "indicator_moving": false,
+        "last_arrangement": null,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Win",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "C:\\Users\\egoin\\AppData\\Roaming\\app.jajan\\notes\\dev-9ef74ed7f8f96bcad543b8f4\\docs\\autostart-visible-1795157458992\\index.md",
+      "visible": true,
+      "warp_right": false
+    },
+    {
+      "always_on_top": true,
+      "animating": false,
+      "auto_layout_excluded": false,
+      "capture_toolbar_below": false,
+      "content_height_cap": 48,
+      "dev_label": "DEV codex/login-autostart · 9ef74ed7",
+      "feedback_active": false,
+      "feedback_surface": null,
+      "focused": false,
+      "folded": false,
+      "global_opacity": null,
+      "highlight_revision": null,
+      "hovered": false,
+      "id": "autostart-hidden-1795157458992",
+      "instance": "dev-9ef74ed7f8f96bcad543b8f4",
+      "layout_destination": null,
+      "layout_pending": false,
+      "note": {
+        "capture": null,
+        "change_html": "<p>로그인 복원 검증 1 · dev-9ef74ed7f8f96bcad543b8f4</p>\n",
+        "color": "#6baa92",
+        "completion_html": null,
+        "edit_on_open": false,
+        "html": "<p>로그인 복원 검증 1 · dev-9ef74ed7f8f96bcad543b8f4</p>\n",
+        "markdown": "로그인 복원 검증 1 · dev-9ef74ed7f8f96bcad543b8f4",
+        "quiet_update": false,
+        "removed": false,
+        "revision": 1,
+        "source_path": null,
+        "status": "대기",
+        "title": "Jajan",
+        "updated_at": 1795157467627
+      },
+      "ok": true,
+      "opacity": 0.5,
+      "position": {
+        "x": 3390,
+        "y": 1872
+      },
+      "size": {
+        "height": 72,
+        "width": 450
+      },
+      "stash": {
+        "active": false,
+        "animating": false,
+        "indicator": {
+          "height": 72,
+          "width": 480,
+          "x": 228,
+          "y": 228
+        },
+        "indicator_moving": false,
+        "last_arrangement": null,
+        "restoring": false,
+        "shortcut": "Ctrl+Alt+Win",
+        "tip_visible": false,
+        "windows": null
+      },
+      "storage_path": "C:\\Users\\egoin\\AppData\\Roaming\\app.jajan\\notes\\dev-9ef74ed7f8f96bcad543b8f4\\docs\\autostart-hidden-1795157458992\\index.md",
+      "visible": false,
+      "warp_right": false
+    }
+  ],
+  "restoredWindows": [
+    {
+      "pid": 28880,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — 방향 안내",
+      "visible": false
+    },
+    {
+      "pid": 28880,
+      "title": "정렬 취소하기",
+      "visible": false
+    },
+    {
+      "pid": 28880,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — 메모 모아보기",
+      "visible": false
+    },
+    {
+      "pid": 28880,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — stash-indicator",
+      "visible": false
+    },
+    {
+      "pid": 28880,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — autostart-visible-1795157458992",
+      "visible": true
+    },
+    {
+      "pid": 28880,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — autostart-visible-1795157087655",
+      "visible": true
+    },
+    {
+      "pid": 28880,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — autostart-visible-1795157175393",
+      "visible": false
+    },
+    {
+      "pid": 28880,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — autostart-hidden-1795157458992",
+      "visible": false
+    },
+    {
+      "pid": 28880,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — autostart-hidden-1795157175394",
+      "visible": false
+    },
+    {
+      "pid": 28880,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — autostart-hidden-1795157087655",
+      "visible": false
+    },
+    {
+      "pid": 28880,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — main",
+      "visible": false
+    },
+    {
+      "pid": 28880,
+      "title": "Jajan [DEV codex/login-autostart · 9ef74ed7] — 메모 배경",
+      "visible": false
+    },
+    {
+      "pid": 28880,
+      "title": "MSCTFIME UI",
+      "visible": false
+    },
+    {
+      "pid": 28880,
+      "title": "Default IME",
+      "visible": false
+    }
+  ],
+  "runAfter": null,
+  "ok": true
+}

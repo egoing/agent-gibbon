@@ -55,6 +55,17 @@ test('prepare acknowledges safe=false while an editing callback reports busy', a
   assert.deepEqual(plain(app.requests), [{ command: 'updater_ack', args: { epoch: 17, safe: false, report: { ...idleReport, editing: true } } }]);
 });
 
+test('startup preference write blocks updater installation until it finishes', async () => {
+  const app = setup();
+  let saving=true;
+  app.window.jajanAutostart={updateBusy:()=>saving};
+  app.fire('updater-prepare', 21); await tick();
+  assert.equal(app.requests.at(-1).args.safe,false);
+  saving=false;
+  app.fire('updater-prepare', 22); await tick();
+  assert.equal(app.requests.at(-1).args.safe,true);
+});
+
 test('prepare acknowledges safe=true when no command or editing work is active', async () => {
   const app = setup();
   app.fire('updater-prepare', 2); await tick();

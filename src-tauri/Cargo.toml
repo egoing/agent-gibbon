@@ -40,6 +40,7 @@ objc2-app-kit = { version = "0.3", default-features = false, features = ["block2
 
 [target.'cfg(windows)'.dependencies]
 uds_windows = "1.2.1"
+winreg = "0.55"
 
 # Full-screen pixel conversion/encoding must remain responsive in dev builds.
 # Keep application code unoptimized for debugging.
