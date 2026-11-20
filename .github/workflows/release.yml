@@ -130,7 +130,33 @@ jobs:
           else
             unset APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID
           fi
+          if [[ "$RUNNER_OS" == Windows ]]; then
+            # Retain function/line symbols for the exact installer binary.
+            export CARGO_PROFILE_RELEASE_DEBUG=1
+          fi
           pnpm exec tauri build --target '${{ matrix.target }}' --bundles '${{ matrix.bundles }}' --config "$RUNNER_TEMP/updater-build-config.json" -- --locked
+      - uses: actions/setup-python@v5
+        if: runner.os == 'Windows'
+        with:
+          python-version: '3.12'
+      - name: Validate matching Windows symbols
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          python -m unittest discover -s scripts -p 'test_windows_symbols.py'
+          python scripts/windows-symbols.py \
+            --binary 'src-tauri/target/${{ matrix.target }}/release/jajan.exe' \
+            --pdb 'src-tauri/target/${{ matrix.target }}/release/jajan.pdb' \
+            --revision "$GITHUB_SHA" --output windows-symbols
+      # Separate from installer-* and complete-release-assets: never include
+      # PDBs in public GitHub Release assets or upload them to Sentry here.
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows'
+        with:
+          name: windows-symbols-${{ github.sha }}
+          path: windows-symbols/*
+          if-no-files-found: error
+          retention-days: 30
       - name: Verify macOS Developer ID
         if: runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/v')
         shell: bash
