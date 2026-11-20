@@ -679,7 +679,10 @@ fn place_indicator(app: &tauri::AppHandle, area: Rect, top: bool, tip: bool) -> 
     let factor = scale / unit(scale);
     geometry(&w, indicator_rect(area, top, factor), scale)?;
     set_tip(app, &w, tip)?;
-    crate::show_without_focus(&w)
+    // The click-through indicator uses CSS transparency, not memo opacity.
+    // On Windows its WS_EX_LAYERED style has no queryable native alpha;
+    // the memo reveal path would fail and tick would restore every note.
+    show_frame(&w)
 }
 fn set_tip(app: &tauri::AppHandle, w: &WebviewWindow, tip: bool) -> Result<(), String> {
     let text = if tip {
