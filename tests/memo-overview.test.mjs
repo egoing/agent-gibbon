@@ -13,6 +13,7 @@ function mount() {
   const window = { __TAURI__: { webviewWindow: { getCurrentWebviewWindow: () => ({ listen(_, callback) { onPointer = callback; } }) }, core: { invoke(command, args) {
     return new Promise((resolve, reject) => requests.push({ command, ...args, resolve, reject }));
   } } } };
+  window.jajanInvoke = window.__TAURI__.core.invoke;
   const document = { elementFromPoint: x => buttons[x], querySelector: s => s === 'nav' ? controls : status };
   vm.runInNewContext(readFileSync(new URL('../ui/memo-overview.js', import.meta.url), 'utf8'), { window, document });
   return { buttons, pointer: payload => onPointer({ payload }), enter: window.beginOverview, requests, status,

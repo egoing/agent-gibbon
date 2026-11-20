@@ -25,7 +25,7 @@ controls.addEventListener('click', async (event) => {
   pending = true;
   status.hidden = true;
   try {
-    await window.__TAURI__.core.invoke('overview_action', { action: button.dataset.action, generation: visit });
+    await window.jajanInvoke('overview_action', { action: button.dataset.action, generation: visit });
   } catch (error) {
     if (visit === generation) {
       status.textContent = String(error);

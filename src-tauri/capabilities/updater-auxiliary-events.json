@@ -1,0 +1,6 @@
+{
+  "identifier": "updater-auxiliary-events",
+  "description": "Receive the local installation handshake in layout helper windows, including hidden ones.",
+  "windows": ["direction-guide", "layout-undo", "memo-backdrop", "memo-overview"],
+  "permissions": ["core:event:allow-listen", "core:event:allow-unlisten"]
+}
