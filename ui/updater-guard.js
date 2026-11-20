@@ -45,7 +45,7 @@
     };
   }
   function busy(state) {
-    return state.editing || state.saving || state.exporting || state.privacy || window.jajanUpdateBusy?.() === true;
+    return state.editing || state.saving || state.exporting || state.privacy || window.jajanUpdateBusy?.() === true || window.jajanAutostart?.updateBusy?.() === true;
   }
   function acknowledge(epoch) {
     if (epoch !== frozenEpoch) return;

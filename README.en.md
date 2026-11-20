@@ -23,6 +23,8 @@ Download the Apple Silicon (`aarch64`) or Intel (`x64`) DMG from GitHub Releases
 
 `open` creates or shows a note. `update` preserves focus and hidden state. `close` hides the note rather than terminating the app. The CLI returns JSON with `ok` indicating success.
 
+**Launch at login:** First launch proposes “로그인 시 자잔 자동 실행” checked, but OS registration happens only after Continue. Existing users are not enrolled automatically. Toggle the checkbox in **Settings → 로그인 자동 실행** to apply the choice immediately. App preference and OS approval are shown separately; Windows registration is reported as approval unknown, with a button to open Startup Apps. Login launch restores note visibility without opening the manager or replaying terminal commands. This feature requires an installed macOS 13+ app bundle or the Windows NSIS desktop app; development and verification builds cannot register. See the [design and verification scope](docs/verification/login-autostart-20261120.md).
+
 Give your agent the [CLI skill](.agents/skills/jajan/SKILL.md), or ask it: “Use Jajan to keep a checklist in note ID work. Update it when a step finishes. Do not reopen a note I have hidden.” The agent needs permission to run local shell commands; the app does not include an AI model.
 
 ## Features and scope

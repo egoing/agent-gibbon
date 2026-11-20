@@ -51,9 +51,15 @@
     busy=true; render(); error('');
     try {
       state=await invoke('privacy_save',{termsAccepted:true,shareDiagnostics:sharing});
+      let startupError='';
+      if(onboarding) {
+        try { await window.jajanAutostart?.confirmWelcome(); }
+        catch(e) { startupError=String(e); }
+      }
       render();
       if(onboarding) api.onAccepted?.();
       else el('privacy-save-result').textContent='Saved. Your choice applies now.';
+      if(startupError) error(startupError);
     } catch(e) { error(String(e)); }
     finally { busy=false; render(); }
   }
