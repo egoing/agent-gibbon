@@ -10,6 +10,8 @@ use tauri::{
     Manager,
 };
 
+mod appearance;
+
 type TrayMenu = std::sync::Mutex<Option<Menu<tauri::Wry>>>;
 
 const RECENT_LIMIT: usize = 30;
@@ -137,81 +139,29 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         )
         .map_err(|e| e.to_string())?;
     }
-    menu.append(
-        &MenuItem::with_id(app, "open-manager", "메모 관리", true, None::<&str>)
-            .map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
-    menu.append(
-        &MenuItem::with_id(
+    append_action(app, &menu, "open-manager", "메모 관리".into())?;
+    for (id, title, shortcut) in [
+        ("capture-image", "영역 캡처", "Ctrl+Shift+1"),
+        ("capture-text", "영역 텍스트 메모", "Ctrl+Shift+2"),
+        ("capture-terminal", "영역 터미널", "Ctrl+Shift+3"),
+        ("capture-web", "영역 웹 창", "Ctrl+Shift+4"),
+    ] {
+        append_action(
             app,
-            "capture-image",
-            format!(
-                "영역 캡처\t{}",
-                crate::presentation::tray_shortcut("Ctrl+Shift+1")
-            ),
-            true,
-            None::<&str>,
-        )
-        .map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
-    menu.append(
-        &MenuItem::with_id(
-            app,
-            "capture-text",
-            format!(
-                "영역 텍스트 메모\t{}",
-                crate::presentation::tray_shortcut("Ctrl+Shift+2")
-            ),
-            true,
-            None::<&str>,
-        )
-        .map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
-    menu.append(
-        &MenuItem::with_id(
-            app,
-            "capture-terminal",
-            format!(
-                "영역 터미널\t{}",
-                crate::presentation::tray_shortcut("Ctrl+Shift+3")
-            ),
-            true,
-            None::<&str>,
-        )
-        .map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
-    menu.append(
-        &MenuItem::with_id(
-            app,
-            "capture-web",
-            format!(
-                "영역 웹 창\t{}",
-                crate::presentation::tray_shortcut("Ctrl+Shift+4")
-            ),
-            true,
-            None::<&str>,
-        )
-        .map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
-    menu.append(
-        &MenuItem::with_id(
-            app,
-            "stash-toggle",
-            format!(
-                "숨김\t{}",
-                crate::presentation::tray_shortcut(&crate::stash::shortcut(app))
-            ),
-            true,
-            None::<&str>,
-        )
-        .map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
+            &menu,
+            id,
+            format!("{title}\t{}", crate::presentation::tray_shortcut(shortcut)),
+        )?;
+    }
+    append_action(
+        app,
+        &menu,
+        "stash-toggle",
+        format!(
+            "숨김\t{}",
+            crate::presentation::tray_shortcut(&crate::stash::shortcut(app))
+        ),
+    )?;
     menu.append(&PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?)
         .map_err(|e| e.to_string())?;
     let (entries, remaining) = recent(entries(app)?);
@@ -222,7 +172,7 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         let item = IconMenuItem::with_id(
             app,
             entry.event_id(),
-            &entry.title,
+            appearance::title(&entry.title, visible),
             true,
             Some(memo_icon(entry.icon(), visible)?),
             None::<&str>,
@@ -257,13 +207,46 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
                 .map_err(|e| e.to_string())?;
         }
     }
-    menu.append(
-        &MenuItem::with_id(app, "quit-app", "Jajan 종료", true, None::<&str>)
-            .map_err(|e| e.to_string())?,
-    )
-    .map_err(|e| e.to_string())?;
+    append_action(app, &menu, "quit-app", "Jajan 종료".into())?;
     template_icons(app, &menu)?;
     Ok(menu)
+}
+
+#[cfg(any(windows, test))]
+fn action_icon(id: &str) -> Option<&'static [u8]> {
+    Some(match id {
+        "open-manager" => include_bytes!("../icons/tabler/layout-grid.png"),
+        "capture-image" => include_bytes!("../icons/tabler/crop.png"),
+        "capture-text" => include_bytes!("../icons/tabler/file-text.png"),
+        "capture-terminal" => include_bytes!("../icons/tabler/terminal-2.png"),
+        "capture-web" => include_bytes!("../icons/tabler/browser.png"),
+        "stash-toggle" => include_bytes!("../icons/tabler/eye-off.png"),
+        "quit-app" => include_bytes!("../icons/tabler/logout.png"),
+        _ => return None,
+    })
+}
+
+fn append_action(
+    app: &tauri::AppHandle,
+    menu: &Menu<tauri::Wry>,
+    id: &str,
+    title: String,
+) -> Result<(), String> {
+    #[cfg(windows)]
+    let item = IconMenuItem::with_id(
+        app,
+        id,
+        title,
+        true,
+        action_icon(id)
+            .map(|bytes| memo_icon(bytes, true))
+            .transpose()?,
+        None::<&str>,
+    )
+    .map_err(|e| e.to_string())?;
+    #[cfg(not(windows))]
+    let item = MenuItem::with_id(app, id, title, true, None::<&str>).map_err(|e| e.to_string())?;
+    menu.append(&item).map_err(|e| e.to_string())
 }
 
 #[cfg(any(test, target_os = "macos"))]
@@ -358,6 +341,13 @@ pub fn sync_visibility(app: &tauri::AppHandle) -> Result<(), String> {
     if let Some(menu) = menu.as_ref() {
         for item in menu.items().map_err(|e| e.to_string())? {
             if let Some(check) = item.as_icon_menuitem() {
+                #[cfg(windows)]
+                if let Some(bytes) = action_icon(check.id().as_ref()) {
+                    check
+                        .set_icon(Some(memo_icon(bytes, true)?))
+                        .map_err(|e| e.to_string())?;
+                    continue;
+                }
                 if let Some(entry) = entries
                     .iter()
                     .find(|entry| entry.event_id() == check.id().as_ref())
@@ -365,6 +355,9 @@ pub fn sync_visibility(app: &tauri::AppHandle) -> Result<(), String> {
                     let visible = app
                         .get_webview_window(&entry.window_label())
                         .is_some_and(|w| w.is_visible().unwrap_or(false));
+                    check
+                        .set_text(appearance::title(&entry.title, visible))
+                        .map_err(|e| e.to_string())?;
                     check
                         .set_icon(Some(memo_icon(entry.icon(), visible)?))
                         .map_err(|e| e.to_string())?;
@@ -381,11 +374,11 @@ pub fn sync_visibility(app: &tauri::AppHandle) -> Result<(), String> {
 fn memo_icon(bytes: &[u8], visible: bool) -> Result<tauri::image::Image<'static>, String> {
     let image = tauri::image::Image::from_bytes(bytes).map_err(|e| e.to_string())?;
     let mut rgba = image.rgba().to_vec();
-    if !visible {
-        for pixel in rgba.as_chunks_mut::<4>().0 {
-            pixel[3] = (pixel[3] as f32 * 0.45) as u8;
-        }
-    }
+    #[cfg(windows)]
+    let foreground = Some(appearance::foreground());
+    #[cfg(not(windows))]
+    let foreground = None;
+    appearance::pixels(&mut rgba, visible, foreground);
     Ok(tauri::image::Image::new_owned(
         rgba,
         image.width(),
@@ -609,6 +602,34 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn windows_action_icons_are_nonempty_transparent_outline_assets() {
+        for id in [
+            "open-manager",
+            "capture-image",
+            "capture-text",
+            "capture-terminal",
+            "capture-web",
+            "stash-toggle",
+            "quit-app",
+        ] {
+            let image = tauri::image::Image::from_bytes(action_icon(id).unwrap()).unwrap();
+            assert_eq!((image.width(), image.height()), (18, 18));
+            assert!(image
+                .rgba()
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .any(|pixel| pixel[3] != 0));
+            assert!(image
+                .rgba()
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .any(|pixel| pixel[3] == 0));
+        }
+        assert!(action_icon("note:private-id").is_none());
+    }
     #[test]
     fn completed_setup_survives_restart_until_blocked_capture() {
         let dir = tempfile::tempdir().unwrap();
