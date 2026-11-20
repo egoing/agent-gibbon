@@ -156,3 +156,16 @@ Sentry 개별 Rust snapshot root `snapshot.request`는 기존 고빈도 작업�
 - 장기 PTY reader에는 시작 부모 lease를 넘기지 않는다. 요청 trace는 reader 생존 중에도 끝나며 각 terminal.output의 별도 최대1% 샘플링과 하위 filter/dispatch span은 유지한다. 따라서 터미널의 수명 전체가 한 trace가 되는 것은 아니다.
 - 이 변경은 진단 내부 구현이므로 디자인 시스템에 상세를 추가하지 않는다. 사용자 피드백에 따라 앞서 넣었던 요약/메타정보 기술 세부도 디자인 시스템에서 제거하고 이 문서와 검증 기록으로 모았다. UI·동의·포커스·창 배치·capture lifecycle 잠금 순서는 유지한다.
 - 구현/모의 검증과 실제 worker의 native/Sentry 수신 증거는 [worker 검증 기록](verification/sentry-workers-20261107.md)에서 구분한다.
+
+
+## macOS 로그인 자동 실행 진단
+
+로컬 `diagnostics`의 `autostart.macos`는 `service_status`(SMAppService 원시 정수), `service_status_name`(`not_registered`, `enabled`, `requires_approval`, `not_found`, `unavailable`), `environment`(`supported`, `unsupported_os`, `invalid_bundle`, `app_translocation`, `unknown`)를 구분한다. 개발 앱의 최상위 `available: false`는 의도된 등록 차단이며 이 환경 정보와 독립적이다. `not_found`는 서비스 탐색 실패로, macOS 버전 미지원의 증거가 아니다. AppTranslocation 검출은 현재 주 번들 경로의 구성 요소를 사용하며, 보안 속성 상태나 정확한 탐색 실패 원인을 단정하지 않는다.
+
+복구 확인 순서와 실제 관측의 한계는 [검증 기록](verification/autostart-recovery-20261120.md)을 따른다. 모든 조회는 읽기 전용이며 자동 등록·보안 속성 변경을 하지 않는다.
+
+자동 실행 로그는 macOS 통합 로그의 subsystem `app.jajan`, category `autostart`에 기록한다. Console.app 또는 다음 명령으로 조회한다. 최초 조회와 값 변경, 명시적 등록·해제 결과만 남긴다. 메모, 전체 경로, 계정 정보는 기록하지 않는다. 이 이벤트는 Sentry에 전송하지 않는다.
+
+```sh
+log show --last 1h --info --predicate 'subsystem == "app.jajan" AND category == "autostart"'
+```
