@@ -35,6 +35,8 @@ function renderUpdater(status) {
   message.setAttribute('role', phase === 'error' ? 'alert' : 'status');
   message.hidden = !message.textContent;
   updaterEl('updater-check').disabled = updaterBusy || phase === 'disabled' || ['checking', 'downloading', 'preparing', 'installing'].includes(phase);
+  updaterEl('updater-check').textContent = phase === 'error' ? '다시 확인' : '지금 확인';
+  updaterEl('updater-install').textContent = phase === 'preparing' ? '작업 상태 확인 중…' : phase === 'installing' ? '설치하고 재시작 중…' : '업데이트하고 재시작';
   updaterEl('updater-install').disabled = updaterBusy || phase !== 'ready';
   updaterEl('updater-install').hidden = !['ready', 'preparing', 'installing'].includes(phase);
 }

@@ -65,3 +65,8 @@ test('explicit installation hold and status errors remain actionable', async () 
   assert.equal(error.elements.get('notice-message').hidden, false);
   assert.equal(error.elements.get('notice-message').attrs.role, 'alert');
 });
+
+test('dismiss means close notice, without implying paused automatic installation', () => {
+  assert.match(html, />안내 닫기<\/button>/);
+  assert.match(html, /자동 설치는 계속됩니다/);
+});

@@ -117,3 +117,16 @@ test('compact settings hide unavailable installation and empty detail', async ()
   assert.equal(app.elements.get('updater-install').hidden, true);
   assert.equal(app.elements.get('updater-message').attrs.role, 'alert');
 });
+
+ test('manual restart, automatic idle policy and recovery stay explicit', async () => {
+  assert.match(html, /5분 동안 입력이 없고 진행 중인 작업이 없으면/);
+  assert.match(html, /안내 닫기는 자동 설치를 끄지 않습니다/);
+  assert.match(html, /5분 대기만 생략/);
+  const app = setup({phase:'preparing', version:'1.3.0'});
+  await app.run('window.jajanUpdater.refresh()');
+  assert.equal(app.elements.get('updater-install').textContent, '작업 상태 확인 중…');
+  app.setStatus({phase:'error', message:'연결을 확인하세요.'});
+  await app.run('window.jajanUpdater.refresh()');
+  assert.equal(app.elements.get('updater-check').textContent, '다시 확인');
+  assert.equal(app.elements.get('updater-check').disabled, false);
+ });

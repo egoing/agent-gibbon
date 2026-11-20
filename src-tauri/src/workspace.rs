@@ -146,7 +146,7 @@ pub(crate) fn shared_displays(app: &tauri::AppHandle) -> Option<Vec<u32>> {
 pub(crate) fn stop(app: &tauri::AppHandle, token: Option<&str>) -> Result<(), String> {
     let state = app.state::<Sharing>();
     let mut guard = state.0.lock().map_err(err)?;
-    if token.is_some_and(|t| !guard.as_ref().is_some_and(|s| s.token() == t)) {
+    if token.is_some_and(|t| guard.as_ref().is_none_or(|s| s.token() != t)) {
         return Err("종료된 공유입니다".into());
     }
     guard.take();

@@ -58,13 +58,15 @@
 <section id="settings-skills" aria-labelledby="settings-skills-title" hidden><h2 id="settings-skills-title">스킬</h2><p id="skills-loading" role="status">스킬을 불러오는 중입니다.</p><p id="skills-feedback" class="settings-feedback" role="alert" hidden></p><div id="skills-list"></div></section>
 <section id="settings-updater" aria-labelledby="settings-updater-title" hidden>
 <h2 id="settings-updater-title">자동 업데이트</h2>
+<p class="updater-policy">공식 설치본은 새 버전을 자동으로 내려받습니다. 5분 동안 입력이 없고 진행 중인 작업이 없으면 설치하고 다시 시작합니다.</p>
 <article class="updater-card">
 <div class="updater-summary">
 <div><p id="updater-status" role="status" aria-live="polite">업데이트 상태를 확인하는 중입니다.</p><p id="updater-version"></p></div>
 </div>
 <div class="updater-progress-row"><progress id="updater-progress" max="1" value="0" hidden></progress><p id="updater-message" role="status" aria-live="polite"></p></div>
-<div class="updater-actions"><button id="updater-check" type="button">지금 확인</button><button id="updater-install" type="button" disabled>재시작하여 설치</button></div>
+<div class="updater-actions"><button id="updater-check" type="button">지금 확인</button><button id="updater-install" type="button" disabled>업데이트하고 재시작</button></div>
 </article>
+<details class="updater-help"><summary>설치가 보류되거나 실패했나요?</summary><p>‘업데이트하고 재시작’은 5분 대기만 생략합니다. 편집·저장·내보내기와 캡처를 마치고, 실행 중인 터미널을 종료한 뒤 숨긴 터미널도 관리 창에서 삭제하세요. 작업이 안전한지 확인한 후 설치합니다.</p><p>안내 닫기는 자동 설치를 끄지 않습니다. 보류 조건이 해소되면 자동으로 다시 확인합니다. 응답 대기 시간이 초과되면 작업을 저장하고 다시 시도하세요.</p><p>다운로드·검증 오류는 연결 상태를 확인한 뒤 ‘다시 확인’으로 다시 받으세요. 반복되면 공식 릴리스의 운영체제와 CPU에 맞는 설치 파일로 수동 설치하세요. 검증 실패를 무시하고 설치하지 않습니다.</p></details>
 </section>
 </div></section>
 <section id="privacy-welcome" aria-labelledby="privacy-welcome-title">
