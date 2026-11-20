@@ -432,6 +432,8 @@ pub fn undo_arrangement(window: WebviewWindow) -> Result<(), String> {
     if window.label() != "layout-undo" {
         return Err("정렬 취소 창 전용입니다".into());
     }
+    // Native hover-click dispatch also calls this command without the JS guard.
+    let _activity = crate::updater::activity(window.app_handle())?;
     let snapshot = window.state::<Undo>().0.lock().unwrap().take();
     window.hide().map_err(|e| e.to_string())?;
     if let Some((until, frames)) = snapshot {

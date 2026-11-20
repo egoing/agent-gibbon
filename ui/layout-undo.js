@@ -4,4 +4,4 @@ window.startCountdown = () => {
   void button.offsetWidth;
   button.classList.add('running');
 };
-button.onclick = () => window.__TAURI__.core.invoke('undo_arrangement');
+button.onclick = () => window.jajanInvoke('undo_arrangement').catch(console.error);
