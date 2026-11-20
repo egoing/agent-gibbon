@@ -85,10 +85,17 @@ fn change_choice(
     change_os(enabled)
 }
 pub fn diagnostics(app: &tauri::AppHandle) -> serde_json::Value {
-    match status(app) {
+    let value = match status(app) {
         Ok(status) => serde_json::json!(status),
         Err(error) => serde_json::json!({"error":error}),
-    }
+    };
+    #[cfg(target_os = "macos")]
+    let value = {
+        let mut value = value;
+        value["macos"] = platform::diagnostics();
+        value
+    };
+    value
 }
 #[derive(Serialize)]
 pub struct Status {
