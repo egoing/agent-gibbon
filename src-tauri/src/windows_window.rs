@@ -728,6 +728,20 @@ mod tests {
     }
 
     #[test]
+    fn click_through_layered_window_has_no_queryable_memo_alpha() {
+        let window = TestWindow::new();
+        // Tao's click-through path sets these styles without writing native alpha.
+        unsafe {
+            let style = GetWindowLongW(window.0, GWL_EXSTYLE);
+            SetWindowLongW(window.0, GWL_EXSTYLE, style | WS_EX_LAYERED | 0x20);
+        }
+        assert!(opacity_for_handle(window.0).is_err());
+        // Ordinary memo alpha becomes queryable only after an explicit write.
+        set_opacity_for_handle(window.0, 0.5).unwrap();
+        assert!((opacity_for_handle(window.0).unwrap() - 0.5).abs() <= 1.0 / 255.0);
+    }
+
+    #[test]
     fn native_alpha_survives_frame_style_replacement_and_repeated_outer_resize() {
         let window = TestWindow::new();
         let mut before = Rect::default();
