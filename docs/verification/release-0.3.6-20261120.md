@@ -20,12 +20,12 @@
 - [x] 전용 워크트리/브랜치 준비 및 version:set/check 0.3.6
 - [x] frozen lockfile 의존성 설치 (Node 24.22.3, pnpm 11.25.0)
 - [x] 최종 로컬 UI/Rust/fmt/Clippy 및 표준 dev:build
-- [ ] 배포 PR 병합, 기본 체크아웃 fast-forward와 원격 SHA 일치
+- [x] 배포 PR 병합, 기본 체크아웃 fast-forward와 원격 SHA 일치
 - [ ] 승인된 공식 태그로 세 플랫폼 테스트/fmt/Clippy/서명 빌드
 - [ ] 동일 Windows EXE/PDB GUID·age·Debug ID artifact 확인
 - [ ] Draft 설치 파일 세 개/updater 서명/manifest/체크섬/실제 자산명 검증
 - [ ] 공개 후 latest feed 및 공개 다운로드/체크섬 재검증
-- [ ] 기본 체크아웃 표준 dev:build/dev:info 준비
+- [x] 기본 체크아웃 표준 dev:build/dev:info 준비
 
 ## 출처와 한계
 
@@ -46,3 +46,19 @@
 - `scripts\jajan-dev.cmd --instance-info`: ok=true, 위 manifest_dir 및 instance 일치. 서버/GUI 출처 검증과는 별개인 바이너리 자체 검사다.
 
 - `npm run check`: Clippy all-targets -D warnings 통과.
+
+
+## 원격 병합·공식 실행
+
+- 배포 커밋: `d0e05cb5e9f9d46a0da7af1cd81cf57b04035cc0`.
+- [PR260](https://github.com/egoing/agent-gibbon/pull/260) MERGED, merge SHA `594ae511260e53f111abfb768b76d2208d8a76c4`.
+- 병합 직전 main은 base와 동일했다. 기본 root에서 `git merge --ff-only origin/main` 후 local main = origin/main = GitHub 원격 SHA가 위 merge SHA임을 확인했다. 기존 `.tmp`는 보존했다.
+- `v0.3.6` 공식 annotated tag의 peeled SHA도 위 merge SHA와 같다.
+- [공식 Release 실행 44702390360](https://github.com/egoing/agent-gibbon/actions/runs/44702390360), headSha `594ae511260e53f111abfb768b76d2208d8a76c4`. 버전/태그 validate 성공, 세 플랫폼 진행 중.
+- 최초 Git push는 Credential Manager의 egoing2 계정 선택으로 HTTP403. 전역 인증 설정을 바꾸지 않고 해당 명령에만 활성 gh 계정 인증 도우미를 지정해 egoing 계정으로 push 성공.
+- 기본 root `C:\Users\egoin\dev\project\agent-gibbon`에서도 `npm run dev:build` 성공. dev:info ID `dev-fbc7d562e05aec4798036a95`, binary `C:\Users\egoin\dev\project\agent-gibbon\src-tauri\target\debug\jajan.exe`.
+- 두 개발 바이너리는 서로 다른 인스턴스다. 이 작업에서 기존 앱/타 작업 프로세스를 종료하거나 새 GUI 앱을 시작하지 않았다. 이미 실행 중인 앱은 새 빌드로 자동 교체되지 않는다.
+
+## 공개 중단과 후속 버전
+
+Windows CI의 Clippy(Rust 1.100.0)가 `autostart.rs:161`의 `needless_bool`을 오류로 판정했다. 로컬 1.99.1 검사와 달라 공식 게이트가 실패했다. Windows 설치/심볼 단계 및 assemble/Draft/공개는 진행할 수 없으므로 0.3.6을 공개하지 않는다. 기존 태그를 이동하거나 덮어쓰지 않고 수정본은 0.3.7에서 새 SHA로 전체 검증한다. 위 0.3.6 체크리스트의 미완료 항목은 이 실패 시도의 상태이며, 후속 결과는 [0.3.7 기록](release-0.3.7-20261120.md)을 따른다.

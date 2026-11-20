@@ -158,13 +158,15 @@ pub fn autostart_open_settings(window: tauri::WebviewWindow) -> Result<(), Strin
     Err("지원하지 않는 운영체제입니다.".into())
 }
 pub fn login_launch() -> bool {
-    if std::env::args().any(|arg| arg == "--login-startup") {
-        return true;
-    }
+    let explicit_login = std::env::args().any(|arg| arg == "--login-startup");
     #[cfg(target_os = "macos")]
-    return platform::login_launch();
+    {
+        explicit_login || platform::login_launch()
+    }
     #[cfg(not(target_os = "macos"))]
-    false
+    {
+        explicit_login
+    }
 }
 #[cfg(target_os = "macos")]
 pub fn current_login_event() -> bool {
