@@ -78,6 +78,14 @@ git push origin v0.2.8
 
 ## 빌드 캐시
 
+### Windows 진단 심볼 보관
+
+Windows 설치 파일을 만드는 같은 빌드에 `CARGO_PROFILE_RELEASE_DEBUG=1`을 지정해 함수·행 심볼을 생성한다. `scripts/windows-symbols.py`는 EXE의 PE CodeView debug directory와 PDB의 MSF info stream에서 GUID와 age를 읽어 일치를 확인한다. 일치한 EXE·PDB와 Git SHA·Debug ID·각 파일 SHA-256 manifest만 `windows-symbols-<전체 SHA>` Actions artifact에 30일 보관한다. 누락·불일치·기존 출력 덮어쓰기는 실패 처리한다.
+
+이 artifact는 `installer-*`·`complete-release-assets`와 분리되어 공개 Release 자산에 포함되지 않으며 Sentry에도 자동 업로드하지 않는다. **접근 범위는 GitHub 저장소의 Actions artifact 접근 권한을 따른다. 비공개 저장소나 비공개 전용 저장소라고 가정하지 않는다.** PDB에는 함수명·빌드 소스 경로가 포함될 수 있다. 보관 기간 이후의 별도 보존이나 Sentry 업로드는 별도 운영 결정이다.
+
+과거 바이너리를 새로 빌드한 PDB와 대조하지 않는다. 이벤트의 Debug ID가 일치하는 원본 EXE/PDB 쌍을 먼저 확인한 뒤 로컬 심볼 분석에 사용한다. 기존 Rust 의존성 캐시는 애플리케이션 심볼 보관 수단이 아니며, 이 변경으로 0.3.5의 누락 PDB가 복구되지는 않는다. [2026-11-20 조사와 로컬 검증 범위](verification/windows-panic-20261120.md)를 따른다. 이 절의 CI 변경은 아직 원격 실행하지 않았다.
+
 `packageManager`의 pnpm 11.25.0과 `pnpm-lock.yaml`을 사용하고, setup-node의 pnpm 저장소 캐시를 복원합니다. 별도로 `Swatinem/rust-cache`를 Rust 도구 설치 뒤에 실행합니다. Cargo 다운로드와 `src-tauri/target`의 의존성 컴파일 결과를 GitHub Actions 캐시 저장 공간에 보관합니다. 캐시는 Git 소스나 릴리스 자산에 포함되지 않습니다.
 
 OS·CPU·대상 triple·Rust 도구 버전·Cargo 매니페스트와 lockfile 등에 따라 캐시를 구분합니다. 앱 자체와 설치 파일은 매번 다시 빌드하며, 테스트·Clippy도 생략하지 않습니다. 캐시가 없거나 호환되지 않으면 전체 빌드를 수행하므로 첫 실행은 캐시를 채우는 시간이 추가될 수 있습니다.
