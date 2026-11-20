@@ -62,3 +62,4 @@
 ## 공개 중단과 후속 버전
 
 Windows CI의 Clippy(Rust 1.100.0)가 `autostart.rs:161`의 `needless_bool`을 오류로 판정했다. 로컬 1.99.1 검사와 달라 공식 게이트가 실패했다. Windows 설치/심볼 단계 및 assemble/Draft/공개는 진행할 수 없으므로 0.3.6을 공개하지 않는다. 기존 태그를 이동하거나 덮어쓰지 않고 수정본은 0.3.7에서 새 SHA로 전체 검증한다. 위 0.3.6 체크리스트의 미완료 항목은 이 실패 시도의 상태이며, 후속 결과는 [0.3.7 기록](release-0.3.7-20261120.md)을 따른다.
+`44702390360` 최종 상태는 completed/failure이며 macOS 두 빌드는 성공했지만 Windows Clippy 실패로 assemble/Draft는 건너뛰었다. 0.3.6은 공개하지 않았다.
