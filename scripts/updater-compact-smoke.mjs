@@ -53,6 +53,13 @@ try {
      const card=await page.$eval('.updater-card',e=>e.getBoundingClientRect().height);
      assert(card<=190,'settings status area must stay compact');
      await page.screenshot({path:`${output}/settings-${width}-${theme}.png`});
+     await page.$eval('.updater-help summary', e=>e.focus());
+     await page.keyboard.press('Enter');
+     assert(await page.$eval('.updater-help', e=>e.open), 'keyboard opens recovery instructions');
+     assert(await page.$eval('.settings-content', e=>e.scrollWidth<=e.clientWidth), 'expanded help must not overflow horizontally');
+     await page.$eval('.updater-help', e=>e.scrollIntoView({block:'end'}));
+     await page.screenshot({path:`${output}/recovery-${width}-${theme}.png`});
+     await page.$eval('.updater-help', e=>e.open=false);
     }
    }
   }

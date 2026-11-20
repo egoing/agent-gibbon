@@ -118,3 +118,9 @@ input:focus-visible,a:focus-visible{outline:2px solid var(--manager-focus);outli
 #list .web-row{display:flex;align-items:baseline;gap:8px;justify-content:space-between}
 .web-row span:first-child{overflow:hidden;text-overflow:ellipsis}
 .web-row span:last-child{flex:none;color:var(--manager-muted)}
+
+.updater-policy, .updater-help { font-size:13px; line-height:1.6; }
+.updater-policy { margin:0 0 16px; }
+.updater-help { margin-top:16px; }
+.updater-help summary { cursor:pointer; }
+.updater-help summary:focus-visible { outline:2px solid currentColor; outline-offset:2px; }

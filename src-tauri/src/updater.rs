@@ -730,7 +730,7 @@ fn check_failed(current: &mut Status, previous: Option<Status>) {
     }
     current.phase = "error".into();
     current.message =
-        "업데이트를 받지 못했습니다. 네트워크 또는 서명을 확인한 뒤 다시 시도하세요".into();
+        "업데이트를 받거나 검증하지 못했습니다. 연결 상태를 확인하고 ‘다시 확인’을 누르세요. 반복되면 공식 릴리스의 설치 파일로 수동 설치하세요.".into();
 }
 async fn check(app: tauri::AppHandle, manual: bool) -> Result<(), String> {
     if !enabled() {
@@ -950,7 +950,7 @@ fn install(app: &tauri::AppHandle, automatic: bool) -> Result<(), String> {
                 break;
             }
             if Instant::now() >= deadline {
-                return Err("창의 설치 준비 응답을 기다리다 시간이 초과됐습니다".into());
+                return Err("창의 설치 준비 응답 시간이 초과됐습니다. 작업을 저장한 뒤 다시 시도하세요. 반복되면 짜잔을 수동으로 종료하고 다시 실행하세요.".into());
             }
             std::thread::sleep(Duration::from_millis(50));
         }

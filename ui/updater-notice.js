@@ -22,6 +22,7 @@ function renderNotice(status) {
   message.textContent = noticeStatus.message || '업데이트 상태를 확인하지 못했습니다.';
   message.setAttribute('role', phase === 'error' ? 'alert' : 'status');
   message.hidden = phase !== 'error' && !(noticeFeedbackVersion && noticeFeedbackVersion === noticeStatus.version);
+  noticeEl('notice-install').textContent = phase === 'preparing' ? '작업 상태 확인 중…' : phase === 'installing' ? '설치하고 재시작 중…' : '업데이트하고 재시작';
   noticeEl('notice-install').disabled = noticeBusy || phase !== 'ready';
   noticeEl('notice-dismiss').disabled = noticeBusy && phase === 'installing';
 }
