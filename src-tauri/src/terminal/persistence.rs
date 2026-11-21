@@ -33,14 +33,22 @@ impl Records {
     #[cfg(windows)]
     pub(super) fn checkpoint_ready(&self, ids: &[String]) -> bool {
         let Ok(_writer) = self.io.try_lock() else {
+            super::verification_gate(|| serde_json::json!({"metadata":"io-lock"}));
             return false;
         };
         let Ok(data) = self.data.try_lock() else {
+            super::verification_gate(|| serde_json::json!({"metadata":"data-lock"}));
             return false;
         };
-        !data.closing
+        let ready = !data.closing
             && data.failed.is_empty()
-            && ids.iter().all(|id| data.records.contains_key(id))
+            && ids.iter().all(|id| data.records.contains_key(id));
+        if !ready {
+            super::verification_gate(
+                || serde_json::json!({"metadata":"state","closing":data.closing,"failed":data.failed.len(),"missing":ids.iter().filter(|id|!data.records.contains_key(*id)).count()}),
+            );
+        }
+        ready
     }
     #[cfg(windows)]
     pub(super) fn checkpoint(&self, root: &Path, ids: &[String]) -> Result<(), String> {
