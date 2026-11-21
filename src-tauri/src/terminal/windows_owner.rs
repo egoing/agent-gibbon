@@ -316,14 +316,82 @@ fn endpoint(id: &str) -> io::Result<PathBuf> {
     Ok(path)
 }
 fn exchange(path: &Path, request: &Value) -> io::Result<Value> {
+    let packet = serde_json::to_vec(request)?;
+    let read_only = matches!(request["op"].as_str(), Some("read" | "status"));
+    for attempt in 0..3 {
+        let result = exchange_once(path, &packet, read_only);
+        let retry = result
+            .as_ref()
+            .err()
+            .is_some_and(|e| e.get_ref().is_some_and(|e| e.is::<EmptyReset>()))
+            && read_only
+            && attempt < 2;
+        if !retry {
+            return result;
+        }
+        super::verification_gate(
+            || json!({"transport":"empty-reset-retry","attempt":attempt+1,"read":request["op"]=="read","possible_output_gap":request["op"]=="read"}),
+        );
+        if request["op"] == "read" {
+            let mut status = request.clone();
+            status["op"] = json!("status");
+            let health = exchange(path, &status)?;
+            if health["protocol"] != 2
+                || health["checkpoint"] != true
+                || health["durable_executable"] != true
+                || !health["exit"].is_null()
+            {
+                return Err(io::Error::other("PTY owner health changed during recovery"));
+            }
+        }
+        thread::sleep(Duration::from_millis(20));
+    }
+    unreachable!()
+}
+#[derive(Debug)]
+struct EmptyReset;
+impl std::fmt::Display for EmptyReset {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("PTY empty reset response")
+    }
+}
+impl std::error::Error for EmptyReset {}
+fn exchange_once(path: &Path, packet: &[u8], read_only: bool) -> io::Result<Value> {
     let mut socket = UnixStream::connect(path)?;
     socket.set_read_timeout(Some(TIMEOUT))?;
     socket.set_write_timeout(Some(TIMEOUT))?;
-    socket.write_all(&serde_json::to_vec(request)?)?;
+    socket.write_all(packet)?;
     socket.shutdown(Shutdown::Write)?;
     let mut bytes = Vec::new();
-    socket.take(WIRE_LIMIT).read_to_end(&mut bytes)?;
-    let value: Value = serde_json::from_slice(&bytes)?;
+    let result = socket.take(WIRE_LIMIT).read_to_end(&mut bytes);
+    decode_reply(&bytes, result, read_only)
+}
+fn decode_reply(bytes: &[u8], result: io::Result<usize>, read_only: bool) -> io::Result<Value> {
+    if bytes.len() as u64 >= WIRE_LIMIT {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "PTY response limit",
+        ));
+    }
+    let decoded = serde_json::from_slice::<Value>(bytes);
+    if let Err(error) = result {
+        let complete = decoded
+            .as_ref()
+            .is_ok_and(|v| v.is_object() && v["ok"] == true);
+        let accepted = read_only && error.kind() == io::ErrorKind::ConnectionReset && complete;
+        super::verification_gate(
+            || json!({"transport":"response-end-error","kind":format!("{:?}",error.kind()),"raw_os_error":error.raw_os_error(),"received_len":bytes.len(),"complete_object":complete,"accepted":accepted}),
+        );
+        if !accepted {
+            if read_only && bytes.is_empty() && error.kind() == io::ErrorKind::ConnectionReset {
+                return Err(io::Error::new(io::ErrorKind::ConnectionReset, EmptyReset));
+            }
+            return Err(error);
+        }
+        // Winsock may report reset instead of EOF after the complete response.
+        // Use those original bytes once; never repeat a draining read or a write.
+    }
+    let value = decoded?;
     if value["ok"] != true {
         return Err(io::Error::other("PTY owner rejected request"));
     }
@@ -338,12 +406,26 @@ pub(super) struct Link {
 }
 impl Link {
     pub(super) fn survives_update(&self) -> bool {
-        self.call("status", Value::Null).is_ok_and(|v| {
-            v["protocol"] == 2
-                && v["checkpoint"] == true
-                && v["durable_executable"] == true
-                && v["exit"].is_null()
-        })
+        match self.call("status", Value::Null) {
+            Ok(v) => {
+                let ready = v["protocol"] == 2
+                    && v["checkpoint"] == true
+                    && v["durable_executable"] == true
+                    && v["exit"].is_null();
+                if !ready {
+                    super::verification_gate(
+                        || json!({"remote":"status","protocol":v["protocol"],"checkpoint":v["checkpoint"],"durable_executable":v["durable_executable"],"exit":v["exit"]}),
+                    );
+                }
+                ready
+            }
+            Err(error) => {
+                super::verification_gate(
+                    || json!({"remote":"rpc-error","kind":format!("{:?}",error.kind())}),
+                );
+                false
+            }
+        }
     }
     pub(super) fn detach(&self) {
         let _ = self.call("detach", Value::Null);
@@ -460,12 +542,24 @@ impl Read for RemoteReader {
         }
         while self.pending.is_empty() {
             if !self.link.active.load(Ordering::Acquire) {
+                super::verification_gate(|| json!({"reader_end":"inactive-link"}));
                 return Ok(0);
             }
-            let v = self.link.call("read", Value::Null)?;
-            self.pending = serde_json::from_value(v["bytes"].clone())?;
+            let v = self.link.call("read", Value::Null).inspect_err(|error| {
+                super::verification_gate(
+                    || json!({"reader_end":"rpc-error","kind":format!("{:?}",error.kind())}),
+                );
+            })?;
+            self.pending = serde_json::from_value(v["bytes"].clone()).inspect_err(|error| {
+                super::verification_gate(
+                    || json!({"reader_end":"reply-data","kind":format!("{:?}",error.classify())}),
+                );
+            })?;
             if self.pending.is_empty() {
                 if !v["exit"].is_null() {
+                    super::verification_gate(
+                        || json!({"reader_end":"child-exit","exit":v["exit"]}),
+                    );
                     return Ok(0);
                 }
                 thread::sleep(Duration::from_millis(20));
@@ -593,6 +687,11 @@ fn job() -> io::Result<Handle> {
         Ok(handle)
     }
 }
+fn configure_accepted(socket: &UnixStream) -> io::Result<()> {
+    socket.set_nonblocking(false)?;
+    socket.set_read_timeout(Some(TIMEOUT))?;
+    socket.set_write_timeout(Some(TIMEOUT))
+}
 fn alive(handle: &Handle) -> bool {
     unsafe { WaitForSingleObject(handle.0, 0) == WAIT_TIMEOUT }
 }
@@ -680,8 +779,9 @@ pub(crate) fn helper(args: &[String]) -> io::Result<()> {
             }
             Err(e) => return Err(e),
         };
-        socket.set_read_timeout(Some(TIMEOUT))?;
-        socket.set_write_timeout(Some(TIMEOUT))?;
+        // Winsock accept inherits the listener's nonblocking mode. Wait for
+        // the complete request instead of dropping a not-yet-written client.
+        configure_accepted(&socket)?;
         let mut bytes = Vec::new();
         if Read::by_ref(&mut socket)
             .take(WIRE_LIMIT)
@@ -875,7 +975,9 @@ pub(crate) fn helper(args: &[String]) -> io::Result<()> {
                 _ => response["ok"] = json!(false),
             }
         }
-        let _ = socket.write_all(&serde_json::to_vec(&response)?);
+        if socket.write_all(&serde_json::to_vec(&response)?).is_ok() {
+            let _ = socket.shutdown(Shutdown::Write);
+        }
         if stop {
             break;
         }
@@ -890,6 +992,64 @@ pub(crate) fn helper(args: &[String]) -> io::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn accepted_nonblocking_listener_waits_for_complete_delayed_request() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("s");
+        let listener = UnixListener::bind(&path).unwrap();
+        listener.set_nonblocking(true).unwrap();
+        let server = thread::spawn(move || {
+            let (mut socket, _) = loop {
+                match listener.accept() {
+                    Ok(s) => break s,
+                    Err(e) if e.kind() == io::ErrorKind::WouldBlock => {
+                        thread::sleep(Duration::from_millis(1))
+                    }
+                    Err(e) => panic!("{e}"),
+                }
+            };
+            configure_accepted(&socket).unwrap();
+            let mut bytes = Vec::new();
+            socket.read_to_end(&mut bytes).unwrap();
+            assert_eq!(
+                serde_json::from_slice::<Value>(&bytes).unwrap(),
+                json!({"op":"status"})
+            );
+        });
+        let mut client = UnixStream::connect(&path).unwrap();
+        thread::sleep(Duration::from_millis(80));
+        client.write_all(br#"{"op":"#).unwrap();
+        thread::sleep(Duration::from_millis(30));
+        client.write_all(br#""status"}"#).unwrap();
+        client.shutdown(Shutdown::Write).unwrap();
+        server.join().unwrap();
+    }
+    #[test]
+    fn completed_reset_reply_preserves_original_bytes_without_reissuing_requests() {
+        let bytes = br#"{"ok":true,"bytes":[65,66,67],"exit":null}"#;
+        let reset = || Err(io::Error::from(io::ErrorKind::ConnectionReset));
+        assert_eq!(
+            decode_reply(bytes, reset(), true).unwrap()["bytes"],
+            json!([65, 66, 67])
+        );
+        assert!(decode_reply(bytes, reset(), false).is_err());
+        for rejected in [
+            b"".as_slice(),
+            br#"{"ok":true"#,
+            br#"{"ok":false}"#,
+            br#"{"ok":true}{}"#,
+            b"true",
+        ] {
+            assert!(decode_reply(rejected, reset(), true).is_err());
+        }
+        assert!(decode_reply(bytes, Err(io::Error::from(io::ErrorKind::TimedOut)), true).is_err());
+        assert!(decode_reply(
+            &vec![b' '; WIRE_LIMIT as usize],
+            Ok(WIRE_LIMIT as usize),
+            true
+        )
+        .is_err());
+    }
     #[test]
     fn reconnect_requires_bounded_valid_checkpoint_and_exact_identity() {
         let dir = tempfile::tempdir().unwrap();

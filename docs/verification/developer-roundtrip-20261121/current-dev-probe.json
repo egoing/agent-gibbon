@@ -1,0 +1,10 @@
+{
+  "process_id": 28836,
+  "binary": "C:\\Users\\egoin\\.codex\\worktrees\\5170\\agent-gibbon\\src-tauri\\target\\debug\\jajan.exe",
+  "instance": "dev-0e8f09996ee653e1d6855ad6",
+  "sentinel_matches": true,
+  "observed_at": "2026-11-21T20:52:23.1433961+09:00",
+  "id": "developer-update-proof-5170",
+  "sha256": "D0DB45F3BF6F7339956AAAFA7E36CD2023D9C7115AD93AB1252A3296E9FFBA1D",
+  "ok": true
+}

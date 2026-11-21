@@ -99,8 +99,9 @@ test('failed status read exposes only retry and retry does not register',async()
   assert.equal(s.elements.get('autostart-setting').disabled,false);
   assert.equal(s.calls.some(c=>c.name==='autostart_save'),false);
 });
-test('settings places privacy last and does not include manual apply or refresh',()=>{
+test('settings places privacy last among default destinations and keeps developer hidden',()=>{
   const nav=html.match(/<nav aria-label="설정 항목">([\s\S]*?)<\/nav>/)[1];
-  assert.deepEqual([...nav.matchAll(/id="settings-([^"]+)-nav"/g)].map(m=>m[1]),['skills','appearance','updater','autostart','privacy']);
+  assert.deepEqual([...nav.matchAll(/id="settings-([^"]+)-nav"/g)].map(m=>m[1]),['skills','appearance','updater','autostart','privacy','developer']);
+  assert.match(nav, /id="settings-developer-nav"[^>]* hidden/);
   assert.doesNotMatch(html,/id="autostart-(save|refresh)"/);
 });

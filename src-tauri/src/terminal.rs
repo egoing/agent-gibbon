@@ -581,6 +581,8 @@ pub async fn terminal_start(
             let cancelled = reservation.cancelled.clone();
             let reader_thread = std::thread::spawn(move || {
                 let _worker = reader_worker;
+                #[cfg(windows)]
+                verification_gate(|| json!({"reader_worker":"started"}));
                 let mut directory_report = welcome::DirectoryReport::default();
                 reader.drain(&cancelled, |bytes| {
                     let _scope = crate::local_trace::Scope::enter(output_parent);
@@ -617,6 +619,8 @@ pub async fn terminal_start(
                     let _dispatch = crate::telemetry::Timing::new("terminal.output.dispatch");
                     let _ = output.send(bytes.to_vec());
                 });
+                #[cfg(windows)]
+                verification_gate(|| json!({"reader_worker":"ended","cancelled":cancelled.load(Ordering::Acquire)}));
             });
             reservation
                 .sender
@@ -710,6 +714,39 @@ pub fn update_blocked(app: &tauri::AppHandle) -> Result<bool, String> {
     app.state::<Terminals>().update_blocked()
 }
 
+#[cfg(windows)]
+fn verification_gate(record: impl FnOnce() -> Value) {
+    #[cfg(feature = "verification-updater")]
+    {
+        use std::io::Write;
+        let Ok(dir) = crate::ipc::directory() else {
+            return;
+        };
+        let path = dir.join(".verification-terminal-gate.jsonl");
+        if std::fs::metadata(&path).is_ok_and(|m| m.len() >= 1024 * 1024) {
+            return;
+        }
+        let mut value = record();
+        value["pid"] = json!(std::process::id());
+        value["unix_ms"] = json!(std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default()
+            .as_millis());
+        if let Ok(mut bytes) = serde_json::to_vec(&value) {
+            bytes.push(b'\n');
+            if let Ok(mut file) = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(path)
+            {
+                let _ = file.write_all(&bytes);
+            }
+        }
+    }
+    #[cfg(not(feature = "verification-updater"))]
+    let _ = record;
+}
+
 impl Terminals {
     fn update_blocked(&self) -> Result<bool, String> {
         let sessions = self.sessions.lock().map_err(err)?;
@@ -726,17 +763,47 @@ impl Terminals {
 
     #[cfg(windows)]
     fn detached_ready_for_update(&self, sessions: &BTreeMap<String, Slot>) -> Result<bool, String> {
-        Ok(!sessions.is_empty()
-            && self.closing.lock().map_err(err)?.is_empty()
-            && !self.close_saves.active()
-            // Exactly the reader and supervisor of each retained session.
-            // A removed/starting session's cleanup must still finish first.
-            && self.workers.count() == sessions.len().saturating_mul(2)
-            && self.records.checkpoint_ready(&sessions.keys().cloned().collect::<Vec<_>>())
-            && sessions.values().all(|slot| match slot {
-                Slot::Running { session, .. } => session.try_lock().is_ok_and(|s|s.child.survives_update()),
-                _ => false,
-            }))
+        let count = sessions.len();
+        macro_rules! gate {
+            ($condition:expr, $reason:literal) => { if !$condition { verification_gate(||json!({"gate":$reason,"sessions":count})); return Ok(false); } };
+        }
+        gate!(!sessions.is_empty(), "no-running-sessions");
+        gate!(self.closing.lock().map_err(err)?.is_empty(), "closing");
+        gate!(!self.close_saves.active(), "close-save");
+        // Exactly the reader and supervisor of each retained session.
+        let workers = self.workers.count();
+        if workers != count.saturating_mul(2) {
+            verification_gate(
+                || json!({"gate":"worker-count","sessions":count,"workers":workers,"expected_workers":count.saturating_mul(2),"slots":sessions.values().map(|slot|match slot{Slot::Starting{..}=>"starting",Slot::Exited{..}=>"exited",Slot::Running{..}=>"running"}).collect::<Vec<_>>()}),
+            );
+            return Ok(false);
+        }
+        gate!(
+            self.records
+                .checkpoint_ready(&sessions.keys().cloned().collect::<Vec<_>>()),
+            "metadata"
+        );
+        for slot in sessions.values() {
+            match slot {
+                Slot::Running { session, .. } => match session.try_lock() {
+                    Ok(s) => gate!(s.child.survives_update(), "remote-health"),
+                    Err(_) => {
+                        verification_gate(|| json!({"gate":"session-lock"}));
+                        return Ok(false);
+                    }
+                },
+                Slot::Starting { .. } => {
+                    verification_gate(|| json!({"gate":"starting-slot"}));
+                    return Ok(false);
+                }
+                Slot::Exited { .. } => {
+                    verification_gate(|| json!({"gate":"exited-slot"}));
+                    return Ok(false);
+                }
+            }
+        }
+        verification_gate(|| json!({"gate":"ready","sessions":count,"workers":workers}));
+        Ok(true)
     }
 
     fn mark_exited(

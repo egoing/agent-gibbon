@@ -28,6 +28,11 @@ impl OwnedChild {
         let remote = state.remote.clone();
         let running = state.status.is_none();
         drop(state);
+        if !running || remote.is_none() {
+            super::verification_gate(
+                || serde_json::json!({"remote_present":remote.is_some(),"running":running}),
+            );
+        }
         running && remote.is_some_and(|r| r.survives_update())
     }
     pub(super) fn new(child: ChildBox) -> Self {

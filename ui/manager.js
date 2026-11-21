@@ -20,7 +20,7 @@ function syncVisibility() {
   if (visibilityView.button.disabled !== pending) visibilityView.button.disabled = pending;
 }
 // Register settings destinations here; navigation preserves each panel's DOM.
-const settingsSections = ['privacy', 'skills', 'appearance', ...(el('settings-updater') ? ['updater'] : []), ...(el('settings-autostart') ? ['autostart'] : [])];
+const settingsSections = ['privacy', 'skills', 'appearance', ...(el('settings-updater') ? ['updater'] : []), ...(el('settings-autostart') ? ['autostart'] : []), ...(el('settings-developer') ? ['developer'] : [])];
 let selectedSettingsSection = 'privacy';
 function settingsSection(selectedSection) {
   selectedSettingsSection = selectedSection;
@@ -30,6 +30,7 @@ function settingsSection(selectedSection) {
     el(`settings-${section}-nav`).setAttribute('aria-current', active ? 'page' : 'false');
   }
   if (selectedSection === 'updater') window.jajanUpdater?.refresh();
+  if (selectedSection === 'developer') window.jajanDeveloperUpdater?.refresh();
   if (selectedSection === 'autostart') window.jajanAutostart?.refresh();
 }
 for (const section of settingsSections) {
@@ -40,6 +41,7 @@ for (const section of settingsSections) {
 }
 function page(settings) {
   if(window.jajanPrivacy && !window.jajanPrivacy.accepted()){window.jajanPrivacy.showWelcome();return;}
+  if (settings) window.jajanDeveloperUpdater?.refresh();
   el('notes-page').hidden = settings;
   el('settings-page').hidden = !settings;
   el('notes-nav').setAttribute('aria-pressed', String(!settings));
@@ -47,6 +49,7 @@ function page(settings) {
   if (!settings) refresh();
   else if (selectedSettingsSection === 'skills') window.jajanSkills?.refresh();
   else if (selectedSettingsSection === 'updater') window.jajanUpdater?.refresh();
+  else if (selectedSettingsSection === 'developer') window.jajanDeveloperUpdater?.refresh();
   else if (selectedSettingsSection === 'autostart') window.jajanAutostart?.refresh();
   else window.jajanPrivacy?.refresh().catch(()=>{});
 }

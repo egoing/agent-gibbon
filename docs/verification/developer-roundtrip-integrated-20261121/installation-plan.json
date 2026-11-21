@@ -1,0 +1,25 @@
+{
+  "workspace": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-JvgCbA",
+  "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-JvgCbA\\source",
+  "target": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-JvgCbA\\target",
+  "base": "http://127.0.0.1:63950/",
+  "verificationInstance": "dev-840521e8945b55d54e763d74",
+  "identifier": "app.jajan.roundtrip5170",
+  "productName": "Jajan Roundtrip Verification 5170",
+  "binaryName": "jajan-roundtrip-5170.exe",
+  "installDir": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-JvgCbA\\installed",
+  "previous": "0.3.12",
+  "latest": "0.3.13",
+  "artifacts": {
+    "0.3.12": {
+      "installer": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-JvgCbA\\Jajan_0.3.12_x64-setup.exe",
+      "sha256": "ae832ec35150e597df9f8883ba98932817a27f629dcddb2ba36144ea3df9806e",
+      "instance": "dev-840521e8945b55d54e763d74"
+    },
+    "0.3.13": {
+      "installer": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-JvgCbA\\Jajan_0.3.13_x64-setup.exe",
+      "sha256": "aec3d9460a1a61db97428d8c76c1011f888817b782589647561eb196738c8fe1",
+      "instance": "dev-840521e8945b55d54e763d74"
+    }
+  }
+}

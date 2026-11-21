@@ -39,6 +39,13 @@
 #settings-page{display:grid;grid-template-columns:220px minmax(0,1fr);flex:1;min-height:0;padding:0;overflow:hidden}
 .settings-sidebar h1{font-size:17px;margin:0 0 16px}
 .settings-sidebar nav{display:flex;flex-direction:column;gap:8px}
+.settings-sidebar{display:flex;flex-direction:column;overflow:hidden}
+.settings-sidebar nav{flex:1;min-height:0;overflow:auto}
+.settings-sidebar nav button{flex-shrink:0}
+.settings-sidebar #settings-version{width:auto;align-self:flex-start;margin-top:24px;font-size:12px;color:var(--manager-muted);padding:6px 12px;flex-shrink:0}
+#developer-update-state{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:8px 16px;font-size:13px}
+#developer-update-state dd{margin:0;overflow-wrap:anywhere}
+#developer-update-message{font-size:13px;overflow-wrap:anywhere}
 .settings-sidebar button{width:100%;min-height:36px;padding:8px 12px;text-align:left;border-color:transparent;overflow-wrap:anywhere}
 .settings-sidebar button[aria-current=page]{background:var(--manager-focus-surface);border-color:var(--manager-control-border)}
 .settings-content{min-width:0;overflow:auto;padding:20px 28px;scrollbar-gutter:stable}

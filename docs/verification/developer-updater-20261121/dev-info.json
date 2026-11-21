@@ -1,0 +1,8 @@
+{
+  "root": "C:\\Users\\egoin\\.codex\\worktrees\\5170\\agent-gibbon",
+  "id": "dev-0e8f09996ee653e1d6855ad6",
+  "name": "codex/developer-update-test",
+  "buildDir": "C:\\Users\\egoin\\dev\\project\\agent-gibbon\\.git\\jajan\\build-cache",
+  "target": "C:\\Users\\egoin\\.codex\\worktrees\\5170\\agent-gibbon\\src-tauri\\target",
+  "binary": "C:\\Users\\egoin\\.codex\\worktrees\\5170\\agent-gibbon\\src-tauri\\target\\debug\\jajan.exe"
+}

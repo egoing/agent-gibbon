@@ -1,0 +1,54 @@
+{
+  "phase": "before-down",
+  "process_id": 29716,
+  "note": {
+    "size": {
+      "height": 72,
+      "width": 450
+    },
+    "sentinel_matches": true,
+    "id": "roundtrip-proof-5170",
+    "position": {
+      "x": 1346,
+      "y": 927
+    },
+    "revision": 1,
+    "visible": true
+  },
+  "observed_at": "2026-11-21T20:28:27.1861590+09:00",
+  "instance": "dev-001020010200102001020010",
+  "privacy": {
+    "notice_ready": true,
+    "onboarding_required": false,
+    "sharing_allowed": false,
+    "terms_accepted": true,
+    "terms_skipped": false
+  },
+  "updater": {
+    "check_seconds": 900,
+    "enabled": true,
+    "idle_threshold_seconds": 300.0,
+    "last_check_failure": null,
+    "last_window_reports": null,
+    "retry_seconds": 15,
+    "status": {
+      "cache_ready": false,
+      "current_version": "0.3.13",
+      "downloaded": 0,
+      "failure_stage": null,
+      "manual_test": false,
+      "message": "최신 버전입니다",
+      "phase": "idle",
+      "roundtrip_active": false,
+      "roundtrip_pair": {
+        "id": "isolated-schema-v1-20261121",
+        "latest": "0.3.13",
+        "previous": "0.3.12"
+      },
+      "roundtrip_reason": "격리 검증 채널의 호환 버전 쌍입니다. 공식 배포판이 아닙니다.",
+      "signature_verified": false,
+      "total": null,
+      "version": null
+    }
+  }
+}
