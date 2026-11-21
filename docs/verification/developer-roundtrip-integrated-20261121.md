@@ -1,5 +1,7 @@
 # 개발자 메뉴·Windows PTY 통합 검증 — 진행 중
 
+최신 마감 상태와 실제 ConnectionReset 수정·worker2 복구 근거는 [2026-11-22 마감 기록](developer-timebox-20261122.md)을 우선 참고한다. 아래는 이전 회차 기록이며 최종 통합 성공 보고가 아니다.
+
 - 작업 루트: `C:\Users\egoin\.codex\worktrees\5170\agent-gibbon`.
 - 통합 코드: `6a03ea415486ed39f9c51e566cac821a937d9b7e`. PR #277 head `26aa1894c4d1fef734330f4b5bbc7c5aeb8121c8`을 먼저 검토·병합했다. main 병합 SHA는 `859c9d9cdedc89ac9d2a7dd1b0ac6591dcc6acb7`이며 기본 체크아웃 main·origin/main·원격 main 일치를 확인했다. 기본 체크아웃의 `.tmp`는 보존했다.
 - 통합 코드의 Rust 330개·실제 ConPTY 통합 1개·UI 257개가 통과했다. 기존 UI 2개 skip과 수동 fixture ignored는 통과에 포함하지 않는다. Clippy all-targets `-D warnings`, Rustfmt 검사를 통과했다.

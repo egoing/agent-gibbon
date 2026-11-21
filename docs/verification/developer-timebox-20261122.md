@@ -25,3 +25,9 @@
 - 재실험은 fenSVI의 새 key가 포함된 최신 GUI를 출처 확인 후 전용 경로에서 시작하고, 기존 캐시의 서명 재검증/수동 대기를 유지한 채 수행한다. 사용자 설치본 교체는 금지다.
 
 Conf5: 이 Windows 기기의 reader 실패·복구/worker2/같은 셸731 보존 범위. 전체 기능의 최종 NSIS 통합은 미완료. Risk Medium.
+
+## 마감 직후 종료 상태 확인
+
+7f5636ff8d967cf32a00f40d083cfc5d81bf5edd를 작업 브랜치에 push했고, 이후 새 구현·검사·설치는 시작하지 않았다. 이미 진행 중이던 최종 5170 개발 빌드(session25842)는 exit0, 55.99초로 완료됐다. deadline-dev-build.log를 완료 로그로 갱신했고 final-dev-info.log에 실제 root/id/binary를 보존했다. cargo11968/rustc32264와 makensis/setup 설치 프로세스는 더 이상 조회되지 않았다. loopback feed는 대기 중이며 NSIS 설치는 진행 중이지 않다. GUI13684·owner35576·셸7588은 유지한다. 절전은 팀장이 수행한다.
+
+Clippy manual_inspect 두 건은 inspect_err로 수정했으나 그 후 재실행은 하지 않았다. 최종 양방향 NSIS·후속 보호/좌표 검증·main 병합 및 배포는 미완료다. 최신 개발 실행은 이 워크트리에서 scripts/jajan-dev.cmd open이며, 자동 재빌드는 하지 않는다.
