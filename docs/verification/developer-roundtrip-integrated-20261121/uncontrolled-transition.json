@@ -1,0 +1,172 @@
+{
+  "observed_at": "2026-11-21T21:55:13.6579754+09:00",
+  "code_commit": "6a03ea4",
+  "workspace": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-JvgCbA",
+  "instance": "dev-840521e8945b55d54e763d74",
+  "process_id": 26188,
+  "actual_file_version": "0.3.12",
+  "updater": {
+    "check_seconds": 900,
+    "enabled": true,
+    "idle_threshold_seconds": 300.0,
+    "last_check_failure": null,
+    "last_window_reports": {
+      "epoch": 1,
+      "outcome": "prepared",
+      "source_version": "0.3.13",
+      "target_version": "0.3.12",
+      "timestamp_ms": 1795265494117,
+      "windows": [
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 1,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": false
+          }
+        },
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 2,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": false
+          }
+        },
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 3,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": true
+          }
+        },
+        {
+          "ack": true,
+          "kind": "manager",
+          "number": 4,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": true
+          }
+        },
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 5,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": false
+          }
+        },
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 6,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": false
+          }
+        },
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 7,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": true
+          }
+        },
+        {
+          "ack": true,
+          "kind": "stash",
+          "number": 8,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": false
+          }
+        }
+      ]
+    },
+    "retry_seconds": 15,
+    "status": {
+      "cache_ready": true,
+      "current_version": "0.3.12",
+      "downloaded": 5417217,
+      "failure_stage": null,
+      "manual_test": true,
+      "message": "수동 시험 대기 중입니다. 준비한 버전 설치·재시작을 눌러야 설치합니다.",
+      "phase": "ready",
+      "roundtrip_active": true,
+      "roundtrip_pair": {
+        "id": "isolated-schema-v1-20261121",
+        "latest": "0.3.13",
+        "previous": "0.3.12"
+      },
+      "roundtrip_reason": "격리 검증 채널의 호환 버전 쌍입니다. 공식 배포판이 아닙니다.",
+      "signature_verified": true,
+      "total": 5417217,
+      "version": "0.3.12"
+    }
+  },
+  "privacy": {
+    "notice_ready": true,
+    "onboarding_required": false,
+    "sharing_allowed": false,
+    "terms_accepted": true,
+    "terms_skipped": false
+  },
+  "agent_action": "No terms/entry/previous UI action sent before this observation; external input guard observed; actor clarification pending",
+  "count_as_pass": false
+}
