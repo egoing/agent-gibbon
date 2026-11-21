@@ -24,7 +24,7 @@
 - 이 고정 쌍 준비 스크립트는 소스 기준 버전 0.3.12만 허용한다. 이후 공개 버전이 바뀌면 새로운 호환 쌍을 검토해 정의해야 하며 임의로 과거 버전 메타데이터를 맞추지 않는다.
 - 재시작해도 캐시가 없어지거나 새 버전 피드가 보인다는 이유로 자동 복귀하지 않도록 `.developer-update-trial.json`으로 별도 시험 대기를 저장한다. 서명된 최신 쌍 패키지를 현재 실행 버전에서 확인한 후에만 일반 자동 업데이트 정책을 복원한다.
 - 5회 클릭 진입 시 UI가 `terminal_persistence_enable`, 조회 시 `terminal_persistence_status`를 호출한다. `supported/enabled/applies_to=new_sessions`를 확인할 때만 켜짐을 표시한다. `backend/persisted/reason`을 함께 표시하고 기존 셸을 재실행하지 않는다. 상태를 따로 만들어 낙관적으로 켜졌다고 표시하지 않는다.
-- Windows backend와 관리 창 전용 API는 PTY 담당 브랜치가 소유한다. 이 메뉴 브랜치에는 아직 API가 없으며, API 미포함·실패는 분리 미지원/통합 필요로 표시한다. Mac release의 debug-only 경로 활성화를 주장하지 않는다. 실제 ON과 재접속은 PTY PR 통합 이후 별도 검증한다.
+- Windows backend와 관리 창 전용 API는 PTY 담당 코드가 단일 소유한다. PR #277의 head `26aa1894c4d1fef734330f4b5bbc7c5aeb8121c8`을 검토해 `859c9d9cdedc89ac9d2a7dd1b0ac6591dcc6acb7`로 선행 병합했고, 기본 체크아웃 main·origin/main·원격 main SHA 일치를 확인했다. 이 메뉴 브랜치에 해당 main을 통합한 뒤 실제 ON과 재접속을 별도 검증한다. API 미포함·실패는 분리 미지원/통합 필요로 표시하고 Mac release의 debug-only 경로 활성화를 주장하지 않는다.
 - 신규 생성 opt-in은 현재 GUI 실행에만 적용한다. 재시작 후 `enabled=false`와 기존 셸의 `reconnect_persisted=true`가 함께 반환되어도 새 세션을 ON으로 표시하지 않는 UI 회귀 검사를 통과했다. 기존 셸 재접속 권한과 신규 생성 활성화를 구분하며 backend 상태를 별도로 복제하지 않는다.
 - 다음 통합 패키지 준비부터 임시 작업공간별 고유 `JAJAN_VERIFICATION_INSTANCE`를 두 버전에 동일하게 주입하고 계획 파일에 기록한다. 해당 compile-time override가 포함되지 않은 소스는 준비 전에 중단한다. 이 추가 경로의 실제 빌드·namespace 응답 확인은 PTY 통합 뒤 수행하며, 이전 독립 시험은 당시 고정 검증 ID의 증거로 보존한다.
 

@@ -1,0 +1,7 @@
+
+running 1 test
+GUI fixture terminal-1795255148442582200 owner=7040 shell=16296 instance=dev-9f4318a9190cf96216037515
+test seed_isolated_gui_session has been running for over 60 seconds
+test seed_isolated_gui_session ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 157.96s

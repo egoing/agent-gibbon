@@ -7,11 +7,11 @@ import {readFileSync} from 'node:fs';
 const flush=async()=>{for(let i=0;i<20;i++)await Promise.resolve();};
 const folder=path=>({path,name:path.split('/').at(-1),parent:path.slice(0,path.lastIndexOf('/')),command:`cd -- '${path}'`});
 const shell={id:'shell',label:'셸',command:"'/bin/zsh' -i"};
-function ui({exitCode=null,grid=null,ipc=null,restoreSupported=true,plan=null,restored=false,autoRestore=false,kind='terminal',path=null,fail=false,focused=true,picker=null,folders=[],choices=[{id:'git',label:'git log',command:"'/usr/bin/git' log --oneline --decorate -20"},shell]}={}){
+function ui({exitCode=null,grid=null,ipc=null,restoreSupported=true,plan=null,restored=false,autoRestore=false,detachedSession=false,kind='terminal',path=null,fail=false,focused=true,picker=null,folders=[],choices=[{id:'git',label:'git log',command:"'/usr/bin/git' log --oneline --decorate -20"},shell]}={}){
  const elements={},calls=[],intervals=[];
  const element=id=>elements[id]??=({id,hidden:false,textContent:'',value:'',children:[],attrs:{},dataset:{},focus(){this.focused=true;},addEventListener(){},setAttribute(k,v){this.attrs[k]=v;},getAttribute(k){return this.attrs[k];},replaceChildren(){this.children=[];},append(...children){this.children.push(...children);}});
  element('rename-title');
- const info={exit_code:exitCode,restore_supported:restoreSupported,restore_plan:plan,restored,auto_restore:autoRestore,kind,id:'terminal-123',title:'터미널',last_path:path};
+ const info={exit_code:exitCode,restore_supported:restoreSupported,restore_plan:plan,restored,auto_restore:autoRestore,detached_session:detachedSession,kind,id:'terminal-123',title:'터미널',last_path:path};
  const context={innerWidth:720,innerHeight:460,navigator:{platform:'MacIntel'},setTimeout,clearTimeout,setInterval:fn=>intervals.push(fn),ResizeObserver:class{observe(){}},Terminal:class{constructor(){this.cols=80;this.rows=24;this.options={fontSize:13};}loadAddon(){}open(){}onData(){}attachCustomKeyEventHandler(){}focus(){}write(){}},FitAddon:{FitAddon:class{fit(){}}},document:{hasFocus:()=>focused,getElementById:element,createElement:()=>element('element'+Math.random()),querySelector:()=>element('header'),querySelectorAll:()=>[]},window:{installTerminalIme(){},__TAURI__:{core:{Channel:class{},invoke:async(name,args)=>{
   calls.push([name,args]);
   if(ipc && (name==='terminal_resize'||name==='terminal_start'))return ipc(name,args);
@@ -248,3 +248,10 @@ test('an exit observed during a pending resize blocks the queued latest grid',as
   assert.deepEqual(resizes(),[[90,24]]);
   assert.equal(calls.filter(([name])=>name==='terminal_start').length,1);
 });
+
+ test('a surviving owner reconnects without a restore plan or a new command',async()=>{
+ const {calls}=ui({restored:true,restoreSupported:false,detachedSession:true});await flush();
+ const starts=calls.filter(([name])=>name==='terminal_start');assert.equal(starts.length,1);
+ assert.equal(starts[0][1].choice,'reattach');assert.equal(starts[0][1].plan,undefined);
+ assert.equal(starts[0][1].execRequest,undefined);
+ });

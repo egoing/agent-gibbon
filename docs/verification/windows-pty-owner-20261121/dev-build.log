@@ -1,0 +1,6 @@
+
+> jajan@0.3.12 dev:build
+> node scripts/dev.mjs build
+
+   Compiling jajan v0.3.12 (C:\Users\egoin\.codex\worktrees\04fb\agent-gibbon\src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 16.75s

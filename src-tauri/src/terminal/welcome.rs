@@ -736,6 +736,20 @@ pub(super) fn start_with_line(
     command_line: Option<String>,
     spawned: impl FnOnce(OwnedChild),
 ) -> Result<(Session, PtyReader), String> {
+    #[cfg(windows)]
+    if choice == "reattach" {
+        let cwd = agent.last_path.clone().unwrap_or(home()?);
+        return super::windows_owner::start(
+            &cwd,
+            None,
+            dimensions,
+            &default_shell()?,
+            &agent.id,
+            PromptState::new(),
+            true,
+            spawned,
+        );
+    }
     require_restore_support(
         std::env::consts::OS,
         plan.is_some() || choice == "auto-monitor",
@@ -782,6 +796,11 @@ fn start_shell(
 ) -> Result<(Session, PtyReader), String> {
     start_shell_supervised(cwd, line, dimensions, shell, None, drop)
 }
+#[cfg(windows)]
+pub(super) fn windows_prompt_script(token: &str) -> String {
+    let prompt_script = r#"function global:prompt { $entry = Get-History -Count 1; if ($entry -and $global:jajanLastId -ne $entry.Id) { $global:jajanLastId = $entry.Id; $name = ''; if ($entry.CommandLine -match '^\s*([A-Za-z][A-Za-z0-9._-]{0,79})(?:\s|$)') { $name = $Matches[1] }; [Console]::Write(([char]27 + ']777;jajan-plan;TOKEN;' + $name + [char]7)) }; [Console]::Write(([char]27 + ']777;jajan-cwd;' + (Get-Location).Path + [char]7)); [Console]::Write(([char]27 + ']777;jajan-ready;TOKEN' + [char]7)); 'PS> ' }; "#;
+    prompt_script.replace("TOKEN", token)
+}
 fn start_shell_supervised(
     cwd: &Path,
     line: Option<String>,
@@ -791,6 +810,14 @@ fn start_shell_supervised(
     spawned: impl FnOnce(OwnedChild),
 ) -> Result<(Session, PtyReader), String> {
     let prompt = PromptState::new();
+    #[cfg(windows)]
+    if super::windows_owner::enabled() {
+        if let Some(id) = _terminal_id {
+            return super::windows_owner::start(
+                cwd, line, dimensions, shell, id, prompt, false, spawned,
+            );
+        }
+    }
     let pair = {
         let _timing = crate::telemetry::Timing::new("terminal.pty.create");
         native_pty_system().openpty(dimensions).map_err(err)?
@@ -802,7 +829,10 @@ fn start_shell_supervised(
     let poc: Option<(&str, std::ffi::OsString)> = None;
     if let Some((id, ref dir)) = poc {
         cmd = CommandBuilder::new("/usr/bin/python3");
-        cmd.arg(concat!(env!("CARGO_MANIFEST_DIR"), "/../scripts/pty-owner-poc.py"));
+        cmd.arg(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../scripts/pty-owner-poc.py"
+        ));
         cmd.arg("client");
         cmd.arg(dir);
         cmd.arg(id);
@@ -840,10 +870,9 @@ fn start_shell_supervised(
     #[cfg(windows)]
     {
         cmd.args(["-NoLogo", "-NoExit", "-Command"]);
-        let prompt_script = r#"function global:prompt { $entry = Get-History -Count 1; if ($entry -and $global:jajanLastId -ne $entry.Id) { $global:jajanLastId = $entry.Id; $name = ''; if ($entry.CommandLine -match '^\s*([A-Za-z][A-Za-z0-9._-]{0,79})(?:\s|$)') { $name = $Matches[1] }; [Console]::Write(([char]27 + ']777;jajan-plan;TOKEN;' + $name + [char]7)) }; [Console]::Write(([char]27 + ']777;jajan-cwd;' + (Get-Location).Path + [char]7)); [Console]::Write(([char]27 + ']777;jajan-ready;TOKEN' + [char]7)); 'PS> ' }; "#;
         cmd.arg(format!(
             "{}{}",
-            prompt_script.replace("TOKEN", &prompt.token),
+            windows_prompt_script(&prompt.token),
             line.as_deref().unwrap_or("")
         ));
     }
@@ -1456,6 +1485,8 @@ pub(super) fn descendants(pid: u32) -> Option<Vec<i32>> {
 pub(super) struct PromptState {
     pub token: String,
     pub ready: bool,
+    // Replayed output cannot replace the saved restore plan before a new input command.
+    pub preserve_plan: bool,
     due: usize,
     editing: bool,
 }
@@ -1468,6 +1499,7 @@ impl PromptState {
         self.editing = true;
         for byte in data {
             if matches!(byte, b'\r' | b'\n') {
+                self.preserve_plan = false;
                 self.due = self.due.saturating_add(1);
                 self.editing = false;
             }
@@ -1486,6 +1518,7 @@ impl PromptState {
                 NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
             ),
             ready: false,
+            preserve_plan: false,
             due: 1,
             editing: false,
         }
@@ -1755,5 +1788,23 @@ mod lifecycle_tests {
                 std::thread::sleep(std::time::Duration::from_millis(10));
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod reconnect_plan_tests {
+    use super::*;
+    #[test]
+    fn replay_preserves_plan_until_a_new_command_is_submitted() {
+        let mut prompt = PromptState::new();
+        prompt.preserve_plan = true;
+        prompt.input(b"\x1b[1;1R");
+        assert!(prompt.preserve_plan);
+        prompt.report();
+        assert!(prompt.preserve_plan);
+        prompt.input(b"partial");
+        assert!(prompt.preserve_plan);
+        prompt.input(b"\r");
+        assert!(!prompt.preserve_plan);
     }
 }

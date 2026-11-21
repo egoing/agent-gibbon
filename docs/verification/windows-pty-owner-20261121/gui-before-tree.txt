@@ -1,0 +1,47 @@
+Window: "Jajan [DEV codex/windows-pty-manager · 9f4318a9] — terminal-90320261121", App: jajan.exe.
+	0 window (창) Jajan [DEV codex/windows-pty-manager · 9f4318a9] — terminal-90320261121 Secondary Actions: Raise
+		1 pane (창)
+			2 pane (창) 터미널
+				3 pane (창) (disabled)
+				4 pane (영역) 터미널 - 웹 콘텐츠
+					5 pane (영역)
+						6 pane (영역)
+						7 pane (영역)
+							8 pane (영역)
+								9 document (문서) 터미널 Value: http://tauri.localhost/terminal.html ID: RootWebArea
+									10 group (머리글)
+										11 toolbar (도구 모음) 메모 도구 ID: controls
+											12 button (단추) 글자 크기 13px · 클릭하여 변경 Description: 글자 크기 13px · 클릭하여 변경 ID: font-size
+											13 button (전환 버튼) 상단 고정 Description: 상단 고정 ID: pin
+											14 button (단추) 메모 연결 Description: 메모 연결 ID: connect
+											15 button (단추) 메모 접기 Description: 메모 접기 ID: toolbar-toggle
+											16 button (단추) 터미널 종료 Description: 터미널 종료 ID: close
+									17 group (기본) 터미널 ID: terminal
+										18 group (그룹)
+											19 group (그룹)
+												20 text field (편집) (settable, string) Terminal input
+								21 pane (영역)
+		22 title bar (제목 표시줄) (settable, string) Value: Jajan [DEV codex/windows-pty-manager · 9f4318a9] — terminal-90320261121
+			23 menu bar (메뉴 모음) 시스템 ID: MenuBar
+				24 menu item (메뉴 항목) 시스템
+			25 button (단추) 최소화
+			26 button (단추) 최대화
+			27 button (단추) 닫기
+
+Document text: ```
+글자 크기 13px · 클릭하여 변경
+상단 고정
+메모 연결
+메모 접기
+터미널 종료
+￼
+Terminal input
+￼
+￼
+￼
+￼
+￼
+￼
+￼
+￼
+```

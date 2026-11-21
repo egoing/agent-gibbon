@@ -29,6 +29,8 @@ pub enum Action {
     Probe,
     Web,
     Workspace(crate::workspace::Operation),
+    #[cfg(all(windows, debug_assertions))]
+    PtyControl(String),
 }
 
 // Retired dedicated-agent IDs stay reserved, so open/update cannot turn an old

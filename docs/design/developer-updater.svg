@@ -7,25 +7,26 @@
 <text x="98" y="114" font-size="17" font-weight="600">Jajan</text><text x="870" y="114" font-size="13">모든 메모</text><text x="966" y="114" font-size="13">설정</text>
 <path d="M78 136H1022 M298 136V710" stroke="#a0a3bc"/>
 <text x="98" y="174" font-size="17" font-weight="600">설정</text>
-<text x="106" y="218" font-size="14">스킬</text><text x="106" y="261" font-size="14">테마</text><text x="106" y="304" font-size="14">자동 업데이트</text><text x="106" y="347" font-size="14">로그인 자동 실행</text><text x="106" y="390" font-size="14">Privacy &amp; Diagnostics</text>
-<rect x="90" y="408" width="196" height="36" rx="3" fill="#cdd0d3" stroke="#6d7084"/><text x="106" y="432" font-size="14">개발자</text><text x="106" y="680" font-size="12" class="muted">v0.3.12</text>
+<text x="106" y="218" font-size="14">스킬</text><text x="106" y="281" font-size="14">테마</text><text x="106" y="324" font-size="14">자동 업데이트</text><text x="106" y="367" font-size="14">로그인 자동 실행</text><text x="106" y="410" font-size="14">Privacy &amp; Diagnostics</text>
+<rect x="90" y="428" width="196" height="36" rx="3" fill="#cdd0d3" stroke="#6d7084"/><text x="106" y="452" font-size="14">개발자</text><text x="106" y="680" font-size="12" class="muted">v0.3.12</text>
 <text x="326" y="176" font-size="21" font-weight="600">개발자</text>
-<text x="326" y="205" font-size="13">터미널 분리 상태 확인 불가 · PTY API 통합 필요 · 기존 실행 셸 유지</text>
-<text x="326" y="232" font-size="13">복귀 메뉴와 데이터 형식이 호환되는 두 버전 사이를 설치·재시작으로 왕복합니다.</text>
-<text x="326" y="257" font-size="13">시험 중에는 재실행 후에도 일반 자동 업데이트로 먼저 복귀하지 않습니다.</text>
-<text x="326" y="285" font-size="13">격리 검증 채널의 호환 버전 쌍입니다. 공식 배포판이 아닙니다. 0.3.12 ↔ 0.3.13</text>
-<rect x="326" y="304" width="211" height="32" rx="3" fill="#dfe2dd" stroke="#6d7084"/><text x="338" y="298" font-size="13" class="muted">이전 테스트 버전으로 교체</text>
-<rect x="545" y="304" width="174" height="32" rx="3" fill="#dfe2dd" stroke="#6d7084"/><text x="557" y="298" font-size="13">최신 버전으로 복귀</text>
-<text x="326" y="377" font-size="13">현재 버전</text><text x="530" y="377" font-size="13">0.3.12</text>
-<text x="326" y="408" font-size="13">준비 버전</text><text x="530" y="408" font-size="13">0.3.12</text>
-<text x="326" y="439" font-size="13">시험 종류</text><text x="530" y="439" font-size="13">호환 버전 왕복 시험</text>
-<text x="326" y="470" font-size="13">다운로드</text><text x="530" y="470" font-size="13">준비 완료 · 다운로드 바이트 수</text>
-<text x="326" y="501" font-size="13">서명·플랫폼·버전 검증</text><text x="530" y="501" font-size="13">검증 완료</text>
-<text x="326" y="532" font-size="13">캐시</text><text x="530" y="532" font-size="13">저장 완료</text>
-<text x="326" y="563" font-size="13">최근 준비 실패</text><text x="530" y="563" font-size="13">없음</text>
-<text x="326" y="594" font-size="13">설치 정책</text><text x="530" y="594" font-size="13">수동 시험 대기 · 명시적인 복귀 버튼 필요</text>
-<text x="326" y="635" font-size="13">실제 작업 보호 보류 이유를 이 영역에 표시합니다.</text>
-<text x="326" y="677" font-size="13">▸ 기존 패키지 준비 시험</text>
+<text x="326" y="205" font-size="13">터미널 분리 켜짐 · 이 실행에서 생성하는 새 터미널부터 적용</text>
+<text x="326" y="225" font-size="13">재시작 후 새 세션은 OFF · 기존 분리 셸은 인증된 체크포인트로 재연결</text>
+<text x="326" y="252" font-size="13">복귀 메뉴와 데이터 형식이 호환되는 두 버전 사이를 설치·재시작으로 왕복합니다.</text>
+<text x="326" y="277" font-size="13">시험 중에는 재실행 후에도 일반 자동 업데이트로 먼저 복귀하지 않습니다.</text>
+<text x="326" y="305" font-size="13">격리 검증 채널의 호환 버전 쌍입니다. 공식 배포판이 아닙니다. 0.3.12 ↔ 0.3.13</text>
+<rect x="326" y="324" width="211" height="32" rx="3" fill="#dfe2dd" stroke="#6d7084"/><text x="338" y="346" font-size="13" class="muted">이전 테스트 버전으로 교체</text>
+<rect x="545" y="324" width="174" height="32" rx="3" fill="#dfe2dd" stroke="#6d7084"/><text x="557" y="346" font-size="13">최신 버전으로 복귀</text>
+<text x="326" y="397" font-size="13">현재 버전</text><text x="530" y="397" font-size="13">0.3.12</text>
+<text x="326" y="428" font-size="13">준비 버전</text><text x="530" y="428" font-size="13">0.3.12</text>
+<text x="326" y="459" font-size="13">시험 종류</text><text x="530" y="459" font-size="13">호환 버전 왕복 시험</text>
+<text x="326" y="490" font-size="13">다운로드</text><text x="530" y="490" font-size="13">준비 완료 · 다운로드 바이트 수</text>
+<text x="326" y="521" font-size="13">서명·플랫폼·버전 검증</text><text x="530" y="521" font-size="13">검증 완료</text>
+<text x="326" y="552" font-size="13">캐시</text><text x="530" y="552" font-size="13">저장 완료</text>
+<text x="326" y="583" font-size="13">최근 준비 실패</text><text x="530" y="583" font-size="13">없음</text>
+<text x="326" y="614" font-size="13">설치 정책</text><text x="530" y="614" font-size="13">수동 시험 대기 · 명시적인 복귀 버튼 필요</text>
+<text x="326" y="655" font-size="13">실제 작업 보호 보류 이유를 이 영역에 표시합니다.</text>
+<text x="326" y="697" font-size="13">▸ 기존 패키지 준비 시험</text>
 <text x="78" y="748" font-size="13" class="muted">공식 호환 쌍이 없는 배포 빌드는 두 왕복 버튼을 비활성화하고 이유를 표시합니다.</text>
 <text x="78" y="774" font-size="13" class="muted">5회 클릭 진입 유지 · 기본 숨김 · 서명과 작업 보호 유지 · 최신 복귀 확인 후 일반 자동 업데이트 재개</text>
 </svg>

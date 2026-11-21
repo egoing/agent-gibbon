@@ -1,0 +1,174 @@
+{
+  "check_seconds": 60,
+  "enabled": true,
+  "idle_threshold_seconds": 30.0,
+  "last_check_failure": null,
+  "last_window_reports": {
+    "epoch": 1,
+    "outcome": "prepared",
+    "source_version": "0.3.23",
+    "target_version": "0.3.24",
+    "timestamp_ms": 1795264545223,
+    "windows": [
+      {
+        "ack": true,
+        "kind": "memo",
+        "number": 1,
+        "report": {
+          "editing": false,
+          "exporting": false,
+          "oldest_ms": 0,
+          "pending": 0,
+          "privacy": false,
+          "requests": {},
+          "saving": false,
+          "visible": false
+        }
+      },
+      {
+        "ack": true,
+        "kind": "memo",
+        "number": 2,
+        "report": {
+          "editing": false,
+          "exporting": false,
+          "oldest_ms": 0,
+          "pending": 0,
+          "privacy": false,
+          "requests": {},
+          "saving": false,
+          "visible": false
+        }
+      },
+      {
+        "ack": true,
+        "kind": "memo",
+        "number": 3,
+        "report": {
+          "editing": false,
+          "exporting": false,
+          "oldest_ms": 0,
+          "pending": 0,
+          "privacy": false,
+          "requests": {},
+          "saving": false,
+          "visible": false
+        }
+      },
+      {
+        "ack": true,
+        "kind": "manager",
+        "number": 4,
+        "report": {
+          "editing": false,
+          "exporting": false,
+          "oldest_ms": 0,
+          "pending": 0,
+          "privacy": false,
+          "requests": {},
+          "saving": false,
+          "visible": true
+        }
+      },
+      {
+        "ack": true,
+        "kind": "memo",
+        "number": 5,
+        "report": {
+          "editing": false,
+          "exporting": false,
+          "oldest_ms": 0,
+          "pending": 0,
+          "privacy": false,
+          "requests": {},
+          "saving": false,
+          "visible": false
+        }
+      },
+      {
+        "ack": true,
+        "kind": "memo",
+        "number": 6,
+        "report": {
+          "editing": false,
+          "exporting": false,
+          "oldest_ms": 0,
+          "pending": 0,
+          "privacy": false,
+          "requests": {},
+          "saving": false,
+          "visible": false
+        }
+      },
+      {
+        "ack": true,
+        "kind": "memo",
+        "number": 7,
+        "report": {
+          "editing": false,
+          "exporting": false,
+          "oldest_ms": 0,
+          "pending": 0,
+          "privacy": false,
+          "requests": {},
+          "saving": false,
+          "visible": true
+        }
+      },
+      {
+        "ack": true,
+        "kind": "stash",
+        "number": 8,
+        "report": {
+          "editing": false,
+          "exporting": false,
+          "oldest_ms": 0,
+          "pending": 0,
+          "privacy": false,
+          "requests": {},
+          "saving": false,
+          "visible": false
+        }
+      },
+      {
+        "ack": true,
+        "kind": "terminal",
+        "number": 9,
+        "report": {
+          "editing": false,
+          "exporting": false,
+          "oldest_ms": 0,
+          "pending": 0,
+          "privacy": false,
+          "requests": {},
+          "saving": false,
+          "visible": false
+        }
+      },
+      {
+        "ack": true,
+        "kind": "memo",
+        "number": 10,
+        "report": {
+          "editing": false,
+          "exporting": false,
+          "oldest_ms": 0,
+          "pending": 0,
+          "privacy": false,
+          "requests": {},
+          "saving": false,
+          "visible": true
+        }
+      }
+    ]
+  },
+  "retry_seconds": 5,
+  "status": {
+    "current_version": "0.3.24",
+    "downloaded": 0,
+    "message": "업데이트를 자동으로 확인합니다",
+    "phase": "idle",
+    "total": null,
+    "version": null
+  }
+}

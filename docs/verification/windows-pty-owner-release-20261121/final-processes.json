@@ -1,0 +1,20 @@
+[
+  {
+    "ProcessId": 32288,
+    "ParentProcessId": 33052,
+    "Name": "owner-2fb5ffc911fe3b93e1c5e3ec.exe",
+    "ExecutablePath": "C:\\Users\\egoin\\AppData\\Local\\Jajan\\dev-041704170417041704170417\\p\\owner-2fb5ffc911fe3b93e1c5e3ec.exe"
+  },
+  {
+    "ProcessId": 32700,
+    "ParentProcessId": 32288,
+    "Name": "powershell.exe",
+    "ExecutablePath": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
+  },
+  {
+    "ProcessId": 1004,
+    "ParentProcessId": 22696,
+    "Name": "jajan-ptyrelease-04fb.exe",
+    "ExecutablePath": "C:\\Users\\egoin\\.codex\\worktrees\\04fb\\agent-gibbon\\.tmp\\pty-release\\installed\\jajan-ptyrelease-04fb.exe"
+  }
+]

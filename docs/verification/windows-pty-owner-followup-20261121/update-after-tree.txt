@@ -1,0 +1,47 @@
+Window: "Jajan [DEV Updater verification · 00102001] — terminal-1795255345836294500", App: jajan-ptyverify-04fb.exe.
+	0 window (창) Jajan [DEV Updater verification · 00102001] — terminal-1795255345836294500 Secondary Actions: Raise
+		1 pane (창)
+			2 pane (창) 터미널
+				3 pane (창) (disabled)
+				4 pane (영역) 터미널 - 웹 콘텐츠
+					5 pane (영역)
+						6 pane (영역)
+						7 pane (영역)
+							8 pane (영역)
+								9 document (문서) 터미널 Value: http://tauri.localhost/terminal.html ID: RootWebArea
+									10 group (머리글)
+										11 toolbar (도구 모음) 메모 도구 ID: controls
+											12 button (단추) 글자 크기 13px · 클릭하여 변경 Description: 글자 크기 13px · 클릭하여 변경 ID: font-size
+											13 button (전환 버튼) 상단 고정 Description: 상단 고정 ID: pin
+											14 button (단추) 메모 연결 Description: 메모 연결 ID: connect
+											15 button (단추) 메모 접기 Description: 메모 접기 ID: toolbar-toggle
+											16 button (단추) 터미널 종료 Description: 터미널 종료 ID: close
+									17 group (기본) 터미널 ID: terminal
+										18 text field (편집) (settable, string) Terminal input
+									19 scroll bar (스크롤 막대) 터미널 출력 기록 스크롤 Value: 0 ID: memo-scrollbar
+								20 pane (영역)
+		21 title bar (제목 표시줄) (settable, string) Value: Jajan [DEV Updater verification · 00102001] — terminal-1795255345836294500
+			22 menu bar (메뉴 모음) 시스템 ID: MenuBar
+				23 menu item (메뉴 항목) 시스템
+			24 button (단추) 최소화
+			25 button (단추) 최대화
+			26 button (단추) 닫기
+
+Document text: ```
+글자 크기 13px · 클릭하여 변경
+상단 고정
+메모 연결
+메모 접기
+터미널 종료
+￼
+Terminal input
+터미널 출력 기록 스크롤
+￼
+￼
+￼
+￼
+￼
+￼
+￼
+￼
+```

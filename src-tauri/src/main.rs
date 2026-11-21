@@ -425,6 +425,29 @@ fn apply_with_presentation(
     expected: Option<manager::RowKind>,
 ) -> Result<Value, String> {
     request.validate()?;
+    #[cfg(all(windows, debug_assertions))]
+    if let Action::PtyControl(operation) = &request.action {
+        if !terminal::windows_owner::enabled() {
+            return Err("PTY 개발 실험 모드가 아닙니다".into());
+        }
+        let operation = operation.clone();
+        let handle = app.clone();
+        match operation.as_str() {
+            "quit" | "restart" => {
+                std::thread::spawn(move || {
+                    std::thread::sleep(Duration::from_millis(300));
+                    if operation == "quit" {
+                        handle.exit(0);
+                    } else {
+                        handle.restart();
+                    }
+                });
+            }
+            "check-update" | "install-update" => updater::poc_control(app, &operation)?,
+            _ => return Err("지원하지 않는 개발 제어 요청".into()),
+        }
+        return Ok(json!({"ok":true,"instance":instance::current().id,"scheduled":true}));
+    }
     // Read-only diagnostics must remain observable during the installation handshake.
     if matches!(request.action, Action::Diagnostics) {
         return Ok(
@@ -560,6 +583,8 @@ fn apply_with_presentation(
         | Action::Probe
         | Action::Web
         | Action::Workspace(_) => (),
+        #[cfg(all(windows, debug_assertions))]
+        Action::PtyControl(_) => (),
     }
     // Existing metadata is recollected before the next menu open. Replacing a
     // tracking native menu here would dismiss it during background updates.
@@ -665,6 +690,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     terminal::terminal_write,
                     terminal::terminal_resize,
                     terminal::terminal_info,
+                    terminal::persistence_mode::terminal_persistence_status,
+                    terminal::persistence_mode::terminal_persistence_enable,
                     terminal::welcome::terminal_welcome,
                     terminal::welcome::terminal_folder,
                     terminal::welcome::terminal_rename,
@@ -1056,6 +1083,28 @@ fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
 }
 
 fn parse(args: &[String]) -> Result<Request, String> {
+    #[cfg(all(windows, debug_assertions))]
+    if let [command] = args {
+        if let Some(operation) = command.strip_prefix("poc-") {
+            if matches!(
+                operation,
+                "quit" | "restart" | "check-update" | "install-update"
+            ) {
+                return Ok(Request {
+                    action: Action::PtyControl(operation.into()),
+                    url: None,
+                    change_mode: None,
+                    highlight: None,
+                    source_path: None,
+                    id: None,
+                    color: None,
+                    title: None,
+                    status: None,
+                    markdown: None,
+                });
+            }
+        }
+    }
     let action = match args.first().map(String::as_str) { Some("workspace") => Action::Workspace(workspace::parse(&args[1..])?), Some("diagnostics") => Action::Diagnostics, Some("diagnostics-probe") => Action::Probe, Some("web") => Action::Web, Some("open") => Action::Open, Some("update") => Action::Update, Some("close") => Action::Close, Some("inspect") => Action::Inspect, Some("list") => Action::List, _ => return Err("사용법: jajan web [--id web-ID] [--url URL]; jajan diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list".into()) };
     let mut request = Request {
         url: None,
@@ -1265,6 +1314,11 @@ fn cli(args: &[String]) -> Result<Value, String> {
 }
 fn main() {
     let helper_args: Vec<String> = std::env::args().skip(1).collect();
+    #[cfg(windows)]
+    if helper_args.first().is_some_and(|arg| arg == "--pty-owner") {
+        let result = terminal::windows_owner::helper(&helper_args[1..]);
+        std::process::exit(if result.is_ok() { 0 } else { 1 });
+    }
     if let [mode, path] = helper_args.as_slice() {
         if mode == "--terminal-exec" {
             let code = terminal::cli::helper(path).unwrap_or_else(|error| {
@@ -1280,6 +1334,17 @@ fn main() {
         std::process::exit(1);
     }
     let args: Vec<_> = std::env::args().skip(1).collect();
+    #[cfg(all(windows, debug_assertions))]
+    let args = if args == ["--poc-serve"] {
+        vec!["--serve".into()]
+    } else {
+        args
+    };
+    #[cfg(all(windows, debug_assertions))]
+    if args == ["--serve"] && std::env::var("JAJAN_POC_WINDOWS_PTY").as_deref() == Ok("1") {
+        terminal::windows_owner::set_runtime_enabled(true);
+        std::env::remove_var("JAJAN_POC_WINDOWS_PTY");
+    }
     // Explorer launches should leave only the detached GUI, not a console window.
     #[cfg(windows)]
     let args = if args.is_empty() {
@@ -1313,6 +1378,17 @@ fn main() {
         Ok(
             json!({"ok":true,"instance":instance::current().id,"dev_label":instance::current().label,"manifest_dir":env!("CARGO_MANIFEST_DIR")}),
         )
+    } else if cfg!(all(windows, debug_assertions)) && args == ["--poc-owner-info"] {
+        #[cfg(all(windows, debug_assertions))]
+        {
+            terminal::windows_owner::prepare_owner_executable()
+                .map(|path| json!({"ok":true,"owner":path}))
+                .map_err(|e| e.to_string())
+        }
+        #[cfg(not(all(windows, debug_assertions)))]
+        {
+            Err("개발 전용 기능".into())
+        }
     } else if args == ["--help"] || args == ["-h"] {
         Ok(
             json!({"ok":true,"workspace":workspace::USAGE,"usage":"jajan web [--id web-ID] [--url URL]; jajan diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title TEXT] [--status TEXT] [--change-mode diff|replace] [--highlight none|newly-completed] [--file PATH|- | --markdown TEXT]; jajan close|inspect [--id ID]; jajan list","note":"open/web은 앱을 시작하거나 창을 생성·복원합니다. web의 ID 생략은 새 웹 창, open의 ID 생략은 main이며 close는 숨기기입니다. 색상은 #RRGGBB입니다."}),

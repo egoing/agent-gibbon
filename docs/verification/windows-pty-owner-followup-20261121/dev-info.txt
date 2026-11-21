@@ -1,0 +1,5 @@
+
+> jajan@0.3.12 dev:info
+> node scripts/dev.mjs info
+
+{"root":"C:\\Users\\egoin\\.codex\\worktrees\\04fb\\agent-gibbon","id":"dev-9f4318a9190cf96216037515","name":"codex/windows-pty-manager","buildDir":"C:\\Users\\egoin\\dev\\project\\agent-gibbon\\.git\\jajan\\build-cache","target":"C:\\Users\\egoin\\.codex\\worktrees\\04fb\\agent-gibbon\\src-tauri\\target","binary":"C:\\Users\\egoin\\.codex\\worktrees\\04fb\\agent-gibbon\\src-tauri\\target\\debug\\jajan.exe"}
