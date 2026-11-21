@@ -771,7 +771,7 @@ pub(super) fn start_with_line(
     };
     let shell = default_shell()?;
     drop(prepare);
-    start_shell_supervised(&cwd, line, dimensions, &shell, spawned)
+    start_shell_supervised(&cwd, line, dimensions, &shell, Some(&agent.id), spawned)
 }
 #[cfg(all(test, unix))]
 fn start_shell(
@@ -780,13 +780,14 @@ fn start_shell(
     dimensions: PtySize,
     shell: &Path,
 ) -> Result<(Session, PtyReader), String> {
-    start_shell_supervised(cwd, line, dimensions, shell, drop)
+    start_shell_supervised(cwd, line, dimensions, shell, None, drop)
 }
 fn start_shell_supervised(
     cwd: &Path,
     line: Option<String>,
     dimensions: PtySize,
     shell: &Path,
+    _terminal_id: Option<&str>,
     spawned: impl FnOnce(OwnedChild),
 ) -> Result<(Session, PtyReader), String> {
     let prompt = PromptState::new();
@@ -795,6 +796,22 @@ fn start_shell_supervised(
         native_pty_system().openpty(dimensions).map_err(err)?
     };
     let mut cmd = CommandBuilder::new(shell);
+    #[cfg(all(debug_assertions, target_os = "macos"))]
+    let poc = _terminal_id.zip(std::env::var_os("JAJAN_POC_PTY_DIR"));
+    #[cfg(not(all(debug_assertions, target_os = "macos")))]
+    let poc: Option<(&str, std::ffi::OsString)> = None;
+    if let Some((id, ref dir)) = poc {
+        cmd = CommandBuilder::new("/usr/bin/python3");
+        cmd.arg(concat!(env!("CARGO_MANIFEST_DIR"), "/../scripts/pty-owner-poc.py"));
+        cmd.arg("client");
+        cmd.arg(dir);
+        cmd.arg(id);
+        cmd.arg(shell);
+        cmd.env_remove("JAJAN_POC_INITIAL_LINE");
+        if let Some(line) = &line {
+            cmd.env("JAJAN_POC_INITIAL_LINE", line);
+        }
+    }
     cmd.cwd(cwd);
     cmd.env("TERM", "xterm-256color");
     cmd.env_remove("NO_COLOR");
@@ -811,7 +828,9 @@ fn start_shell_supervised(
     }
     #[cfg(unix)]
     {
-        cmd.arg("-i");
+        if poc.is_none() {
+            cmd.arg("-i");
+        }
         // A shell which replaces PS1 remains unknown and asks before closing.
         cmd.env(
             "PS1",
@@ -848,7 +867,7 @@ fn start_shell_supervised(
     let reader = PtyReader::new(&*session.master)?;
     session.writer = session.master.take_writer().map_err(err)?;
     #[cfg(unix)]
-    if setup.is_some() {
+    if poc.is_none() && setup.is_some() {
         // Keep the initial PTY input short, so startup can finish before output draining begins.
         session
             .writer
@@ -856,7 +875,7 @@ fn start_shell_supervised(
             .map_err(err)?;
     }
     #[cfg(unix)]
-    if let Some(line) = line {
+    if let Some(line) = line.filter(|_| poc.is_none()) {
         session.prompt.input(format!("{line}\r").as_bytes());
         session
             .writer
