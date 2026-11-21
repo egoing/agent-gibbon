@@ -1,10 +1,9 @@
-## 개발자 버전 왕복과 터미널 분리 상태 — 2026-11-21 후속
+## 개발자 업데이트 시험 — 2026-11-22 분리 연동 제거
 
 - 사용자 후속 요청에 따라 주 행동을 ‘이전 테스트 버전으로 교체’와 ‘최신 버전으로 복귀’로 구성한다. 두 행동은 다운로드·정상 서명/플랫폼/버전 바인딩·캐시·기존 작업 보호·실제 설치·재시작을 수행한다. 기존 준비/설치 시험은 접힌 ‘기존 패키지 준비 시험’에 보존하고 왕복 시험을 대신한다고 설명하지 않는다.
 - 공개된 호환 쌍은 아직 없다. 일반 빌드의 두 왕복 버튼은 비활성이며, 복귀 메뉴를 잃을 수 있는 임의 과거 버전으로 내려가지 않는다. `verification-roundtrip`은 동일 데이터 형식과 메뉴를 포함한 명시적 격리 쌍 `0.3.12 ↔ 0.3.13`만 허용한다. 정식 피드·키·설치본과 구분한 검증 채널이다. 버전값 위조나 서명 무시는 없다.
 - 시험 시작을 패키지 캐시와 별도로 원자 저장하여 이전 버전으로 재시작한 후에도 자동 복귀를 막는다. 최신 패키지의 서명과 실제 실행 버전이 최신 쌍에 일치하는 것을 확인한 뒤에만 일반 자동 업데이트 정책을 재개한다. 지정 쌍 밖의 현재/대상 버전은 거부한다.
-- 5회 클릭 진입은 유지한다. 진입 시 `terminal_persistence_enable`, 이후 상태 조회에는 `terminal_persistence_status`를 호출한다. 관리 창 전용 backend 계약의 `supported`, `enabled`, `backend`, `applies_to`, `persisted`, `reason`으로 실제 상태를 표시한다. supported/enabled와 새 세션 적용 범위를 확인한 경우만 켜짐을 표시한다. API 미포함·지원 불가·조회 실패는 미지원/통합 필요로 설명한다. UI가 환경변수나 독립된 활성 상태를 만들지 않으며 기존 실행 셸을 건드리지 않는다. 재시작 수명은 backend 응답으로 구분한다.
-- Windows PTY backend는 PR #277의 단일 관리 창 API로 통합한다. 신규 생성은 기본 OFF이고 5회 클릭 진입의 성공 응답에만 현재 GUI 실행에서 ON을 표시한다. 일반/업데이트 재시작 후 새 세션은 다시 OFF이며 기존 분리 셸의 인증된 체크포인트 재접속과 구분한다. API 실패·미지원은 켜짐으로 표시하지 않는다. 실제 연동 검증 결과는 후속 검증 기록을 따른다. Mac release의 debug-only PoC가 활성화됐다고 주장하지 않는다.
+- 5회 클릭은 숨김 업데이트 시험 메뉴만 표시한다. 프로세스 분리는 장기 이슈 #279로 유예했으므로 진입·상태 갱신에서 터미널 활성화 API를 호출하거나 분리 상태를 표시하지 않는다. 실행 중·시작 중·정리 중인 일반 터미널과 숨긴 Welcome의 기존 설치 보호를 유지한다. 업데이트 시험은 서명 검증이나 작업 보호를 해제하는 기능이 아니다.
 - [왕복 시안 SVG](design/developer-updater.svg) · [PNG](design/developer-updater.png), [후속 검증 기록](verification/developer-roundtrip-20261121.md)을 따른다. 아래 최초 두 단계 준비/설치 정책은 접힌 기존 시험 범위에 적용된다.
 
 ## 숨김 개발자 업데이트 시험 — 2026-11-21
@@ -1478,11 +1477,10 @@ macOS에서 앱 소유 메모 WebView는 기본 메모 구성의 첫 클릭 정�
 - 창 모서리와 외곽 3px/6px의 기존 resize hit area는 유지하며, 그 영역은 닫기보다 크기 조절을 우선한다. 포커스 overlay는 기존 pointer-events:none과 z-index:20을 유지한다. 이미지 하단 툴바·접힌 툴바에도 같은 오른쪽 끝 기준을 적용한다. 웹의 별도 네이티브 프레임에는 메모용 포커스선을 추가하지 않는다.
 - [상태별 시안 SVG](design/toolbar-close-edge.svg) · [PNG](design/toolbar-close-edge.png)는 설명용이다. 구현과 미실행 범위는 [작업 기록](verification/toolbar-close-edge-20261119.md)을 따른다.
 
-## Windows 분리형 PTY 개발자 모드 — 2026-11-21
+## 셸·PTY 프로세스 분리 유예 — 2026-11-22
 
-- 기본 OFF를 유지한다. 관리 창의 `terminal_persistence_enable` 호출은 현재 GUI 실행의 이후 새 터미널부터 적용한다. 기존 일반 셸을 이전하거나 종료하지 않는다. 앱·업데이트 재시작 후 새 세션 생성은 OFF다. 관리 창만 status/enable을 호출할 수 있다.
-- status의 `supported/enabled/backend/applies_to/persisted/reason`은 신규 생성 선택을 설명하며 `applies_to=new_sessions`, `persisted=false`다. `reconnect_persisted/reconnect_sessions`는 같은 설치 namespace에서 인증된 살아있는 기존 owner의 세션별 재접속 상태다. 이 지속 상태로 새 셸을 만들 수는 없다. Windows release도 지원하며 다른 플랫폼은 실제 메뉴 연동 지원 사유를 정확히 반환한다.
-- owner는 사용자 전용 DACL 폴더의 내용 해시별 복사 실행 파일로 ConPTY·셸·Job Object를 소유한다. 재접속 checkpoint에는 프로토콜2·임의 capability·owner/셸 PID만 보존하며 원시 입출력·명령 원문을 디스크에 기록하지 않는다. 설치 경로별 namespace와 개발 instance를 분리한다. 호환되지 않거나 없어진 owner는 새 셸로 대체하지 않는다.
-- 정상 앱 종료는 detach, 명시적 터미널 종료는 해당 owner와 소유 작업의 종료다. 마지막 detach 후 기본 300초(개발 환경변수로 1~900초) 유예가 있다. OS 재부팅·로그아웃·owner 강제 종료·상위 Job 전체 종료 생존은 보장하지 않는다. 출력은 메모리 최신 64KiB이며 전체 화면·스크롤 복원은 제공하지 않는다.
-- 업데이트는 살아있는 호환 owner·분리된 실행 파일·유효 checkpoint·저장 완료·세션별 두 worker·추가 닫기/정리 없음이 모두 확인된 remote 세션만 예외로 허용한다. 새 세션 생성 OFF여도 이 검증은 독립적으로 동작한다. Welcome·일반 PTY·웹 창·불완전 저장은 기존대로 보류한다. 재접속의 과거 출력 hook은 새 명령 입력 전까지 저장된 restore_plan을 덮지 않는다.
-- [정식 프로필 검증](verification/windows-pty-owner-release-20261121.md)을 현재 계약으로 사용한다. [이전 debug 검증](verification/windows-pty-owner-followup-20261121.md)의 영구 argv opt-in은 폐기한 중간 실험이다. 개발자 메뉴 UI와 버전 왕복 기능은 별도 변경에서 통합한다.
+- Windows/macOS의 별도 owner 분리 실행은 [장기 과제 #279](https://github.com/egoing/agent-gibbon/issues/279)로 유예한다. 기존 일반 PTY·창 생성/포커스·명시적 실행/종료 동작은 유지한다. Mac Python client/owner는 과거 macOS debug opt-in PoC였으며 일반/정식 Mac 실행 구조가 아니다.
+- 분리 owner 생성·관리 상태/enable API·환경변수 opt-in·자동 reattach와 분리 세션 업데이트 예외는 제거한다. 실행/시작/정리 중인 터미널과 남은 Welcome/웹 창은 기존 업데이트 보호를 따른다. 과거 저장된 창 snapshot은 일반 Welcome UI로 복원할 수 있지만 셸을 자동 재실행하지 않는다.
+- 개발자 메뉴의 업데이트 시험은 별도 범위다. 5회 클릭 진입·업데이트 준비/설치·호환 버전 왕복·서명/플랫폼/버전 검증·캐시·수동 대기·작업 보호는 삭제 대상이 아니다. PR #276에서 분리 활성화 호출/표시와 추가 transport/worker 코드만 제거해 최신 main에 통합한다.
+- 기존 기록·사용자 데이터·cached owner 실행 파일·ticket·Mac/iMac 로컬 미커밋 변경을 자동 삭제하지 않는다. 현재 살아있는 세션이나 사용자 앱을 종료/이전하지 않으며 향후 이행·정리 정책은 장기 이슈에서 결정한다.
+- [선별 제거 보고서](verification/pty-separation-deferred-20261122.md)와 과거 [Windows 실측](verification/windows-pty-owner-release-20261121.md)을 구분한다. old8405 GUI CPU 정체는 [별도 #278](https://github.com/egoing/agent-gibbon/issues/278)이며 분리 기능과 인과 미확정이다.

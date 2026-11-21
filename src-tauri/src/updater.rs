@@ -283,27 +283,6 @@ pub async fn updater_test_roundtrip(
     status(window.app_handle())
 }
 
-#[cfg(all(windows, debug_assertions))]
-pub(crate) fn poc_control(app: &tauri::AppHandle, operation: &str) -> Result<(), String> {
-    if !VERIFICATION {
-        return Err("격리된 업데이트 검증 빌드에서만 사용할 수 있습니다".into());
-    }
-    let handle = app.clone();
-    match operation {
-        "check-update" => {
-            tauri::async_runtime::spawn(async move {
-                let _ = check(handle, true).await;
-            });
-        }
-        "install-update" => {
-            std::thread::spawn(move || {
-                let _ = install(&handle, false);
-            });
-        }
-        _ => return Err("잘못된 업데이트 검증 요청".into()),
-    }
-    Ok(())
-}
 fn notice_window(window: &WebviewWindow) -> Result<(), String> {
     if window.label() == NOTICE_LABEL {
         Ok(())

@@ -15,7 +15,7 @@ if (process.platform !== 'win32') throw Error('Windows NSIS verification only');
 const root = fileURLToPath(new URL('..', import.meta.url));
 if (checkVersion(undefined, root) !== '0.3.12') throw Error('This approved isolated pair requires source version 0.3.12; review a new compatible pair before changing it.');
 if (!(await readFile(join(root,'src-tauri/src/instance.rs'),'utf8')).includes('JAJAN_VERIFICATION_INSTANCE')) {
-  throw Error('Integrate the PTY verification namespace support before preparing the combined trial.');
+  throw Error('Isolated updater verification requires compile-time verification namespace support.');
 }
 const workspace = await mkdtemp(join(tmpdir(), 'jajan-roundtrip-5170-'));
 // Both versions share this trial's namespace; other concurrent verification apps do not.
@@ -60,7 +60,7 @@ const plan = {workspace,source,target,base,verificationInstance,identifier:confi
   binaryName:`${binaryName}.exe`,installDir:join(workspace,'installed'),previous:'0.3.12',latest:'0.3.13',artifacts:{}};
 plan.codeCommit = execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();
 plan.sourceHashes = {};
-for (const path of ['src-tauri/src/updater.rs','src-tauri/src/main.rs','src-tauri/src/terminal/windows_owner.rs','src-tauri/src/terminal/persistence_mode.rs','ui/developer-updater.js','ui/terminal.js']) {
+for (const path of ['src-tauri/src/updater.rs','src-tauri/src/main.rs','src-tauri/src/terminal.rs','src-tauri/src/update_restore.rs','ui/developer-updater.js','ui/updater.js']) {
   plan.sourceHashes[path] = createHash('sha256').update(await readFile(join(source,path))).digest('hex');
 }
 await writeFile(join(workspace,'plan.json'),JSON.stringify(plan,null,2));

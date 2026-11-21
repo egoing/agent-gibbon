@@ -7,7 +7,7 @@ const tick = () => new Promise(setImmediate);
 function setup(initial = { phase: 'idle', current_version: '1.0.0' }) {
   const elements = new Map();
   const make = () => ({ hidden: false, disabled: false, textContent: '', children: [], replaceChildren() { this.children = []; }, append(...children) { this.children.push(...children); } });
-  for (const id of ['settings-version', 'settings-developer-nav', 'settings-page', 'settings-developer', 'developer-update-state', 'developer-update-message', 'developer-prepare', 'developer-install', 'developer-previous', 'developer-latest', 'developer-roundtrip-reason', 'developer-terminal-status']) elements.set(id, make());
+  for (const id of ['settings-version', 'settings-developer-nav', 'settings-page', 'settings-developer', 'developer-update-state', 'developer-update-message', 'developer-prepare', 'developer-install', 'developer-previous', 'developer-latest', 'developer-roundtrip-reason']) elements.set(id, make());
   elements.get('settings-developer-nav').hidden = true;
   let now = 0, status = initial, invokeAction = async () => status;
   const requests = [];
@@ -16,27 +16,12 @@ function setup(initial = { phase: 'idle', current_version: '1.0.0' }) {
   vm.runInContext(source, context);
   return { elements, requests, payloads, click: delta => { now += delta; elements.get('settings-version').onclick(); }, setStatus: value => { status = value; }, setAction: fn => { invokeAction = fn; }, refresh: () => context.window.jajanDeveloperUpdater.refresh() };
 }
-test('developer entry requests actual terminal persistence and never shows optimistic ON', async () => {
+test('developer entry and refresh never invoke deferred terminal separation APIs', async () => {
   const app=setup(); await tick();
-  app.setAction(async()=>{throw Error('API missing');});
   for(let i=0;i<5;i++) app.click(100);
-  await tick();
-  assert.equal(app.requests.filter(n=>n==='terminal_persistence_enable').length,1);
-  assert.doesNotMatch(app.elements.get('developer-terminal-status').textContent,/켜짐/);
-  assert.match(app.elements.get('developer-terminal-status').textContent,/PTY 기능 통합/);
-  app.setAction(async()=>({supported:true,enabled:true,applies_to:'new_sessions',persisted:false,backend:'windows-owner',reason:'이번 시험 실행'}));
   await app.refresh();
-  assert.match(app.elements.get('developer-terminal-status').textContent,/켜짐/);
-  assert.match(app.elements.get('developer-terminal-status').textContent,/기존 실행 셸은 변경하지 않습니다/);
-  assert.match(app.elements.get('developer-terminal-status').textContent,/이 실행에만 적용/);
-  app.setAction(async()=>({supported:true,enabled:false,applies_to:'new_sessions',persisted:false,reconnect_persisted:true,reconnect_sessions:1,backend:'windows-owner',reason:'기존 셸 재접속 가능'}));
-  await app.refresh();
-  assert.match(app.elements.get('developer-terminal-status').textContent,/터미널 분리 꺼짐/);
-  assert.match(app.elements.get('developer-terminal-status').textContent,/기존 셸 재접속 가능/);
-  assert.doesNotMatch(app.elements.get('developer-terminal-status').textContent,/켜짐/);
-  app.setAction(async()=>({supported:true,enabled:true,applies_to:'new_sessions',persisted:true,backend:'legacy-mode'}));
-  await app.refresh();
-  assert.doesNotMatch(app.elements.get('developer-terminal-status').textContent,/켜짐/);
+  assert.equal(app.elements.get('settings-developer-nav').hidden,false);
+  assert.equal(app.requests.some(name=>name.startsWith('terminal_')),false);
 });
 test('public builds cannot downgrade without a menu-compatible pair; isolated pair reverses direction after restart', async () => {
   const app = setup({phase:'idle',current_version:'0.3.12'}); await tick();

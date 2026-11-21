@@ -30,54 +30,6 @@ pub(super) struct Records {
 }
 
 impl Records {
-    #[cfg(windows)]
-    pub(super) fn checkpoint_ready(&self, ids: &[String]) -> bool {
-        let Ok(_writer) = self.io.try_lock() else {
-            super::verification_gate(|| serde_json::json!({"metadata":"io-lock"}));
-            return false;
-        };
-        let Ok(data) = self.data.try_lock() else {
-            super::verification_gate(|| serde_json::json!({"metadata":"data-lock"}));
-            return false;
-        };
-        let ready = !data.closing
-            && data.failed.is_empty()
-            && ids.iter().all(|id| data.records.contains_key(id));
-        if !ready {
-            super::verification_gate(
-                || serde_json::json!({"metadata":"state","closing":data.closing,"failed":data.failed.len(),"missing":ids.iter().filter(|id|!data.records.contains_key(*id)).count()}),
-            );
-        }
-        ready
-    }
-    #[cfg(windows)]
-    pub(super) fn checkpoint(&self, root: &Path, ids: &[String]) -> Result<(), String> {
-        let _writer = self
-            .io
-            .try_lock()
-            .map_err(|_| "터미널 기록 저장이 끝난 뒤 다시 설치하세요".to_string())?;
-        let snapshots = {
-            let data = self.data.lock().map_err(err)?;
-            if data.closing || !data.failed.is_empty() {
-                return Err("터미널 기록 저장 오류를 해결한 뒤 다시 설치하세요".into());
-            }
-            ids.iter()
-                .map(|id| {
-                    data.records
-                        .get(id)
-                        .cloned()
-                        .ok_or_else(|| "복원할 터미널 기록이 없습니다".to_string())
-                })
-                .collect::<Result<Vec<_>, _>>()?
-        };
-        for record in snapshots {
-            if let Err(error) = save(root, &record) {
-                self.data.lock().map_err(err)?.failed.insert(record.id);
-                return Err(error);
-            }
-        }
-        Ok(())
-    }
     pub(super) fn restore(&self, records: Vec<Terminal>) -> Result<(), String> {
         let mut data = self.data.lock().map_err(err)?;
         for record in records {
@@ -222,39 +174,6 @@ mod tests {
     use crate::terminal::read_records;
     use std::path::PathBuf;
 
-    #[cfg(windows)]
-    #[test]
-    fn update_checkpoint_blocks_pending_or_failed_saves_and_preserves_the_plan() {
-        let dir = tempfile::tempdir().unwrap();
-        let store = Records::default();
-        let mut r = record("terminal-1");
-        r.restore_plan = Some("preserve-plan".into());
-        store.restore(vec![r]).unwrap();
-        let ids = vec!["terminal-1".to_string()];
-        assert!(store.checkpoint_ready(&ids));
-        {
-            let _writer = store.io.lock().unwrap();
-            assert!(!store.checkpoint_ready(&ids));
-            assert!(store.checkpoint(dir.path(), &ids).is_err());
-        }
-        store.checkpoint(dir.path(), &ids).unwrap();
-        assert_eq!(
-            read_records(dir.path()).unwrap()[0].restore_plan.as_deref(),
-            Some("preserve-plan")
-        );
-        store
-            .data
-            .lock()
-            .unwrap()
-            .failed
-            .insert("terminal-1".into());
-        assert!(!store.checkpoint_ready(&ids));
-        assert!(store.checkpoint(dir.path(), &ids).is_err());
-        assert_eq!(
-            read_records(dir.path()).unwrap()[0].restore_plan.as_deref(),
-            Some("preserve-plan")
-        );
-    }
     fn record(id: &str) -> Terminal {
         serde_json::from_value(
             serde_json::json!({"id":id,"bounds":{"x":0.,"y":0.,"width":640.,"height":400.}}),

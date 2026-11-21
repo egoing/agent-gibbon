@@ -2496,7 +2496,6 @@ name = "jajan"
 version = "0.3.12"
 dependencies = [
  "ammonia",
- "anyhow",
  "base64 0.22.1",
  "block2",
  "cc",
@@ -2520,7 +2519,6 @@ dependencies = [
  "tauri-plugin-updater",
  "tempfile",
  "uds_windows",
- "windows-sys 0.61.2",
  "winreg 0.55.0",
  "xcap",
 ]

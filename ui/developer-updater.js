@@ -3,22 +3,6 @@
   const invoke = window.jajanInvoke || window.__TAURI__.core.invoke;
   const el = id => document.getElementById(id);
   let current, busy = false, clicks = 0, lastClick = -Infinity, revealed = false;
-  let persistenceRequest = false;
-  function renderPersistence(status) {
-    const target = el('developer-terminal-status');
-    if (!target) return;
-    const sessionPolicy = status?.supported === true && status?.persisted === false && status?.applies_to === 'new_sessions';
-    const active = sessionPolicy && status?.enabled === true;
-    const label = active ? '터미널 분리 켜짐 · 이후 생성하는 새 터미널부터 적용' : status?.supported === false ? '이 빌드에서는 터미널 분리를 사용할 수 없습니다' : status?.supported === true && status?.enabled === false ? '터미널 분리 꺼짐' : '터미널 분리 상태 확인 불가';
-    target.textContent = `${label}${status?.backend ? ` · ${status.backend}` : ''}. ${status?.reason || ''} ${sessionPolicy ? '새 터미널 설정은 이 실행에만 적용합니다. 재시작 후 다시 활성화해야 하며 기존 분리 세션은 복원 정책에 따라 재연결합니다.' : ''} 기존 실행 셸은 변경하지 않습니다.`;
-  }
-  async function persistence(enable = false) {
-    if (persistenceRequest) return;
-    persistenceRequest = true;
-    try { renderPersistence(await invoke(enable ? 'terminal_persistence_enable' : 'terminal_persistence_status')); }
-    catch { renderPersistence({reason:'현재 빌드에 지원 API가 없거나 상태를 확인하지 못했습니다. PTY 기능 통합과 실제 상태를 확인하세요.'}); }
-    finally { persistenceRequest = false; }
-  }
   const phases = { disabled: '사용 불가', idle: '대기', checking: '공식 피드 확인 중', downloading: '다운로드 중', ready: '준비 완료', preparing: '작업 보호 확인 중', installing: '설치·재시작 중', error: '오류' };
   function render(status) {
     current = status;
@@ -54,7 +38,6 @@
   async function refresh() {
     try { render(await invoke('updater_status')); }
     catch { el('developer-update-message').textContent = '상태를 확인하지 못했습니다. 설정을 다시 열어 확인하세요.'; }
-    if (revealed) await persistence();
   }
   async function action(command, id, args) {
     if (busy || !current || el(id).disabled) return;
@@ -80,7 +63,6 @@
     if (clicks === 5) {
       revealed = true;
       el('settings-developer-nav').hidden = false;
-      persistence(true);
     }
   };
   el('developer-prepare').onclick = () => action('updater_test_prepare', 'developer-prepare');
