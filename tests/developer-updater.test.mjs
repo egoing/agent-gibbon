@@ -29,6 +29,11 @@ test('developer entry requests actual terminal persistence and never shows optim
   assert.match(app.elements.get('developer-terminal-status').textContent,/켜짐/);
   assert.match(app.elements.get('developer-terminal-status').textContent,/기존 실행 셸은 변경하지 않습니다/);
   assert.match(app.elements.get('developer-terminal-status').textContent,/이 실행에만 적용/);
+  app.setAction(async()=>({supported:true,enabled:false,applies_to:'new_sessions',persisted:false,reconnect_persisted:true,reconnect_sessions:1,backend:'windows-owner',reason:'기존 셸 재접속 가능'}));
+  await app.refresh();
+  assert.match(app.elements.get('developer-terminal-status').textContent,/터미널 분리 꺼짐/);
+  assert.match(app.elements.get('developer-terminal-status').textContent,/기존 셸 재접속 가능/);
+  assert.doesNotMatch(app.elements.get('developer-terminal-status').textContent,/켜짐/);
   app.setAction(async()=>({supported:true,enabled:true,applies_to:'new_sessions',persisted:true,backend:'legacy-mode'}));
   await app.refresh();
   assert.doesNotMatch(app.elements.get('developer-terminal-status').textContent,/켜짐/);

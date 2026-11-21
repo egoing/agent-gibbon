@@ -25,13 +25,15 @@
 - 재시작해도 캐시가 없어지거나 새 버전 피드가 보인다는 이유로 자동 복귀하지 않도록 `.developer-update-trial.json`으로 별도 시험 대기를 저장한다. 서명된 최신 쌍 패키지를 현재 실행 버전에서 확인한 후에만 일반 자동 업데이트 정책을 복원한다.
 - 5회 클릭 진입 시 UI가 `terminal_persistence_enable`, 조회 시 `terminal_persistence_status`를 호출한다. `supported/enabled/applies_to=new_sessions`를 확인할 때만 켜짐을 표시한다. `backend/persisted/reason`을 함께 표시하고 기존 셸을 재실행하지 않는다. 상태를 따로 만들어 낙관적으로 켜졌다고 표시하지 않는다.
 - Windows backend와 관리 창 전용 API는 PTY 담당 브랜치가 소유한다. 이 메뉴 브랜치에는 아직 API가 없으며, API 미포함·실패는 분리 미지원/통합 필요로 표시한다. Mac release의 debug-only 경로 활성화를 주장하지 않는다. 실제 ON과 재접속은 PTY PR 통합 이후 별도 검증한다.
+- 신규 생성 opt-in은 현재 GUI 실행에만 적용한다. 재시작 후 `enabled=false`와 기존 셸의 `reconnect_persisted=true`가 함께 반환되어도 새 세션을 ON으로 표시하지 않는 UI 회귀 검사를 통과했다. 기존 셸 재접속 권한과 신규 생성 활성화를 구분하며 backend 상태를 별도로 복제하지 않는다.
+- 다음 통합 패키지 준비부터 임시 작업공간별 고유 `JAJAN_VERIFICATION_INSTANCE`를 두 버전에 동일하게 주입하고 계획 파일에 기록한다. 해당 compile-time override가 포함되지 않은 소스는 준비 전에 중단한다. 이 추가 경로의 실제 빌드·namespace 응답 확인은 PTY 통합 뒤 수행하며, 이전 독립 시험은 당시 고정 검증 ID의 증거로 보존한다.
 
 ## 실제 독립 왕복 시험
 
 - 준비 디렉터리: `C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-Ms4WyJ`.
 - 설치 실행 파일: `...\installed\jajan-roundtrip-5170.exe`. [설치 계획과 패키지 해시](developer-roundtrip-20261121/installation-plan.json)를 남겼다. 로컬 feed는 `127.0.0.1`에만 바인딩했다.
 - 실제 최초 설치 파일 정보·NSIS 등록 버전은 `0.3.13`이었다. 최초 실행 PID 29716, 파일 SHA-256 `3C4D6189F5F777C32729CBB9A87004E8CDBBC5E32A907BACA01E92B7A6CF3153`이다. 선택 진단 전송은 false다.
-- [소스 해시 대조](developer-roundtrip-20261121/source-provenance.json)에서 왕복 설치에 사용한 `updater.rs`와 `main.rs`가 이 작업의 같은 파일과 바이트 단위로 일치함을 확인했다. `developer-updater.js`는 그 뒤 추가한 PTY API 상태 표시에 차이가 있다. 순수 설치 왕복 증거를 이후 PTY 연동의 실행 증거로 재사용하지 않는다. 시험 서명 검증용 [공개 키](developer-roundtrip-20261121/verification-public.key)를 보존했고 개인 키는 저장하지 않았다.
+- [소스 해시 대조](developer-roundtrip-20261121/source-provenance.json)는 독립 설치 시험 시점의 소스를 기록한다. 그 뒤 `updater.rs`에 별도 시험 대기가 기존 자동 캐시·이미 진행 중인 자동 다운로드보다 우선하는 두 경계 검사를 추가했고, `developer-updater.js`에는 PTY API와 실행 한정 수명 표시를 추가했다. 따라서 독립 설치 쌍을 최종 통합 코드의 실행 증거로 재사용하지 않는다. JSON의 `matches_current`로 현재 코드 커밋 668432e와의 차이를 구분했다. 시험 서명 검증용 [공개 키](developer-roundtrip-20261121/verification-public.key)를 보존했고 개인 키는 저장하지 않았다.
 - 지원 Computer Use의 반환 창에서 전용 실행 경로와 네이티브 관리 창 제목으로 선택했다. 실제 설치 앱과 혼용하지 않았다. 5회 클릭 후 ‘이전 테스트 버전으로 교체’를 실행했다.
 - [이전 설치 전](developer-roundtrip-20261121/before-down.json)과 [교체 후](developer-roundtrip-20261121/after-down.json): 실제 실행·파일 버전이 `0.3.13 → 0.3.12`, PID가 `29716 → 21488`로 바뀌었다. 준비 기록은 source `0.3.13`, target `0.3.12`, **8개 창 ACK 모두 true**, pending 0이다. 시험 메모 `roundtrip-proof-5170`의 sentinel 일치·revision 1·크기·가시성이 유지됐다. 최초 좌표는 생성 직후 자동 배치 안정 여부를 확인하지 않은 snapshot으로 `(1346,927)`이며 하향 후 `(3390,1582)`와 다르다. 첫 하향 구간의 좌표 보존은 미검증으로 정정한다. 통합 시험에서 `animating=false`·`layout_pending=false`와 안정된 좌표를 확인하고 다시 비교한다.
 - 이전 버전도 5회 클릭으로 진입할 수 있고 최신 복귀 버튼이 활성이다. [이전 버전 화면](developer-roundtrip-20261121/previous-ready.jpg). `manual_test=true`, `roundtrip_active=true`, 공식 최신 피드 대신 지정 검증 최신 피드에 `0.3.13`이 있는 상태다. 기존 API 미포함 상태의 순수 업데이트 시험이며 터미널 분리 ON 시험과 혼동하지 않는다.

@@ -13,7 +13,12 @@ import { checkVersion, setVersion } from './release-version.mjs';
 if (process.platform !== 'win32') throw Error('Windows NSIS verification only');
 const root = fileURLToPath(new URL('..', import.meta.url));
 if (checkVersion(undefined, root) !== '0.3.12') throw Error('This approved isolated pair requires source version 0.3.12; review a new compatible pair before changing it.');
+if (!(await readFile(join(root,'src-tauri/src/instance.rs'),'utf8')).includes('JAJAN_VERIFICATION_INSTANCE')) {
+  throw Error('Integrate the PTY verification namespace support before preparing the combined trial.');
+}
 const workspace = await mkdtemp(join(tmpdir(), 'jajan-roundtrip-5170-'));
+// Both versions share this trial's namespace; other concurrent verification apps do not.
+const verificationInstance = `dev-${createHash('sha256').update(workspace).digest('hex').slice(0,24)}`;
 const source = join(workspace, 'source');
 await mkdir(source);
 for (const name of ['src-tauri', 'ui', 'scripts', 'docs', 'bundled-skills', '.agents', 'package.json', 'pnpm-lock.yaml']) {
@@ -39,14 +44,15 @@ const configPath = join(workspace, 'verification.json');
 await writeFile(configPath, JSON.stringify(config));
 const target = join(workspace, 'target');
 const env = {...process.env, CARGO_TARGET_DIR:target, CARGO_BUILD_BUILD_DIR:devInstance(root).buildDir,
-  TAURI_UPDATER_PUBLIC_KEY:publicKeyText, JAJAN_VERIFICATION_UPDATE_URL:`${base}latest.json`, JAJAN_VERIFICATION_STANDARD_TIMING:'1'};
+  TAURI_UPDATER_PUBLIC_KEY:publicKeyText, JAJAN_VERIFICATION_UPDATE_URL:`${base}latest.json`, JAJAN_VERIFICATION_STANDARD_TIMING:'1',
+  JAJAN_VERIFICATION_INSTANCE:verificationInstance};
 async function run(args) {
   await new Promise((resolve,reject) => {
     const child=spawn(process.execPath,args,{cwd:source,env,stdio:'inherit'});
     child.on('error',reject); child.on('exit',code=>code===0?resolve():reject(Error(`Build exited ${code}`)));
   });
 }
-const plan = {workspace,source,target,base,identifier:config.identifier,productName:config.productName,
+const plan = {workspace,source,target,base,verificationInstance,identifier:config.identifier,productName:config.productName,
   binaryName:'jajan-roundtrip-5170.exe',installDir:join(workspace,'installed'),previous:'0.3.12',latest:'0.3.13',artifacts:{}};
 await writeFile(join(workspace,'plan.json'),JSON.stringify(plan,null,2));
 console.log(`ROUNDTRIP_WORKSPACE=${workspace}`);
