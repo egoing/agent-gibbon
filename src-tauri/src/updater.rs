@@ -1050,7 +1050,6 @@ pub fn initialize(app: &tauri::AppHandle) {
                 "보관된 업데이트를 검증하지 못했습니다. 다시 다운로드합니다",
             );
         }
-        let mut resumed = status(&app).is_ok_and(|s| s.phase == "ready");
         let mut last = None;
         std::thread::sleep(Duration::from_secs(15));
         loop {
@@ -1059,8 +1058,8 @@ pub fn initialize(app: &tauri::AppHandle) {
                     tauri::async_runtime::block_on(check(app.clone(), false))
                 });
             }
-            let _ = install(&app, !resumed);
-            resumed = false;
+            // Restoring verified bytes does not grant permission to interrupt input.
+            let _ = install(&app, true);
             evaluate_ready(&app, false);
             std::thread::sleep(Duration::from_secs(RETRY_SECONDS));
         }
