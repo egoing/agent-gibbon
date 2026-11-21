@@ -461,6 +461,8 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result
         .collect();
     *app.state::<Captures>().0.lock().map_err(err)? = screens;
     for (label, b) in bounds {
+        #[cfg(target_os = "macos")]
+        let _passive = crate::app_activation::passive_creation();
         let _timing = crate::telemetry::Timing::new("capture.overlay.create");
         crate::focus::remember(app, &label);
         let win = tauri::WebviewWindowBuilder::new(
@@ -649,17 +651,7 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
     trace("window ordered front");
     if let Some(overlay) = focus_target {
         #[cfg(target_os = "macos")]
-        {
-            let ptr = overlay.ns_window().map_err(err)?;
-            // Activation must happen now, not on a subsequent input event.
-            #[allow(deprecated)]
-            objc2_app_kit::NSRunningApplication::currentApplication().activateWithOptions(
-                objc2_app_kit::NSApplicationActivationOptions::ActivateIgnoringOtherApps,
-            );
-            unsafe {
-                (&*(ptr as *const objc2_app_kit::NSWindow)).makeKeyAndOrderFront(None);
-            }
-        }
+        crate::app_activation::focus_content(&overlay)?;
         #[cfg(not(target_os = "macos"))]
         overlay.set_focus().map_err(err)?;
         // A key native window can still route keys to its parent view. Send the
@@ -971,12 +963,21 @@ pub(crate) fn create_text_note(
     Ok(id)
 }
 pub(crate) fn show_text(win: &WebviewWindow) -> Result<(), String> {
-    #[cfg(windows)]
-    crate::show_without_focus(win)?;
-    #[cfg(not(windows))]
-    win.show().map_err(err)?;
-    win.set_focus().map_err(err)
+    #[cfg(target_os = "macos")]
+    {
+        crate::focus::discard_restore(win.app_handle(), win.label());
+        crate::app_activation::focus_content(win)
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        #[cfg(windows)]
+        crate::show_without_focus(win)?;
+        #[cfg(not(windows))]
+        win.show().map_err(err)?;
+        win.set_focus().map_err(err)
+    }
 }
+
 pub(crate) fn create_note(
     app: &tauri::AppHandle,
     bytes: Vec<u8>,

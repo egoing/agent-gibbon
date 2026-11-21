@@ -1,0 +1,680 @@
+{
+  "root": "/Users/egoinglee/.codex/worktrees/quiet-window-startup/agent-gibbon",
+  "base": "a4e62a5a228a57ae670dd790bc10b84514a7d575",
+  "instance": {
+    "root": "/Users/egoinglee/.codex/worktrees/quiet-window-startup/agent-gibbon",
+    "id": "dev-18ff216edb66cc11722efd33",
+    "name": "detached@a4e62a5",
+    "buildDir": "/Users/egoinglee/dev/project/agent-gibbon/.git/jajan/build-cache",
+    "target": "/Users/egoinglee/.codex/worktrees/quiet-window-startup/agent-gibbon/src-tauri/target",
+    "binary": "/Users/egoinglee/.codex/worktrees/quiet-window-startup/agent-gibbon/src-tauri/target/debug/jajan"
+  },
+  "binary_sha256": "52f806cf328a7fb7d10f4fe8eadcf6b1bc1f143fd469a61f7bb71903a2846412",
+  "environment": {
+    "macOS": "15.6.1",
+    "arch": "arm64",
+    "node": "26.0.0",
+    "pnpm": "11.25.0",
+    "rustc": "1.91.1"
+  },
+  "cold_cli": {
+    "memo": {
+      "pid": 92119,
+      "id": "first-ever-memo",
+      "instance": "dev-18ff216edb66cc11722efd33",
+      "native": {
+        "frontmost": 44966,
+        "windows": [
+          {
+            "main": false,
+            "minimized": false,
+            "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — first-ever-memo"
+          }
+        ],
+        "onscreen_titles": [
+          "Item-0",
+          "Jajan [DEV detached@a4e62a5 · 18ff216e] — first-ever-memo"
+        ]
+      }
+    },
+    "terminal": {
+      "pid": 88829,
+      "id": "terminal-1795230508837623000",
+      "instance": "dev-18ff216edb66cc11722efd33",
+      "native": {
+        "frontmost": 44966,
+        "windows": [
+          {
+            "main": false,
+            "minimized": false,
+            "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230508837623000"
+          }
+        ],
+        "onscreen_titles": [
+          "Item-0",
+          "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230508837623000"
+        ]
+      }
+    },
+    "web": {
+      "pid": 89112,
+      "id": "web-cold",
+      "instance": "dev-18ff216edb66cc11722efd33",
+      "native": {
+        "frontmost": 44966,
+        "windows": [
+          {
+            "main": false,
+            "minimized": false,
+            "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — 웹 — web-cold"
+          }
+        ],
+        "onscreen_titles": [
+          "Item-0",
+          "Jajan [DEV detached@a4e62a5 · 18ff216e] — 웹 — web-cold"
+        ]
+      }
+    }
+  },
+  "selection": {
+    "pid": 92164,
+    "restore": {
+      "frontmost": 44966,
+      "windows": [
+        {
+          "main": true,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note"
+        }
+      ],
+      "onscreen_titles": [
+        "Item-0",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note"
+      ]
+    },
+    "activation": {
+      "frontmost": 92164,
+      "windows": [
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note"
+        },
+        {
+          "main": true,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+        }
+      ],
+      "onscreen_titles": [
+        "Item-0",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+      ]
+    },
+    "cmd_tab": {
+      "frontmost": 92164,
+      "windows": [
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note"
+        },
+        {
+          "main": true,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+        }
+      ],
+      "onscreen_titles": [
+        "Item-0",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+      ]
+    },
+    "dock_reopen": {
+      "frontmost": 92164,
+      "windows": [
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note"
+        },
+        {
+          "main": true,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+        }
+      ],
+      "onscreen_titles": [
+        "Item-0",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+      ]
+    }
+  },
+  "direct_launch": {
+    "pid": 90969,
+    "native": {
+      "frontmost": 90969,
+      "windows": [
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note"
+        },
+        {
+          "main": true,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+        }
+      ],
+      "onscreen_titles": [
+        "Item-0",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+      ]
+    }
+  },
+  "terms": {
+    "pid": 91045,
+    "privacy": {
+      "notice_ready": true,
+      "onboarding_required": true,
+      "sharing_allowed": false,
+      "terms_accepted": false,
+      "terms_skipped": false
+    },
+    "blocked": {
+      "error": "Review the Terms of Use in the manager; sharing is optional",
+      "instance": "dev-18ff216edb66cc11722efd33",
+      "ok": false,
+      "onboarding_required": true
+    },
+    "native": {
+      "frontmost": 91045,
+      "windows": [
+        {
+          "main": true,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+        }
+      ],
+      "onscreen_titles": [
+        "Item-0",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+      ]
+    }
+  },
+  "tray": {
+    "pid": 92264,
+    "instance": "dev-18ff216edb66cc11722efd33",
+    "cases": [
+      {
+        "mode": "text",
+        "note_id": "text-1795230647808821000",
+        "instance": "dev-18ff216edb66cc11722efd33",
+        "overlay": {
+          "frontmost": 92264,
+          "windows": [
+            {
+              "main": true,
+              "minimized": false,
+              "title": "빈 메모 영역 선택 — Escape로 취소"
+            }
+          ],
+          "onscreen_titles": [
+            "Item-0",
+            "빈 메모 영역 선택 — Escape로 취소"
+          ]
+        },
+        "after": {
+          "frontmost": 92264,
+          "windows": [
+            {
+              "main": true,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230647808821000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000"
+            }
+          ],
+          "onscreen_titles": [
+            "Item-0",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230647808821000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000"
+          ]
+        }
+      },
+      {
+        "mode": "terminal",
+        "note_id": "terminal-1795230653159825000",
+        "instance": "dev-18ff216edb66cc11722efd33",
+        "overlay": {
+          "frontmost": 92264,
+          "windows": [
+            {
+              "main": true,
+              "minimized": false,
+              "title": "터미널 영역 선택 — Escape로 취소"
+            }
+          ],
+          "onscreen_titles": [
+            "Item-0",
+            "터미널 영역 선택 — Escape로 취소"
+          ]
+        },
+        "after": {
+          "frontmost": 92264,
+          "windows": [
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230653159825000"
+            },
+            {
+              "main": true,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000"
+            },
+            {
+              "main": false,
+              "minimized": false,
+              "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230647808821000"
+            }
+          ],
+          "onscreen_titles": [
+            "Item-0",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230653159825000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000",
+            "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230647808821000"
+          ]
+        }
+      }
+    ],
+    "manual_manager": {
+      "frontmost": 92264,
+      "windows": [
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230653159825000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000"
+        },
+        {
+          "main": false,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230647808821000"
+        },
+        {
+          "main": true,
+          "minimized": false,
+          "title": "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+        }
+      ],
+      "onscreen_titles": [
+        "Item-0",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230653159825000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230534546459000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230430278556000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230529207433000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795229734396352000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795229736626084000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — cold-note",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — terminal-1795230435612461000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230380125282000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — text-1795230647808821000",
+        "Jajan [DEV detached@a4e62a5 · 18ff216e] — 메모 관리"
+      ]
+    }
+  },
+  "automated": {
+    "rust": {
+      "passed": 328,
+      "ignored": 1,
+      "failed": 0
+    },
+    "node": {
+      "passed": 252,
+      "failed": 0
+    },
+    "clippy": "passed",
+    "dev_build": "passed"
+  }
+}
