@@ -4,9 +4,27 @@ use std::sync::OnceLock;
 static APP: OnceLock<tauri::AppHandle> = OnceLock::new();
 
 extern "C" {
+    fn jajan_activation_begin_creation();
+    fn jajan_activation_end_creation();
     fn jajan_activation_install(callback: extern "C" fn());
     fn jajan_activation_preserve_focus();
+    fn jajan_activation_focus_content(window: *mut std::ffi::c_void);
     fn jajan_activation_focus_manager(window: *mut std::ffi::c_void);
+}
+
+// Interception is installed once; suppression is scoped to passive construction.
+// Drop also releases the guard on every error path; nesting supports startup.
+pub struct PassiveCreation;
+pub fn passive_creation() -> PassiveCreation {
+    // SAFETY: all callers build native windows on the AppKit main thread.
+    unsafe { jajan_activation_begin_creation() };
+    PassiveCreation
+}
+impl Drop for PassiveCreation {
+    fn drop(&mut self) {
+        // SAFETY: guards never leave the main thread or outlive their scope.
+        unsafe { jajan_activation_end_creation() };
+    }
 }
 
 pub fn install(app: &tauri::AppHandle) {
@@ -20,6 +38,13 @@ pub fn install(app: &tauri::AppHandle) {
 pub fn preserve_focus() {
     // SAFETY: focus transactions and native window operations run on main.
     unsafe { jajan_activation_preserve_focus() };
+}
+
+pub fn focus_content(window: &tauri::WebviewWindow) -> Result<(), String> {
+    let pointer = window.ns_window().map_err(|e| e.to_string())?;
+    // SAFETY: Tauri owns the live window; callers focus content on main only.
+    unsafe { jajan_activation_focus_content(pointer) };
+    Ok(())
 }
 
 pub fn focus_manager(window: &tauri::WebviewWindow) -> Result<(), String> {

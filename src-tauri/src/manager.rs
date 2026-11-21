@@ -34,6 +34,8 @@ pub fn open(app: &tauri::AppHandle) -> Result<(), String> {
 }
 
 fn focus(window: &tauri::WebviewWindow) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    crate::focus::discard_all(window.app_handle());
     window.set_focus().map_err(|e| e.to_string())?;
     #[cfg(target_os = "macos")]
     crate::app_activation::focus_manager(window)?;

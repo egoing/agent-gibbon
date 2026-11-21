@@ -46,6 +46,10 @@ pub fn remember(app: &tauri::AppHandle, label: &str) {
 pub fn discard_restore(app: &tauri::AppHandle, label: &str) {
     app.state::<Targets>().0.lock().unwrap().remove(label);
 }
+#[cfg(target_os = "macos")]
+pub fn discard_all(app: &tauri::AppHandle) {
+    app.state::<Targets>().0.lock().unwrap().clear();
+}
 #[cfg(any(target_os = "macos", windows))]
 pub fn restore(window: &tauri::WebviewWindow) {
     #[cfg(target_os = "macos")]

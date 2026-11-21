@@ -290,6 +290,8 @@ pub(crate) fn open_presented(
     id: &str,
     present: bool,
 ) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    let _passive = crate::app_activation::passive_creation();
     let _root = crate::telemetry::Timing::new("terminal.window.open");
     let mut agent = app.state::<Terminals>().records.get(id)?;
     crate::focus::remember(app, id);
@@ -387,8 +389,10 @@ pub(crate) fn show(win: &tauri::WebviewWindow) -> Result<(), String> {
             .orderFrontRegardless();
     }
     #[cfg(not(target_os = "macos"))]
-    crate::stash::release(win)?;
-    win.show().map_err(err)?;
+    {
+        crate::stash::release(win)?;
+        win.show().map_err(err)?;
+    }
     #[cfg(any(target_os = "macos", windows))]
     crate::focus::restore(win);
     Ok(())

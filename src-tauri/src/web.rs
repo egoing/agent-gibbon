@@ -515,6 +515,8 @@ pub(crate) fn create_presented(
     let w = if let Some(previous) = &previous {
         previous.clone()
     } else {
+        #[cfg(target_os = "macos")]
+        let _passive = crate::app_activation::passive_creation();
         crate::focus::remember(app, &label);
         let window =
             tauri::WebviewWindowBuilder::new(app, &label, WebviewUrl::App("web.html".into()))

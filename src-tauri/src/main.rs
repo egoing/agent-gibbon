@@ -78,6 +78,8 @@ fn create_window(
     id: &str,
     region: bool,
 ) -> Result<tauri::WebviewWindow, String> {
+    #[cfg(target_os = "macos")]
+    let _passive = app_activation::passive_creation();
     let _timing = telemetry::Timing::new("window.create");
     telemetry::checkpoint("window.create");
     let mut config = memo_window_config(app).clone();
@@ -574,6 +576,8 @@ fn apply_with_presentation(
 fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     // CLI starts with --serve too: restored visible windows still need the
     // foreground target captured before Tao/Wry can activate this process.
+    #[cfg(target_os = "macos")]
+    let mut launch_creation = Some(app_activation::passive_creation());
     let initial_focus = focus::Targets::initial();
     let builder = tauri::Builder::default();
     #[cfg(target_os = "macos")]
@@ -917,6 +921,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     }
                 }
             };
+            // Explicit macOS app launch opens management even when windows were restored.
+            #[cfg(target_os = "macos")]
+            let _ = restored_session;
             session_restore::start(app.handle(), session_enabled);
             updater::initialize(app.handle());
             relation_prototype::install(app.handle());
@@ -928,6 +935,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             sizing::install_contact_monitor(app.handle());
             #[cfg(windows)]
             windows_contact::install(app.handle());
+            #[cfg(not(target_os = "macos"))]
             if initial_open && !autostart::login_launch() && !restored_update && !restored_session {
                 apply_direct(
                     app.handle(),
@@ -946,6 +954,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 )?;
             }
             telemetry::install(app.handle());
+            #[cfg(not(target_os = "macos"))]
             if privacy::onboarding_required(app.handle()) && !autostart::login_launch() {
                 manager::open(app.handle())?;
             }
@@ -995,15 +1004,25 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         })
         .build(tauri::generate_context!())
         .map_err(|e| e.to_string())?;
-    app.run(|_app, _event| {
+    app.run(move |_app, _event| {
         // Complete the launch transaction after Tao activation and Tauri setup.
         #[cfg(any(target_os = "macos", windows))]
         if matches!(_event, tauri::RunEvent::Ready) {
+            #[cfg(target_os = "macos")]
+            drop(launch_creation.take());
             if let Some(main) = _app.get_webview_window("main") {
                 focus::restore(&main);
             }
             #[cfg(target_os = "macos")]
             app_activation::install(_app);
+            #[cfg(target_os = "macos")]
+            if !autostart::login_launch() && (initial_open || privacy::onboarding_required(_app)) {
+                // Explicit app launch/required onboarding focus only after Tao
+                // has finished launch, outside the passive startup transaction.
+                if let Err(error) = manager::open(_app) {
+                    eprintln!("시작 관리 창을 열지 못했습니다: {error}");
+                }
+            }
         }
         if matches!(_event, tauri::RunEvent::ExitRequested { .. }) {
             session_restore::checkpoint(_app);
@@ -1027,42 +1046,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
 #[cfg(target_os = "macos")]
 fn reopen_from_icon(app: &tauri::AppHandle) -> Result<(), String> {
     let _update_activity = updater::activity(app)?;
-    let mut visible = false;
-    // Only note windows count; capture overlays must not prevent reopening.
-    let ids: Vec<_> = app
-        .state::<AppNotes>()
-        .lock()
-        .map_err(|e| e.to_string())?
-        .keys()
-        .cloned()
-        .collect();
-    for id in ids {
-        let Some(win) = app.get_webview_window(&label(&id)) else {
-            continue;
-        };
-        if win.is_visible().map_err(|e| e.to_string())? {
-            show_without_focus(&win)?;
-            visible = true;
-        }
-    }
-    if !visible {
-        apply_direct(
-            app,
-            Request {
-                url: None,
-                action: Action::Open,
-                id: None,
-                color: None,
-                title: None,
-                markdown: None,
-                change_mode: None,
-                highlight: None,
-                source_path: None,
-                status: None,
-            },
-        )?;
-    }
-    Ok(())
+    // Dock/application Reopen is an explicit selection, independent of passive creation.
+    manager::open(app)
 }
 
 fn parse(args: &[String]) -> Result<Request, String> {
@@ -1161,6 +1146,7 @@ fn launch_cli_server() -> Result<(), String> {
             let result = Command::new("/usr/bin/open")
                 .arg("-g")
                 .arg(bundle)
+                .args(["--args", "--serve"])
                 .output()
                 .map_err(|e| e.to_string())?;
             return if result.status.success() {
