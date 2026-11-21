@@ -14,33 +14,17 @@ struct ChildState {
     child: Option<ChildBox>,
     status: Option<ExitStatus>,
     jobs: OwnedJobs,
-    #[cfg(windows)]
-    remote: Option<super::windows_owner::Link>,
 }
 
 #[derive(Clone)]
 pub(super) struct OwnedChild(Arc<Mutex<ChildState>>);
 
 impl OwnedChild {
-    #[cfg(windows)]
-    pub(super) fn survives_update(&self) -> bool {
-        let state = self.0.lock().unwrap();
-        let remote = state.remote.clone();
-        let running = state.status.is_none();
-        drop(state);
-        running && remote.is_some_and(|r| r.survives_update())
-    }
     pub(super) fn new(child: ChildBox) -> Self {
-        #[cfg(windows)]
-        let remote = (&*child as &dyn Child)
-            .downcast_ref::<super::windows_owner::RemoteChild>()
-            .map(super::windows_owner::RemoteChild::control);
         Self(Arc::new(Mutex::new(ChildState {
             child: Some(child),
             status: None,
             jobs: OwnedJobs::default(),
-            #[cfg(windows)]
-            remote,
         })))
     }
 
@@ -88,29 +72,11 @@ impl OwnedChild {
         let mut state = self.0.lock().unwrap();
         let child = state.child.take();
         let jobs = std::mem::take(&mut state.jobs);
-        #[cfg(windows)]
-        let remote = state.remote.take();
         drop(state);
-        #[cfg(windows)]
-        if let Some(remote) = remote {
-            remote.stop();
-        }
         jobs.stop();
         if let Some(child) = child {
             terminate_and_reap(child);
         }
-    }
-
-    #[cfg(windows)]
-    fn detach_remote(&self) -> bool {
-        let mut state = self.0.lock().unwrap();
-        let Some(remote) = state.remote.take() else {
-            return false;
-        };
-        remote.detach();
-        state.child.take();
-        state.status = Some(ExitStatus::with_exit_code(0));
-        true
     }
 }
 
@@ -164,11 +130,6 @@ fn terminate_and_reap(mut child: ChildBox) {
 
 impl Drop for ChildState {
     fn drop(&mut self) {
-        #[cfg(windows)]
-        if let Some(remote) = self.remote.take() {
-            thread::spawn(move || remote.stop());
-            return;
-        }
         // Spawn/attach failures before publication have no supervisor yet.
         if let Some(child) = self.child.take() {
             let jobs = std::mem::take(&mut self.jobs);
@@ -227,10 +188,6 @@ pub(super) fn supervise(
                 if let Ok(Event::Quit { saved, until }) = event {
                     let _ = saved
                         .recv_timeout(until.saturating_duration_since(std::time::Instant::now()));
-                    #[cfg(windows)]
-                    if child.detach_remote() {
-                        return;
-                    }
                 }
                 child.terminate();
                 return;
@@ -344,10 +301,6 @@ pub(super) struct Workers {
 pub(super) struct Worker(Arc<Workers>);
 
 impl Workers {
-    #[cfg(windows)]
-    pub(super) fn count(&self) -> usize {
-        *self.count.lock().unwrap()
-    }
     pub(super) fn enter(self: &Arc<Self>) -> Worker {
         *self.count.lock().unwrap() += 1;
         Worker(self.clone())

@@ -22,11 +22,8 @@ use jobs::OwnedJobs;
 mod lifecycle;
 #[cfg(all(test, unix))]
 mod lifecycle_tests;
-#[cfg(windows)]
-pub(crate) mod windows_owner;
 use lifecycle::{Control, Event, OwnedChild, PtyReader, Worker, Workers};
 mod persistence;
-pub(crate) mod persistence_mode;
 use persistence::EditSource;
 pub mod welcome;
 pub use welcome::{create as create_terminal, request_close};
@@ -277,8 +274,6 @@ fn read_records(root: &Path) -> Result<Vec<Terminal>, String> {
     Ok(records)
 }
 pub fn restore(app: &tauri::AppHandle) -> Result<(), String> {
-    #[cfg(windows)]
-    persistence_mode::initialize(&root(app));
     let restored = read_records(&root(app))?;
     app.state::<Terminals>().records.restore(restored)
 }
@@ -438,12 +433,8 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
     } else {
         (None, None, None, false, false)
     };
-    #[cfg(windows)]
-    let detached_session = windows_owner::available(id);
-    #[cfg(not(windows))]
-    let detached_session = false;
     Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"detached_session":detached_session,"bounds":bounds,"metadata_save_failed":app.state::<Terminals>().records.save_failed(id),"pid":pid,"program":program,"running":running,"ready":ready,"exit_code":exit_status.as_ref().map(|s|s.exit_code()),"exit_signal":exit_status.as_ref().and_then(|s|s.signal()),"restored":crate::session_restore::terminal_restored(app,id),"focused":win.as_ref().and_then(|w|w.is_focused().ok()),"auto_layout_excluded":win.as_ref().map(crate::layout::excluded),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
+        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":bounds,"metadata_save_failed":app.state::<Terminals>().records.save_failed(id),"pid":pid,"program":program,"running":running,"ready":ready,"exit_code":exit_status.as_ref().map(|s|s.exit_code()),"exit_signal":exit_status.as_ref().and_then(|s|s.signal()),"restored":crate::session_restore::terminal_restored(app,id),"focused":win.as_ref().and_then(|w|w.is_focused().ok()),"auto_layout_excluded":win.as_ref().map(crate::layout::excluded),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
     )
 }
 pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value, String> {
@@ -568,9 +559,7 @@ pub async fn terminal_start(
                     .or(choice.as_deref())
                     .filter(|s| *s != "shell")
             };
-            if choice.as_deref() != Some("reattach") {
-                welcome::start_metadata(&app, &id, token, initial)?;
-            }
+            welcome::start_metadata(&app, &id, token, initial)?;
             let watched_session = Arc::downgrade(&reservation.finish(session)?);
             crate::session_restore::terminal_started(&app, &id);
             let watched_app = app.clone();
@@ -596,9 +585,7 @@ pub async fn terminal_start(
                     if directory_report.take_prompt(&s.prompt.token) {
                         s.prompt.report();
                     }
-                    let plan = directory_report
-                        .take_plan(&s.prompt.token)
-                        .filter(|_| !s.prompt.preserve_plan);
+                    let plan = directory_report.take_plan(&s.prompt.token);
                     s.observed_command |= plan.is_some();
                     drop(s);
                     if plan.is_some() || !paths.is_empty() {
@@ -713,30 +700,11 @@ pub fn update_blocked(app: &tauri::AppHandle) -> Result<bool, String> {
 impl Terminals {
     fn update_blocked(&self) -> Result<bool, String> {
         let sessions = self.sessions.lock().map_err(err)?;
-        #[cfg(windows)]
-        if self.detached_ready_for_update(&sessions)? {
-            return Ok(false);
-        }
         // A removed slot can still have a draining pump or a child reaper.
         // reserve and window changes take the registry lock first as well.
         Ok(!sessions.is_empty()
             || !self.closing.lock().map_err(err)?.is_empty()
             || self.workers.active())
-    }
-
-    #[cfg(windows)]
-    fn detached_ready_for_update(&self, sessions: &BTreeMap<String, Slot>) -> Result<bool, String> {
-        Ok(!sessions.is_empty()
-            && self.closing.lock().map_err(err)?.is_empty()
-            && !self.close_saves.active()
-            // Exactly the reader and supervisor of each retained session.
-            // A removed/starting session's cleanup must still finish first.
-            && self.workers.count() == sessions.len().saturating_mul(2)
-            && self.records.checkpoint_ready(&sessions.keys().cloned().collect::<Vec<_>>())
-            && sessions.values().all(|slot| match slot {
-                Slot::Running { session, .. } => session.try_lock().is_ok_and(|s|s.child.survives_update()),
-                _ => false,
-            }))
     }
 
     fn mark_exited(
@@ -765,46 +733,6 @@ impl Terminals {
         drop(old);
         true
     }
-}
-
-pub(crate) fn survives_update(app: &tauri::AppHandle, id: &str) -> bool {
-    #[cfg(windows)]
-    {
-        let state = app.state::<Terminals>();
-        state
-            .sessions
-            .lock()
-            .ok()
-            .and_then(|slots| slots.get(id).and_then(running))
-            .is_some_and(|s| s.try_lock().is_ok_and(|s| s.child.survives_update()))
-    }
-    #[cfg(not(windows))]
-    {
-        let _ = (app, id);
-        false
-    }
-}
-
-pub(crate) fn checkpoint_for_update(app: &tauri::AppHandle) -> Result<(), String> {
-    #[cfg(windows)]
-    {
-        let state = app.state::<Terminals>();
-        if state.update_blocked()? {
-            return Err("터미널 분리 세션의 저장·정리·재접속 준비를 먼저 완료하세요".into());
-        }
-        let ids = state
-            .sessions
-            .lock()
-            .map_err(err)?
-            .keys()
-            .cloned()
-            .collect::<Vec<_>>();
-        if !ids.is_empty() {
-            state.records.checkpoint(&root(app), &ids)?;
-        }
-    }
-    let _ = app;
-    Ok(())
 }
 
 const QUIT_BUDGET: Duration = Duration::from_millis(750);
@@ -904,6 +832,22 @@ pub fn shutdown(app: &tauri::AppHandle) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn updates_wait_for_starting_sessions_and_draining_workers() {
+        let state = Terminals::default();
+        assert!(!state.update_blocked().unwrap());
+        let pending = Start::reserve(&state, "terminal-909").unwrap();
+        assert!(state.update_blocked().unwrap());
+        drop(pending);
+        assert!(!state.update_blocked().unwrap());
+        let draining = state.workers.enter();
+        assert!(state.update_blocked().unwrap());
+        drop(draining);
+        state.closing.lock().unwrap().insert("terminal-909".into());
+        assert!(state.update_blocked().unwrap());
+        state.closing.lock().unwrap().clear();
+        assert!(!state.update_blocked().unwrap());
+    }
     #[test]
     fn legacy_logical_and_windows_physical_origins_survive_restore() {
         let legacy = json!({"id":"terminal-123","bounds":{"x":-1600.,"y":240.,"width":720.,"height":460.},"kind":"terminal"});

@@ -1,3 +1,5 @@
+> 보존된 과거 실험 기록입니다. 분리 기능은 [장기 과제 #279](https://github.com/egoing/agent-gibbon/issues/279)로 유예하고 이 작업 브랜치에서 실행 경로를 제거했습니다. 본문의 지원·검증 설명은 실험 당시 범위이며 현재 기능 활성화를 뜻하지 않습니다. [선별 제거 보고서](pty-separation-deferred-20261122.md)를 참고하세요.
+
 # Windows 분리형 ConPTY: 정식 프로필·일시 활성화 검증
 
 작업 root는 `C:\Users\egoin\.codex\worktrees\04fb\agent-gibbon`, 브랜치는 `codex/windows-pty-manager`, base는 `974197adbc34f2f72872eb4e6262e270db90ef2d`다. `AGENTS.md`와 복사된 `AGENTS.override.md`의 로컬 개발 완료 정책을 적용했다. 기본 버전 0.3.12는 변경하지 않았다.

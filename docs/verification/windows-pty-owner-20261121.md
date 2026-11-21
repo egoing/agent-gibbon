@@ -1,3 +1,5 @@
+> 보존된 과거 실험 기록입니다. 분리 기능은 [장기 과제 #279](https://github.com/egoing/agent-gibbon/issues/279)로 유예하고 이 작업 브랜치에서 실행 경로를 제거했습니다. 본문의 지원·검증 설명은 실험 당시 범위이며 현재 기능 활성화를 뜻하지 않습니다. [선별 제거 보고서](pty-separation-deferred-20261122.md)를 참고하세요.
+
 > 역사적 debug 실험 기록입니다. 현재 활성화 수명과 정식 빌드 지원은 [release 검증](windows-pty-owner-release-20261121.md)을 따릅니다.
 
 # Windows ConPTY 분리 소유자 개발 실험

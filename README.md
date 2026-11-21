@@ -12,7 +12,7 @@ macOS에서는 앱 아이콘·Dock·⌘Tab으로 앱을 명시적으로 선택�
 
 ## Windows 터미널 개발 실험
 
-Windows 분리형 ConPTY는 기본 OFF이며 관리 창의 개발자 모드 API로 이번 앱 실행의 새 터미널에만 활성화합니다. 정식 Windows 빌드도 지원하며 기존 셸의 인증된 재접속은 신규 생성 선택과 별도로 유지합니다. 미접속 유예는 기본 300초, 출력 보관은 최신 64KiB입니다. [지원 경계·API·정식 프로필 검증](docs/verification/windows-pty-owner-release-20261121.md)을 확인하세요.
+Windows/macOS의 별도 owner 기반 셸·PTY 프로세스 분리는 [장기 과제 #279](https://github.com/egoing/agent-gibbon/issues/279)로 유예했다. 현재 실행 경로는 앱이 소유한 PTY에서 셸을 직접 시작하며, 과거 분리 opt-in 환경변수·관리 API·자동 재접속은 사용하지 않는다. 업데이트 시험 기능은 별도 작업으로 유지한다. [선별 제거와 검증 범위](docs/verification/pty-separation-deferred-20261122.md)를 확인하세요.
 
 ## 디자인 기준
 

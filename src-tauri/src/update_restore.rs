@@ -115,12 +115,7 @@ pub fn check(app: &AppHandle) -> Result<(), String> {
         return Err("이전 업데이트의 창 복원을 먼저 완료해야 합니다".into());
     }
     let windows = crate::web::managed_windows(app);
-    check_live_window_kinds(
-        windows
-            .keys()
-            .map(String::as_str)
-            .filter(|label| !crate::terminal::survives_update(app, label)),
-    )?;
+    check_live_window_kinds(windows.keys().map(String::as_str))?;
     if crate::stash::active(app) || crate::stash::chord_busy(app) {
         return Err("메모 숨김·복원 동작이 끝난 뒤 다시 설치하세요.".into());
     }
@@ -148,7 +143,6 @@ pub fn check(app: &AppHandle) -> Result<(), String> {
 /// be restored without opening/focusing them.
 pub fn save(app: &AppHandle) -> Result<(), String> {
     check(app)?;
-    crate::terminal::checkpoint_for_update(app)?;
     let windows = crate::web::managed_windows(app);
 
     let mut snapshot_windows = Vec::new();
