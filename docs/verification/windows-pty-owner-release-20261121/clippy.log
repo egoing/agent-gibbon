@@ -1,0 +1,6 @@
+
+> jajan@0.3.12 check
+> node scripts/build.mjs cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+
+    Checking jajan v0.3.12 (C:\Users\egoin\.codex\worktrees\04fb\agent-gibbon\src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12.08s

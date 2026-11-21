@@ -1,0 +1,16 @@
+{
+  "check_seconds": 60,
+  "enabled": true,
+  "idle_threshold_seconds": 30.0,
+  "last_check_failure": "manifest",
+  "last_window_reports": null,
+  "retry_seconds": 5,
+  "status": {
+    "current_version": "0.3.12",
+    "downloaded": 7806797,
+    "message": "업데이트를 다운로드하고 있습니다",
+    "phase": "downloading",
+    "total": 7806797,
+    "version": "0.3.13"
+  }
+}

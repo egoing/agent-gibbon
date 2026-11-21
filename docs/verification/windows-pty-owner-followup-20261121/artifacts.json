@@ -1,0 +1,17 @@
+[
+  {
+    "path": ".tmp\\pty-update\\feed\\v0.3.13\\Jajan_0.3.13_x64-setup.exe",
+    "bytes": 7806797,
+    "sha256": "7dcfb6381343060045788cda29308689b4c736801066a641f9983c29e75d70dc"
+  },
+  {
+    "path": ".tmp\\pty-update\\feed\\v0.3.15\\Jajan_0.3.15_x64-setup.exe",
+    "bytes": 7811032,
+    "sha256": "e3ce659e0ded7580263582114eb8f3cf378ac721b8f22857228dfc4c601b1053"
+  },
+  {
+    "path": ".tmp\\pty-update\\verify-config.json",
+    "bytes": 803,
+    "sha256": "3aaec48c345534c43ef23c2e4831d5dc9f0b0059df9a2a774723bad5030cf3df"
+  }
+]

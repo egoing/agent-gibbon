@@ -1,0 +1,11 @@
+   Compiling jajan v0.3.12 (C:\Users\egoin\.codex\worktrees\04fb\agent-gibbon\src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 18.90s
+     Running tests\windows_pty_owner.rs (C:\Users\egoin\dev\project\agent-gibbon\.git\jajan\build-cache\debug\deps\windows_pty_owner-9921456f4b81996d.exe)
+
+running 2 tests
+test seed_isolated_gui_session ... ignored, explicit isolated GUI fixture; holds owner until stop marker or 900 seconds
+PASS owner=4372 shell=26940 descendant=10164: detach, 1.9MiB disconnected output, same variable/PID, resize, duplicate owner/client, unauthorized token, forced client death, owned job cleanup
+PASS attach-only never creates a shell; detached lease expiry cleans owner and shell
+test real_conpty_survives_detach_client_death_flood_and_stops_owned_job ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 9.51s
