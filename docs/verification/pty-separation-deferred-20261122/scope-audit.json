@@ -1,0 +1,8 @@
+{
+  "base": "859c9d9cdedc89ac9d2a7dd1b0ac6591dcc6acb7",
+  "normal_shell_matches_pre_poc": true,
+  "normal_lifecycle_matches_pre_windows_owner": true,
+  "verification_instance_preserved": true,
+  "metadata_sync_preserved": true,
+  "legacy_snapshot_window_restore_preserved": true
+}

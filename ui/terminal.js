@@ -237,7 +237,6 @@ async function initializeTerminal() {
     }
     queueExecution(info.pending_execution);
     if(pendingExecution)return;
-    if(info.detached_session){ await start('reattach', null); return; }
     await welcome();
     // The original two-command CLI can queue execution while Welcome loads.
     if(pendingExecution)return;
