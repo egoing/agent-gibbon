@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="660" viewBox="0 0 1000 660">
-<style>text{font-family:Arial,'Apple SD Gothic Neo',sans-serif;fill:#2d2d2d}</style>
+<style>text{font-family:'Malgun Gothic',Arial,'Apple SD Gothic Neo',sans-serif;fill:#2d2d2d}</style>
 <rect width="1000" height="660" fill="#f8f8f8" stroke="#858585"/>
 <text x="28" y="40" font-size="23" font-weight="600">03 설정 · 스킬</text>
 <text x="28" y="68" font-size="14">현재 구현 구조 · 스위치 상태는 설명용 · 실제 앱 캡처와 구분</text>
@@ -17,6 +17,7 @@
 <text x="52" y="318" font-size="16">자동 업데이트</text>
 <text x="52" y="362" font-size="16">로그인 자동 실행</text>
 <text x="52" y="406" font-size="16">Privacy &amp; Diagnostics</text>
+<text x="52" y="554" font-size="12">v0.3.12</text>
 <text x="276" y="191" font-size="21" font-weight="600">스킬</text>
 <rect x="276" y="215" width="656" height="144" fill="#f8f8f8" stroke="#d6d6d6"/>
 <path d="M276 267H932" stroke="#d6d6d6"/>

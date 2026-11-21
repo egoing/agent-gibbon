@@ -1,0 +1,31 @@
+{
+  "privacy": {
+    "notice_ready": true,
+    "onboarding_required": false,
+    "sharing_allowed": false,
+    "terms_accepted": true,
+    "terms_skipped": false
+  },
+  "instance": "dev-001020010200102001020010",
+  "updater": {
+    "check_seconds": 900,
+    "enabled": true,
+    "idle_threshold_seconds": 300.0,
+    "last_check_failure": null,
+    "last_window_reports": null,
+    "retry_seconds": 15,
+    "status": {
+      "cache_ready": false,
+      "current_version": "0.3.12",
+      "downloaded": 0,
+      "failure_stage": null,
+      "manual_test": false,
+      "message": "업데이트를 자동으로 확인합니다",
+      "phase": "idle",
+      "signature_verified": false,
+      "total": null,
+      "version": null
+    }
+  },
+  "diagnostics_enabled": false
+}

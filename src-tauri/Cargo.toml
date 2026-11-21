@@ -30,6 +30,7 @@ tauri-plugin-updater = "2"
 
 [features]
 verification-updater = []
+verification-roundtrip = ["verification-updater"]
 custom-protocol = ["tauri/custom-protocol"]
 
 [target.'cfg(target_os = "macos")'.dependencies]

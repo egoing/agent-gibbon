@@ -630,6 +630,9 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     updater::updater_status,
                     updater::updater_check,
                     updater::updater_install,
+                    updater::updater_test_prepare,
+                    updater::updater_test_install,
+                    updater::updater_test_roundtrip,
                     updater::updater_notice_status,
                     updater::updater_notice_ready,
                     updater::updater_notice_install,
@@ -954,6 +957,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 )?;
             }
             telemetry::install(app.handle());
+            #[cfg(feature = "verification-roundtrip")]
+            manager::open(app.handle())?;
             #[cfg(not(target_os = "macos"))]
             if privacy::onboarding_required(app.handle()) && !autostart::login_launch() {
                 manager::open(app.handle())?;

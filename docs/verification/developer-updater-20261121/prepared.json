@@ -1,0 +1,32 @@
+{
+  "privacy": {
+    "notice_ready": true,
+    "onboarding_required": false,
+    "sharing_allowed": false,
+    "terms_accepted": true,
+    "terms_skipped": false
+  },
+  "updater": {
+    "check_seconds": 900,
+    "enabled": true,
+    "idle_threshold_seconds": 300.0,
+    "last_check_failure": null,
+    "last_window_reports": null,
+    "retry_seconds": 15,
+    "status": {
+      "cache_ready": true,
+      "current_version": "0.3.12",
+      "downloaded": 6110871,
+      "failure_stage": null,
+      "manual_test": true,
+      "message": "수동 시험 대기 중입니다. 준비한 버전 설치·재시작을 눌러야 설치합니다.",
+      "phase": "ready",
+      "signature_verified": true,
+      "total": 6110871,
+      "version": "0.3.12"
+    }
+  },
+  "instance": "dev-001020010200102001020010",
+  "diagnostics_enabled": false,
+  "observed_at": "2026-11-21T19:54:19.2359514+09:00"
+}
