@@ -54,7 +54,11 @@ pub fn init() -> Result<(), String> {
     };
     let value = if cfg!(feature = "verification-updater") {
         Instance::parse(
-            Some("dev-001020010200102001020010".into()),
+            Some(
+                option_env!("JAJAN_VERIFICATION_INSTANCE")
+                    .unwrap_or("dev-001020010200102001020010")
+                    .into(),
+            ),
             Some("Updater verification".into()),
         )?
     } else {

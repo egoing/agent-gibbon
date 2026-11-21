@@ -1,0 +1,16 @@
+{
+  "check_seconds": 60,
+  "enabled": true,
+  "idle_threshold_seconds": 30.0,
+  "last_check_failure": null,
+  "last_window_reports": null,
+  "retry_seconds": 5,
+  "status": {
+    "current_version": "0.3.18",
+    "downloaded": 5370361,
+    "message": "터미널 작업이 실행 중이거나 시작되고 있습니다. 종료를 선택해 작업을 마친 뒤, 숨긴 터미널도 관리 창에서 삭제하고 다시 시도하세요.",
+    "phase": "ready",
+    "total": 5370361,
+    "version": "0.3.19"
+  }
+}

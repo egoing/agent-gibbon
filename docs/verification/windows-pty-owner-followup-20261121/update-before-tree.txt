@@ -1,0 +1,24 @@
+Window: "Jajan [DEV Updater verification · 00102001] — terminal-1795255345836294500", App: jajan-ptyverify-04fb.exe.
+	0 window (창) Jajan [DEV Updater verification · 00102001] — terminal-1795255345836294500 Secondary Actions: Raise
+		1 pane (창)
+			2 pane (창) 터미널
+				3 pane (창) (disabled)
+				4 pane (영역) 터미널 - 웹 콘텐츠
+					5 pane (영역)
+						6 pane (영역)
+							7 pane (영역)
+								8 pane (영역)
+								9 pane (영역)
+									10 pane (영역)
+										11 pane (영역)
+											12 pane (영역)
+												13 pane (영역)
+								14 pane (영역)
+						15 pane (영역)
+						16 pane (영역)
+		17 title bar (제목 표시줄) (settable, string) Value: Jajan [DEV Updater verification · 00102001] — terminal-1795255345836294500
+			18 menu bar (메뉴 모음) 시스템 ID: MenuBar
+				19 menu item (메뉴 항목) 시스템
+			20 button (단추) 최소화
+			21 button (단추) 최대화
+			22 button (단추) 닫기
