@@ -40,6 +40,7 @@
 - [이전 버전 무입력 실측](developer-roundtrip-20261121/previous-idle-held.json): Windows 무입력 **325.406초**, 임계값 300초와 15초 retry 주기를 넘긴 뒤에도 같은 PID 21488/버전 0.3.12와 수동 시험 대기를 유지했다. 실제 최신 피드는 0.3.13을 제공하고 있었으며 입력 시간을 조작하지 않았다.
 - ‘최신 버전으로 복귀’를 명시적으로 실행해 실제 0.3.13/PID 18688로 재시작했다. [복귀 결과](developer-roundtrip-20261121/after-return.json)의 source 0.3.12 → target 0.3.13과 모든 창 ACK true, sentinel/revision/창 위치·크기·가시성 보존을 확인했다. 최종 파일 SHA-256이 처음 설치한 최신 바이너리와 같은 `3C4D6189F5F777C32729CBB9A87004E8CDBBC5E32A907BACA01E92B7A6CF3153`이다.
 - 최신 복귀 후 `manual_test=false`, `roundtrip_active=false`, `phase=idle`, 별도 시험 대기 파일 부재를 확인했다. 메시지는 ‘최신 버전 복귀를 확인했습니다. 일반 자동 업데이트 정책을 다시 적용합니다.’다. 최신 실행 확인 전에 시험 대기를 해제하지 않았다.
+- 다음 통합 설치 준비를 위해 실행 중인 전용 앱이 없음을 확인한 후, 이 시험에서 설치한 `Ms4WyJ\installed\uninstall.exe`만 `/S`로 실행했다. 반환 코드 0과 전용 exe·제거 레지스트리 부재, 사용자 설치 앱 PID 20272의 원래 경로 생존을 [정리 결과](developer-roundtrip-20261121/standalone-cleanup.json)에 남겼다. 패키지와 시험 기록은 보존했다.
 
 ## 검사와 남은 작업
 

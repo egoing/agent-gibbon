@@ -4,7 +4,7 @@ import { cp, mkdir, mkdtemp, readFile, writeFile, symlink, readdir } from 'node:
 import { tmpdir } from 'node:os';
 import { dirname, join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { createServer } from 'node:http';
 import { generateKeyPairSync, randomBytes, sign, createHash } from 'node:crypto';
 import { devInstance } from './dev-instance.mjs';
@@ -60,6 +60,8 @@ for (const version of [plan.previous,plan.latest]) {
   if (version !== plan.previous) setVersion(version,source);
   await run([join(source,'scripts/build-editor.mjs')]);
   await run([join(source,'node_modules/@tauri-apps/cli/tauri.js'),'build','--ci','--bundles','nsis','--features','verification-roundtrip','--config',configPath]);
+  const identity = JSON.parse(execFileSync(join(target,'release',plan.binaryName),['--instance-info'],{encoding:'utf8',env}));
+  if (identity.ok !== true || identity.instance !== verificationInstance) throw Error('Built verification instance does not match this trial.');
   const installers = (await readdir(join(target,'release/bundle/nsis'))).filter(name=>name.endsWith('.exe') && name.includes(`_${version}_`));
   if (installers.length!==1) throw Error(`Expected one installer for ${version}`);
   const bytes=await readFile(join(target,'release/bundle/nsis',installers[0]));
@@ -73,7 +75,7 @@ for (const version of [plan.previous,plan.latest]) {
   responses.set(`/v${version}/${filename}`,bytes);
   const manifest={version,platforms:{'windows-x86_64':{url:`${base}v${version}/${filename}`,signature:encoded}}};
   responses.set(version===plan.previous?'/previous.json':'/latest.json',Buffer.from(JSON.stringify(manifest)));
-  plan.artifacts[version]={installer:output,sha256:createHash('sha256').update(bytes).digest('hex')};
+  plan.artifacts[version]={installer:output,sha256:createHash('sha256').update(bytes).digest('hex'),instance:identity.instance};
 }
 await writeFile(join(workspace,'public.key'),publicKeyText);
 await writeFile(join(workspace,'plan.json'),JSON.stringify(plan,null,2));
