@@ -1,6 +1,7 @@
 // Build two genuine, schema-identical NSIS versions in a private temporary tree.
 // This prepares artifacts and a loopback feed; it never installs or publishes them.
 import { cp, mkdir, mkdtemp, readFile, writeFile, symlink, readdir } from 'node:fs/promises';
+import { appendFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,6 +20,8 @@ if (!(await readFile(join(root,'src-tauri/src/instance.rs'),'utf8')).includes('J
 const workspace = await mkdtemp(join(tmpdir(), 'jajan-roundtrip-5170-'));
 // Both versions share this trial's namespace; other concurrent verification apps do not.
 const verificationInstance = `dev-${createHash('sha256').update(workspace).digest('hex').slice(0,24)}`;
+const trialSuffix = verificationInstance.slice(4,12);
+const binaryName = `jajan-roundtrip-5170-${trialSuffix}`;
 const source = join(workspace, 'source');
 await mkdir(source);
 for (const name of ['src-tauri', 'ui', 'scripts', 'docs', 'bundled-skills', '.agents', 'package.json', 'pnpm-lock.yaml']) {
@@ -28,6 +31,7 @@ await symlink(join(root, 'node_modules'), join(source, 'node_modules'), 'junctio
 const responses = new Map();
 const server = createServer((req, res) => {
   const body = responses.get(req.url);
+  appendFileSync(join(workspace,'feed-events.jsonl'),JSON.stringify({at:new Date().toISOString(),method:req.method,path:req.url?.split('?')[0],status:body?200:503,bytes:body?.length||0})+'\n');
   if (!body) { res.writeHead(503); res.end('Verification feed not ready'); return; }
   res.writeHead(200, {'Content-Length':body.length}); res.end(body);
 });
@@ -37,7 +41,7 @@ const {privateKey, publicKey} = generateKeyPairSync('ed25519');
 const keyId = randomBytes(8);
 const pubPacket = Buffer.concat([Buffer.from('Ed'),keyId,publicKey.export({format:'der',type:'spki'}).subarray(-32)]);
 const publicKeyText = Buffer.from(`untrusted comment: isolated verification key\n${pubPacket.toString('base64')}\n`).toString('base64');
-const config = {identifier:'app.jajan.roundtrip5170', productName:'Jajan Roundtrip Verification 5170', mainBinaryName:'jajan-roundtrip-5170',
+const config = {identifier:`app.jajan.roundtrip5170.${trialSuffix}`, productName:`Jajan Roundtrip Verification 5170 ${trialSuffix}`, mainBinaryName:binaryName,
   build:{beforeBuildCommand:''}, bundle:{targets:['nsis'],createUpdaterArtifacts:false,windows:{nsis:{installMode:'currentUser'},allowDowngrades:true}},
   plugins:{updater:{pubkey:publicKeyText,requireSignedVersion:true,dangerousInsecureTransportProtocol:true,windows:{installMode:'quiet',installerArgs:['/NS']}}}};
 const configPath = join(workspace, 'verification.json');
@@ -53,7 +57,12 @@ async function run(args) {
   });
 }
 const plan = {workspace,source,target,base,verificationInstance,identifier:config.identifier,productName:config.productName,
-  binaryName:'jajan-roundtrip-5170.exe',installDir:join(workspace,'installed'),previous:'0.3.12',latest:'0.3.13',artifacts:{}};
+  binaryName:`${binaryName}.exe`,installDir:join(workspace,'installed'),previous:'0.3.12',latest:'0.3.13',artifacts:{}};
+plan.codeCommit = execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();
+plan.sourceHashes = {};
+for (const path of ['src-tauri/src/updater.rs','src-tauri/src/main.rs','src-tauri/src/terminal/windows_owner.rs','src-tauri/src/terminal/persistence_mode.rs','ui/developer-updater.js','ui/terminal.js']) {
+  plan.sourceHashes[path] = createHash('sha256').update(await readFile(join(source,path))).digest('hex');
+}
 await writeFile(join(workspace,'plan.json'),JSON.stringify(plan,null,2));
 console.log(`ROUNDTRIP_WORKSPACE=${workspace}`);
 for (const version of [plan.previous,plan.latest]) {

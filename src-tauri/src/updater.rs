@@ -232,12 +232,14 @@ pub async fn updater_install(window: tauri::WebviewWindow) -> Result<Status, Str
 #[tauri::command]
 pub async fn updater_test_prepare(window: tauri::WebviewWindow) -> Result<Status, String> {
     manager(&window)?;
+    verification_event(window.app_handle(), "test-prepare-request", None, None);
     check_with_policy(window.app_handle().clone(), true, true).await?;
     status(window.app_handle())
 }
 #[tauri::command]
 pub async fn updater_test_install(window: tauri::WebviewWindow) -> Result<Status, String> {
     manager(&window)?;
+    verification_event(window.app_handle(), "test-install-request", None, None);
     let app = window.app_handle().clone();
     tauri::async_runtime::spawn_blocking(move || install_with_policy(&app, false, true))
         .await
@@ -263,6 +265,7 @@ pub async fn updater_test_roundtrip(
     if crate::privacy::onboarding_required(&app) {
         return Err("먼저 약관을 확인하세요".into());
     }
+    verification_event(&app, "roundtrip-request", Some(&target), None);
     write_trial_hold(&app, &pair)?;
     {
         let updates = app.state::<Updates>();
@@ -420,6 +423,39 @@ fn configured_builder<R: tauri::Runtime>(
         }))
 }
 
+// Local, bounded trial evidence only. No user content or input is recorded and
+// ordinary release builds compile out all filesystem access here.
+fn verification_event(
+    app: &tauri::AppHandle,
+    event: &'static str,
+    target: Option<&str>,
+    automatic: Option<bool>,
+) {
+    #[cfg(feature = "verification-updater")]
+    {
+        use std::io::Write;
+        let path = app
+            .state::<crate::storage::Store>()
+            .0
+            .join(".verification-update-events.jsonl");
+        if std::fs::metadata(&path).is_ok_and(|m| m.len() >= 1024 * 1024) {
+            return;
+        }
+        let record = serde_json::json!({"event":event,"unix_ms":std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_millis(),"pid":std::process::id(),"current_version":env!("CARGO_PKG_VERSION"),"target_version":target,"automatic":automatic});
+        if let Ok(mut bytes) = serde_json::to_vec(&record) {
+            bytes.push(b'\n');
+            if let Ok(mut file) = std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(path)
+            {
+                let _ = file.write_all(&bytes);
+            }
+        }
+    }
+    #[cfg(not(feature = "verification-updater"))]
+    let _ = (app, event, target, automatic);
+}
 fn cache(app: &tauri::AppHandle) -> std::path::PathBuf {
     app.state::<crate::storage::Store>().0.join(".update-cache")
 }
@@ -1231,6 +1267,16 @@ fn install_with_policy(
         s.message = "작업 상태를 확인하고 있습니다".into();
         version
     };
+    verification_event(
+        app,
+        if explicit_test {
+            "test-install-start"
+        } else {
+            "normal-install-start"
+        },
+        Some(&install_version),
+        Some(automatic),
+    );
     let mut snapshot_written = false;
     let mut prepared_epoch = None;
     let result: Result<(), String> = (|| {
@@ -1343,6 +1389,7 @@ pub fn initialize(app: &tauri::AppHandle) {
     if !enabled() {
         return;
     }
+    verification_event(app, "initialize", None, None);
     let path = app
         .state::<crate::storage::Store>()
         .0
