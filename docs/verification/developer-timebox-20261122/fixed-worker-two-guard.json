@@ -1,0 +1,27 @@
+{
+  "check_seconds": 900,
+  "enabled": true,
+  "idle_threshold_seconds": 300.0,
+  "last_check_failure": null,
+  "last_window_reports": null,
+  "retry_seconds": 15,
+  "status": {
+    "cache_ready": true,
+    "current_version": "0.3.13",
+    "downloaded": 5419234,
+    "failure_stage": null,
+    "manual_test": true,
+    "message": "터미널 시작 화면이 남아 있습니다. 관리 창에서 터미널을 삭제한 뒤 다시 설치하세요.",
+    "phase": "ready",
+    "roundtrip_active": true,
+    "roundtrip_pair": {
+      "id": "isolated-schema-v1-20261121",
+      "latest": "0.3.13",
+      "previous": "0.3.12"
+    },
+    "roundtrip_reason": "격리 검증 채널의 호환 버전 쌍입니다. 공식 배포판이 아닙니다.",
+    "signature_verified": true,
+    "total": 5419234,
+    "version": "0.3.12"
+  }
+}

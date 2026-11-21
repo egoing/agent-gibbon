@@ -1,0 +1,15 @@
+   Compiling jajan v0.3.12 (C:\Users\egoin\.codex\worktrees\5170\agent-gibbon\src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 54.76s
+     Running unittests src\main.rs (C:\Users\egoin\dev\project\agent-gibbon\.git\jajan\build-cache\debug\deps\jajan-6c8ed092d692d7a1.exe)
+
+running 1 test
+test terminal::windows_owner::tests::completed_reset_reply_preserves_original_bytes_without_reissuing_requests ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 330 filtered out; finished in 0.00s
+
+     Running tests\windows_pty_owner.rs (C:\Users\egoin\dev\project\agent-gibbon\.git\jajan\build-cache\debug\deps\windows_pty_owner-9921456f4b81996d.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+

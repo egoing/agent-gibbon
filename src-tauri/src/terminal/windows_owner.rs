@@ -545,17 +545,15 @@ impl Read for RemoteReader {
                 super::verification_gate(|| json!({"reader_end":"inactive-link"}));
                 return Ok(0);
             }
-            let v = self.link.call("read", Value::Null).map_err(|error| {
+            let v = self.link.call("read", Value::Null).inspect_err(|error| {
                 super::verification_gate(
                     || json!({"reader_end":"rpc-error","kind":format!("{:?}",error.kind())}),
                 );
-                error
             })?;
-            self.pending = serde_json::from_value(v["bytes"].clone()).map_err(|error| {
+            self.pending = serde_json::from_value(v["bytes"].clone()).inspect_err(|error| {
                 super::verification_gate(
                     || json!({"reader_end":"reply-data","kind":format!("{:?}",error.classify())}),
                 );
-                error
             })?;
             if self.pending.is_empty() {
                 if !v["exit"].is_null() {
