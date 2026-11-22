@@ -1,5 +1,7 @@
 # 개발자 메뉴·Windows PTY 통합 검증 — 진행 중
 
+> 현재 업데이트 전용 범위와 최신 검증은 [2026-11-22 기록](developer-update-only-20261122.md)을 따른다. 아래는 분리 연동을 포함했던 과거 회차의 증거다.
+
 최신 마감 상태와 실제 ConnectionReset 수정·worker2 복구 근거는 [2026-11-22 마감 기록](developer-timebox-20261122.md)을 우선 참고한다. 아래는 이전 회차 기록이며 최종 통합 성공 보고가 아니다.
 
 - 작업 루트: `C:\Users\egoin\.codex\worktrees\5170\agent-gibbon`.

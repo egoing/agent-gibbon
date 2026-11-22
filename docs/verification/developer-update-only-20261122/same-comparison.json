@@ -1,0 +1,22 @@
+{
+  "same_text": true,
+  "same_revision": true,
+  "before_position": {
+    "x": 86,
+    "y": 130
+  },
+  "after_position": {
+    "x": 86,
+    "y": 130
+  },
+  "before_size": {
+    "height": 146,
+    "width": 634
+  },
+  "after_size": {
+    "height": 146,
+    "width": 634
+  },
+  "before_visible": true,
+  "after_visible": true
+}

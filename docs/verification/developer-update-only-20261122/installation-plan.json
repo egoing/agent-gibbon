@@ -1,0 +1,34 @@
+{
+  "workspace": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-5bxQe6",
+  "source": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-5bxQe6\\source",
+  "target": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-5bxQe6\\target",
+  "base": "http://127.0.0.1:64342/",
+  "verificationInstance": "dev-efb2e8be996701d1c17d2a25",
+  "identifier": "app.jajan.roundtrip5170.efb2e8be",
+  "productName": "Jajan Roundtrip Verification 5170 efb2e8be",
+  "binaryName": "jajan-roundtrip-5170-efb2e8be.exe",
+  "installDir": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-5bxQe6\\installed",
+  "previous": "0.3.12",
+  "latest": "0.3.13",
+  "artifacts": {
+    "0.3.12": {
+      "installer": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-5bxQe6\\Jajan_0.3.12_x64-setup.exe",
+      "sha256": "ea4475e9ce4836a99691cdd48d4375dfaf704e43cc11019b3066ba7d0d1abc31",
+      "instance": "dev-efb2e8be996701d1c17d2a25"
+    },
+    "0.3.13": {
+      "installer": "C:\\Users\\egoin\\AppData\\Local\\Temp\\jajan-roundtrip-5170-5bxQe6\\Jajan_0.3.13_x64-setup.exe",
+      "sha256": "85e4938ffeb9c1e3e90be62ebedf5cd149f6f2f1d4355a4279f98f0768a50098",
+      "instance": "dev-efb2e8be996701d1c17d2a25"
+    }
+  },
+  "codeCommit": "bdf527296451d11975ad37cc92102769ee084bc7",
+  "sourceHashes": {
+    "src-tauri/src/updater.rs": "97686fca8b0b1f5c3031b3b554842362c7c7263115da70c86acbf24187ba0c40",
+    "src-tauri/src/main.rs": "25709e7f9c047c7c0f3d05ea7c91f264ca9da2532e519ac85d1394096cd3b962",
+    "src-tauri/src/terminal.rs": "3878331bbc3f3bcf37ea186adc0d25ee1d982fcf1ad08327a67364325d939ac4",
+    "src-tauri/src/update_restore.rs": "aa8d3c613c867fdec63fff91e9322cf9efcc3fa42be561d0410565b199712709",
+    "ui/developer-updater.js": "bd585292617ee7c15b8bb671b88bc183fc3bb9844e5816394ade31fb87c55892",
+    "ui/updater.js": "3fb3b53402ad731bc746e7398cec9ccb4b18bf711daf20fa4dcc194328a81c42"
+  }
+}

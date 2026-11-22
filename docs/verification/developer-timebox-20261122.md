@@ -1,5 +1,7 @@
 # 개발자 메뉴 통합 — 20분 마감 기록
 
+> 현재 업데이트 전용 범위와 최신 검증은 [2026-11-22 기록](developer-update-only-20261122.md)을 따른다. 아래는 분리 연동을 포함했던 과거 회차의 증거다.
+
 사용자 마감: 2026-11-22 00:18:16 KST. 이 기록은 완료 보고가 아니다. PR #276은 Draft이며 미병합·미배포다.
 
 - 작업 root: C:\Users\egoin\.codex\worktrees\5170\agent-gibbon, branch codex/developer-update-test.
