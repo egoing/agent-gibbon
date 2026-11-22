@@ -1,0 +1,2 @@
+{"error":"사용법: jajan web [--id web-ID] [--url URL]; jajan diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list","ok":false}
+{"error":"사용법: jajan web [--id web-ID] [--url URL]; jajan diagnostics|diagnostics-probe; open|update [--id ID] [--color #RRGGBB] [--title 제목] [--status 상태] [--file 경로|- 또는 --markdown 본문] / close|inspect [--id ID] / list","ok":false}

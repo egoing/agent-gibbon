@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko"><head><script src="telemetry.js"></script><script src="updater-guard.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>메모 관리</title><link rel="stylesheet" href="manager.css"><script src="manager-theme.js"></script><script type="module" src="memo-preview.js"></script><script src="autostart.js" defer></script><script src="privacy.js" defer></script><script src="skills.js" defer></script><script src="manager.js" defer></script><script src="updater.js" defer></script></head>
+<html lang="ko"><head><script src="telemetry.js"></script><script src="updater-guard.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>메모 관리</title><link rel="stylesheet" href="manager.css"><script src="manager-theme.js"></script><script type="module" src="memo-preview.js"></script><script src="autostart.js" defer></script><script src="privacy.js" defer></script><script src="skills.js" defer></script><script src="manager.js" defer></script><script src="updater.js" defer></script><script src="developer-updater.js" defer></script></head>
 <body><header><strong>Jajan</strong><nav id="manager-navigation" aria-label="관리 탐색" hidden><button id="notes-nav" aria-pressed="true">모든 메모</button><button id="settings-nav" aria-pressed="false">설정</button></nav></header>
 <div id="error" role="alert" hidden>메모를 읽지 못했습니다. <button id="retry">다시 시도</button></div>
 <main id="notes-page" hidden><aside aria-label="메모 목록"><div class="list-heading"><h2>모든 메모</h2><button id="refresh" aria-label="메모 목록 새로고침">새로고침</button></div><input id="memo-search" type="search" aria-label="메모 검색" placeholder="제목 또는 본문 검색" aria-controls="list" autocomplete="off"><div class="memo-results"><div id="list"></div><p id="list-status" role="status"></p></div></aside><section id="detail" aria-label="메모 상세" tabindex="0"><p>메모를 선택하세요.</p></section></main>
@@ -10,7 +10,8 @@
 <button id="settings-updater-nav" type="button" aria-current="false" aria-controls="settings-updater">자동 업데이트</button>
 <button id="settings-autostart-nav" type="button" aria-current="false" aria-controls="settings-autostart">로그인 자동 실행</button>
 <button id="settings-privacy-nav" type="button" aria-current="page" aria-controls="settings-privacy">Privacy &amp; Diagnostics</button>
-</nav></aside>
+<button id="settings-developer-nav" type="button" aria-current="false" aria-controls="settings-developer" hidden>개발자</button>
+</nav><button id="settings-version" type="button" aria-label="앱 버전">버전 확인 중</button></aside>
 <div class="settings-content">
 <section id="settings-autostart" aria-labelledby="settings-autostart-title" hidden>
 <h2 id="settings-autostart-title">로그인 자동 실행</h2>
@@ -67,6 +68,15 @@
 <div class="updater-actions"><button id="updater-check" type="button">지금 확인</button><button id="updater-install" type="button" disabled>업데이트하고 재시작</button></div>
 </article>
 <details class="updater-help"><summary>설치가 보류되거나 실패했나요?</summary><p>‘업데이트하고 재시작’은 5분 대기만 생략합니다. 편집·저장·내보내기와 캡처를 마치고, 실행 중인 터미널을 종료한 뒤 숨긴 터미널도 관리 창에서 삭제하세요. 작업이 안전한지 확인한 후 설치합니다.</p><p>안내 닫기는 자동 설치를 끄지 않습니다. 보류 조건이 해소되면 자동으로 다시 확인합니다. 응답 대기 시간이 초과되면 작업을 저장하고 다시 시도하세요.</p><p>다운로드·검증 오류는 연결 상태를 확인한 뒤 ‘다시 확인’으로 다시 받으세요. 반복되면 공식 릴리스의 운영체제와 CPU에 맞는 설치 파일로 수동 설치하세요. 검증 실패를 무시하고 설치하지 않습니다.</p></details>
+</section>
+<section id="settings-developer" aria-labelledby="settings-developer-title" hidden>
+<h2 id="settings-developer-title">개발자</h2>
+<p>복귀 메뉴와 데이터 형식이 호환되는 지정된 두 버전 사이를 실제 설치·재시작으로 왕복합니다. 시험 중에는 재실행 후에도 일반 자동 업데이트로 먼저 복귀하지 않습니다.</p>
+<p id="developer-roundtrip-reason" role="status"></p>
+<div class="updater-actions"><button id="developer-previous" type="button" disabled>이전 테스트 버전으로 교체</button><button id="developer-latest" type="button" disabled>최신 버전으로 복귀</button></div>
+<dl id="developer-update-state" aria-live="polite"></dl>
+<p id="developer-update-message" role="status"></p>
+<details><summary>기존 패키지 준비 시험</summary><p>공식 최신 패키지를 준비한 뒤 별도 설치합니다. 동일 버전 재설치 시험이며 버전 왕복을 대신하지 않습니다. 준비만 하면 설치하지 않습니다.</p><div class="updater-actions"><button id="developer-prepare" type="button" disabled>최신 배포판 준비</button><button id="developer-install" type="button" disabled>준비한 버전 설치·재시작</button></div></details>
 </section>
 </div></section>
 <section id="privacy-welcome" aria-labelledby="privacy-welcome-title">

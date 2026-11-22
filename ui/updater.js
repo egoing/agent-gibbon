@@ -38,6 +38,10 @@ function renderUpdater(status) {
   updaterEl('updater-check').textContent = phase === 'error' ? '다시 확인' : '지금 확인';
   updaterEl('updater-install').textContent = phase === 'preparing' ? '작업 상태 확인 중…' : phase === 'installing' ? '설치하고 재시작 중…' : '업데이트하고 재시작';
   updaterEl('updater-install').disabled = updaterBusy || phase !== 'ready';
+  if (updaterStatus.manual_test) {
+    updaterEl('updater-install').disabled = true;
+    updaterEl('updater-message').textContent = updaterStatus.message || '개발자 메뉴에서 수동 시험 대기 중입니다.';
+  }
   updaterEl('updater-install').hidden = !['ready', 'preparing', 'installing'].includes(phase);
 }
 

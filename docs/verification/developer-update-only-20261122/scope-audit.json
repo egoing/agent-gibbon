@@ -1,0 +1,26 @@
+{
+  "base": "f15d8129388f1cdeec73bf5b1313b15d79dc3be9",
+  "code": "bdf527296451d11975ad37cc92102769ee084bc7",
+  "protection_files": [
+    {
+      "path": "src-tauri/src/terminal.rs",
+      "matches_main": true
+    },
+    {
+      "path": "src-tauri/src/terminal/lifecycle.rs",
+      "matches_main": true
+    },
+    {
+      "path": "src-tauri/src/terminal/persistence.rs",
+      "matches_main": true
+    },
+    {
+      "path": "src-tauri/src/update_restore.rs",
+      "matches_main": true
+    }
+  ],
+  "owner_absent": true,
+  "mode_absent": true,
+  "owner_test_absent": true,
+  "poc_script_absent": true
+}

@@ -1,0 +1,38 @@
+{
+  "at": "2026-11-21T23:38:12.3433689+09:00",
+  "terminal": {
+    "running": true,
+    "pid": 7588,
+    "restore_plan": "function",
+    "metadata_save_failed": false,
+    "ready": false,
+    "visible": false
+  },
+  "updater": {
+    "check_seconds": 900,
+    "enabled": true,
+    "idle_threshold_seconds": 300.0,
+    "last_check_failure": null,
+    "last_window_reports": null,
+    "retry_seconds": 15,
+    "status": {
+      "cache_ready": true,
+      "current_version": "0.3.13",
+      "downloaded": 5419234,
+      "failure_stage": null,
+      "manual_test": true,
+      "message": "터미널 세션을 종료한 뒤 설치할 수 있습니다. 숨긴 터미널도 포함됩니다",
+      "phase": "ready",
+      "roundtrip_active": true,
+      "roundtrip_pair": {
+        "id": "isolated-schema-v1-20261121",
+        "latest": "0.3.13",
+        "previous": "0.3.12"
+      },
+      "roundtrip_reason": "격리 검증 채널의 호환 버전 쌍입니다. 공식 배포판이 아닙니다.",
+      "signature_verified": true,
+      "total": 5419234,
+      "version": "0.3.12"
+    }
+  }
+}

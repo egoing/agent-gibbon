@@ -1,0 +1,1641 @@
+
+> jajan@0.3.12 test
+> node scripts/build.mjs cargo test --manifest-path src-tauri/Cargo.toml && node scripts/test-ui.mjs
+
+   Compiling jajan v0.3.12 (C:\Users\egoin\.codex\worktrees\5170\agent-gibbon\src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 55.21s
+     Running unittests src\main.rs (C:\Users\egoin\dev\project\agent-gibbon\.git\jajan\build-cache\debug\deps\jajan-411b1bcfa561ca85.exe)
+
+running 318 tests
+test autostart::platform::tests::registration_removal_and_os_disabled_entry_are_independent ... ok
+test autostart::tests::development_and_verification_never_register ... ok
+test autostart::platform::tests::run_command_quotes_paths_and_only_uses_passive_launch ... ok
+test capture::tests::capture_toolbar_expands_window_without_shrinking_or_moving_image ... ok
+test entrance::tests::corners_and_negative_monitor_origin_keep_clearance ... ok
+test entrance::tests::destination_reservation_retains_size_in_both_mixed_dpi_directions ... ok
+test capture::tests::retina_crop_and_invalid_selection ... ok
+test capture::tests::preview_preserves_dimensions_and_rgba_bytes ... ok
+test capture::tests::selected_origin_keeps_desktop_coordinate_units ... ok
+test capture::tests::toolbar_uses_bottom_at_work_area_top_including_negative_and_scaled_monitors ... ok
+test capture::tests::transition_does_not_continue_after_missing_destroy_acknowledgment ... ok
+test entrance::tests::completed_or_disconnected_frame_stops_the_worker ... ok
+test entrance::tests::clamping_never_covers_pointer_and_large_windows_fall_back ... ok
+test entrance::tests::early_pointer_movement_waits_until_one_second_even_if_pointer_returns ... ok
+test entrance::tests::every_direction_and_diagonal_starts_the_same_flight_after_hold ... ok
+test entrance::tests::late_frame_response_keeps_worker_alive_without_queuing_another_frame ... ok
+test capture::tests::clipboard_png_decode_preserves_rgba_and_dimensions ... ok
+test entrance::tests::native_frame_conversion_handles_negative_desktop_positions ... ok
+test entrance::tests::native_frame_conversion_preserves_top_left_while_resizing ... ok
+test entrance::tests::only_pointer_movement_starts_one_flight ... ok
+test feedback::tests::deadlines_restart_and_are_isolated_without_stale_callbacks ... ok
+test feedback::tests::acknowledgement_is_revision_guarded_and_does_not_touch_opacity ... ok
+test feedback_window::tests::folded_feedback_is_suppressed_even_for_legacy_tips_and_errors ... ok
+test feedback_window::tests::recovery_targets_the_displayed_draft_even_if_highlight_changes ... ok
+test feedback_window::tests::shortcut_reaches_owner_without_trusting_stale_edit_buttons ... ok
+test first_frame::tests::both_orders_reveal_once_and_only_the_placed_window ... ok
+test capture::tests::text_selection_creates_empty_editable_note_without_image ... ok
+test capture::tests::transition_waits_for_every_destroyed_window ... ok
+test feedback_window::tests::stale_confirmation_is_blocked_but_edit_actions_reach_conflict_check ... ok
+test first_frame::tests::hide_or_destroy_cancels_even_an_already_delivered_layout_request ... ok
+test instance::tests::installed_path_is_unchanged ... ok
+test layout::arrangement::tests::left_columns_preserve_order_and_align_different_widths_on_a_negative_screen ... ok
+test instance::tests::namespaces_are_short_and_distinct ... ok
+test instance::tests::rejects_empty_traversal_and_malformed_ids ... ok
+test ipc::tests::windows_socket_limit_counts_utf8_bytes ... ok
+test capture::tests::lifecycle_errors_release_the_gate_without_dropping_next_cleanup ... ok
+test layout::free_space::tests::active_window_margin_is_second_to_desktop_and_requires_clear_pixels ... ok
+test layout::free_space::tests::blank_pixels_inside_app_force_secondary_then_original_bottom_right ... ok
+test feedback::tests::restored_pending_notes_have_highlights_without_attention_and_reverts_clear_them ... ok
+test launcher_recognizes_only_bundle_executables ... ok
+test layout::free_space::tests::fixed_wins_and_bottom_right_stack_skips_a_protected_slot ... ok
+test layout::free_space::tests::same_display_preferred_and_no_capture_still_stacks_offscreen_window ... ok
+test layout::free_space::tests::mixed_plan_preserves_clear_destination_and_stacks_only_remainder ... ok
+test layout::free_space::tests::third_monitor_receives_only_overlap_then_second_run_is_idle ... ok
+test layout::free_space::tests::touching_column_uses_empty_secondary_without_churning_on_repeat ... ok
+test layout::overview::tests::manual_frames_and_failed_close_do_not_replace_the_entry_snapshot ... ok
+test layout::tests::explicit_arrangement_includes_all_memo_hosts_but_no_children_or_tools ... ok
+test layout::tests::hidden_restore_moves_only_that_note_to_the_tail ... ok
+test layout::tests::insufficient_viewport_space_fails_before_any_frames_are_applied ... ok
+test layout::tests::request_order_continues_into_left_column ... ok
+test layout::tests::reverse_ids_follow_requests_even_when_measurements_finish_in_reverse ... ok
+test layout::tests::mixed_surface_fixtures_fit_both_arrangements_at_each_scale_and_negative_origin ... ok
+test local_trace::tests::linked_child_keeps_parent_and_mutation_cause_after_parent_completed ... ok
+test layout::free_space::tests::image_tiles_map_retina_pixels_to_negative_screen_coordinates ... ok
+test local_trace::tests::stage_flood_is_bounded_and_expiration_removes_unfinished_flow ... ok
+test local_trace::tests::recorder_is_bounded_and_never_waits_for_its_mutex ... ok
+test local_trace::tests::concurrent_scopes_are_explicit_and_restore_even_after_unwind ... ok
+test local_trace::tests::flows_are_owner_scoped_bounded_expire_and_reject_late_events ... ok
+test manager::tests::first_text_ignores_markdown_and_blank_lines ... ok
+test local_trace::tests::unfinished_call_survives_history_turnover_and_records_completion ... ok
+test manager::tests::conditional_rows_only_omit_the_exact_rendered_body ... ok
+test model::tests::color_updates_are_normalized_preserved_and_atomic ... ok
+test autostart::tests::failed_preference_write_does_not_touch_os ... ok
+test model::tests::cumulative_diff_keeps_unconfirmed_changes_and_omits_intermediate_versions ... ok
+test export::tests::failed_export_preserves_destination_and_cleans_temp_file ... ok
+test model::tests::confirmation_advances_baseline_and_reverts_remove_only_net_changes ... ok
+test manager::tests::capture_file_replacement_changes_image_stamp ... ok
+test model::tests::feedback_marks_changed_lines_without_polluting_source_or_plain_html ... ok
+test model::tests::invalid_ids_and_read_only_options_are_rejected ... ok
+test model::tests::markdown_validation_allows_code_links_and_real_tasks ... ok
+test model::tests::feedback_html_is_sanitized_and_editor_uses_same_diff ... ok
+test model::tests::malformed_tasks_report_line_and_preserve_all_fields ... ok
+test model::tests::partial_updates_preserve_unspecified_fields ... ok
+test model::tests::feedback_distinguishes_additions_replacements_and_deletions ... ok
+test model::tests::inline_update_detaches_file_and_editor_preserves_metadata ... ok
+test model::tests::feedback_deletion_keeps_remaining_line_unmarked_and_large_diff_is_bounded ... ok
+test model::tests::task_identity_handles_reorder_duplicates_nested_and_code ... ok
+test model::tests::retired_agent_ids_are_reserved_while_ordinary_note_ids_still_work ... ok
+test model::tests::old_requests_keep_default_window_and_color ... ok
+test model::tests::renders_korean_tasks_and_blocks_active_content ... ok
+test model::tests::rejected_update_does_not_change_note ... ok
+test model::tests::update_options_are_strictly_validated ... ok
+test model::tests::task_symbols_keep_text_state_and_change_marks_without_user_html ... ok
+test model::tests::tasks_use_unindented_rows_but_normal_lists_keep_markers ... ok
+test model::tests::pending_baselines_survive_metadata_same_body_and_remain_note_local ... ok
+test monitor_layout::tests::image_fit_keeps_ratio_and_source_geometry ... ok
+test monitor_layout::tests::duplicated_monitor_identity_and_invalid_journal_are_rejected ... ok
+test monitor_layout::tests::folding_after_rescue_does_not_replace_the_original_expanded_height ... ok
+test model::tests::feedback_deletion_empty_initial_same_and_metadata ... ok
+test monitor_layout::tests::dpi_conversion_preserves_logical_size_without_scaling_desktop_origin ... ok
+test autostart::tests::missing_is_unselected_and_explicit_off_survives_reloads ... ok
+test monitor_layout::tests::detach_os_move_and_reconnect_preserve_home_across_restart ... ok
+test monitor_layout::tests::rapid_monitor_notifications_wait_for_the_final_stable_configuration ... ok
+test model::tests::feedback_preserves_unchanged_middle_and_handles_tasks_tables_code ... ok
+test monitor_layout::tests::only_rescue_candidates_move_and_capacity_failure_is_reported ... ok
+test monitor_layout::tests::user_move_and_resize_override_only_the_touched_window ... ok
+test monitor_layout::tests::relation_surfaces_never_enter_monitor_recovery_or_manual_tracking ... ok
+test monitor_layout::tests::unchanged_drag_click_does_not_discard_temporary_home ... ok
+test monitor_layout::tests::resolution_and_work_area_changes_fit_and_return_original_size ... ok
+test monitor_layout::tests::undo_and_zoom_recovery_payload_retains_the_temporary_home ... ok
+test monitor_layout::tests::valid_and_adjacent_spanning_windows_do_not_move ... ok
+test ipc::tests::independent_locks_and_stale_socket_recovery ... ok
+test opacity::global_tests::accumulates_fractions_and_resets_between_chords_and_idle ... ok
+test opacity::global_tests::global_target_excludes_auxiliary_windows ... ok
+test opacity::global_tests::bounds_and_first_choice_preserve_legacy_until_used ... ok
+test opacity::tests::arranging_is_opaque_and_crossed_pointer_does_not_keep_one_memo_emphasized ... ok
+test opacity::tests::hover_is_local_and_wheel_refresh_starts_at_the_new_saved_value ... ok
+test placement::tests::full_screen_and_short_slots ... ok
+test opacity::tests::newly_presented_memo_stays_opaque_while_idle_peers_keep_their_alpha ... ok
+test placement::tests::obstacles_and_negative_origins ... ok
+test opacity::tests::ordinary_hover_and_new_presentation_still_override_saved_opacity ... ok
+test opacity::tests::waits_two_seconds_then_eases_and_interrupts_immediately ... ok
+test placement::tests::bounded_single_and_exact_remainders ... ok
+test placement::tests::fixed_ratio_images_and_folded_heights ... ok
+test opacity::tests::hover_temporarily_overrides_manual_choice_and_restores_with_existing_delay ... ok
+test export::tests::exports_utf8_and_image_bytes_and_replaces_existing_file ... ok
+test placement::tests::ordinary_notes_fill_bottom_up_then_left ... ok
+test placement::tests::short_content_is_never_stretched_to_fill_the_screen ... ok
+test placement::tests::overflow_minimizes_overlap_then_prefers_bottom_right ... ok
+test presentation::tests::labels_hide_only_internal_wrappers_and_bound_unicode_titles ... ok
+test presentation::tests::display_keys_follow_os_without_changing_raw_contract ... ok
+test presentation::tests::tray_labels_show_only_keys_and_other_surfaces_keep_explanations ... ok
+test model::tests::quiet_completion_tracks_only_latest_and_never_changes_source ... ok
+test privacy::tests::published_notice_enables_choice_without_granting_consent ... ok
+test placement::tests::zero_gap_fills_exact_horizontal_and_vertical_slots ... ok
+test privacy::tests::terms_skip_is_limited_to_debug_development_instances_and_can_be_disabled ... ok
+test model::tests::mixed_quiet_update_preserves_diff_and_rejects_overlap_atomically ... ok
+test privacy::tests::unfinished_notice_cannot_enable_sharing ... ok
+test relation_editor::tests::target_requires_one_visible_owner_and_never_the_source ... ok
+test relation_prototype::tests::curve_faces_boundaries_in_both_directions ... ok
+test autostart::tests::explicit_intent_survives_os_denial_without_retry_on_read ... ok
+test relation_prototype::tests::endpoint_types_use_registered_hosts_and_reject_unregistered_ids ... ok
+test relation_prototype::tests::held_pause_blocks_only_incident_layout_until_native_release ... ok
+test relation_prototype::tests::focus_candidates_are_memos_not_management_or_child_surfaces ... ok
+test relation_prototype::tests::native_clamping_uses_actual_origin_without_accumulating_offset ... ok
+test relation_prototype::tests::relation_validation ... ok
+test relation_prototype::tests::native_frame_is_stable_during_small_movements ... ok
+test relation_prototype::tests::resize_or_restore_settle_survives_drag_release ... ok
+test relation_prototype::tests::release_draw_requires_visible_unchanged_endpoints_and_its_own_ack ... ok
+test relation_prototype::tests::motion_quiet_period_is_per_endpoint_and_restarts_on_each_event ... ok
+test relation_prototype::tests::new_drag_survives_old_failure_and_native_end_survives_a_second_press ... ok
+test relation_prototype::tests::legacy_arrows_and_upsert_preserve_other_connections ... ok
+test relation_prototype::tests::stash_and_stale_reveal_never_restart_a_hidden_connection ... ok
+test session_restore::tests::invalid_records_are_rejected ... ok
+test session_restore::tests::old_journal_defaults_new_recovery_fields_without_losing_fold_or_url ... ok
+test session_restore::tests::native_close_guard_never_waits_for_the_journal_writer ... ok
+test session_restore::tests::safe_command_preview_discards_secrets_and_edits ... ok
+test session_restore::tests::roundtrip_hidden_folded_web ... ok
+test memo_color::tests::saved_colors_survive_recreation_and_legacy_is_not_recolored ... ok
+test sizing::contact_tests::editor_grows_without_shrinking_or_moving_large_frames ... ok
+test session_restore::tests::web_url_before_load_restores_request_without_confusing_navigation ... ok
+test sizing::contact_tests::editor_respects_work_area_and_negative_monitor_coordinates ... ok
+test sizing::contact_tests::folded_margin_handles_small_title_and_negative_coordinates ... ok
+test local_trace::tests::atomic_local_file_contains_only_fixed_fields_and_numeric_call_ids ... ok
+test sizing::contact_tests::rapid_exit_and_reentry_rearms_without_bouncing_after_resize ... ok
+test sizing::contact_tests::update_notice_is_excluded_while_memo_windows_keep_contact_folding ... ok
+test skills::tests::catalog_is_real_self_contained_resources_and_does_not_ship_example_capabilities ... ok
+test model::palette_tests::random_palette_and_explicit_color_survives_updates ... ok
+test session_restore::tests::close_preserves_invalid_journal_and_never_creates_an_absent_one ... ok
+test opacity::global_tests::failed_save_keeps_previous_file_and_memory_choice ... ok
+test local_trace::tests::blocked_operation_is_persistable_before_it_returns ... ok
+test model::tests::editor_saves_source_and_rejects_stale_or_invalid_changes ... ok
+test privacy::tests::local_choice_roundtrips_and_declining_is_a_valid_choice ... ok
+test session_restore::tests::checkpoint_collected_before_close_cannot_restore_the_closed_web ... ok
+test skills::tests::cross_instance_lock_refuses_parallel_changes ... ok
+test stash::tests::bare_modifier_chord_commits_once_on_complete_release ... ok
+test stash::tests::direction_uses_screen_scale_and_locks_the_first_valid_axis ... ok
+test stash::tests::escape_requires_fresh_exit_and_reentry_without_pointer_chase ... ok
+test stash::tests::left_alignment_is_latched_even_if_pointer_later_crosses_right ... ok
+test stash::tests::only_memo_hosts_enter_the_stash_snapshot ... ok
+test session_restore::tests::failed_close_keeps_last_good_journal_and_first_close_does_not_invent_an_empty_session ... ok
+test stash::tests::opacity_wheel_cancels_stash_until_all_modifiers_are_released ... ok
+test stash::tests::other_shortcuts_clicks_shift_and_preheld_keys_cancel_until_release ... ok
+test stash::tests::reentry_during_hint_does_not_wait_for_hint_or_cooldown ... ok
+test stash::tests::repeat_chord_keeps_the_guide_until_the_new_anchor_is_known ... ok
+test stash::tests::reverse_animation_has_exact_endpoints_and_continuous_retarget ... ok
+test stash::tests::unplugged_and_oversized_rectangles_stay_in_work_area ... ok
+test stash_input::tests::captured_trackpad_tail_never_leaks_but_the_next_gesture_is_normal ... ok
+test stash_input::tests::consumes_only_owned_opacity_wheel_including_fractional_and_limit_input ... ok
+test stash_input::tests::normalizes_physical_direction_and_precise_wheels ... ok
+test session_restore::tests::moving_open_windows_uses_the_shared_checkpoint_and_skips_equal_frames ... ok
+test privacy::tests::absent_corrupt_old_and_unaccepted_records_fail_closed ... ok
+test session_restore::tests::failed_destroy_dispatch_restores_restart_entry ... ok
+test session_restore::tests::close_web_removes_only_its_restart_entry_even_when_retried ... ok
+test opacity::global_tests::saves_reloads_and_isolates_instances_and_rejects_corruption ... ok
+test skills::installer::tests::interrupted_first_install_is_removed_when_choice_was_not_committed ... ok
+test storage::tests::completion_emphasis_is_ephemeral_but_completed_markdown_is_persisted ... ok
+test telemetry::tests::aggregate_tag_survives_but_local_correlation_never_leaves_envelope ... ok
+test telemetry::tests::basic_release_and_opted_in_diagnostics_have_separate_features ... ok
+test session_restore::tests::checkpoint_close_reload_and_reopen_preserve_distinct_window_lifecycles ... ok
+test telemetry::tests::bounded_request_lease_crosses_await_without_source_scope_or_reader_retention ... ok
+test telemetry::tests::every_child_span_gets_trusted_platform_build_metadata_at_final_egress ... ok
+test telemetry::tests::foreign_breadcrumbs_and_logs_are_not_allowed ... ok
+test telemetry::tests::capture_worker_then_ui_callback_keeps_request_parent ... ok
+test session_restore::tests::failed_terminal_close_write_recovers_via_checkpoint_after_web_close ... ok
+test telemetry::tests::legacy_snapshot_summary_never_creates_a_transaction_or_blocks_other_measurements ... ok
+test telemetry::tests::rejects_unknown_and_nonfinite_frontend_measurements ... ok
+test session_restore::tests::web_rollback_preserves_nested_terminal_close_and_its_final_geometry ... ok
+test telemetry::tests::snapshot_summary_is_denied_at_egress_but_individual_request_survives ... ok
+test telemetry::tests::snapshot_request_is_sampled_and_children_use_the_same_trace ... ok
+test telemetry::tests::ipc_callback_keeps_wait_parent_across_threads ... ok
+test telemetry::tests::request_constructor_retains_sampling_and_epoch_barriers_with_cancellation ... ok
+test telemetry::tests::terminal_blocking_worker_keeps_request_parent ... ok
+test telemetry::tests::timing_denies_revoked_disabled_and_prior_epoch_work_after_reactivation ... ok
+test telemetry::tests::timing_concurrent_requests_restore_destination_context_including_panic ... ok
+test telemetry::tests::timing_late_callback_finishes_child_before_root_and_cancellation_releases_lease ... ok
+test telemetry::tests::timing_late_finish_uses_originating_client_scope_and_restores_destination_hub ... ok
+test telemetry::tests::transmission_requires_embedded_dsn_and_explicit_development_opt_in ... ok
+test telemetry::tests::timing_children_inherit_unsampled_parent_without_resampling_and_polling_is_capped ... ok
+test telemetry::transport::tests::no_delivery_without_consent_and_old_queues_never_replay ... ok
+test session_restore::tests::reentrant_checkpoint_and_second_close_preserve_only_the_failed_session ... ok
+test telemetry::watchdog::tests::distinguishes_native_and_webview_and_reports_once ... ok
+test telemetry::watchdog::tests::hidden_and_new_views_do_not_stall ... ok
+test telemetry::transport::tests::revocation_waits_for_started_request_and_denies_following_requests ... ok
+test telemetry::tests::whole_envelope_scrubs_error_trace_log_and_denies_sessions_and_attachments ... ok
+test terminal::cli::tests::parses_optional_request_id_and_literal_arguments ... ok
+test terminal::tests::approved_recent_folders_survive_metadata_roundtrip ... ok
+test terminal::tests::legacy_logical_and_windows_physical_origins_survive_restore ... ok
+test terminal::tests::reservation_is_per_window_and_released_on_failure ... ok
+test storage::tests::direct_save_confirms_pending_diff_even_when_text_is_unchanged ... ok
+test terminal::tests::updates_wait_for_starting_sessions_and_draining_workers ... ok
+test terminal::tests::welcome_metadata_preserves_only_last_path_title_and_geometry ... ok
+test terminal::welcome::lifecycle_tests::deleting_or_closing_a_window_excludes_start_and_duplicate_changes ... ok
+test terminal::welcome::lifecycle_tests::old_reservation_does_not_match_reopened_window ... ok
+test telemetry::journal::tests::only_fixed_bounded_history_is_persisted ... ok
+test terminal::welcome::lifecycle_tests::queued_startup_prompt_cannot_mark_submitted_builtin_idle ... ok
+test terminal::welcome::report_tests::directory_control_sequence_survives_chunks_without_retaining_transcript ... ok
+test terminal::welcome::tests::no_history_has_no_display_path_and_home_is_execution_fallback ... ok
+test terminal::welcome::tests::preview_directory_quotes_spaces_and_metacharacters ... ok
+test telemetry::transport::tests::http_queue_cannot_send_without_consent_or_replay_an_old_client ... ok
+test terminal::welcome::tests::restoration_is_gated_before_starting_on_unsupported_platforms ... ok
+test tests::invalid_commands_and_duplicate_content_fail ... ok
+test tests::named_window_commands_and_list_parse ... ok
+test tests::permission_window_never_resolves_to_main_note ... ok
+test tests::retired_agent_cli_and_project_ids_are_rejected ... ok
+test storage::tests::retired_project_without_terminal_metadata_is_preserved_and_not_loaded ... ok
+test tests::update_mode_options_parse_and_reject_unsupported_combinations ... ok
+test tests::web_cli_accepts_http_https_and_local_development_pages ... ok
+test tests::web_cli_opens_welcome_without_a_url ... ok
+test tests::web_cli_rejects_note_content_and_duplicate_url_options ... ok
+test tests::web_cli_rejects_unsafe_urls_before_connecting_or_starting_the_app ... ok
+test tests::window_labels_do_not_collide ... ok
+test tray::appearance::tests::mac_template_rgb_is_preserved_and_windows_state_is_explicit ... ok
+test tray::appearance::tests::theme_tint_preserves_antialiasing_and_distinguishes_hidden_icons ... ok
+test tray::tests::all_kinds_have_icons_event_routing_and_visibility_alpha ... ok
+test tray::tests::content_updates_reorder_and_legacy_time_is_compatible ... ok
+test tray::tests::legacy_region_notes_with_zero_update_time_use_creation_fallback ... ok
+test tray::tests::menu_metadata_is_owned_and_does_not_copy_memo_content ... ok
+test terminal::welcome::tests::latest_valid_path_and_custom_title_are_independent ... ok
+test tray::tests::recent_boundary_zero_thirty_thirty_one_and_mixed_ties ... ok
+test tray::tests::windows_action_icons_are_nonempty_transparent_outline_assets ... ok
+test tray::tests::native_menu_wait_allows_ui_snapshot_to_acquire_notes ... ok
+test update_policy::tests::concrete_native_block_reason_precedes_the_idle_reminder ... ok
+test update_policy::tests::every_hidden_or_visible_window_must_acknowledge_current_epoch ... ok
+test update_policy::tests::idle_gate_produces_a_specific_reason_or_allows_automatic_install ... ok
+test update_policy::tests::manual_install_skips_only_the_idle_gate ... ok
+test update_policy::tests::ongoing_operation_and_duplicate_prepare_block_install ... ok
+test update_policy::tests::ready_notice_is_deduplicated_by_exact_release_version ... ok
+test update_policy::tests::stale_installer_cannot_release_a_newer_frozen_epoch ... ok
+test update_restore::tests::rejects_duplicate_labels_and_invalid_bounds ... ok
+test update_restore::tests::snapshot_roundtrips_and_allows_only_application_window_labels ... ok
+test update_restore::tests::update_rejects_session_windows_including_hidden_web_views ... ok
+test updater::tests::active_profile_checks_every_fifteen_minutes_in_production ... ok
+test updater::tests::closing_an_old_notice_does_not_mark_a_newer_downloading_version_as_seen ... ok
+test updater::tests::debug_instances_cannot_enable_updater ... ok
+test updater::tests::download_location_is_limited_to_official_https_version_path ... ok
+test storage::tests::cumulative_baseline_survives_restart_and_confirmation_is_transactional ... ok
+test updater::tests::first_check_and_retries_after_offline_and_failed_requests_use_completion_time ... ok
+test terminal::tests::metadata_does_not_claim_project_index ... ok
+test updater::tests::manual_cache_policy_survives_serialization_and_never_grants_automatic_install ... ok
+test updater::tests::notice_sits_inside_bottom_right_work_area_with_real_outer_size ... ok
+test updater::tests::offline_manual_recheck_preserves_the_verified_download ... ok
+test updater::tests::package_names_match_github_release_asset_normalization ... ok
+test updater::tests::production_comparator_rejects_equal_older_and_prerelease_versions ... ok
+test updater::tests::test_comparator_accepts_real_equal_version_but_rejects_downgrades_and_prereleases ... ok
+test updater::tests::trial_pair_never_admits_arbitrary_past_versions_or_outside_source_versions ... ok
+test warp::tests::contact_requires_entry_and_does_not_retrigger_on_key_press_inside ... ok
+test tray::tests::completed_setup_survives_restart_until_blocked_capture ... ok
+test warp::tests::entering_without_key_then_pressing_inside_does_not_trigger ... ok
+test warp::tests::focused_note_and_focus_loss_inside_do_not_trigger ... ok
+test warp::tests::movement_does_not_bounce_but_real_exit_rearms ... ok
+test updater::tests::cached_bytes_and_signature_must_verify_before_any_install ... ok
+test warp::tests::native_contact_targets_only_memo_windows ... ok
+test warp::tests::paused_contact_cannot_fire_on_resume_inside ... ok
+test warp::tests::sides_initial_height_and_monitor_bounds ... ok
+test storage::failure_tests::edit_persists_and_failed_store_rolls_back_source_and_memory ... ok
+test web::tests::generated_web_creation_order_is_not_navigation_or_color_update_time ... ok
+test web::tests::closing_one_host_waits_for_destroy_and_isolates_reused_ids ... ok
+test windows_contact::tests::only_the_complete_three_modifier_chord_is_reserved_for_stash ... ok
+test web::tests::navigation_validation_rejects_internal_and_credential_urls ... ok
+test windows_contact::tests::pointer_gestures_require_their_single_modifier ... ok
+test terminal::tests::retired_agent_records_are_ignored_without_changing_metadata_or_projects ... ok
+test updater::tests::signed_platform_binding_rejects_cross_architecture_cache_swap ... ok
+test terminal::persistence::tests::unchanged_explicit_retry_persists_a_failed_edit_but_polling_does_not_retry ... ok
+test windows_window::tests::image_ratio_keeps_two_dip_minimum_on_both_axes ... ok
+test web::recent::tests::invalid_records_never_reach_the_ui_and_corruption_is_preserved ... ok
+test updater::tests::notice_version_is_atomically_persisted_and_deduplicated_across_reads ... ok
+test workspace::tests::clips_a_window_to_each_display_in_placement_units ... ok
+test workspace::tests::fit_validates_bounds_and_automatic_flag ... ok
+test skills::tests::corrupt_state_and_unowned_off_fail_without_deleting_user_data ... ok
+test skills::installer::tests::interrupted_install_recovers_before_state_commit_and_finishes_after_commit ... ok
+test windows_window::tests::client_size_survives_native_frame_recalculation_without_moving_or_marking_manual ... ok
+test windows_window::tests::click_through_layered_window_has_no_queryable_memo_alpha ... ok
+test skills::tests::default_is_off_and_enabling_installs_all_detected_agents_without_execution ... ok
+test terminal::persistence::tests::shutdown_retries_live_failures_once_and_skips_deleted_generations ... ok
+test skills::tests::explicit_on_overwrites_local_changes_but_ordinary_start_does_not ... ok
+test storage::tests::roundtrip_and_isolation ... ok
+test skills::tests::new_agent_receives_on_skills_on_next_reconciliation ... ok
+test terminal::welcome::tests::recent_folders_migrate_deduplicate_bound_and_filter_missing ... ok
+test windows_window::tests::image_native_resize_constrains_all_edges_and_restores_after_fold_without_touching_text ... ok
+test windows_window::tests::exact_client_rect_handles_negative_monitors_and_frame_changes_without_activation ... ok
+test windows_window::tests::native_user_resize_survives_drag_exit_but_programmatic_size_and_move_do_not_latch ... ok
+test storage::tests::windows_reserved_ids_roundtrip_without_case_collisions ... ok
+test skills::tests::upgrade_overwrites_only_on_skills_preserves_choices_and_retries_failures ... ok
+test skills::tests::state_write_failure_rolls_back_every_agent_copy ... ok
+test windows_window::tests::native_alpha_survives_frame_style_replacement_and_repeated_outer_resize ... ok
+test skills::tests::off_removes_only_receipted_copies_and_never_reactivates_on_upgrade ... ok
+test web::recent::tests::recent_addresses_survive_reload_deduplicate_limit_and_delete ... ok
+
+test result: ok. 318 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s
+
+TAP version 13
+# Subtest: memo defaults to gray regardless of manager selection, old color mode or OS appearance
+ok 1 - memo defaults to gray regardless of manager selection, old color mode or OS appearance
+  ---
+  duration_ms: 4.9624
+  ...
+# Subtest: inaccessible memo preferences fall back to gray
+ok 2 - inaccessible memo preferences fall back to gray
+  ---
+  duration_ms: 0.5098
+  ...
+# Subtest: independent theme roles and color mode display preserve the individual color across cycles
+ok 3 - independent theme roles and color mode display preserve the individual color across cycles
+  ---
+  duration_ms: 8.5842
+  ...
+# Subtest: only the independent system memo choice follows day/night appearance
+ok 4 - only the independent system memo choice follows day/night appearance
+  ---
+  duration_ms: 0.703
+  ...
+# Subtest: first run proposes checked startup, but reads/focus never register
+ok 5 - first run proposes checked startup, but reads/focus never register
+  ---
+  duration_ms: 12.5134
+  ...
+# Subtest: onboarding rejection is explicit Off and does not alter diagnostics
+ok 6 - onboarding rejection is explicit Off and does not alter diagnostics
+  ---
+  duration_ms: 4.579
+  ...
+# Subtest: existing Off and OS-disabled On remain distinct after refresh/restart
+ok 7 - existing Off and OS-disabled On remain distinct after refresh/restart
+  ---
+  duration_ms: 4.188
+  ...
+# Subtest: development/verification and unknown status never submit default On
+ok 8 - development/verification and unknown status never submit default On
+  ---
+  duration_ms: 3.1065
+  ...
+# Subtest: settings changes apply immediately; OS error preserves intent and reports mismatch
+ok 9 - settings changes apply immediately; OS error preserves intent and reports mismatch
+  ---
+  duration_ms: 3.4425
+  ...
+# Subtest: onboarding OS failure is returned to the global consent flow
+ok 10 - onboarding OS failure is returned to the global consent flow
+  ---
+  duration_ms: 4.6887
+  ...
+# Subtest: successful checkbox change saves once and refresh never repeats it
+ok 11 - successful checkbox change saves once and refresh never repeats it
+  ---
+  duration_ms: 3.3522
+  ...
+# Subtest: OS settings action only appears for approval-required or unconfirmed states
+ok 12 - OS settings action only appears for approval-required or unconfirmed states
+  ---
+  duration_ms: 9.5402
+  ...
+# Subtest: failed status read exposes only retry and retry does not register
+ok 13 - failed status read exposes only retry and retry does not register
+  ---
+  duration_ms: 4.2161
+  ...
+# Subtest: settings places privacy last among default destinations and keeps developer hidden
+ok 14 - settings places privacy last among default destinations and keeps developer hidden
+  ---
+  duration_ms: 3.9945
+  ...
+# Subtest: reverse drag clamps to the display and submits one selection
+ok 15 - reverse drag clamps to the display and submits one selection
+  ---
+  duration_ms: 8.827
+  ...
+# Subtest: click without drag creates no note; Escape cancels
+ok 16 - click without drag creates no note; Escape cancels
+  ---
+  duration_ms: 2.1053
+  ...
+# Subtest: original RGBA pixels are painted before showing, without a load or click event
+ok 17 - original RGBA pixels are painted before showing, without a load or click event
+  ---
+  duration_ms: 2.2604
+  ...
+# Subtest: unusable preview cancels without displaying a black overlay: {"malformed":true}
+ok 18 - unusable preview cancels without displaying a black overlay: {"malformed":true}
+  ---
+  duration_ms: 2.4947
+  ...
+# Subtest: unusable preview cancels without displaying a black overlay: {"noCanvas":true}
+ok 19 - unusable preview cancels without displaying a black overlay: {"noCanvas":true}
+  ---
+  duration_ms: 2.4347
+  ...
+# Subtest: the first pointer press after paint immediately starts selection
+ok 20 - the first pointer press after paint immediately starts selection
+  ---
+  duration_ms: 2.8048
+  ...
+# Subtest: the first Escape cancels without a click even while shortcut modifiers are held
+ok 21 - the first Escape cancels without a click even while shortcut modifiers are held
+  ---
+  duration_ms: 4.1959
+  ...
+# Subtest: Escape releases an active drag before pointerup can commit it
+ok 22 - Escape releases an active drag before pointerup can commit it
+  ---
+  duration_ms: 2.6858
+  ...
+# Subtest: drag and Escape work between native presentation and the dimming transition
+ok 23 - drag and Escape work between native presentation and the dimming transition
+  ---
+  duration_ms: 3.5905
+  ...
+# Subtest: canonical paths, not cwd or basename, determine stable instance IDs
+ok 24 - canonical paths, not cwd or basename, determine stable instance IDs
+  ---
+  duration_ms: 750.3381
+  ...
+# Subtest: development CLI rejects missing, old and foreign binaries without release fallback
+ok 25 - development CLI rejects missing, old and foreign binaries without release fallback # SKIP POSIX executable fixtures; Windows uses native CLI smoke tests
+  ---
+  duration_ms: 0.2725
+  ...
+# Subtest: build cache uses the Git common directory while final artifacts stay local
+ok 26 - build cache uses the Git common directory while final artifacts stay local
+  ---
+  duration_ms: 170.8437
+  ...
+# Subtest: development does not inject a connection feature switch
+ok 27 - development does not inject a connection feature switch
+  ---
+  duration_ms: 96.002
+  ...
+# Subtest: developer entry and refresh never invoke deferred terminal separation APIs
+ok 28 - developer entry and refresh never invoke deferred terminal separation APIs
+  ---
+  duration_ms: 12.9274
+  ...
+# Subtest: public builds cannot downgrade without a menu-compatible pair; isolated pair reverses direction after restart
+ok 29 - public builds cannot downgrade without a menu-compatible pair; isolated pair reverses direction after restart
+  ---
+  duration_ms: 5.6011
+  ...
+# Subtest: five rapid clicks reveal once; slow clicks reset; refresh preserves reveal
+ok 30 - five rapid clicks reveal once; slow clicks reset; refresh preserves reveal
+  ---
+  duration_ms: 5.4734
+  ...
+# Subtest: prepare is explicit, rejects duplicate actions and never installs on ready refresh
+ok 31 - prepare is explicit, rejects duplicate actions and never installs on ready refresh
+  ---
+  duration_ms: 3.1705
+  ...
+# Subtest: installation preserves precise protection reason, disabled builds cannot prepare
+ok 32 - installation preserves precise protection reason, disabled builds cannot prepare
+  ---
+  duration_ms: 3.0313
+  ...
+# Subtest: normal ready package cannot be installed as a test, and errors remain visible
+ok 33 - normal ready package cannot be installed as a test, and errors remain visible
+  ---
+  duration_ms: 3.3254
+  ...
+# Subtest: ordinary contributor build does not fetch official DSN or silently enable transmission
+ok 34 - ordinary contributor build does not fetch official DSN or silently enable transmission
+  ---
+  duration_ms: 151.1354
+  ...
+# Subtest: invalid DSN is rejected without printing the supplied value
+ok 35 - invalid DSN is rejected without printing the supplied value
+  ---
+  duration_ms: 125.147
+  ...
+# Subtest: open and repeat reuse the same icon nodes and expose the next action
+ok 36 - open and repeat reuse the same icon nodes and expose the next action
+  ---
+  duration_ms: 11.088
+  ...
+# Subtest: text surface is always editable and clean reads never serialize/save/export
+ok 37 - text surface is always editable and clean reads never serialize/save/export
+  ---
+  duration_ms: 29.789
+  ...
+# Subtest: dirty draft survives external revision and save conflict; explicit cancel reveals latest
+ok 38 - dirty draft survives external revision and save conflict; explicit cancel reveals latest
+  ---
+  duration_ms: 9.0222
+  ...
+# Subtest: explicit save preserves editor and clears dirty; failure preserves retryable draft
+ok 39 - explicit save preserves editor and clears dirty; failure preserves retryable draft
+  ---
+  duration_ms: 4.8865
+  ...
+# Subtest: save shortcuts share explicit save on both platforms and never export text
+ok 40 - save shortcuts share explicit save on both platforms and never export text
+  ---
+  duration_ms: 10.2743
+  ...
+# Subtest: composition protects save/cancel/remote refresh and updater busy until composition ends
+ok 41 - composition protects save/cancel/remote refresh and updater busy until composition ends
+  ---
+  duration_ms: 8.3871
+  ...
+# Subtest: IME keycode and repeat/modified shortcuts never save
+ok 42 - IME keycode and repeat/modified shortcuts never save
+  ---
+  duration_ms: 5.0975
+  ...
+# Subtest: pending autosave coalesces requests without locking input and saves newer draft next
+ok 43 - pending autosave coalesces requests without locking input and saves newer draft next
+  ---
+  duration_ms: 5.8056
+  ...
+# Subtest: unsupported source protection never becomes a dirty save
+ok 44 - unsupported source protection never becomes a dirty save
+  ---
+  duration_ms: 4.4232
+  ...
+# Subtest: fold/hide/restore and theme-only refresh retain local draft and source base
+ok 45 - fold/hide/restore and theme-only refresh retain local draft and source base
+  ---
+  duration_ms: 5.7231
+  ...
+# Subtest: first dirty input requests entry height once, clean open and refresh do not
+ok 46 - first dirty input requests entry height once, clean open and refresh do not
+  ---
+  duration_ms: 7.5627
+  ...
+# Subtest: dirty state defers acknowledgement; clean focus departure confirms only observed revision
+ok 47 - dirty state defers acknowledgement; clean focus departure confirms only observed revision
+  ---
+  duration_ms: 5.3593
+  ...
+# Subtest: selected copy preserves native shortcut, copy button copies draft without save
+ok 48 - selected copy preserves native shortcut, copy button copies draft without save
+  ---
+  duration_ms: 4.9104
+  ...
+# Subtest: image notes keep native copy and shortcut export with no text editor
+ok 49 - image notes keep native copy and shortcut export with no text editor
+  ---
+  duration_ms: 4.9394
+  ...
+# Subtest: font sizing, monitor polling and native rollover remain independent of editing
+ok 50 - font sizing, monitor polling and native rollover remain independent of editing
+  ---
+  duration_ms: 5.2209
+  ...
+# Subtest: Escape flushes changes before hiding and close refuses to discard a failed save
+ok 51 - Escape flushes changes before hiding and close refuses to discard a failed save
+  ---
+  duration_ms: 7.7133
+  ...
+# Subtest: autosave Feedback shows status and exposes recovery only on failure
+ok 52 - autosave Feedback shows status and exposes recovery only on failure
+  ---
+  duration_ms: 2.1153
+  ...
+# Subtest: autosave coalesces latest input and never writes an unchanged note
+ok 53 - autosave coalesces latest input and never writes an unchanged note
+  ---
+  duration_ms: 4.9705
+  ...
+# Subtest: composition defers autosave until final input is committed
+ok 54 - composition defers autosave until final input is committed
+  ---
+  duration_ms: 4.9448
+  ...
+# Subtest: autosave failure pauses retries and retains newer input until explicit retry
+ok 55 - autosave failure pauses retries and retains newer input until explicit retry
+  ---
+  duration_ms: 4.3481
+  ...
+# Subtest: undo while a write is pending is saved as the following revision
+ok 56 - undo while a write is pending is saved as the following revision
+  ---
+  duration_ms: 5.0779
+  ...
+# Subtest: a revision first seen on focus departure remains unread
+ok 57 - a revision first seen on focus departure remains unread
+  ---
+  duration_ms: 6.3156
+  ...
+# Subtest: stale snapshots after successful save cannot replace the saved editor base
+ok 58 - stale snapshots after successful save cannot replace the saved editor base
+  ---
+  duration_ms: 4.7543
+  ...
+# Subtest: hidden notes suppress inline feedback delivery until explicitly visible
+ok 59 - hidden notes suppress inline feedback delivery until explicitly visible
+  ---
+  duration_ms: 10.9988
+  ...
+# Subtest: native pointer messages target the owning memo and do not mark content edited
+ok 60 - native pointer messages target the owning memo and do not mark content edited
+  ---
+  duration_ms: 4.0373
+  ...
+# Subtest: copy ignores removed diff text and does not acknowledge a change
+ok 61 - copy ignores removed diff text and does not acknowledge a change
+  ---
+  duration_ms: 5.6415
+  ...
+# Subtest: clipboard failure reports the actual error without erasing draft
+ok 62 - clipboard failure reports the actual error without erasing draft
+  ---
+  duration_ms: 6.9336
+  ...
+# Subtest: image export failures preserve state and can retry
+ok 63 - image export failures preserve state and can retry
+  ---
+  duration_ms: 4.4096
+  ...
+# Subtest: failed automatic acknowledgement keeps decoration and can retry
+ok 64 - failed automatic acknowledgement keeps decoration and can retry
+  ---
+  duration_ms: 4.9538
+  ...
+# Subtest: explicit region input waits for visible/unfolded state and focuses once
+ok 65 - explicit region input waits for visible/unfolded state and focuses once
+  ---
+  duration_ms: 4.7373
+  ...
+# Subtest: normal CLI-created and capture notes never request editor focus
+ok 66 - normal CLI-created and capture notes never request editor focus
+  ---
+  duration_ms: 11.9776
+  ...
+# Subtest: memo content does not register an immediate mousedown drag handler
+ok 67 - memo content does not register an immediate mousedown drag handler
+  ---
+  duration_ms: 15.3554
+  ...
+# (node:9420) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///C:/Users/egoin/.codex/worktrees/5170/agent-gibbon/ui/feedback.js is not specified and it doesn't parse as CommonJS.
+# Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+# To eliminate this warning, add "type": "module" to C:\\Users\\egoin\\.codex\\worktrees\\5170\\agent-gibbon\\package.json.
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: inline footer preserves action focus identities and uses the latest revision
+ok 68 - inline footer preserves action focus identities and uses the latest revision
+  ---
+  duration_ms: 4.3521
+  ...
+# Subtest: fold and hidden memo suppression do not discard the view or its buttons
+ok 69 - fold and hidden memo suppression do not discard the view or its buttons
+  ---
+  duration_ms: 0.5441
+  ...
+# Subtest: off opt-in neither starts a flow nor augments application arguments
+ok 70 - off opt-in neither starts a flow nor augments application arguments
+  ---
+  duration_ms: 10.0143
+  ...
+# Subtest: overlapping flows carry distinct IDs; stages never contain application content
+ok 71 - overlapping flows carry distinct IDs; stages never contain application content
+  ---
+  duration_ms: 4.9666
+  ...
+# Subtest: refresh is sampled at most once per two seconds and hidden work is uninstrumented
+ok 72 - refresh is sampled at most once per two seconds and hidden work is uninstrumented
+  ---
+  duration_ms: 3.0597
+  ...
+# Subtest: frames do not delay application result; completion follows second callback; errors close flow
+ok 73 - frames do not delay application result; completion follows second callback; errors close flow
+  ---
+  duration_ms: 5.9246
+  ...
+# Subtest: fit observation preserves application completion while frame waits for fit
+ok 74 - fit observation preserves application completion while frame waits for fit
+  ---
+  duration_ms: 2.7172
+  ...
+# Subtest: system light maps to gray, dark maps to black before paint and remains unsaved
+ok 75 - system light maps to gray, dark maps to black before paint and remains unsaved
+  ---
+  duration_ms: 7.5723
+  ...
+# Subtest: all explicit themes survive reload and ignore subsequent system changes; reset resumes tracking
+ok 76 - all explicit themes survive reload and ignore subsequent system changes; reset resumes tracking
+  ---
+  duration_ms: 11.2059
+  ...
+# Subtest: corrupt or inaccessible storage follows system; write failures retain previous selection
+ok 77 - corrupt or inaccessible storage follows system; write failures retain previous selection
+  ---
+  duration_ms: 6.1803
+  ...
+# Subtest: other manager windows update or reset preference; unrelated storage is ignored
+ok 78 - other manager windows update or reset preference; unrelated storage is ignored
+  ---
+  duration_ms: 1.7448
+  ...
+# Subtest: native color changes are serialized and carry only a fixed theme, without delaying the UI
+ok 79 - native color changes are serialized and carry only a fixed theme, without delaying the UI
+  ---
+  duration_ms: 15.9751
+  ...
+# Subtest: native failure reports a separate status and retries without undoing the saved preference
+ok 80 - native failure reports a separate status and retries without undoing the saved preference
+  ---
+  duration_ms: 2.7892
+  ...
+# Subtest: five memo designs persist independently of manager selection and default to gray
+ok 81 - five memo designs persist independently of manager selection and default to gray
+  ---
+  duration_ms: 9.3827
+  ...
+# Subtest: storage changes update memo design without changing manager selection; invalid values reset only memo design
+ok 82 - storage changes update memo design without changing manager selection; invalid values reset only memo design
+  ---
+  duration_ms: 2.9879
+  ...
+# Subtest: manager system is a radio selection and saved colors remain explicit choices
+ok 83 - manager system is a radio selection and saved colors remain explicit choices
+  ---
+  duration_ms: 2.786
+  ...
+# Subtest: read-only selection, settings navigation and empty result
+ok 84 - read-only selection, settings navigation and empty result
+  ---
+  duration_ms: 21.7732
+  ...
+# Subtest: one common show action precedes unchanged content for every memo type
+ok 85 - one common show action precedes unchanged content for every memo type
+  ---
+  duration_ms: 5.6386
+  ...
+# Subtest: show failure stays visible across polling and supports retry without exposing raw errors
+ok 86 - show failure stays visible across polling and supports retry without exposing raw errors
+  ---
+  duration_ms: 4.0423
+  ...
+# Subtest: pending actions use the clicked id, prevent duplicate submission and cannot affect a new selection
+ok 87 - pending actions use the clicked id, prevent duplicate submission and cannot affect a new selection
+  ---
+  duration_ms: 3.6786
+  ...
+# Subtest: visible status toggles to hide and back for every memo kind
+ok 88 - visible status toggles to hide and back for every memo kind
+  ---
+  duration_ms: 10.8348
+  ...
+# Subtest: polling external visibility changes keeps the existing controls and inline errors
+ok 89 - polling external visibility changes keeps the existing controls and inline errors
+  ---
+  duration_ms: 3.2169
+  ...
+# Subtest: a query started before a visibility change cannot roll back the confirmed result
+ok 90 - a query started before a visibility change cannot roll back the confirmed result
+  ---
+  duration_ms: 2.8605
+  ...
+# Subtest: settings sections preserve privacy drafts and selected memo across navigation
+ok 91 - settings sections preserve privacy drafts and selected memo across navigation
+  ---
+  duration_ms: 3.2109
+  ...
+# Subtest: More destination returns from Settings to the full list without type prefixes or IDs
+ok 92 - More destination returns from Settings to the full list without type prefixes or IDs
+  ---
+  duration_ms: 5.0771
+  ...
+# Subtest: retired agent records cannot appear in the manager list
+ok 93 - retired agent records cannot appear in the manager list
+  ---
+  duration_ms: 4.6798
+  ...
+# Subtest: body tokens support partial responses and recover from an unknown token
+ok 94 - body tokens support partial responses and recover from an unknown token
+  ---
+  duration_ms: 3.3048
+  ...
+# Subtest: filter keeps only explicit selections and survives unrelated updates
+ok 95 - filter keeps only explicit selections and survives unrelated updates
+  ---
+  duration_ms: 4.0935
+  ...
+# Subtest: capture updates retain the toolbar and old image until the latest replacement is ready
+ok 96 - capture updates retain the toolbar and old image until the latest replacement is ready
+  ---
+  duration_ms: 9.3289
+  ...
+# Subtest: web rows keep their session id across Welcome and navigation and send typed visibility actions
+ok 97 - web rows keep their session id across Welcome and navigation and send typed visibility actions
+  ---
+  duration_ms: 3.2721
+  ...
+# Subtest: web search reads registered titles, never remote body, and does not transfer a selection to a reused id
+ok 98 - web search reads registered titles, never remote body, and does not transfer a selection to a reused id
+  ---
+  duration_ms: 3.7081
+  ...
+# Subtest: format-only normalization is allowed without treating it as a no-op source write
+ok 99 - format-only normalization is allowed without treating it as a no-op source write
+  ---
+  duration_ms: 38.5936
+  ...
+# Subtest: semantic source loss in HTML, references, code meta, tables, tasks is rejected
+ok 100 - semantic source loss in HTML, references, code meta, tables, tasks is rejected
+  ---
+  duration_ms: 15.4994
+  ...
+# Subtest: native memo focus follows events and protects initial sample (race=false)
+ok 101 - native memo focus follows events and protects initial sample (race=false)
+  ---
+  duration_ms: 11.6716
+  ...
+# Subtest: native memo focus follows events and protects initial sample (race=true)
+ok 102 - native memo focus follows events and protects initial sample (race=true)
+  ---
+  duration_ms: 4.0328
+  ...
+# Subtest: entry leaves frames alone and each explicit button dispatches once
+ok 103 - entry leaves frames alone and each explicit button dispatches once
+  ---
+  duration_ms: 6.6635
+  ...
+# Subtest: late results from a previous visit cannot unlock controls or replace new feedback
+ok 104 - late results from a previous visit cannot unlock controls or replace new feedback
+  ---
+  duration_ms: 3.7313
+  ...
+# Subtest: inactive overview highlights only the button under the pointer without a click
+ok 105 - inactive overview highlights only the button under the pointer without a click
+  ---
+  duration_ms: 2.5282
+  ...
+# Subtest: all memo types share accessible controls and retain their supported actions
+ok 106 - all memo types share accessible controls and retain their supported actions
+  ---
+  duration_ms: 9.8903
+  ...
+# Subtest: overlay thumb reaches both ends without escaping the content track
+ok 107 - overlay thumb reaches both ends without escaping the content track
+  ---
+  duration_ms: 2.6032
+  ...
+# Subtest: short and empty notes have no scroll range; long notes retain a draggable thumb
+ok 108 - short and empty notes have no scroll range; long notes retain a draggable thumb
+  ---
+  duration_ms: 1.3973
+  ...
+# Subtest: native activation distinguishes passive creation, deliberate content focus and explicit selection
+ok 109 - native activation distinguishes passive creation, deliberate content focus and explicit selection # SKIP
+  ---
+  duration_ms: 1.5115
+  ...
+# Subtest: required terms do not imply optional sharing; unchecked Continue submits nothing
+ok 110 - required terms do not imply optional sharing; unchecked Continue submits nothing
+  ---
+  duration_ms: 16.1739
+  ...
+# Subtest: unfinished notice disables optional sharing but still allows terms-only use
+ok 111 - unfinished notice disables optional sharing but still allows terms-only use
+  ---
+  duration_ms: 4.4135
+  ...
+# Subtest: stored decline stays declined and settings withdrawal is an explicit false
+ok 112 - stored decline stays declined and settings withdrawal is an explicit false
+  ---
+  duration_ms: 3.1954
+  ...
+# Subtest: unreadable status fails closed; legal documents remain local
+ok 113 - unreadable status fails closed; legal documents remain local
+  ---
+  duration_ms: 4.8346
+  ...
+# Subtest: turning sharing off submits withdrawal without another Save click
+ok 114 - turning sharing off submits withdrawal without another Save click
+  ---
+  duration_ms: 6.0108
+  ...
+# Subtest: published notice offers unchecked opt-in; settings only enable after explicit save
+ok 115 - published notice offers unchecked opt-in; settings only enable after explicit save
+  ---
+  duration_ms: 2.9315
+  ...
+# Subtest: development terms skip opens navigation without accepting terms or sharing
+ok 116 - development terms skip opens navigation without accepting terms or sharing
+  ---
+  duration_ms: 3.5832
+  ...
+# Subtest: first diagnostic opt-in after a development skip still requires explicit terms
+ok 117 - first diagnostic opt-in after a development skip still requires explicit terms
+  ---
+  duration_ms: 3.0445
+  ...
+# Subtest: explicit terms verification keeps the welcome gate for an unaccepted instance
+ok 118 - explicit terms verification keeps the welcome gate for an unaccepted instance
+  ---
+  duration_ms: 3.0602
+  ...
+# Subtest: ordinary hidden page keeps initialization and never reveals during restored
+ok 119 - ordinary hidden page keeps initialization and never reveals during restored
+  ---
+  duration_ms: 6.069
+  ...
+# Subtest: ordinary hidden page keeps initialization and never reveals during onboarding
+ok 120 - ordinary hidden page keeps initialization and never reveals during onboarding
+  ---
+  duration_ms: 3.2391
+  ...
+# Subtest: a rejected Welcome task presents its error after all initial tasks settle
+ok 121 - a rejected Welcome task presents its error after all initial tasks settle
+  ---
+  duration_ms: 2.4715
+  ...
+# Subtest: a newly drawn surface stays transparent until its themed paint is prepared
+ok 122 - a newly drawn surface stays transparent until its themed paint is prepared
+  ---
+  duration_ms: 1.8808
+  ...
+# Subtest: all memo toolbars install the accessible plug button and source Escape cancels its generation
+ok 123 - all memo toolbars install the accessible plug button and source Escape cancels its generation
+  ---
+  duration_ms: 26.129
+  ...
+# Subtest: picker coalesces pointer motion, snaps hover and confirms click coordinates rather than a stale hover
+ok 124 - picker coalesces pointer motion, snaps hover and confirms click coordinates rather than a stale hover
+  ---
+  duration_ms: 7.9427
+  ...
+# Subtest: settings allow an empty label, keep direction and generation, and recover from save failure without duplicate submissions
+ok 125 - settings allow an empty label, keep direction and generation, and recover from save failure without duplicate submissions
+  ---
+  duration_ms: 6.8652
+  ...
+# Subtest: settled geometry is drawn once and acknowledged without relying on a visible frame
+ok 126 - settled geometry is drawn once and acknowledged without relying on a visible frame
+  ---
+  duration_ms: 23.3283
+  ...
+# Subtest: newer settled geometry invalidates an old reveal and snaps to current endpoints
+ok 127 - newer settled geometry invalidates an old reveal and snaps to current endpoints
+  ---
+  duration_ms: 3.9945
+  ...
+# Subtest: direction, identity and coordinate changes have no residual animation or repeated text measurement
+ok 128 - direction, identity and coordinate changes have no residual animation or repeated text measurement
+  ---
+  duration_ms: 5.3354
+  ...
+# Subtest: arrow choice supports target-only, both ends and no arrow without stale markers
+ok 129 - arrow choice supports target-only, both ends and no arrow without stale markers
+  ---
+  duration_ms: 2.8716
+  ...
+# Subtest: a steep diagonal joins the center of the full-size head base and keeps its tip at the port
+ok 130 - a steep diagonal joins the center of the full-size head base and keeps its tip at the port
+  ---
+  duration_ms: 3.992
+  ...
+# Subtest: opposed heads fit inside a narrow gap and reset to full size after movement
+ok 131 - opposed heads fit inside a narrow gap and reset to full size after movement
+  ---
+  duration_ms: 2.0384
+  ...
+# Subtest: touching ports retain the straight chord and coincident ports have no drawable arrow
+ok 132 - touching ports retain the straight chord and coincident ports have no drawable arrow
+  ---
+  duration_ms: 1.7487
+  ...
+# Subtest: version bump updates all manifests and Cargo lockfile, retaining pnpm resolution without changing dependencies
+ok 133 - version bump updates all manifests and Cargo lockfile, retaining pnpm resolution without changing dependencies
+  ---
+  duration_ms: 190.8344
+  ...
+# Subtest: version drift blocks release and bump without writing files
+ok 134 - version drift blocks release and bump without writing files
+  ---
+  duration_ms: 102.4651
+  ...
+# Subtest: release assets require all three platforms and contain independently checkable hashes
+ok 135 - release assets require all three platforms and contain independently checkable hashes
+  ---
+  duration_ms: 40.1781
+  ...
+# Subtest: skills are lazy and independent; immediate toggle preserves accordion state
+ok 136 - skills are lazy and independent; immediate toggle preserves accordion state
+  ---
+  duration_ms: 12.8569
+  ...
+# Subtest: pending install has no optimistic On and prevents duplicate changes
+ok 137 - pending install has no optimistic On and prevents duplicate changes
+  ---
+  duration_ms: 3.3017
+  ...
+# Subtest: installation failure reloads authoritative state and reports the error
+ok 138 - installation failure reloads authoritative state and reports the error
+  ---
+  duration_ms: 5.0423
+  ...
+# Subtest: failed initial load ends loading state and navigation can retry
+ok 139 - failed initial load ends loading state and navigation can retry
+  ---
+  duration_ms: 4.2488
+  ...
+# Subtest: fixed error kinds exclude message/reason; disabled diagnostics install no timers
+ok 140 - fixed error kinds exclude message/reason; disabled diagnostics install no timers
+  ---
+  duration_ms: 20.33
+  ...
+# Subtest: invoke instrumentation preserves values/rejections but never serializes arguments or errors
+ok 141 - invoke instrumentation preserves values/rejections but never serializes arguments or errors
+  ---
+  duration_ms: 4.832
+  ...
+# Subtest: lag observers send only durations and skip hidden/sleep intervals; heartbeat has one in flight
+ok 142 - lag observers send only durations and skip hidden/sleep intervals; heartbeat has one in flight
+  ---
+  duration_ms: 5.1206
+  ...
+# Subtest: captured invoke works with frozen Tauri API and source metadata is allowlisted
+ok 143 - captured invoke works with frozen Tauri API and source metadata is allowlisted
+  ---
+  duration_ms: 2.4983
+  ...
+# Subtest: explicit terminal stages accept only fixed names and finite visible durations
+ok 144 - explicit terminal stages accept only fixed names and finite visible durations
+  ---
+  duration_ms: 3.7112
+  ...
+# Subtest: withdrawal clears pending samples and old callbacks cannot replay after re-opt-in
+ok 145 - withdrawal clears pending samples and old callbacks cannot replay after re-opt-in
+  ---
+  duration_ms: 4.1169
+  ...
+# Subtest: snapshot calls keep values and failures but never create summary measurements; heartbeat survives
+ok 146 - snapshot calls keep values and failures but never create summary measurements; heartbeat survives
+  ---
+  duration_ms: 3.9871
+  ...
+# Subtest: terminal Welcome starts with the saved independent design and a safe gray fallback
+ok 147 - terminal Welcome starts with the saved independent design and a safe gray fallback
+  ---
+  duration_ms: 3.9719
+  ...
+# Subtest: cross-document changes update color roles and scheme without invoking terminal state
+ok 148 - cross-document changes update color roles and scheme without invoking terminal state
+  ---
+  duration_ms: 0.6672
+  ...
+# Subtest: only system Welcome follows OS light/dark; explicit gray remains fixed
+ok 149 - only system Welcome follows OS light/dark; explicit gray remains fixed
+  ---
+  duration_ms: 0.3434
+  ...
+# Subtest: trusted chrome loads stored color and receives updates while preserving other designs
+ok 150 - trusted chrome loads stored color and receives updates while preserving other designs
+  ---
+  duration_ms: 12.5155
+  ...
+# Subtest: WebKit word stays editable while only the current Hangul character is highlighted
+ok 151 - WebKit word stays editable while only the current Hangul character is highlighted
+  ---
+  duration_ms: 8.6383
+  ...
+# Subtest: final consonant migration and deletion update the highlighted suffix without PTY edits
+ok 152 - final consonant migration and deletion update the highlighted suffix without PTY edits
+  ---
+  duration_ms: 2.4704
+  ...
+# Subtest: commit boundaries remove the fallback background before newline or navigation
+ok 153 - commit boundaries remove the fallback background before newline or navigation
+  ---
+  duration_ms: 12.2359
+  ...
+# Subtest: cancel, blur and paste preserve existing commit/cancel semantics
+ok 154 - cancel, blur and paste preserve existing commit/cancel semantics
+  ---
+  duration_ms: 7.7329
+  ...
+# Subtest: native composition and ordinary English/paste input remain owned by xterm
+ok 155 - native composition and ordinary English/paste input remain owned by xterm
+  ---
+  duration_ms: 1.6311
+  ...
+# Subtest: switching to native composition clears fallback styling; Chromium is untouched
+ok 156 - switching to native composition clears fallback styling; Chromium is untouched
+  ---
+  duration_ms: 2.6659
+  ...
+# Subtest: pending Hangul and ASCII use terminal column widths, including after resize
+ok 157 - pending Hangul and ASCII use terminal column widths, including after resize
+  ---
+  duration_ms: 1.7511
+  ...
+# Subtest: Welcome text and controls retain contrast in white
+ok 158 - Welcome text and controls retain contrast in white
+  ---
+  duration_ms: 3.388
+  ...
+# Subtest: Welcome text and controls retain contrast in gray
+ok 159 - Welcome text and controls retain contrast in gray
+  ---
+  duration_ms: 0.6693
+  ...
+# Subtest: Welcome text and controls retain contrast in black
+ok 160 - Welcome text and controls retain contrast in black
+  ---
+  duration_ms: 0.3755
+  ...
+# Subtest: Welcome text and controls retain contrast in system-false
+ok 161 - Welcome text and controls retain contrast in system-false
+  ---
+  duration_ms: 0.368
+  ...
+# Subtest: Welcome text and controls retain contrast in system-true
+ok 162 - Welcome text and controls retain contrast in system-true
+  ---
+  duration_ms: 0.349
+  ...
+# Subtest: Welcome text and controls retain contrast in \#ffeeaa
+ok 163 - Welcome text and controls retain contrast in \#ffeeaa
+  ---
+  duration_ms: 0.3673
+  ...
+# Subtest: Welcome text and controls retain contrast in \#123456
+ok 164 - Welcome text and controls retain contrast in \#123456
+  ---
+  duration_ms: 0.312
+  ...
+# Subtest: Welcome text and controls retain contrast in \#ff0000
+ok 165 - Welcome text and controls retain contrast in \#ff0000
+  ---
+  duration_ms: 0.2685
+  ...
+# Subtest: Welcome text and controls retain contrast in \#00ff00
+ok 166 - Welcome text and controls retain contrast in \#00ff00
+  ---
+  duration_ms: 1.9841
+  ...
+# Subtest: Welcome text and controls retain contrast in \#0000ff
+ok 167 - Welcome text and controls retain contrast in \#0000ff
+  ---
+  duration_ms: 1.0749
+  ...
+# Subtest: Welcome text and controls retain contrast in \#777777
+ok 168 - Welcome text and controls retain contrast in \#777777
+  ---
+  duration_ms: 0.6089
+  ...
+# Subtest: Welcome text and controls retain contrast in \#ffffff
+ok 169 - Welcome text and controls retain contrast in \#ffffff
+  ---
+  duration_ms: 0.2985
+  ...
+# Subtest: Welcome text and controls retain contrast in \#000000
+ok 170 - Welcome text and controls retain contrast in \#000000
+  ---
+  duration_ms: 0.2232
+  ...
+# (node:20412) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: no history uses home preview and retains folder picker and shell without autostart
+ok 171 - no history uses home preview and retains folder picker and shell without autostart
+  ---
+  duration_ms: 11.8597
+  ...
+# Subtest: recent folders show three, expand, select locally and update preview
+ok 172 - recent folders show three, expand, select locally and update preview
+  ---
+  duration_ms: 6.871
+  ...
+# Subtest: task selection updates pressed state and exact preview; Run starts only once
+ok 173 - task selection updates pressed state and exact preview; Run starts only once
+  ---
+  duration_ms: 4.3281
+  ...
+# Subtest: shell remains the only task when no recommended app is installed
+ok 174 - shell remains the only task when no recommended app is installed
+  ---
+  duration_ms: 4.908
+  ...
+# Subtest: picker refreshes location and preview without starting
+ok 175 - picker refreshes location and preview without starting
+  ---
+  duration_ms: 3.6184
+  ...
+# Subtest: failed Run preserves Welcome, restores Run focus and permits retry
+ok 176 - failed Run preserves Welcome, restores Run focus and permits retry
+  ---
+  duration_ms: 4.3607
+  ...
+# Subtest: failed launch does not move focus when window is inactive
+ok 177 - failed launch does not move focus when window is inactive
+  ---
+  duration_ms: 4.8784
+  ...
+# Subtest: removed agent mode cannot auto launch a PTY
+ok 178 - removed agent mode cannot auto launch a PTY
+  ---
+  duration_ms: 4.5326
+  ...
+# Subtest: Welcome removes rename while polling still reads metadata
+ok 179 - Welcome removes rename while polling still reads metadata
+  ---
+  duration_ms: 4.5714
+  ...
+# Subtest: long folder path and exact command remain available
+ok 180 - long folder path and exact command remain available
+  ---
+  duration_ms: 3.6579
+  ...
+# Subtest: cancelled delayed picker preserves local folder selection and blocks Run while pending
+ok 181 - cancelled delayed picker preserves local folder selection and blocks Run while pending
+  ---
+  duration_ms: 5.3413
+  ...
+# Subtest: selecting recent folder from home clears the home location hint
+ok 182 - selecting recent folder from home clears the home location hint
+  ---
+  duration_ms: 6.7232
+  ...
+# Subtest: approved wireframe selects a task without starting until Run
+ok 183 - approved wireframe selects a task without starting until Run
+  ---
+  duration_ms: 3.7781
+  ...
+# Subtest: restoration uses edited plan only after explicit restore
+ok 184 - restoration uses edited plan only after explicit restore
+  ---
+  duration_ms: 3.4505
+  ...
+# Subtest: cancel opens welcome without starting a shell
+ok 185 - cancel opens welcome without starting a shell
+  ---
+  duration_ms: 3.1726
+  ...
+# Subtest: only a verified monitor in a restored window starts automatically
+ok 186 - only a verified monitor in a restored window starts automatically
+  ---
+  duration_ms: 10.2604
+  ...
+# Subtest: unsupported restoration shows an explanation and blocks auto and edited execution
+ok 187 - unsupported restoration shows an explanation and blocks auto and edited execution
+  ---
+  duration_ms: 5.1505
+  ...
+# Subtest: a recreated webview for a retained exited session cannot rerun the saved plan
+ok 188 - a recreated webview for a retained exited session cannot rerun the saved plan
+  ---
+  duration_ms: 2.8286
+  ...
+# Subtest: a PTY starts with its measured grid and equivalent later measurements send no resize
+ok 189 - a PTY starts with its measured grid and equivalent later measurements send no resize
+  ---
+  duration_ms: 33.6815
+  ...
+# Subtest: resizing during start and a delayed resize converges to the latest measured grid
+ok 190 - resizing during start and a delayed resize converges to the latest measured grid
+  ---
+  duration_ms: 6.2177
+  ...
+# Subtest: a failed resize retries once, then a fresh measurement may retry the same grid
+ok 191 - a failed resize retries once, then a fresh measurement may retry the same grid
+  ---
+  duration_ms: 8.6391
+  ...
+# Subtest: restored PTY, hidden host and font change use the visible grid
+ok 192 - restored PTY, hidden host and font change use the visible grid
+  ---
+  duration_ms: 10.6086
+  ...
+# Subtest: a failed launch may restart with a different grid, and a failed stale resize yields to newer cells
+ok 193 - a failed launch may restart with a different grid, and a failed stale resize yields to newer cells
+  ---
+  duration_ms: 4.3744
+  ...
+# Subtest: an exit observed during a pending resize blocks the queued latest grid
+ok 194 - an exit observed during a pending resize blocks the queued latest grid
+  ---
+  duration_ms: 4.6689
+  ...
+# Subtest: legacy detached flag cannot automatically reattach or execute a shell
+ok 195 - legacy detached flag cannot automatically reattach or execute a shell
+  ---
+  duration_ms: 3.2846
+  ...
+# Subtest: light and dark backgrounds have readable foregrounds
+ok 196 - light and dark backgrounds have readable foregrounds
+  ---
+  duration_ms: 5.1266
+  ...
+# Subtest: sampled RGB space has at least 4.5:1 text contrast
+ok 197 - sampled RGB space has at least 4.5:1 text contrast
+  ---
+  duration_ms: 2322.8205
+  ...
+# Subtest: error text retains contrast on saturated memo colors
+ok 198 - error text retains contrast on saturated memo colors
+  ---
+  duration_ms: 1.7222
+  ...
+# Subtest: palette and arbitrary colors keep opaque secondary and panel text readable
+ok 199 - palette and arbitrary colors keep opaque secondary and panel text readable
+  ---
+  duration_ms: 54.0006
+  ...
+# Subtest: frontend palette matches colors assigned by the native backend
+ok 200 - frontend palette matches colors assigned by the native backend
+  ---
+  duration_ms: 2.7951
+  ...
+# Subtest: stationary toolbar clicks stay local; double click toggles once and synchronizes folded content
+ok 201 - stationary toolbar clicks stay local; double click toggles once and synchronizes folded content
+  ---
+  duration_ms: 11.8345
+  ...
+# Subtest: toolbar drag requires held primary pointer movement and cancels after release/cancellation
+ok 202 - toolbar drag requires held primary pointer movement and cancels after release/cancellation
+  ---
+  duration_ms: 3.0227
+  ...
+# Subtest: buttons and editable descendants keep gestures; titles drag but never maximize
+ok 203 - buttons and editable descendants keep gestures; titles drag but never maximize
+  ---
+  duration_ms: 2.848
+  ...
+# Subtest: a pending toggle cannot race another; native failure is reported and retry works
+ok 204 - a pending toggle cannot race another; native failure is reported and retry works
+  ---
+  duration_ms: 3.7097
+  ...
+# Subtest: toolbar waits for native fold and restores the same state on expansion
+ok 205 - toolbar waits for native fold and restores the same state on expansion
+  ---
+  duration_ms: 9.8439
+  ...
+# Subtest: native pointer events stay in their own toolbar across two webviews
+ok 206 - native pointer events stay in their own toolbar across two webviews
+  ---
+  duration_ms: 6.295
+  ...
+# Subtest: direction-guide acknowledges prepare, freezes input and releases for retry
+ok 207 - direction-guide acknowledges prepare, freezes input and releases for retry
+  ---
+  duration_ms: 18.1924
+  ...
+# Subtest: layout-undo acknowledges prepare, freezes input and releases for retry
+ok 208 - layout-undo acknowledges prepare, freezes input and releases for retry
+  ---
+  duration_ms: 14.1295
+  ...
+# Subtest: memo-backdrop acknowledges prepare, freezes input and releases for retry
+ok 209 - memo-backdrop acknowledges prepare, freezes input and releases for retry
+  ---
+  duration_ms: 4.655
+  ...
+# Subtest: memo-overview acknowledges prepare, freezes input and releases for retry
+ok 210 - memo-overview acknowledges prepare, freezes input and releases for retry
+  ---
+  duration_ms: 5.1608
+  ...
+# Subtest: layout-undo includes its real layout action in the safety handshake
+ok 211 - layout-undo includes its real layout action in the safety handshake
+  ---
+  duration_ms: 6.2565
+  ...
+# Subtest: memo-backdrop includes its real layout action in the safety handshake
+ok 212 - memo-backdrop includes its real layout action in the safety handshake
+  ---
+  duration_ms: 4.7621
+  ...
+# Subtest: memo-overview includes its real layout action in the safety handshake
+ok 213 - memo-overview includes its real layout action in the safety handshake
+  ---
+  duration_ms: 5.6996
+  ...
+# Subtest: updater build overlay enables signed artifacts and embeds the exact public key
+ok 214 - updater build overlay enables signed artifacts and embeds the exact public key
+  ---
+  duration_ms: 41.8096
+  ...
+# Subtest: updater build overlay fails closed when public key is missing
+ok 215 - updater build overlay fails closed when public key is missing
+  ---
+  duration_ms: 1.1428
+  ...
+# Subtest: prepare acknowledges safe=false while a write command is pending
+ok 216 - prepare acknowledges safe=false while a write command is pending
+  ---
+  duration_ms: 15.8227
+  ...
+# Subtest: prepare acknowledges safe=false while an editing callback reports busy
+ok 217 - prepare acknowledges safe=false while an editing callback reports busy
+  ---
+  duration_ms: 5.7386
+  ...
+# Subtest: startup preference write blocks updater installation until it finishes
+ok 218 - startup preference write blocks updater installation until it finishes
+  ---
+  duration_ms: 3.1919
+  ...
+# Subtest: prepare acknowledges safe=true when no command or editing work is active
+ok 219 - prepare acknowledges safe=true when no command or editing work is active
+  ---
+  duration_ms: 3.4354
+  ...
+# Subtest: frozen state rejects new commands and captures input until release
+ok 220 - frozen state rejects new commands and captures input until release
+  ---
+  duration_ms: 4.0615
+  ...
+# Subtest: updater status and install commands do not count as pending manager work
+ok 221 - updater status and install commands do not count as pending manager work
+  ---
+  duration_ms: 3.7207
+  ...
+# Subtest: a failed prepare listener registration sends no acknowledgement
+ok 222 - a failed prepare listener registration sends no acknowledgement
+  ---
+  duration_ms: 2.4999
+  ...
+# Subtest: unknown command names and request arguments are absent from the installation report
+ok 223 - unknown command names and request arguments are absent from the installation report
+  ---
+  duration_ms: 3.4927
+  ...
+# Subtest: background polls settle before acknowledgement, with new work frozen
+ok 224 - background polls settle before acknowledgement, with new work frozen
+  ---
+  duration_ms: 15.6041
+  ...
+# Subtest: a held background poll stays unsafe after its drain deadline
+ok 225 - a held background poll stays unsafe after its drain deadline
+  ---
+  duration_ms: 564.9347
+  ...
+# Subtest: a save alongside background polls refuses immediately
+ok 226 - a save alongside background polls refuses immediately
+  ---
+  duration_ms: 1.8912
+  ...
+# Subtest: a released epoch cannot acknowledge later work or unfreeze a newer epoch
+ok 227 - a released epoch cannot acknowledge later work or unfreeze a newer epoch
+  ---
+  duration_ms: 17.1527
+  ...
+# Subtest: a rejected acknowledgement does not escape the guard
+ok 228 - a rejected acknowledgement does not escape the guard
+  ---
+  duration_ms: 1.6341
+  ...
+# Subtest: ready notice exposes hold reason, safe install action and dismiss action
+ok 229 - ready notice exposes hold reason, safe install action and dismiss action
+  ---
+  duration_ms: 12.9454
+  ...
+# Subtest: notice page is guarded and exposes only notice-scoped update controls
+ok 230 - notice page is guarded and exposes only notice-scoped update controls
+  ---
+  duration_ms: 0.785
+  ...
+# Subtest: compact ready notice hides routine explanation and omits verification label
+ok 231 - compact ready notice hides routine explanation and omits verification label
+  ---
+  duration_ms: 3.7213
+  ...
+# Subtest: explicit installation hold and status errors remain actionable
+ok 232 - explicit installation hold and status errors remain actionable
+  ---
+  duration_ms: 5.5643
+  ...
+# Subtest: dismiss means close notice, without implying paused automatic installation
+ok 233 - dismiss means close notice, without implying paused automatic installation
+  ---
+  duration_ms: 0.6567
+  ...
+# Subtest: updater release rejects installer-only assets without signed update bundles
+ok 234 - updater release rejects installer-only assets without signed update bundles
+  ---
+  duration_ms: 14.5036
+  ...
+# Subtest: failed updater preparation preserves an existing manifest instead of publishing unsigned assets
+ok 235 - failed updater preparation preserves an existing manifest instead of publishing unsigned assets
+  ---
+  duration_ms: 24.8733
+  ...
+# Subtest: updater preparation emits a target-specific manifest with encoded release URLs and signed versions
+ok 236 - updater preparation emits a target-specific manifest with encoded release URLs and signed versions
+  ---
+  duration_ms: 262.0212
+  ...
+# Subtest: updater preparation rejects signatures that do not bind the published stable version
+ok 237 - updater preparation rejects signatures that do not bind the published stable version
+  ---
+  duration_ms: 88.3325
+  ...
+# Subtest: updater preparation only accepts stable semver versions
+ok 238 - updater preparation only accepts stable semver versions
+  ---
+  duration_ms: 38.668
+  ...
+# Subtest: damaged payload, wrong signing key and swapped platforms never publish a manifest
+ok 239 - damaged payload, wrong signing key and swapped platforms never publish a manifest
+  ---
+  duration_ms: 208.3248
+  ...
+# Subtest: Tauri CLI signatures verify with the release verifier without private keys
+ok 240 - Tauri CLI signatures verify with the release verifier without private keys
+  ---
+  duration_ms: 66.9962
+  ...
+# Subtest: updater release rejects legacy product filenames before creating a manifest
+ok 241 - updater release rejects legacy product filenames before creating a manifest
+  ---
+  duration_ms: 15.7101
+  ...
+# Subtest: cached startup and every background retry use automatic installation gates
+ok 242 - cached startup and every background retry use automatic installation gates
+  ---
+  duration_ms: 4.9742
+  ...
+# Subtest: manager exposes updater settings navigation and panel without a modal
+ok 243 - manager exposes updater settings navigation and panel without a modal
+  ---
+  duration_ms: 4.3623
+  ...
+# Subtest: status renders version and download progress, and installs only when ready
+ok 244 - status renders version and download progress, and installs only when ready
+  ---
+  duration_ms: 3.1737
+  ...
+# Subtest: debug disabled status explains that automatic updates are unavailable
+ok 245 - debug disabled status explains that automatic updates are unavailable
+  ---
+  duration_ms: 1.3414
+  ...
+# Subtest: check and install reject duplicate clicks and show returned safe-condition message
+ok 246 - check and install reject duplicate clicks and show returned safe-condition message
+  ---
+  duration_ms: 1.8341
+  ...
+# Subtest: periodic refresh runs only while updater settings are visible
+ok 247 - periodic refresh runs only while updater settings are visible
+  ---
+  duration_ms: 12.4291
+  ...
+# Subtest: request errors use safe text and expose an alert
+ok 248 - request errors use safe text and expose an alert
+  ---
+  duration_ms: 1.8492
+  ...
+# Subtest: compact settings hide unavailable installation and empty detail
+ok 249 - compact settings hide unavailable installation and empty detail
+  ---
+  duration_ms: 1.9595
+  ...
+# Subtest: manual restart, automatic idle policy and recovery stay explicit
+ok 250 - manual restart, automatic idle policy and recovery stay explicit
+  ---
+  duration_ms: 1.4182
+  ...
+# Subtest: trusted web chrome pin toggles through web_chrome and reflects native state
+ok 251 - trusted web chrome pin toggles through web_chrome and reflects native state
+  ---
+  duration_ms: 8.6887
+  ...
+# Subtest: trusted web chrome X dispatches close through web_chrome
+ok 252 - trusted web chrome X dispatches close through web_chrome
+  ---
+  duration_ms: 2.5601
+  ...
+# Subtest: web resize grips send only their explicit native direction on primary press
+ok 253 - web resize grips send only their explicit native direction on primary press
+  ---
+  duration_ms: 2.9945
+  ...
+# Subtest: web page actions start disabled on Welcome and act on the trusted native child
+ok 254 - web page actions start disabled on Welcome and act on the trusted native child
+  ---
+  duration_ms: 6.228
+  ...
+# Subtest: a failed zoom keeps the current size and retries the same step
+ok 255 - a failed zoom keeps the current size and retries the same step
+  ---
+  duration_ms: 3.3282
+  ...
+# Subtest: reload dispatches one native request per click and skips overlapping requests
+ok 256 - reload dispatches one native request per click and skips overlapping requests
+  ---
+  duration_ms: 6.1971
+  ...
+# Subtest: web navigation follows platform modifiers and preserves editing and Welcome
+ok 257 - web navigation follows platform modifiers and preserves editing and Welcome
+  ---
+  duration_ms: 11.8976
+  ...
+# Subtest: web Welcome waits for explicit submit and sends the exact URL once
+ok 258 - web Welcome waits for explicit submit and sends the exact URL once
+  ---
+  duration_ms: 3.8582
+  ...
+# Subtest: invalid URL or native failure keeps input and allows retry without stealing focus
+ok 259 - invalid URL or native failure keeps input and allows retry without stealing focus
+  ---
+  duration_ms: 3.611
+  ...
+1..259
+# tests 259
+# suites 0
+# pass 257
+# fail 0
+# cancelled 0
+# skipped 2
+# todo 0
+# duration_ms 3136.6939

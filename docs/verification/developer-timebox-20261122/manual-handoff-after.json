@@ -1,0 +1,41 @@
+{
+  "at": "2026-11-21T23:31:24.3452363+09:00",
+  "terminal": {
+    "ok": true,
+    "instance": "dev-f19639c4269e7f1aa6e123f0",
+    "id": "terminal-1795271052106808300",
+    "running": true,
+    "pid": 7588,
+    "ready": false,
+    "restore_plan": "function",
+    "last_path": "C:\\Users\\egoin",
+    "metadata_save_failed": false,
+    "position": {
+      "x": 1793,
+      "y": 311
+    },
+    "size": {
+      "height": 777,
+      "width": 1152
+    },
+    "visible": true,
+    "pty_size": {
+      "cols": 108,
+      "rows": 36
+    }
+  },
+  "processes": [
+    {
+      "ProcessId": 35576,
+      "ParentProcessId": 8248,
+      "ExecutablePath": "C:\\Users\\egoin\\AppData\\Local\\Jajan\\dev-f19639c4269e7f1aa6e123f0\\p\\owner-ed5913c2b4a3d51c4a8d1407.exe",
+      "CreationDate": "2026-11-21T23:30:32.793914+09:00"
+    },
+    {
+      "ProcessId": 7588,
+      "ParentProcessId": 35576,
+      "ExecutablePath": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "CreationDate": "2026-11-21T23:30:32.85799+09:00"
+    }
+  ]
+}

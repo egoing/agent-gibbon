@@ -1,0 +1,12 @@
+{"at":"2026-11-21T23:54:23.252Z","method":"GET","path":"/latest.json","status":200,"bytes":570}
+{"at":"2026-11-21T23:56:25.919Z","method":"GET","path":"/latest.json","status":200,"bytes":570}
+{"at":"2026-11-21T23:56:25.933Z","method":"GET","path":"/v0.3.13/Jajan_0.3.13_x64-setup.exe","status":200,"bytes":5363212}
+{"at":"2026-11-22T00:03:50.350Z","method":"GET","path":"/previous.json","status":200,"bytes":570}
+{"at":"2026-11-22T00:03:50.354Z","method":"GET","path":"/v0.3.12/Jajan_0.3.12_x64-setup.exe","status":200,"bytes":5361925}
+{"at":"2026-11-22T00:10:17.848Z","method":"GET","path":"/latest.json","status":200,"bytes":570}
+{"at":"2026-11-22T00:10:17.853Z","method":"GET","path":"/v0.3.13/Jajan_0.3.13_x64-setup.exe","status":200,"bytes":5363212}
+{"at":"2026-11-22T00:10:39.699Z","method":"GET","path":"/latest.json","status":200,"bytes":570}
+{"at":"2026-11-22T00:13:48.987Z","method":"GET","path":"/previous.json","status":200,"bytes":570}
+{"at":"2026-11-22T00:13:48.991Z","method":"GET","path":"/v0.3.12/Jajan_0.3.12_x64-setup.exe","status":200,"bytes":5361925}
+{"at":"2026-11-22T00:16:59.731Z","method":"GET","path":"/previous.json","status":200,"bytes":570}
+{"at":"2026-11-22T00:16:59.735Z","method":"GET","path":"/v0.3.12/Jajan_0.3.12_x64-setup.exe","status":200,"bytes":5361925}

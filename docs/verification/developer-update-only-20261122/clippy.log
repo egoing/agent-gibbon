@@ -1,0 +1,7 @@
+
+> jajan@0.3.12 check
+> node scripts/build.mjs cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+
+    Blocking waiting for file lock on build directory
+   Compiling jajan v0.3.12 (C:\Users\egoin\.codex\worktrees\5170\agent-gibbon\src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 51.31s

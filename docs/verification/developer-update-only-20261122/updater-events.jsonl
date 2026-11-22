@@ -1,0 +1,14 @@
+{"automatic":null,"current_version":"0.3.13","event":"test-prepare-request","pid":10700,"target_version":null,"unix_ms":1795305385917}
+{"automatic":null,"current_version":"0.3.13","event":"test-install-request","pid":10700,"target_version":null,"unix_ms":1795305744113}
+{"automatic":false,"current_version":"0.3.13","event":"test-install-start","pid":10700,"target_version":"0.3.13","unix_ms":1795305744114}
+{"automatic":null,"current_version":"0.3.13","event":"initialize","pid":2228,"target_version":null,"unix_ms":1795305750954}
+{"automatic":null,"current_version":"0.3.13","event":"roundtrip-request","pid":2228,"target_version":"0.3.12","unix_ms":1795305830342}
+{"automatic":false,"current_version":"0.3.13","event":"test-install-start","pid":2228,"target_version":"0.3.12","unix_ms":1795305830411}
+{"automatic":null,"current_version":"0.3.12","event":"initialize","pid":2408,"target_version":null,"unix_ms":1795305837169}
+{"automatic":null,"current_version":"0.3.12","event":"roundtrip-request","pid":2408,"target_version":"0.3.13","unix_ms":1795306217839}
+{"automatic":false,"current_version":"0.3.12","event":"test-install-start","pid":2408,"target_version":"0.3.13","unix_ms":1795306217910}
+{"automatic":null,"current_version":"0.3.13","event":"initialize","pid":2492,"target_version":null,"unix_ms":1795306224656}
+{"automatic":null,"current_version":"0.3.13","event":"roundtrip-request","pid":2492,"target_version":"0.3.12","unix_ms":1795306428981}
+{"automatic":false,"current_version":"0.3.13","event":"test-install-start","pid":2492,"target_version":"0.3.12","unix_ms":1795306429047}
+{"automatic":null,"current_version":"0.3.13","event":"roundtrip-request","pid":2492,"target_version":"0.3.12","unix_ms":1795306619724}
+{"automatic":false,"current_version":"0.3.13","event":"test-install-start","pid":2492,"target_version":"0.3.12","unix_ms":1795306619790}

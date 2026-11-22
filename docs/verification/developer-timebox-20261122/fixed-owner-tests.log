@@ -1,0 +1,23 @@
+   Compiling jajan v0.3.12 (C:\Users\egoin\.codex\worktrees\5170\agent-gibbon\src-tauri)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.70s
+     Running unittests src\main.rs (C:\Users\egoin\dev\project\agent-gibbon\.git\jajan\build-cache\debug\deps\jajan-6c8ed092d692d7a1.exe)
+
+running 9 tests
+test terminal::windows_owner::tests::disconnected_output_has_a_bounded_tail ... ok
+test terminal::windows_owner::tests::installed_paths_keep_updates_together_but_other_installations_apart ... ok
+test terminal::windows_owner::tests::completed_reset_reply_preserves_original_bytes_without_reissuing_requests ... ok
+test terminal::windows_owner::tests::observed_shell_exit_keeps_control_for_explicit_owned_job_cleanup ... ok
+test terminal::windows_owner::tests::update_waits_for_removed_sessions_and_pending_closes ... ok
+test terminal::windows_owner::tests::normal_quit_supervisor_detaches_without_stopping_remote_shell ... ok
+test terminal::windows_owner::tests::update_requires_a_live_compatible_owner_outside_the_gui_binary ... ok
+test terminal::windows_owner::tests::reconnect_requires_bounded_valid_checkpoint_and_exact_identity ... ok
+test terminal::windows_owner::tests::accepted_nonblocking_listener_waits_for_complete_delayed_request ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 323 filtered out; finished in 0.12s
+
+     Running tests\windows_pty_owner.rs (C:\Users\egoin\dev\project\agent-gibbon\.git\jajan\build-cache\debug\deps\windows_pty_owner-9921456f4b81996d.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+

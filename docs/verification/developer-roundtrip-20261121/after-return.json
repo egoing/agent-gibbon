@@ -1,0 +1,183 @@
+{
+  "sha256": "3C4D6189F5F777C32729CBB9A87004E8CDBBC5E32A907BACA01E92B7A6CF3153",
+  "hold_exists": false,
+  "process_id": 18688,
+  "updater": {
+    "check_seconds": 900,
+    "enabled": true,
+    "idle_threshold_seconds": 300.0,
+    "last_check_failure": null,
+    "last_window_reports": {
+      "epoch": 1,
+      "outcome": "prepared",
+      "source_version": "0.3.12",
+      "target_version": "0.3.13",
+      "timestamp_ms": 1795261036223,
+      "windows": [
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 1,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": false
+          }
+        },
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 2,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": false
+          }
+        },
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 3,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": true
+          }
+        },
+        {
+          "ack": true,
+          "kind": "manager",
+          "number": 4,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": true
+          }
+        },
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 5,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": false
+          }
+        },
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 6,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": false
+          }
+        },
+        {
+          "ack": true,
+          "kind": "memo",
+          "number": 7,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": true
+          }
+        },
+        {
+          "ack": true,
+          "kind": "stash",
+          "number": 8,
+          "report": {
+            "editing": false,
+            "exporting": false,
+            "oldest_ms": 0,
+            "pending": 0,
+            "privacy": false,
+            "requests": {},
+            "saving": false,
+            "visible": false
+          }
+        }
+      ]
+    },
+    "retry_seconds": 15,
+    "status": {
+      "cache_ready": true,
+      "current_version": "0.3.13",
+      "downloaded": 5355060,
+      "failure_stage": null,
+      "manual_test": false,
+      "message": "최신 버전 복귀를 확인했습니다. 일반 자동 업데이트 정책을 다시 적용합니다.",
+      "phase": "idle",
+      "roundtrip_active": false,
+      "roundtrip_pair": {
+        "id": "isolated-schema-v1-20261121",
+        "latest": "0.3.13",
+        "previous": "0.3.12"
+      },
+      "roundtrip_reason": "격리 검증 채널의 호환 버전 쌍입니다. 공식 배포판이 아닙니다.",
+      "signature_verified": true,
+      "total": 5355060,
+      "version": null
+    }
+  },
+  "note": {
+    "size": {
+      "height": 72,
+      "width": 450
+    },
+    "id": "roundtrip-proof-5170",
+    "position": {
+      "x": 3390,
+      "y": 1582
+    },
+    "revision": 1,
+    "visible": true,
+    "sentinel_matches": true
+  },
+  "privacy": {
+    "notice_ready": true,
+    "onboarding_required": false,
+    "sharing_allowed": false,
+    "terms_accepted": true,
+    "terms_skipped": false
+  },
+  "version": "0.3.13",
+  "observed_at": "2026-11-21T20:37:46.6010869+09:00"
+}

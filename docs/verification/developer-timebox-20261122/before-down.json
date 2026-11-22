@@ -1,0 +1,69 @@
+{
+  "at": "2026-11-21T23:36:21.1646690+09:00",
+  "phase": "before-down",
+  "instance": "dev-f19639c4269e7f1aa6e123f0",
+  "gui_pid": 35784,
+  "shell_pid": 7588,
+  "owner_pid": 35576,
+  "note": {
+    "sentinel_matches": true,
+    "revision": 1,
+    "position": {
+      "x": 2304,
+      "y": 1512
+    },
+    "size": {
+      "height": 173,
+      "width": 614
+    },
+    "visible": true,
+    "animating": false,
+    "layout_pending": false
+  },
+  "terminal": {
+    "running": true,
+    "pid": 7588,
+    "restore_plan": "function",
+    "metadata_save_failed": false,
+    "position": {
+      "x": 1793,
+      "y": 311
+    },
+    "size": {
+      "height": 777,
+      "width": 1152
+    },
+    "visible": false,
+    "pty_size": {
+      "cols": 108,
+      "rows": 36
+    }
+  },
+  "updater": {
+    "check_seconds": 900,
+    "enabled": true,
+    "idle_threshold_seconds": 300.0,
+    "last_check_failure": null,
+    "last_window_reports": null,
+    "retry_seconds": 15,
+    "status": {
+      "cache_ready": false,
+      "current_version": "0.3.13",
+      "downloaded": 0,
+      "failure_stage": null,
+      "manual_test": false,
+      "message": "최신 버전입니다",
+      "phase": "idle",
+      "roundtrip_active": false,
+      "roundtrip_pair": {
+        "id": "isolated-schema-v1-20261121",
+        "latest": "0.3.13",
+        "previous": "0.3.12"
+      },
+      "roundtrip_reason": "격리 검증 채널의 호환 버전 쌍입니다. 공식 배포판이 아닙니다.",
+      "signature_verified": false,
+      "total": null,
+      "version": null
+    }
+  }
+}

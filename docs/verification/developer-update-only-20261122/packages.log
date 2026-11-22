@@ -1,0 +1,23 @@
+ROUNDTRIP_WORKSPACE=C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6
+        Info Looking up installed tauri packages to check mismatched versions...
+   Compiling jajan v0.3.12 (C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6\source\src-tauri)
+    Finished `release` profile [optimized] target(s) in 2m 07s
+       Built application at: C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6\target\release\jajan-roundtrip-5170-efb2e8be.exe
+        Info Patching C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6\target\release\jajan-roundtrip-5170-efb2e8be.exe with bundle type information: nsis
+        Info Target: x64
+     Running makensis to produce C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6\target\release\bundle\nsis\Jajan Roundtrip Verification 5170 efb2e8be_0.3.12_x64-setup.exe
+    Finished 1 bundle at:
+        C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6\target\release\bundle\nsis\Jajan Roundtrip Verification 5170 efb2e8be_0.3.12_x64-setup.exe (5.11 MiB)
+
+        Info Looking up installed tauri packages to check mismatched versions...
+   Compiling jajan v0.3.13 (C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6\source\src-tauri)
+    Finished `release` profile [optimized] target(s) in 1m 21s
+       Built application at: C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6\target\release\jajan-roundtrip-5170-efb2e8be.exe
+        Info Patching C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6\target\release\jajan-roundtrip-5170-efb2e8be.exe with bundle type information: nsis
+        Info Target: x64
+     Running makensis to produce C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6\target\release\bundle\nsis\Jajan Roundtrip Verification 5170 efb2e8be_0.3.13_x64-setup.exe
+    Finished 1 bundle at:
+        C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6\target\release\bundle\nsis\Jajan Roundtrip Verification 5170 efb2e8be_0.3.13_x64-setup.exe (5.11 MiB)
+
+ROUNDTRIP_READY=C:\Users\egoin\AppData\Local\Temp\jajan-roundtrip-5170-5bxQe6\plan.json
+Loopback feed is running. Stop this process after the verification. No installation was executed.
