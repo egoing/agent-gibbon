@@ -104,7 +104,6 @@ pub fn creating<T>(
 
 pub fn cancel(app: &tauri::AppHandle, label: &str) {
     app.state::<Pending>().cancel(label);
-    crate::layout::overview::capture_frame_finished(app, label);
 }
 
 pub fn placed(window: &WebviewWindow) -> Result<(), String> {
@@ -164,14 +163,11 @@ pub async fn region_frame_ready(window: WebviewWindow) -> Result<(), String> {
                                         completionHandler: &*completion];
             }
         })
-        .map_err(|e| {
-            crate::layout::overview::capture_frame_finished(window.app_handle(), window.label());
-            e.to_string()
-        })?;
-    result.recv().await.ok_or_else(|| {
-        crate::layout::overview::capture_frame_finished(window.app_handle(), window.label());
-        "첫 화면 준비가 중단되었습니다".to_string()
-    })?
+        .map_err(|e| e.to_string())?;
+    result
+        .recv()
+        .await
+        .ok_or_else(|| "첫 화면 준비가 중단되었습니다".to_string())?
 }
 
 fn show_prepared(window: &WebviewWindow, generation: &Arc<()>) -> Result<(), String> {
@@ -187,11 +183,7 @@ fn show_prepared(window: &WebviewWindow, generation: &Arc<()>) -> Result<(), Str
             edit_on_open: false,
         } => crate::show_without_focus(window),
         Presentation::Text { edit_on_open: true } => crate::capture::show_text(window),
-        Presentation::Image => {
-            let shown = crate::show_without_focus(window);
-            crate::layout::overview::capture_frame_finished(window.app_handle(), window.label());
-            shown
-        }
+        Presentation::Image => crate::show_without_focus(window),
         Presentation::Terminal => crate::terminal::show(window),
         Presentation::Web => crate::web::show(window),
     }?;

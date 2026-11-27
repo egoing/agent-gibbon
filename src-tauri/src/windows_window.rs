@@ -378,6 +378,17 @@ pub fn restore_minimized_without_focus(window: &WebviewWindow) -> Result<(), Str
     })
 }
 
+// Capture temporarily masks an existing HWND in its current Z-order slot.
+pub(crate) fn capture_visible(window: &WebviewWindow, visible: bool) -> Result<(), String> {
+    let handle = window.hwnd().map_err(|e| e.to_string())?.0 as isize;
+    // SWP_NOSIZE | NOMOVE | NOZORDER | NOACTIVATE | NOOWNERZORDER
+    let flags = 0x0217 | if visible { 0x0040 } else { 0x0080 };
+    if unsafe { SetWindowPos(handle, 0, 0, 0, 0, 0, flags) } == 0 {
+        return Err(std::io::Error::last_os_error().to_string());
+    }
+    Ok(())
+}
+
 pub fn show_without_focus(window: &WebviewWindow) -> Result<(), String> {
     on_owner_thread(window, show_on_owner)
 }

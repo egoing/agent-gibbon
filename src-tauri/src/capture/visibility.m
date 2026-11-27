@@ -27,3 +27,14 @@ bool jajan_copy_rgba(const uint8_t *source, uint8_t *destination,
     const uint8_t channels[] = {2, 1, 0, 3};
     return vImagePermuteChannels_ARGB8888(&input, &output, channels, kvImageNoFlags) == kvImageNoError;
 }
+
+// Copy only the ordering metadata needed to restore windows across applications.
+bool jajan_visit_window_order(void *context, void (*visit)(void *, uint32_t, int32_t)) {
+    NSArray *windows = CFBridgingRelease(CGWindowListCopyWindowInfo(
+        kCGWindowListOptionOnScreenOnly, kCGNullWindowID));
+    if (!windows) return false;
+    for (NSDictionary *window in windows)
+        visit(context, [window[(id)kCGWindowNumber] unsignedIntValue],
+              [window[(id)kCGWindowLayer] intValue]);
+    return true;
+}

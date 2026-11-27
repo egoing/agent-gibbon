@@ -59,6 +59,11 @@ extern "C" fn open_manager() {
     let Some(app) = APP.get() else {
         return;
     };
+    // An overlay becoming key is part of the active selection. Direct manager
+    // actions (Dock reopen, tray, onboarding) use their own entry points.
+    if crate::capture::active(app) {
+        return;
+    }
     let Ok(_activity) = crate::updater::activity(app) else {
         return;
     };
