@@ -566,10 +566,10 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result
             serde_json::to_string(&outlines).map_err(err)?
         ))
         .title(match mode {
-            SelectionMode::Image => "영역 캡처 — Escape로 취소",
-            SelectionMode::Text => "빈 메모 영역 선택 — Escape로 취소",
-            SelectionMode::Terminal => "터미널 영역 선택 — Escape로 취소",
-            SelectionMode::Web => "웹 창 영역 선택 — Escape로 취소",
+            SelectionMode::Image => "영역 캡처",
+            SelectionMode::Text => "빈 메모 영역 선택",
+            SelectionMode::Terminal => "터미널 영역 선택",
+            SelectionMode::Web => "웹 창 영역 선택",
         })
         .decorations(false)
         .transparent(true)

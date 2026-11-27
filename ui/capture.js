@@ -11,10 +11,6 @@ for (const { x, y, width, height } of window.captureNoteFrames || []) {
   document.getElementById('note-outlines').append(outline);
 }
 let start, rect, ready = true, busy = false;
-invoke('capture_ready').catch(() => {
-  ready = false;
-  invoke('capture_failed').catch(() => {});
-});
 const point = e => ({ x: Math.max(0,Math.min(innerWidth,e.clientX)), y:Math.max(0,Math.min(innerHeight,e.clientY)) });
 document.addEventListener('pointerdown', e => {
   if (!ready || busy || e.button !== 0) return;
@@ -41,23 +37,30 @@ document.addEventListener('pointerup', async () => {
   if (!rect || rect.width < 2 || rect.height < 2) return;
   busy = true;
   try { await invoke('finish_capture',rect); }
-  catch(error) { hint.hidden = false; hint.textContent = `${error} · Escape로 닫기`; busy = false; }
+  catch(error) { hint.hidden = false; hint.textContent = String(error); busy = false; }
 });
-document.addEventListener('keydown', e => {
+window.addEventListener('keydown', e => {
   if (e.key !== 'Escape' || busy) return;
   e.preventDefault();
   busy = true;
-  if (start && document.body.hasPointerCapture(start.pointerId)) {
-    document.body.releasePointerCapture(start.pointerId);
-  }
+  const pointerId = start?.pointerId;
   start = null;
   rect = null;
+  selection.hidden = true;
+  shade.classList.remove('active');
+  hint.hidden = true;
+  if (pointerId !== undefined && document.body.hasPointerCapture(pointerId)) {
+    document.body.releasePointerCapture(pointerId);
+  }
   invoke('cancel_capture').catch(error => {
     busy = false;
-    selection.hidden = true;
-    shade.classList.remove('active');
     hint.hidden = false;
     hint.textContent = String(error);
   });
-});
+}, true);
 document.addEventListener('contextmenu',e => e.preventDefault());
+// The native side can show and focus this overlay as soon as it receives ready.
+invoke('capture_ready').catch(() => {
+  ready = false;
+  invoke('capture_failed').catch(() => {});
+});
