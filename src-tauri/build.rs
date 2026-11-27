@@ -42,6 +42,7 @@ fn main() {
         cc::Build::new()
             .file("src/terminal/macos_jobs.c")
             .compile("terminal_jobs");
+        println!("cargo:rustc-link-lib=framework=Accelerate");
         println!("cargo:rerun-if-changed=src/capture/visibility.m");
         cc::Build::new()
             .file("src/capture/visibility.m")

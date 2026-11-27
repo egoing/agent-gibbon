@@ -32,7 +32,9 @@ struct Screen {
     generation: u64,
     mode: SelectionMode,
     ready: bool,
-    image: RgbaImage,
+    pixels: (u32, u32),
+    #[cfg(not(target_os = "macos"))]
+    monitor_id: u32,
     bounds: ImageNote,
 }
 #[derive(Default)]
@@ -173,6 +175,7 @@ pub fn trigger(app: &tauri::AppHandle, mode: SelectionMode) {
             // Finish hiding overview in a separate UI dispatch before acquiring
             // the frozen preview. Keeping both in begin blocks the event loop
             // throughout screenshot acquisition and WebView construction.
+            #[cfg(not(target_os = "macos"))]
             if !active(&app) {
                 if let Err(error) = visibility::set(&app, generation, true) {
                     let _ = visibility::set(&app, generation, false);
@@ -388,6 +391,67 @@ pub fn permission_guide(
     }
 }
 
+#[cfg(target_os = "macos")]
+fn background_windows(
+) -> Result<objc2_core_foundation::CFRetained<objc2_core_foundation::CFArray>, String> {
+    use objc2_core_foundation::{CFArray, CFRetained};
+    unsafe extern "C" {
+        fn jajan_copy_background_windows() -> *mut CFArray;
+    }
+    std::ptr::NonNull::new(unsafe { jajan_copy_background_windows() })
+        .map(|ptr| unsafe { CFRetained::from_raw(ptr) })
+        .ok_or_else(|| "화면 창 목록을 가져오지 못했습니다".into())
+}
+
+#[cfg(target_os = "macos")]
+// Match xcap's Quartz backend, including on pre-ScreenshotManager macOS.
+#[allow(deprecated)]
+fn background_image(
+    windows: &objc2_core_foundation::CFArray,
+    bounds: &ImageNote,
+) -> Result<RgbaImage, String> {
+    use objc2_core_foundation::{CGPoint, CGRect, CGSize};
+    use objc2_core_graphics::{
+        CGDataProvider, CGImage, CGWindowImageOption, CGWindowListCreateImageFromArray,
+    };
+    let area = CGRect::new(
+        CGPoint::new(bounds.x, bounds.y),
+        CGSize::new(bounds.width, bounds.height),
+    );
+    let image =
+        unsafe { CGWindowListCreateImageFromArray(area, windows, CGWindowImageOption::Default) }
+            .ok_or("화면 배경을 캡처하지 못했습니다")?;
+    let width = CGImage::width(Some(&image));
+    let height = CGImage::height(Some(&image));
+    let stride = CGImage::bytes_per_row(Some(&image));
+    let provider = CGImage::data_provider(Some(&image));
+    let data = CGDataProvider::data(provider.as_deref()).ok_or("화면 픽셀이 없습니다")?;
+    if width == 0
+        || height == 0
+        || CGImage::bits_per_pixel(Some(&image)) != 32
+        || stride < width * 4
+        || data.len() / stride < height
+    {
+        return Err("지원하지 않는 화면 픽셀 형식입니다".into());
+    }
+    unsafe extern "C" {
+        fn jajan_copy_rgba(
+            source: *const u8,
+            destination: *mut u8,
+            width: usize,
+            height: usize,
+            stride: usize,
+        ) -> bool;
+    }
+    let mut pixels = vec![0; width * height * 4];
+    // The provider copy is immutable and both buffers live through this synchronous conversion.
+    if !unsafe { jajan_copy_rgba(data.byte_ptr(), pixels.as_mut_ptr(), width, height, stride) } {
+        return Err("화면 픽셀을 변환하지 못했습니다".into());
+    }
+    RgbaImage::from_raw(width as u32, height as u32, pixels)
+        .ok_or_else(|| "화면 크기가 올바르지 않습니다".into())
+}
+
 fn begin(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result<(), String> {
     let _update_activity = crate::updater::activity(app)?;
     #[cfg(not(windows))]
@@ -396,7 +460,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result
     #[cfg(target_os = "macos")]
     // Called only by an explicit capture action. Never capture a wallpaper-only
     // image when macOS has denied access to other applications' windows.
-    if unsafe { !CGPreflightScreenCaptureAccess() } {
+    if mode == SelectionMode::Image && unsafe { !CGPreflightScreenCaptureAccess() } {
         // The OS request may display a dialog or require a restart before returning.
         // Record the blocked user action before handing control to macOS.
         if let Err(error) = crate::tray::sync_permission_item(app, false, true) {
@@ -429,38 +493,63 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result
     if monitors.is_empty() {
         return Err("캡처할 화면을 찾을 수 없습니다".into());
     }
+    #[cfg(target_os = "macos")]
+    let frames = crate::layout::visible_hosts(app)?
+        .iter()
+        .map(crate::layout::window_rect)
+        .collect::<Result<Vec<_>, _>>()?;
+    #[cfg(not(target_os = "macos"))]
+    let frames = visibility::note_frames(app, generation);
+    let mut displays = Vec::new();
     for (index, monitor) in monitors.into_iter().enumerate() {
         let scale = if cfg!(target_os = "macos") {
             1.0
         } else {
             f64::from(monitor.scale_factor().map_err(err)?)
         };
+        let label = format!("capture-{generation}-{index}");
+        let bounds = ImageNote {
+            x: f64::from(monitor.x().map_err(err)?),
+            y: f64::from(monitor.y().map_err(err)?),
+            width: f64::from(monitor.width().map_err(err)?) / scale,
+            height: f64::from(monitor.height().map_err(err)?) / scale,
+        };
+        // Keep full rectangles so a window spanning displays has no artificial seam.
+        let outlines: Vec<_> = frames
+            .iter()
+            .map(|frame| ImageNote {
+                x: (frame.x as f64 - bounds.x) / scale,
+                y: (frame.y as f64 - bounds.y) / scale,
+                width: frame.width as f64 / scale,
+                height: frame.height as f64 / scale,
+            })
+            .filter(|r| {
+                r.x < bounds.width
+                    && r.y < bounds.height
+                    && r.x + r.width > 0.0
+                    && r.y + r.height > 0.0
+            })
+            .collect();
+        displays.push((label.clone(), bounds.clone(), outlines));
         screens.insert(
-            format!("capture-{generation}-{index}"),
+            label,
             Screen {
                 generation,
                 mode,
                 ready: false,
-                image: {
-                    let _timing = crate::telemetry::Timing::new("capture.screen.capture");
-                    monitor.capture_image().map_err(err)?
-                },
-                bounds: ImageNote {
-                    x: f64::from(monitor.x().map_err(err)?),
-                    y: f64::from(monitor.y().map_err(err)?),
-                    width: f64::from(monitor.width().map_err(err)?) / scale,
-                    height: f64::from(monitor.height().map_err(err)?) / scale,
-                },
+                pixels: (
+                    monitor.width().map_err(err)?,
+                    monitor.height().map_err(err)?,
+                ),
+                #[cfg(not(target_os = "macos"))]
+                monitor_id: monitor.id().map_err(err)?,
+                bounds,
             },
         );
     }
-    trace("screens captured");
-    let bounds: Vec<_> = screens
-        .iter()
-        .map(|(label, s)| (label.clone(), s.bounds.clone()))
-        .collect();
+    trace("display bounds ready");
     *app.state::<Captures>().0.lock().map_err(err)? = screens;
-    for (label, b) in bounds {
+    for (label, b, outlines) in displays {
         #[cfg(target_os = "macos")]
         let _passive = crate::app_activation::passive_creation();
         let _timing = crate::telemetry::Timing::new("capture.overlay.create");
@@ -470,6 +559,10 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result
             &label,
             tauri::WebviewUrl::App("capture.html".into()),
         )
+        .initialization_script(format!(
+            "window.captureNoteFrames = {};",
+            serde_json::to_string(&outlines).map_err(err)?
+        ))
         .title(match mode {
             SelectionMode::Image => "영역 캡처 — Escape로 취소",
             SelectionMode::Text => "빈 메모 영역 선택 — Escape로 취소",
@@ -588,9 +681,20 @@ fn cancel_selection(window: WebviewWindow) -> Result<(), String> {
 }
 
 fn end_selection(app: &tauri::AppHandle, generation: u64) -> Result<(), String> {
+    #[cfg(target_os = "macos")]
+    {
+        // Restore behind the opaque preview before dismissing it.
+        let restored = visibility::set(app, generation, false);
+        cleanup_before_create(app)?;
+        return restored;
+    }
+    #[cfg(not(target_os = "macos"))]
     let cleanup = cleanup_before_create(app);
-    visibility::set(app, generation, false)?;
-    cleanup
+    #[cfg(not(target_os = "macos"))]
+    {
+        visibility::set(app, generation, false)?;
+        cleanup
+    }
 }
 #[cfg(windows)]
 #[tauri::command]
@@ -605,7 +709,7 @@ pub fn cancel_capture(window: WebviewWindow) -> Result<(), String> {
 }
 #[tauri::command]
 pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
-    trace("image decoded");
+    trace("input ready");
     let app = window.app_handle();
     let labels = {
         let state = app.state::<Captures>();
@@ -641,12 +745,21 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
             overlay.show().map_err(err)?;
             true
         };
-        overlay
-            .eval("window.dispatchEvent(new Event('capture-shown'))")
-            .map_err(err)?;
         if focus_target.is_none() || under_pointer {
             focus_target = Some(overlay);
         }
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let state = app.state::<Captures>();
+        let generation = state
+            .0
+            .lock()
+            .map_err(err)?
+            .get(window.label())
+            .ok_or("캡처가 종료되었습니다")?
+            .generation;
+        visibility::set(app, generation, true)?;
     }
     trace("window ordered front");
     if let Some(overlay) = focus_target {
@@ -673,8 +786,8 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
                     label.clone(),
                     s.bounds.x,
                     s.bounds.y,
-                    s.image.width(),
-                    s.image.height(),
+                    s.pixels.0,
+                    s.pixels.1,
                 )
             })
             .collect::<Vec<_>>();
@@ -706,26 +819,6 @@ pub async fn capture_failed(window: WebviewWindow) -> Result<(), String> {
 pub fn capture_failed(window: WebviewWindow) -> Result<(), String> {
     let _root = crate::telemetry::Timing::new("capture.failed");
     failed_selection(window)
-}
-#[tauri::command]
-pub fn capture_screen(window: WebviewWindow) -> Result<tauri::ipc::Response, String> {
-    let _timing = crate::telemetry::Timing::new("capture.preview.copy");
-    trace("preview requested");
-    let state = window.state::<Captures>();
-    let screens = state.0.lock().map_err(err)?;
-    let screen = screens.get(window.label()).ok_or("캡처가 종료되었습니다")?;
-    let bytes = preview_pixels(&screen.image);
-    trace("preview pixels copied");
-    Ok(tauri::ipc::Response::new(bytes))
-}
-// Width/height (little-endian u32) followed by lossless RGBA pixels. The
-// selection canvas consumes these directly without PNG encoding or decoding.
-fn preview_pixels(image: &RgbaImage) -> Vec<u8> {
-    let mut bytes = Vec::with_capacity(8 + image.as_raw().len());
-    bytes.extend_from_slice(&image.width().to_le_bytes());
-    bytes.extend_from_slice(&image.height().to_le_bytes());
-    bytes.extend_from_slice(image.as_raw());
-    bytes
 }
 // CSS coordinates are converted using the actual snapshot dimensions (Retina included).
 fn crop_rect(
@@ -789,13 +882,13 @@ fn finish_selection(
     // Window getters can wait for the UI thread on Windows. Do not hold the
     // capture state while waiting: capture_ready/cancel use it on that thread.
     let scale = window.scale_factor().map_err(err)?;
-    let (bytes, bounds, mode, generation) = {
+    let (bounds, mode, generation, region) = {
         let state = app.state::<Captures>();
         let screens = state.0.lock().map_err(err)?;
         let s = screens.get(window.label()).ok_or("캡처가 종료되었습니다")?;
-        let (px, py, pw, ph) = {
+        let region = {
             let _timing = crate::telemetry::Timing::new("capture.selection.validate");
-            crop_rect(&s.bounds, s.image.dimensions(), [x, y, width, height])?
+            crop_rect(&s.bounds, s.pixels, [x, y, width, height])?
         };
         let offset = if cfg!(target_os = "macos") {
             1.0
@@ -803,14 +896,6 @@ fn finish_selection(
             scale
         };
         (
-            if s.mode == SelectionMode::Image {
-                let _timing = crate::telemetry::Timing::new("capture.image.encode");
-                Some(png(
-                    &image::imageops::crop_imm(&s.image, px, py, pw, ph).to_image()
-                )?)
-            } else {
-                None
-            },
             ImageNote {
                 x: s.bounds.x + x * offset,
                 y: s.bounds.y + y * offset,
@@ -819,23 +904,52 @@ fn finish_selection(
             },
             s.mode,
             s.generation,
+            region,
         )
     };
     // Restore the previous app before the new editor deliberately takes focus.
     if mode == SelectionMode::Image {
-        let result = end_selection(app, generation).and_then(|()| {
-            create_note(
-                app,
-                bytes.ok_or("캡처 이미지가 없습니다")?,
-                bounds,
-                Some(generation),
-            )
-            .map(|_| ())
-        });
-        if result.is_err() {
-            visibility::set(app, generation, false)?;
-        }
-        return result;
+        // Keep original memo windows suspended until the selected pixels are acquired.
+        let image = (|| {
+            #[cfg(target_os = "macos")]
+            {
+                let _ = region;
+                let windows = background_windows()?;
+                background_image(&windows, &bounds)
+            }
+            #[cfg(not(target_os = "macos"))]
+            {
+                let monitor_id = app
+                    .state::<Captures>()
+                    .0
+                    .lock()
+                    .map_err(err)?
+                    .get(window.label())
+                    .ok_or("캡처가 종료되었습니다")?
+                    .monitor_id;
+                let monitor = xcap::Monitor::all()
+                    .map_err(err)?
+                    .into_iter()
+                    .find(|monitor| monitor.id().ok() == Some(monitor_id))
+                    .ok_or("선택한 디스플레이가 분리되었습니다")?;
+                cleanup_before_create(app)?;
+                #[cfg(windows)]
+                {
+                    #[link(name = "dwmapi")]
+                    unsafe extern "system" {
+                        fn DwmFlush() -> i32;
+                    }
+                    if unsafe { DwmFlush() } < 0 {
+                        return Err("선택창 숨김을 확인하지 못했습니다".into());
+                    }
+                }
+                monitor
+                    .capture_region(region.0, region.1, region.2, region.3)
+                    .map_err(err)
+            }
+        })();
+        end_selection(app, generation)?;
+        return create_note(app, png(&image?)?, bounds, Some(generation)).map(|_| ());
     }
     end_selection(app, generation)?;
     if mode == SelectionMode::Web {
@@ -1159,14 +1273,6 @@ mod tests {
         assert!(note.markdown.is_empty() && note.html.is_empty() && note.change_html.is_empty());
         assert!(note.edit_on_open);
         assert_eq!(note.revision, 1);
-    }
-    #[test]
-    fn preview_preserves_dimensions_and_rgba_bytes() {
-        let pixels = vec![255, 0, 1, 255, 2, 3, 254, 255];
-        let image = RgbaImage::from_raw(2, 1, pixels.clone()).unwrap();
-        let bytes = preview_pixels(&image);
-        assert_eq!(&bytes[..8], &[2, 0, 0, 0, 1, 0, 0, 0]);
-        assert_eq!(&bytes[8..], pixels.as_slice());
     }
     #[test]
     fn retina_crop_and_invalid_selection() {
