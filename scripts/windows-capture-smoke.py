@@ -295,7 +295,7 @@ def main():
     def overlay(mode):
         fixture_ready()
         chord(fixture_hwnd, [0x11, 0x10], 0x31 if mode == 'image' else 0x32)
-        expected = '영역 캡처 — Escape로 취소' if mode == 'image' else '빈 메모 영역 선택 — Escape로 취소'
+        expected = '영역 캡처' if mode == 'image' else '빈 메모 영역 선택'
         def find():
             x, y, width, height = primary_rect
             hwnd = user.GetAncestor(user.WindowFromPoint(W.POINT(x + width // 2, y + height // 2)), 2)
@@ -398,7 +398,7 @@ def main():
         cancelled = overlay('image')
         # Escape is sent only to our foreground capture overlay, never another app.
         foreground = user.GetForegroundWindow()
-        assert pid_of(foreground) == owned_pid and 'Escape로 취소' in title_of(foreground)
+        assert pid_of(foreground) == owned_pid and title_of(foreground) == '영역 캡처'
         send(foreground, 0x1b)
         send(foreground, 0x1b, flags=2, release=True)
         wait_for(lambda: not user.IsWindowVisible(cancelled), 'Escape 취소 실패')
