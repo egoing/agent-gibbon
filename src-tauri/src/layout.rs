@@ -101,7 +101,7 @@ fn native_rect(p: tauri::PhysicalPosition<i32>, s: tauri::PhysicalSize<u32>, sca
         height: (s.height as f64 / u).round() as i64,
     }
 }
-fn window_rect(w: &WebviewWindow) -> Result<Rect, String> {
+pub(crate) fn window_rect(w: &WebviewWindow) -> Result<Rect, String> {
     Ok(native_rect(
         w.outer_position().map_err(|e| e.to_string())?,
         w.outer_size().map_err(|e| e.to_string())?,
@@ -551,7 +551,7 @@ fn arrangement_rects(
     Ok(rects)
 }
 
-fn visible_hosts(app: &tauri::AppHandle) -> Result<Vec<WebviewWindow>, String> {
+pub(crate) fn visible_hosts(app: &tauri::AppHandle) -> Result<Vec<WebviewWindow>, String> {
     let mut windows = Vec::new();
     for w in crate::web::managed_windows(app).into_values() {
         let Some(id) = arrangement_id(w.label()) else {

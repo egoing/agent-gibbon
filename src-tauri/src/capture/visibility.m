@@ -1,18 +1,29 @@
 #import <Cocoa/Cocoa.h>
+#import <unistd.h>
+#import <Accelerate/Accelerate.h>
 
-// Query WindowServer, not NSWindow's local visibility flag. Hidden windows must
-// be absent from the same on-screen window list used by Quartz screen capture.
-bool jajan_capture_windows_hidden(const int64_t *ids, size_t count) {
+// Quartz expects window numbers as raw pointer-sized integers in front-to-back order.
+CFArrayRef jajan_copy_background_windows(void) {
     @autoreleasepool {
         NSArray *windows = CFBridgingRelease(CGWindowListCopyWindowInfo(
             kCGWindowListOptionOnScreenOnly, kCGNullWindowID));
-        if (!windows) return false;
+        if (!windows) return NULL;
+        CFMutableArrayRef ids = CFArrayCreateMutable(NULL, windows.count, NULL);
+        if (!ids) return NULL;
         for (NSDictionary *window in windows) {
-            int64_t number = [window[(id)kCGWindowNumber] longLongValue];
-            for (size_t i = 0; i < count; ++i) {
-                if (ids[i] == number) return false;
-            }
+            if ([window[(id)kCGWindowOwnerPID] intValue] == getpid()) continue;
+            uintptr_t number = [window[(id)kCGWindowNumber] unsignedIntValue];
+            CFArrayAppendValue(ids, (const void *)number);
         }
-        return true;
+        return ids;
     }
+}
+
+// Copy padded Quartz BGRA rows into tightly packed RGBA in one pass.
+bool jajan_copy_rgba(const uint8_t *source, uint8_t *destination,
+                     size_t width, size_t height, size_t stride) {
+    vImage_Buffer input = {(void *)source, height, width, stride};
+    vImage_Buffer output = {destination, height, width, width * 4};
+    const uint8_t channels[] = {2, 1, 0, 3};
+    return vImagePermuteChannels_ARGB8888(&input, &output, channels, kvImageNoFlags) == kvImageNoError;
 }

@@ -678,7 +678,6 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     feedback_window::present_feedback,
                     feedback_window::memo_frame_focus,
                     feedback_window::feedback_action,
-                    capture::capture_screen,
                     capture::capture_ready,
                     first_frame::region_frame_placement,
                     first_frame::region_frame_ready,
