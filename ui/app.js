@@ -60,16 +60,24 @@ let layoutPending = false;
 let folded = false;
 async function fitContent(flow) {
   if (latestNote?.capture || !needsFit || fitting || ((editing || composition) && !layoutPending) || folded) return;
-  fitting = true;
+  const measuredRevision = latestNote.revision;
   const {width, height} = (flow?.measure || ((_stage, work) => work()))('measure', () => {
     // Measure natural flow independently of the current window height.
     const measure = $('viewport').cloneNode(true);
     measure.id = 'measure-viewport';
-    measure.querySelector('#editor')?.remove();
-    measure.querySelector('#controls')?.remove();
-    const measuredContent = measure.querySelector('#content');
-    measuredContent.hidden = false;
-    measuredContent.innerHTML = latestNote.html;
+    const editorState = editor?.status();
+    const editorBody = measure.querySelector('#memo-editor');
+    if (editorBody && editorState?.revision === measuredRevision && !editing && !composition) {
+      // Milkdown's empty paragraphs and line breaks occupy space in the editor.
+      editorBody.querySelectorAll('.change-removed[contenteditable="false"]').forEach(node => node.remove());
+      measure.replaceChildren(editorBody);
+    } else {
+      // A pending open can need the saved revision while a local draft is active.
+      measure.querySelector('#editor')?.remove();
+      const measuredContent = measure.querySelector('#content');
+      measuredContent.hidden = false;
+      measuredContent.innerHTML = latestNote.html;
+    }
     Object.assign(measure.style, {
       position: 'fixed', left: '-10000px', top: '0', visibility: 'hidden',
       display: 'flow-root', flex: 'none', width: '298px', minWidth: '298px',
@@ -84,9 +92,16 @@ async function fitContent(flow) {
     return {width, height};
   });
   flow?.stage('fit');
-  try { needsFit = !await (flow?.invoke || invoke)('fit_note', { width, height, revision: latestNote.revision }); }
-  catch (error) { failure(error); }
-  finally { fitting = false; }
+  fitting = true;
+  // Consume this request before awaiting IPC so a newer request stays pending.
+  needsFit = false;
+  try {
+    const accepted = await (flow?.invoke || invoke)('fit_note', { width, height, revision: measuredRevision });
+    if (!accepted) needsFit = true;
+  } catch (error) {
+    needsFit = true;
+    failure(error);
+  } finally { fitting = false; }
 }
 function contentAction() { return invoke('content_action').catch(failure); }
 
@@ -186,7 +201,9 @@ async function performSave() {
       flow.stage('response');
       displayedHtml = undefined;
       revision = Math.max(revision, savedNote.revision);
+      needsFit = true;
       if (!editing) notify('저장됨');
+      await fitContent(flow).catch(failure);
       flow.frame?.();
     });
     return true;
