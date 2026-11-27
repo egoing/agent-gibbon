@@ -11,7 +11,11 @@ export async function setup(initial = {}, state = {}, platform = 'MacIntel') {
       addEventListener(type, handler) { this.listeners[type] = handler; },
       setAttribute(k,v) { this.attributes[k]=v; }, removeAttribute(k) { delete this.attributes[k]; },
       getBoundingClientRect: () => ({ width: 298, height: id === 'controls' ? 22 : 120 }),
-      cloneNode: () => ({ style: {}, querySelector: () => ({ hidden:false, innerHTML:'', remove() {} }), getBoundingClientRect: () => ({width:298,height:120}), remove() {} }),
+      cloneNode: () => ({
+        style: {}, replaceChildren() {},
+        querySelector: () => ({ hidden:false, innerHTML:'', remove() {}, querySelectorAll: () => [] }),
+        getBoundingClientRect: () => ({width:298,height:120}), remove() {},
+      }),
     });
     return elements.get(id);
   };
