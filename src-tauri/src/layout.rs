@@ -600,7 +600,11 @@ fn planned_frames(
                 specs[i] = placement::Item {
                     width: (f64::from(frame.size.width) * factor).round() as i64,
                     min: height,
-                    max: height,
+                    max: if !crate::sizing::folded(w) && height <= specs[i].min {
+                        height.max(specs[i].max)
+                    } else {
+                        height
+                    },
                 };
                 fixed[i] = true;
             }
@@ -778,6 +782,32 @@ mod tests {
         ] {
             assert_eq!(arrangement_id(label), None, "{label}");
         }
+    }
+
+    #[test]
+    fn grid_can_restore_measured_height_for_a_minimum_height_text_note() {
+        let area = Rect {
+            x: 0,
+            y: 0,
+            width: 1200,
+            height: 800,
+        };
+        let specs = [placement::Item {
+            width: 300,
+            min: 48,
+            max: 274,
+        }];
+        let frames = arrangement_rects(
+            area,
+            1.0,
+            Arrangement::Grid,
+            &specs,
+            &[None],
+            &[false],
+            &[true],
+        )
+        .unwrap();
+        assert_eq!((frames[0].width, frames[0].height), (300, 274));
     }
 
     #[test]
