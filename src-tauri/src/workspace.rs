@@ -421,7 +421,7 @@ pub fn execute(app: &tauri::AppHandle, op: &Operation) -> Result<Value, String> 
             let crop =
                 xcap::image::imageops::crop_imm(&image, px(x), py(y), width, height).to_image();
             drop(guard);
-            let id = capture::create_note(app, capture::png(&crop)?, bounds(*dest)?, None)?;
+            let id = capture::create_note(app, capture::png(&crop)?, bounds(*dest)?)?;
             record_placement(app, json!({"ok":true,"id":id}))
         }
     }

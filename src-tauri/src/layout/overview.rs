@@ -73,15 +73,9 @@ impl RememberedLayout {
 }
 
 #[derive(Clone)]
-struct CapturePause {
-    generation: u64,
-    frame: Option<String>,
-}
-
-#[derive(Clone)]
 struct Session {
     id: u32,
-    paused_capture: Option<CapturePause>,
+    paused_capture: Option<u64>,
     work: Destination,
     originals: BTreeMap<String, Original>,
 }
@@ -527,108 +521,29 @@ fn finish_visit(app: &tauri::AppHandle, generation: u32, animate: bool) -> Resul
     Ok(())
 }
 
-/// Capture workers call this synchronously so screenshot acquisition starts only
-/// after both native surfaces have been hidden. Native access stays on the UI thread.
-pub(crate) fn capture_visibility(
-    app: &tauri::AppHandle,
-    generation: u64,
-    suspend: bool,
-) -> Result<(), String> {
-    let Some(state) = app.try_state::<Overview>() else {
-        return Ok(());
-    };
-    if state.session.lock().unwrap().is_none() {
-        return Ok(());
-    }
-    let handle = app.clone();
-    let (sender, receiver) = std::sync::mpsc::sync_channel(1);
-    app.run_on_main_thread(move || {
-        let _ = sender.send(set_capture_visibility(&handle, generation, suspend));
-    })
-    .map_err(error)?;
-    receiver.recv().map_err(error)?
+pub(crate) fn is_surface(label: &str) -> bool {
+    matches!(label, BACKDROP | CONTROLS)
 }
 
-fn set_capture_visibility(
-    app: &tauri::AppHandle,
-    generation: u64,
-    suspend: bool,
-) -> Result<(), String> {
-    let state = app.state::<Overview>();
-    {
-        let mut guard = state.session.lock().unwrap();
-        let Some(session) = guard.as_mut() else {
-            return Ok(());
-        };
-        if suspend {
-            session.paused_capture = Some(CapturePause {
-                generation,
-                frame: None,
-            });
-        } else if session.paused_capture.as_ref().map(|p| p.generation) != Some(generation) {
-            return Ok(());
-        }
-    }
-    let backdrop = utility(app, BACKDROP)?;
-    let controls = utility(app, CONTROLS)?;
-    if suspend {
-        for window in [&controls, &backdrop] {
-            #[cfg(target_os = "macos")]
-            {
-                // Match show_frame's native ordering. The screenshot is acquired
-                // in this same main-thread turn, before queued UI events can run.
-                let ptr = window.ns_window().map_err(error)?;
-                unsafe { (&*(ptr as *const objc2_app_kit::NSWindow)).orderOut(None) };
-            }
-            #[cfg(not(target_os = "macos"))]
-            window.hide().map_err(error)?;
-            if window.is_visible().map_err(error)? {
-                return Err("모아보기 창을 숨기지 못했습니다".into());
-            }
-        }
-        return set_backdrop_visible(&backdrop, false);
-    }
-    crate::stash::show_frame(&backdrop)?;
-    for window in visible_hosts(app)? {
-        crate::stash::show_frame(&window)?;
-    }
-    crate::stash::show_frame(&controls)?;
-    set_backdrop_visible(&backdrop, true)?;
-    if let Some(session) = state.session.lock().unwrap().as_mut() {
-        if session.paused_capture.as_ref().map(|p| p.generation) == Some(generation) {
-            session.paused_capture = None;
-        }
-    }
-    Ok(())
-}
-
-pub(crate) fn await_capture_frame(app: &tauri::AppHandle, generation: u64, label: &str) {
-    if let Some(state) = app.try_state::<Overview>() {
-        let mut guard = state.session.lock().unwrap();
-        if let Some(pause) = guard.as_mut().and_then(|s| s.paused_capture.as_mut()) {
-            if pause.generation == generation {
-                pause.frame = Some(label.into());
-            }
-        }
+// Only the visit suspended by this selection may display its surfaces again.
+pub(crate) fn pause_capture(app: &tauri::AppHandle, generation: u64) {
+    if let Some(session) = app.state::<Overview>().session.lock().unwrap().as_mut() {
+        session.paused_capture = Some(generation);
     }
 }
 
-pub(crate) fn capture_frame_finished(app: &tauri::AppHandle, label: &str) {
-    let generation = app.try_state::<Overview>().and_then(|state| {
-        let guard = state.session.lock().unwrap();
-        let pause = guard.as_ref()?.paused_capture.as_ref()?;
-        (pause.frame.as_deref() == Some(label)).then_some(pause.generation)
-    });
-    if let Some(generation) = generation {
-        let handle = app.clone();
-        if let Err(e) = app.run_on_main_thread(move || {
-            if let Err(e) = set_capture_visibility(&handle, generation, false) {
-                eprintln!("모아보기 재표시 실패: {e}");
-            }
-        }) {
-            eprintln!("모아보기 재표시 요청 실패: {e}");
-        }
-    }
+pub(crate) fn resume_capture(app: &tauri::AppHandle, generation: u64) -> bool {
+    app.state::<Overview>()
+        .session
+        .lock()
+        .unwrap()
+        .as_mut()
+        .is_some_and(|session| {
+            session
+                .paused_capture
+                .take_if(|id| *id == generation)
+                .is_some()
+        })
 }
 
 /// Other explicit layout or stash commands leave overview before taking ownership.

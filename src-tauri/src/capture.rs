@@ -1,5 +1,7 @@
 //! Frozen screen selection; only app-created PNGs are exposed to note windows.
 mod visibility;
+#[cfg(target_os = "macos")]
+mod window_order;
 use crate::sizing::TOOLBAR_ROW_HEIGHT;
 use base64::{engine::general_purpose::STANDARD, Engine};
 use serde::{Deserialize, Serialize};
@@ -683,15 +685,14 @@ fn cancel_selection(window: WebviewWindow) -> Result<(), String> {
 fn end_selection(app: &tauri::AppHandle, generation: u64) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     {
-        // Restore behind the opaque preview before dismissing it.
+        // Restore the desktop while the selection overlay still owns input.
         let restored = visibility::set(app, generation, false);
         cleanup_before_create(app)?;
-        return restored;
+        restored
     }
     #[cfg(not(target_os = "macos"))]
-    let cleanup = cleanup_before_create(app);
-    #[cfg(not(target_os = "macos"))]
     {
+        let cleanup = cleanup_before_create(app);
         visibility::set(app, generation, false)?;
         cleanup
     }
@@ -723,6 +724,19 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
         }
         screens.keys().cloned().collect::<Vec<_>>()
     };
+    // Snapshot the desktop before any selection overlay changes its window order.
+    #[cfg(target_os = "macos")]
+    {
+        let state = app.state::<Captures>();
+        let generation = state
+            .0
+            .lock()
+            .map_err(err)?
+            .get(window.label())
+            .ok_or("캡처가 종료되었습니다")?
+            .generation;
+        visibility::set(app, generation, true)?;
+    }
     let mut focus_target = None;
     for label in labels {
         let overlay = app.get_webview_window(&label).ok_or("캡처 창이 없습니다")?;
@@ -748,18 +762,6 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
         if focus_target.is_none() || under_pointer {
             focus_target = Some(overlay);
         }
-    }
-    #[cfg(target_os = "macos")]
-    {
-        let state = app.state::<Captures>();
-        let generation = state
-            .0
-            .lock()
-            .map_err(err)?
-            .get(window.label())
-            .ok_or("캡처가 종료되었습니다")?
-            .generation;
-        visibility::set(app, generation, true)?;
     }
     trace("window ordered front");
     if let Some(overlay) = focus_target {
@@ -878,6 +880,24 @@ fn finish_selection(
     width: f64,
     height: f64,
 ) -> Result<(), String> {
+    let result = create_from_selection(&window, x, y, width, height);
+    if result.is_err() {
+        // Failures before end_selection (for example a disconnected display)
+        // still own a live selection. A stale overlay cannot cancel a newer one.
+        if let Err(error) = cancel_selection(window) {
+            eprintln!("영역 선택 실패 후 복원 오류: {error}");
+        }
+    }
+    result
+}
+
+fn create_from_selection(
+    window: &WebviewWindow,
+    x: f64,
+    y: f64,
+    width: f64,
+    height: f64,
+) -> Result<(), String> {
     let app = window.app_handle();
     // Window getters can wait for the UI thread on Windows. Do not hold the
     // capture state while waiting: capture_ready/cancel use it on that thread.
@@ -949,7 +969,7 @@ fn finish_selection(
             }
         })();
         end_selection(app, generation)?;
-        return create_note(app, png(&image?)?, bounds, Some(generation)).map(|_| ());
+        return create_note(app, png(&image?)?, bounds).map(|_| ());
     }
     end_selection(app, generation)?;
     if mode == SelectionMode::Web {
@@ -1096,7 +1116,6 @@ pub(crate) fn create_note(
     app: &tauri::AppHandle,
     bytes: Vec<u8>,
     bounds: ImageNote,
-    generation: Option<u64>,
 ) -> Result<String, String> {
     use std::time::{SystemTime, UNIX_EPOCH};
     let stamp = SystemTime::now()
@@ -1143,9 +1162,6 @@ pub(crate) fn create_note(
         return Err(error);
     }
     let label = crate::label(&id);
-    if let Some(generation) = generation {
-        crate::layout::overview::await_capture_frame(app, generation, &label);
-    }
     crate::first_frame::creating(app, &label, crate::first_frame::Presentation::Image, || {
         let win = crate::create_window(app, &id, true)?;
         app.state::<crate::AppNotes>()
