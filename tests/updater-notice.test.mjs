@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -13,11 +14,11 @@ function setup(status) {
   const make = () => ({ hidden: false, disabled: false, textContent: '', attrs: {}, setAttribute(k, v) { this.attrs[k] = v; } });
   for (const id of ['notice-title', 'notice-version', 'notice-message', 'notice-install', 'notice-dismiss']) elements.set(id, make());
   const requests = [];
-  const context = vm.createContext({
+  const context = vm.createContext(sourceLanguageWindow({
     document: { getElementById: id => elements.get(id) },
     window: { __TAURI__: { core: { invoke: async (command, args) => { requests.push({ command, args }); if (command === 'updater_notice_status') return status; if (command === 'updater_notice_ready') return {}; if (command === 'updater_notice_install') return status; if (command === 'updater_notice_dismiss') return { dismissed: true }; throw Error(`unexpected command ${command}`); } } } },
     setInterval: () => 1,
-  });
+  }));
   vm.runInContext(source, context);
   return { elements, requests };
 }

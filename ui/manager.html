@@ -1,113 +1,120 @@
 <!doctype html>
-<html lang="ko"><head><script src="telemetry.js"></script><script src="updater-guard.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>메모 관리</title><link rel="stylesheet" href="manager.css"><script src="manager-theme.js"></script><script type="module" src="memo-preview.js"></script><script src="autostart.js" defer></script><script src="privacy.js" defer></script><script src="skills.js" defer></script><script src="manager.js" defer></script><script src="updater.js" defer></script><script src="developer-updater.js" defer></script></head>
-<body><header><strong>Jajan</strong><nav id="manager-navigation" aria-label="관리 탐색" hidden><button id="notes-nav" aria-pressed="true">모든 메모</button><button id="settings-nav" aria-pressed="false">설정</button></nav></header>
-<div id="error" role="alert" hidden>메모를 읽지 못했습니다. <button id="retry">다시 시도</button></div>
-<main id="notes-page" hidden><aside aria-label="메모 목록"><div class="list-heading"><h2>모든 메모</h2><button id="refresh" aria-label="메모 목록 새로고침">새로고침</button></div><input id="memo-search" type="search" aria-label="메모 검색" placeholder="제목 또는 본문 검색" aria-controls="list" autocomplete="off"><div class="memo-results"><div id="list"></div><p id="list-status" role="status"></p></div></aside><section id="detail" aria-label="메모 상세" tabindex="0"><p>메모를 선택하세요.</p></section></main>
-<section id="settings-page" aria-label="설정" hidden>
-<aside class="settings-sidebar"><h1>설정</h1><nav aria-label="설정 항목">
-<button id="settings-skills-nav" type="button" aria-controls="settings-skills">스킬</button>
-<button id="settings-appearance-nav" type="button" aria-controls="settings-appearance">테마</button>
-<button id="settings-updater-nav" type="button" aria-current="false" aria-controls="settings-updater">자동 업데이트</button>
-<button id="settings-autostart-nav" type="button" aria-current="false" aria-controls="settings-autostart">로그인 자동 실행</button>
-<button id="settings-privacy-nav" type="button" aria-current="page" aria-controls="settings-privacy">Privacy &amp; Diagnostics</button>
-<button id="settings-developer-nav" type="button" aria-current="false" aria-controls="settings-developer" hidden>개발자</button>
-</nav><button id="settings-version" type="button" aria-label="앱 버전">버전 확인 중</button></aside>
+<html lang="ko"><head><link rel="stylesheet" href="language.css"><script src="generated/messages.js"></script><script src="language.js"></script><script src="telemetry.js"></script><script src="updater-guard.js"></script><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title data-l10n="text">메모 관리</title><link rel="stylesheet" href="manager.css"><script src="manager-theme.js"></script><script type="module" src="memo-preview.js"></script><script src="autostart.js" defer></script><script src="privacy.js" defer></script><script src="skills.js" defer></script><script src="manager.js" defer></script><script src="updater.js" defer></script><script src="developer-updater.js" defer></script></head>
+<body><header><strong data-l10n="text">Jajan</strong><nav id="manager-navigation" aria-label="관리 탐색" hidden data-l10n="aria-label"><button id="notes-nav" aria-pressed="true" data-l10n="text">모든 메모</button><button id="settings-nav" aria-pressed="false" data-l10n="text">설정</button></nav></header>
+<div id="error" role="alert" hidden data-l10n="text">메모를 읽지 못했습니다. <button id="retry" data-l10n="text">다시 시도</button></div>
+<main id="notes-page" hidden><aside aria-label="메모 목록" data-l10n="aria-label"><div class="list-heading"><h2 data-l10n="text">모든 메모</h2><button id="refresh" aria-label="메모 목록 새로고침" data-l10n="aria-label text">새로고침</button></div><input id="memo-search" type="search" aria-label="메모 검색" placeholder="제목 또는 본문 검색" aria-controls="list" autocomplete="off" data-l10n="aria-label placeholder"><div class="memo-results"><div id="list"></div><p id="list-status" role="status"></p></div></aside><section id="detail" aria-label="메모 상세" tabindex="0" data-l10n="aria-label"><p data-l10n="text">메모를 선택하세요.</p></section></main>
+<section id="settings-page" aria-label="설정" hidden data-l10n="aria-label">
+<aside class="settings-sidebar"><h1 data-l10n="text">설정</h1><nav aria-label="설정 항목" data-l10n="aria-label">
+<button id="settings-skills-nav" type="button" aria-controls="settings-skills" data-l10n="text">스킬</button>
+<button id="settings-language-nav" type="button" aria-controls="settings-language">언어 / Language / 言語</button>
+<button id="settings-appearance-nav" type="button" aria-controls="settings-appearance" data-l10n="text">테마</button>
+<button id="settings-updater-nav" type="button" aria-current="false" aria-controls="settings-updater" data-l10n="text">자동 업데이트</button>
+<button id="settings-autostart-nav" type="button" aria-current="false" aria-controls="settings-autostart" data-l10n="text">로그인 자동 실행</button>
+<button id="settings-privacy-nav" type="button" aria-current="page" aria-controls="settings-privacy" data-l10n="text">Privacy &amp; Diagnostics</button>
+<button id="settings-developer-nav" type="button" aria-current="false" aria-controls="settings-developer" hidden data-l10n="text">개발자</button>
+</nav><button id="settings-version" type="button" aria-label="앱 버전" data-l10n="aria-label text">버전 확인 중</button></aside>
 <div class="settings-content">
+<section id="settings-language" aria-labelledby="language-heading" hidden>
+<h2 id="language-heading"><label for="app-language">언어 / Language / 言語</label></h2>
+<select id="app-language">
+<option value="system" data-l10n="text">시스템 설정 따르기</option>
+<option value="ko" lang="ko">한국어</option><option value="en" lang="en">English</option><option value="ja" lang="ja">日本語</option>
+</select><p id="language-error" role="alert" hidden></p></section>
 <section id="settings-autostart" aria-labelledby="settings-autostart-title" hidden>
-<h2 id="settings-autostart-title">로그인 자동 실행</h2>
-<p id="autostart-help">로그인 후 메모와 단축키를 바로 사용할 수 있습니다. 설정에서 언제든 끌 수 있습니다.</p>
-<label class="privacy-choice"><input id="autostart-setting" type="checkbox" aria-describedby="autostart-help" disabled>로그인 시 자잔 자동 실행</label>
-<p id="autostart-choice" role="status"></p><p id="autostart-status" role="status" aria-live="polite">상태를 확인하는 중입니다.</p>
-<p>관리 창을 앞에 띄우지 않으며 메모는 기존 표시·숨김 상태로 복원합니다. 터미널 명령을 자동으로 다시 실행하지 않습니다.</p>
-<div class="updater-actions"><button id="autostart-retry" type="button" hidden>다시 시도</button><button id="autostart-os-settings" type="button" hidden>OS 시작 설정 열기</button></div>
+<h2 id="settings-autostart-title" data-l10n="text">로그인 자동 실행</h2>
+<p id="autostart-help" data-l10n="text">로그인 후 메모와 단축키를 바로 사용할 수 있습니다. 설정에서 언제든 끌 수 있습니다.</p>
+<label class="privacy-choice" data-l10n="text"><input id="autostart-setting" type="checkbox" aria-describedby="autostart-help" disabled>로그인 시 자잔 자동 실행</label>
+<p id="autostart-choice" role="status"></p><p id="autostart-status" role="status" aria-live="polite" data-l10n="text">상태를 확인하는 중입니다.</p>
+<p data-l10n="text">관리 창을 앞에 띄우지 않으며 메모는 기존 표시·숨김 상태로 복원합니다. 터미널 명령을 자동으로 다시 실행하지 않습니다.</p>
+<div class="updater-actions"><button id="autostart-retry" type="button" hidden data-l10n="text">다시 시도</button><button id="autostart-os-settings" type="button" hidden data-l10n="text">OS 시작 설정 열기</button></div>
 <p id="autostart-error" role="alert" hidden></p>
 </section>
 <section id="settings-appearance" aria-labelledby="settings-appearance-title" hidden>
-<h2 id="settings-appearance-title">테마</h2><p>관리 창 테마를 선택하세요. 선택은 이 기기에 자동 저장됩니다.</p>
-<fieldset class="theme-options"><legend>관리 창 테마</legend>
-<label><input type="radio" name="manager-theme" value="white">흰색</label>
-<label><input type="radio" name="manager-theme" value="gray">회색</label>
-<label><input type="radio" name="manager-theme" value="black">검정</label>
-<label class="theme-system-option"><input type="radio" name="manager-theme" value="system">시스템</label>
+<h2 id="settings-appearance-title" data-l10n="text">테마</h2><p data-l10n="text">관리 창 테마를 선택하세요. 선택은 이 기기에 자동 저장됩니다.</p>
+<fieldset class="theme-options"><legend data-l10n="text">관리 창 테마</legend>
+<label data-l10n="text"><input type="radio" name="manager-theme" value="white">흰색</label>
+<label data-l10n="text"><input type="radio" name="manager-theme" value="gray">회색</label>
+<label data-l10n="text"><input type="radio" name="manager-theme" value="black">검정</label>
+<label class="theme-system-option" data-l10n="text"><input type="radio" name="manager-theme" value="system">시스템</label>
 </fieldset>
 <p id="theme-mode" class="theme-help"></p>
 <p id="theme-result" role="status" aria-live="polite"></p>
-<p id="theme-native-status" role="status" hidden>제목 표시줄 색상을 적용하지 못했습니다. 테마를 다시 선택해 재시도하세요.</p>
+<p id="theme-native-status" role="status" hidden data-l10n="text">제목 표시줄 색상을 적용하지 못했습니다. 테마를 다시 선택해 재시도하세요.</p>
 
 <div class="memo-appearance-card">
-<fieldset class="theme-options"><legend>메모 창 디자인</legend>
-<label><input type="radio" name="memo-design" value="white">흰색</label>
-<label><input type="radio" name="memo-design" value="gray">회색</label>
-<label><input type="radio" name="memo-design" value="black">검정</label>
-<label><input type="radio" name="memo-design" value="color">컬러</label>
-<label class="theme-system-option"><input type="radio" name="memo-design" value="system">시스템</label>
+<fieldset class="theme-options"><legend data-l10n="text">메모 창 디자인</legend>
+<label data-l10n="text"><input type="radio" name="memo-design" value="white">흰색</label>
+<label data-l10n="text"><input type="radio" name="memo-design" value="gray">회색</label>
+<label data-l10n="text"><input type="radio" name="memo-design" value="black">검정</label>
+<label data-l10n="text"><input type="radio" name="memo-design" value="color">컬러</label>
+<label class="theme-system-option" data-l10n="text"><input type="radio" name="memo-design" value="system">시스템</label>
 </fieldset>
 
-<section class="memo-preview" aria-labelledby="memo-preview-title"><h3 id="memo-preview-title">미리보기</h3>
+<section class="memo-preview" aria-labelledby="memo-preview-title"><h3 id="memo-preview-title" data-l10n="text">미리보기</h3>
 <div class="memo-preview-grid">
-<article id="memo-preview-first" class="memo-sample" aria-label="첫 번째 예시 메모"><h4>오늘 할 일</h4><p>☑ 자료 정리<br>☐ 다음 일정 확인</p></article>
-<article id="memo-preview-second" class="memo-sample" aria-label="두 번째 예시 메모"><h4>작업 메모</h4><p>작은 아이디어를 적어두세요.<br>필요할 때 곁에서 확인합니다.</p></article>
+<article id="memo-preview-first" class="memo-sample" aria-label="첫 번째 예시 메모" data-l10n="aria-label"><h4 data-l10n="text">오늘 할 일</h4><p data-l10n="text">☑ 자료 정리<br>☐ 다음 일정 확인</p></article>
+<article id="memo-preview-second" class="memo-sample" aria-label="두 번째 예시 메모" data-l10n="aria-label"><h4 data-l10n="text">작업 메모</h4><p data-l10n="text">작은 아이디어를 적어두세요.<br>필요할 때 곁에서 확인합니다.</p></article>
 </div></section>
 </div>
 </section>
-<section id="settings-privacy" aria-labelledby="settings-privacy-title"><div class="privacy-card privacy-settings"><h2 id="settings-privacy-title">Privacy &amp; Diagnostics</h2><p>Your choice is stored locally.</p>
-<div class="privacy-box"><label class="privacy-choice"><input id="privacy-setting-share" type="checkbox" disabled> I agree to diagnostic sharing (optional)</label><p id="privacy-sharing-status" role="status">Not sharing</p><p>Sanitized errors, app/OS versions, operation timings and freeze diagnostics.</p><p>No notes, terminal input/output, clipboard or screenshots.</p><p>Sent to Sentry in Iowa, United States. Originals: up to 30 days. Read the notice for backup and aggregate retention and overseas transfer details.</p></div>
-<p>Turning this off saves withdrawal immediately. Turning it on requires Save Changes. A request already started before withdrawal may finish. Previously uploaded information is handled separately.</p>
-<p id="privacy-settings-draft" class="privacy-notice">Sharing is unavailable until all privacy details are published. Read the Privacy Notice for the current operator, storage region and retention information.</p>
-<div class="privacy-links"><button id="privacy-settings-terms" type="button">Read Terms</button><button id="privacy-settings-notice" type="button">Privacy Notice</button></div>
-<div class="privacy-actions"><span id="privacy-save-result" role="status"></span><button id="privacy-save" type="button" disabled>Save Changes</button></div></div></section>
-<section id="settings-skills" aria-labelledby="settings-skills-title" hidden><h2 id="settings-skills-title">스킬</h2><p id="skills-loading" role="status">스킬을 불러오는 중입니다.</p><p id="skills-feedback" class="settings-feedback" role="alert" hidden></p><div id="skills-list"></div></section>
+<section id="settings-privacy" aria-labelledby="settings-privacy-title"><div class="privacy-card privacy-settings"><h2 id="settings-privacy-title" data-l10n="text">Privacy &amp; Diagnostics</h2><p data-l10n="text">Your choice is stored locally.</p>
+<div class="privacy-box"><label class="privacy-choice" data-l10n="text"><input id="privacy-setting-share" type="checkbox" disabled> I agree to diagnostic sharing (optional)</label><p id="privacy-sharing-status" role="status" data-l10n="text">Not sharing</p><p data-l10n="text">Sanitized errors, app/OS versions, operation timings and freeze diagnostics.</p><p data-l10n="text">No notes, terminal input/output, clipboard or screenshots.</p><p data-l10n="text">Sent to Sentry in Iowa, United States. Originals: up to 30 days. Read the notice for backup and aggregate retention and overseas transfer details.</p></div>
+<p data-l10n="text">Turning this off saves withdrawal immediately. Turning it on requires Save Changes. A request already started before withdrawal may finish. Previously uploaded information is handled separately.</p>
+<p id="privacy-settings-draft" class="privacy-notice" data-l10n="text">Sharing is unavailable until all privacy details are published. Read the Privacy Notice for the current operator, storage region and retention information.</p>
+<div class="privacy-links"><button id="privacy-settings-terms" type="button" data-l10n="text">Read Terms</button><button id="privacy-settings-notice" type="button" data-l10n="text">Privacy Notice</button></div>
+<div class="privacy-actions"><span id="privacy-save-result" role="status"></span><button id="privacy-save" type="button" disabled data-l10n="text">Save Changes</button></div></div></section>
+<section id="settings-skills" aria-labelledby="settings-skills-title" hidden><h2 id="settings-skills-title" data-l10n="text">스킬</h2><p id="skills-loading" role="status" data-l10n="text">스킬을 불러오는 중입니다.</p><p id="skills-feedback" class="settings-feedback" role="alert" hidden></p><div id="skills-list"></div></section>
 <section id="settings-updater" aria-labelledby="settings-updater-title" hidden>
-<h2 id="settings-updater-title">자동 업데이트</h2>
-<p class="updater-policy">공식 설치본은 새 버전을 자동으로 내려받습니다. 5분 동안 입력이 없고 진행 중인 작업이 없으면 설치하고 다시 시작합니다.</p>
+<h2 id="settings-updater-title" data-l10n="text">자동 업데이트</h2>
+<p class="updater-policy" data-l10n="text">공식 설치본은 새 버전을 자동으로 내려받습니다. 5분 동안 입력이 없고 진행 중인 작업이 없으면 설치하고 다시 시작합니다.</p>
 <article class="updater-card">
 <div class="updater-summary">
-<div><p id="updater-status" role="status" aria-live="polite">업데이트 상태를 확인하는 중입니다.</p><p id="updater-version"></p></div>
+<div><p id="updater-status" role="status" aria-live="polite" data-l10n="text">업데이트 상태를 확인하는 중입니다.</p><p id="updater-version"></p></div>
 </div>
 <div class="updater-progress-row"><progress id="updater-progress" max="1" value="0" hidden></progress><p id="updater-message" role="status" aria-live="polite"></p></div>
-<div class="updater-actions"><button id="updater-check" type="button">지금 확인</button><button id="updater-install" type="button" disabled>업데이트하고 재시작</button></div>
+<div class="updater-actions"><button id="updater-check" type="button" data-l10n="text">지금 확인</button><button id="updater-install" type="button" disabled data-l10n="text">업데이트하고 재시작</button></div>
 </article>
-<details class="updater-help"><summary>설치가 보류되거나 실패했나요?</summary><p>‘업데이트하고 재시작’은 5분 대기만 생략합니다. 편집·저장·내보내기와 캡처를 마치고, 실행 중인 터미널을 종료한 뒤 숨긴 터미널도 관리 창에서 삭제하세요. 작업이 안전한지 확인한 후 설치합니다.</p><p>안내 닫기는 자동 설치를 끄지 않습니다. 보류 조건이 해소되면 자동으로 다시 확인합니다. 응답 대기 시간이 초과되면 작업을 저장하고 다시 시도하세요.</p><p>다운로드·검증 오류는 연결 상태를 확인한 뒤 ‘다시 확인’으로 다시 받으세요. 반복되면 공식 릴리스의 운영체제와 CPU에 맞는 설치 파일로 수동 설치하세요. 검증 실패를 무시하고 설치하지 않습니다.</p></details>
+<details class="updater-help"><summary data-l10n="text">설치가 보류되거나 실패했나요?</summary><p data-l10n="text">‘업데이트하고 재시작’은 5분 대기만 생략합니다. 편집·저장·내보내기와 캡처를 마치고, 실행 중인 터미널을 종료한 뒤 숨긴 터미널도 관리 창에서 삭제하세요. 작업이 안전한지 확인한 후 설치합니다.</p><p data-l10n="text">안내 닫기는 자동 설치를 끄지 않습니다. 보류 조건이 해소되면 자동으로 다시 확인합니다. 응답 대기 시간이 초과되면 작업을 저장하고 다시 시도하세요.</p><p data-l10n="text">다운로드·검증 오류는 연결 상태를 확인한 뒤 ‘다시 확인’으로 다시 받으세요. 반복되면 공식 릴리스의 운영체제와 CPU에 맞는 설치 파일로 수동 설치하세요. 검증 실패를 무시하고 설치하지 않습니다.</p></details>
 </section>
 <section id="settings-developer" aria-labelledby="settings-developer-title" hidden>
-<h2 id="settings-developer-title">개발자</h2>
-<p>복귀 메뉴와 데이터 형식이 호환되는 지정된 두 버전 사이를 실제 설치·재시작으로 왕복합니다. 시험 중에는 재실행 후에도 일반 자동 업데이트로 먼저 복귀하지 않습니다.</p>
+<h2 id="settings-developer-title" data-l10n="text">개발자</h2>
+<p data-l10n="text">복귀 메뉴와 데이터 형식이 호환되는 지정된 두 버전 사이를 실제 설치·재시작으로 왕복합니다. 시험 중에는 재실행 후에도 일반 자동 업데이트로 먼저 복귀하지 않습니다.</p>
 <p id="developer-roundtrip-reason" role="status"></p>
-<div class="updater-actions"><button id="developer-previous" type="button" disabled>이전 테스트 버전으로 교체</button><button id="developer-latest" type="button" disabled>최신 버전으로 복귀</button></div>
+<div class="updater-actions"><button id="developer-previous" type="button" disabled data-l10n="text">이전 테스트 버전으로 교체</button><button id="developer-latest" type="button" disabled data-l10n="text">최신 버전으로 복귀</button></div>
 <dl id="developer-update-state" aria-live="polite"></dl>
 <p id="developer-update-message" role="status"></p>
-<details><summary>기존 패키지 준비 시험</summary><p>공식 최신 패키지를 준비한 뒤 별도 설치합니다. 동일 버전 재설치 시험이며 버전 왕복을 대신하지 않습니다. 준비만 하면 설치하지 않습니다.</p><div class="updater-actions"><button id="developer-prepare" type="button" disabled>최신 배포판 준비</button><button id="developer-install" type="button" disabled>준비한 버전 설치·재시작</button></div></details>
+<details><summary data-l10n="text">기존 패키지 준비 시험</summary><p data-l10n="text">공식 최신 패키지를 준비한 뒤 별도 설치합니다. 동일 버전 재설치 시험이며 버전 왕복을 대신하지 않습니다. 준비만 하면 설치하지 않습니다.</p><div class="updater-actions"><button id="developer-prepare" type="button" disabled data-l10n="text">최신 배포판 준비</button><button id="developer-install" type="button" disabled data-l10n="text">준비한 버전 설치·재시작</button></div></details>
 </section>
 </div></section>
 <section id="privacy-welcome" aria-labelledby="privacy-welcome-title">
   <div class="privacy-card">
-    <h1 id="privacy-welcome-title">Welcome to Jajan</h1><h2>Terms &amp; Privacy</h2>
-    <p>Nothing is sent until you choose.</p>
+    <h1 id="privacy-welcome-title" data-l10n="text">Welcome to Jajan</h1><h2 data-l10n="text">Terms &amp; Privacy</h2>
+    <p data-l10n="text">Nothing is sent until you choose.</p>
     <div class="privacy-box" role="group" aria-labelledby="privacy-terms-title">
-      <h3 id="privacy-terms-title">Terms of Use</h3><p>Local desktop app. Your content stays on your device.</p>
-      <button id="privacy-read-terms" type="button">Read Terms</button>
-      <label class="privacy-choice privacy-agreement"><input id="privacy-terms" type="checkbox" aria-required="true" disabled><span class="privacy-choice-label">I agree to the Terms of Use <span>(required)</span></span></label>
+      <h3 id="privacy-terms-title" data-l10n="text">Terms of Use</h3><p data-l10n="text">Local desktop app. Your content stays on your device.</p>
+      <button id="privacy-read-terms" type="button" data-l10n="text">Read Terms</button>
+      <label class="privacy-choice privacy-agreement"><input id="privacy-terms" type="checkbox" aria-required="true" disabled><span class="privacy-choice-label" data-l10n="text">I agree to the Terms of Use <span data-l10n="text">(required)</span></span></label>
     </div>
     <div class="privacy-box" role="group" aria-labelledby="privacy-diagnostics-title">
-      <h3 id="privacy-diagnostics-title">Service improvement diagnostics</h3>
-      <p>Includes sanitized errors, app/OS versions, operation timings and freeze diagnostics.</p>
-      <p>Excludes notes, terminal input/output, clipboard and screenshots.</p>
-      <p>Sent to Sentry in Iowa, United States. Originals: up to 30 days. Read the notice for backup and aggregate retention and overseas transfer details.</p>
-      <button id="privacy-read-notice" type="button">Privacy Notice</button>
-      <p id="privacy-draft" class="privacy-notice">Sharing is unavailable until all privacy details are published. Read the Privacy Notice for the current details. You can continue without sharing.</p>
-      <label class="privacy-choice privacy-agreement"><input id="privacy-share" type="checkbox" aria-describedby="privacy-draft" disabled><span class="privacy-choice-label">I agree to diagnostic sharing <span>(optional)</span></span></label>
+      <h3 id="privacy-diagnostics-title" data-l10n="text">Service improvement diagnostics</h3>
+      <p data-l10n="text">Includes sanitized errors, app/OS versions, operation timings and freeze diagnostics.</p>
+      <p data-l10n="text">Excludes notes, terminal input/output, clipboard and screenshots.</p>
+      <p data-l10n="text">Sent to Sentry in Iowa, United States. Originals: up to 30 days. Read the notice for backup and aggregate retention and overseas transfer details.</p>
+      <button id="privacy-read-notice" type="button" data-l10n="text">Privacy Notice</button>
+      <p id="privacy-draft" class="privacy-notice" data-l10n="text">Sharing is unavailable until all privacy details are published. Read the Privacy Notice for the current details. You can continue without sharing.</p>
+      <label class="privacy-choice privacy-agreement"><input id="privacy-share" type="checkbox" aria-describedby="privacy-draft" disabled><span class="privacy-choice-label" data-l10n="text">I agree to diagnostic sharing <span data-l10n="text">(optional)</span></span></label>
     </div>
     <div class="privacy-box" role="group" aria-labelledby="autostart-welcome-title">
-      <h3 id="autostart-welcome-title">로그인 자동 실행</h3>
-      <label class="privacy-choice"><input id="autostart-welcome" type="checkbox" checked disabled aria-describedby="autostart-welcome-help">로그인 시 자잔 자동 실행</label>
-      <p id="autostart-welcome-help">로그인 후 메모와 단축키를 바로 사용할 수 있습니다. 설정에서 언제든 끌 수 있습니다.</p>
-      <p id="autostart-welcome-status" role="status">Continue를 눌러 확인하기 전에는 등록하지 않습니다.</p>
+      <h3 id="autostart-welcome-title" data-l10n="text">로그인 자동 실행</h3>
+      <label class="privacy-choice" data-l10n="text"><input id="autostart-welcome" type="checkbox" checked disabled aria-describedby="autostart-welcome-help">로그인 시 자잔 자동 실행</label>
+      <p id="autostart-welcome-help" data-l10n="text">로그인 후 메모와 단축키를 바로 사용할 수 있습니다. 설정에서 언제든 끌 수 있습니다.</p>
+      <p id="autostart-welcome-status" role="status" data-l10n="text">Continue를 눌러 확인하기 전에는 등록하지 않습니다.</p>
     </div>
-    <p>You can use every feature without sharing diagnostics.</p>
-    <div class="privacy-actions"><button id="privacy-exit" type="button">Exit</button><button id="privacy-continue" type="button" disabled>Continue</button></div>
+    <p data-l10n="text">You can use every feature without sharing diagnostics.</p>
+    <div class="privacy-actions"><button id="privacy-exit" type="button" data-l10n="text">Exit</button><button id="privacy-continue" type="button" disabled data-l10n="text">Continue</button></div>
   </div>
 </section>
-<div id="privacy-error" role="alert" hidden></div><button id="privacy-retry" type="button" hidden>Reload privacy choices</button>
-<p id="privacy-storage-warning" role="status" hidden>Local choices could not be read. Review the current terms; sharing remains off.</p>
-<section id="privacy-document" class="privacy-document" aria-labelledby="privacy-document-title" tabindex="-1" hidden><div class="privacy-document-heading"><h2 id="privacy-document-title"></h2><button id="privacy-document-close" type="button">Close document</button></div><article id="privacy-document-content"></article></section>
+<div id="privacy-error" role="alert" hidden></div><button id="privacy-retry" type="button" hidden data-l10n="text">Reload privacy choices</button>
+<p id="privacy-storage-warning" role="status" hidden data-l10n="text">Local choices could not be read. Review the current terms; sharing remains off.</p>
+<section id="privacy-document" class="privacy-document" aria-labelledby="privacy-document-title" tabindex="-1" hidden><div class="privacy-document-heading"><h2 id="privacy-document-title"></h2><button id="privacy-document-close" type="button" data-l10n="text">Close document</button></div><article id="privacy-document-content"></article></section>
 </body></html>

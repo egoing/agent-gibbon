@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -15,7 +16,7 @@ function mount() {
   } } } };
   window.jajanInvoke = window.__TAURI__.core.invoke;
   const document = { elementFromPoint: x => buttons[x], querySelector: s => s === 'nav' ? controls : status };
-  vm.runInNewContext(readFileSync(new URL('../ui/memo-overview.js', import.meta.url), 'utf8'), { window, document });
+  vm.runInNewContext(readFileSync(new URL('../ui/memo-overview.js', import.meta.url), 'utf8'), sourceLanguageWindow({ window, document }));
   return { buttons, pointer: payload => onPointer({ payload }), enter: window.beginOverview, requests, status,
     click: action => handler({ target: { closest: () => ({ dataset: { action } }) } }) };
 }

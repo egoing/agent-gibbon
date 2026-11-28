@@ -252,7 +252,7 @@ fn choices(paths: &[PathBuf]) -> Vec<Value> {
 #[tauri::command]
 pub fn terminal_welcome(window: WebviewWindow) -> Result<Value, String> {
     let id = caller(&window)?;
-    let info = inspect(window.app_handle(), &id)?;
+    let info = super::inspect_with_title(window.app_handle(), &id, true)?;
     let home = home()?;
     let recent = recent_directories(entries(window.app_handle()).into_iter());
     let folders: Vec<_> = recent
@@ -301,7 +301,7 @@ pub async fn terminal_folder(window: WebviewWindow, path: Option<String>) -> Res
         } else if let Some(path) = app
             .dialog()
             .file()
-            .set_title("작업 폴더 선택")
+            .set_title(crate::language::tr("작업 폴더 선택"))
             .blocking_pick_folder()
         {
             selected = true;
@@ -916,11 +916,13 @@ pub fn request_close(window: &WebviewWindow) -> Result<(), String> {
         let app = app.clone();
         app.clone()
             .dialog()
-            .message("실행 중인 작업을 종료하고 창을 닫을까요?")
-            .title("터미널 종료")
+            .message(crate::language::tr(
+                "실행 중인 작업을 종료하고 창을 닫을까요?",
+            ))
+            .title(crate::language::tr("터미널 종료"))
             .buttons(MessageDialogButtons::OkCancelCustom(
-                "종료".into(),
-                "취소".into(),
+                crate::language::tr("종료").into(),
+                crate::language::tr("취소").into(),
             ))
             .show(move |yes| {
                 if yes {

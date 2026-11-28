@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -15,11 +16,11 @@ function setup(initial = { phase: 'idle', version: null, current_version: '1.2.3
   let check = async () => status;
   let install = async () => status;
   let interval;
-  const context = vm.createContext({
+  const context = vm.createContext(sourceLanguageWindow({
     document: { hidden: false, getElementById: id => elements.get(id) },
     window: { __TAURI__: { core: { invoke: async (name, args) => { requests.push({ name, args }); if (name === 'updater_status') return status; if (name === 'updater_check') return check(); if (name === 'updater_install') return install(); throw Error(`unexpected command ${name}`); } } } },
     setInterval: fn => { interval = fn; },
-  });
+  }));
   vm.runInContext(source, context);
   return { elements, requests, run: code => vm.runInContext(code, context), tick: () => interval(), setStatus: value => { status = value; }, setCheck: fn => { check = fn; }, setInstall: fn => { install = fn; } };
 }

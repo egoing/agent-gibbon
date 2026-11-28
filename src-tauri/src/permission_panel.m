@@ -22,6 +22,28 @@
 static NSPanel *guidePanel;
 static NSTimer *positionTimer;
 
+extern const unsigned char *jajan_ui_label(const char *key, size_t *length);
+static NSString *localized(NSString *key) {
+    size_t length;
+    const unsigned char *bytes = jajan_ui_label(key.UTF8String, &length);
+    return [[NSString alloc] initWithBytes:bytes length:length encoding:NSUTF8StringEncoding];
+}
+static BOOL panelCapture;
+static NSURL *panelTarget;
+static BOOL panelBundled;
+
+void jajan_refresh_permission_language(void) {
+    if (!guidePanel || !panelTarget) return;
+    guidePanel.title = localized(panelCapture ? @"화면 캡처 허용" : @"손쉬운 사용 허용");
+    NSTextField *label = [guidePanel.contentView viewWithTag:1];
+    JajanFileRow *row = [guidePanel.contentView viewWithTag:2];
+    NSTextField *hint = [guidePanel.contentView viewWithTag:3];
+    label.stringValue = localized(@"↑  아래 앱을 시스템 설정의 허용 목록으로 드래그하세요.");
+    row.title = panelBundled ? panelTarget.lastPathComponent :
+        [NSString stringWithFormat:@"%@  ·  %@", panelTarget.lastPathComponent, localized(@"개발 실행 파일")];
+    hint.stringValue = localized(panelBundled ? @"목록에 추가되지 않으면 + 버튼으로 앱을 선택하세요." : @"개발 실행 파일은 macOS가 목록 추가를 제한할 수 있습니다.");
+}
+
 // Quartz uses a top-left origin on the primary screen, AppKit a bottom-left origin.
 static BOOL alignWithSettings(void) {
     NSArray *settings = [NSRunningApplication runningApplicationsWithBundleIdentifier:@"com.apple.systempreferences"];
@@ -74,23 +96,28 @@ void jajan_show_permission_panel(BOOL screenCapture, NSWindow *overview) {
         guidePanel.hidesOnDeactivate = NO;
         guidePanel.collectionBehavior = NSWindowCollectionBehaviorMoveToActiveSpace;
     }
-    guidePanel.title = screenCapture ? @"화면 캡처 허용" : @"손쉬운 사용 허용";
+    panelTarget = target;
+    panelCapture = screenCapture;
+    panelBundled = bundled;
     NSView *body = [[NSView alloc] initWithFrame:NSMakeRect(0,0,500,124)];
-    NSTextField *label = [NSTextField labelWithString:@"↑  아래 앱을 시스템 설정의 허용 목록으로 드래그하세요."];
+    NSTextField *label = [NSTextField wrappingLabelWithString:@""];
+    label.tag = 1;
     label.frame = NSMakeRect(16,92,470,20);
     [body addSubview:label];
     JajanFileRow *row = [[JajanFileRow alloc] initWithFrame:NSMakeRect(16,44,468,44)];
     row.fileURL = target;
-    row.title = bundled ? target.lastPathComponent : [target.lastPathComponent stringByAppendingString:@"  ·  개발 실행 파일"];
+    row.tag = 2;
     row.image = [[NSWorkspace sharedWorkspace] iconForFile:target.path];
     row.image.size = NSMakeSize(26,26);
     row.imagePosition = NSImageLeft;
     row.toolTip = target.path;
     [body addSubview:row];
-    NSTextField *hint = [NSTextField labelWithString:bundled ? @"목록에 추가되지 않으면 + 버튼으로 앱을 선택하세요." : @"개발 실행 파일은 macOS가 목록 추가를 제한할 수 있습니다."];
+    NSTextField *hint = [NSTextField wrappingLabelWithString:@""];
+    hint.tag = 3;
     hint.frame = NSMakeRect(16,12,470,22);
     [body addSubview:hint];
     guidePanel.contentView = body;
+    jajan_refresh_permission_language();
     NSRect visible = (overview.screen ?: NSScreen.mainScreen).visibleFrame;
     [guidePanel setFrameTopLeftPoint:NSMakePoint(NSMidX(visible)-250, NSMinY(visible)+190)];
     alignWithSettings();

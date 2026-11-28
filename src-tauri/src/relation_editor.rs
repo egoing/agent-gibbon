@@ -196,7 +196,7 @@ pub fn relation_pick(window: WebviewWindow, x: f64, y: f64, choose: bool) -> Res
             "relation-settings",
             tauri::WebviewUrl::App("relation-settings.html".into()),
         )
-        .title("메모 연결 설정")
+        .title(crate::language::tr("메모 연결 설정"))
         .inner_size(380., 330.)
         .resizable(false)
         .minimizable(false)

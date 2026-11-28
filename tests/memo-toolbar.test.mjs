@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -17,7 +18,7 @@ function mount(kind) {
   const controls = createElement();
   controls.dataset.kind = kind;
   const window = {};
-  vm.runInNewContext(script, {document: {createElement, currentScript: {parentElement: controls}}, window});
+  vm.runInNewContext(script, sourceLanguageWindow({document: {createElement, currentScript: {parentElement: controls}}, window}));
   return {nodes, api: window.jajanMemoToolbar};
 }
 

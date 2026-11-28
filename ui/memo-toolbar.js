@@ -50,8 +50,8 @@
     const el = document.createElement('button');
     el.type = 'button';
     el.id = id;
-    el.setAttribute('aria-label', labels[id]);
-    el.title = labels[id];
+    window.jajanLanguage.bind(el, 'aria-label', labels[id]);
+    window.jajanLanguage.bind(el, 'title', labels[id]);
     el.innerHTML = icons[id === 'fold-toggle' ? 'toolbar-toggle' : id];
     if (id === 'toolbar-previous' || id === 'toolbar-next') {
       el.setAttribute('aria-controls', 'toolbar-items');
@@ -68,7 +68,7 @@
   if (kind !== 'text') {
     const name = document.createElement('span');
     name.id = 'title';
-    name.textContent = kind === 'terminal' ? '터미널' : '웹';
+    window.jajanLanguage.bind(name, 'textContent', kind === 'terminal' ? '터미널' : '웹');
     title.append(name);
   }
   const items = document.createElement('div');

@@ -266,7 +266,7 @@ fn show_permission_scope(app: &tauri::AppHandle, shortcut: bool) -> Result<(), S
             "permission.html".into()
         }),
     )
-    .title("Jajan 권한 설정")
+    .title(crate::language::tr("Jajan 권한 설정"))
     .inner_size(600.0, 450.0)
     .min_inner_size(380.0, 320.0)
     .focused(false)
@@ -565,12 +565,12 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result
             "window.captureNoteFrames = {};",
             serde_json::to_string(&outlines).map_err(err)?
         ))
-        .title(match mode {
+        .title(crate::language::tr(match mode {
             SelectionMode::Image => "영역 캡처",
             SelectionMode::Text => "빈 메모 영역 선택",
             SelectionMode::Terminal => "터미널 영역 선택",
             SelectionMode::Web => "웹 창 영역 선택",
-        })
+        }))
         .decorations(false)
         .transparent(true)
         .background_color(tauri::window::Color(0, 0, 0, 0))
@@ -807,7 +807,9 @@ pub fn capture_ready(window: WebviewWindow) -> Result<(), String> {
 fn failed_selection(window: WebviewWindow) -> Result<(), String> {
     cancel_selection(window.clone())?;
     if let Some(tray) = window.app_handle().tray_by_id("jajan") {
-        let _ = tray.set_tooltip(Some("화면 이미지 로딩 실패. 캡처를 다시 실행하세요."));
+        let _ = tray.set_tooltip(Some(crate::language::tr(
+            "화면 이미지 로딩 실패. 캡처를 다시 실행하세요.",
+        )));
     }
     Ok(())
 }
@@ -1042,7 +1044,7 @@ pub fn place(win: &WebviewWindow, bounds: &ImageNote) -> Result<(), String> {
 }
 fn empty_text_note(edit_on_open: bool) -> crate::Note {
     crate::Note {
-        title: "새 메모".into(),
+        title: crate::language::tr("새 메모").into(),
         markdown: String::new(),
         html: String::new(),
         change_html: String::new(),
@@ -1125,7 +1127,7 @@ pub(crate) fn create_note(
     let id = format!("image-{stamp}");
     let note = crate::Note {
         capture: Some(bounds.clone()),
-        title: "화면 캡처".into(),
+        title: crate::language::tr("화면 캡처").into(),
         markdown: String::new(),
         html: String::new(),
         change_html: String::new(),

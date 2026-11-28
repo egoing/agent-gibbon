@@ -10,7 +10,7 @@
     registered_unknown: '등록됨 · Windows 허용 여부 미확인. Windows 시작 앱에서 켜짐/꺼짐을 확인하세요.',
     unavailable: '이 실행 환경에서는 자동 실행을 설정할 수 없습니다.',
   };
-  function error(value = '') { el('autostart-error').textContent=value; el('autostart-error').hidden=!value; }
+  function error(value = '') { window.jajanLanguage.bind(el('autostart-error'), 'textContent', value); el('autostart-error').hidden=!value; }
   function render() {
     const available = Boolean(state?.available);
     el('autostart-setting').disabled = busy || !available;
@@ -21,9 +21,9 @@
     el('autostart-welcome').disabled = busy || !available;
     el('autostart-setting').checked = pending ?? (state?.selected === true);
     if (!welcomeDirty) el('autostart-welcome').checked = state?.selected ?? true;
-    el('autostart-choice').textContent = state?.selected == null ? '앱 선택: 아직 선택하지 않았습니다.' : `앱 선택: ${state.selected ? '켜기' : '끄기'}`;
-    el('autostart-status').textContent = state ? (state.reason || descriptions[state.os_status] || 'OS 상태를 확인하지 못했습니다.') : '자동 실행 상태를 읽지 못했습니다. 다시 확인하세요.';
-    el('autostart-welcome-status').textContent = available ? (state.selected == null ? 'Continue를 눌러 확인하기 전에는 등록하지 않습니다.' : '저장된 앱 선택입니다. Continue를 눌러 현재 선택을 확인합니다.') : (state?.reason || '상태를 확인하지 못했습니다. Continue 이후 설정에서 선택할 수 있습니다.');
+    window.jajanLanguage.bind(el('autostart-choice'), 'textContent', state?.selected == null ? '앱 선택: 아직 선택하지 않았습니다.' : (state.selected ? '앱 선택: 켜기' : '앱 선택: 끄기'));
+    window.jajanLanguage.bind(el('autostart-status'), 'textContent', state ? (state.reason || descriptions[state.os_status] || 'OS 상태를 확인하지 못했습니다.') : '자동 실행 상태를 읽지 못했습니다. 다시 확인하세요.');
+    window.jajanLanguage.bind(el('autostart-welcome-status'), 'textContent', available ? (state.selected == null ? 'Continue를 눌러 확인하기 전에는 등록하지 않습니다.' : '저장된 앱 선택입니다. Continue를 눌러 현재 선택을 확인합니다.') : (state?.reason || '상태를 확인하지 못했습니다. Continue 이후 설정에서 선택할 수 있습니다.'));
   }
   async function refresh() {
     if(busy) return;
@@ -39,7 +39,7 @@
       state=await invoke('autostart_save',{enabled}); welcomeDirty=false; readFailed=false;
       return true;
     } catch(e) {
-      error(`${String(e)} 앱 선택과 OS 상태가 다를 수 있습니다. 아래 상태를 확인하세요.`);
+      error(window.jajanLanguage.msg('{error} 앱 선택과 OS 상태가 다를 수 있습니다. 아래 상태를 확인하세요.', {error:window.jajanLanguage.msg(String(e))}));
       // Read after failure; never retry OS registration automatically.
       try { state=await invoke('autostart_status'); readFailed=false; } catch { state=null; readFailed=true; }
       return false;

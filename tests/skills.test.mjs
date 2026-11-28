@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -18,7 +19,7 @@ function setup(){
   }
   return {skills:skills.map(s=>({...s})),feedback:null};
  }}}};
- vm.runInNewContext(source,{window,document:{getElementById:id=>elements.get(id),createElement:make},Map,String});
+ vm.runInNewContext(source,sourceLanguageWindow({window,document:{getElementById:id=>elements.get(id),createElement:make},Map,String}));
  const rows=()=>elements.get('skills-list').children;
  return {window,elements,calls,rows,toggle:i=>rows()[i].children[1].children[1],delay:()=>{let release;pending=new Promise(r=>release=r);return release;},fail:()=>{fail=true;},readFailure:value=>{failRead=value;}};
 }

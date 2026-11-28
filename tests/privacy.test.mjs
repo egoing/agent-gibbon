@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -18,7 +19,7 @@ function setup(initial={terms_accepted:false,sharing:false,notice_ready:true},fa
     state={...state,terms_accepted:true,allowed:args.shareDiagnostics,sharing:args.shareDiagnostics};return state;
    }
  }}}};
- vm.runInNewContext(source,{window,document:{getElementById:id=>elements.get(id)},Boolean,Error});
+ vm.runInNewContext(source,sourceLanguageWindow({window,document:{getElementById:id=>elements.get(id)},Boolean,Error}));
  return{window,elements,calls};
 }
 test('required terms do not imply optional sharing; unchecked Continue submits nothing',async()=>{
@@ -45,7 +46,7 @@ test('stored decline stays declined and settings withdrawal is an explicit false
 });
 test('unreadable status fails closed; legal documents remain local',async()=>{
  const failed=setup(undefined,true);await tick();assert.equal(failed.elements.get('privacy-continue').disabled,true);assert.equal(failed.window.jajanPrivacy.accepted(),false);assert.equal(failed.elements.get('manager-navigation').hidden,true);
- const s=setup();await tick();s.elements.get('privacy-read-terms').onclick();assert.equal(s.elements.get('privacy-document-content').innerHTML,'<h1>Terms</h1>');
+ const s=setup();await tick();await s.elements.get('privacy-read-terms').onclick();assert.equal(s.elements.get('privacy-document-content').innerHTML,'<h1>Terms</h1>');
  let blocked=false;s.elements.get('privacy-document-content').listeners.click({target:{closest:()=>true},preventDefault(){blocked=true;}});assert.equal(blocked,true);
  assert.deepEqual(s.calls.map(c=>c.name),['privacy_status']);
 });

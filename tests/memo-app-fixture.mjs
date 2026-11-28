@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import { memoThemeFor } from '../ui/theme.mjs';
@@ -32,7 +33,7 @@ export async function setup(initial = {}, state = {}, platform = 'MacIntel') {
     saved(next, snapshot) { base={...next};dirty=draft!==snapshot.markdown;onChange(status()); },
     lock(value) {locked=value;}, highlight(html) {element('editor').highlight=html;}, focus() {calls.push(['editor-focus']);},
   };
-  const context = vm.createContext({
+  const context = vm.createContext(sourceLanguageWindow({
     navigator:{platform}, memoThemeFor,readMemoAppearance,feedbackView,durations,
     createMemoEditor:async (_root,fn)=>{onChange=fn;return adapter;}, createFeedback:()=>()=>{},
     clearTimeout(fn) {const i=timers.indexOf(fn);if(i>=0)timers.splice(i,1);},setTimeout(fn){timers.push(fn);return fn;},
@@ -61,7 +62,7 @@ export async function setup(initial = {}, state = {}, platform = 'MacIntel') {
         }
       }},
     }},
-  });
+  }));
   vm.runInContext(readFileSync(new URL('../ui/content-size.js',import.meta.url),'utf8'),context);
   vm.runInContext(readFileSync(new URL('../ui/app.js',import.meta.url),'utf8').replace(/^import .*;$/gm,''),context);
   const settle=()=>new Promise(setImmediate);

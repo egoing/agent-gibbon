@@ -19,7 +19,8 @@ function mount(label) {
   const controls = { querySelectorAll: () => [], addEventListener: (name, fn) => dom.set(name, fn) };
   const document = {
     querySelector: selector => selector === 'nav' ? controls : selector === 'button' ? button : status,
-    documentElement: { hasAttribute: () => true },
+    querySelectorAll: () => [],
+    documentElement: { setAttribute() {}, hasAttribute: () => true },
     addEventListener: (name, fn) => dom.set(name, fn),
   };
   const window = {

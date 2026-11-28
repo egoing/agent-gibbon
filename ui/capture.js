@@ -37,7 +37,7 @@ document.addEventListener('pointerup', async () => {
   if (!rect || rect.width < 2 || rect.height < 2) return;
   busy = true;
   try { await invoke('finish_capture',rect); }
-  catch(error) { hint.hidden = false; hint.textContent = String(error); busy = false; }
+  catch(error) { hint.hidden = false; window.jajanLanguage.bind(hint, 'textContent', String(error)); busy = false; }
 });
 window.addEventListener('keydown', e => {
   if (e.key !== 'Escape' || busy) return;
@@ -55,7 +55,7 @@ window.addEventListener('keydown', e => {
   invoke('cancel_capture').catch(error => {
     busy = false;
     hint.hidden = false;
-    hint.textContent = String(error);
+    window.jajanLanguage.bind(hint, 'textContent', String(error));
   });
 }, true);
 document.addEventListener('contextmenu',e => e.preventDefault());

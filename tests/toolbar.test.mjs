@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -33,9 +34,9 @@ test('toolbar waits for native fold and restores the same state on expansion', a
   const document = {body, elementFromPoint: () => hit, hasFocus: () => focused, getElementById: id => id === 'fold-title' ? null : element(id)};
   const listen = (name, callback) => { nativeEvents[name] = callback; };
   const env = {addEventListener(name, callback) { windowEvents[name] = callback; }, __TAURI__: {event: {listen() { assert.fail('toolbar pointer must not use a global listener'); }}, webviewWindow: {getCurrentWebviewWindow: () => ({listen})}, core: {invoke: async name => { calls.push(name); folded = !folded; return folded; }}}};
-  vm.runInNewContext(readFileSync(new URL('../ui/toolbar.js', import.meta.url), 'utf8'), {
+  vm.runInNewContext(readFileSync(new URL('../ui/toolbar.js', import.meta.url), 'utf8'), sourceLanguageWindow({
     document, window: env, ResizeObserver: class {observe() {}}, MutationObserver: class {observe() {}},
-  });
+  }));
   const close = element('close');
   close.listeners.pointerenter();
   assert.equal(close.attributes['data-pointer-over'], '');
@@ -123,7 +124,7 @@ test('native pointer events stay in their own toolbar across two webviews', () =
     const close = element('close');
     element('controls').querySelectorAll = () => [close, element('toolbar-toggle')];
     const listen = target => (event, callback) => listeners.push({target, event, callback});
-    vm.runInNewContext(readFileSync(new URL('../ui/toolbar.js', import.meta.url), 'utf8'), {
+    vm.runInNewContext(readFileSync(new URL('../ui/toolbar.js', import.meta.url), 'utf8'), sourceLanguageWindow({
       document: {
         getElementById: id => id === 'fold-title' ? null : element(id),
         body: {classList: {contains: () => false}},
@@ -134,7 +135,7 @@ test('native pointer events stay in their own toolbar across two webviews', () =
         webviewWindow: {getCurrentWebviewWindow: () => ({listen: listen(label)})},
       }},
       ResizeObserver: class {observe() {}}, MutationObserver: class {observe() {}},
-    });
+    }));
     return close.attributes;
   }
   const a = toolbar('memo-a'), b = toolbar('memo-b');

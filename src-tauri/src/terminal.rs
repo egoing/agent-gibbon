@@ -399,6 +399,12 @@ pub(crate) fn show(win: &tauri::WebviewWindow) -> Result<(), String> {
     Ok(())
 }
 pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
+    inspect_with_title(app, id, false)
+}
+
+// Only trusted UI snapshots need to distinguish a generated label from an
+// identically named user title or directory. CLI snapshots keep their schema.
+fn inspect_with_title(app: &tauri::AppHandle, id: &str, ui: bool) -> Result<Value, String> {
     welcome::refresh_path(app, id)?;
     let agent = app.state::<Terminals>().records.get(id)?;
     if !contains(app, id) {
@@ -433,9 +439,18 @@ pub fn inspect(app: &tauri::AppHandle, id: &str) -> Result<Value, String> {
     } else {
         (None, None, None, false, false)
     };
-    Ok(
-        json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":bounds,"metadata_save_failed":app.state::<Terminals>().records.save_failed(id),"pid":pid,"program":program,"running":running,"ready":ready,"exit_code":exit_status.as_ref().map(|s|s.exit_code()),"exit_signal":exit_status.as_ref().and_then(|s|s.signal()),"restored":crate::session_restore::terminal_restored(app,id),"focused":win.as_ref().and_then(|w|w.is_focused().ok()),"auto_layout_excluded":win.as_ref().map(crate::layout::excluded),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())}),
-    )
+    let mut snapshot = json!({"ok":true,"instance":crate::instance::current().id,"id":id,"kind":agent.kind,"color":crate::memo_color::read(&root(app), id)?,"title":agent.display_title(),"cwd":agent.last_path.clone(),"last_path":agent.last_path,"restore_plan":agent.restore_plan,"auto_restore":agent.auto_restore,"restore_supported":cfg!(target_os = "macos"),"bounds":bounds,"metadata_save_failed":app.state::<Terminals>().records.save_failed(id),"pid":pid,"program":program,"running":running,"ready":ready,"exit_code":exit_status.as_ref().map(|s|s.exit_code()),"exit_signal":exit_status.as_ref().and_then(|s|s.signal()),"restored":crate::session_restore::terminal_restored(app,id),"focused":win.as_ref().and_then(|w|w.is_focused().ok()),"auto_layout_excluded":win.as_ref().map(crate::layout::excluded),"last_command":crate::session_restore::last_command(app,id),"pty_size":size.map(|s|json!({"cols":s.cols,"rows":s.rows})),"visible":win.as_ref().is_some_and(|w|w.is_visible().unwrap_or(false)),"position":win.as_ref().and_then(|w|w.outer_position().ok()),"size":win.as_ref().and_then(|w|w.inner_size().ok())});
+    if ui {
+        snapshot["default_title"] = json!(
+            agent.title.trim().is_empty()
+                && agent
+                    .last_path
+                    .as_ref()
+                    .and_then(|p| p.file_name())
+                    .is_none()
+        );
+    }
+    Ok(snapshot)
 }
 pub fn handle(app: &tauri::AppHandle, request: &crate::Request) -> Result<Value, String> {
     let id = request.id();
@@ -545,8 +560,10 @@ pub async fn terminal_start(
                         let _worker = supervisor_worker;
                         lifecycle::supervise(child, events, |status, jobs| {
                             if welcome::retire(&watched_app, &watched_id, token, status, jobs) {
-                                let _ =
-                                    end_output.send("\r\n[PTY 세션 종료]\r\n".as_bytes().to_vec());
+                                let _ = end_output.send(
+                                    format!("\r\n[{}]\r\n", crate::language::tr("PTY 세션 종료"))
+                                        .into_bytes(),
+                                );
                             }
                         });
                     });
@@ -687,7 +704,7 @@ pub fn terminal_info(
 ) -> Result<Value, String> {
     let id = caller(&window)?;
     let app = window.app_handle();
-    let mut info = inspect(app, &id)?;
+    let mut info = inspect_with_title(app, &id, true)?;
     if with_pending_execution.unwrap_or(false) {
         info["pending_execution"] = json!(cli::pending(app, &id)?);
     }

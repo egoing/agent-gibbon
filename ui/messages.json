@@ -1,0 +1,3447 @@
+{
+  "위로 메모 모아보기, 오른쪽으로 오른쪽 정렬, 아래로 전체 숨기기, 왼쪽으로 화면 빈자리 배치, Esc 키로 취소": {
+    "ko": "위로 메모 모아보기, 오른쪽으로 오른쪽 정렬, 아래로 전체 숨기기, 왼쪽으로 화면 빈자리 배치, Esc 키로 취소",
+    "en": "Swipe up for all notes, right to align right, down to hide all, or left to arrange in free space. Press Esc to cancel.",
+    "ja": "上でメモ一覧、右で右揃え、下ですべて隠す、左で空き領域に配置。Escでキャンセル"
+  },
+  "Jajan": {
+    "ko": "Jajan",
+    "en": "Jajan",
+    "ja": "Jajan"
+  },
+  "메모 도구": {
+    "ko": "메모 도구",
+    "en": "Note tools",
+    "ja": "メモツール"
+  },
+  "메모 내용": {
+    "ko": "메모 내용",
+    "en": "Note contents",
+    "ja": "メモの内容"
+  },
+  "메모 본문 편집": {
+    "ko": "메모 본문 편집",
+    "en": "Edit note body",
+    "ja": "メモ本文を編集"
+  },
+  "Feedback": {
+    "ko": "피드백",
+    "en": "Feedback",
+    "ja": "フィードバック"
+  },
+  "Action Bar": {
+    "ko": "작업 도구",
+    "en": "Action bar",
+    "ja": "操作バー"
+  },
+  "메모 세로 스크롤": {
+    "ko": "메모 세로 스크롤",
+    "en": "Scroll note vertically",
+    "ja": "メモを縦にスクロール"
+  },
+  "↶　취소하기": {
+    "ko": "↶　취소하기",
+    "en": "↶　Undo",
+    "ja": "↶　元に戻す"
+  },
+  "메모 관리": {
+    "ko": "메모 관리",
+    "en": "Manage notes",
+    "ja": "メモ管理"
+  },
+  "관리 탐색": {
+    "ko": "관리 탐색",
+    "en": "Manager navigation",
+    "ja": "管理画面のナビゲーション"
+  },
+  "모든 메모": {
+    "ko": "모든 메모",
+    "en": "All notes",
+    "ja": "すべてのメモ"
+  },
+  "설정": {
+    "ko": "설정",
+    "en": "Settings",
+    "ja": "設定"
+  },
+  "메모를 읽지 못했습니다.": {
+    "ko": "메모를 읽지 못했습니다.",
+    "en": "Could not load notes.",
+    "ja": "メモを読み込めませんでした。"
+  },
+  "다시 시도": {
+    "ko": "다시 시도",
+    "en": "Try again",
+    "ja": "再試行"
+  },
+  "메모 목록": {
+    "ko": "메모 목록",
+    "en": "Note list",
+    "ja": "メモ一覧"
+  },
+  "메모 목록 새로고침": {
+    "ko": "메모 목록 새로고침",
+    "en": "Refresh note list",
+    "ja": "メモ一覧を更新"
+  },
+  "새로고침": {
+    "ko": "새로고침",
+    "en": "Refresh",
+    "ja": "更新"
+  },
+  "메모 검색": {
+    "ko": "메모 검색",
+    "en": "Search notes",
+    "ja": "メモを検索"
+  },
+  "제목 또는 본문 검색": {
+    "ko": "제목 또는 본문 검색",
+    "en": "Search titles or contents",
+    "ja": "タイトルまたは本文を検索"
+  },
+  "메모 상세": {
+    "ko": "메모 상세",
+    "en": "Note details",
+    "ja": "メモの詳細"
+  },
+  "메모를 선택하세요.": {
+    "ko": "메모를 선택하세요.",
+    "en": "Select a note.",
+    "ja": "メモを選択してください。"
+  },
+  "설정 항목": {
+    "ko": "설정 항목",
+    "en": "Settings categories",
+    "ja": "設定項目"
+  },
+  "스킬": {
+    "ko": "스킬",
+    "en": "Skills",
+    "ja": "スキル"
+  },
+  "테마": {
+    "ko": "테마",
+    "en": "Theme",
+    "ja": "テーマ"
+  },
+  "자동 업데이트": {
+    "ko": "자동 업데이트",
+    "en": "Automatic updates",
+    "ja": "自動更新"
+  },
+  "로그인 자동 실행": {
+    "ko": "로그인 자동 실행",
+    "en": "Launch at login",
+    "ja": "ログイン時に起動"
+  },
+  "Privacy & Diagnostics": {
+    "ko": "개인정보 및 진단",
+    "en": "Privacy & Diagnostics",
+    "ja": "プライバシーと診断"
+  },
+  "개발자": {
+    "ko": "개발자",
+    "en": "Developer",
+    "ja": "開発者"
+  },
+  "앱 버전": {
+    "ko": "앱 버전",
+    "en": "App version",
+    "ja": "アプリのバージョン"
+  },
+  "버전 확인 중": {
+    "ko": "버전 확인 중",
+    "en": "Checking version",
+    "ja": "バージョンを確認中"
+  },
+  "로그인 후 메모와 단축키를 바로 사용할 수 있습니다. 설정에서 언제든 끌 수 있습니다.": {
+    "ko": "로그인 후 메모와 단축키를 바로 사용할 수 있습니다. 설정에서 언제든 끌 수 있습니다.",
+    "en": "Use notes and shortcuts as soon as you sign in. You can turn this off in Settings.",
+    "ja": "ログイン後すぐにメモとショートカットを使えます。設定でいつでも解除できます。"
+  },
+  "로그인 시 자잔 자동 실행": {
+    "ko": "로그인 시 자잔 자동 실행",
+    "en": "Launch Jajan at login",
+    "ja": "ログイン時にJajanを起動"
+  },
+  "상태를 확인하는 중입니다.": {
+    "ko": "상태를 확인하는 중입니다.",
+    "en": "Checking status…",
+    "ja": "状態を確認中…"
+  },
+  "관리 창을 앞에 띄우지 않으며 메모는 기존 표시·숨김 상태로 복원합니다. 터미널 명령을 자동으로 다시 실행하지 않습니다.": {
+    "ko": "관리 창을 앞에 띄우지 않으며 메모는 기존 표시·숨김 상태로 복원합니다. 터미널 명령을 자동으로 다시 실행하지 않습니다.",
+    "en": "Notes reopen with their previous visibility. The manager stays in the background. Terminal commands do not run again automatically.",
+    "ja": "管理画面は前面に出ず、各メモの表示状態を復元します。ターミナルのコマンドは自動で再実行されません。"
+  },
+  "OS 시작 설정 열기": {
+    "ko": "OS 시작 설정 열기",
+    "en": "Open OS startup settings",
+    "ja": "OSの起動設定を開く"
+  },
+  "관리 창 테마를 선택하세요. 선택은 이 기기에 자동 저장됩니다.": {
+    "ko": "관리 창 테마를 선택하세요. 선택은 이 기기에 자동 저장됩니다.",
+    "en": "Choose a theme for the manager. Your choice is saved on this device.",
+    "ja": "管理画面のテーマを選んでください。選択はこの端末に保存されます。"
+  },
+  "관리 창 테마": {
+    "ko": "관리 창 테마",
+    "en": "Manager theme",
+    "ja": "管理画面のテーマ"
+  },
+  "흰색": {
+    "ko": "흰색",
+    "en": "White",
+    "ja": "白"
+  },
+  "회색": {
+    "ko": "회색",
+    "en": "Gray",
+    "ja": "グレー"
+  },
+  "검정": {
+    "ko": "검정",
+    "en": "Black",
+    "ja": "黒"
+  },
+  "시스템": {
+    "ko": "시스템",
+    "en": "System",
+    "ja": "システム"
+  },
+  "제목 표시줄 색상을 적용하지 못했습니다. 테마를 다시 선택해 재시도하세요.": {
+    "ko": "제목 표시줄 색상을 적용하지 못했습니다. 테마를 다시 선택해 재시도하세요.",
+    "en": "Could not apply the title bar color. Select the theme again.",
+    "ja": "タイトルバーの色を適用できませんでした。テーマを選び直してください。"
+  },
+  "메모 창 디자인": {
+    "ko": "메모 창 디자인",
+    "en": "Note appearance",
+    "ja": "メモウィンドウのデザイン"
+  },
+  "컬러": {
+    "ko": "컬러",
+    "en": "Color",
+    "ja": "カラー"
+  },
+  "미리보기": {
+    "ko": "미리보기",
+    "en": "Preview",
+    "ja": "プレビュー"
+  },
+  "첫 번째 예시 메모": {
+    "ko": "첫 번째 예시 메모",
+    "en": "First sample note",
+    "ja": "サンプルメモ1"
+  },
+  "오늘 할 일": {
+    "ko": "오늘 할 일",
+    "en": "Today's tasks",
+    "ja": "今日の予定"
+  },
+  "☑ 자료 정리": {
+    "ko": "☑ 자료 정리",
+    "en": "☑ Organize materials",
+    "ja": "☑ 資料を整理"
+  },
+  "☐ 다음 일정 확인": {
+    "ko": "☐ 다음 일정 확인",
+    "en": "☐ Check upcoming events",
+    "ja": "☐ 次の予定を確認"
+  },
+  "두 번째 예시 메모": {
+    "ko": "두 번째 예시 메모",
+    "en": "Second sample note",
+    "ja": "サンプルメモ2"
+  },
+  "작업 메모": {
+    "ko": "작업 메모",
+    "en": "Work notes",
+    "ja": "作業メモ"
+  },
+  "작은 아이디어를 적어두세요.": {
+    "ko": "작은 아이디어를 적어두세요.",
+    "en": "Jot down an idea.",
+    "ja": "思いついたことを書き留めましょう。"
+  },
+  "필요할 때 곁에서 확인합니다.": {
+    "ko": "필요할 때 곁에서 확인합니다.",
+    "en": "Keep it nearby for reference.",
+    "ja": "必要なときに手元で確認できます。"
+  },
+  "Your choice is stored locally.": {
+    "ko": "선택은 이 기기에 저장됩니다.",
+    "en": "Your choice is stored locally.",
+    "ja": "選択はこの端末に保存されます。"
+  },
+  "I agree to diagnostic sharing (optional)": {
+    "ko": "진단 정보 공유에 동의합니다 (선택)",
+    "en": "I agree to diagnostic sharing (optional)",
+    "ja": "診断情報の共有に同意します（任意）"
+  },
+  "Not sharing": {
+    "ko": "공유하지 않음",
+    "en": "Not sharing",
+    "ja": "共有していません"
+  },
+  "Sanitized errors, app/OS versions, operation timings and freeze diagnostics.": {
+    "ko": "민감 정보를 제거한 오류, 앱·OS 버전, 작업 시간, 멈춤 진단을 포함합니다.",
+    "en": "Sanitized errors, app/OS versions, operation timings and freeze diagnostics.",
+    "ja": "機密情報を除いたエラー、アプリとOSのバージョン、処理時間、フリーズ診断を含みます。"
+  },
+  "No notes, terminal input/output, clipboard or screenshots.": {
+    "ko": "메모, 터미널 입출력, 클립보드, 화면 캡처는 제외됩니다.",
+    "en": "No notes, terminal input/output, clipboard or screenshots.",
+    "ja": "メモ、ターミナルの入出力、クリップボード、画面キャプチャは含みません。"
+  },
+  "Sent to Sentry in Iowa, United States. Originals: up to 30 days. Read the notice for backup and aggregate retention and overseas transfer details.": {
+    "ko": "미국 아이오와의 Sentry로 전송하며 원본은 최대 30일 보관합니다. 백업·집계 자료의 보관 및 국외 이전에 관한 자세한 내용은 개인정보 안내를 확인하세요.",
+    "en": "Sent to Sentry in Iowa, United States. Originals: up to 30 days. Read the notice for backup and aggregate retention and overseas transfer details.",
+    "ja": "米国アイオワ州のSentryに送信します。原本の保存は最長30日です。バックアップ・集計情報の保存期間と国外移転については通知をご覧ください。"
+  },
+  "Turning this off saves withdrawal immediately. Turning it on requires Save Changes. A request already started before withdrawal may finish. Previously uploaded information is handled separately.": {
+    "ko": "끄면 동의 철회가 즉시 저장됩니다. 켜려면 변경 사항을 저장하세요. 철회 전에 시작한 요청은 완료될 수 있으며 이미 전송된 정보는 별도로 처리합니다.",
+    "en": "Turning this off saves withdrawal immediately. Turning it on requires Save Changes. A request already started before withdrawal may finish. Previously uploaded information is handled separately.",
+    "ja": "オフにすると同意を直ちに撤回します。オンにするには変更を保存してください。撤回前に開始した送信は完了する場合があります。送信済みの情報は別途取り扱います。"
+  },
+  "Sharing is unavailable until all privacy details are published. Read the Privacy Notice for the current operator, storage region and retention information.": {
+    "ko": "개인정보 처리 세부 사항이 공개되면 공유할 수 있습니다. 운영자, 저장 지역과 보관 기간은 개인정보 안내에서 확인하세요.",
+    "en": "Sharing is unavailable until all privacy details are published. Read the Privacy Notice for the current operator, storage region and retention information.",
+    "ja": "プライバシーに関する詳細の公開後に共有できます。運営者、保存地域、保存期間はプライバシー通知をご覧ください。"
+  },
+  "Read Terms": {
+    "ko": "이용약관 읽기",
+    "en": "Read Terms",
+    "ja": "利用規約を読む"
+  },
+  "Privacy Notice": {
+    "ko": "개인정보 안내",
+    "en": "Privacy Notice",
+    "ja": "プライバシー通知"
+  },
+  "Save Changes": {
+    "ko": "변경 사항 저장",
+    "en": "Save Changes",
+    "ja": "変更を保存"
+  },
+  "스킬을 불러오는 중입니다.": {
+    "ko": "스킬을 불러오는 중입니다.",
+    "en": "Loading skills…",
+    "ja": "スキルを読み込み中…"
+  },
+  "공식 설치본은 새 버전을 자동으로 내려받습니다. 5분 동안 입력이 없고 진행 중인 작업이 없으면 설치하고 다시 시작합니다.": {
+    "ko": "공식 설치본은 새 버전을 자동으로 내려받습니다. 5분 동안 입력이 없고 진행 중인 작업이 없으면 설치하고 다시 시작합니다.",
+    "en": "Official installations download new versions automatically. After five minutes without input and once active tasks finish, Jajan installs the update and restarts.",
+    "ja": "公式版は新しいバージョンを自動でダウンロードします。入力が5分間なく、実行中の作業がないときにインストールして再起動します。"
+  },
+  "업데이트 상태를 확인하는 중입니다.": {
+    "ko": "업데이트 상태를 확인하는 중입니다.",
+    "en": "Checking update status…",
+    "ja": "更新状態を確認中…"
+  },
+  "지금 확인": {
+    "ko": "지금 확인",
+    "en": "Check now",
+    "ja": "今すぐ確認"
+  },
+  "업데이트하고 재시작": {
+    "ko": "업데이트하고 재시작",
+    "en": "Update and restart",
+    "ja": "更新して再起動"
+  },
+  "설치가 보류되거나 실패했나요?": {
+    "ko": "설치가 보류되거나 실패했나요?",
+    "en": "Update delayed or unsuccessful?",
+    "ja": "更新を保留中、または失敗しましたか？"
+  },
+  "‘업데이트하고 재시작’은 5분 대기만 생략합니다. 편집·저장·내보내기와 캡처를 마치고, 실행 중인 터미널을 종료한 뒤 숨긴 터미널도 관리 창에서 삭제하세요. 작업이 안전한지 확인한 후 설치합니다.": {
+    "ko": "‘업데이트하고 재시작’은 5분 대기만 생략합니다. 편집·저장·내보내기와 캡처를 마치고, 실행 중인 터미널을 종료한 뒤 숨긴 터미널도 관리 창에서 삭제하세요. 작업이 안전한지 확인한 후 설치합니다.",
+    "en": "Update and restart skips the five-minute wait. Finish editing, saving, exporting and capturing. Close running terminals and remove hidden terminals from the manager. Installation starts after a safety check.",
+    "ja": "「更新して再起動」は5分の待機のみを省略します。編集、保存、書き出し、キャプチャを終え、使用中のターミナルを終了し、非表示のターミナルも管理画面から削除してください。安全確認後にインストールします。"
+  },
+  "안내 닫기는 자동 설치를 끄지 않습니다. 보류 조건이 해소되면 자동으로 다시 확인합니다. 응답 대기 시간이 초과되면 작업을 저장하고 다시 시도하세요.": {
+    "ko": "안내 닫기는 자동 설치를 끄지 않습니다. 보류 조건이 해소되면 자동으로 다시 확인합니다. 응답 대기 시간이 초과되면 작업을 저장하고 다시 시도하세요.",
+    "en": "Closing the notice keeps automatic installation enabled. Jajan checks again when blocking tasks finish. If the request times out, save your work and retry.",
+    "ja": "通知を閉じても自動インストールは有効です。保留条件が解消すると再確認します。タイムアウトした場合は作業を保存して再試行してください。"
+  },
+  "다운로드·검증 오류는 연결 상태를 확인한 뒤 ‘다시 확인’으로 다시 받으세요. 반복되면 공식 릴리스의 운영체제와 CPU에 맞는 설치 파일로 수동 설치하세요. 검증 실패를 무시하고 설치하지 않습니다.": {
+    "ko": "다운로드·검증 오류는 연결 상태를 확인한 뒤 ‘다시 확인’으로 다시 받으세요. 반복되면 공식 릴리스의 운영체제와 CPU에 맞는 설치 파일로 수동 설치하세요. 검증 실패를 무시하고 설치하지 않습니다.",
+    "en": "For download or verification errors, check your connection and select Check again. If errors persist, install the official release for your OS and CPU manually. Installation requires successful verification.",
+    "ja": "ダウンロードや検証に失敗した場合は接続を確認して再確認してください。問題が続く場合はOSとCPUに対応する公式版を手動でインストールしてください。検証に失敗したファイルはインストールしません。"
+  },
+  "복귀 메뉴와 데이터 형식이 호환되는 지정된 두 버전 사이를 실제 설치·재시작으로 왕복합니다. 시험 중에는 재실행 후에도 일반 자동 업데이트로 먼저 복귀하지 않습니다.": {
+    "ko": "복귀 메뉴와 데이터 형식이 호환되는 지정된 두 버전 사이를 실제 설치·재시작으로 왕복합니다. 시험 중에는 재실행 후에도 일반 자동 업데이트로 먼저 복귀하지 않습니다.",
+    "en": "Switch between two designated compatible versions with actual installations and restarts. Normal automatic updates stay paused throughout the test, including after relaunch.",
+    "ja": "復帰メニューとデータ形式が互換の指定2バージョンを、実際のインストールと再起動で往復します。試験中は再起動後も通常の自動更新を再開しません。"
+  },
+  "이전 테스트 버전으로 교체": {
+    "ko": "이전 테스트 버전으로 교체",
+    "en": "Switch to previous test version",
+    "ja": "以前のテスト版に切り替え"
+  },
+  "최신 버전으로 복귀": {
+    "ko": "최신 버전으로 복귀",
+    "en": "Return to latest version",
+    "ja": "最新版に戻す"
+  },
+  "기존 패키지 준비 시험": {
+    "ko": "기존 패키지 준비 시험",
+    "en": "Existing package preparation test",
+    "ja": "既存パッケージの準備テスト"
+  },
+  "공식 최신 패키지를 준비한 뒤 별도 설치합니다. 동일 버전 재설치 시험이며 버전 왕복을 대신하지 않습니다. 준비만 하면 설치하지 않습니다.": {
+    "ko": "공식 최신 패키지를 준비한 뒤 별도 설치합니다. 동일 버전 재설치 시험이며 버전 왕복을 대신하지 않습니다. 준비만 하면 설치하지 않습니다.",
+    "en": "Prepare the latest official package and install it separately. This tests reinstalling the same version. Preparing a package alone does not install it or test version switching.",
+    "ja": "公式の最新パッケージを準備し、別操作でインストールします。同じバージョンの再インストール試験です。準備のみではインストールやバージョン切り替えは行いません。"
+  },
+  "최신 배포판 준비": {
+    "ko": "최신 배포판 준비",
+    "en": "Prepare latest release",
+    "ja": "最新リリースを準備"
+  },
+  "준비한 버전 설치·재시작": {
+    "ko": "준비한 버전 설치·재시작",
+    "en": "Install prepared version and restart",
+    "ja": "準備した版をインストールして再起動"
+  },
+  "Welcome to Jajan": {
+    "ko": "Jajan에 오신 것을 환영합니다",
+    "en": "Welcome to Jajan",
+    "ja": "Jajanへようこそ"
+  },
+  "Terms & Privacy": {
+    "ko": "약관 및 개인정보",
+    "en": "Terms & Privacy",
+    "ja": "利用規約とプライバシー"
+  },
+  "Nothing is sent until you choose.": {
+    "ko": "선택하기 전에는 아무것도 전송하지 않습니다.",
+    "en": "Nothing is sent until you choose.",
+    "ja": "選択するまで何も送信しません。"
+  },
+  "Terms of Use": {
+    "ko": "이용약관",
+    "en": "Terms of Use",
+    "ja": "利用規約"
+  },
+  "Local desktop app. Your content stays on your device.": {
+    "ko": "로컬 데스크톱 앱입니다. 콘텐츠는 이 기기에 보관합니다.",
+    "en": "Local desktop app. Your content stays on your device.",
+    "ja": "ローカルのデスクトップアプリです。コンテンツは端末内に保存されます。"
+  },
+  "I agree to the Terms of Use": {
+    "ko": "이용약관에 동의합니다",
+    "en": "I agree to the Terms of Use",
+    "ja": "利用規約に同意します"
+  },
+  "(required)": {
+    "ko": "(필수)",
+    "en": "(required)",
+    "ja": "（必須）"
+  },
+  "Service improvement diagnostics": {
+    "ko": "서비스 개선을 위한 진단",
+    "en": "Service improvement diagnostics",
+    "ja": "サービス改善のための診断"
+  },
+  "Includes sanitized errors, app/OS versions, operation timings and freeze diagnostics.": {
+    "ko": "민감 정보를 제거한 오류, 앱·OS 버전, 작업 시간, 멈춤 진단을 포함합니다.",
+    "en": "Includes sanitized errors, app/OS versions, operation timings and freeze diagnostics.",
+    "ja": "機密情報を除いたエラー、アプリとOSのバージョン、処理時間、フリーズ診断を含みます。"
+  },
+  "Excludes notes, terminal input/output, clipboard and screenshots.": {
+    "ko": "메모, 터미널 입출력, 클립보드, 화면 캡처는 제외됩니다.",
+    "en": "Excludes notes, terminal input/output, clipboard and screenshots.",
+    "ja": "メモ、ターミナルの入出力、クリップボード、画面キャプチャは含みません。"
+  },
+  "Sharing is unavailable until all privacy details are published. Read the Privacy Notice for the current details. You can continue without sharing.": {
+    "ko": "개인정보 처리 세부 사항이 공개되면 공유할 수 있습니다. 현재 내용은 개인정보 안내에서 확인하세요. 공유하지 않고 계속할 수 있습니다.",
+    "en": "Sharing is unavailable until all privacy details are published. Read the Privacy Notice for the current details. You can continue without sharing.",
+    "ja": "プライバシーに関する詳細の公開後に共有できます。現在の内容はプライバシー通知をご覧ください。共有せずに続行できます。"
+  },
+  "I agree to diagnostic sharing": {
+    "ko": "진단 정보 공유에 동의합니다",
+    "en": "I agree to diagnostic sharing",
+    "ja": "診断情報の共有に同意します"
+  },
+  "(optional)": {
+    "ko": "(선택)",
+    "en": "(optional)",
+    "ja": "（任意）"
+  },
+  "Continue를 눌러 확인하기 전에는 등록하지 않습니다.": {
+    "ko": "Continue를 눌러 확인하기 전에는 등록하지 않습니다.",
+    "en": "Registration takes effect only after you select Continue.",
+    "ja": "「続ける」で確定するまで登録しません。"
+  },
+  "You can use every feature without sharing diagnostics.": {
+    "ko": "진단 정보를 공유하지 않아도 모든 기능을 사용할 수 있습니다.",
+    "en": "You can use every feature without sharing diagnostics.",
+    "ja": "診断情報を共有せずにすべての機能を使用できます。"
+  },
+  "Exit": {
+    "ko": "종료",
+    "en": "Exit",
+    "ja": "終了"
+  },
+  "Continue": {
+    "ko": "계속",
+    "en": "Continue",
+    "ja": "続ける"
+  },
+  "Reload privacy choices": {
+    "ko": "개인정보 설정 다시 읽기",
+    "en": "Reload privacy choices",
+    "ja": "プライバシー設定を再読み込み"
+  },
+  "Local choices could not be read. Review the current terms; sharing remains off.": {
+    "ko": "저장된 선택을 읽지 못했습니다. 현재 약관을 확인하세요. 공유는 꺼져 있습니다.",
+    "en": "Local choices could not be read. Review the current terms; sharing remains off.",
+    "ja": "保存済みの選択を読み込めませんでした。現在の規約を確認してください。共有はオフのままです。"
+  },
+  "Close document": {
+    "ko": "문서 닫기",
+    "en": "Close document",
+    "ja": "文書を閉じる"
+  },
+  "메모 배경": {
+    "ko": "메모 배경",
+    "en": "Note background",
+    "ja": "メモの背景"
+  },
+  "메모 모아보기": {
+    "ko": "메모 모아보기",
+    "en": "Note overview",
+    "ja": "メモ一覧表示"
+  },
+  "자동 정렬": {
+    "ko": "자동 정렬",
+    "en": "Auto arrange",
+    "ja": "自動整列"
+  },
+  "닫기": {
+    "ko": "닫기",
+    "en": "Close",
+    "ja": "閉じる"
+  },
+  "Jajan 권한 설정": {
+    "ko": "Jajan 권한 설정",
+    "en": "Jajan permissions",
+    "ja": "Jajanの権限設定"
+  },
+  "사용하려는 기능에 필요한 Mac 권한을 확인하세요.": {
+    "ko": "사용하려는 기능에 필요한 Mac 권한을 확인하세요.",
+    "en": "Check the Mac permissions required for the features you use.",
+    "ja": "使用する機能に必要なMacの権限を確認してください。"
+  },
+  "손쉬운 사용": {
+    "ko": "손쉬운 사용",
+    "en": "Accessibility",
+    "ja": "アクセシビリティ"
+  },
+  "보조키로 창을 숨길 때 필요합니다.": {
+    "ko": "보조키로 창을 숨길 때 필요합니다.",
+    "en": "Required to hide windows with modifier keys.",
+    "ja": "修飾キーでウィンドウを隠すために必要です。"
+  },
+  "확인 중": {
+    "ko": "확인 중",
+    "en": "Checking…",
+    "ja": "確認中…"
+  },
+  "화면 캡처": {
+    "ko": "화면 캡처",
+    "en": "Screen capture",
+    "ja": "画面キャプチャ"
+  },
+  "영역을 선택할 때 필요합니다.": {
+    "ko": "영역을 선택할 때 필요합니다.",
+    "en": "Required to select a screen region.",
+    "ja": "画面上の範囲選択に必要です。"
+  },
+  "응용 프로그램 폴더에서 Jajan.app을 선택하세요.": {
+    "ko": "응용 프로그램 폴더에서 Jajan.app을 선택하세요.",
+    "en": "Select Jajan.app in the Applications folder.",
+    "ja": "アプリケーションフォルダでJajan.appを選択してください。"
+  },
+  "설정에 추가할 앱": {
+    "ko": "설정에 추가할 앱",
+    "en": "App to add in Settings",
+    "ja": "設定に追加するアプリ"
+  },
+  "진단용 실행 파일 경로": {
+    "ko": "진단용 실행 파일 경로",
+    "en": "Executable path for diagnostics",
+    "ja": "診断用の実行ファイルパス"
+  },
+  "다시 확인": {
+    "ko": "다시 확인",
+    "en": "Check again",
+    "ja": "再確認"
+  },
+  "연결할 메모 위로 이동한 뒤 클릭하세요.": {
+    "ko": "연결할 메모 위로 이동한 뒤 클릭하세요.",
+    "en": "Move over the note to connect, then click.",
+    "ja": "接続したいメモに移動してクリックしてください。"
+  },
+  "취소 · Esc": {
+    "ko": "취소 · Esc",
+    "en": "Cancel · Esc",
+    "ja": "キャンセル · Esc"
+  },
+  "메모 연결": {
+    "ko": "메모 연결",
+    "en": "Connect notes",
+    "ja": "メモを接続"
+  },
+  "레이블": {
+    "ko": "레이블",
+    "en": "Label",
+    "ja": "ラベル"
+  },
+  "(선택)": {
+    "ko": "(선택)",
+    "en": "(optional)",
+    "ja": "（任意）"
+  },
+  "예: 선행 작업": {
+    "ko": "예: 선행 작업",
+    "en": "e.g. Prerequisite task",
+    "ja": "例：先行タスク"
+  },
+  "화살표": {
+    "ko": "화살표",
+    "en": "Arrow",
+    "ja": "矢印"
+  },
+  "한쪽 — 클릭한 메모 방향": {
+    "ko": "한쪽 — 클릭한 메모 방향",
+    "en": "One way — toward the selected note",
+    "ja": "片方向 — クリックしたメモの方向"
+  },
+  "양쪽": {
+    "ko": "양쪽",
+    "en": "Both ways",
+    "ja": "双方向"
+  },
+  "화살표 없음": {
+    "ko": "화살표 없음",
+    "en": "No arrow",
+    "ja": "矢印なし"
+  },
+  "취소": {
+    "ko": "취소",
+    "en": "Cancel",
+    "ja": "キャンセル"
+  },
+  "연결": {
+    "ko": "연결",
+    "en": "Connect",
+    "ja": "接続"
+  },
+  "눈을 가린 긴팔원숭이 · 창 접어둠": {
+    "ko": "눈을 가린 긴팔원숭이 · 창 접어둠",
+    "en": "Gibbon covering its eyes · windows tucked away",
+    "ja": "目を覆ったテナガザル · ウィンドウを収納中"
+  },
+  "터미널": {
+    "ko": "터미널",
+    "en": "Terminal",
+    "ja": "ターミナル"
+  },
+  "작업 시작": {
+    "ko": "작업 시작",
+    "en": "Start a task",
+    "ja": "作業を開始"
+  },
+  "실행 계획": {
+    "ko": "실행 계획",
+    "en": "Execution plan",
+    "ja": "実行計画"
+  },
+  "복원": {
+    "ko": "복원",
+    "en": "Restore",
+    "ja": "復元"
+  },
+  "작업 위치": {
+    "ko": "작업 위치",
+    "en": "Working directory",
+    "ja": "作業フォルダ"
+  },
+  "폴더 열기…": {
+    "ko": "폴더 열기…",
+    "en": "Open folder…",
+    "ja": "フォルダを開く…"
+  },
+  "최근 폴더": {
+    "ko": "최근 폴더",
+    "en": "Recent folders",
+    "ja": "最近のフォルダ"
+  },
+  "더 보기…": {
+    "ko": "더 보기…",
+    "en": "Show more…",
+    "ja": "さらに表示…"
+  },
+  "홈 폴더에서 시작합니다.": {
+    "ko": "홈 폴더에서 시작합니다.",
+    "en": "Starts in your home folder.",
+    "ja": "ホームフォルダから開始します。"
+  },
+  "추천 작업": {
+    "ko": "추천 작업",
+    "en": "Suggested tasks",
+    "ja": "おすすめの作業"
+  },
+  "실행": {
+    "ko": "실행",
+    "en": "Run",
+    "ja": "実行"
+  },
+  "실행 명령 미리보기": {
+    "ko": "실행 명령 미리보기",
+    "en": "Command preview",
+    "ja": "実行コマンドのプレビュー"
+  },
+  "터미널 시작 화면 스크롤": {
+    "ko": "터미널 시작 화면 스크롤",
+    "en": "Scroll terminal start screen",
+    "ja": "ターミナルの開始画面をスクロール"
+  },
+  "터미널 준비 중…": {
+    "ko": "터미널 준비 중…",
+    "en": "Preparing terminal…",
+    "ja": "ターミナルを準備中…"
+  },
+  "터미널 출력 기록 스크롤": {
+    "ko": "터미널 출력 기록 스크롤",
+    "en": "Scroll terminal history",
+    "ja": "ターミナルの出力履歴をスクロール"
+  },
+  "업데이트 준비 완료": {
+    "ko": "업데이트 준비 완료",
+    "en": "Update ready",
+    "ja": "更新の準備完了"
+  },
+  "새 버전이 준비됐습니다": {
+    "ko": "새 버전이 준비됐습니다",
+    "en": "A new version is ready",
+    "ja": "新しいバージョンの準備ができました"
+  },
+  "안내만 닫습니다. 안전한 유휴 상태에서 자동 설치는 계속됩니다.": {
+    "ko": "안내만 닫습니다. 안전한 유휴 상태에서 자동 설치는 계속됩니다.",
+    "en": "Automatic installation continues when the app is safely idle.",
+    "ja": "通知を閉じても、安全な待機状態になると自動でインストールします。"
+  },
+  "안내 닫기": {
+    "ko": "안내 닫기",
+    "en": "Dismiss notice",
+    "ja": "通知を閉じる"
+  },
+  "웹 시작": {
+    "ko": "웹 시작",
+    "en": "Open a web page",
+    "ja": "ウェブページを開く"
+  },
+  "웹 주소": {
+    "ko": "웹 주소",
+    "en": "Web address",
+    "ja": "ウェブアドレス"
+  },
+  "https://example.com": {
+    "ko": "https://example.com",
+    "en": "https://example.com",
+    "ja": "https://example.com"
+  },
+  "이동": {
+    "ko": "이동",
+    "en": "Go",
+    "ja": "移動"
+  },
+  "최근 주소": {
+    "ko": "최근 주소",
+    "en": "Recent addresses",
+    "ja": "最近のアドレス"
+  },
+  "시스템 설정 따르기": {
+    "ko": "시스템 설정 따르기",
+    "en": "Follow system settings",
+    "ja": "システム設定に従う"
+  },
+  "언어 설정을 저장하지 못했습니다.": {
+    "ko": "언어 설정을 저장하지 못했습니다.",
+    "en": "Could not save the language setting.",
+    "ja": "言語設定を保存できませんでした。"
+  },
+  "영역 캡처": {
+    "ko": "영역 캡처",
+    "en": "Capture a region",
+    "ja": "範囲をキャプチャ"
+  },
+  "영역 텍스트 메모": {
+    "ko": "영역 텍스트 메모",
+    "en": "Text note in a region",
+    "ja": "範囲にテキストメモ"
+  },
+  "영역 터미널": {
+    "ko": "영역 터미널",
+    "en": "Terminal in a region",
+    "ja": "範囲にターミナル"
+  },
+  "영역 웹 창": {
+    "ko": "영역 웹 창",
+    "en": "Web window in a region",
+    "ja": "範囲にウェブウィンドウ"
+  },
+  "모니터 {count}개 공유 중 · 공유 중지": {
+    "ko": "모니터 {count}개 공유 중 · 공유 중지",
+    "en": "Sharing displays ({count}) · Stop sharing",
+    "ja": "共有中のディスプレイ（{count}）· 共有を停止"
+  },
+  "더보기({count})": {
+    "ko": "더보기({count})",
+    "en": "More ({count})",
+    "ja": "さらに表示（{count}）"
+  },
+  "숨김": {
+    "ko": "숨김",
+    "en": "Hide",
+    "ja": "隠す"
+  },
+  "Jajan 종료": {
+    "ko": "Jajan 종료",
+    "en": "Quit Jajan",
+    "ja": "Jajanを終了"
+  },
+  "권한 설정": {
+    "ko": "권한 설정",
+    "en": "Permissions",
+    "ja": "権限設定"
+  },
+  "메모": {
+    "ko": "메모",
+    "en": "Note",
+    "ja": "メモ"
+  },
+  "웹": {
+    "ko": "웹",
+    "en": "Web",
+    "ja": "ウェブ"
+  },
+  "이전 도구": {
+    "ko": "이전 도구",
+    "en": "Previous tool",
+    "ja": "前のツール"
+  },
+  "다음 도구": {
+    "ko": "다음 도구",
+    "en": "Next tool",
+    "ja": "次のツール"
+  },
+  "메모 접기": {
+    "ko": "메모 접기",
+    "en": "Collapse note",
+    "ja": "メモを折りたたむ"
+  },
+  "메모 펼치기": {
+    "ko": "메모 펼치기",
+    "en": "Expand note",
+    "ja": "メモを展開"
+  },
+  "페이지 확대/축소": {
+    "ko": "페이지 확대/축소",
+    "en": "Page zoom",
+    "ja": "ページの拡大・縮小"
+  },
+  "글자 크기": {
+    "ko": "글자 크기",
+    "en": "Text size",
+    "ja": "文字サイズ"
+  },
+  "웹페이지 새로고침": {
+    "ko": "웹페이지 새로고침",
+    "en": "Reload page",
+    "ja": "ページを再読み込み"
+  },
+  "웹페이지 뒤로": {
+    "ko": "웹페이지 뒤로",
+    "en": "Go back",
+    "ja": "前のページへ"
+  },
+  "저장 · Command S / Ctrl S": {
+    "ko": "저장 · Command S / Ctrl S",
+    "en": "Save · Command S / Ctrl S",
+    "ja": "保存 · Command S / Ctrl S"
+  },
+  "파일로 저장": {
+    "ko": "파일로 저장",
+    "en": "Save to file",
+    "ja": "ファイルに保存"
+  },
+  "웹 주소 복사": {
+    "ko": "웹 주소 복사",
+    "en": "Copy web address",
+    "ja": "ウェブアドレスをコピー"
+  },
+  "본문 복사": {
+    "ko": "본문 복사",
+    "en": "Copy text",
+    "ja": "本文をコピー"
+  },
+  "상단 고정": {
+    "ko": "상단 고정",
+    "en": "Keep on top",
+    "ja": "最前面に固定"
+  },
+  "메모 창 닫기": {
+    "ko": "메모 창 닫기",
+    "en": "Close note",
+    "ja": "メモを閉じる"
+  },
+  "터미널 종료": {
+    "ko": "터미널 종료",
+    "en": "Close terminal",
+    "ja": "ターミナルを終了"
+  },
+  "웹 창 닫기": {
+    "ko": "웹 창 닫기",
+    "en": "Close web window",
+    "ja": "ウェブウィンドウを閉じる"
+  },
+  "화면에서 숨기기": {
+    "ko": "화면에서 숨기기",
+    "en": "Hide from screen",
+    "ja": "画面から隠す"
+  },
+  "화면에 띄우기": {
+    "ko": "화면에 띄우기",
+    "en": "Show on screen",
+    "ja": "画面に表示"
+  },
+  "아직 메모가 없습니다.": {
+    "ko": "아직 메모가 없습니다.",
+    "en": "No notes yet.",
+    "ja": "メモはまだありません。"
+  },
+  "메모 공통 도구": {
+    "ko": "메모 공통 도구",
+    "en": "Note actions",
+    "ja": "メモの操作"
+  },
+  "메모 표시 상태를 변경하지 못했습니다. 다시 시도하세요.": {
+    "ko": "메모 표시 상태를 변경하지 못했습니다. 다시 시도하세요.",
+    "en": "Could not change note visibility. Try again.",
+    "ja": "メモの表示状態を変更できませんでした。再試行してください。"
+  },
+  "목록에서 삭제": {
+    "ko": "목록에서 삭제",
+    "en": "Remove from list",
+    "ja": "一覧から削除"
+  },
+  "검색 결과가 없습니다.": {
+    "ko": "검색 결과가 없습니다.",
+    "en": "No matching notes.",
+    "ja": "一致するメモがありません。"
+  },
+  "파일 내보내기": {
+    "ko": "파일 내보내기",
+    "en": "Export file",
+    "ja": "ファイルを書き出す"
+  },
+  "메모가 외부에서 갱신되었습니다. 초안을 복사한 뒤 취소하면 최신 내용을 확인할 수 있습니다.": {
+    "ko": "메모가 외부에서 갱신되었습니다. 초안을 복사한 뒤 취소하면 최신 내용을 확인할 수 있습니다.",
+    "en": "This note changed elsewhere. Copy your draft and cancel to view the latest contents.",
+    "ja": "メモが外部で更新されました。下書きをコピーしてキャンセルすると最新の内容を表示できます。"
+  },
+  "저장됨": {
+    "ko": "저장됨",
+    "en": "Saved",
+    "ja": "保存済み"
+  },
+  "지원하지 않는 문법의 손실을 막기 위해 원문을 보호하고 있습니다. 원문 복사를 사용할 수 있습니다.": {
+    "ko": "지원하지 않는 문법의 손실을 막기 위해 원문을 보호하고 있습니다. 원문 복사를 사용할 수 있습니다.",
+    "en": "The source is protected to preserve unsupported syntax. You can copy the original text.",
+    "ja": "未対応の構文を保持するため原文を保護しています。原文をコピーできます。"
+  },
+  "이미지 복사": {
+    "ko": "이미지 복사",
+    "en": "Copy image",
+    "ja": "画像をコピー"
+  },
+  "원문 복사": {
+    "ko": "원문 복사",
+    "en": "Copy source",
+    "ja": "原文をコピー"
+  },
+  "저장": {
+    "ko": "저장",
+    "en": "Save",
+    "ja": "保存"
+  },
+  "복사했습니다": {
+    "ko": "복사했습니다",
+    "en": "Copied",
+    "ja": "コピーしました"
+  },
+  "Control만 누른 채 메모에 포인터를 올려도 접거나 펼칠 수 있습니다": {
+    "ko": "Control만 누른 채 메모에 포인터를 올려도 접거나 펼칠 수 있습니다",
+    "en": "Hold Control and hover over a note to collapse or expand it",
+    "ja": "Controlキーを押しながらメモにポインタを合わせると折りたたみ・展開できます"
+  },
+  "초안 복구": {
+    "ko": "초안 복구",
+    "en": "Recover draft",
+    "ja": "下書きを復元"
+  },
+  "변경 취소": {
+    "ko": "변경 취소",
+    "en": "Discard changes",
+    "ja": "変更を取り消す"
+  },
+  "다시 저장": {
+    "ko": "다시 저장",
+    "en": "Save again",
+    "ja": "再保存"
+  },
+  "저장 중": {
+    "ko": "저장 중",
+    "en": "Saving",
+    "ja": "保存中"
+  },
+  "편집을 취소했습니다": {
+    "ko": "편집을 취소했습니다",
+    "en": "Editing canceled",
+    "ja": "編集をキャンセルしました"
+  },
+  "자동 저장 중…": {
+    "ko": "자동 저장 중…",
+    "en": "Autosaving…",
+    "ja": "自動保存中…"
+  },
+  "입력 중…": {
+    "ko": "입력 중…",
+    "en": "Typing…",
+    "ja": "入力中…"
+  },
+  "자동 저장 대기…": {
+    "ko": "자동 저장 대기…",
+    "en": "Waiting to autosave…",
+    "ja": "自動保存を待機中…"
+  },
+  "선택한 글자 서식": {
+    "ko": "선택한 글자 서식",
+    "en": "Format selection",
+    "ja": "選択範囲の書式"
+  },
+  "굵게": {
+    "ko": "굵게",
+    "en": "Bold",
+    "ja": "太字"
+  },
+  "기울임": {
+    "ko": "기울임",
+    "en": "Italic",
+    "ja": "斜体"
+  },
+  "취소선": {
+    "ko": "취소선",
+    "en": "Strikethrough",
+    "ja": "取り消し線"
+  },
+  "코드": {
+    "ko": "코드",
+    "en": "Code",
+    "ja": "コード"
+  },
+  "큰제목": {
+    "ko": "큰제목",
+    "en": "Heading",
+    "ja": "大見出し"
+  },
+  "작은제목": {
+    "ko": "작은제목",
+    "en": "Subheading",
+    "ja": "小見出し"
+  },
+  "본문": {
+    "ko": "본문",
+    "en": "Body text",
+    "ja": "本文"
+  },
+  "이미지 표시 안 함": {
+    "ko": "이미지 표시 안 함",
+    "en": "Image hidden",
+    "ja": "画像を非表示"
+  },
+  "완료 상태": {
+    "ko": "완료 상태",
+    "en": "Completion status",
+    "ja": "完了状態"
+  },
+  "메모 본문": {
+    "ko": "메모 본문",
+    "en": "Note body",
+    "ja": "メモ本文"
+  },
+  "메모 원문을 읽지 못했습니다": {
+    "ko": "메모 원문을 읽지 못했습니다",
+    "en": "Could not read the note source",
+    "ja": "メモの原文を読み込めませんでした"
+  },
+  "한글 조합을 마친 뒤 저장해 주세요": {
+    "ko": "한글 조합을 마친 뒤 저장해 주세요",
+    "en": "Finish composing text before saving",
+    "ja": "文字入力を確定してから保存してください"
+  },
+  "보존할 수 없는 문법이 있어 원문을 보호하고 있습니다": {
+    "ko": "보존할 수 없는 문법이 있어 원문을 보호하고 있습니다",
+    "en": "The source is protected to preserve unsupported syntax",
+    "ja": "未対応の構文を保持するため原文を保護しています"
+  },
+  "편집기 세로 스크롤": {
+    "ko": "편집기 세로 스크롤",
+    "en": "Scroll editor vertically",
+    "ja": "エディタを縦にスクロール"
+  },
+  "라임": {
+    "ko": "라임",
+    "en": "Lime",
+    "ja": "ライム"
+  },
+  "코랄": {
+    "ko": "코랄",
+    "en": "Coral",
+    "ja": "コーラル"
+  },
+  "민트": {
+    "ko": "민트",
+    "en": "Mint",
+    "ja": "ミント"
+  },
+  "아이보리": {
+    "ko": "아이보리",
+    "en": "Ivory",
+    "ja": "アイボリー"
+  },
+  "차콜": {
+    "ko": "차콜",
+    "en": "Charcoal",
+    "ja": "チャコール"
+  },
+  "숨기기": {
+    "ko": "숨기기",
+    "en": "Hide",
+    "ja": "隠す"
+  },
+  "접기": {
+    "ko": "접기",
+    "en": "Show less",
+    "ja": "折りたたむ"
+  },
+  "삭제": {
+    "ko": "삭제",
+    "en": "Delete",
+    "ja": "削除"
+  },
+  "최근 주소를 삭제했습니다.": {
+    "ko": "최근 주소를 삭제했습니다.",
+    "en": "Removed the recent address.",
+    "ja": "最近のアドレスを削除しました。"
+  },
+  "웹페이지를 여는 중입니다.": {
+    "ko": "웹페이지를 여는 중입니다.",
+    "en": "Opening web page…",
+    "ja": "ウェブページを開いています。"
+  },
+  "연결을 저장하고 있습니다…": {
+    "ko": "연결을 저장하고 있습니다…",
+    "en": "Saving connection…",
+    "ja": "接続を保存中…"
+  },
+  "클릭하면 이 메모와 연결합니다.": {
+    "ko": "클릭하면 이 메모와 연결합니다.",
+    "en": "Click to connect to this note.",
+    "ja": "クリックしてこのメモに接続します。"
+  },
+  "연결할 메모 위로 이동한 뒤 클릭하세요. 겹친 메모는 먼저 떨어뜨려 주세요.": {
+    "ko": "연결할 메모 위로 이동한 뒤 클릭하세요. 겹친 메모는 먼저 떨어뜨려 주세요.",
+    "en": "Click the note to connect. Separate overlapping notes first.",
+    "ja": "接続するメモをクリックしてください。重なっているメモは先に離してください。"
+  },
+  "겹치지 않은 다른 메모를 클릭해 주세요.": {
+    "ko": "겹치지 않은 다른 메모를 클릭해 주세요.",
+    "en": "Click another note that does not overlap.",
+    "ja": "重なっていない別のメモをクリックしてください。"
+  },
+  "확인됨 ✓": {
+    "ko": "확인됨 ✓",
+    "en": "Verified ✓",
+    "ja": "確認済み ✓"
+  },
+  "설정 열기": {
+    "ko": "설정 열기",
+    "en": "Open Settings",
+    "ja": "設定を開く"
+  },
+  "화면 및 시스템 오디오 녹음": {
+    "ko": "화면 및 시스템 오디오 녹음",
+    "en": "Screen & System Audio Recording",
+    "ja": "画面収録とシステムオーディオ録音"
+  },
+  "선택한 권한을 확인했습니다.": {
+    "ko": "선택한 권한을 확인했습니다.",
+    "en": "The selected permission is enabled.",
+    "ja": "選択した権限を確認しました。"
+  },
+  "손쉬운 사용과 화면 캡처 접근을 확인했습니다.": {
+    "ko": "손쉬운 사용과 화면 캡처 접근을 확인했습니다.",
+    "en": "Accessibility and screen capture access are enabled.",
+    "ja": "アクセシビリティと画面キャプチャの権限を確認しました。"
+  },
+  "확인하지 못했습니다. 설정을 확인한 뒤 다시 시도하세요.": {
+    "ko": "확인하지 못했습니다. 설정을 확인한 뒤 다시 시도하세요.",
+    "en": "Could not verify access. Check Settings and retry.",
+    "ja": "権限を確認できませんでした。設定を確認して再試行してください。"
+  },
+  "선택한 테마를 사용 중입니다.": {
+    "ko": "선택한 테마를 사용 중입니다.",
+    "en": "Using the selected theme.",
+    "ja": "選択したテーマを使用中です。"
+  },
+  "시스템 테마를 따르는 중입니다.": {
+    "ko": "시스템 테마를 따르는 중입니다.",
+    "en": "Following the system theme.",
+    "ja": "システムのテーマに従っています。"
+  },
+  "시스템 테마를 따릅니다.": {
+    "ko": "시스템 테마를 따릅니다.",
+    "en": "Following the system theme.",
+    "ja": "システムのテーマに従います。"
+  },
+  "테마를 저장했습니다.": {
+    "ko": "테마를 저장했습니다.",
+    "en": "Theme saved.",
+    "ja": "テーマを保存しました。"
+  },
+  "테마를 저장하지 못했습니다. 기존 설정을 유지합니다. 다시 시도하세요.": {
+    "ko": "테마를 저장하지 못했습니다. 기존 설정을 유지합니다. 다시 시도하세요.",
+    "en": "Could not save the theme. The previous setting is still active. Try again.",
+    "ja": "テーマを保存できませんでした。以前の設定を維持します。再試行してください。"
+  },
+  "메모 창 디자인을 저장했습니다.": {
+    "ko": "메모 창 디자인을 저장했습니다.",
+    "en": "Note appearance saved.",
+    "ja": "メモのデザインを保存しました。"
+  },
+  "메모 창 디자인을 저장하지 못했습니다. 기존 설정을 유지합니다. 다시 시도하세요.": {
+    "ko": "메모 창 디자인을 저장하지 못했습니다. 기존 설정을 유지합니다. 다시 시도하세요.",
+    "en": "Could not save note appearance. The previous setting is still active. Try again.",
+    "ja": "メモのデザインを保存できませんでした。以前の設定を維持します。再試行してください。"
+  },
+  "자동 업데이트를 사용할 수 없습니다.": {
+    "ko": "자동 업데이트를 사용할 수 없습니다.",
+    "en": "Automatic updates are unavailable.",
+    "ja": "自動更新を利用できません。"
+  },
+  "업데이트를 확인할 수 있습니다.": {
+    "ko": "업데이트를 확인할 수 있습니다.",
+    "en": "Ready to check for updates.",
+    "ja": "更新を確認できます。"
+  },
+  "업데이트를 확인하는 중입니다.": {
+    "ko": "업데이트를 확인하는 중입니다.",
+    "en": "Checking for updates…",
+    "ja": "更新を確認中です。"
+  },
+  "업데이트를 다운로드하는 중입니다.": {
+    "ko": "업데이트를 다운로드하는 중입니다.",
+    "en": "Downloading the update…",
+    "ja": "更新をダウンロード中です。"
+  },
+  "업데이트를 설치할 준비가 되었습니다.": {
+    "ko": "업데이트를 설치할 준비가 되었습니다.",
+    "en": "Ready to install the update.",
+    "ja": "更新をインストールできます。"
+  },
+  "설치를 준비하는 중입니다.": {
+    "ko": "설치를 준비하는 중입니다.",
+    "en": "Preparing installation…",
+    "ja": "インストールを準備中です。"
+  },
+  "업데이트를 설치하는 중입니다.": {
+    "ko": "업데이트를 설치하는 중입니다.",
+    "en": "Installing the update…",
+    "ja": "更新をインストール中です。"
+  },
+  "업데이트를 처리하지 못했습니다.": {
+    "ko": "업데이트를 처리하지 못했습니다.",
+    "en": "Could not complete the update.",
+    "ja": "更新を完了できませんでした。"
+  },
+  "확인할 수 없음": {
+    "ko": "확인할 수 없음",
+    "en": "Unknown",
+    "ja": "不明"
+  },
+  "개발용 빌드에서는 자동 업데이트가 꺼져 있습니다.": {
+    "ko": "개발용 빌드에서는 자동 업데이트가 꺼져 있습니다.",
+    "en": "Automatic updates are disabled in development builds.",
+    "ja": "開発版では自動更新は無効です。"
+  },
+  "작업 상태 확인 중…": {
+    "ko": "작업 상태 확인 중…",
+    "en": "Checking active tasks…",
+    "ja": "実行中の作業を確認中…"
+  },
+  "설치하고 재시작 중…": {
+    "ko": "설치하고 재시작 중…",
+    "en": "Installing and restarting…",
+    "ja": "インストールして再起動中…"
+  },
+  "개발자 메뉴에서 수동 시험 대기 중입니다.": {
+    "ko": "개발자 메뉴에서 수동 시험 대기 중입니다.",
+    "en": "Waiting for a manual test in Developer settings.",
+    "ja": "開発者設定で手動試験を待機中です。"
+  },
+  "업데이트 상태를 확인하지 못했습니다. 다시 시도하세요.": {
+    "ko": "업데이트 상태를 확인하지 못했습니다. 다시 시도하세요.",
+    "en": "Could not read update status. Try again.",
+    "ja": "更新状態を確認できませんでした。再試行してください。"
+  },
+  "업데이트를 확인하지 못했습니다. 다시 시도하세요.": {
+    "ko": "업데이트를 확인하지 못했습니다. 다시 시도하세요.",
+    "en": "Could not check for updates. Try again.",
+    "ja": "更新を確認できませんでした。再試行してください。"
+  },
+  "업데이트 설치를 시작하지 못했습니다. 다시 시도하세요.": {
+    "ko": "업데이트 설치를 시작하지 못했습니다. 다시 시도하세요.",
+    "en": "Could not start installation. Try again.",
+    "ja": "インストールを開始できませんでした。再試行してください。"
+  },
+  "안전 검사를 마치지 못했습니다. 다시 시도하세요.": {
+    "ko": "안전 검사를 마치지 못했습니다. 다시 시도하세요.",
+    "en": "Could not finish safety checks. Try again.",
+    "ja": "安全確認を完了できませんでした。再試行してください。"
+  },
+  "안내를 닫지 못했습니다. 다시 시도하세요.": {
+    "ko": "안내를 닫지 못했습니다. 다시 시도하세요.",
+    "en": "Could not dismiss the notice. Try again.",
+    "ja": "通知を閉じられませんでした。再試行してください。"
+  },
+  "OS 자동 실행에 등록되어 있지 않습니다.": {
+    "ko": "OS 자동 실행에 등록되어 있지 않습니다.",
+    "en": "Not registered to launch at login.",
+    "ja": "ログイン時に起動するよう登録されていません。"
+  },
+  "OS에서 로그인 자동 실행을 허용했습니다.": {
+    "ko": "OS에서 로그인 자동 실행을 허용했습니다.",
+    "en": "Launch at login is allowed by the OS.",
+    "ja": "OSでログイン時の起動が許可されています。"
+  },
+  "OS 승인이 필요하거나 OS에서 비활성화했습니다. OS 시작 설정에서 확인하세요.": {
+    "ko": "OS 승인이 필요하거나 OS에서 비활성화했습니다. OS 시작 설정에서 확인하세요.",
+    "en": "OS approval is required or startup is disabled. Check OS startup settings.",
+    "ja": "OSの承認が必要か、無効になっています。OSの起動設定を確認してください。"
+  },
+  "등록됨 · Windows 허용 여부 미확인. Windows 시작 앱에서 켜짐/꺼짐을 확인하세요.": {
+    "ko": "등록됨 · Windows 허용 여부 미확인. Windows 시작 앱에서 켜짐/꺼짐을 확인하세요.",
+    "en": "Registered. Check whether it is enabled under Windows Startup Apps.",
+    "ja": "登録済みです。Windowsのスタートアップアプリで有効か確認してください。"
+  },
+  "이 실행 환경에서는 자동 실행을 설정할 수 없습니다.": {
+    "ko": "이 실행 환경에서는 자동 실행을 설정할 수 없습니다.",
+    "en": "Launch at login is unavailable in this environment.",
+    "ja": "この環境ではログイン時の起動を設定できません。"
+  },
+  "앱 선택: 아직 선택하지 않았습니다.": {
+    "ko": "앱 선택: 아직 선택하지 않았습니다.",
+    "en": "App preference: no choice yet.",
+    "ja": "アプリ設定：未選択"
+  },
+  "앱 선택: 켜기": {
+    "ko": "앱 선택: 켜기",
+    "en": "App preference: on",
+    "ja": "アプリ設定：オン"
+  },
+  "앱 선택: 끄기": {
+    "ko": "앱 선택: 끄기",
+    "en": "App preference: off",
+    "ja": "アプリ設定：オフ"
+  },
+  "OS 상태를 확인하지 못했습니다.": {
+    "ko": "OS 상태를 확인하지 못했습니다.",
+    "en": "Could not read OS status.",
+    "ja": "OSの状態を確認できませんでした。"
+  },
+  "자동 실행 상태를 읽지 못했습니다. 다시 확인하세요.": {
+    "ko": "자동 실행 상태를 읽지 못했습니다. 다시 확인하세요.",
+    "en": "Could not read startup status. Check again.",
+    "ja": "自動起動の状態を確認できませんでした。再確認してください。"
+  },
+  "저장된 앱 선택입니다. Continue를 눌러 현재 선택을 확인합니다.": {
+    "ko": "저장된 앱 선택입니다. Continue를 눌러 현재 선택을 확인합니다.",
+    "en": "This is your saved preference. Select Continue to confirm.",
+    "ja": "保存済みの選択です。「続ける」で確定してください。"
+  },
+  "상태를 확인하지 못했습니다. Continue 이후 설정에서 선택할 수 있습니다.": {
+    "ko": "상태를 확인하지 못했습니다. Continue 이후 설정에서 선택할 수 있습니다.",
+    "en": "Could not read status. After continuing, choose a preference in Settings.",
+    "ja": "状態を確認できませんでした。続行後に設定から選択できます。"
+  },
+  "자동 실행 설정을 적용하지 못했습니다. 설정의 로그인 자동 실행에서 앱 선택과 OS 상태를 확인하세요.": {
+    "ko": "자동 실행 설정을 적용하지 못했습니다. 설정의 로그인 자동 실행에서 앱 선택과 OS 상태를 확인하세요.",
+    "en": "Could not apply launch at login. Check the app preference and OS status under Launch at login.",
+    "ja": "ログイン時の起動を適用できませんでした。設定でアプリの選択とOSの状態を確認してください。"
+  },
+  "개발·검증 앱은 로그인 자동 실행에 등록하지 않습니다.": {
+    "ko": "개발·검증 앱은 로그인 자동 실행에 등록하지 않습니다.",
+    "en": "Development and verification builds do not register for launch at login.",
+    "ja": "開発・検証版はログイン時の起動に登録しません。"
+  },
+  "지원하지 않는 운영체제입니다.": {
+    "ko": "지원하지 않는 운영체제입니다.",
+    "en": "Unsupported operating system.",
+    "ja": "未対応のOSです。"
+  },
+  "사용 불가": {
+    "ko": "사용 불가",
+    "en": "Unavailable",
+    "ja": "利用不可"
+  },
+  "대기": {
+    "ko": "대기",
+    "en": "Idle",
+    "ja": "待機"
+  },
+  "공식 피드 확인 중": {
+    "ko": "공식 피드 확인 중",
+    "en": "Checking official feed",
+    "ja": "公式フィードを確認中"
+  },
+  "다운로드 중": {
+    "ko": "다운로드 중",
+    "en": "Downloading",
+    "ja": "ダウンロード中"
+  },
+  "준비 완료": {
+    "ko": "준비 완료",
+    "en": "Ready",
+    "ja": "準備完了"
+  },
+  "작업 보호 확인 중": {
+    "ko": "작업 보호 확인 중",
+    "en": "Checking active work",
+    "ja": "作業の安全を確認中"
+  },
+  "설치·재시작 중": {
+    "ko": "설치·재시작 중",
+    "en": "Installing and restarting",
+    "ja": "インストール・再起動中"
+  },
+  "오류": {
+    "ko": "오류",
+    "en": "Error",
+    "ja": "エラー"
+  },
+  "확인 불가": {
+    "ko": "확인 불가",
+    "en": "Unknown",
+    "ja": "不明"
+  },
+  "현재 버전": {
+    "ko": "현재 버전",
+    "en": "Current version",
+    "ja": "現在のバージョン"
+  },
+  "준비 버전": {
+    "ko": "준비 버전",
+    "en": "Prepared version",
+    "ja": "準備したバージョン"
+  },
+  "없음": {
+    "ko": "없음",
+    "en": "None",
+    "ja": "なし"
+  },
+  "시험 종류": {
+    "ko": "시험 종류",
+    "en": "Test type",
+    "ja": "試験の種類"
+  },
+  "호환 버전 왕복 시험": {
+    "ko": "호환 버전 왕복 시험",
+    "en": "Switch between compatible versions",
+    "ja": "互換バージョン間の往復試験"
+  },
+  "동일 버전 재설치 테스트": {
+    "ko": "동일 버전 재설치 테스트",
+    "en": "Same-version reinstall test",
+    "ja": "同一バージョンの再インストール試験"
+  },
+  "공식 배포판 설치 테스트": {
+    "ko": "공식 배포판 설치 테스트",
+    "en": "Official release installation test",
+    "ja": "公式リリースのインストール試験"
+  },
+  "수동 시험 미준비": {
+    "ko": "수동 시험 미준비",
+    "en": "Manual test not prepared",
+    "ja": "手動試験の準備前"
+  },
+  "다운로드": {
+    "ko": "다운로드",
+    "en": "Download",
+    "ja": "ダウンロード"
+  },
+  "서명·플랫폼·버전 검증": {
+    "ko": "서명·플랫폼·버전 검증",
+    "en": "Signature, platform and version",
+    "ja": "署名・プラットフォーム・バージョンの検証"
+  },
+  "검증 완료": {
+    "ko": "검증 완료",
+    "en": "Verified",
+    "ja": "検証済み"
+  },
+  "미검증": {
+    "ko": "미검증",
+    "en": "Unverified",
+    "ja": "未検証"
+  },
+  "캐시": {
+    "ko": "캐시",
+    "en": "Cache",
+    "ja": "キャッシュ"
+  },
+  "저장 완료": {
+    "ko": "저장 완료",
+    "en": "Saved",
+    "ja": "保存済み"
+  },
+  "준비 안 됨": {
+    "ko": "준비 안 됨",
+    "en": "Not ready",
+    "ja": "準備前"
+  },
+  "최근 준비 실패": {
+    "ko": "최근 준비 실패",
+    "en": "Last preparation failure",
+    "ja": "直近の準備失敗"
+  },
+  "공식 피드·버전 확인": {
+    "ko": "공식 피드·버전 확인",
+    "en": "Official feed and version check",
+    "ja": "公式フィードとバージョンの確認"
+  },
+  "공식 플랫폼 파일 경로": {
+    "ko": "공식 플랫폼 파일 경로",
+    "en": "Official platform file path",
+    "ja": "公式のプラットフォーム別ファイルパス"
+  },
+  "다운로드·서명 검증": {
+    "ko": "다운로드·서명 검증",
+    "en": "Download and signature verification",
+    "ja": "ダウンロードと署名の検証"
+  },
+  "서명·플랫폼·버전 바인딩": {
+    "ko": "서명·플랫폼·버전 바인딩",
+    "en": "Signature, platform and version binding",
+    "ja": "署名・プラットフォーム・バージョンの対応確認"
+  },
+  "캐시 저장": {
+    "ko": "캐시 저장",
+    "en": "Write cache",
+    "ja": "キャッシュの保存"
+  },
+  "준비 상태 반영": {
+    "ko": "준비 상태 반영",
+    "en": "Apply readiness state",
+    "ja": "準備状態の反映"
+  },
+  "설치 정책": {
+    "ko": "설치 정책",
+    "en": "Installation policy",
+    "ja": "インストール方針"
+  },
+  "수동 시험 대기 · 이 화면의 설치 버튼 필요": {
+    "ko": "수동 시험 대기 · 이 화면의 설치 버튼 필요",
+    "en": "Manual test pending · Use the install button on this screen",
+    "ja": "手動試験を待機中 · この画面のインストールボタンを使用"
+  },
+  "일반 자동 업데이트": {
+    "ko": "일반 자동 업데이트",
+    "en": "Standard automatic updates",
+    "ja": "通常の自動更新"
+  },
+  "공식 호환 버전 쌍이 아직 없습니다.": {
+    "ko": "공식 호환 버전 쌍이 아직 없습니다.",
+    "en": "No official compatible version pair is available yet.",
+    "ja": "対応する公式バージョンの組み合わせはまだありません。"
+  },
+  "최신 배포판 준비 중…": {
+    "ko": "최신 배포판 준비 중…",
+    "en": "Preparing latest release…",
+    "ja": "最新リリースを準備中…"
+  },
+  "설치·재시작 중…": {
+    "ko": "설치·재시작 중…",
+    "en": "Installing and restarting…",
+    "ja": "インストールして再起動中…"
+  },
+  "상태를 확인하지 못했습니다. 설정을 다시 열어 확인하세요.": {
+    "ko": "상태를 확인하지 못했습니다. 설정을 다시 열어 확인하세요.",
+    "en": "Could not check status. Reopen Settings to retry.",
+    "ja": "状態を確認できませんでした。設定を開き直してください。"
+  },
+  "설치를 위한 안전 검사를 진행 중입니다": {
+    "ko": "설치를 위한 안전 검사를 진행 중입니다",
+    "en": "Checking whether it is safe to install",
+    "ja": "インストールの安全を確認中です"
+  },
+  "업데이트를 설치하고 다시 시작합니다": {
+    "ko": "업데이트를 설치하고 다시 시작합니다",
+    "en": "Installing the update and restarting",
+    "ja": "更新をインストールして再起動します"
+  },
+  "업데이트를 처리하지 못했습니다": {
+    "ko": "업데이트를 처리하지 못했습니다",
+    "en": "Could not complete the update",
+    "ja": "更新を完了できませんでした"
+  },
+  "업데이트 상태를 확인하지 못했습니다.": {
+    "ko": "업데이트 상태를 확인하지 못했습니다.",
+    "en": "Could not read update status.",
+    "ja": "更新状態を確認できませんでした。"
+  },
+  "업데이트 상태를 확인하지 못했습니다. 설정에서 다시 확인하세요.": {
+    "ko": "업데이트 상태를 확인하지 못했습니다. 설정에서 다시 확인하세요.",
+    "en": "Could not read update status. Check again in Settings.",
+    "ja": "更新状態を確認できませんでした。設定で再確認してください。"
+  },
+  "업데이트 설치를 준비하고 있습니다": {
+    "ko": "업데이트 설치를 준비하고 있습니다",
+    "en": "Preparing to install the update",
+    "ja": "更新のインストールを準備中です"
+  },
+  "시스템 설정 → 개인정보 보호 및 보안 → 화면 및 시스템 오디오 녹음": {
+    "ko": "시스템 설정 → 개인정보 보호 및 보안 → 화면 및 시스템 오디오 녹음",
+    "en": "System Settings → Privacy & Security → Screen & System Audio Recording",
+    "ja": "システム設定 → プライバシーとセキュリティ → 画面収録とシステムオーディオ録音"
+  },
+  "시스템 설정 → 개인정보 보호 및 보안 → 손쉬운 사용": {
+    "ko": "시스템 설정 → 개인정보 보호 및 보안 → 손쉬운 사용",
+    "en": "System Settings → Privacy & Security → Accessibility",
+    "ja": "システム設定 → プライバシーとセキュリティ → アクセシビリティ"
+  },
+  "목록의 앱을 확인하세요. 추가가 필요하면 + 버튼을 누른 뒤 아래 .app 번들을 선택하세요. 앱 업데이트 후 같은 경로가 이미 켜져 있어도 확인되지 않으면 해당 앱 항목을 제거한 뒤 현재 앱을 다시 추가하고 허용하세요.": {
+    "ko": "목록의 앱을 확인하세요. 추가가 필요하면 + 버튼을 누른 뒤 아래 .app 번들을 선택하세요. 앱 업데이트 후 같은 경로가 이미 켜져 있어도 확인되지 않으면 해당 앱 항목을 제거한 뒤 현재 앱을 다시 추가하고 허용하세요.",
+    "en": "Check the app in the list. To add it, select + and choose the .app bundle below. If access is still unrecognized after an update, remove the old entry and add and allow the current app again.",
+    "ja": "一覧を確認し、必要に応じて＋で下記の.appを追加してください。更新後に同じパスが有効でも認識されない場合は、古い項目を削除し、現在のアプリを追加し直して許可してください。"
+  },
+  "현재는 .app 번들 밖에서 실행 중입니다. 실행한 터미널이나 개발 도구의 권한을 확인하세요. 진단용 실행 파일 경로는 아래에서 확인할 수 있습니다.": {
+    "ko": "현재는 .app 번들 밖에서 실행 중입니다. 실행한 터미널이나 개발 도구의 권한을 확인하세요. 진단용 실행 파일 경로는 아래에서 확인할 수 있습니다.",
+    "en": "Running outside an .app bundle. Check permissions for the terminal or development tool that launched it. The executable path is shown below.",
+    "ja": ".appの外で実行中です。起動に使ったターミナルや開発ツールの権限を確認してください。実行ファイルのパスは下に表示されます。"
+  },
+  "macOS에서 현재 실행 앱의 권한이 아직 확인되지 않습니다. 설정이 켜져 있다면 아래 앱 경로와 등록된 앱이 일치하는지 확인하세요.": {
+    "ko": "macOS에서 현재 실행 앱의 권한이 아직 확인되지 않습니다. 설정이 켜져 있다면 아래 앱 경로와 등록된 앱이 일치하는지 확인하세요.",
+    "en": "macOS has not confirmed access for this app. If access is enabled, compare the registered app with the path below.",
+    "ja": "macOSで実行中のアプリの権限を確認できません。許可済みの場合は登録したアプリと下記のパスが一致するか確認してください。"
+  },
+  "손쉬운 사용 권한과 단축키 입력 감시를 확인했습니다.": {
+    "ko": "손쉬운 사용 권한과 단축키 입력 감시를 확인했습니다.",
+    "en": "Accessibility access and shortcut monitoring are active.",
+    "ja": "アクセシビリティ権限とショートカットの入力監視を確認しました。"
+  },
+  "손쉬운 사용 권한을 확인했습니다. 입력 감시를 연결 중입니다. 계속 작동하지 않으면 다른 Jajan 실행 여부를 확인하세요.": {
+    "ko": "손쉬운 사용 권한을 확인했습니다. 입력 감시를 연결 중입니다. 계속 작동하지 않으면 다른 Jajan 실행 여부를 확인하세요.",
+    "en": "Accessibility access is enabled. Connecting the input monitor. If shortcuts still fail, check for another running Jajan instance.",
+    "ja": "アクセシビリティ権限を確認しました。入力監視に接続中です。動作しない場合は別のJajanが起動中でないか確認してください。"
+  },
+  "보조키 조합 단축키에 손쉬운 사용 권한이 필요합니다. 다른 앱에서 입력이 감지되지 않으면 Jajan 창을 선택하거나 트레이의 권한 설정을 여세요.": {
+    "ko": "보조키 조합 단축키에 손쉬운 사용 권한이 필요합니다. 다른 앱에서 입력이 감지되지 않으면 Jajan 창을 선택하거나 트레이의 권한 설정을 여세요.",
+    "en": "Modifier shortcuts require Accessibility access. If input in other apps is not detected, select a Jajan window or open Permissions from the tray.",
+    "ja": "修飾キーのショートカットにはアクセシビリティ権限が必要です。他のアプリで入力を検出しない場合はJajanのウィンドウを選ぶか、トレイから権限設定を開いてください。"
+  },
+  "macOS에서 현재 실행 앱의 손쉬운 사용 권한이 확인되지 않습니다. 이미 허용했다면 설정에 등록된 앱과 아래 앱 경로를 확인하세요.": {
+    "ko": "macOS에서 현재 실행 앱의 손쉬운 사용 권한이 확인되지 않습니다. 이미 허용했다면 설정에 등록된 앱과 아래 앱 경로를 확인하세요.",
+    "en": "macOS has not confirmed Accessibility access. If access is enabled, compare the registered app with the path below.",
+    "ja": "実行中のアプリのアクセシビリティ権限を確認できません。許可済みの場合は登録したアプリと下記のパスを確認してください。"
+  },
+  "손쉬운 사용은 확인됐으며 화면 캡처 접근은 아직 확인되지 않습니다.": {
+    "ko": "손쉬운 사용은 확인됐으며 화면 캡처 접근은 아직 확인되지 않습니다.",
+    "en": "Accessibility is enabled. Screen capture access has not been confirmed.",
+    "ja": "アクセシビリティは許可済みです。画面キャプチャの権限はまだ確認できません。"
+  },
+  "Sharing enabled": {
+    "ko": "공유 중",
+    "en": "Sharing enabled",
+    "ja": "共有中"
+  },
+  "Could not load privacy choices. Sharing stays off. Retry to continue.": {
+    "ko": "개인정보 설정을 읽지 못했습니다. 공유는 꺼져 있습니다. 다시 시도하세요.",
+    "en": "Could not load privacy choices. Sharing stays off. Retry to continue.",
+    "ja": "設定を読み込めませんでした。共有はオフのままです。再試行してください。"
+  },
+  "Not sharing. No changes to save.": {
+    "ko": "공유하지 않습니다. 저장할 변경 사항이 없습니다.",
+    "en": "Not sharing. No changes to save.",
+    "ja": "共有していません。保存する変更はありません。"
+  },
+  "Saved. Your choice applies now.": {
+    "ko": "저장했습니다. 지금부터 선택한 설정을 적용합니다.",
+    "en": "Saved. Your choice applies now.",
+    "ja": "保存しました。設定が適用されました。"
+  },
+  "Could not exit. Please close the app.": {
+    "ko": "종료하지 못했습니다. 앱을 닫아 주세요.",
+    "en": "Could not exit. Please close the app.",
+    "ja": "終了できませんでした。アプリを閉じてください。"
+  },
+  "On": {
+    "ko": "켜짐",
+    "en": "On",
+    "ja": "オン"
+  },
+  "Off": {
+    "ko": "꺼짐",
+    "en": "Off",
+    "ja": "オフ"
+  },
+  "작업 진행 표시": {
+    "ko": "작업 진행 표시",
+    "en": "Show progress",
+    "ja": "作業の進捗表示"
+  },
+  "작업 공간 구성": {
+    "ko": "작업 공간 구성",
+    "en": "Arrange workspace",
+    "ja": "作業スペースの配置"
+  },
+  "Jajan의 메모 생성·조회·갱신·숨기기를 사용합니다. 기존 창의 위치와 포커스, 숨김 상태를 유지합니다.": {
+    "ko": "Jajan의 메모 생성·조회·갱신·숨기기를 사용합니다. 기존 창의 위치와 포커스, 숨김 상태를 유지합니다.",
+    "en": "Create, inspect, update and hide notes while preserving window positions, focus and visibility.",
+    "ja": "ウィンドウの位置・フォーカス・表示状態を保ちながら、メモを作成・確認・更新・非表示にします。"
+  },
+  "작업 계획과 진행상황을 플로팅 체크리스트 메모로 표시합니다. 실제로 끝난 단계와 미검증 범위를 구분하며 같은 메모를 갱신합니다.": {
+    "ko": "작업 계획과 진행상황을 플로팅 체크리스트 메모로 표시합니다. 실제로 끝난 단계와 미검증 범위를 구분하며 같은 메모를 갱신합니다.",
+    "en": "Display a floating checklist and update it as tasks finish, identifying what still needs verification.",
+    "ja": "フローティングチェックリストを更新し、完了した作業と未検証の項目を表示します。"
+  },
+  "작업에 필요한 웹·터미널·노트·캡처를 적절한 위치에 띄우고 임시 창을 정리합니다.": {
+    "ko": "작업에 필요한 웹·터미널·노트·캡처를 적절한 위치에 띄우고 임시 창을 정리합니다.",
+    "en": "Arrange web pages, terminals, notes and captures for a task, then clear temporary windows.",
+    "ja": "作業に必要なウェブページ、ターミナル、メモ、キャプチャを配置し、一時ウィンドウを整理します。"
+  },
+  "셸": {
+    "ko": "셸",
+    "en": "Shell",
+    "ja": "シェル"
+  },
+  "작업 폴더 선택": {
+    "ko": "작업 폴더 선택",
+    "en": "Choose working folder",
+    "ja": "作業フォルダを選択"
+  },
+  "실행 중인 작업을 종료하고 창을 닫을까요?": {
+    "ko": "실행 중인 작업을 종료하고 창을 닫을까요?",
+    "en": "End running tasks and close the window?",
+    "ja": "実行中の作業を終了してウィンドウを閉じますか？"
+  },
+  "종료": {
+    "ko": "종료",
+    "en": "Quit",
+    "ja": "終了"
+  },
+  "표시 중": {
+    "ko": "표시 중",
+    "en": "Visible",
+    "ja": "表示中"
+  },
+  "메모 연결 설정": {
+    "ko": "메모 연결 설정",
+    "en": "Note connection settings",
+    "ja": "メモの接続設定"
+  },
+  "정렬 취소하기": {
+    "ko": "정렬 취소하기",
+    "en": "Undo arrangement",
+    "ja": "整列を元に戻す"
+  },
+  "Jajan · 업데이트": {
+    "ko": "Jajan · 업데이트",
+    "en": "Jajan · Update",
+    "ja": "Jajan · 更新"
+  },
+  "웹 팝업": {
+    "ko": "웹 팝업",
+    "en": "Web popup",
+    "ja": "ウェブポップアップ"
+  },
+  "터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.": {
+    "ko": "터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.",
+    "en": "Terminal restore is currently available only on macOS.",
+    "ja": "ターミナルの復元は現在macOSのみで利用できます。"
+  },
+  "{label} · {shortcut}": {
+    "ko": "{label} · {shortcut}",
+    "en": "{label} · {shortcut}",
+    "ja": "{label} · {shortcut}"
+  },
+  "{url}로 이동": {
+    "ko": "{url}로 이동",
+    "en": "Open {url}",
+    "ja": "{url} に移動"
+  },
+  "{url} 최근 주소 삭제": {
+    "ko": "{url} 최근 주소 삭제",
+    "en": "Remove {url} from recent addresses",
+    "ja": "最近のアドレスから {url} を削除"
+  },
+  "{task} 시작 중…": {
+    "ko": "{task} 시작 중…",
+    "en": "Starting {task}…",
+    "ja": "{task} を起動中…"
+  },
+  "이전 터미널 프로세스는 종료되었습니다. 마지막 명령: {command} · 자동 실행하지 않았습니다.": {
+    "ko": "이전 터미널 프로세스는 종료되었습니다. 마지막 명령: {command} · 자동 실행하지 않았습니다.",
+    "en": "The previous terminal process ended. Last command: {command} · Not run automatically.",
+    "ja": "前のターミナルプロセスは終了しました。最後のコマンド：{command} · 自動実行していません。"
+  },
+  "이전 터미널 프로세스는 종료되었습니다. 마지막 명령은 안전한 복원을 위해 저장에서 제외되었습니다.": {
+    "ko": "이전 터미널 프로세스는 종료되었습니다. 마지막 명령은 안전한 복원을 위해 저장에서 제외되었습니다.",
+    "en": "The previous terminal process ended. Its last command was excluded from storage for safe restoration.",
+    "ja": "前のターミナルプロセスは終了しました。安全に復元するため最後のコマンドは保存されていません。"
+  },
+  "현재 버전 {current} · 새 버전 {version}": {
+    "ko": "현재 버전 {current} · 새 버전 {version}",
+    "en": "Current version {current} · New version {version}",
+    "ja": "現在のバージョン {current} · 新しいバージョン {version}"
+  },
+  "현재 버전 {current}": {
+    "ko": "현재 버전 {current}",
+    "en": "Current version {current}",
+    "ja": "現在のバージョン {current}"
+  },
+  "새 버전 {version}": {
+    "ko": "새 버전 {version}",
+    "en": "New version {version}",
+    "ja": "新しいバージョン {version}"
+  },
+  "파일로 내보냈습니다: {path}": {
+    "ko": "파일로 내보냈습니다: {path}",
+    "en": "Exported to {path}",
+    "ja": "{path} に書き出しました"
+  },
+  "페이지 배율 {value}% · 클릭하여 변경": {
+    "ko": "페이지 배율 {value}% · 클릭하여 변경",
+    "en": "Page zoom {value}% · Click to change",
+    "ja": "ページ倍率 {value}% · クリックして変更"
+  },
+  "글자 크기 {value}px · 클릭하여 변경": {
+    "ko": "글자 크기 {value}px · 클릭하여 변경",
+    "en": "Text size {value}px · Click to change",
+    "ja": "文字サイズ {value}px · クリックして変更"
+  },
+  "위로 메모 모아보기, 오른쪽으로 오른쪽 정렬, 아래로 전체 복원, 왼쪽으로 화면 빈자리 배치, Esc 키로 취소": {
+    "ko": "위로 메모 모아보기, 오른쪽으로 오른쪽 정렬, 아래로 전체 복원, 왼쪽으로 화면 빈자리 배치, Esc 키로 취소",
+    "en": "Swipe up for all notes, right to align right, down to restore all, or left to arrange in free space. Press Esc to cancel.",
+    "ja": "上でメモ一覧、右で右揃え、下ですべて復元、左で空き領域に配置。Escでキャンセル"
+  },
+  "종료된 터미널": {
+    "ko": "종료된 터미널",
+    "en": "Closed terminal",
+    "ja": "終了したターミナル"
+  },
+  "빈 메모 영역 선택": {
+    "ko": "빈 메모 영역 선택",
+    "en": "Select text note region",
+    "ja": "メモの範囲を選択"
+  },
+  "터미널 영역 선택": {
+    "ko": "터미널 영역 선택",
+    "en": "Select terminal region",
+    "ja": "ターミナルの範囲を選択"
+  },
+  "웹 창 영역 선택": {
+    "ko": "웹 창 영역 선택",
+    "en": "Select web window region",
+    "ja": "ウェブウィンドウの範囲を選択"
+  },
+  "방향 안내": {
+    "ko": "방향 안내",
+    "en": "Gesture guide",
+    "ja": "方向ガイド"
+  },
+  "화면 캡처 허용": {
+    "ko": "화면 캡처 허용",
+    "en": "Allow screen capture",
+    "ja": "画面キャプチャを許可"
+  },
+  "손쉬운 사용 허용": {
+    "ko": "손쉬운 사용 허용",
+    "en": "Allow Accessibility access",
+    "ja": "アクセシビリティを許可"
+  },
+  "↑  아래 앱을 시스템 설정의 허용 목록으로 드래그하세요.": {
+    "ko": "↑  아래 앱을 시스템 설정의 허용 목록으로 드래그하세요.",
+    "en": "↑ Drag the app below into the allowed list in System Settings.",
+    "ja": "↑ 下のアプリをシステム設定の許可リストにドラッグしてください。"
+  },
+  "개발 실행 파일": {
+    "ko": "개발 실행 파일",
+    "en": "Development executable",
+    "ja": "開発用実行ファイル"
+  },
+  "목록에 추가되지 않으면 + 버튼으로 앱을 선택하세요.": {
+    "ko": "목록에 추가되지 않으면 + 버튼으로 앱을 선택하세요.",
+    "en": "If the app is missing, select it with the + button.",
+    "ja": "一覧に追加されない場合は＋ボタンでアプリを選択してください。"
+  },
+  "개발 실행 파일은 macOS가 목록 추가를 제한할 수 있습니다.": {
+    "ko": "개발 실행 파일은 macOS가 목록 추가를 제한할 수 있습니다.",
+    "en": "macOS may restrict adding development executables.",
+    "ja": "macOSが開発用実行ファイルの追加を制限する場合があります。"
+  },
+  "복원: {shortcut} 놓고 ↓": {
+    "ko": "복원: {shortcut} 놓고 ↓",
+    "en": "Restore: release {shortcut}, then ↓",
+    "ja": "復元：{shortcut} を離して ↓"
+  },
+  "격리 검증 채널의 호환 버전 쌍입니다. 공식 배포판이 아닙니다.": {
+    "ko": "격리 검증 채널의 호환 버전 쌍입니다. 공식 배포판이 아닙니다.",
+    "en": "Compatible versions from the isolated verification channel. These are verification builds.",
+    "ja": "隔離検証チャネルの互換バージョンです。公式リリースではありません。"
+  },
+  "개발자 메뉴와 복귀 기능이 포함된 공식 호환 버전 쌍이 아직 없습니다. 이전 버전 교체를 사용할 수 없습니다.": {
+    "ko": "개발자 메뉴와 복귀 기능이 포함된 공식 호환 버전 쌍이 아직 없습니다. 이전 버전 교체를 사용할 수 없습니다.",
+    "en": "No official version pair includes the developer menu and return feature yet. Switching to a previous version is unavailable.",
+    "ja": "開発者メニューと復帰機能を持つ公式互換バージョンの組み合わせがまだないため、以前の版には切り替えられません。"
+  },
+  "개발 실행 또는 업데이트 키가 없는 빌드에서는 업데이트를 실행하지 않습니다": {
+    "ko": "개발 실행 또는 업데이트 키가 없는 빌드에서는 업데이트를 실행하지 않습니다",
+    "en": "Updates are disabled for development runs and builds without an update key.",
+    "ja": "開発実行時および更新キーのないビルドでは更新を実行しません"
+  },
+  "업데이트 상태가 바뀌어 설치를 보류했습니다": {
+    "ko": "업데이트 상태가 바뀌어 설치를 보류했습니다",
+    "en": "Installation paused because the update status changed.",
+    "ja": "更新状態が変わったためインストールを保留しました"
+  },
+  "관리 창에서만 업데이트를 실행할 수 있습니다": {
+    "ko": "관리 창에서만 업데이트를 실행할 수 있습니다",
+    "en": "Run updates from the manager.",
+    "ja": "更新は管理画面から実行してください"
+  },
+  "시험 방향을 확인할 수 없습니다": {
+    "ko": "시험 방향을 확인할 수 없습니다",
+    "en": "Unknown test direction.",
+    "ja": "試験の方向を確認できません"
+  },
+  "먼저 약관을 확인하세요": {
+    "ko": "먼저 약관을 확인하세요",
+    "en": "Review the terms first.",
+    "ja": "先に利用規約を確認してください"
+  },
+  "최신 버전 복귀를 확인했습니다. 일반 자동 업데이트 정책을 다시 적용합니다.": {
+    "ko": "최신 버전 복귀를 확인했습니다. 일반 자동 업데이트 정책을 다시 적용합니다.",
+    "en": "Returned to the latest version. Standard automatic updates are active again.",
+    "ja": "最新版への復帰を確認しました。通常の自動更新を再開します。"
+  },
+  "다운로드와 서명 검증을 마쳤습니다. 작업이 안전하게 끝나면 설치합니다": {
+    "ko": "다운로드와 서명 검증을 마쳤습니다. 작업이 안전하게 끝나면 설치합니다",
+    "en": "Downloaded and verified the signature. Installation will begin when active work finishes safely.",
+    "ja": "ダウンロードと署名検証が完了しました。作業が安全に終了したらインストールします"
+  },
+  "수동 시험 대기 중입니다. 준비한 버전 설치·재시작을 눌러야 설치합니다.": {
+    "ko": "수동 시험 대기 중입니다. 준비한 버전 설치·재시작을 눌러야 설치합니다.",
+    "en": "Waiting for a manual test. Select Install prepared version and restart to install.",
+    "ja": "手動試験の待機中です。「準備した版をインストールして再起動」を選択してください。"
+  },
+  "터미널 작업이 실행 중이거나 시작되고 있습니다. 종료를 선택해 작업을 마친 뒤, 숨긴 터미널도 관리 창에서 삭제하고 다시 시도하세요.": {
+    "ko": "터미널 작업이 실행 중이거나 시작되고 있습니다. 종료를 선택해 작업을 마친 뒤, 숨긴 터미널도 관리 창에서 삭제하고 다시 시도하세요.",
+    "en": "A terminal is starting or running. End the task, remove hidden terminals from the manager, and try again.",
+    "ja": "ターミナルが起動中または実行中です。終了を選び、非表示のターミナルも管理画面から削除して再試行してください。"
+  },
+  "화면 캡처나 영역 선택이 끝난 뒤 다시 시도하세요.": {
+    "ko": "화면 캡처나 영역 선택이 끝난 뒤 다시 시도하세요.",
+    "en": "Finish capturing or selecting a region, then retry.",
+    "ja": "画面キャプチャや範囲選択を終えてから再試行してください。"
+  },
+  "메모 숨김·복원 동작이 끝난 뒤 다시 시도하세요.": {
+    "ko": "메모 숨김·복원 동작이 끝난 뒤 다시 시도하세요.",
+    "en": "Wait for notes to finish hiding or restoring, then retry.",
+    "ja": "メモの非表示・復元が完了してから再試行してください。"
+  },
+  "작업 중인 창이 있어 자동 설치를 보류했습니다. 상태를 확인한 뒤 다시 시도하세요.": {
+    "ko": "작업 중인 창이 있어 자동 설치를 보류했습니다. 상태를 확인한 뒤 다시 시도하세요.",
+    "en": "Automatic installation paused because a window is busy. Check its status and retry.",
+    "ja": "作業中のウィンドウがあるため自動インストールを保留しました。状態を確認して再試行してください。"
+  },
+  "새 버전은 준비됐지만 안내 창을 표시하지 못했습니다. 설정에서 업데이트 상태를 확인하세요.": {
+    "ko": "새 버전은 준비됐지만 안내 창을 표시하지 못했습니다. 설정에서 업데이트 상태를 확인하세요.",
+    "en": "The update is ready. The notice could not open. Check update status in Settings.",
+    "ja": "新版の準備は完了しましたが通知を表示できません。設定で更新状態を確認してください。"
+  },
+  "새 업데이트 확인에 실패했습니다. 이미 검증한 업데이트는 설치할 수 있습니다": {
+    "ko": "새 업데이트 확인에 실패했습니다. 이미 검증한 업데이트는 설치할 수 있습니다",
+    "en": "Could not check for a new update. A previously verified update can still be installed.",
+    "ja": "新しい更新を確認できませんでした。検証済みの更新はインストールできます"
+  },
+  "업데이트를 받거나 검증하지 못했습니다. 연결 상태를 확인하고 ‘다시 확인’을 누르세요. 반복되면 공식 릴리스의 설치 파일로 수동 설치하세요.": {
+    "ko": "업데이트를 받거나 검증하지 못했습니다. 연결 상태를 확인하고 ‘다시 확인’을 누르세요. 반복되면 공식 릴리스의 설치 파일로 수동 설치하세요.",
+    "en": "Could not download or verify the update. Check your connection and select Check again. If this repeats, use the official release installer.",
+    "ja": "更新を取得または検証できませんでした。接続を確認して再確認してください。繰り返す場合は公式版を手動でインストールしてください。"
+  },
+  "업데이트를 확인하고 있습니다": {
+    "ko": "업데이트를 확인하고 있습니다",
+    "en": "Checking for updates…",
+    "ja": "更新を確認中です"
+  },
+  "최신 버전입니다": {
+    "ko": "최신 버전입니다",
+    "en": "You have the latest version.",
+    "ja": "最新版です"
+  },
+  "업데이트를 다운로드하고 있습니다": {
+    "ko": "업데이트를 다운로드하고 있습니다",
+    "en": "Downloading update…",
+    "ja": "更新をダウンロード中です"
+  },
+  "터미널 세션을 종료한 뒤 설치할 수 있습니다. 숨긴 터미널도 포함됩니다": {
+    "ko": "터미널 세션을 종료한 뒤 설치할 수 있습니다. 숨긴 터미널도 포함됩니다",
+    "en": "Close all terminal sessions, including hidden ones, before installing.",
+    "ja": "非表示のものも含めてターミナルを終了してからインストールしてください"
+  },
+  "캡처 또는 창 전환이 끝나면 설치합니다": {
+    "ko": "캡처 또는 창 전환이 끝나면 설치합니다",
+    "en": "Installation will start after screen capture or window switching finishes.",
+    "ja": "キャプチャまたはウィンドウの切り替え後にインストールします"
+  },
+  "작업 상태를 확인하고 있습니다": {
+    "ko": "작업 상태를 확인하고 있습니다",
+    "en": "Checking active tasks…",
+    "ja": "作業状態を確認中です"
+  },
+  "창의 설치 준비 응답 시간이 초과됐습니다. 작업을 저장한 뒤 다시 시도하세요. 반복되면 짜잔을 수동으로 종료하고 다시 실행하세요.": {
+    "ko": "창의 설치 준비 응답 시간이 초과됐습니다. 작업을 저장한 뒤 다시 시도하세요. 반복되면 짜잔을 수동으로 종료하고 다시 실행하세요.",
+    "en": "A window timed out during installation preparation. Save your work and retry. If this repeats, quit and reopen Jajan.",
+    "ja": "インストール準備中にウィンドウがタイムアウトしました。作業を保存して再試行してください。繰り返す場合はJajanを手動で終了し、再起動してください。"
+  },
+  "작업 상태가 바뀌어 설치를 보류했습니다": {
+    "ko": "작업 상태가 바뀌어 설치를 보류했습니다",
+    "en": "Installation paused because task status changed.",
+    "ja": "作業状態が変わったためインストールを保留しました"
+  },
+  "다시 사용 중이어서 설치를 보류했습니다": {
+    "ko": "다시 사용 중이어서 설치를 보류했습니다",
+    "en": "Installation paused because activity resumed.",
+    "ja": "操作が再開されたためインストールを保留しました"
+  },
+  "보관된 업데이트를 확인하고 있습니다": {
+    "ko": "보관된 업데이트를 확인하고 있습니다",
+    "en": "Checking the saved update…",
+    "ja": "保存した更新を確認中です"
+  },
+  "보관된 시험 패키지를 검증하지 못했습니다. 수동 대기를 유지합니다. 개발자 메뉴에서 최신 배포판을 다시 준비하세요.": {
+    "ko": "보관된 시험 패키지를 검증하지 못했습니다. 수동 대기를 유지합니다. 개발자 메뉴에서 최신 배포판을 다시 준비하세요.",
+    "en": "Could not verify the saved test package. The manual test remains paused. Prepare the latest release again in Developer settings.",
+    "ja": "保存した試験用パッケージを検証できませんでした。手動待機を維持します。開発者設定で最新リリースを準備し直してください。"
+  },
+  "보관된 업데이트를 검증하지 못했습니다. 다시 다운로드합니다": {
+    "ko": "보관된 업데이트를 검증하지 못했습니다. 다시 다운로드합니다",
+    "en": "Could not verify the saved update. Downloading it again.",
+    "ja": "保存した更新を検証できなかったため再ダウンロードします"
+  },
+  "업데이트를 자동으로 확인합니다": {
+    "ko": "업데이트를 자동으로 확인합니다",
+    "en": "Checking for updates automatically.",
+    "ja": "更新を自動で確認します"
+  },
+  "자동 실행 선택을 읽지 못했습니다.": {
+    "ko": "자동 실행 선택을 읽지 못했습니다.",
+    "en": "Could not read the startup preference.",
+    "ja": "自動起動の設定を読み込めませんでした。"
+  },
+  "자동 실행 선택 파일이 너무 큽니다.": {
+    "ko": "자동 실행 선택 파일이 너무 큽니다.",
+    "en": "The startup preference file is too large.",
+    "ja": "自動起動の設定ファイルが大きすぎます。"
+  },
+  "자동 실행 저장 경로 오류": {
+    "ko": "자동 실행 저장 경로 오류",
+    "en": "Invalid startup preference path.",
+    "ja": "自動起動設定の保存先が無効です。"
+  },
+  "관리 창에서만 자동 실행을 설정할 수 있습니다.": {
+    "ko": "관리 창에서만 자동 실행을 설정할 수 있습니다.",
+    "en": "Change launch at login in the manager.",
+    "ja": "ログイン時の起動は管理画面で設定してください。"
+  },
+  "로그인 자동 실행은 macOS 13 이상에서 지원합니다.": {
+    "ko": "로그인 자동 실행은 macOS 13 이상에서 지원합니다.",
+    "en": "Launch at login requires macOS 13 or later.",
+    "ja": "ログイン時の起動にはmacOS 13以降が必要です。"
+  },
+  "설치 앱 번들을 확인하지 못했습니다. 공식 설치 파일에서 Jajan을 응용 프로그램 폴더에 다시 설치한 뒤 Finder에서 여세요.": {
+    "ko": "설치 앱 번들을 확인하지 못했습니다. 공식 설치 파일에서 Jajan을 응용 프로그램 폴더에 다시 설치한 뒤 Finder에서 여세요.",
+    "en": "Could not identify the installed app bundle. Reinstall Jajan in Applications using the official installer, then open it from Finder.",
+    "ja": "インストール済みのアプリを確認できません。公式版をアプリケーションフォルダに再インストールし、Finderから開いてください。"
+  },
+  "macOS가 앱을 임시 격리 경로에서 실행했습니다. 앱을 종료하고 Finder의 응용 프로그램 폴더에서 Jajan을 여세요. 반복되면 공식 설치 파일을 다시 받아 Finder로 다시 설치하세요. 보안 속성을 제거할 필요는 없습니다.": {
+    "ko": "macOS가 앱을 임시 격리 경로에서 실행했습니다. 앱을 종료하고 Finder의 응용 프로그램 폴더에서 Jajan을 여세요. 반복되면 공식 설치 파일을 다시 받아 Finder로 다시 설치하세요. 보안 속성을 제거할 필요는 없습니다.",
+    "en": "macOS opened the app from a temporary location. Quit and reopen Jajan from Applications in Finder. If this repeats, download the official installer and reinstall using Finder. Security attributes can stay in place.",
+    "ja": "macOSが一時隔離パスから起動しました。終了してFinderのアプリケーションフォルダから開き直してください。繰り返す場合は公式版を再取得しFinderから再インストールしてください。セキュリティ属性の削除は不要です。"
+  },
+  "자동 실행 환경을 확인하지 못했습니다.": {
+    "ko": "자동 실행 환경을 확인하지 못했습니다.",
+    "en": "Could not determine the startup environment.",
+    "ja": "自動起動環境を確認できませんでした。"
+  },
+  "macOS가 이 앱의 로그인 서비스를 찾지 못했습니다. 앱을 종료하고 응용 프로그램 폴더에서 다시 여세요. 계속되면 공식 설치 파일로 다시 설치하거나 시스템 설정의 일반 → 로그인 항목 및 확장 프로그램 → 로그인 시 열기에서 Jajan을 직접 추가하세요. 앱 선택과 OS 등록 상태는 다를 수 있습니다.": {
+    "ko": "macOS가 이 앱의 로그인 서비스를 찾지 못했습니다. 앱을 종료하고 응용 프로그램 폴더에서 다시 여세요. 계속되면 공식 설치 파일로 다시 설치하거나 시스템 설정의 일반 → 로그인 항목 및 확장 프로그램 → 로그인 시 열기에서 Jajan을 직접 추가하세요. 앱 선택과 OS 등록 상태는 다를 수 있습니다.",
+    "en": "macOS could not find the app’s login service. Quit and reopen it from Applications. If needed, reinstall the official app or add Jajan under System Settings → General → Login Items & Extensions → Open at Login. The app preference and OS registration may differ.",
+    "ja": "macOSがログインサービスを見つけられません。終了しアプリケーションフォルダから開き直してください。改善しない場合は公式版を再インストールするか、システム設定 → 一般 → ログイン項目と機能拡張 → ログイン時に開く、からJajanを追加してください。アプリの選択とOSの登録状態は異なる場合があります。"
+  },
+  "macOS 자동 실행 상태를 확인하지 못했습니다.": {
+    "ko": "macOS 자동 실행 상태를 확인하지 못했습니다.",
+    "en": "Could not read macOS login item status.",
+    "ja": "macOSのログイン項目の状態を確認できませんでした。"
+  },
+  "로그인 항목을 변경하지 못했습니다. 시스템 설정에서 현재 상태를 확인하세요.": {
+    "ko": "로그인 항목을 변경하지 못했습니다. 시스템 설정에서 현재 상태를 확인하세요.",
+    "en": "Could not change the login item. Check System Settings.",
+    "ja": "ログイン項目を変更できませんでした。システム設定を確認してください。"
+  },
+  "다른 경로의 자동 실행 항목을 변경하지 않았습니다. 기존 설치 앱에서 설정하세요.": {
+    "ko": "다른 경로의 자동 실행 항목을 변경하지 않았습니다. 기존 설치 앱에서 설정하세요.",
+    "en": "A login item at another path was left in place. Change it from the installed app.",
+    "ja": "別のパスのログイン項目を保持しました。既存のアプリから設定してください。"
+  },
+  "자동 실행 경로를 읽지 못했습니다.": {
+    "ko": "자동 실행 경로를 읽지 못했습니다.",
+    "en": "Could not read the startup path.",
+    "ja": "自動起動のパスを読み込めませんでした。"
+  },
+  "자동 실행 경로가 올바르지 않습니다.": {
+    "ko": "자동 실행 경로가 올바르지 않습니다.",
+    "en": "Invalid startup path.",
+    "ja": "自動起動のパスが無効です。"
+  },
+  "자동 실행 경로가 너무 깁니다.": {
+    "ko": "자동 실행 경로가 너무 깁니다.",
+    "en": "The startup path is too long.",
+    "ja": "自動起動のパスが長すぎます。"
+  },
+  "다른 경로의 Jajan 자동 실행 항목이 있습니다. 기존 설치 앱에서 설정하세요.": {
+    "ko": "다른 경로의 Jajan 자동 실행 항목이 있습니다. 기존 설치 앱에서 설정하세요.",
+    "en": "A Jajan startup item points to another path. Change it from the installed app.",
+    "ja": "別のパスのJajan起動項目があります。既存のアプリから設定してください。"
+  },
+  "등록됨 · Windows 허용 여부 미확인. Windows 시작 앱에서 Jajan의 켜짐/꺼짐을 확인하세요.": {
+    "ko": "등록됨 · Windows 허용 여부 미확인. Windows 시작 앱에서 Jajan의 켜짐/꺼짐을 확인하세요.",
+    "en": "Registered. Check whether Jajan is enabled under Windows Startup Apps.",
+    "ja": "登録済みです。WindowsのスタートアップアプリでJajanが有効か確認してください。"
+  },
+  "Windows 시작 앱 설정을 열지 못했습니다.": {
+    "ko": "Windows 시작 앱 설정을 열지 못했습니다.",
+    "en": "Could not open Windows Startup Apps settings.",
+    "ja": "Windowsのスタートアップアプリ設定を開けませんでした。"
+  },
+  "최근 입력이 있어 자동 설치를 보류했습니다. 30초 동안 조작하지 않으면 자동 설치합니다.": {
+    "ko": "최근 입력이 있어 자동 설치를 보류했습니다. 30초 동안 조작하지 않으면 자동 설치합니다.",
+    "en": "Installation paused after recent input. Installation starts after 30 seconds without input.",
+    "ja": "最近の操作により自動インストールを保留しました。30秒間操作がないと開始します。"
+  },
+  "최근 입력이 있어 자동 설치를 보류했습니다. 5분 동안 조작하지 않으면 자동 설치합니다.": {
+    "ko": "최근 입력이 있어 자동 설치를 보류했습니다. 5분 동안 조작하지 않으면 자동 설치합니다.",
+    "en": "Installation paused after recent input. Installation starts after five minutes without input.",
+    "ja": "最近の操作により自動インストールを保留しました。5分間操作がないと開始します。"
+  },
+  "사용자 입력 상태를 확인할 수 없어 자동 설치를 보류했습니다.": {
+    "ko": "사용자 입력 상태를 확인할 수 없어 자동 설치를 보류했습니다.",
+    "en": "Installation paused because input activity could not be checked.",
+    "ja": "入力状態を確認できないため自動インストールを保留しました。"
+  },
+  "업데이트 설치를 준비하고 있습니다. 잠시 후 다시 시도하세요": {
+    "ko": "업데이트 설치를 준비하고 있습니다. 잠시 후 다시 시도하세요",
+    "en": "Preparing to install the update. Try again shortly.",
+    "ja": "更新のインストールを準備中です。しばらくしてから再試行してください"
+  },
+  "진행 중인 작업이 끝나면 설치합니다": {
+    "ko": "진행 중인 작업이 끝나면 설치합니다",
+    "en": "Installation will start when active tasks finish.",
+    "ja": "実行中の作業が終了するとインストールします"
+  },
+  "편집·저장 중인 창이 있어 설치를 보류했습니다": {
+    "ko": "편집·저장 중인 창이 있어 설치를 보류했습니다",
+    "en": "Installation paused while a window is editing or saving.",
+    "ja": "編集・保存中のウィンドウがあるためインストールを保留しました"
+  },
+  "내보내기가 끝나면 설치할 수 있습니다": {
+    "ko": "내보내기가 끝나면 설치할 수 있습니다",
+    "en": "Finish exporting before installing.",
+    "ja": "書き出しが終了するとインストールできます"
+  },
+  "개인정보 설정 작업이 끝나면 설치할 수 있습니다": {
+    "ko": "개인정보 설정 작업이 끝나면 설치할 수 있습니다",
+    "en": "Finish changing privacy settings before installing.",
+    "ja": "プライバシー設定が完了するとインストールできます"
+  },
+  "내부 요청이 처리 중이어서 설치를 보류했습니다": {
+    "ko": "내부 요청이 처리 중이어서 설치를 보류했습니다",
+    "en": "Installation paused while an internal request is running.",
+    "ja": "内部リクエストを処理中のためインストールを保留しました"
+  },
+  "창이 설치 준비를 보류했습니다": {
+    "ko": "창이 설치 준비를 보류했습니다",
+    "en": "A window is not ready for installation.",
+    "ja": "ウィンドウがインストール準備を保留しました"
+  },
+  "공식 호환 시험 버전 쌍이 아직 없습니다": {
+    "ko": "공식 호환 시험 버전 쌍이 아직 없습니다",
+    "en": "No compatible official test version pair is available yet.",
+    "ja": "公式の互換試験バージョンの組み合わせはまだありません"
+  },
+  "이 빌드는 지정된 격리 호환 버전 쌍에 포함되지 않습니다": {
+    "ko": "이 빌드는 지정된 격리 호환 버전 쌍에 포함되지 않습니다",
+    "en": "This build is outside the designated isolated version pair.",
+    "ja": "このビルドは指定の隔離試験バージョンの組み合わせに含まれていません"
+  },
+  "업데이트 안내 창에서만 실행할 수 있습니다": {
+    "ko": "업데이트 안내 창에서만 실행할 수 있습니다",
+    "en": "Use the update notice to run this action.",
+    "ja": "更新通知から実行してください"
+  },
+  "호환 시험 버전 쌍이 없습니다": {
+    "ko": "호환 시험 버전 쌍이 없습니다",
+    "en": "No compatible test version pair is available.",
+    "ja": "互換試験バージョンの組み合わせがありません"
+  },
+  "허용된 호환 버전 쌍이 아닙니다": {
+    "ko": "허용된 호환 버전 쌍이 아닙니다",
+    "en": "This version pair is not permitted.",
+    "ja": "許可されたバージョンの組み合わせではありません"
+  },
+  "검증 빌드의 업데이트 공개키가 Tauri 설정과 일치하지 않습니다": {
+    "ko": "검증 빌드의 업데이트 공개키가 Tauri 설정과 일치하지 않습니다",
+    "en": "The verification build’s update key differs from the Tauri configuration.",
+    "ja": "検証ビルドの更新公開鍵がTauriの設定と一致しません"
+  },
+  "시험 상태 폴더가 없습니다": {
+    "ko": "시험 상태 폴더가 없습니다",
+    "en": "The test state folder is missing.",
+    "ja": "試験状態のフォルダがありません"
+  },
+  "보관된 호환 시험 버전 쌍이 일치하지 않습니다": {
+    "ko": "보관된 호환 시험 버전 쌍이 일치하지 않습니다",
+    "en": "The saved test versions do not match.",
+    "ja": "保存済みの互換試験バージョンが一致しません"
+  },
+  "보관된 버전이 없습니다": {
+    "ko": "보관된 버전이 없습니다",
+    "en": "No saved version is available.",
+    "ja": "保存済みのバージョンがありません"
+  },
+  "보관된 업데이트의 설치 정책을 확인할 수 없습니다": {
+    "ko": "보관된 업데이트의 설치 정책을 확인할 수 없습니다",
+    "en": "Could not determine the saved update’s installation policy.",
+    "ja": "保存済みの更新のインストール方針を確認できません"
+  },
+  "검증 피드의 업데이트 파일 경로가 일치하지 않습니다": {
+    "ko": "검증 피드의 업데이트 파일 경로가 일치하지 않습니다",
+    "en": "The update file path differs from the verification feed.",
+    "ja": "検証フィードの更新ファイルのパスが一致しません"
+  },
+  "이 플랫폼의 공식 릴리스 업데이트 파일이 아닙니다": {
+    "ko": "이 플랫폼의 공식 릴리스 업데이트 파일이 아닙니다",
+    "en": "This file is not an official update for this platform.",
+    "ja": "このプラットフォームの公式更新ファイルではありません"
+  },
+  "서명에 플랫폼 파일 이름이 없습니다": {
+    "ko": "서명에 플랫폼 파일 이름이 없습니다",
+    "en": "The signature has no platform file name.",
+    "ja": "署名にプラットフォーム別のファイル名がありません"
+  },
+  "서명된 업데이트 플랫폼이 일치하지 않습니다": {
+    "ko": "서명된 업데이트 플랫폼이 일치하지 않습니다",
+    "en": "The signed update is for a different platform.",
+    "ja": "署名された更新のプラットフォームが一致しません"
+  },
+  "업데이트 안내 상태 폴더가 없습니다": {
+    "ko": "업데이트 안내 상태 폴더가 없습니다",
+    "en": "The update notice state folder is missing.",
+    "ja": "更新通知の状態フォルダがありません"
+  },
+  "공식 최신 피드에 현재 버전 이상의 안정 배포판이 없습니다": {
+    "ko": "공식 최신 피드에 현재 버전 이상의 안정 배포판이 없습니다",
+    "en": "The official feed has no stable release at or above the installed version.",
+    "ja": "公式フィードには現在のバージョン以上の安定版がありません"
+  },
+  "업데이트를 설치하고 재시작합니다": {
+    "ko": "업데이트를 설치하고 재시작합니다",
+    "en": "Installing the update and restarting.",
+    "ja": "更新をインストールして再起動します"
+  },
+  "다운로드된 업데이트가 없습니다": {
+    "ko": "다운로드된 업데이트가 없습니다",
+    "en": "No downloaded update is available.",
+    "ja": "ダウンロード済みの更新がありません"
+  },
+  "메모 창에서만 사용할 수 있습니다": {
+    "ko": "메모 창에서만 사용할 수 있습니다",
+    "en": "Use this action in a note window.",
+    "ja": "メモウィンドウから実行してください"
+  },
+  "메모를 찾을 수 없습니다": {
+    "ko": "메모를 찾을 수 없습니다",
+    "en": "Note not found.",
+    "ja": "メモが見つかりません"
+  },
+  "메모 창이 아닙니다": {
+    "ko": "메모 창이 아닙니다",
+    "en": "Select a note window.",
+    "ja": "メモウィンドウを選択してください"
+  },
+  "PNG 이미지": {
+    "ko": "PNG 이미지",
+    "en": "PNG image",
+    "ja": "PNG画像"
+  },
+  "저장할 폴더가 없습니다": {
+    "ko": "저장할 폴더가 없습니다",
+    "en": "The destination folder is missing.",
+    "ja": "保存先フォルダがありません"
+  },
+  "메모 툴바에서만 연결할 수 있습니다": {
+    "ko": "메모 툴바에서만 연결할 수 있습니다",
+    "en": "Connect notes from the note toolbar.",
+    "ja": "メモのツールバーから接続してください"
+  },
+  "메모 툴바가 아닙니다": {
+    "ko": "메모 툴바가 아닙니다",
+    "en": "Select the note toolbar.",
+    "ja": "メモのツールバーを選択してください"
+  },
+  "이 앱에서 연결 기능이 활성화되지 않았습니다": {
+    "ko": "이 앱에서 연결 기능이 활성화되지 않았습니다",
+    "en": "Connections are disabled in this app.",
+    "ja": "このアプリでは接続機能が無効です"
+  },
+  "전체 숨김을 복원한 뒤 연결해 주세요": {
+    "ko": "전체 숨김을 복원한 뒤 연결해 주세요",
+    "en": "Restore hidden notes before connecting them.",
+    "ja": "すべての非表示メモを復元してから接続してください"
+  },
+  "표시된 메모에서 연결해 주세요": {
+    "ko": "표시된 메모에서 연결해 주세요",
+    "en": "Start the connection from a visible note.",
+    "ja": "表示中のメモから接続してください"
+  },
+  "사용 가능한 화면이 없습니다": {
+    "ko": "사용 가능한 화면이 없습니다",
+    "en": "No screen is available.",
+    "ja": "使用できる画面がありません"
+  },
+  "연결이 취소됐습니다": {
+    "ko": "연결이 취소됐습니다",
+    "en": "Connection canceled.",
+    "ja": "接続をキャンセルしました"
+  },
+  "연결이 활성화되지 않았습니다": {
+    "ko": "연결이 활성화되지 않았습니다",
+    "en": "Connection is inactive.",
+    "ja": "接続が有効ではありません"
+  },
+  "이전 연결 요청입니다": {
+    "ko": "이전 연결 요청입니다",
+    "en": "This connection request has expired.",
+    "ja": "古い接続リクエストです"
+  },
+  "유효하지 않은 포인터 위치입니다": {
+    "ko": "유효하지 않은 포인터 위치입니다",
+    "en": "Invalid pointer position.",
+    "ja": "ポインタの位置が無効です"
+  },
+  "출발 메모가 숨겨지거나 닫혔습니다": {
+    "ko": "출발 메모가 숨겨지거나 닫혔습니다",
+    "en": "The source note was hidden or closed.",
+    "ja": "接続元のメモが非表示または閉じられました"
+  },
+  "연결 설정창 전용입니다": {
+    "ko": "연결 설정창 전용입니다",
+    "en": "Use the connection settings window.",
+    "ja": "接続設定ウィンドウから実行してください"
+  },
+  "대상 메모가 없습니다": {
+    "ko": "대상 메모가 없습니다",
+    "en": "The target note is missing.",
+    "ja": "接続先のメモがありません"
+  },
+  "웹 메모": {
+    "ko": "웹 메모",
+    "en": "Web note",
+    "ja": "ウェブメモ"
+  },
+  "진행 중인 연결이 없습니다": {
+    "ko": "진행 중인 연결이 없습니다",
+    "en": "No connection is in progress.",
+    "ja": "接続の操作が進行していません"
+  },
+  "현재 연결의 창이 아닙니다": {
+    "ko": "현재 연결의 창이 아닙니다",
+    "en": "This window belongs to another connection.",
+    "ja": "現在の接続のウィンドウではありません"
+  },
+  "URL은 자격증명 없는 HTTP(S) 웹 주소여야 합니다": {
+    "ko": "URL은 자격증명 없는 HTTP(S) 웹 주소여야 합니다",
+    "en": "Enter an HTTP or HTTPS address without credentials.",
+    "ja": "認証情報を含まないHTTPまたはHTTPSアドレスを入力してください"
+  },
+  "웹 창을 찾을 수 없습니다": {
+    "ko": "웹 창을 찾을 수 없습니다",
+    "en": "Web window not found.",
+    "ja": "ウェブウィンドウが見つかりません"
+  },
+  "웹 창 종료 중입니다": {
+    "ko": "웹 창 종료 중입니다",
+    "en": "The web window is closing.",
+    "ja": "ウェブウィンドウを終了中です"
+  },
+  "약관 확인이 필요합니다": {
+    "ko": "약관 확인이 필요합니다",
+    "en": "Review the Terms of Use first.",
+    "ja": "利用規約の確認が必要です"
+  },
+  "웹 세션이 종료되었거나 변경되었습니다": {
+    "ko": "웹 세션이 종료되었거나 변경되었습니다",
+    "en": "The web session ended or changed.",
+    "ja": "ウェブセッションが終了または変更されました"
+  },
+  "웹 콘텐츠를 찾을 수 없습니다": {
+    "ko": "웹 콘텐츠를 찾을 수 없습니다",
+    "en": "Web content not found.",
+    "ja": "ウェブコンテンツが見つかりません"
+  },
+  "같은 ID의 메모가 이미 있습니다. 다른 웹 창 ID를 사용하세요": {
+    "ko": "같은 ID의 메모가 이미 있습니다. 다른 웹 창 ID를 사용하세요",
+    "en": "A note already uses this ID. Choose another web window ID.",
+    "ja": "同じIDのメモがあります。別のウェブウィンドウIDを選んでください"
+  },
+  "웹 창의 내용은 web 명령으로 변경하세요": {
+    "ko": "웹 창의 내용은 web 명령으로 변경하세요",
+    "en": "Use the web command to change web window content.",
+    "ja": "ウェブウィンドウの内容はwebコマンドで変更してください"
+  },
+  "웹 창에는 web/open/inspect/close 또는 색상만 지정한 update를 사용하세요": {
+    "ko": "웹 창에는 web/open/inspect/close 또는 색상만 지정한 update를 사용하세요",
+    "en": "Use web, open, inspect, close, or a color-only update for web windows.",
+    "ja": "ウェブウィンドウにはweb、open、inspect、close、または色だけを指定したupdateを使用してください"
+  },
+  "웹 시작 화면에서만 사용할 수 있습니다": {
+    "ko": "웹 시작 화면에서만 사용할 수 있습니다",
+    "en": "Use this action on the web start screen.",
+    "ja": "ウェブの開始画面から実行してください"
+  },
+  "웹 Welcome에서만 실행할 수 있습니다": {
+    "ko": "웹 Welcome에서만 실행할 수 있습니다",
+    "en": "Use this action on the web welcome screen.",
+    "ja": "ウェブの開始画面から実行してください"
+  },
+  "웹 시작 화면이 종료되었습니다": {
+    "ko": "웹 시작 화면이 종료되었습니다",
+    "en": "The web start screen has closed.",
+    "ja": "ウェブの開始画面は終了しました"
+  },
+  "현재 페이지 주소가 없습니다": {
+    "ko": "현재 페이지 주소가 없습니다",
+    "en": "There is no current page address.",
+    "ja": "現在のページのアドレスがありません"
+  },
+  "웹 툴바에서만 실행할 수 있습니다": {
+    "ko": "웹 툴바에서만 실행할 수 있습니다",
+    "en": "Use this action in the web toolbar.",
+    "ja": "ウェブツールバーから実行してください"
+  },
+  "열린 웹페이지가 없습니다": {
+    "ko": "열린 웹페이지가 없습니다",
+    "en": "No web page is open.",
+    "ja": "開いているウェブページがありません"
+  },
+  "지원하지 않는 페이지 배율입니다": {
+    "ko": "지원하지 않는 페이지 배율입니다",
+    "en": "Unsupported page zoom.",
+    "ja": "未対応のページ倍率です"
+  },
+  "최근 주소를 읽을 수 없습니다": {
+    "ko": "최근 주소를 읽을 수 없습니다",
+    "en": "Could not read recent addresses.",
+    "ja": "最近のアドレスを読み込めません"
+  },
+  "최근 주소 파일이 너무 큽니다": {
+    "ko": "최근 주소 파일이 너무 큽니다",
+    "en": "The recent addresses file is too large.",
+    "ja": "最近のアドレスのファイルが大きすぎます"
+  },
+  "최근 주소 파일을 읽을 수 없습니다": {
+    "ko": "최근 주소 파일을 읽을 수 없습니다",
+    "en": "Could not read the recent addresses file.",
+    "ja": "最近のアドレスのファイルを読み込めません"
+  },
+  "최근 주소를 저장할 수 없습니다": {
+    "ko": "최근 주소를 저장할 수 없습니다",
+    "en": "Could not save recent addresses.",
+    "ja": "最近のアドレスを保存できません"
+  },
+  "관리 창에서만 테마를 변경할 수 있습니다": {
+    "ko": "관리 창에서만 테마를 변경할 수 있습니다",
+    "en": "Change the theme in the manager.",
+    "ja": "テーマは管理画面で変更してください"
+  },
+  "관리 창에서만 조회할 수 있습니다": {
+    "ko": "관리 창에서만 조회할 수 있습니다",
+    "en": "View this in the manager.",
+    "ja": "管理画面で確認してください"
+  },
+  "이미지 메모가 아닙니다": {
+    "ko": "이미지 메모가 아닙니다",
+    "en": "Select an image note.",
+    "ja": "画像メモを選択してください"
+  },
+  "텍스트 메모에서만 편집할 수 있습니다": {
+    "ko": "텍스트 메모에서만 편집할 수 있습니다",
+    "en": "Only text notes can be edited.",
+    "ja": "テキストメモでのみ編集できます"
+  },
+  "화면을 찾지 못했습니다": {
+    "ko": "화면을 찾지 못했습니다",
+    "en": "Screen not found.",
+    "ja": "画面が見つかりません"
+  },
+  "메모 툴바에서만 실행할 수 있습니다": {
+    "ko": "메모 툴바에서만 실행할 수 있습니다",
+    "en": "Use this action from the note toolbar.",
+    "ja": "メモのツールバーから実行してください"
+  },
+  "메모 창을 찾을 수 없습니다": {
+    "ko": "메모 창을 찾을 수 없습니다",
+    "en": "Note window not found.",
+    "ja": "メモウィンドウが見つかりません"
+  },
+  "화면을 찾을 수 없습니다": {
+    "ko": "화면을 찾을 수 없습니다",
+    "en": "Could not find the screen.",
+    "ja": "画面を確認できません"
+  },
+  "접힌 메모는 펼친 뒤 크기를 조절하세요": {
+    "ko": "접힌 메모는 펼친 뒤 크기를 조절하세요",
+    "en": "Expand the note before resizing.",
+    "ja": "メモを展開してからサイズを変更してください"
+  },
+  "유효하지 않은 패널 크기입니다": {
+    "ko": "유효하지 않은 패널 크기입니다",
+    "en": "Invalid panel size.",
+    "ja": "パネルサイズが無効です"
+  },
+  "메모 모아보기에서만 실행할 수 있습니다": {
+    "ko": "메모 모아보기에서만 실행할 수 있습니다",
+    "en": "Use this action in the note overview.",
+    "ja": "メモ一覧表示から実行してください"
+  },
+  "홈 폴더를 찾을 수 없습니다": {
+    "ko": "홈 폴더를 찾을 수 없습니다",
+    "en": "Home folder not found.",
+    "ja": "ホームフォルダが見つかりません"
+  },
+  "터미널 창이 없습니다": {
+    "ko": "터미널 창이 없습니다",
+    "en": "Terminal window not found.",
+    "ja": "ターミナルウィンドウがありません"
+  },
+  "SystemRoot가 없습니다": {
+    "ko": "SystemRoot가 없습니다",
+    "en": "SystemRoot is missing.",
+    "ja": "SystemRootがありません"
+  },
+  "지원하지 않는 실행 항목입니다": {
+    "ko": "지원하지 않는 실행 항목입니다",
+    "en": "Unsupported launch item.",
+    "ja": "未対応の起動項目です"
+  },
+  "실행 파일을 찾을 수 없습니다. 설치 상태를 확인하세요": {
+    "ko": "실행 파일을 찾을 수 없습니다. 설치 상태를 확인하세요",
+    "en": "Executable not found. Check the installation.",
+    "ja": "実行ファイルが見つかりません。インストール状態を確認してください"
+  },
+  "실행 중에는 셸에서 폴더를 변경하세요": {
+    "ko": "실행 중에는 셸에서 폴더를 변경하세요",
+    "en": "Change folders in the shell while the terminal is running.",
+    "ja": "実行中はシェルからフォルダを変更してください"
+  },
+  "사용 가능한 폴더가 아닙니다": {
+    "ko": "사용 가능한 폴더가 아닙니다",
+    "en": "This folder is unavailable.",
+    "ja": "使用できないフォルダです"
+  },
+  "제목은 한 줄, 120자 이하여야 합니다": {
+    "ko": "제목은 한 줄, 120자 이하여야 합니다",
+    "en": "The title must fit on one line and contain at most 120 characters.",
+    "ja": "タイトルは1行で120文字以内にしてください"
+  },
+  "터미널 세션이 변경되었습니다": {
+    "ko": "터미널 세션이 변경되었습니다",
+    "en": "The terminal session changed.",
+    "ja": "ターミナルセッションが変わりました"
+  },
+  "마지막 폴더가 없습니다. 다른 폴더를 선택하세요": {
+    "ko": "마지막 폴더가 없습니다. 다른 폴더를 선택하세요",
+    "en": "The previous folder is missing. Choose another folder.",
+    "ja": "前回のフォルダが見つかりません。別のフォルダを選んでください"
+  },
+  "자동 복원할 프로그램을 확인할 수 없습니다": {
+    "ko": "자동 복원할 프로그램을 확인할 수 없습니다",
+    "en": "Could not identify the program to restore automatically.",
+    "ja": "自動復元するプログラムを確認できません"
+  },
+  "실행 계획을 확인하세요": {
+    "ko": "실행 계획을 확인하세요",
+    "en": "Review the execution plan.",
+    "ja": "実行計画を確認してください"
+  },
+  "앱이 종료 중입니다": {
+    "ko": "앱이 종료 중입니다",
+    "en": "The app is quitting.",
+    "ja": "アプリを終了中です"
+  },
+  "이미 시작 중이거나 시작된 세션입니다. 창을 숨겼다가 복원하세요": {
+    "ko": "이미 시작 중이거나 시작된 세션입니다. 창을 숨겼다가 복원하세요",
+    "en": "The session is running or starting. Hide and restore its window.",
+    "ja": "セッションは起動中または実行中です。ウィンドウを隠して復元してください"
+  },
+  "터미널 시작이 취소되었습니다": {
+    "ko": "터미널 시작이 취소되었습니다",
+    "en": "Terminal startup was canceled.",
+    "ja": "ターミナルの起動をキャンセルしました"
+  },
+  "터미널 메타데이터를 저장할 수 없습니다": {
+    "ko": "터미널 메타데이터를 저장할 수 없습니다",
+    "en": "Could not save terminal metadata.",
+    "ja": "ターミナルのメタデータを保存できません"
+  },
+  "잘못된 터미널 ID": {
+    "ko": "잘못된 터미널 ID",
+    "en": "Invalid terminal ID.",
+    "ja": "ターミナルIDが無効です"
+  },
+  "터미널 창은 내용 갱신을 지원하지 않습니다": {
+    "ko": "터미널 창은 내용 갱신을 지원하지 않습니다",
+    "en": "Terminal window content cannot be updated.",
+    "ja": "ターミナルウィンドウの内容は更新できません"
+  },
+  "터미널 창이 아닙니다": {
+    "ko": "터미널 창이 아닙니다",
+    "en": "Select a terminal window.",
+    "ja": "ターミナルウィンドウを選択してください"
+  },
+  "터미널 크기 범위를 벗어났습니다": {
+    "ko": "터미널 크기 범위를 벗어났습니다",
+    "en": "Terminal size is out of range.",
+    "ja": "ターミナルサイズが範囲外です"
+  },
+  "터미널 실행 요청이 대기 중입니다": {
+    "ko": "터미널 실행 요청이 대기 중입니다",
+    "en": "A terminal launch request is pending.",
+    "ja": "ターミナルの起動リクエストを待機中です"
+  },
+  "PTY 세션 종료": {
+    "ko": "PTY 세션 종료",
+    "en": "PTY session ended",
+    "ja": "PTYセッション終了"
+  },
+  "실행 중인 세션이 없습니다": {
+    "ko": "실행 중인 세션이 없습니다",
+    "en": "No session is running.",
+    "ja": "実行中のセッションがありません"
+  },
+  "입력은 64KiB 이하여야 합니다": {
+    "ko": "입력은 64KiB 이하여야 합니다",
+    "en": "Input must be 64 KiB or less.",
+    "ja": "入力は64 KiB以下にしてください"
+  },
+  "종료된 세션입니다": {
+    "ko": "종료된 세션입니다",
+    "en": "The session has ended.",
+    "ja": "終了したセッションです"
+  },
+  "터미널이 종료 중입니다": {
+    "ko": "터미널이 종료 중입니다",
+    "en": "The terminal is closing.",
+    "ja": "ターミナルを終了中です"
+  },
+  "PTY 파일 디스크립터가 없습니다": {
+    "ko": "PTY 파일 디스크립터가 없습니다",
+    "en": "The PTY file descriptor is missing.",
+    "ja": "PTYのファイル記述子がありません"
+  },
+  "터미널을 생성할 수 없습니다": {
+    "ko": "터미널을 생성할 수 없습니다",
+    "en": "Could not create the terminal.",
+    "ja": "ターミナルを作成できません"
+  },
+  "터미널을 삭제할 수 없습니다": {
+    "ko": "터미널을 삭제할 수 없습니다",
+    "en": "Could not delete the terminal.",
+    "ja": "ターミナルを削除できません"
+  },
+  "터미널 기록을 삭제할 수 없습니다": {
+    "ko": "터미널 기록을 삭제할 수 없습니다",
+    "en": "Could not delete terminal history.",
+    "ja": "ターミナル履歴を削除できません"
+  },
+  "터미널 기록 저장을 종료했습니다": {
+    "ko": "터미널 기록 저장을 종료했습니다",
+    "en": "Terminal history storage has stopped.",
+    "ja": "ターミナル履歴の保存を終了しました"
+  },
+  "권한 안내 창에서 실행하세요": {
+    "ko": "권한 안내 창에서 실행하세요",
+    "en": "Use this action in the permissions window.",
+    "ja": "権限設定のウィンドウから実行してください"
+  },
+  "알 수 없는 동작입니다": {
+    "ko": "알 수 없는 동작입니다",
+    "en": "Unknown action.",
+    "ja": "不明な操作です"
+  },
+  "시스템 설정을 열지 못했습니다": {
+    "ko": "시스템 설정을 열지 못했습니다",
+    "en": "Could not open System Settings.",
+    "ja": "システム設定を開けませんでした"
+  },
+  "macOS에서 지원합니다": {
+    "ko": "macOS에서 지원합니다",
+    "en": "Available on macOS.",
+    "ja": "macOSで利用できます"
+  },
+  "화면 창 목록을 가져오지 못했습니다": {
+    "ko": "화면 창 목록을 가져오지 못했습니다",
+    "en": "Could not retrieve the on-screen window list.",
+    "ja": "画面上のウィンドウ一覧を取得できませんでした"
+  },
+  "화면 배경을 캡처하지 못했습니다": {
+    "ko": "화면 배경을 캡처하지 못했습니다",
+    "en": "Could not capture the screen background.",
+    "ja": "画面の背景をキャプチャできませんでした"
+  },
+  "화면 픽셀이 없습니다": {
+    "ko": "화면 픽셀이 없습니다",
+    "en": "Screen pixel data is missing.",
+    "ja": "画面のピクセルデータがありません"
+  },
+  "지원하지 않는 화면 픽셀 형식입니다": {
+    "ko": "지원하지 않는 화면 픽셀 형식입니다",
+    "en": "Unsupported screen pixel format.",
+    "ja": "画面のピクセル形式が未対応です"
+  },
+  "화면 픽셀을 변환하지 못했습니다": {
+    "ko": "화면 픽셀을 변환하지 못했습니다",
+    "en": "Could not convert screen pixels.",
+    "ja": "画面のピクセルを変換できませんでした"
+  },
+  "화면 크기가 올바르지 않습니다": {
+    "ko": "화면 크기가 올바르지 않습니다",
+    "en": "Invalid screen size.",
+    "ja": "画面サイズが無効です"
+  },
+  "현재 앱의 화면 캡처 접근을 확인하지 못했습니다": {
+    "ko": "현재 앱의 화면 캡처 접근을 확인하지 못했습니다",
+    "en": "Screen capture access has not been confirmed for this app.",
+    "ja": "実行中のアプリの画面キャプチャ権限を確認できません"
+  },
+  "캡처할 화면을 찾을 수 없습니다": {
+    "ko": "캡처할 화면을 찾을 수 없습니다",
+    "en": "No screen is available for capture.",
+    "ja": "キャプチャする画面が見つかりません"
+  },
+  "영역 선택 창 종료를 확인하지 못했습니다. 다시 시도하세요": {
+    "ko": "영역 선택 창 종료를 확인하지 못했습니다. 다시 시도하세요",
+    "en": "Could not confirm that the region selector closed. Try again.",
+    "ja": "範囲選択ウィンドウの終了を確認できませんでした。再試行してください"
+  },
+  "캡처 창이 아닙니다": {
+    "ko": "캡처 창이 아닙니다",
+    "en": "Select a capture window.",
+    "ja": "キャプチャウィンドウを選択してください"
+  },
+  "캡처가 종료되었습니다": {
+    "ko": "캡처가 종료되었습니다",
+    "en": "Capture has ended.",
+    "ja": "キャプチャが終了しました"
+  },
+  "캡처 창이 없습니다": {
+    "ko": "캡처 창이 없습니다",
+    "en": "Capture window not found.",
+    "ja": "キャプチャウィンドウがありません"
+  },
+  "화면 이미지 로딩 실패. 캡처를 다시 실행하세요.": {
+    "ko": "화면 이미지 로딩 실패. 캡처를 다시 실행하세요.",
+    "en": "Could not load the screen image. Start capture again.",
+    "ja": "画面画像を読み込めません。もう一度キャプチャしてください。"
+  },
+  "화면 안에서 2px 이상의 영역을 선택하세요": {
+    "ko": "화면 안에서 2px 이상의 영역을 선택하세요",
+    "en": "Select a region at least 2 px wide and high within the screen.",
+    "ja": "画面内で幅と高さが2px以上の範囲を選択してください"
+  },
+  "선택한 디스플레이가 분리되었습니다": {
+    "ko": "선택한 디스플레이가 분리되었습니다",
+    "en": "The selected display was disconnected.",
+    "ja": "選択したディスプレイが切断されました"
+  },
+  "선택창 숨김을 확인하지 못했습니다": {
+    "ko": "선택창 숨김을 확인하지 못했습니다",
+    "en": "Could not confirm that the region selector was hidden.",
+    "ja": "範囲選択ウィンドウの非表示を確認できませんでした"
+  },
+  "새 메모": {
+    "ko": "새 메모",
+    "en": "New note",
+    "ja": "新しいメモ"
+  },
+  "이미지 저장 폴더가 없습니다": {
+    "ko": "이미지 저장 폴더가 없습니다",
+    "en": "The image storage folder is missing.",
+    "ja": "画像保存フォルダがありません"
+  },
+  "스킬 파일을 확인하지 못했습니다": {
+    "ko": "스킬 파일을 확인하지 못했습니다",
+    "en": "Could not inspect the skill file.",
+    "ja": "スキルファイルを確認できませんでした"
+  },
+  "스킬 링크를 정리하지 못했습니다": {
+    "ko": "스킬 링크를 정리하지 못했습니다",
+    "en": "Could not remove the skill link.",
+    "ja": "スキルのリンクを整理できませんでした"
+  },
+  "스킬 파일을 정리하지 못했습니다": {
+    "ko": "스킬 파일을 정리하지 못했습니다",
+    "en": "Could not remove the skill file.",
+    "ja": "スキルファイルを整理できませんでした"
+  },
+  "스킬 저장 위치가 올바르지 않습니다": {
+    "ko": "스킬 저장 위치가 올바르지 않습니다",
+    "en": "Invalid skill storage location.",
+    "ja": "スキルの保存先が無効です"
+  },
+  "스킬 저장 폴더를 만들지 못했습니다": {
+    "ko": "스킬 저장 폴더를 만들지 못했습니다",
+    "en": "Could not create the skill storage folder.",
+    "ja": "スキルの保存フォルダを作成できませんでした"
+  },
+  "스킬 임시 파일을 만들지 못했습니다": {
+    "ko": "스킬 임시 파일을 만들지 못했습니다",
+    "en": "Could not create a temporary skill file.",
+    "ja": "スキルの一時ファイルを作成できませんでした"
+  },
+  "스킬 설정을 기록하지 못했습니다": {
+    "ko": "스킬 설정을 기록하지 못했습니다",
+    "en": "Could not write the skill settings.",
+    "ja": "スキル設定を書き込めませんでした"
+  },
+  "스킬 설정을 저장하지 못했습니다": {
+    "ko": "스킬 설정을 저장하지 못했습니다",
+    "en": "Could not save the skill settings.",
+    "ja": "スキル設定を保存できませんでした"
+  },
+  "스킬 설정을 교체하지 못했습니다": {
+    "ko": "스킬 설정을 교체하지 못했습니다",
+    "en": "Could not replace the skill settings.",
+    "ja": "スキル設定を置き換えられませんでした"
+  },
+  "스킬 복구 경로 오류": {
+    "ko": "스킬 복구 경로 오류",
+    "en": "Invalid skill recovery path.",
+    "ja": "スキル復旧パスが無効です"
+  },
+  "스킬 복구 기록의 경로가 올바르지 않습니다": {
+    "ko": "스킬 복구 기록의 경로가 올바르지 않습니다",
+    "en": "The skill recovery record contains an invalid path.",
+    "ja": "スキル復旧記録のパスが無効です"
+  },
+  "스킬 이전 설치본을 복원하지 못했습니다": {
+    "ko": "스킬 이전 설치본을 복원하지 못했습니다",
+    "en": "Could not restore the previous skill installation.",
+    "ja": "以前のスキルを復元できませんでした"
+  },
+  "스킬 복구 기록을 읽지 못했습니다": {
+    "ko": "스킬 복구 기록을 읽지 못했습니다",
+    "en": "Could not read the skill recovery record.",
+    "ja": "スキル復旧記録を読み込めませんでした"
+  },
+  "스킬 복구 기록이 손상되었습니다": {
+    "ko": "스킬 복구 기록이 손상되었습니다",
+    "en": "The skill recovery record is damaged.",
+    "ja": "スキル復旧記録が破損しています"
+  },
+  "스킬 설정과 복구 기록이 일치하지 않습니다": {
+    "ko": "스킬 설정과 복구 기록이 일치하지 않습니다",
+    "en": "The skill settings and recovery record differ.",
+    "ja": "スキル設定と復旧記録が一致しません"
+  },
+  "스킬 설치 경로 오류": {
+    "ko": "스킬 설치 경로 오류",
+    "en": "Invalid skill installation path.",
+    "ja": "スキルのインストール先が無効です"
+  },
+  "스킬 설치 폴더를 만들지 못했습니다": {
+    "ko": "스킬 설치 폴더를 만들지 못했습니다",
+    "en": "Could not create the skill installation folder.",
+    "ja": "スキルのインストールフォルダを作成できませんでした"
+  },
+  "스킬 작업 경로 오류": {
+    "ko": "스킬 작업 경로 오류",
+    "en": "Invalid skill working path.",
+    "ja": "スキル作業パスが無効です"
+  },
+  "스킬 작업 폴더가 링크여서 사용할 수 없습니다": {
+    "ko": "스킬 작업 폴더가 링크여서 사용할 수 없습니다",
+    "en": "The skill working folder is a link and cannot be used.",
+    "ja": "スキル作業フォルダがリンクのため使用できません"
+  },
+  "스킬 작업 폴더를 만들지 못했습니다": {
+    "ko": "스킬 작업 폴더를 만들지 못했습니다",
+    "en": "Could not create the skill working folder.",
+    "ja": "スキル作業フォルダを作成できませんでした"
+  },
+  "스킬 백업 경로를 만들지 못했습니다": {
+    "ko": "스킬 백업 경로를 만들지 못했습니다",
+    "en": "Could not create the skill backup path.",
+    "ja": "スキルのバックアップ先を作成できませんでした"
+  },
+  "스킬 백업 경로 준비 실패": {
+    "ko": "스킬 백업 경로 준비 실패",
+    "en": "Could not prepare the skill backup path.",
+    "ja": "スキルのバックアップ先を準備できませんでした"
+  },
+  "스킬 배포본 준비 실패": {
+    "ko": "스킬 배포본 준비 실패",
+    "en": "Could not prepare the distributed skill package.",
+    "ja": "スキルの配布パッケージを準備できませんでした"
+  },
+  "스킬 배포본 기록 실패": {
+    "ko": "스킬 배포본 기록 실패",
+    "en": "Could not write the distributed skill package.",
+    "ja": "スキルの配布パッケージを書き込めませんでした"
+  },
+  "스킬 소유권 기록 실패": {
+    "ko": "스킬 소유권 기록 실패",
+    "en": "Could not record skill ownership.",
+    "ja": "スキルの所有権を記録できませんでした"
+  },
+  "기존 스킬을 교체하지 못했습니다": {
+    "ko": "기존 스킬을 교체하지 못했습니다",
+    "en": "Could not replace the installed skill.",
+    "ja": "既存のスキルを置き換えられませんでした"
+  },
+  "새 스킬을 설치하지 못했습니다": {
+    "ko": "새 스킬을 설치하지 못했습니다",
+    "en": "Could not install the new skill.",
+    "ja": "新しいスキルをインストールできませんでした"
+  },
+  "메모가 없습니다": {
+    "ko": "메모가 없습니다",
+    "en": "Note not found.",
+    "ja": "メモがありません"
+  },
+  "메모 종류가 변경되었습니다": {
+    "ko": "메모 종류가 변경되었습니다",
+    "en": "The note type changed.",
+    "ja": "メモの種類が変更されました"
+  },
+  "메모가 없거나 종류가 변경되었습니다": {
+    "ko": "메모가 없거나 종류가 변경되었습니다",
+    "en": "The note is missing or its type changed.",
+    "ja": "メモがないか、種類が変更されました"
+  },
+  "메모 열기": {
+    "ko": "메모 열기",
+    "en": "Open notes",
+    "ja": "メモを開く"
+  },
+  "터미널 입력": {
+    "ko": "터미널 입력",
+    "en": "Terminal input",
+    "ja": "ターミナル入力"
+  },
+  "출력이 너무 많아 읽기를 중단했습니다.": {
+    "ko": "출력이 너무 많아 읽기를 중단했습니다.",
+    "en": "Too much output to read. Navigate to the lines you want to read.",
+    "ja": "出力が多いため読み上げを停止しました。読みたい行に移動してください。"
+  },
+  "메모가 외부에서 갱신되었습니다. 작성 내용을 복사한 뒤 취소하고 다시 편집하세요.": {
+    "ko": "메모가 외부에서 갱신되었습니다. 작성 내용을 복사한 뒤 취소하고 다시 편집하세요.",
+    "en": "This note changed elsewhere. Copy your edits, cancel and edit again.",
+    "ja": "メモが外部で更新されました。編集内容をコピーしてキャンセルし、編集し直してください。"
+  },
+  "원본 파일이 외부에서 변경되었습니다. 작성 내용을 복사한 뒤 파일을 다시 열어 주세요.": {
+    "ko": "원본 파일이 외부에서 변경되었습니다. 작성 내용을 복사한 뒤 파일을 다시 열어 주세요.",
+    "en": "The source file changed elsewhere. Copy your edits and reopen the file.",
+    "ja": "元ファイルが外部で変更されました。編集内容をコピーし、ファイルを開き直してください。"
+  },
+  "원본 파일이 읽기 전용입니다": {
+    "ko": "원본 파일이 읽기 전용입니다",
+    "en": "The source file is read-only.",
+    "ja": "元ファイルは読み取り専用です"
+  },
+  "원본 파일의 디렉터리가 없습니다": {
+    "ko": "원본 파일의 디렉터리가 없습니다",
+    "en": "The source directory is missing.",
+    "ja": "元ファイルのディレクトリがありません"
+  },
+  "메모 폴더가 없습니다": {
+    "ko": "메모 폴더가 없습니다",
+    "en": "The note folder is missing.",
+    "ja": "メモのフォルダがありません"
+  },
+  "저장 형식을 확인하세요": {
+    "ko": "저장 형식을 확인하세요",
+    "en": "Check the storage format.",
+    "ja": "保存形式を確認してください"
+  },
+  "Accept the Terms of Use to continue, or exit the app": {
+    "ko": "계속하려면 이용약관에 동의하거나 앱을 종료하세요.",
+    "en": "Accept the Terms of Use to continue, or exit the app.",
+    "ja": "利用規約に同意して続けるか、アプリを終了してください。"
+  },
+  "Sharing is unavailable until operator, region and retention details are published": {
+    "ko": "운영자, 저장 지역 및 보관 기간이 공개되면 공유할 수 있습니다.",
+    "en": "Sharing is unavailable until operator, region and retention details are published.",
+    "ja": "運営者・保存地域・保有期間の公開後に共有できます。"
+  },
+  "Review the Terms of Use in the manager first": {
+    "ko": "먼저 관리 창에서 이용약관을 확인하세요.",
+    "en": "Review the Terms of Use in the manager first.",
+    "ja": "先に管理画面で利用規約を確認してください。"
+  },
+  "Could not save privacy settings": {
+    "ko": "개인정보 설정을 저장하지 못했습니다.",
+    "en": "Could not save privacy settings.",
+    "ja": "プライバシー設定を保存できませんでした。"
+  },
+  "작업을 완료하지 못했습니다. {reason}": {
+    "ko": "작업을 완료하지 못했습니다. {reason}",
+    "en": "Could not complete the operation. {reason}",
+    "ja": "操作を完了できませんでした。{reason}"
+  },
+  "공식 피드·다운로드·서명·캐시 상태를 확인하고 다시 시도하세요.": {
+    "ko": "공식 피드·다운로드·서명·캐시 상태를 확인하고 다시 시도하세요.",
+    "en": "Check the official feed, download, signature and cache, then retry.",
+    "ja": "公式フィード、ダウンロード、署名、キャッシュの状態を確認して再試行してください。"
+  },
+  "전용 에이전트 기능은 지원하지 않습니다.": {
+    "ko": "전용 에이전트 기능은 지원하지 않습니다.",
+    "en": "Dedicated agent features are unavailable.",
+    "ja": "専用エージェント機能には対応していません。"
+  },
+  "Jajan 정보": {
+    "ko": "Jajan 정보",
+    "en": "About Jajan",
+    "ja": "Jajanについて"
+  },
+  "서비스": {
+    "ko": "서비스",
+    "en": "Services",
+    "ja": "サービス"
+  },
+  "Jajan 숨기기": {
+    "ko": "Jajan 숨기기",
+    "en": "Hide Jajan",
+    "ja": "Jajanを隠す"
+  },
+  "다른 앱 숨기기": {
+    "ko": "다른 앱 숨기기",
+    "en": "Hide Others",
+    "ja": "ほかを隠す"
+  },
+  "파일": {
+    "ko": "파일",
+    "en": "File",
+    "ja": "ファイル"
+  },
+  "창 닫기": {
+    "ko": "창 닫기",
+    "en": "Close Window",
+    "ja": "ウィンドウを閉じる"
+  },
+  "편집": {
+    "ko": "편집",
+    "en": "Edit",
+    "ja": "編集"
+  },
+  "실행 취소": {
+    "ko": "실행 취소",
+    "en": "Undo",
+    "ja": "取り消す"
+  },
+  "다시 실행": {
+    "ko": "다시 실행",
+    "en": "Redo",
+    "ja": "やり直す"
+  },
+  "잘라내기": {
+    "ko": "잘라내기",
+    "en": "Cut",
+    "ja": "カット"
+  },
+  "복사": {
+    "ko": "복사",
+    "en": "Copy",
+    "ja": "コピー"
+  },
+  "붙여넣기": {
+    "ko": "붙여넣기",
+    "en": "Paste",
+    "ja": "ペースト"
+  },
+  "모두 선택": {
+    "ko": "모두 선택",
+    "en": "Select All",
+    "ja": "すべてを選択"
+  },
+  "보기": {
+    "ko": "보기",
+    "en": "View",
+    "ja": "表示"
+  },
+  "전체 화면 전환": {
+    "ko": "전체 화면 전환",
+    "en": "Toggle Full Screen",
+    "ja": "フルスクリーンの切り替え"
+  },
+  "윈도우": {
+    "ko": "윈도우",
+    "en": "Window",
+    "ja": "ウィンドウ"
+  },
+  "최소화": {
+    "ko": "최소화",
+    "en": "Minimize",
+    "ja": "最小化"
+  },
+  "확대": {
+    "ko": "확대",
+    "en": "Zoom",
+    "ja": "拡大"
+  },
+  "도움말": {
+    "ko": "도움말",
+    "en": "Help",
+    "ja": "ヘルプ"
+  },
+  "지원하지 않는 스킬 설정 형식입니다": {
+    "ko": "지원하지 않는 스킬 설정 형식입니다",
+    "en": "Unsupported skill settings format.",
+    "ja": "スキル設定の形式が未対応です"
+  },
+  "스킬 설정의 항목이나 경로가 올바르지 않습니다": {
+    "ko": "스킬 설정의 항목이나 경로가 올바르지 않습니다",
+    "en": "Invalid skill settings entry or path.",
+    "ja": "スキル設定の項目またはパスが無効です"
+  },
+  "스킬 설정 파일이 너무 큽니다": {
+    "ko": "스킬 설정 파일이 너무 큽니다",
+    "en": "The skill settings file is too large.",
+    "ja": "スキル設定ファイルが大きすぎます"
+  },
+  "스킬 설정을 읽지 못했습니다. 기존 파일은 보존했습니다": {
+    "ko": "스킬 설정을 읽지 못했습니다. 기존 파일은 보존했습니다",
+    "en": "Could not read skill settings. The existing file was preserved.",
+    "ja": "スキル設定を読み込めません。既存のファイルは保持されています"
+  },
+  "스킬 설정 파일을 읽지 못했습니다": {
+    "ko": "스킬 설정 파일을 읽지 못했습니다",
+    "en": "Could not read the skill settings file.",
+    "ja": "スキル設定ファイルを読み込めませんでした"
+  },
+  "스킬 설정 폴더를 만들지 못했습니다": {
+    "ko": "스킬 설정 폴더를 만들지 못했습니다",
+    "en": "Could not create the skill settings folder.",
+    "ja": "スキル設定フォルダを作成できませんでした"
+  },
+  "스킬 설정 잠금을 만들지 못했습니다": {
+    "ko": "스킬 설정 잠금을 만들지 못했습니다",
+    "en": "Could not lock the skill settings.",
+    "ja": "スキル設定をロックできませんでした"
+  },
+  "다른 스킬 변경을 처리 중입니다. 잠시 후 다시 시도하세요": {
+    "ko": "다른 스킬 변경을 처리 중입니다. 잠시 후 다시 시도하세요",
+    "en": "Another skill change is in progress. Try again shortly.",
+    "ja": "別のスキル変更を処理中です。しばらくしてから再試行してください"
+  },
+  "에이전트의 스킬 폴더에 쓸 수 없습니다": {
+    "ko": "에이전트의 스킬 폴더에 쓸 수 없습니다",
+    "en": "Cannot write to the agent’s skills folder.",
+    "ja": "エージェントのスキルフォルダに書き込めません"
+  },
+  "에이전트 스킬 폴더를 확인하지 못했습니다": {
+    "ko": "에이전트 스킬 폴더를 확인하지 못했습니다",
+    "en": "Could not identify the agent’s skills folder.",
+    "ja": "エージェントのスキルフォルダを確認できませんでした"
+  },
+  "알 수 없는 스킬입니다": {
+    "ko": "알 수 없는 스킬입니다",
+    "en": "Unknown skill.",
+    "ja": "不明なスキルです"
+  },
+  "사용 가능한 Codex 또는 Claude Code를 찾지 못했습니다": {
+    "ko": "사용 가능한 Codex 또는 Claude Code를 찾지 못했습니다",
+    "en": "Could not find an available Codex or Claude Code installation.",
+    "ja": "使用可能なCodexまたはClaude Codeが見つかりませんでした"
+  },
+  "이전 스킬 설치본의 소유권을 확인하지 못했습니다": {
+    "ko": "이전 스킬 설치본의 소유권을 확인하지 못했습니다",
+    "en": "Could not verify ownership of the existing skill installation.",
+    "ja": "既存のスキルの所有権を確認できませんでした"
+  },
+  "스킬 설치본의 소유권을 확인할 수 없어 해제하지 못했습니다": {
+    "ko": "스킬 설치본의 소유권을 확인할 수 없어 해제하지 못했습니다",
+    "en": "Could not disable the skill because its ownership could not be verified.",
+    "ja": "スキルの所有権を確認できないため無効にできませんでした"
+  },
+  "약관 확인 후 관리 창에서만 스킬을 설정할 수 있습니다": {
+    "ko": "약관 확인 후 관리 창에서만 스킬을 설정할 수 있습니다",
+    "en": "Review the terms, then configure skills in the manager.",
+    "ja": "利用規約を確認してから管理画面でスキルを設定してください"
+  },
+  "작업 보호 확인 중…": {
+    "ko": "작업 보호 확인 중…",
+    "en": "Checking active work…",
+    "ja": "作業の安全を確認中…"
+  },
+  "{error} 앱 선택과 OS 상태가 다를 수 있습니다. 아래 상태를 확인하세요.": {
+    "ko": "{error} 앱 선택과 OS 상태가 다를 수 있습니다. 아래 상태를 확인하세요.",
+    "en": "{error} The app preference and OS status may differ. Check the status below.",
+    "ja": "{error} アプリの設定とOSの状態が異なる場合があります。下の状態を確認してください。"
+  },
+  "스킬 저장 위치를 찾지 못했습니다": {
+    "ko": "스킬 저장 위치를 찾지 못했습니다",
+    "en": "Could not find the skill storage location.",
+    "ja": "スキルの保存先が見つかりませんでした"
+  },
+  "스킬 조회 작업이 중단되었습니다": {
+    "ko": "스킬 조회 작업이 중단되었습니다",
+    "en": "Loading skills was interrupted.",
+    "ja": "スキルの読み込みが中断されました"
+  },
+  "스킬 변경 작업이 중단되었습니다": {
+    "ko": "스킬 변경 작업이 중단되었습니다",
+    "en": "The skill change was interrupted.",
+    "ja": "スキルの変更が中断されました"
+  },
+  "Invalid privacy settings path": {
+    "ko": "개인정보 설정 경로가 올바르지 않습니다.",
+    "en": "Invalid privacy settings path.",
+    "ja": "プライバシー設定のパスが無効です。"
+  },
+  "Could not create privacy settings": {
+    "ko": "개인정보 설정을 만들지 못했습니다.",
+    "en": "Could not create privacy settings.",
+    "ja": "プライバシー設定を作成できませんでした。"
+  },
+  "원본 파일 확인 실패: {detail}": {
+    "ko": "원본 파일 확인 실패: {detail}",
+    "en": "Could not inspect the source file: {detail}",
+    "ja": "元ファイルを確認できません：{detail}"
+  },
+  "저장 파일 생성 실패: {detail}": {
+    "ko": "저장 파일 생성 실패: {detail}",
+    "en": "Could not create the destination file: {detail}",
+    "ja": "保存先ファイルを作成できません：{detail}"
+  },
+  "파일 저장 실패: {detail}": {
+    "ko": "파일 저장 실패: {detail}",
+    "en": "Could not save the file: {detail}",
+    "ja": "ファイルを保存できません：{detail}"
+  },
+  "원본 파일 저장 실패: {detail}": {
+    "ko": "원본 파일 저장 실패: {detail}",
+    "en": "Could not save the source file: {detail}",
+    "ja": "元ファイルを保存できません：{detail}"
+  },
+  "언어는 저장했지만 일부 화면에 적용하지 못했습니다.": {
+    "ko": "언어는 저장했지만 일부 화면에 적용하지 못했습니다.",
+    "en": "Language saved. Some open windows or menus could not be updated.",
+    "ja": "言語を保存しましたが、一部のウィンドウまたはメニューを更新できませんでした。"
+  },
+  "배치할 화면이 너무 작습니다": {
+    "ko": "배치할 화면이 너무 작습니다",
+    "en": "The screen is too small for this arrangement.",
+    "ja": "画面が小さすぎて配置できません"
+  },
+  "정렬 취소 창 전용입니다": {
+    "ko": "정렬 취소 창 전용입니다",
+    "en": "Use the undo arrangement window.",
+    "ja": "整列の取り消しウィンドウから実行してください"
+  },
+  "메모를 배치할 공간이 부족합니다": {
+    "ko": "메모를 배치할 공간이 부족합니다",
+    "en": "There is not enough space to arrange the notes.",
+    "ja": "メモを配置する空間が足りません"
+  },
+  "메모 크기를 유지하며 배치할 공간이 부족합니다": {
+    "ko": "메모 크기를 유지하며 배치할 공간이 부족합니다",
+    "en": "There is not enough space to arrange the notes at their current sizes.",
+    "ja": "メモのサイズを保って配置する空間が足りません"
+  },
+  "정렬 취소 창 없음": {
+    "ko": "정렬 취소 창 없음",
+    "en": "The undo arrangement window is missing.",
+    "ja": "整列の取り消しウィンドウがありません"
+  },
+  "포인터 위치 없음": {
+    "ko": "포인터 위치 없음",
+    "en": "Pointer position unavailable.",
+    "ja": "ポインタの位置が不明です"
+  },
+  "사용 가능한 화면 없음": {
+    "ko": "사용 가능한 화면 없음",
+    "en": "No display available.",
+    "ja": "使用できる画面がありません"
+  },
+  "메모가 화면보다 큽니다. 크기를 줄인 후 워프하세요": {
+    "ko": "메모가 화면보다 큽니다. 크기를 줄인 후 워프하세요",
+    "en": "The note is larger than the screen. Reduce its size before moving it.",
+    "ja": "メモが画面より大きいため、縮小してから移動してください"
+  },
+  "메모가 있는 모니터를 찾을 수 없습니다": {
+    "ko": "메모가 있는 모니터를 찾을 수 없습니다",
+    "en": "Could not find the display containing the note.",
+    "ja": "メモがあるディスプレイが見つかりません"
+  },
+  "최초 위치가 아직 준비되지 않았습니다": {
+    "ko": "최초 위치가 아직 준비되지 않았습니다",
+    "en": "The initial position is not ready yet.",
+    "ja": "初期位置を準備中です"
+  },
+  "종료된 공유입니다": {
+    "ko": "종료된 공유입니다",
+    "en": "Sharing has ended.",
+    "ja": "共有は終了しました"
+  },
+  "영역은 화면 안에 있어야 합니다": {
+    "ko": "영역은 화면 안에 있어야 합니다",
+    "en": "The region must be inside the display.",
+    "ja": "範囲は画面内に指定してください"
+  },
+  "위치는 X,Y 형식이어야 합니다": {
+    "ko": "위치는 X,Y 형식이어야 합니다",
+    "en": "Enter the position as X,Y.",
+    "ja": "位置はX,Y形式で指定してください"
+  },
+  "서로 다른 연결된 모니터 ID를 지정하세요": {
+    "ko": "서로 다른 연결된 모니터 ID를 지정하세요",
+    "en": "Choose different IDs for connected displays.",
+    "ja": "接続中のディスプレイから異なるIDを指定してください"
+  },
+  "다른 화면 공유가 진행 중입니다": {
+    "ko": "다른 화면 공유가 진행 중입니다",
+    "en": "Another screen share is active.",
+    "ja": "別の画面共有が進行中です"
+  },
+  "모니터가 연결되지 않았습니다": {
+    "ko": "모니터가 연결되지 않았습니다",
+    "en": "The display is disconnected.",
+    "ja": "ディスプレイが接続されていません"
+  },
+  "화면 공유가 종료되었거나 대상이 다릅니다": {
+    "ko": "화면 공유가 종료되었거나 대상이 다릅니다",
+    "en": "The screen share ended or the target changed.",
+    "ja": "画面共有が終了したか対象が異なります"
+  },
+  "화면 기록 권한이 필요합니다": {
+    "ko": "화면 기록 권한이 필요합니다",
+    "en": "Screen Recording permission is required.",
+    "ja": "画面収録の権限が必要です"
+  },
+  "캡처 영역이 너무 작습니다": {
+    "ko": "캡처 영역이 너무 작습니다",
+    "en": "The capture region is too small.",
+    "ja": "キャプチャ範囲が小さすぎます"
+  },
+  "위치는 0~999 범위여야 합니다": {
+    "ko": "위치는 0~999 범위여야 합니다",
+    "en": "The position must be between 0 and 999.",
+    "ja": "位置は0～999の範囲で指定してください"
+  },
+  "이 창의 배치는 자동으로 변경할 수 없습니다": {
+    "ko": "이 창의 배치는 자동으로 변경할 수 없습니다",
+    "en": "This window cannot be arranged automatically.",
+    "ja": "このウィンドウの配置は自動で変更できません"
+  },
+  "표시 중인 창만 이동할 수 있습니다": {
+    "ko": "표시 중인 창만 이동할 수 있습니다",
+    "en": "Only visible windows can be moved.",
+    "ja": "表示中のウィンドウのみ移動できます"
+  },
+  "접힌 창과 이미지 메모에는 크기를 유지하는 move를 사용하세요": {
+    "ko": "접힌 창과 이미지 메모에는 크기를 유지하는 move를 사용하세요",
+    "en": "Use move to retain the size of collapsed windows and image notes.",
+    "ja": "折りたたんだウィンドウや画像メモには、サイズを保つmoveを使用してください"
+  },
+  "대상 영역이 창의 최소 크기보다 작습니다": {
+    "ko": "대상 영역이 창의 최소 크기보다 작습니다",
+    "en": "The target area is smaller than the minimum window size.",
+    "ja": "対象範囲がウィンドウの最小サイズより小さいです"
+  },
+  "대상 위치에서 창이 모니터를 벗어납니다": {
+    "ko": "대상 위치에서 창이 모니터를 벗어납니다",
+    "en": "The window would extend beyond the target display.",
+    "ja": "移動先でウィンドウがディスプレイからはみ出します"
+  },
+  "공유 모니터 연결이 해제되었습니다": {
+    "ko": "공유 모니터 연결이 해제되었습니다",
+    "en": "The shared display was disconnected.",
+    "ja": "共有ディスプレイの接続が解除されました"
+  },
+  "창 이동 요청이 종료되었습니다": {
+    "ko": "창 이동 요청이 종료되었습니다",
+    "en": "The window move request has ended.",
+    "ja": "ウィンドウの移動リクエストは終了しました"
+  },
+  "연결은 최대16개까지 만들 수 있습니다": {
+    "ko": "연결은 최대16개까지 만들 수 있습니다",
+    "en": "You can create up to 16 connections.",
+    "ja": "接続は最大16件まで作成できます"
+  },
+  "연결 입력값이 올바르지 않습니다": {
+    "ko": "연결 입력값이 올바르지 않습니다",
+    "en": "Invalid connection settings.",
+    "ja": "接続設定の入力値が無効です"
+  },
+  "연결할 메모를 찾을 수 없습니다": {
+    "ko": "연결할 메모를 찾을 수 없습니다",
+    "en": "Could not find the note to connect.",
+    "ja": "接続するメモが見つかりません"
+  },
+  "연결 설정 파일이 너무 큽니다": {
+    "ko": "연결 설정 파일이 너무 큽니다",
+    "en": "The connection settings file is too large.",
+    "ja": "接続設定ファイルが大きすぎます"
+  },
+  "기존 연결 설정을 읽을 수 없습니다": {
+    "ko": "기존 연결 설정을 읽을 수 없습니다",
+    "en": "Could not read the existing connection settings.",
+    "ja": "既存の接続設定を読み込めません"
+  },
+  "기존 연결 설정을 먼저 확인해 주세요": {
+    "ko": "기존 연결 설정을 먼저 확인해 주세요",
+    "en": "Check the existing connection settings first.",
+    "ja": "既存の接続設定を先に確認してください"
+  },
+  "저장 경로가 없습니다": {
+    "ko": "저장 경로가 없습니다",
+    "en": "The storage path is missing.",
+    "ja": "保存先がありません"
+  }
+}

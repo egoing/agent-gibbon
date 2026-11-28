@@ -1,4 +1,5 @@
 // 메뉴 막대에서 보이는 창을 앞으로 가져오거나 숨긴 창을 개별 복원한다.
+use crate::language::tr;
 use crate::{
     apply_direct,
     model::{Action, Request},
@@ -124,7 +125,8 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
             &MenuItem::with_id(
                 app,
                 "workspace-stop",
-                format!("모니터 {}개 공유 중 · 공유 중지", display.len()),
+                tr("모니터 {count}개 공유 중 · 공유 중지")
+                    .replace("{count}", &display.len().to_string()),
                 true,
                 None::<&str>,
             )
@@ -139,7 +141,7 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         )
         .map_err(|e| e.to_string())?;
     }
-    append_action(app, &menu, "open-manager", "메모 관리".into())?;
+    append_action(app, &menu, "open-manager", tr("메모 관리").into())?;
     for (id, title, shortcut) in [
         ("capture-image", "영역 캡처", "Ctrl+Shift+1"),
         ("capture-text", "영역 텍스트 메모", "Ctrl+Shift+2"),
@@ -150,7 +152,11 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
             app,
             &menu,
             id,
-            format!("{title}\t{}", crate::presentation::tray_shortcut(shortcut)),
+            format!(
+                "{}\t{}",
+                tr(title),
+                crate::presentation::tray_shortcut(shortcut)
+            ),
         )?;
     }
     append_action(
@@ -158,7 +164,8 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
         &menu,
         "stash-toggle",
         format!(
-            "숨김\t{}",
+            "{}\t{}",
+            tr("숨김"),
             crate::presentation::tray_shortcut(&crate::stash::shortcut(app))
         ),
     )?;
@@ -185,7 +192,7 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
             &MenuItem::with_id(
                 app,
                 "more-notes",
-                format!("더보기({remaining})"),
+                tr("더보기({count})").replace("{count}", &remaining.to_string()),
                 true,
                 None::<&str>,
             )
@@ -207,7 +214,7 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
                 .map_err(|e| e.to_string())?;
         }
     }
-    append_action(app, &menu, "quit-app", "Jajan 종료".into())?;
+    append_action(app, &menu, "quit-app", tr("Jajan 종료").into())?;
     template_icons(app, &menu)?;
     Ok(menu)
 }
@@ -277,7 +284,7 @@ fn permission_item_visible(
 
 #[cfg(target_os = "macos")]
 fn permission_item(app: &tauri::AppHandle) -> Result<MenuItem<tauri::Wry>, String> {
-    MenuItem::with_id(app, "permission-guide", "권한 설정", true, None::<&str>)
+    MenuItem::with_id(app, "permission-guide", tr("권한 설정"), true, None::<&str>)
         .map_err(|e| e.to_string())
 }
 
@@ -317,6 +324,12 @@ pub(crate) fn sync_permission_item(
 
 pub fn refresh(app: &tauri::AppHandle) -> Result<(), String> {
     if let Some(tray) = app.tray_by_id("jajan") {
+        tray.set_tooltip(Some(format!(
+            "{} — {}",
+            crate::instance::current().title(),
+            tr("메모 열기")
+        )))
+        .map_err(|e| e.to_string())?;
         let menu = menu(app)?;
         tray.set_menu(Some(menu.clone()))
             .map_err(|e| e.to_string())?;
@@ -516,8 +529,9 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
         .icon(icon())
         .icon_as_template(true)
         .tooltip(format!(
-            "{} — 메모 열기",
-            crate::instance::current().title()
+            "{} — {}",
+            crate::instance::current().title(),
+            tr("메모 열기")
         ))
         .menu(&initial_menu)
         .show_menu_on_left_click(true)
@@ -590,7 +604,7 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
             let result = result.and(sync_visibility(app));
             if let Err(error) = result {
                 if let Some(tray) = app.tray_by_id("jajan") {
-                    let _ = tray.set_tooltip(Some(format!("Jajan: {error}")));
+                    let _ = tray.set_tooltip(Some(format!("Jajan: {}", tr(&error))));
                 }
             }
         })

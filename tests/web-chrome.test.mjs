@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -14,7 +15,7 @@ function chrome({welcome=true, failZoom=false}={}) {
   document:{getElementById:node,querySelector:()=>node('main'),querySelectorAll:()=>handles},
   window:{__TAURI__:{core:{invoke:async(name,args)=>{calls.push({name,...args});if(args.action==='pin')alwaysOnTop=!alwaysOnTop;if(failZoom && args.action==='zoom')throw Error('배율 실패');return {welcome,always_on_top:alwaysOnTop};}}}},
  };
- for(const script of ['content-size.js','web-chrome.js'])vm.runInNewContext(readFileSync(new URL('../ui/'+script,import.meta.url),'utf8'),context);
+ for(const script of ['content-size.js','web-chrome.js'])vm.runInNewContext(readFileSync(new URL('../ui/'+script,import.meta.url),'utf8'),sourceLanguageWindow(context));
  return {nodes,calls,handles};
 }
 test('trusted web chrome pin toggles through web_chrome and reflects native state',async()=>{

@@ -28,7 +28,7 @@ controls.addEventListener('click', async (event) => {
     await window.jajanInvoke('overview_action', { action: button.dataset.action, generation: visit });
   } catch (error) {
     if (visit === generation) {
-      status.textContent = String(error);
+      window.jajanLanguage.bind(status, 'textContent', String(error));
       status.hidden = false;
     }
   } finally {

@@ -30,7 +30,7 @@ pub fn list_title(raw: &str, id: &str, kind: Kind) -> String {
     let suffix = format!(" ({id})");
     title = title.strip_suffix(&suffix).unwrap_or(title).trim();
     if title.is_empty() || title == id {
-        title = kind.default_title();
+        title = crate::language::tr(kind.default_title());
     }
     title.chars().take(30).collect()
 }

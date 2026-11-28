@@ -38,7 +38,7 @@
     for (const radio of document.querySelectorAll('input[name="manager-theme"]')) radio.checked = radio.value === (selected || 'system');
     renderNativeStatus();
     for (const radio of document.querySelectorAll('input[name="memo-design"]')) radio.checked = radio.value === memoDesign;
-    document.getElementById('theme-mode').textContent = selected ? '선택한 테마를 사용 중입니다.' : '시스템 테마를 따르는 중입니다.';
+    window.jajanLanguage.bind(document.getElementById('theme-mode'), 'textContent', selected ? '선택한 테마를 사용 중입니다.' : '시스템 테마를 따르는 중입니다.');
     window.jajanMemoPreview?.(memoDesign);
   }
   function choose(value) {
@@ -48,10 +48,10 @@
       else window.localStorage.setItem(key, value);
       selected = value;
       result.dataset.error = 'false';
-      result.textContent = value === null ? '시스템 테마를 따릅니다.' : '테마를 저장했습니다.';
+      window.jajanLanguage.bind(result, 'textContent', value === null ? '시스템 테마를 따릅니다.' : '테마를 저장했습니다.');
     } catch {
       result.dataset.error = 'true';
-      result.textContent = '테마를 저장하지 못했습니다. 기존 설정을 유지합니다. 다시 시도하세요.';
+      window.jajanLanguage.bind(result, 'textContent', '테마를 저장하지 못했습니다. 기존 설정을 유지합니다. 다시 시도하세요.');
     }
     apply();
   }
@@ -61,10 +61,10 @@
       window.localStorage.setItem(memoDesignKey, value);
       memoDesign = value;
       result.dataset.error = 'false';
-      result.textContent = '메모 창 디자인을 저장했습니다.';
+      window.jajanLanguage.bind(result, 'textContent', '메모 창 디자인을 저장했습니다.');
     } catch {
       result.dataset.error = 'true';
-      result.textContent = '메모 창 디자인을 저장하지 못했습니다. 기존 설정을 유지합니다. 다시 시도하세요.';
+      window.jajanLanguage.bind(result, 'textContent', '메모 창 디자인을 저장하지 못했습니다. 기존 설정을 유지합니다. 다시 시도하세요.');
     }
     apply();
   }

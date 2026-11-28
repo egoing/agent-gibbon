@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -12,7 +13,7 @@ function setup(initial = { phase: 'idle', current_version: '1.0.0' }) {
   let now = 0, status = initial, invokeAction = async () => status;
   const requests = [];
   const payloads = [];
-  const context = vm.createContext({ document: { hidden: false, getElementById: id => elements.get(id), createElement: make }, performance: { now: () => now }, window: { jajanInvoke: async (name, args) => { requests.push(name); payloads.push({name,args}); return name === 'updater_status' ? status : invokeAction(name); } }, setInterval() {} });
+  const context = vm.createContext(sourceLanguageWindow({ document: { hidden: false, getElementById: id => elements.get(id), createElement: make }, performance: { now: () => now }, window: { jajanInvoke: async (name, args) => { requests.push(name); payloads.push({name,args}); return name === 'updater_status' ? status : invokeAction(name); } }, setInterval() {} }));
   vm.runInContext(source, context);
   return { elements, requests, payloads, click: delta => { now += delta; elements.get('settings-version').onclick(); }, setStatus: value => { status = value; }, setAction: fn => { invokeAction = fn; }, refresh: () => context.window.jajanDeveloperUpdater.refresh() };
 }

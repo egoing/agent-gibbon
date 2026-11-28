@@ -10,8 +10,8 @@ const $ = (id) => document.getElementById(id);
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
 const renderFeedback = createFeedback(document, (action, revision) => invoke('feedback_action', { action, revision }).catch(failure));
 const shortcut = key => isMac ? `Command ${key}` : `Ctrl ${key}`;
-$('export').title = `파일 내보내기 · ${shortcut('S')}`;
-$('export').setAttribute('aria-label', '파일 내보내기');
+window.jajanLanguage.bind($('export'), 'title', window.jajanLanguage.msg('{label} · {shortcut}', {label: window.jajanLanguage.msg('파일 내보내기'), shortcut: shortcut('S')}));
+window.jajanLanguage.bind($('export'), 'aria-label', '파일 내보내기');
 let revision = -1;
 let appearanceSignature;
 function applyMemoAppearance(color) {
@@ -250,7 +250,7 @@ async function publishFeedback() {
   const signature = JSON.stringify({ folded, stashActive, view });
   if (signature === feedbackSignature) return;
   publishing = true;
-  try { await invoke('present_feedback', { view }); feedbackSignature = signature; }
+  try { await invoke('present_feedback', { view: {...view, message: window.jajanLanguage.source(view.message)} }); feedbackSignature = signature; }
   catch (error) { console.error('Feedback 상태 기록 실패:', error); }
   finally { publishing = false; if (publishAgain) { publishAgain = false; publishFeedback(); } }
 }
@@ -263,7 +263,7 @@ async function exportNote() {
   try {
     const path = await invoke('export_note', { markdown: null });
     if (path) {
-      notify(`파일로 내보냈습니다: ${path}`);
+      notify(window.jajanLanguage.msg('파일로 내보냈습니다: {path}', {path}));
     }
   } catch (error) { failure(error); }
   finally { exporting = false; $('export').disabled = false; publishFeedback(); }
@@ -298,15 +298,15 @@ async function refresh(schedule = true) {
         composition = editorState.composing;
         sourceProtected = editorState.protected;
         $('save').disabled = !editing || saving || composition || sourceProtected;
-        if (editorState.conflict && editing && !notice?.text?.includes('외부')) notify(externalDraftMessage, 'error', true);
+        if (editorState.conflict && editing && notice?.text !== externalDraftMessage) notify(externalDraftMessage, 'error', true);
         else if (sourceProtected && !notice) notify('지원하지 않는 문법의 손실을 막기 위해 원문을 보호하고 있습니다. 원문 복사를 사용할 수 있습니다.', 'error', true);
       }
       window.jajanMemoToolbar.setKind(state.note.capture ? 'image' : 'text');
       $('font-size').disabled = !!state.note.capture;
       $('copy').disabled = false;
       const copyLabel = state.note.capture ? '이미지 복사' : sourceProtected ? '원문 복사' : '본문 복사';
-      $('copy').title = `${copyLabel} · ${shortcut('C')}`;
-      $('copy').setAttribute('aria-label', copyLabel);
+      window.jajanLanguage.bind($('copy'), 'title', window.jajanLanguage.msg('{label} · {shortcut}', {label: window.jajanLanguage.msg(copyLabel), shortcut: shortcut('C')}));
+      window.jajanLanguage.bind($('copy'), 'aria-label', copyLabel);
       document.body.classList.toggle('image-note', !!state.note.capture);
       document.body.classList.toggle('capture-toolbar-below', !!state.capture_toolbar_below);
 
@@ -314,7 +314,8 @@ async function refresh(schedule = true) {
       // Refresh CSS independently of revisions; preserve drafts and local trace stages.
       applyMemoAppearance(state.note.color);
       if (revision !== state.note.revision) {
-        $('viewport').setAttribute('aria-label', state.note.title || '메모 내용');
+        if (state.note.title) window.jajanLanguage.raw($('viewport'), 'aria-label', state.note.title);
+        else window.jajanLanguage.bind($('viewport'), 'aria-label', '메모 내용');
         // HTML is generated and sanitized in Rust; no user HTML reaches this sink.
         // Feedback rendering is synchronized below even when revision is unchanged.
         revision = state.note.revision;
@@ -398,8 +399,8 @@ document.addEventListener('keydown', (event) => {
   }
 });
 function saveShortcut() { return latestNote?.capture ? exportNote() : save(); }
-$('save').title = `저장 · ${shortcut('S')}`;
-$('save').setAttribute('aria-label', $('save').title);
+window.jajanLanguage.bind($('save'), 'title', window.jajanLanguage.msg('{label} · {shortcut}', {label: window.jajanLanguage.msg('저장'), shortcut: shortcut('S')}));
+window.jajanLanguage.bind($('save'), 'aria-label', window.jajanLanguage.msg('{label} · {shortcut}', {label: window.jajanLanguage.msg('저장'), shortcut: shortcut('S')}));
 $('save').addEventListener('click', () => save());
 // Render the current sanitized HTML offscreen: innerText retains the existing
 // rendered-text format without ever touching the visible diff or its baseline.
@@ -486,8 +487,8 @@ function displayFold(value) {
   window.jajanToolbarFold?.(folded);
   document.body.classList.toggle('folded', folded);
   $('fold-toggle').setAttribute('aria-expanded', String(!folded));
-  $('fold-toggle').setAttribute('aria-label', folded ? '메모 펼치기' : '메모 접기');
-  $('fold-toggle').title = folded ? '메모 펼치기' : '메모 접기';
+  window.jajanLanguage.bind($('fold-toggle'), 'aria-label', folded ? '메모 펼치기' : '메모 접기');
+  window.jajanLanguage.bind($('fold-toggle'), 'title', folded ? '메모 펼치기' : '메모 접기');
   publishFeedback();
   $('fold-title').hidden = !folded;
 }

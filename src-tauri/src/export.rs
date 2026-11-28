@@ -32,10 +32,10 @@ pub async fn export_note(
             .dialog()
             .file()
             .set_parent(&window)
-            .set_title("파일로 저장")
+            .set_title(crate::language::tr("파일로 저장"))
             .add_filter(
                 if extension == "png" {
-                    "PNG 이미지"
+                    crate::language::tr("PNG 이미지")
                 } else {
                     "Markdown"
                 },

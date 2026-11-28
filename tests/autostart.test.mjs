@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -19,7 +20,7 @@ function setup(initial={}, rejectSave=false, failRead=false) {
       state.os_status=args.enabled?'registered_unknown':'disabled';return {...state};
     }
   }}}};
-  vm.runInNewContext(source,{window,document:{getElementById:id=>elements.get(id)},Boolean,Error});
+  vm.runInNewContext(source,sourceLanguageWindow({window,document:{getElementById:id=>elements.get(id)},Boolean,Error}));
   return {elements,calls,window,events,setState:next=>state={...state,...next},setReadFailure:value=>failRead=value};
 }
 test('first run proposes checked startup, but reads/focus never register',async()=>{
@@ -100,8 +101,8 @@ test('failed status read exposes only retry and retry does not register',async()
   assert.equal(s.calls.some(c=>c.name==='autostart_save'),false);
 });
 test('settings places privacy last among default destinations and keeps developer hidden',()=>{
-  const nav=html.match(/<nav aria-label="설정 항목">([\s\S]*?)<\/nav>/)[1];
-  assert.deepEqual([...nav.matchAll(/id="settings-([^"]+)-nav"/g)].map(m=>m[1]),['skills','appearance','updater','autostart','privacy','developer']);
+  const nav=html.match(/<nav aria-label="설정 항목"[^>]*>([\s\S]*?)<\/nav>/)[1];
+  assert.deepEqual([...nav.matchAll(/id="settings-([^"]+)-nav"/g)].map(m=>m[1]),['skills','language','appearance','updater','autostart','privacy','developer']);
   assert.match(nav, /id="settings-developer-nav"[^>]* hidden/);
   assert.doesNotMatch(html,/id="autostart-(save|refresh)"/);
 });

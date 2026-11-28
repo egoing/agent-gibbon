@@ -27,3 +27,18 @@ for (const input of Object.keys(result.metafile.inputs).filter(name => name.incl
   }
 }
 writeFileSync(join(root, 'ui/generated/THIRD_PARTY_LICENSES.txt'), [...packages].sort(([a], [b]) => a.localeCompare(b)).map(([, notice]) => notice).join('\n\n-----\n\n'));
+
+// A parser-blocking, same-origin resource keeps the catalog available to every
+// window, including the small native overlays that do not load an ES module.
+const catalog = JSON.parse(readFileSync(join(root, 'ui/messages.json'), 'utf8'));
+for (const [key, translations] of Object.entries(catalog)) {
+  const languages = Object.keys(translations).sort();
+  if (languages.join(',') !== 'en,ja,ko') throw new Error(`Missing UI translation: ${key}`);
+  const variables = text => [...text.matchAll(/\{(\w+)\}/g)].map(match => match[1]).sort().join(',');
+  for (const [language, value] of Object.entries(translations)) {
+    if (typeof value !== 'string' || !value.trim() || variables(value) !== variables(key)) {
+      throw new Error(`Invalid ${language} translation or variables: ${key}`);
+    }
+  }
+}
+writeFileSync(join(root, 'ui/generated/messages.js'), 'window.jajanMessages = ' + JSON.stringify(catalog) + ';\n');

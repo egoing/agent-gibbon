@@ -6,6 +6,14 @@ use tauri::Manager;
 
 pub const LABEL: &str = "manager";
 
+pub fn title() -> String {
+    format!(
+        "{} — {}",
+        crate::instance::current().title(),
+        crate::language::tr("메모 관리")
+    )
+}
+
 pub fn open(app: &tauri::AppHandle) -> Result<(), String> {
     if let Some(window) = app.get_webview_window(LABEL) {
         crate::stash::release(&window)?;
@@ -15,10 +23,7 @@ pub fn open(app: &tauri::AppHandle) -> Result<(), String> {
     }
     let builder =
         tauri::WebviewWindowBuilder::new(app, LABEL, tauri::WebviewUrl::App("manager.html".into()))
-            .title(format!(
-                "{} — 메모 관리",
-                crate::instance::current().title()
-            ))
+            .title(title())
             .transparent(false)
             .inner_size(944.0, 480.0)
             .min_inner_size(600.0, 360.0);

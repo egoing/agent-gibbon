@@ -10,7 +10,7 @@
     showWelcome: () => { el('manager-navigation').hidden=true; el('privacy-welcome').hidden=false; el('notes-page').hidden=true; el('settings-page').hidden=true; },
     refresh,
   };
-  function error(message) { el('privacy-error').textContent=message; el('privacy-error').hidden=!message; el('privacy-retry').hidden=!message; }
+  function error(message) { window.jajanLanguage.bind(el('privacy-error'), 'textContent', message); el('privacy-error').hidden=!message; el('privacy-retry').hidden=!message; }
   function render() {
     const accepted=api.accepted(), ready=Boolean(state?.notice_ready);
     el('privacy-welcome').hidden=accepted;
@@ -27,7 +27,7 @@
     el('privacy-save').disabled=busy || !state;
     el('privacy-terms').disabled=busy || !state;
     for(const id of ['privacy-draft','privacy-settings-draft']) el(id).hidden=ready;
-    el('privacy-sharing-status').textContent=state?.sharing?'Sharing enabled':'Not sharing';
+    window.jajanLanguage.bind(el('privacy-sharing-status'), 'textContent', state?.sharing?'Sharing enabled':'Not sharing');
     el('privacy-storage-warning').hidden=!state?.load_failed;
     if(!accepted) api.showWelcome();
   }
@@ -45,7 +45,7 @@
       if(sharing) {
         api.showWelcome();
         el('privacy-share').checked=true;
-      } else el('privacy-save-result').textContent='Not sharing. No changes to save.';
+      } else window.jajanLanguage.bind(el('privacy-save-result'), 'textContent', 'Not sharing. No changes to save.');
       return;
     }
     busy=true; render(); error('');
@@ -58,7 +58,7 @@
       }
       render();
       if(onboarding) api.onAccepted?.();
-      else el('privacy-save-result').textContent='Saved. Your choice applies now.';
+      else window.jajanLanguage.bind(el('privacy-save-result'), 'textContent', 'Saved. Your choice applies now.');
       if(startupError) error(startupError);
     } catch(e) { error(String(e)); }
     finally { busy=false; render(); }
@@ -69,15 +69,31 @@
   el('privacy-setting-share').addEventListener('change',()=>{if(!el('privacy-setting-share').checked)save(false);});
   el('privacy-exit').onclick=()=>invoke('privacy_quit').catch(()=>error('Could not exit. Please close the app.'));
   el('privacy-retry').onclick=()=>refresh().catch(()=>{});
-  for(const id of ['privacy-read-terms','privacy-settings-terms','privacy-read-notice','privacy-settings-notice']) {
-    el(id).onclick=()=>{
-      if(!state) return;
-      el('privacy-document-title').textContent=id.includes('terms')?'Terms of Use':'Privacy Notice';
-      el('privacy-document-content').innerHTML=id.includes('terms')?state.terms_html:state.notice_html;
-      el('privacy-document').hidden=false; el('privacy-document').focus();
-    };
+  let openDocument = null;
+  let documentRequest = 0;
+  async function showDocument(kind, focus) {
+    openDocument = kind;
+    const ticket = ++documentRequest;
+    try {
+      const docs = state && state.document_locale === window.jajanLanguage.locale ? state : await invoke('privacy_status');
+      if (ticket !== documentRequest) return;
+      window.jajanLanguage.bind(el('privacy-document-title'), 'textContent', kind === 'terms' ? 'Terms of Use' : 'Privacy Notice');
+      el('privacy-document-content').innerHTML = kind === 'terms' ? docs.terms_html : docs.notice_html;
+      el('privacy-document').hidden = false;
+      if (focus) el('privacy-document').focus();
+    } catch (e) { if (ticket === documentRequest) error(String(e)); }
   }
-  el('privacy-document-close').onclick=()=>{el('privacy-document').hidden=true;};
+  for(const id of ['privacy-read-terms','privacy-settings-terms','privacy-read-notice','privacy-settings-notice']) {
+    el(id).onclick = () => showDocument(id.includes('terms') ? 'terms' : 'notice', true);
+  }
+  window.addEventListener('jajan-language-change', () => {
+    if (openDocument) showDocument(openDocument, false);
+  });
+  el('privacy-document-close').onclick = () => {
+    openDocument = null;
+    documentRequest++;
+    el('privacy-document').hidden = true;
+  };
   el('privacy-document-content').addEventListener('click',e=>{if(e.target.closest('a'))e.preventDefault();});
   api.ready=refresh();
   api.ready.catch(()=>{});

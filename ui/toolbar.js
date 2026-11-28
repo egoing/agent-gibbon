@@ -7,7 +7,9 @@ const toggle = document.getElementById('toolbar-toggle');
 const title = document.getElementById('chrome-title');
 const sourceTitle = document.getElementById('fold-title');
 function updateTitle() {
-  title.textContent = sourceTitle?.textContent || window.jajanToolbarTitle || '메모';
+  const source = sourceTitle?.textContent || window.jajanToolbarTitle;
+  if (source) window.jajanLanguage.raw(title, 'textContent', source);
+  else window.jajanLanguage.bind(title, 'textContent', '메모');
   title.title = title.textContent;
 }
 if (sourceTitle) new MutationObserver(updateTitle).observe(sourceTitle, { childList: true, characterData: true, subtree: true });
@@ -19,8 +21,8 @@ let changingFold = false;
 function displayFold(collapsed) {
   document.body.classList.toggle('toolbar-collapsed', collapsed);
   toggle.setAttribute('aria-expanded', String(!collapsed));
-  toggle.setAttribute('aria-label', collapsed ? '메모 펼치기' : '메모 접기');
-  toggle.title = collapsed ? '메모 펼치기' : '메모 접기';
+  window.jajanLanguage.bind(toggle, 'aria-label', collapsed ? '메모 펼치기' : '메모 접기');
+  window.jajanLanguage.bind(toggle, 'title', collapsed ? '메모 펼치기' : '메모 접기');
   refresh();
 }
 window.jajanToolbarFold = displayFold;

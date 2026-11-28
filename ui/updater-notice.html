@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="ko">
-<head>
+<head><link rel="stylesheet" href="language.css"><script src="generated/messages.js"></script><script src="language.js"></script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>업데이트 준비 완료</title>
+  <title data-l10n="text">업데이트 준비 완료</title>
   <link rel="stylesheet" href="updater-notice.css">
   <script src="updater-guard.js"></script>
   <script src="updater-notice.js" defer></script>
@@ -11,13 +11,13 @@
 <body>
   <main aria-labelledby="notice-title">
     <div class="notice-content">
-    <h1 id="notice-title">새 버전이 준비됐습니다</h1>
+    <h1 id="notice-title" data-l10n="text">새 버전이 준비됐습니다</h1>
     <p id="notice-version" class="version" aria-live="polite"></p>
     <p id="notice-message" role="status" aria-live="polite" hidden></p>
     </div>
     <div class="actions">
-      <button id="notice-dismiss" type="button" title="안내만 닫습니다. 안전한 유휴 상태에서 자동 설치는 계속됩니다.">안내 닫기</button>
-      <button id="notice-install" type="button" disabled>업데이트하고 재시작</button>
+      <button id="notice-dismiss" type="button" title="안내만 닫습니다. 안전한 유휴 상태에서 자동 설치는 계속됩니다." data-l10n="title text">안내 닫기</button>
+      <button id="notice-install" type="button" disabled data-l10n="text">업데이트하고 재시작</button>
     </div>
   </main>
 </body>
