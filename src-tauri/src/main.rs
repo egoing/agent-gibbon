@@ -382,12 +382,49 @@ fn memo_id_from_window(label: &str) -> Option<&str> {
     }
 }
 
+#[cfg(target_os = "macos")]
+#[tauri::command]
+fn close_hit_rect(window: tauri::WebviewWindow, rect: [f64; 4]) -> Result<(), String> {
+    if memo_id_from_window(window.label()).is_none() {
+        return Err("메모 창이 아닙니다".into());
+    }
+    extern "C" {
+        fn jajan_close_hit_rect(web: *mut std::ffi::c_void, x: f64, y: f64, w: f64, h: f64);
+    }
+    let [x, y, w, h] = rect;
+    window.with_webview(move |web| unsafe {
+        // with_webview supplies the live WKWebView on AppKit's main thread.
+        jajan_close_hit_rect(web.inner().cast(), x, y, w, h);
+    }).map_err(|e| e.to_string())
+}
 #[tauri::command]
 fn close_note(window: tauri::WebviewWindow) -> Result<(), String> {
     let app = window.app_handle();
     let id = memo_id_from_window(window.label())
         .ok_or("메모 창이 아닙니다")?
         .to_string();
+    #[cfg(target_os = "macos")]
+    {
+        // AppKit chooses a new key/main window synchronously in orderOut:.
+        // A visible background manager must not be promoted by this close.
+        app_activation::preserve_focus();
+        let manager = app.get_webview_window(manager::LABEL);
+        if let Some(manager) = &manager {
+            app_activation::prepare_close(&window, manager)?;
+        }
+        let manager = manager.filter(|manager| {
+            window.is_focused().unwrap_or(false) && manager.is_visible().unwrap_or(false)
+        });
+        if let Some(manager) = &manager {
+            manager.set_focusable(false).map_err(|e| e.to_string())?;
+        }
+        let hidden = hide_note(window.clone());
+        if let Some(manager) = manager {
+            manager.set_focusable(true).map_err(|e| e.to_string())?;
+        }
+        hidden?;
+    }
+    #[cfg(not(target_os = "macos"))]
     hide_note(window.clone())?;
     let note = app
         .state::<AppNotes>()
@@ -700,6 +737,8 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     entrance::drag_note,
                     hide_note,
                     close_note,
+                    #[cfg(target_os = "macos")]
+                    close_hit_rect,
                     toggle_pin,
                     sync_opacity,
                     feedback::acknowledge_feedback,
@@ -1046,6 +1085,14 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 if let Err(error) = manager::open(_app) {
                     eprintln!("시작 관리 창을 열지 못했습니다: {error}");
                 }
+            }
+        }
+        #[cfg(target_os = "macos")]
+        if let tauri::RunEvent::ExitRequested { code: None, ref api, .. } = _event {
+            if _app.webview_windows().is_empty() {
+                // Closing the last memo leaves the tray and app switcher available.
+                api.prevent_exit();
+                return;
             }
         }
         if matches!(_event, tauri::RunEvent::ExitRequested { .. }) {

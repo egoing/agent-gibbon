@@ -382,6 +382,22 @@ for (const grip of document.querySelectorAll('.resize')) {
   });
 }
 $('pin').addEventListener('click', () => invoke('toggle_pin').catch(failure));
+if (isMac && typeof ResizeObserver !== 'undefined') {
+  const close = $('close');
+  let previous = '';
+  const syncCloseRect = () => {
+    const { x, y, width, height } = close.getBoundingClientRect();
+    const rect = [x, y, width, height];
+    const signature = rect.join(',');
+    if (signature === previous) return;
+    previous = signature;
+    invoke('close_hit_rect', { rect }).catch(() => { previous = ''; });
+  };
+  const resize = new ResizeObserver(syncCloseRect);
+  for (const element of [document.documentElement, $('controls'), close]) resize.observe(element);
+  new MutationObserver(syncCloseRect).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  syncCloseRect();
+}
 $('close').addEventListener('click', () => flushAnd('close_note'));
 document.addEventListener('keydown', (event) => {
   if (event.isComposing || event.keyCode === 229 || composition || editor?.status().composing) return;
