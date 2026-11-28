@@ -122,9 +122,14 @@ input:focus-visible,a:focus-visible{outline:2px solid var(--manager-focus);outli
 #notes-page aside > :not(.memo-results){flex-shrink:0}
 .memo-results{min-height:0;overflow:auto}
 
-#list .web-row{display:flex;align-items:baseline;gap:8px;justify-content:space-between}
-.web-row span:first-child{overflow:hidden;text-overflow:ellipsis}
-.web-row span:last-child{flex:none;color:var(--manager-muted)}
+#list button { display:flex; align-items:center; gap:8px; }
+.row-name { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+.row-type,.row-open { flex:none; width:16px; height:16px; background:currentColor; -webkit-mask:var(--glyph) center/contain no-repeat; mask:var(--glyph) center/contain no-repeat; }
+.type-text { --glyph:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.8%22%3E%3Cpath%20d%3D%22M14%203v4a1%201%200%200%200%201%201h4%22%20/%3E%3Cpath%20d%3D%22M17%2021h-10a2%202%200%200%201%20-2%20-2v-14a2%202%200%200%201%202%20-2h7l5%205v11a2%202%200%200%201%20-2%202z%22%20/%3E%3Cpath%20d%3D%22M9%209l1%200%22%20/%3E%3Cpath%20d%3D%22M9%2013l6%200%22%20/%3E%3Cpath%20d%3D%22M9%2017l6%200%22%20/%3E%3C/svg%3E"); }
+.type-capture { --glyph:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.8%22%3E%3Cpath%20d%3D%22M15%208h.01%22%20/%3E%3Cpath%20d%3D%22M3%206a3%203%200%200%201%203%20-3h12a3%203%200%200%201%203%203v12a3%203%200%200%201%20-3%203h-12a3%203%200%200%201%20-3%20-3v-12z%22%20/%3E%3Cpath%20d%3D%22M3%2016l5%20-5c.928%20-.893%202.072%20-.893%203%200l5%205%22%20/%3E%3Cpath%20d%3D%22M14%2014l1%20-1c.928%20-.893%202.072%20-.893%203%200l3%203%22%20/%3E%3C/svg%3E"); }
+.type-terminal { --glyph:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.8%22%3E%3Cpath%20d%3D%22M8%209l3%203l-3%203%22%20/%3E%3Cpath%20d%3D%22M13%2015l3%200%22%20/%3E%3Cpath%20d%3D%22M3%204m0%202a2%202%200%200%201%202%20-2h14a2%202%200%200%201%202%202v12a2%202%200%200%201%20-2%202h-14a2%202%200%200%201%20-2%20-2z%22%20/%3E%3C/svg%3E"); }
+.type-web { --glyph:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.8%22%3E%3Cpath%20d%3D%22M4%208h16%22%20/%3E%3Cpath%20d%3D%22M4%204m0%202a2%202%200%200%201%202%20-2h12a2%202%200%200%201%202%202v12a2%202%200%200%201%20-2%202h-12a2%202%200%200%201%20-2%20-2z%22%20/%3E%3Cpath%20d%3D%22M8%204v4%22%20/%3E%3C/svg%3E"); }
+.row-open { --glyph:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.8%22%3E%3Cpath%20d%3D%22M8%2016c-2-3-4-5-4-8a8%207%200%200%201%2016%200c0%203-2%205-4%208zM9%2016l1%204h4l1-4M10%2021h4M11%202c-4%205-3%209-1%2014m3-14c4%205%203%209%201%2014%22/%3E%3C/svg%3E"); }
 
 .updater-policy, .updater-help { font-size:13px; line-height:1.6; }
 .updater-policy { margin:0 0 16px; }
@@ -133,3 +138,43 @@ input:focus-visible,a:focus-visible{outline:2px solid var(--manager-focus);outli
 .updater-help summary:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
 
 #app-language { max-width: 100%; font: inherit; color: inherit; background: var(--manager-surface); padding: 6px 10px; }
+
+.manager-editor { min-height:8em; }
+.manager-editor .ProseMirror { min-height:8em; white-space:pre-wrap; outline:none; }
+.manager-editor .task-item { list-style:none; display:flex; align-items:baseline; gap:6px; }
+.manager-editor .task-item p { margin:0; }
+.manager-editor .editor-task { padding:0; width:1em; height:1em; }
+.manager-editor .editor-task[aria-checked=true]::after { content:'✓'; }
+.manager-editor [data-inert-link] { text-decoration:underline; }
+/* The shared editor mounts its toolbar under body. This stylesheet is
+   loaded only by the manager; ordinary manager buttons keep their own chrome. */
+.manager-edit-actions { gap:4px; }
+.manager-edit-actions > button, .selection-format button {
+  appearance:none; border:0; border-radius:5px; color:var(--manager-text);
+  background:transparent; line-height:1.25;
+}
+.manager-edit-actions > button {
+  padding:5px 10px; min-height:28px; font-size:13px; font-weight:500;
+  background:color-mix(in srgb, var(--manager-text) 8%, var(--manager-bg));
+}
+.selection-format {
+  position:fixed; z-index:10; display:flex; align-items:center; gap:2px;
+  padding:4px; overflow-x:auto; border-radius:8px; color:var(--manager-text);
+  background:var(--manager-modal); box-shadow:0 2px 9px #0002, 0 0 0 1px color-mix(in srgb, var(--manager-text) 12%, transparent);
+}
+.selection-format button { flex:none; min-width:26px; height:26px; padding:0 6px; white-space:nowrap; font-size:12px; }
+.selection-format [data-format=strong] { font-weight:700; }
+.selection-format [data-format=emphasis] { font-style:italic; }
+.selection-format [data-format=strike_through] { text-decoration:line-through; }
+.manager-edit-actions > button:enabled:hover, .selection-format button:enabled:hover { background:var(--manager-focus-surface); }
+.selection-format button[aria-pressed=true]:enabled { color:var(--manager-bg); background:var(--manager-text); }
+.manager-edit-actions > button:enabled:active, .selection-format button:enabled:active { box-shadow:inset 0 0 0 2px currentColor; }
+.manager-edit-actions > button:disabled, .selection-format button:disabled { background:transparent; color:var(--manager-disabled); opacity:.65; cursor:default; }
+.manager-edit-actions > button:focus-visible, .selection-format button:focus-visible {
+  outline:2px solid currentColor; outline-offset:-3px;
+}
+@media (forced-colors:active) {
+  .selection-format { border:1px solid CanvasText; }
+  .selection-format button[aria-pressed=true]:enabled { outline:1px solid Highlight; }
+}
+.detail-tools [role=status] { align-self:center; font-size:13px; }

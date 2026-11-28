@@ -345,22 +345,30 @@ fn save_note(
     markdown: String,
     expected_revision: u64,
     local_flow: Option<u64>,
+    id: Option<String>,
 ) -> Result<Note, String> {
     let _scope = local_trace::webview_scope(&window, local_flow);
     let _timing = telemetry::Timing::new("save_note");
-    let id = window.label().strip_prefix("note-").unwrap_or("main");
+    let app = window.app_handle();
+    let id = match (window.label(), id) {
+        (manager::LABEL, Some(id)) => id,
+        (label, None) => memo_id_from_window(label).ok_or("메모 창이 아닙니다")?.to_owned(),
+        _ => return Err("메모를 찾을 수 없습니다".into()),
+    };
     let mut notes = notes.lock().map_err(|e| e.to_string())?;
-    let note = notes.get_mut(id).ok_or("메모를 찾을 수 없습니다")?;
-    window.app_handle().state::<storage::Store>().save_edit(
-        id,
-        note,
-        markdown,
-        expected_revision,
-    )?;
+    let note = notes.get_mut(&id).ok_or("메모를 찾을 수 없습니다")?;
+    if note.capture.is_some() {
+        return Err("텍스트 메모가 아닙니다".into());
+    }
+    app.state::<storage::Store>().save_edit(&id, note, markdown, expected_revision)?;
     note.local_mutation = local_trace::current();
-    layout::mark(&window, false);
-    feedback::edited(&window)?;
-    Ok(note.clone())
+    let note = note.clone();
+    drop(notes);
+    if let Some(memo) = app.get_webview_window(&label(&id)) {
+        layout::mark(&memo, false);
+        feedback::edited(&memo)?;
+    }
+    Ok(note)
 }
 #[tauri::command]
 fn hide_note(window: tauri::WebviewWindow) -> Result<(), String> {
@@ -718,6 +726,7 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                     terminal::welcome::terminal_close,
                     manager::manager_set_theme,
                     manager::manager_notes,
+                    manager::manager_text,
                     manager::manager_set_visibility,
                     manager::manager_terminal,
                     manager::manager_image,

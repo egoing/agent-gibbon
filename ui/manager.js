@@ -4,7 +4,8 @@ const el = id => document.getElementById(id);
 let notes = new Map(), selected = null, displayed, busy = false, detailVersion = 0;
 let query = '', composing = false, retryFull = false;
 let listFailed = false, imageFailed = false, cachedImage = null, captureView = null;
-let unfilteredScroll = 0;
+let unfilteredScroll = 0, textEditor = null, selectionRequest = 0;
+window.jajanUpdateActivity = () => textEditor?.activity() || {};
 const buttons = new Map();
 const search = el('memo-search');
 function updateError() { el('error').hidden = !listFailed && !imageFailed; }
@@ -65,6 +66,7 @@ el('settings-nav').onclick = () => page(true);
 el('retry').onclick = () => refresh(true);
 el('refresh').onclick = () => refresh(true);
 async function detail(note) {
+  textEditor?.dispose(); textEditor = null;
   const version = ++detailVersion;
   imageFailed = false; updateError();
   const target = el('detail'); target.replaceChildren();
@@ -84,7 +86,7 @@ async function detail(note) {
       if (note.kind === 'web') args.session = note.session;
       const visible = await invoke('manager_set_visibility', args);
       const current = notes.get(note.key);
-      if (current) current.visible = visible;
+      if (current) { current.visible = visible; render(); }
     }
     catch { if (version === detailVersion) { window.jajanLanguage.bind(error, 'textContent', '메모 표시 상태를 변경하지 못했습니다. 다시 시도하세요.'); error.hidden = false; } }
     finally { visibilityPending.delete(note.key); visibilityVersion++; syncVisibility(); }
@@ -101,8 +103,8 @@ async function detail(note) {
   } else if (note.capture) {
     await loadImage(note, captureView, false);
   } else {
-    // HTML is rendered and sanitized by the same Rust pipeline as floating memos.
-    const content = document.createElement('div'); content.innerHTML = note.html; target.append(content);
+    textEditor = managerEditor(note.id, target, tools, invoke);
+    textEditor.read(note.revision);
   }
 }
 async function loadImage(note, view, verifyFile) {
@@ -194,19 +196,27 @@ function render(scroll = el('list').parentElement.scrollTop, verifyImage = false
       const key = row.key;
       button.dataset.id = row.id;
       button.dataset.key = key;
-      button.onclick = () => { if (notes.has(key)) { selected = key; render(); } };
-      if (row.kind === 'web') {
-        button.className = 'web-row';
-        const name = document.createElement('span');
-        const kind = document.createElement('span');
-        window.jajanLanguage.bind(kind, 'textContent', '웹');
-        button.append(name); button.append(kind);
-      }
+      button.onclick = async () => {
+        const request = ++selectionRequest;
+        if (key === selected || (textEditor && !await textEditor.flush())) return;
+        if (request === selectionRequest && notes.has(key)) { selected = key; render(); }
+      };
+      const kind = row.kind || (row.capture ? 'capture' : 'text');
+      const icon = document.createElement('span');
+      icon.className = 'row-type type-' + kind;
+      icon.setAttribute('role', 'img');
+      window.jajanLanguage.bind(icon, 'aria-label', {text:'메모', capture:'화면 캡처', terminal:'터미널', web:'웹'}[kind]);
+      const name = document.createElement('span'); name.className = 'row-name';
+      const balloon = document.createElement('span'); balloon.className = 'row-open';
+      balloon.setAttribute('role','img');
+      window.jajanLanguage.bind(balloon,'aria-label','표시 중');
+      window.jajanLanguage.bind(balloon,'title','표시 중');
+      button.append(icon, name, balloon);
       buttons.set(key, button);
     }
-    if (row.kind === 'web') {
-      if (button.title !== row.title) button.children[0].textContent = Array.from(row.title).slice(0, 30).join('');
-    } else if (button.textContent !== (row.title || '')) button.textContent = row.title || '';
+    const name = button.querySelector('.row-name');
+    if (name.textContent !== row.title) name.textContent = row.title;
+    button.lastElementChild.hidden = !row.visible;
     if (button.title !== (row.title || row.id)) button.title = row.title || row.id;
     const current = String(selected === row.key);
     if (button.getAttribute('aria-current') !== current) button.setAttribute('aria-current', current);
@@ -221,6 +231,14 @@ function render(scroll = el('list').parentElement.scrollTop, verifyImage = false
   const next = ids.has(selected) ? notes.get(selected) : null;
   const target = el('detail');
   const placeholder = notes.size ? '메모를 선택하세요.' : '아직 메모가 없습니다.';
+  if (textEditor && displayed?.key === next?.key && next && !next.kind && !next.capture) {
+    displayed = next;
+    textEditor.read(next.revision);
+    syncVisibility();
+    return;
+  }
+  // A filter or polling response can remove the row while a draft is in flight.
+  if (textEditor?.busy()) return;
   if (captureView && next?.capture && displayed?.key === next.key) {
     if (displayed.title !== next.title) {
       captureView.title.textContent = next.title || next.id;

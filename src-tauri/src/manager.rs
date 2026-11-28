@@ -1,4 +1,4 @@
-//! Manager selection is read-only; explicit actions use existing window behavior.
+//! Memo management and editing share the floating windows’ storage and visibility state.
 use crate::AppNotes;
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -108,6 +108,7 @@ fn note_row(id: &str, note: &crate::model::Note, known: Option<&HashMap<String, 
         let token = note
             .manager_body_token
             .get_or_init(|| format!("{:x}", Sha256::digest(note.html.as_bytes())));
+        row["revision"] = json!(note.revision.to_string());
         row["bodyToken"] = json!(token);
         if known.and_then(|map| map.get(id)) != Some(token) {
             row["html"] = json!(note.html);
@@ -175,6 +176,23 @@ pub fn manager_notes(
     }
     rows.extend(crate::web::manager_entries(app)?);
     Ok(Value::Array(rows))
+}
+
+#[tauri::command]
+pub fn manager_text(
+    window: tauri::WebviewWindow,
+    state: tauri::State<'_, AppNotes>,
+    id: String,
+) -> Result<Value, String> {
+    if window.label() != LABEL {
+        return Err("관리 창에서만 조회할 수 있습니다".into());
+    }
+    let notes = state.lock().map_err(|e| e.to_string())?;
+    let note = notes
+        .get(&id)
+        .filter(|n| n.capture.is_none())
+        .ok_or("텍스트 메모가 아닙니다")?;
+    Ok(json!({"markdown": note.markdown, "revision": note.revision}))
 }
 
 #[tauri::command]
