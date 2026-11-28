@@ -72,7 +72,11 @@ git push origin v0.2.8
 
 오류·성능·로그·릴리스 상태·응답 감시는 별도 사용자 동의 전에는 켜지지 않는다. 운영 정보가 확정된 빌드에서 동의한 뒤에만 허용된 진단을 활성화하며, 개발 빌드는 명시적 진단 실행도 필요하다. 수집 끄기와 공헌자 빌드 경계는 [Sentry 진단 안내](diagnostics.md)를 따른다. 관리 토큰·진단 원문은 빌드 캐시나 릴리스 자산에 포함하지 않는다.
 
-공식 macOS 태그 빌드는 Developer ID 서명, 팀과 앱 식별자를 검증합니다. 수동 빌드는 애드혹 서명을 사용합니다.
+공식 macOS 태그 빌드는 ARM64와 Intel에서 각각 Developer ID로 앱을 서명하고 Tauri가 앱 공증과 티켓 부착을 마친 뒤 패키징합니다. CI는 팀과 앱 식별자를 확인하고 최종 DMG를 Apple에 제출합니다. 제출 ID와 Accepted 응답을 확인한 뒤 DMG에 티켓을 부착합니다. DMG 자체, 마운트한 DMG 안의 앱, updater 아카이브에서 추출한 앱 모두 stapler validate를 통과해야 산출물을 업로드합니다. 아키텍처별 제출 ID와 파일 해시는 Actions 실행 요약에서 확인할 수 있습니다.
+
+일반 수동 빌드는 애드혹 서명을 사용합니다. 릴리스 생성 없이 실제 공증을 확인하려면 신뢰하는 작업 브랜치에서 `gh workflow run release.yml --ref <브랜치> -f notarize=true`를 실행합니다. 수동 실행은 기존과 같이 일회용 updater 키를 사용합니다.
+
+macOS Developer ID 서명에는 Actions secrets `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_TEAM_ID`가 필요합니다. 앱과 DMG를 공증할 때는 같은 App Store Connect 팀 API 키로 인증합니다. `APPLE_API_KEY`에는 Key ID, `APPLE_API_ISSUER`에는 Issuer ID, `APPLE_API_KEY_P8`에는 내려받은 `.p8` 파일의 내용을 저장합니다.
 
 공식 참고: [Tauri GitHub 배포](https://v2.tauri.app/distribute/pipelines/github/), [GitHub 호스팅 runner](https://docs.github.com/en/actions/reference/runners/github-hosted-runners), [GitHub CLI 릴리스 생성](https://cli.github.com/manual/gh_release_create).
 
@@ -113,5 +117,3 @@ GitHub는 업로드 이름의 공백을 점으로 정규화했다. 0.2.8의 mani
 정식 빌드는 시작 15초 뒤 최초 확인을 시도하고, 성공·실패 여부와 관계없이 각 자동 확인 완료 후 15분 주기로 다시 확인한다. 설치 준비 재검사는 15초 간격이고 무입력 기준은 5분이다. 검증 프로필은 60초 확인·5초 재검사·30초 무입력을 사용한다.
 
 로컬 package 스크립트는 [README의 중앙 캐시 정책](../README.md)을 사용합니다. 단일 체크아웃 CI는 `CARGO_BUILD_BUILD_DIR`를 `src-tauri/target`으로 지정해 Rust 캐시 action의 기존 복원 경로와 맞춥니다.
-
-사용자가 재개를 요청할 때까지 공식 macOS 배포에서 공증 제출과 티켓 검사를 생략합니다. 해당 릴리스의 아키텍처별 DMG와 서명된 앱 아카이브를 SHA256SUMS.txt와 함께 보존합니다.
