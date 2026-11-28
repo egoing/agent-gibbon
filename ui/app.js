@@ -399,6 +399,9 @@ if (isMac && typeof ResizeObserver !== 'undefined') {
   syncCloseRect();
 }
 $('close').addEventListener('click', () => flushAnd('close_note'));
+function bodyEditorHasFocus() {
+  return !latestNote?.capture && document.activeElement?.id === 'memo-editor';
+}
 document.addEventListener('keydown', (event) => {
   if (event.isComposing || event.keyCode === 229 || composition || editor?.status().composing) return;
   if (event.key === 'Escape') {
@@ -406,7 +409,7 @@ document.addEventListener('keydown', (event) => {
     flushAnd('hide_note');
   }
   const copyModifier = isMac ? event.metaKey && !event.ctrlKey : event.ctrlKey && !event.metaKey;
-  if (latestNote && copyModifier && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 'c') {
+  if (latestNote && !bodyEditorHasFocus() && copyModifier && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 'c') {
     event.preventDefault();
     copyNote({ wholeNote: true });
   }
@@ -435,7 +438,7 @@ function currentPlainText() {
 }
 // WKWebView can receive the native Edit > Copy command without a keydown.
 document.addEventListener('copy', event => {
-  if (!latestNote || !event.isTrusted) return;
+  if (!latestNote || !event.isTrusted || bodyEditorHasFocus()) return;
   event.preventDefault();
   event.stopPropagation();
   copyNote({ wholeNote: true });
