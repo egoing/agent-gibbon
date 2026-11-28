@@ -774,6 +774,21 @@
     "en": "Could not save the language setting.",
     "ja": "言語設定を保存できませんでした。"
   },
+  "이미지 캡처": {
+    "ko": "이미지 캡처",
+    "en": "Image Capture",
+    "ja": "画像キャプチャ"
+  },
+  "텍스트": {
+    "ko": "텍스트",
+    "en": "Text",
+    "ja": "テキスト"
+  },
+  "웹 브라우저": {
+    "ko": "웹 브라우저",
+    "en": "Web Browser",
+    "ja": "ウェブブラウザー"
+  },
   "영역 캡처": {
     "ko": "영역 캡처",
     "en": "Capture a region",

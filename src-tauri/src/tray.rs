@@ -143,10 +143,10 @@ fn menu(app: &tauri::AppHandle) -> Result<Menu<tauri::Wry>, String> {
     }
     append_action(app, &menu, "open-manager", tr("메모 관리").into())?;
     for (id, title, shortcut) in [
-        ("capture-image", "영역 캡처", "Ctrl+Shift+1"),
-        ("capture-text", "영역 텍스트 메모", "Ctrl+Shift+2"),
-        ("capture-terminal", "영역 터미널", "Ctrl+Shift+3"),
-        ("capture-web", "영역 웹 창", "Ctrl+Shift+4"),
+        ("capture-image", "이미지 캡처", "Ctrl+Shift+1"),
+        ("capture-text", "텍스트", "Ctrl+Shift+2"),
+        ("capture-terminal", "터미널", "Ctrl+Shift+3"),
+        ("capture-web", "웹 브라우저", "Ctrl+Shift+4"),
     ] {
         append_action(
             app,
