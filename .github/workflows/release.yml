@@ -1,4 +1,4 @@
-name: Notary authentication diagnostic
+name: App Store Connect notarization authentication
 
 on:
   workflow_dispatch:
@@ -11,25 +11,24 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 3
     steps:
-      - name: Check Apple notarization credentials
+      - name: Check App Store Connect team key
         shell: bash
         env:
-          DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
         run: |
-          : "${APPLE_ID:?Missing APPLE_ID}" "${APPLE_PASSWORD:?Missing APPLE_PASSWORD}" "${APPLE_TEAM_ID:?Missing APPLE_TEAM_ID}"
-          [[ "$APPLE_TEAM_ID" == 5P84RWXNB6 ]] || { echo 'Unexpected team ID'; exit 1; }
-          errors=$(mktemp)
-          trap 'rm -f "$errors"' EXIT
-          xcodebuild -version
+          : "${APPLE_API_KEY_P8:?Missing APPLE_API_KEY_P8}" "${APPLE_API_KEY:?Missing APPLE_API_KEY}" "${APPLE_API_ISSUER:?Missing APPLE_API_ISSUER}"
+          umask 077
+          work=$(mktemp -d)
+          trap 'rm -rf "$work"' EXIT
+          printf '%s\n' "$APPLE_API_KEY_P8" > "$work/notary.p8"
           xcrun notarytool --version
-          if xcrun notarytool history --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" \
-            --team-id "$APPLE_TEAM_ID" --output-format json > /dev/null 2>"$errors"; then
+          if xcrun notarytool history --key "$work/notary.p8" --key-id "$APPLE_API_KEY" \
+            --issuer "$APPLE_API_ISSUER" --output-format json > /dev/null 2>"$work/errors"; then
             echo 'Apple notarization authentication succeeded.'
           else
-            code=$(sed -nE 's/.*HTTP status code: ([0-9]{3}).*/\1/p' "$errors" | head -n 1)
+            code=$(sed -nE 's/.*HTTP status code: ([0-9]{3}).*/\1/p' "$work/errors" | head -n 1)
             echo "::error::Apple notarization authentication failed (HTTP ${code:-unknown})."
             exit 1
           fi
