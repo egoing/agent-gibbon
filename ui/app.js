@@ -304,8 +304,8 @@ async function refresh(schedule = true) {
       window.jajanMemoToolbar.setKind(state.note.capture ? 'image' : 'text');
       $('font-size').disabled = !!state.note.capture;
       $('copy').disabled = false;
-      const copyLabel = state.note.capture ? '이미지 복사' : sourceProtected ? '원문 복사' : '본문 복사';
-      window.jajanLanguage.bind($('copy'), 'title', window.jajanLanguage.msg('{label} · {shortcut}', {label: window.jajanLanguage.msg(copyLabel), shortcut: shortcut('C')}));
+      const copyLabel = state.note.capture ? '이미지 복사' : sourceProtected ? '원문 전체 복사' : '본문 전체 복사';
+      window.jajanLanguage.bind($('copy'), 'title', state.note.capture ? window.jajanLanguage.msg('{label} · {shortcut}', {label: window.jajanLanguage.msg(copyLabel), shortcut: shortcut('C')}) : copyLabel);
       window.jajanLanguage.bind($('copy'), 'aria-label', copyLabel);
       document.body.classList.toggle('image-note', !!state.note.capture);
       document.body.classList.toggle('capture-toolbar-below', !!state.capture_toolbar_below);
@@ -411,7 +411,7 @@ document.addEventListener('keydown', (event) => {
   const copyModifier = isMac ? event.metaKey && !event.ctrlKey : event.ctrlKey && !event.metaKey;
   if (latestNote && !bodyEditorHasFocus() && copyModifier && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 'c') {
     event.preventDefault();
-    copyNote({ wholeNote: true });
+    copyNote();
   }
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
     event.preventDefault();
@@ -441,23 +441,22 @@ document.addEventListener('copy', event => {
   if (!latestNote || !event.isTrusted || bodyEditorHasFocus()) return;
   event.preventDefault();
   event.stopPropagation();
-  copyNote({ wholeNote: true });
+  copyNote();
 }, true);
-async function copyNote({ wholeNote = false } = {}) {
+async function copyNote() {
   if (!latestNote) return;
   contentAction();
   try {
     if (latestNote.capture) {
       await invoke('copy_note_image');
     } else {
-      const selection = wholeNote ? '' : window.getSelection()?.toString();
-      const text = selection || (sourceProtected ? latestNote.markdown : editing ? $('editor').innerText : currentPlainText());
+      const text = sourceProtected ? latestNote.markdown : editing ? $('memo-editor').innerText : currentPlainText();
       await window.__TAURI__.clipboardManager.writeText(text);
     }
     notify('복사했습니다');
   } catch (error) { failure(error); }
 }
-$('copy').addEventListener('click', () => copyNote());
+$('copy').addEventListener('click', copyNote);
 $('content').addEventListener('click', (event) => { if (event.target.closest('a')) event.preventDefault(); });
 // Native movement arrives even when WKWebView belongs to a background app.
 window.__TAURI__.event.listen('note-pointer-over', ({ payload }) => {

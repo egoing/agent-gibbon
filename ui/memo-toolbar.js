@@ -42,7 +42,7 @@
     'web-reload': '웹페이지 새로고침',
     'web-back': '웹페이지 뒤로',
     save: '저장 · Command S / Ctrl S', export: '파일로 저장',
-    copy: kind === 'web' ? '웹 주소 복사' : '본문 복사', pin: '상단 고정',
+    copy: kind === 'web' ? '웹 주소 복사' : '본문 전체 복사', pin: '상단 고정',
     close: {text: '메모 창 닫기', terminal: '터미널 종료', web: '웹 창 닫기'}[kind],
   };
 

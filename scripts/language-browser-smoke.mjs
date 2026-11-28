@@ -121,7 +121,7 @@ try {
       });
       assert.deepEqual(leftover, [], 'untranslated manager labels');
     }
-    const labels = {ja:['設定','本文をコピー','ウェブアドレス'], ko:['설정','본문 복사','웹 주소'], en:['Settings','Copy text','Web address']}[resolved];
+    const labels = {ja:['設定','本文全体をコピー','ウェブアドレス'], ko:['설정','본문 전체 복사','웹 주소'], en:['Settings','Copy entire note text','Web address']}[resolved];
     assert.equal(await manager.$eval('#settings-nav', e => e.textContent), labels[0]);
     assert.equal(await memo.$eval('#copy', e => e.getAttribute('aria-label')), labels[1]);
     assert.equal(await web.$eval('#web-url', e => e.getAttribute('aria-label')), labels[2]);
