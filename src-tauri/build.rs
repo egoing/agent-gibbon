@@ -48,9 +48,11 @@ fn main() {
             .file("src/capture/visibility.m")
             .flag("-fobjc-arc")
             .compile("capture_visibility");
+        println!("cargo:rerun-if-changed=src/tray/status_item.m");
         println!("cargo:rerun-if-changed=src/permission_panel.m");
         println!("cargo:rerun-if-changed=src/layout/app_windows.m");
         cc::Build::new()
+            .file("src/tray/status_item.m")
             .file("src/permission_panel.m")
             .file("src/layout/app_windows.m")
             .file("src/app_activation.m")
