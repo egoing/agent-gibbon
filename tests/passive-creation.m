@@ -6,6 +6,9 @@ extern void jajan_activation_begin_creation(void);
 extern void jajan_activation_end_creation(void);
 extern void jajan_activation_install(void (*callback)(void));
 extern void jajan_activation_focus_content(void *pointer);
+
+// This fixture links native activation without the Rust Dock menu provider.
+void jajan_populate_dock_menu(void *menu) { (void)menu; }
 static BOOL testActive, focusSucceeds = YES;
 static unsigned managers;
 static BOOL isActive(id app, SEL selector) { (void)app; (void)selector; return testActive; }
