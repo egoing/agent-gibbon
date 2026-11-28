@@ -322,6 +322,26 @@ pub(crate) fn sync_permission_item(
     }
 }
 
+#[cfg(target_os = "macos")]
+fn attach_status_menu(
+    tray: &tauri::tray::TrayIcon,
+    menu: Menu<tauri::Wry>,
+) -> Result<(), String> {
+    fn native(menu: &impl tauri::menu::ContextMenu) -> *mut std::ffi::c_void {
+        menu.inner_context().ns_menu()
+    }
+    extern "C" {
+        fn jajan_attach_status_menu(item: *const objc2_app_kit::NSStatusItem, menu: *mut std::ffi::c_void);
+    }
+    tray.with_inner_tray_icon(move |inner| {
+        let item = inner.ns_status_item().ok_or("메뉴 막대 항목이 없습니다")?;
+        // Both handles live through this main-thread call. AppKit retains the menu.
+        unsafe { jajan_attach_status_menu(&*item, native(&menu)) };
+        Ok(())
+    })
+    .map_err(|e| e.to_string())?
+}
+
 pub fn refresh(app: &tauri::AppHandle) -> Result<(), String> {
     if let Some(tray) = app.tray_by_id("jajan") {
         tray.set_tooltip(Some(format!(
@@ -331,6 +351,9 @@ pub fn refresh(app: &tauri::AppHandle) -> Result<(), String> {
         )))
         .map_err(|e| e.to_string())?;
         let menu = menu(app)?;
+        #[cfg(target_os = "macos")]
+        attach_status_menu(&tray, menu.clone())?;
+        #[cfg(not(target_os = "macos"))]
         tray.set_menu(Some(menu.clone()))
             .map_err(|e| e.to_string())?;
         // Drop the old native menu only after releasing TrayMenu as well.
@@ -525,7 +548,7 @@ fn icon() -> tauri::image::Image<'static> {
 pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
     let initial_menu = menu(app)?;
     app.manage(TrayMenu::new(Some(initial_menu.clone())));
-    TrayIconBuilder::with_id("jajan")
+    let tray = TrayIconBuilder::with_id("jajan")
         .icon(icon())
         .icon_as_template(true)
         .tooltip(format!(
@@ -610,6 +633,10 @@ pub fn install(app: &tauri::AppHandle) -> Result<(), String> {
         })
         .build(app)
         .map_err(|e| e.to_string())?;
+    #[cfg(target_os = "macos")]
+    attach_status_menu(&tray, initial_menu)?;
+    #[cfg(not(target_os = "macos"))]
+    let _ = tray;
     Ok(())
 }
 
