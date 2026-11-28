@@ -1,4 +1,5 @@
 #import <Cocoa/Cocoa.h>
+#import <WebKit/WebKit.h>
 #import <Carbon/Carbon.h>
 #import <objc/runtime.h>
 
@@ -49,6 +50,7 @@ static BOOL passiveTurn;
 static void (*openManager)(void);
 static id managerRestoreObserver;
 static BOOL contentActivation;
+static BOOL activatingWithMouse;
 
 static void cancelManagerRestore(void) {
     if (managerRestoreObserver) {
@@ -121,6 +123,8 @@ void jajan_add_dock_window(void *menuPointer, void *windowPointer,
 // Complete this explicit focus request on the native completion notification,
 // but never after a subsequent user input or application switch.
 void jajan_activation_focus_manager(void *pointer) {
+    ++generation; // An explicit manager selection supersedes a pending memo close.
+    passiveTurn = NO;
     contentActivation = NO;
     NSWindow *window = (__bridge NSWindow *)pointer;
     cancelManagerRestore();
@@ -148,9 +152,47 @@ void jajan_activation_preserve_focus(void) {
     });
 }
 
+// Tao destroys the NSWindow asynchronously. Preserve the manager's position
+// across that native close, including other applications at the same level.
+static char closeCompletionKey;
+static NSArray<NSNumber *> *peersOf(NSWindow *manager, CGWindowListOption side) {
+    NSArray *list = CFBridgingRelease(CGWindowListCopyWindowInfo(
+        side, (CGWindowID)manager.windowNumber));
+    NSMutableArray *peers = [NSMutableArray array];
+    for (NSDictionary *entry in list) {
+        if ([entry[(id)kCGWindowLayer] integerValue] == manager.level)
+            [peers addObject:entry[(id)kCGWindowNumber]];
+    }
+    return peers;
+}
+
+void jajan_activation_prepare_close(void *memoPointer, void *managerPointer) {
+    NSWindow *memo = (__bridge NSWindow *)memoPointer;
+    NSWindow *manager = (__bridge NSWindow *)managerPointer;
+    __weak NSWindow *weakManager = manager;
+    if (!manager.visible || manager.miniaturized) return;
+    NSSet *above = [NSSet setWithArray:peersOf(manager, kCGWindowListOptionOnScreenAboveWindow)];
+    if (!above.count) return;
+    NSUInteger ticket = generation;
+    dispatch_block_t completion = ^{
+        NSWindow *window = weakManager;
+        if (!window.visible || window.miniaturized || ticket != generation) return;
+        // Only move down, and only past windows which were above this manager.
+        for (NSNumber *peer in [peersOf(window, kCGWindowListOptionOnScreenBelowWindow)
+                reverseObjectEnumerator]) {
+            if ([above containsObject:peer]) {
+                [window orderWindow:NSWindowBelow relativeTo:peer.integerValue];
+                break;
+            }
+        }
+    };
+    objc_setAssociatedObject(memo, &closeCompletionKey, completion, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
 void jajan_activation_install(void (*callback)(void)) {
-    static id activeObserver, inactiveObserver, mouseMonitor;
+    static id activatingObserver, activeObserver, inactiveObserver, mouseMonitor;
     if (activeObserver) return;
+    (void)activatingObserver;
     (void)inactiveObserver;
     (void)mouseMonitor;
     openManager = callback;
@@ -158,9 +200,28 @@ void jajan_activation_install(void (*callback)(void)) {
     class_addMethod(object_getClass(NSApp.delegate), @selector(applicationDockMenu:),
                     (IMP)dockMenu, "@@:@");
     NSNotificationCenter *center = NSNotificationCenter.defaultCenter;
+    // Remember the input at the start of this activation. A quick click on a
+    // memo can be released before DidBecomeActive; never carry it into a
+    // later app-switcher selection.
+    activatingObserver = [center addObserverForName:NSApplicationWillBecomeActiveNotification
+        object:NSApp queue:nil usingBlock:^(NSNotification *notification) {
+            (void)notification;
+            activatingWithMouse = NSEvent.pressedMouseButtons != 0;
+        }];
+    [center addObserverForName:NSWindowWillCloseNotification object:nil queue:nil
+        usingBlock:^(NSNotification *notification) {
+            NSWindow *window = notification.object;
+            dispatch_block_t completion = objc_getAssociatedObject(window, &closeCompletionKey);
+            if (completion) {
+                objc_setAssociatedObject(window, &closeCompletionKey, nil, OBJC_ASSOCIATION_ASSIGN);
+                dispatch_async(dispatch_get_main_queue(), completion);
+            }
+        }];
     inactiveObserver = [center addObserverForName:NSApplicationDidResignActiveNotification
         object:NSApp queue:nil usingBlock:^(NSNotification *notification) {
             (void)notification;
+            activatingWithMouse = NO;
+            contentActivation = NO;
             ++generation; // Never complete an old selection after switching away.
             passiveTurn = NO;
             cancelManagerRestore();
@@ -178,7 +239,8 @@ void jajan_activation_install(void (*callback)(void)) {
     activeObserver = [center addObserverForName:NSApplicationDidBecomeActiveNotification
         object:NSApp queue:nil usingBlock:^(NSNotification *notification) {
             (void)notification;
-            if (contentActivation) {
+            if (activatingWithMouse || contentActivation) {
+                activatingWithMouse = NO;
                 contentActivation = NO;
                 return;
             }
@@ -190,4 +252,33 @@ void jajan_activation_install(void (*callback)(void)) {
                 openManager();
             });
         }];
+}
+
+// A first click normally orders the window before the DOM receives mousedown.
+// Give only the close button AppKit's delayed-ordering first-mouse contract.
+@interface JajanCloseHitView : NSView
+@property(nonatomic, weak) WKWebView *web;
+@end
+
+@implementation JajanCloseHitView
+- (BOOL)acceptsFirstMouse:(NSEvent *)event { return YES; }
+- (BOOL)shouldDelayWindowOrderingForEvent:(NSEvent *)event { return YES; }
+- (void)mouseDown:(NSEvent *)event { [NSApp preventWindowOrdering]; }
+- (void)mouseUp:(NSEvent *)event {
+    if (NSPointInRect([self convertPoint:event.locationInWindow fromView:nil], self.bounds))
+        [self.web evaluateJavaScript:@"document.getElementById('close')?.click()" completionHandler:nil];
+}
+@end
+
+void jajan_close_hit_rect(void *pointer, double x, double y, double width, double height) {
+    WKWebView *web = (__bridge WKWebView *)pointer;
+    static char key;
+    JajanCloseHitView *hit = objc_getAssociatedObject(web, &key);
+    if (!hit) {
+        hit = [[JajanCloseHitView alloc] initWithFrame:NSZeroRect];
+        hit.web = web;
+        [web addSubview:hit positioned:NSWindowAbove relativeTo:nil];
+        objc_setAssociatedObject(web, &key, hit, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    hit.frame = NSMakeRect(x, web.flipped ? y : NSHeight(web.bounds) - y - height, width, height);
 }
