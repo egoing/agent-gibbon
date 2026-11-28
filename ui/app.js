@@ -405,9 +405,10 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
     flushAnd('hide_note');
   }
-  if (latestNote && !window.getSelection()?.toString() && (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'c') {
+  const copyModifier = isMac ? event.metaKey && !event.ctrlKey : event.ctrlKey && !event.metaKey;
+  if (latestNote && copyModifier && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 'c') {
     event.preventDefault();
-    copyNote();
+    copyNote({ wholeNote: true });
   }
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
     event.preventDefault();
@@ -432,19 +433,28 @@ function currentPlainText() {
   try { return source.innerText; }
   finally { source.remove(); }
 }
-async function copyNote() {
+// WKWebView can receive the native Edit > Copy command without a keydown.
+document.addEventListener('copy', event => {
+  if (!latestNote || !event.isTrusted) return;
+  event.preventDefault();
+  event.stopPropagation();
+  copyNote({ wholeNote: true });
+}, true);
+async function copyNote({ wholeNote = false } = {}) {
   if (!latestNote) return;
   contentAction();
   try {
     if (latestNote.capture) {
       await invoke('copy_note_image');
     } else {
-      await window.__TAURI__.clipboardManager.writeText(window.getSelection()?.toString() || (sourceProtected ? latestNote.markdown : editing ? $('editor').innerText : currentPlainText()));
+      const selection = wholeNote ? '' : window.getSelection()?.toString();
+      const text = selection || (sourceProtected ? latestNote.markdown : editing ? $('editor').innerText : currentPlainText());
+      await window.__TAURI__.clipboardManager.writeText(text);
     }
     notify('복사했습니다');
   } catch (error) { failure(error); }
 }
-$('copy').addEventListener('click', copyNote);
+$('copy').addEventListener('click', () => copyNote());
 $('content').addEventListener('click', (event) => { if (event.target.closest('a')) event.preventDefault(); });
 // Native movement arrives even when WKWebView belongs to a background app.
 window.__TAURI__.event.listen('note-pointer-over', ({ payload }) => {

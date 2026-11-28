@@ -79,10 +79,11 @@ test('dirty state defers acknowledgement; clean focus departure confirms only ob
   app.input('초안');await app.leave();assert.equal(app.calls.some(([n])=>n==='acknowledge_feedback'),false);
   await app.action('cancel');await app.leave();assert.equal(app.calls.filter(([n])=>n==='acknowledge_feedback').at(-1)[1].revision,2);
 });
-test('selected copy preserves native shortcut, copy button copies draft without save',async()=>{
-  const app=await setup();app.input('작성중');app.state.selection='선택';
-  let prevented=false;app.events.keydown({key:'c',metaKey:true,preventDefault(){prevented=true;}});assert.equal(prevented,false);
-  await app.element('copy').listeners.click();assert.equal(app.calls.find(([n])=>n==='clipboard-text')[1],'선택');
+test('copy shortcut copies the whole draft and the button keeps the selection',async()=>{
+  const app=await setup();app.input('작성중');app.state.selection='중';
+  let prevented=false;app.events.keydown({key:'c',metaKey:true,preventDefault(){prevented=true;}});assert.equal(prevented,true);
+  await app.element('copy').listeners.click();
+  assert.deepEqual(app.calls.filter(([n])=>n==='clipboard-text').map(([,text])=>text),['작성중','중']);
   assert.equal(app.calls.some(([n])=>n==='save_note'),false);
 });
 test('image notes keep native copy and shortcut export with no text editor',async()=>{
