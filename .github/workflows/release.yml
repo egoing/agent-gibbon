@@ -96,13 +96,27 @@ jobs:
       - run: cargo test --locked --manifest-path src-tauri/Cargo.toml
       - run: pnpm run test:ui
       - run: cargo clippy --locked --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
+      - name: Prepare App Store Connect notarization key
+        if: env.NOTARIZE_MAC == 'true'
+        shell: bash
+        env:
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+        run: |
+          : "${APPLE_API_KEY_P8:?Missing APPLE_API_KEY_P8}"
+          umask 077
+          printf '%s\n' "$APPLE_API_KEY_P8" > "$RUNNER_TEMP/jajan-notary.p8"
+          if ! openssl pkey -in "$RUNNER_TEMP/jajan-notary.p8" -noout </dev/null >/dev/null 2>&1; then
+            echo '::error::APPLE_API_KEY_P8 must contain an unencrypted App Store Connect .p8 key.'
+            exit 1
+          fi
       - name: Build installers
         shell: bash
         env:
           APPLE_CERTIFICATE: ${{ env.NOTARIZE_MAC == 'true' && secrets.APPLE_CERTIFICATE || '' }}
           APPLE_CERTIFICATE_PASSWORD: ${{ env.NOTARIZE_MAC == 'true' && secrets.APPLE_CERTIFICATE_PASSWORD || '' }}
-          APPLE_ID: ${{ env.NOTARIZE_MAC == 'true' && secrets.APPLE_ID || '' }}
-          APPLE_PASSWORD: ${{ env.NOTARIZE_MAC == 'true' && secrets.APPLE_PASSWORD || '' }}
+          APPLE_API_KEY: ${{ env.NOTARIZE_MAC == 'true' && secrets.APPLE_API_KEY || '' }}
+          APPLE_API_ISSUER: ${{ env.NOTARIZE_MAC == 'true' && secrets.APPLE_API_ISSUER || '' }}
+          APPLE_API_KEY_PATH: ${{ env.NOTARIZE_MAC == 'true' && format('{0}/jajan-notary.p8', runner.temp) || '' }}
           APPLE_TEAM_ID: ${{ env.NOTARIZE_MAC == 'true' && secrets.APPLE_TEAM_ID || '' }}
           JAJAN_SENTRY_DSN: ${{ secrets.AGENT_GIBBON_SENTRY_DSN || vars.AGENT_GIBBON_SENTRY_DSN }}
           RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
@@ -130,13 +144,14 @@ jobs:
           export TAURI_SIGNING_PRIVATE_KEY TAURI_SIGNING_PRIVATE_KEY_PASSWORD TAURI_UPDATER_PUBLIC_KEY
           node scripts/updater-build-config.mjs "$RUNNER_TEMP/updater-build-config.json"
           if [[ "$NOTARIZE_MAC" == true ]]; then
-            : "${APPLE_CERTIFICATE:?}" "${APPLE_CERTIFICATE_PASSWORD:?}" "${APPLE_TEAM_ID:?}" "${APPLE_ID:?}" "${APPLE_PASSWORD:?}"
+            : "${APPLE_CERTIFICATE:?}" "${APPLE_CERTIFICATE_PASSWORD:?}" "${APPLE_TEAM_ID:?}" "${APPLE_API_KEY:?}" "${APPLE_API_ISSUER:?}"
+            [[ -s "$APPLE_API_KEY_PATH" ]]
             [[ "$APPLE_TEAM_ID" == 5P84RWXNB6 ]]
             export APPLE_SIGNING_IDENTITY='Developer ID Application: tae kyong kim (5P84RWXNB6)'
             jq --arg identity "$APPLE_SIGNING_IDENTITY" '.bundle.macOS.signingIdentity = $identity' "$RUNNER_TEMP/updater-build-config.json" > "$RUNNER_TEMP/signed-config.json"
             mv "$RUNNER_TEMP/signed-config.json" "$RUNNER_TEMP/updater-build-config.json"
           else
-            unset APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID
+            unset APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_API_KEY APPLE_API_ISSUER APPLE_API_KEY_PATH APPLE_TEAM_ID
           fi
           if [[ "$RUNNER_OS" == Windows ]]; then
             # Retain function/line symbols for the exact installer binary.
@@ -241,10 +256,14 @@ jobs:
         if: env.NOTARIZE_MAC == 'true'
         shell: bash
         env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY_PATH: ${{ runner.temp }}/jajan-notary.p8
         run: bash scripts/notarize-macos-dmg.sh '${{ matrix.target }}' release-assets
+      - name: Remove App Store Connect notarization key
+        if: always() && env.NOTARIZE_MAC == 'true'
+        shell: bash
+        run: rm -f "$RUNNER_TEMP/jajan-notary.p8"
       - uses: actions/upload-artifact@v4
         with:
           name: installer-${{ matrix.asset }}

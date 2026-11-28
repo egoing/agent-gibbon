@@ -33,8 +33,8 @@ verify_app() {
 
 tar -xzf "$archive" -C "$work/updater"
 verify_app "$work/updater/Jajan.app"
-xcrun notarytool submit "$dmg" --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" \
-  --team-id "$APPLE_TEAM_ID" --wait --timeout 45m --output-format json > "$work/submission.json"
+xcrun notarytool submit "$dmg" --key "$APPLE_API_KEY_PATH" --key-id "$APPLE_API_KEY" \
+  --issuer "$APPLE_API_ISSUER" --wait --timeout 45m --output-format json > "$work/submission.json"
 id=$(jq -er '.id | select(test("^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"))' "$work/submission.json")
 status=$(jq -er '.status' "$work/submission.json")
 echo "$target DMG submission $id ($status)"
