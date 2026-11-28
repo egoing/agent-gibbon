@@ -16,13 +16,13 @@ const labels = {
 function renderNotice(status) {
   noticeStatus = status || { phase: 'error', message: '' };
   const phase = Object.hasOwn(labels, noticeStatus.phase) ? noticeStatus.phase : 'error';
-  noticeEl('notice-title').textContent = labels[phase];
-  noticeEl('notice-version').textContent = noticeStatus.version ? `새 버전 ${noticeStatus.version}` : '';
+  window.jajanLanguage.bind(noticeEl('notice-title'), 'textContent', labels[phase]);
+  window.jajanLanguage.bind(noticeEl('notice-version'), 'textContent', noticeStatus.version ? window.jajanLanguage.msg('새 버전 {version}', {version: noticeStatus.version}) : '');
   const message = noticeEl('notice-message');
-  message.textContent = noticeStatus.message || '업데이트 상태를 확인하지 못했습니다.';
+  window.jajanLanguage.bind(message, 'textContent', noticeStatus.message || '업데이트 상태를 확인하지 못했습니다.');
   message.setAttribute('role', phase === 'error' ? 'alert' : 'status');
   message.hidden = phase !== 'error' && !(noticeFeedbackVersion && noticeFeedbackVersion === noticeStatus.version);
-  noticeEl('notice-install').textContent = phase === 'preparing' ? '작업 상태 확인 중…' : phase === 'installing' ? '설치하고 재시작 중…' : '업데이트하고 재시작';
+  window.jajanLanguage.bind(noticeEl('notice-install'), 'textContent', phase === 'preparing' ? '작업 상태 확인 중…' : phase === 'installing' ? '설치하고 재시작 중…' : '업데이트하고 재시작');
   noticeEl('notice-install').disabled = noticeBusy || phase !== 'ready';
   noticeEl('notice-dismiss').disabled = noticeBusy && phase === 'installing';
 }
@@ -61,7 +61,7 @@ async function dismissNotice() {
   try { await noticeInvoke('updater_notice_dismiss'); }
   catch {
     noticeEl('notice-message').hidden = false;
-    noticeEl('notice-message').textContent = '안내를 닫지 못했습니다. 다시 시도하세요.';
+    window.jajanLanguage.bind(noticeEl('notice-message'), 'textContent', '안내를 닫지 못했습니다. 다시 시도하세요.');
     noticeEl('notice-message').setAttribute('role', 'alert');
     noticeEl('notice-dismiss').disabled = false;
   }

@@ -19,7 +19,7 @@
       // A failed Welcome request is also a drawable state. Settle the task
       // after putting the error into the trusted page's existing status area.
       const prepared = placement.then(work).catch(error => {
-        document.getElementById('status').textContent = String(error);
+        window.jajanLanguage.bind(document.getElementById('status'), 'textContent', String(error));
       });
       initialContent.push(prepared);
       return prepared;

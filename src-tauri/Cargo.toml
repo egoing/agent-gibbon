@@ -27,6 +27,7 @@ tauri-plugin-dialog = "2"
 tempfile = "3"
 portable-pty = "0.9"
 tauri-plugin-updater = "2"
+sys-locale = "0.3.2"
 
 [features]
 verification-updater = []

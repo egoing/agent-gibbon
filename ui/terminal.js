@@ -11,12 +11,19 @@ const terminal = new Terminal({fontSize:window.jajanContentSize.defaultValue('te
 const fit = new FitAddon.FitAddon();
 terminal.loadAddon(fit);
 terminal.open(terminalHost);
+if (terminal.textarea) window.jajanLanguage.bind(terminal.textarea, 'aria-label', '터미널 입력');
+window.addEventListener('jajan-language-change', () => {
+  if (Terminal.strings) {
+    Terminal.strings.promptLabel = window.jajanLanguage.t('터미널 입력');
+    Terminal.strings.tooMuchOutput = window.jajanLanguage.t('출력이 너무 많아 읽기를 중단했습니다.');
+  }
+});
 let homePath=null, selectedFolder=null, selectedChoice=null, availableChoices=[], folders=[], expandedFolders=false, selectingFolder=false;
 let restoreSupported=true;
 let ended=false;
 let started=false, starting=false, input=Promise.resolve(), resizeTimer;
 let presented=false, pendingExecution, lastExecution;
-function report(e){status.textContent=String(e);}
+function report(e){window.jajanLanguage.bind(status, 'textContent', String(e));}
 // A successful terminal_start creates the PTY at the supplied cell size. Only
 // one subsequent resize may be in flight; xterm holds the latest desired grid.
 let appliedSize=null, resizing=false, retryTimer;
@@ -87,7 +94,10 @@ document.querySelectorAll('.resize').forEach(handle=>handle.addEventListener('po
 document.getElementById('close').onclick=()=>invoke('terminal_close').catch(report);
 function setInfo(info){
   ended ||= info.exit_code!=null;
-  document.getElementById('title').textContent=info.running && info.program && info.program !== 'shell' ? info.program : info.title;
+  const title = document.getElementById('title');
+  const program = info.running && info.program !== 'shell' && info.program;
+  if (!program && info.default_title) window.jajanLanguage.bind(title, 'textContent', '터미널');
+  else window.jajanLanguage.raw(title, 'textContent', program || info.title);
 
 }
 async function start(choice, trigger, plan, execRequest){
@@ -98,7 +108,7 @@ async function start(choice, trigger, plan, execRequest){
   }
   const automated = execRequest !== undefined;
   starting=true;
-  status.textContent=automated ? '' : `${trigger?.dataset?.label||'터미널'} 시작 중…`;
+  window.jajanLanguage.bind(status, 'textContent', automated ? '' : window.jajanLanguage.msg('{task} 시작 중…', {task: window.jajanLanguage.msg(trigger?.dataset?.label || '터미널')}));
   welcomeSurface.setAttribute('aria-busy','true');
   welcomeSurface.hidden=true;
   terminalHost.hidden=false;
@@ -136,7 +146,7 @@ async function start(choice, trigger, plan, execRequest){
     }
     loading.hidden=true;
     terminalHost.inert=false;
-    status.textContent='';measure();
+    window.jajanLanguage.bind(status, 'textContent', '');measure();
     if(trigger && document.hasFocus() && (document.activeElement===trigger || document.activeElement===document.body))terminal.focus();
   }catch(e){
     const restoreFocus=trigger && document.hasFocus() && (document.activeElement===trigger || document.activeElement===document.body);
@@ -159,7 +169,7 @@ function queueExecution(token){
   pendingExecution=token;
   welcomeSurface.hidden=true;
   terminalHost.inert=true;
-  status.textContent='';
+  window.jajanLanguage.bind(status, 'textContent', '');
   loading.hidden=false;
   startQueuedExecution();
 }
@@ -184,7 +194,7 @@ function renderFolders(){
     const parent=document.createElement('span');parent.className='folder-parent';parent.textContent=folder.parent;
     button.append(name,parent);button.onclick=()=>{selectedFolder=folder;selectionChanged();};list.append(button);
   }
-  const more=document.getElementById('more-folders');more.hidden=folders.length<=3;more.textContent=expandedFolders?'접기':'더 보기…';more.setAttribute('aria-expanded',String(expandedFolders));
+  const more=document.getElementById('more-folders');more.hidden=folders.length<=3;window.jajanLanguage.bind(more, 'textContent', expandedFolders?'접기':'더 보기…');more.setAttribute('aria-expanded',String(expandedFolders));
   selectionChanged();
 }
 async function welcome(){
@@ -195,7 +205,7 @@ async function welcome(){
   if(!availableChoices.some(item=>item.id===selectedChoice))selectedChoice=availableChoices[0]?.id;
   const list=document.getElementById('recommendations');list.replaceChildren();
   for(const item of availableChoices){
-    const button=document.createElement('button');button.className='select-row';button.dataset.choice=item.id;button.textContent=item.label;
+    const button=document.createElement('button');button.className='select-row';button.dataset.choice=item.id;window.jajanLanguage.bind(button, 'textContent', item.label);
     button.onclick=()=>{selectedChoice=item.id;selectionChanged();};list.append(button);
   }
   renderFolders();
@@ -215,7 +225,7 @@ document.getElementById('more-folders').onclick=()=>{expandedFolders=!expandedFo
 document.getElementById('run-task').onclick=()=>{if(!selectingFolder) return start(selectedChoice,document.getElementById('run-task'));};
 document.getElementById('choose-folder').onclick=async()=>{
   if(selectingFolder)return;selectingFolder=true;selectionChanged();
-  try{const result=await invoke('terminal_folder',{path:null});if(result.folder_selected!==false)await welcome();status.textContent='';}catch(e){report(e);}finally{selectingFolder=false;selectionChanged();}
+  try{const result=await invoke('terminal_folder',{path:null});if(result.folder_selected!==false)await welcome();window.jajanLanguage.bind(status, 'textContent', '');}catch(e){report(e);}finally{selectingFolder=false;selectionChanged();}
 };
 async function initializeTerminal() {
   // An event registered before the snapshot covers commands arriving after it.
@@ -226,13 +236,13 @@ async function initializeTerminal() {
   restoreSupported=info.restore_supported !== false;
   setInfo(info);
   {
-    const close=document.getElementById('close');close.title='터미널 종료';close.setAttribute('aria-label','터미널 종료');
+    const close=document.getElementById('close');window.jajanLanguage.bind(close, 'title', '터미널 종료');window.jajanLanguage.bind(close, 'aria-label', '터미널 종료');
     if(ended){
       loading.hidden=true;
       welcomeSurface.hidden=true;
       terminalHost.hidden=false;
       terminalHost.inert=false;
-      terminal.write('\r\n[PTY 세션 종료]\r\n');
+      terminal.write('\r\n[' + window.jajanLanguage.t('PTY 세션 종료') + ']\r\n');
       return;
     }
     queueExecution(info.pending_execution);
@@ -246,7 +256,7 @@ async function initializeTerminal() {
       if(!restoreSupported)report('터미널 복원 실행은 이 운영체제에서 아직 지원하지 않습니다. 현재 macOS에서만 사용할 수 있습니다.');
       else if(info.restored && info.auto_restore) await start('auto-monitor', null);
     }
-    else if(info.restored) status.textContent = `이전 터미널 프로세스는 종료되었습니다. ${info.last_command ? `마지막 명령: ${info.last_command} · 자동 실행하지 않았습니다.` : '마지막 명령은 안전한 복원을 위해 저장에서 제외되었습니다.'}`;
+    else if(info.restored) window.jajanLanguage.bind(status, 'textContent', info.last_command ? window.jajanLanguage.msg('이전 터미널 프로세스는 종료되었습니다. 마지막 명령: {command} · 자동 실행하지 않았습니다.', {command: info.last_command}) : '이전 터미널 프로세스는 종료되었습니다. 마지막 명령은 안전한 복원을 위해 저장에서 제외되었습니다.');
   }
   window.jajanMeasure?.('terminal.ui.ready',clock());
 }

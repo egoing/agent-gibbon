@@ -685,17 +685,11 @@ fn place_indicator(app: &tauri::AppHandle, area: Rect, top: bool, tip: bool) -> 
     show_frame(&w)
 }
 fn set_tip(app: &tauri::AppHandle, w: &WebviewWindow, tip: bool) -> Result<(), String> {
-    let text = if tip {
-        format!(
-            "복원: {} 놓고 ↓",
-            crate::presentation::shortcut(shortcut(app).split_whitespace().next().unwrap_or(""))
-        )
-    } else {
-        String::new()
-    };
+    let shortcut =
+        crate::presentation::shortcut(shortcut(app).split_whitespace().next().unwrap_or(""));
     w.eval(format!(
-        "window.setStashTip({})",
-        serde_json::to_string(&text).map_err(err)?
+        "window.setStashTip({tip}, {})",
+        serde_json::to_string(&shortcut).map_err(err)?
     ))
     .map_err(err)
 }
@@ -1043,7 +1037,7 @@ pub(crate) fn refresh_input(app: &tauri::AppHandle) -> Result<(), String> {
                 "layout-undo",
                 tauri::WebviewUrl::App("layout-undo.html".into()),
             )
-            .title("정렬 취소하기")
+            .title(crate::language::tr("정렬 취소하기"))
             .accept_first_mouse(true)
             .inner_size(144., 40.)
             .decorations(false)
@@ -1065,8 +1059,9 @@ pub(crate) fn refresh_input(app: &tauri::AppHandle) -> Result<(), String> {
                 tauri::WebviewUrl::App("direction-guide.html".into()),
             )
             .title(format!(
-                "{} — 방향 안내",
-                crate::instance::current().title()
+                "{} — {}",
+                crate::instance::current().title(),
+                crate::language::tr("방향 안내")
             ))
             .inner_size(232., 232.)
             .decorations(false)

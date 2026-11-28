@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -16,7 +17,7 @@ function selectionUI() {
     } } } },
     document:{documentElement:{classList:classes},getElementById:id=>elements[id],body:{setPointerCapture(){},hasPointerCapture(){return true;},releasePointerCapture(id){ calls.push(['releasePointerCapture',id]); }},addEventListener:(name,fn)=>{events[name]=fn;}},
   };
-  vm.runInNewContext(readFileSync(new URL('../ui/capture.js',import.meta.url),'utf8'),context);
+  vm.runInNewContext(readFileSync(new URL('../ui/capture.js',import.meta.url),'utf8'),sourceLanguageWindow(context));
   const ready = flush;
   return {events,calls,elements,ready,frames,ticks,classes};
 }

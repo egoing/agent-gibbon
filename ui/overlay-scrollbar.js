@@ -33,7 +33,7 @@ export function installOverlayScrollbar(doc = document, options = {}) {
     bar.setAttribute('aria-valuemax', String(Math.round(geometry.range)));
     bar.setAttribute('aria-valuenow', String(Math.round(target.scrollTop)));
     bar.setAttribute('aria-controls', target.id);
-    bar.setAttribute('aria-label', target === editor ? '편집기 세로 스크롤' : (options.label || '메모 세로 스크롤'));
+    window.jajanLanguage.bind(bar, 'aria-label', target === editor ? '편집기 세로 스크롤' : (options.label || '메모 세로 스크롤'));
     if (wasHidden && !bar.hidden) reveal();
   }
   function schedule() { if (frame == null) frame = requestAnimationFrame(update); }

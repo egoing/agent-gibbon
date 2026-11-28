@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -41,8 +42,8 @@ function ui({exitCode=null,grid=null,ipc=null,restoreSupported=true,plan=null,re
    context.matchMedia=()=>({matches:false});
    context.ResizeObserver=class{constructor(callback){grid.observed=callback;}observe(){}};
  }
- vm.runInNewContext(readFileSync(new URL('../ui/content-size.js',import.meta.url),'utf8'),context);
- vm.runInNewContext(readFileSync(new URL('../ui/terminal.js',import.meta.url),'utf8'),context);return {elements,calls,intervals,info};
+ vm.runInNewContext(readFileSync(new URL('../ui/content-size.js',import.meta.url),'utf8'),sourceLanguageWindow(context));
+ vm.runInNewContext(readFileSync(new URL('../ui/terminal.js',import.meta.url),'utf8'),sourceLanguageWindow(context));return {elements,calls,intervals,info};
 }
 test('no history uses home preview and retains folder picker and shell without autostart',async()=>{const {elements,calls}=ui();await flush();assert.equal(elements['home-hint'].hidden,false);assert.equal(elements['recent-folders'].children.length,0);assert.equal(calls.some(([n])=>n==='terminal_start'),false);assert.equal(typeof elements['choose-folder'].onclick,'function');assert.ok(elements.recommendations.children.some(b=>b.dataset.choice==='shell'));assert.match(elements['command-preview'].textContent,/cd -- '\/home\/test'/);});
 test('recent folders show three, expand, select locally and update preview',async()=>{const folders=['/a/one','/b/two','/c/three','/d/four'].map(folder);const {elements,calls}=ui({path:folders[0].path,folders});await flush();assert.equal(elements['recent-folders'].children.length,3);assert.equal(elements['more-folders'].hidden,false);await elements['more-folders'].onclick();assert.equal(elements['recent-folders'].children.length,4);const row=elements['recent-folders'].children[3];row.onclick();assert.equal(row.attrs['aria-pressed'],'true');assert.equal(elements['recent-folders'].children[0].attrs['aria-pressed'],'false');assert.ok(elements['command-preview'].textContent.includes(folders[3].command));assert.equal(calls.some(([n])=>n==='terminal_folder'||n==='terminal_start'),false);await elements['run-task'].onclick();const writes=calls.filter(([n])=>n==='terminal_folder'||n==='terminal_start');assert.equal(writes[0][0],'terminal_folder');assert.equal(writes[0][1].path,folders[3].path);assert.equal(writes[1][0],'terminal_start');});

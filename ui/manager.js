@@ -15,12 +15,12 @@ function syncVisibility() {
   const note = notes.get(visibilityView.key);
   if (!note) return;
   const label = note.visible ? '화면에서 숨기기' : '화면에 띄우기';
-  if (visibilityView.button.textContent !== label) visibilityView.button.textContent = label;
+  if (visibilityView.button.textContent !== label) window.jajanLanguage.bind(visibilityView.button, 'textContent', label);
   const pending = visibilityPending.has(note.key);
   if (visibilityView.button.disabled !== pending) visibilityView.button.disabled = pending;
 }
 // Register settings destinations here; navigation preserves each panel's DOM.
-const settingsSections = ['privacy', 'skills', 'appearance', ...(el('settings-updater') ? ['updater'] : []), ...(el('settings-autostart') ? ['autostart'] : []), ...(el('settings-developer') ? ['developer'] : [])];
+const settingsSections = ['privacy', 'skills', 'language', 'appearance', ...(el('settings-updater') ? ['updater'] : []), ...(el('settings-autostart') ? ['autostart'] : []), ...(el('settings-developer') ? ['developer'] : [])];
 let selectedSettingsSection = 'privacy';
 function settingsSection(selectedSection) {
   selectedSettingsSection = selectedSection;
@@ -70,9 +70,9 @@ async function detail(note) {
   const target = el('detail'); target.replaceChildren();
   visibilityView = null;
   captureView = null;
-  if (!note) { target.textContent = notes.size ? '메모를 선택하세요.' : '아직 메모가 없습니다.'; return; }
+  if (!note) { window.jajanLanguage.bind(target, 'textContent', notes.size ? '메모를 선택하세요.' : '아직 메모가 없습니다.'); return; }
   const tools = document.createElement('div'); tools.className = 'detail-tools';
-  tools.setAttribute('role', 'group'); tools.setAttribute('aria-label', '메모 공통 도구');
+  tools.setAttribute('role', 'group'); window.jajanLanguage.bind(tools, 'aria-label', '메모 공통 도구');
   const open = document.createElement('button');
   const error = document.createElement('p'); error.className = 'detail-error'; error.hidden = true; error.setAttribute('role', 'alert');
   open.onclick = async () => {
@@ -86,7 +86,7 @@ async function detail(note) {
       const current = notes.get(note.key);
       if (current) current.visible = visible;
     }
-    catch { if (version === detailVersion) { error.textContent = '메모 표시 상태를 변경하지 못했습니다. 다시 시도하세요.'; error.hidden = false; } }
+    catch { if (version === detailVersion) { window.jajanLanguage.bind(error, 'textContent', '메모 표시 상태를 변경하지 못했습니다. 다시 시도하세요.'); error.hidden = false; } }
     finally { visibilityPending.delete(note.key); visibilityVersion++; syncVisibility(); }
   };
   visibilityView = { key: note.key, button: open }; syncVisibility();
@@ -96,8 +96,8 @@ async function detail(note) {
     if (note.capture) captureView = {title, image:null, request:0};
   }
   if (note.kind) {
-    const kind=document.createElement('p');kind.textContent=note.kind === 'web' ? '웹' : '터미널';target.append(kind);
-    if(note.kind==='terminal'){const remove=document.createElement('button');remove.textContent='목록에서 삭제';remove.onclick=async()=>{try{await invoke('manager_terminal',{id:note.id,action:'delete'});await refresh(true);}catch(e){el('error').hidden=false;remove.title=String(e);}};target.append(remove);}
+    const kind=document.createElement('p');window.jajanLanguage.bind(kind, 'textContent', note.kind === 'web' ? '웹' : '터미널');target.append(kind);
+    if(note.kind==='terminal'){const remove=document.createElement('button');window.jajanLanguage.bind(remove, 'textContent', '목록에서 삭제');remove.onclick=async()=>{try{await invoke('manager_terminal',{id:note.id,action:'delete'});await refresh(true);}catch(e){el('error').hidden=false;remove.title=String(e);}};target.append(remove);}
   } else if (note.capture) {
     await loadImage(note, captureView, false);
   } else {
@@ -199,7 +199,7 @@ function render(scroll = el('list').parentElement.scrollTop, verifyImage = false
         button.className = 'web-row';
         const name = document.createElement('span');
         const kind = document.createElement('span');
-        kind.textContent = '웹';
+        window.jajanLanguage.bind(kind, 'textContent', '웹');
         button.append(name); button.append(kind);
       }
       buttons.set(key, button);
@@ -213,7 +213,7 @@ function render(scroll = el('list').parentElement.scrollTop, verifyImage = false
     if (list.children[index] !== button) list.insertBefore(button, list.children[index] || null);
   }
   const status = !notes.size ? '아직 메모가 없습니다.' : !rows.length ? '검색 결과가 없습니다.' : '';
-  if (el('list-status').textContent !== status) el('list-status').textContent = status;
+  if (el('list-status').textContent !== status) window.jajanLanguage.bind(el('list-status'), 'textContent', status);
   if (active?.dataset.id && active !== document.activeElement) {
     (buttons.get(active.dataset.key) || search).focus({preventScroll:true});
   }
@@ -232,7 +232,7 @@ function render(scroll = el('list').parentElement.scrollTop, verifyImage = false
     if (reload) loadImage(next, captureView, verifyImage);
     return;
   }
-  if (sameDetail(displayed, next) && (next || target.textContent === placeholder)) {
+  if (sameDetail(displayed, next) && (next || target.textContent === window.jajanLanguage.t(placeholder))) {
     syncVisibility();
     return;
   }
@@ -289,8 +289,27 @@ async function refresh(force = false) {
 // Content links remain inert; showing a memo requires an explicit button.
 el('detail').addEventListener('click', event => { if (event.target.closest('a')) event.preventDefault(); });
 window.addEventListener('focus', () => refresh());
+window.addEventListener('jajan-language-change', () => { if (!el('notes-page').hidden) refresh(); });
 setInterval(() => { if (!document.hidden && !el('notes-page').hidden) refresh(); }, 2000);
 if(window.jajanPrivacy){
   window.jajanPrivacy.onAccepted=()=>page(false);
   window.jajanPrivacy.ready.then(()=>{if(window.jajanPrivacy.accepted())page(false);}).catch(()=>{});
 }else refresh();
+
+el('app-language').onchange = async event => {
+  const select = event.currentTarget;
+  select.disabled = true;
+  el('language-error').hidden = true;
+  try {
+    const saved = await invoke('language_save', {choice: select.value});
+    window.jajanLanguage.apply(saved);
+    if (saved.refresh_failed) {
+      window.jajanLanguage.bind(el('language-error'), 'textContent', '언어는 저장했지만 일부 화면에 적용하지 못했습니다.');
+      el('language-error').hidden = false;
+    }
+  } catch {
+    select.value = window.jajanLanguage.choice;
+    window.jajanLanguage.bind(el('language-error'), 'textContent', '언어 설정을 저장하지 못했습니다.');
+    el('language-error').hidden = false;
+  } finally { select.disabled = false; }
+};

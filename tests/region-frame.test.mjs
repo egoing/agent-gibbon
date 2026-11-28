@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -13,7 +14,7 @@ for (const condition of ['restored', 'onboarding']) {
       if (condition === 'onboarding') throw new Error('onboarding_required');
       return false;
     }}}};
-    vm.runInNewContext(source, {window});
+    vm.runInNewContext(source, sourceLanguageWindow({window}));
     let initialized = false;
     await window.jajanRegionFrame.prepare(() => { initialized = true; });
     await window.jajanRegionFrame.ready();
@@ -35,7 +36,7 @@ test('a rejected Welcome task presents its error after all initial tasks settle'
     assert.equal(status.textContent, 'Error: Welcome 조회 실패');
     order.push('show');
   }}}};
-  vm.runInNewContext(source, {window, document});
+  vm.runInNewContext(source, sourceLanguageWindow({window, document}));
   const frame = window.jajanRegionFrame;
   await frame.prepare(async () => { throw new Error('Welcome 조회 실패'); });
   let applyTheme;
@@ -60,7 +61,7 @@ test('a newly drawn surface stays transparent until its themed paint is prepared
     assert.equal(command, 'region_frame_ready');
     assert.equal(style.opacity, undefined);
   }}}};
-  vm.runInNewContext(source, {window, document});
+  vm.runInNewContext(source, sourceLanguageWindow({window, document}));
   assert.equal(style.opacity, '0');
   await window.jajanRegionFrame.placement;
   assert.equal(style.opacity, '0');

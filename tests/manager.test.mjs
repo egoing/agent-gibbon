@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -18,13 +19,13 @@ function setup() {
     querySelector(tag) { return this.children.find(x=>x.tagName===tag); },
     contains(x) { return x===this || this.children.some(c=>c.contains(x)); }, addEventListener() {}, focus() {}
   });
-  for (const id of ['notes-page','settings-page','notes-nav','settings-nav','retry','refresh','detail','list','memo-search','list-status','error','settings-privacy','settings-skills','settings-privacy-nav','settings-skills-nav','settings-appearance','settings-appearance-nav']) elements.set(id, make());
+  for (const id of ['notes-page','settings-page','notes-nav','settings-nav','retry','refresh','detail','list','memo-search','list-status','error','settings-privacy','settings-skills','settings-privacy-nav','settings-skills-nav','settings-appearance','settings-appearance-nav','settings-language-nav','settings-language','app-language','language-error']) elements.set(id, make());
   let data = [{id:'hidden',title:'숨긴 메모',html:'<h1>숨긴 메모</h1><p>내용</p>',capture:null,visible:false}];
   const calls = [], requests = [];
   let show = async ({id,visible}) => { data = data.map(n => n.id === id ? {...n,visible} : n); return visible; };
   let readNotes = () => data.map(n => ({...n}));
   let readImage = () => 'data:image/png;base64,test';
-  const context = vm.createContext({document:{getElementById:id=>elements.get(id),createElement:make,hidden:false}, window:{__TAURI__:{core:{invoke:async (name,args)=>{ calls.push(name); requests.push({name,args}); if(name==='manager_set_visibility')return show(args); if(name==='manager_notes')return readNotes(); if(name==='manager_image')return readImage(); return data; }}},addEventListener(){}},setInterval(){}});
+  const context = vm.createContext(sourceLanguageWindow({document:{getElementById:id=>elements.get(id),createElement:make,hidden:false}, window:{__TAURI__:{core:{invoke:async (name,args)=>{ calls.push(name); requests.push({name,args}); if(name==='manager_set_visibility')return show(args); if(name==='manager_notes')return readNotes(); if(name==='manager_image')return readImage(); return data; }}},addEventListener(){}},setInterval(){}}));
   vm.runInContext(source,context);
   return { elements, calls, requests, setShow:fn=>{show=fn;}, setReadNotes:fn=>{readNotes=fn;}, setReadImage:fn=>{readImage=fn;}, run:code=>vm.runInContext(code,context), setData:value=>{data=value;} };
 }

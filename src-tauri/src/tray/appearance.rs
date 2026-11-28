@@ -54,7 +54,10 @@ pub(super) fn pixels(rgba: &mut [u8], visible: bool, foreground: Option<[u8; 3]>
 
 pub(super) fn title(title: &str, visible: bool) -> String {
     if cfg!(windows) {
-        format!("{title}\t{}", if visible { "표시 중" } else { "숨김" })
+        format!(
+            "{title}\t{}",
+            crate::language::tr(if visible { "표시 중" } else { "숨김" })
+        )
     } else {
         title.into()
     }

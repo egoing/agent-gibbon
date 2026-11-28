@@ -13,9 +13,10 @@ window.jajanContentSize = (() => {
     let pending = false;
     const label = () => {
       const value = steps[index][kind];
-      const size = kind === 'web' ? `페이지 배율 ${Math.round(value * 100)}%` : `글자 크기 ${value}px`;
-      button.title = `${size} · 클릭하여 변경`;
-      button.setAttribute('aria-label', button.title);
+      const key = kind === 'web' ? '페이지 배율 {value}% · 클릭하여 변경' : '글자 크기 {value}px · 클릭하여 변경';
+      const variables = {value: kind === 'web' ? Math.round(value * 100) : value};
+      window.jajanLanguage.bind(button, 'title', key, variables);
+      window.jajanLanguage.bind(button, 'aria-label', key, variables);
     };
     label();
     button.onclick = async () => {

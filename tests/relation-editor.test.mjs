@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -13,8 +14,8 @@ function fixture(script,invoke){
  };
  const document={getElementById:node,querySelector:()=>node('svg'),createElement:()=>({...node('new'),listeners:{},attributes:{}}),addEventListener(k,fn){events[k]=fn;}};
  const context={document,requestAnimationFrame(fn){frames.push(fn);return frames.length;},window:{__TAURI__:{core:{invoke(name,args){calls.push([name,args]);return invoke(name,args);}},event:{async listen(name,fn){native[name]=fn;}}}}};
- if(script==='relation-pick.js')vm.runInNewContext(readFileSync(new URL('../ui/relation-curve.js',import.meta.url),'utf8'),context);
- vm.runInNewContext(readFileSync(new URL(`../ui/${script}`,import.meta.url),'utf8'),context);
+ if(script==='relation-pick.js')vm.runInNewContext(readFileSync(new URL('../ui/relation-curve.js',import.meta.url),'utf8'),sourceLanguageWindow(context));
+ vm.runInNewContext(readFileSync(new URL(`../ui/${script}`,import.meta.url),'utf8'),sourceLanguageWindow(context));
  return{node,events,frames,calls,native};
 }
 test('all memo toolbars install the accessible plug button and source Escape cancels its generation',async()=>{

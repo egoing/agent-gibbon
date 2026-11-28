@@ -131,3 +131,5 @@ input:focus-visible,a:focus-visible{outline:2px solid var(--manager-focus);outli
 .updater-help { margin-top:16px; }
 .updater-help summary { cursor:pointer; }
 .updater-help summary:focus-visible { outline:2px solid currentColor; outline-offset:2px; }
+
+#app-language { max-width: 100%; font: inherit; color: inherit; background: var(--manager-surface); padding: 6px 10px; }

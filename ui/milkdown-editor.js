@@ -13,7 +13,16 @@ import { createFormatMenu } from './editor-format-menu.js';
 // Source attributes remain serializable, but never become requests or navigation.
 const inertImage = imageSchema.extendSchema(previous => ctx => ({
   ...previous(ctx), parseDOM: [],
-  toDOM: node => ['span', { 'data-inert-image': '', contenteditable: 'false', role: 'img', 'aria-label': '이미지 표시 안 함' }, node.attrs.alt || '이미지 표시 안 함'],
+  toDOM: node => {
+    const image = document.createElement('span');
+    image.setAttribute('data-inert-image', '');
+    image.contentEditable = 'false';
+    image.setAttribute('role', 'img');
+    window.jajanLanguage.bind(image, 'aria-label', '이미지 표시 안 함');
+    if (node.attrs.alt) image.textContent = node.attrs.alt;
+    else window.jajanLanguage.bind(image, 'textContent', '이미지 표시 안 함');
+    return image;
+  },
 }));
 const inertLink = linkSchema.extendSchema(previous => ctx => ({
   ...previous(ctx), parseDOM: [], toDOM: () => ['span', { 'data-inert-link': '' }, 0],
@@ -36,7 +45,7 @@ export async function createMemoEditor(root, onChange) {
     const button = document.createElement('button');
     button.type = 'button'; button.className = 'editor-task';
     button.contentEditable = 'false'; button.setAttribute('role', 'checkbox');
-    button.setAttribute('aria-label', '완료 상태');
+    window.jajanLanguage.bind(button, 'aria-label', '완료 상태');
     const contentDOM = document.createElement('div');
     dom.append(button, contentDOM);
     function update(next) {
@@ -107,12 +116,13 @@ export async function createMemoEditor(root, onChange) {
     ctx.set(rootCtx, root); ctx.set(defaultValueCtx, '');
     ctx.update(editorViewOptionsCtx, options => ({
       ...options, editable: () => !locked && !protectedSource,
-      attributes: { role: 'textbox', 'aria-label': '메모 본문', 'aria-multiline': 'true', spellcheck: 'false' },
+      attributes: () => ({ role: 'textbox', 'aria-label': window.jajanLanguage.t('메모 본문'), 'aria-multiline': 'true', spellcheck: 'false' }),
       nodeViews: { list_item: taskView },
     }));
   }).use(commonmark).use(gfm).use(inertImage).use(inertLink).use(history).use(integration).create();
   view = editor.action(ctx => ctx.get(editorViewCtx));
   view.dom.id = 'memo-editor';
+  window.jajanLanguage.bind(view.dom, 'aria-label', '메모 본문');
   formatMenu = createFormatMenu(view, root, () => !locked && !protectedSource && !status().composing);
   loading = false;
 

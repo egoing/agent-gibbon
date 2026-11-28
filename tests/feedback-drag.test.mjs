@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createFeedback } from '../ui/feedback.js';
@@ -8,7 +9,7 @@ function fixture() {
     addEventListener(k,v) {this.listeners[k]=v;}, appendChild(b) {this.children.push(b);b.remove=()=>{this.children=this.children.filter(x=>x!==b);};} });
   const elements = Object.fromEntries(['feedback','message','actions'].map(id=>[id,make()]));
   const calls=[];
-  const render=createFeedback({getElementById:id=>elements[id],createElement:make,defaultView:{navigator:{platform:'MacIntel'}}},(...args)=>calls.push(args));
+  const render=createFeedback({getElementById:id=>elements[id],createElement:make,defaultView:sourceLanguageWindow({window:{navigator:{platform:'MacIntel'}}}).window},(...args)=>calls.push(args));
   return {elements,calls,render};
 }
 test('inline footer preserves action focus identities and uses the latest revision', () => {

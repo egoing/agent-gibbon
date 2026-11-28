@@ -176,7 +176,13 @@ pub struct Note {
 }
 impl Default for Note {
     fn default() -> Self {
-        let markdown = include_str!("welcome.md").trim().to_owned();
+        let markdown = match crate::language::locale() {
+            crate::language::Locale::Ko => include_str!("welcome.md"),
+            crate::language::Locale::En => include_str!("welcome.en.md"),
+            crate::language::Locale::Ja => include_str!("welcome.ja.md"),
+        }
+        .trim()
+        .to_owned();
         let html = render(&markdown);
         Self {
             local_mutation: None,

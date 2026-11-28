@@ -19,10 +19,10 @@ function renderUpdater(status) {
   updaterStatus = status || { phase: 'error', message: '' };
   const phase = Object.hasOwn(phaseText, updaterStatus.phase) ? updaterStatus.phase : 'error';
   const version = updaterStatus.version || null;
-  updaterEl('updater-status').textContent = phaseText[phase];
-  updaterEl('updater-version').textContent = version
-    ? `현재 버전 ${updaterStatus.current_version || ''} · 새 버전 ${version}`
-    : `현재 버전 ${updaterStatus.current_version || '확인할 수 없음'}`;
+  window.jajanLanguage.bind(updaterEl('updater-status'), 'textContent', phaseText[phase]);
+  window.jajanLanguage.bind(updaterEl('updater-version'), 'textContent', version
+    ? window.jajanLanguage.msg('현재 버전 {current} · 새 버전 {version}', {current: updaterStatus.current_version || '', version})
+    : window.jajanLanguage.msg('현재 버전 {current}', {current: updaterStatus.current_version || window.jajanLanguage.msg('확인할 수 없음')}));
   const progress = updaterEl('updater-progress');
   const hasProgress = phase === 'downloading' && Number.isFinite(updaterStatus.total) && updaterStatus.total > 0;
   progress.hidden = !hasProgress;
@@ -31,16 +31,16 @@ function renderUpdater(status) {
     progress.value = Math.min(Math.max(Number(updaterStatus.downloaded) || 0, 0), updaterStatus.total);
   }
   const message = updaterEl('updater-message');
-  message.textContent = updaterStatus.message || (phase === 'disabled' ? '개발용 빌드에서는 자동 업데이트가 꺼져 있습니다.' : '');
+  window.jajanLanguage.bind(message, 'textContent', updaterStatus.message || (phase === 'disabled' ? '개발용 빌드에서는 자동 업데이트가 꺼져 있습니다.' : ''));
   message.setAttribute('role', phase === 'error' ? 'alert' : 'status');
   message.hidden = !message.textContent;
   updaterEl('updater-check').disabled = updaterBusy || phase === 'disabled' || ['checking', 'downloading', 'preparing', 'installing'].includes(phase);
-  updaterEl('updater-check').textContent = phase === 'error' ? '다시 확인' : '지금 확인';
-  updaterEl('updater-install').textContent = phase === 'preparing' ? '작업 상태 확인 중…' : phase === 'installing' ? '설치하고 재시작 중…' : '업데이트하고 재시작';
+  window.jajanLanguage.bind(updaterEl('updater-check'), 'textContent', phase === 'error' ? '다시 확인' : '지금 확인');
+  window.jajanLanguage.bind(updaterEl('updater-install'), 'textContent', phase === 'preparing' ? '작업 상태 확인 중…' : phase === 'installing' ? '설치하고 재시작 중…' : '업데이트하고 재시작');
   updaterEl('updater-install').disabled = updaterBusy || phase !== 'ready';
   if (updaterStatus.manual_test) {
     updaterEl('updater-install').disabled = true;
-    updaterEl('updater-message').textContent = updaterStatus.message || '개발자 메뉴에서 수동 시험 대기 중입니다.';
+    window.jajanLanguage.bind(updaterEl('updater-message'), 'textContent', updaterStatus.message || '개발자 메뉴에서 수동 시험 대기 중입니다.');
   }
   updaterEl('updater-install').hidden = !['ready', 'preparing', 'installing'].includes(phase);
 }

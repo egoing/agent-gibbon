@@ -123,7 +123,11 @@ pub(crate) fn install(app: &tauri::AppHandle) -> Result<(), String> {
         crate::focus::remember(app, label);
         let builder =
             WebviewWindowBuilder::new(app, label, WebviewUrl::App(format!("{label}.html").into()))
-                .title(format!("{} — {title}", crate::instance::current().title()))
+                .title(format!(
+                    "{} — {}",
+                    crate::instance::current().title(),
+                    crate::language::tr(title)
+                ))
                 .inner_size(BAR_WIDTH, BAR_HEIGHT)
                 .visible(false)
                 .focused(false)

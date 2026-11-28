@@ -15,7 +15,7 @@
       const open = document.createElement('button');
       open.type = 'button'; open.className = 'recent-open';
       open.textContent = url; open.title = url;
-      open.setAttribute('aria-label', `${url}로 이동`);
+      window.jajanLanguage.bind(open, 'aria-label', window.jajanLanguage.msg('{url}로 이동', {url}));
       open.onclick = () => {
         if (busy() || deleting) return;
         input.value = url;
@@ -23,8 +23,8 @@
       };
       const remove = document.createElement('button');
       remove.type = 'button'; remove.className = 'recent-remove';
-      remove.textContent = '삭제';
-      remove.setAttribute('aria-label', `${url} 최근 주소 삭제`);
+      window.jajanLanguage.bind(remove, 'textContent', '삭제');
+      window.jajanLanguage.bind(remove, 'aria-label', window.jajanLanguage.msg('{url} 최근 주소 삭제', {url}));
       remove.onclick = async () => {
         if (busy() || deleting) return;
         deleting = true; ++generation;
@@ -36,9 +36,9 @@
           const urls = await invoke('web_recent', {remove: url});
           render(urls);
           focusAfter = list.children[Math.min(index, urls.length - 1)]?.querySelector('.recent-remove') || input;
-          status.textContent = '최근 주소를 삭제했습니다.';
+          window.jajanLanguage.bind(status, 'textContent', '최근 주소를 삭제했습니다.');
         } catch (error) {
-          status.textContent = String(error);
+          window.jajanLanguage.bind(status, 'textContent', String(error));
         } finally {
           deleting = false;
           for (const button of list.querySelectorAll('button')) button.disabled = busy();
@@ -56,7 +56,7 @@
       const urls = await invoke('web_recent');
       if (ticket === generation) render(urls);
     } catch (error) {
-      if (ticket === generation) status.textContent = String(error);
+      if (ticket === generation) window.jajanLanguage.bind(status, 'textContent', String(error));
     }
   };
   new MutationObserver(() => {

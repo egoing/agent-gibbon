@@ -1,7 +1,7 @@
 (() => {
   const invoke = window.__TAURI__.core.invoke;
   const status = document.getElementById('status');
-  const report = error => { status.textContent = String(error); };
+  const report = error => { window.jajanLanguage.bind(status, 'textContent', String(error)); };
   const copy = document.getElementById('copy');
   const size = document.getElementById('font-size');
   const back = document.getElementById('web-back');
@@ -21,7 +21,9 @@
     scale => invoke('web_chrome', { action: 'zoom', scale }), report);
   const apply = info => {
     copy.disabled = size.disabled = back.disabled = reload.disabled = info.welcome;
-    document.getElementById('title').textContent = info.url || '웹';
+    const title = document.getElementById('title');
+    if (info.url) window.jajanLanguage.raw(title, 'textContent', info.url);
+    else window.jajanLanguage.bind(title, 'textContent', '웹');
     document.getElementById('pin').setAttribute('aria-pressed', String(info.always_on_top));
     document.querySelector('main').hidden = !info.welcome;
   };

@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -12,7 +13,7 @@ function setup(saved=null, {dark=false, failRead=false, failWrite=false, nativeI
   const doc={readyState:'loading',documentElement:{dataset:{}},getElementById:id=>ids[id],querySelectorAll:selector=>selector.includes('memo-design')?memoRadios:radios,addEventListener(_,fn){this.ready=fn;}};
   const storage={getItem(k){if(failRead)throw Error();return k==='jajan.memo-design'?memoValue:value;},setItem(k,v){if(failWrite)throw Error();if(k==='jajan.memo-design')memoValue=v;else value=v;},removeItem(){if(failWrite)throw Error();value=null;}};
   const listeners={};
-  vm.runInNewContext(source,{document:doc,window:{__TAURI__:nativeInvoke?{core:{invoke:nativeInvoke}}:undefined,matchMedia:()=>media,localStorage:storage,addEventListener:(name,fn)=>listeners[name]=fn}});
+  vm.runInNewContext(source,sourceLanguageWindow({document:doc,window:{__TAURI__:nativeInvoke?{core:{invoke:nativeInvoke}}:undefined,matchMedia:()=>media,localStorage:storage,addEventListener:(name,fn)=>listeners[name]=fn}}));
   const first=doc.documentElement.dataset.managerTheme;
   doc.readyState='interactive';doc.ready();
   return {doc,ids,media,first,radios,memoRadios,listeners,storage,value:()=>value,memoValue:()=>memoValue,chooseDesign(design){const r=memoRadios.find(r=>r.value===design);r.checked=true;r.click();},choose(theme){const r=radios.find(r=>r.value===theme);r.checked=true;r.change();},system(dark){media.matches=dark;media.change();},theme:()=>doc.documentElement.dataset.managerTheme};

@@ -1,3 +1,4 @@
+import { sourceLanguageWindow } from './fixtures/language.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -14,12 +15,12 @@ test('open and repeat reuse the same icon nodes and expose the next action', () 
     toggle: (name, on) => on ? classes.add(name) : classes.delete(name),
   };
   const window = {};
-  vm.runInNewContext(read('direction-guide.js'), {
+  vm.runInNewContext(read('direction-guide.js'), sourceLanguageWindow({
     window, document: { querySelector: selector => {
       assert.equal(selector, 'title');
       return title;
     }, body: { classList } },
-  });
+  }));
   for (const restoring of [false, false, true, true, false]) {
     window.showDirectionGuide(restoring);
     assert.match(title.textContent, restoring ? /아래로 전체 복원/ : /아래로 전체 숨기기/);

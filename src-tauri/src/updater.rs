@@ -150,8 +150,7 @@ fn check_when_due(
 }
 
 fn enabled() -> bool {
-    (!cfg!(debug_assertions) || VERIFICATION)
-        && (VERIFICATION || crate::instance::current().id.is_none())
+    (VERIFICATION || (!cfg!(debug_assertions) && crate::instance::current().id.is_none()))
         && !PUBLIC_KEY.trim().is_empty()
         && cfg!(any(target_os = "macos", windows))
 }
@@ -870,7 +869,7 @@ fn show_ready_notice(app: &tauri::AppHandle) -> Result<(), String> {
                 NOTICE_LABEL,
                 tauri::WebviewUrl::App("updater-notice.html".into()),
             )
-            .title("Jajan · 업데이트")
+            .title(crate::language::tr("Jajan · 업데이트"))
             .inner_size(360., 140.)
             .min_inner_size(320., 140.)
             .decorations(true)

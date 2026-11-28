@@ -5,7 +5,7 @@
   const rows = new Map();
   let state = [], busy = false, loaded = false;
   function feedback(message) {
-    el('skills-feedback').textContent = message || '';
+    window.jajanLanguage.bind(el('skills-feedback'), 'textContent', message || '');
     el('skills-feedback').hidden = !message;
   }
   function render(snapshot) {
@@ -16,12 +16,12 @@
         const details = document.createElement('details'); details.className = 'skill-item';
         const summary = document.createElement('summary');
         const dot = document.createElement('span'); dot.className = 'skill-dot'; dot.setAttribute('aria-hidden', 'true');
-        const name = document.createElement('span'); name.className = 'skill-name'; name.textContent = skill.name;
+        const name = document.createElement('span'); name.className = 'skill-name'; window.jajanLanguage.bind(name, 'textContent', skill.name);
         const status = document.createElement('span'); status.className = 'skill-status-label';
         summary.append(dot, name, status);
         const body = document.createElement('div'); body.className = 'skill-body';
-        const description = document.createElement('p'); description.textContent = skill.description;
-        const toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = 'skill-switch'; toggle.setAttribute('role', 'switch'); toggle.setAttribute('aria-label', skill.name);
+        const description = document.createElement('p'); window.jajanLanguage.bind(description, 'textContent', skill.description);
+        const toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = 'skill-switch'; toggle.setAttribute('role', 'switch'); window.jajanLanguage.bind(toggle, 'aria-label', skill.name);
         const label = document.createElement('span');
         const track = document.createElement('span'); track.className = 'skill-switch-track'; track.setAttribute('aria-hidden', 'true');
         toggle.append(label, track);
@@ -31,8 +31,8 @@
       }
       const value = skill.enabled ? 'On' : 'Off';
       row.details.dataset.enabled = String(skill.enabled);
-      row.status.textContent = value;
-      row.label.textContent = value;
+      window.jajanLanguage.bind(row.status, 'textContent', value);
+      window.jajanLanguage.bind(row.label, 'textContent', value);
       row.toggle.setAttribute('aria-checked', String(skill.enabled));
       row.toggle.setAttribute('aria-disabled', String(busy));
     }

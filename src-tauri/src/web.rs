@@ -230,8 +230,12 @@ pub fn entries(app: &tauri::AppHandle) -> Result<Vec<Value>, String> {
         .collect();
     ids.iter().map(|id| inspect(app, id)).collect()
 }
-fn host_title(id: &str) -> String {
-    format!("{} — 웹 — {id}", crate::instance::current().title())
+pub(crate) fn host_title(id: &str) -> String {
+    format!(
+        "{} — {} — {id}",
+        crate::instance::current().title(),
+        crate::language::tr("웹")
+    )
 }
 // Poll only registered hosts. CLI inspect also queries the remote view, reads
 // color storage and measures geometry, none of which the manager needs.
@@ -249,7 +253,7 @@ pub(crate) fn manager_entries(app: &tauri::AppHandle) -> Result<Vec<Value>, Stri
         }
         rows.push(json!({
             "id":id, "kind":"web", "session":record.session.generation.to_string(),
-            "sourceTitle":host_title(&id), "title":record.url.as_deref().unwrap_or("Welcome"),
+            "sourceTitle":host_title(&id), "title":record.url.as_deref().unwrap_or_else(|| crate::language::tr("웹 시작")),
             "visible":visible?
         }));
     }
@@ -413,7 +417,7 @@ fn popup_handler(
             format!("webpage-popup-{}", new_id()),
             WebviewUrl::External("about:blank".parse().expect("valid blank URL")),
         )
-        .title("웹 팝업")
+        .title(crate::language::tr("웹 팝업"))
         .window_features(features)
         .user_agent(MOBILE_USER_AGENT)
         .initialization_script(REMOTE_KEYS)

@@ -173,7 +173,25 @@ fn manager(window: &tauri::WebviewWindow) -> Result<(), String> {
 #[tauri::command]
 pub fn privacy_status(window: tauri::WebviewWindow) -> Result<Value, String> {
     manager(&window)?;
-    Ok(status(window.app_handle()))
+    Ok(localized_status(window.app_handle()))
+}
+fn localized_status(app: &tauri::AppHandle) -> Value {
+    let mut view = status(app);
+    let (terms, notice) = match crate::language::locale() {
+        crate::language::Locale::Ko => (TERMS, NOTICE),
+        crate::language::Locale::En => (
+            include_str!("../../docs/legal/terms.en.md"),
+            include_str!("../../docs/legal/privacy.en.md"),
+        ),
+        crate::language::Locale::Ja => (
+            include_str!("../../docs/legal/terms.ja.md"),
+            include_str!("../../docs/legal/privacy.ja.md"),
+        ),
+    };
+    view["terms_html"] = crate::model::render(terms).into();
+    view["notice_html"] = crate::model::render(notice).into();
+    view["document_locale"] = json!(crate::language::locale());
+    view
 }
 #[tauri::command]
 pub async fn privacy_save(
@@ -251,7 +269,7 @@ pub async fn privacy_save(
             });
         }
         let _ = app.emit("privacy-changed", crate::telemetry::status());
-        Ok(status(&app))
+        Ok(localized_status(&app))
     })
     .await
     .map_err(|_| "Could not update privacy settings".to_string())?

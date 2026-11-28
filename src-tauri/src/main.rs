@@ -15,6 +15,9 @@ mod update_policy;
 mod update_restore;
 mod updater;
 
+mod language;
+#[cfg(target_os = "macos")]
+mod language_menu;
 mod layout;
 mod local_trace;
 mod memo_color;
@@ -579,7 +582,14 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     let mut launch_creation = Some(app_activation::passive_creation());
     let initial_focus = focus::Targets::initial();
-    let builder = tauri::Builder::default();
+    let builder = tauri::Builder::default().plugin(
+        tauri::plugin::Builder::<_, ()>::new("language")
+            .setup(|app, _| {
+                language::initialize(app)?;
+                Ok(())
+            })
+            .build(),
+    );
     #[cfg(target_os = "macos")]
     let builder = builder
         .activate_ignoring_other_apps(false)
@@ -617,13 +627,11 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
         .manage(layout::Undo::default())
         .manage(layout::LastLayout::default())
         .manage(stash::Stash::default())
-        .manage(Mutex::new(BTreeMap::from([(
-            "main".to_string(),
-            Note::default(),
-        )])))
         .invoke_handler({
             let handler: Box<dyn Fn(tauri::ipc::Invoke) -> bool + Send + Sync> =
                 Box::new(tauri::generate_handler![
+                    language::language_status,
+                    language::language_save,
                     layout::undo_arrangement,
                     layout::overview::overview_action,
                     capture::permission_guide,
@@ -720,13 +728,14 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                 let command = invoke.message.command();
                 if updater::frozen(invoke.message.webview_ref().app_handle())
                     && !command.starts_with("updater_")
+                    && command != "language_status"
                 {
                     invoke.resolver.reject("업데이트 설치를 준비하고 있습니다");
                     return true;
                 }
                 let exempt = matches!(
                     command,
-                    "manager_set_theme" // Local cosmetic-only manager command.
+                    "language_status" | "language_save" | "manager_set_theme" // Local cosmetic-only manager command.
                         | "privacy_status"
                         | "privacy_save"
                         | "privacy_quit"
@@ -847,6 +856,12 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             }
         })
         .setup(move |app| {
+            app.manage(Mutex::new(BTreeMap::from([(
+                "main".to_owned(),
+                Note::default(),
+            )])));
+            #[cfg(target_os = "macos")]
+            language_menu::install(app.handle())?;
             local_trace::start(app.handle());
             privacy::initialize(app.handle())?;
             opacity::initialize(app.handle())?;
@@ -875,7 +890,12 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             };
             let store = storage::Store::new(root, instance);
             store.migrate_from(&data_dir.join("notes").join(instance.unwrap_or("default")))?;
-            let restored = store.load()?;
+            let mut restored = store.load()?;
+            if !restored.contains_key("main") {
+                let welcome = Note::default();
+                store.save("main", &welcome)?;
+                restored.insert("main".to_owned(), welcome);
+            }
             app.state::<feedback::Feedbacks>().restore(&restored)?;
             let ids: Vec<_> = restored
                 .keys()
