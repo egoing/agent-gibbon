@@ -173,6 +173,20 @@ void jajan_activation_prepare_close(void *memoPointer, void *managerPointer) {
     if (!manager.visible || manager.miniaturized) return;
     NSSet *above = [NSSet setWithArray:peersOf(manager, kCGWindowListOptionOnScreenAboveWindow)];
     if (!above.count) return;
+    // If closing the active memo uncovers another application, relinquish
+    // activation before AppKit picks a replacement key window during teardown.
+    if (NSApp.active && NSApp.keyWindow == memo) {
+        NSArray *below = CFBridgingRelease(CGWindowListCopyWindowInfo(
+            kCGWindowListOptionOnScreenBelowWindow | kCGWindowListExcludeDesktopElements,
+            (CGWindowID)memo.windowNumber));
+        for (NSDictionary *entry in below) {
+            if ([entry[(id)kCGWindowLayer] integerValue] != NSNormalWindowLevel) continue;
+            if ([above containsObject:entry[(id)kCGWindowNumber]] &&
+                [entry[(id)kCGWindowOwnerPID] intValue] != NSProcessInfo.processInfo.processIdentifier)
+                [NSApp deactivate];
+            break;
+        }
+    }
     NSUInteger ticket = generation;
     dispatch_block_t completion = ^{
         NSWindow *window = weakManager;
