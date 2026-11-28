@@ -392,10 +392,12 @@ fn close_hit_rect(window: tauri::WebviewWindow, rect: [f64; 4]) -> Result<(), St
         fn jajan_close_hit_rect(web: *mut std::ffi::c_void, x: f64, y: f64, w: f64, h: f64);
     }
     let [x, y, w, h] = rect;
-    window.with_webview(move |web| unsafe {
-        // with_webview supplies the live WKWebView on AppKit's main thread.
-        jajan_close_hit_rect(web.inner().cast(), x, y, w, h);
-    }).map_err(|e| e.to_string())
+    window
+        .with_webview(move |web| unsafe {
+            // with_webview supplies the live WKWebView on AppKit's main thread.
+            jajan_close_hit_rect(web.inner().cast(), x, y, w, h);
+        })
+        .map_err(|e| e.to_string())
 }
 #[tauri::command]
 fn close_note(window: tauri::WebviewWindow) -> Result<(), String> {
@@ -1088,7 +1090,12 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
             }
         }
         #[cfg(target_os = "macos")]
-        if let tauri::RunEvent::ExitRequested { code: None, ref api, .. } = _event {
+        if let tauri::RunEvent::ExitRequested {
+            code: None,
+            ref api,
+            ..
+        } = _event
+        {
             if _app.webview_windows().is_empty() {
                 // Closing the last memo leaves the tray and app switcher available.
                 api.prevent_exit();
