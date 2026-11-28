@@ -76,6 +76,47 @@ void jajan_activation_focus_content(void *pointer) {
     if (!activated) contentActivation = NO;
 }
 
+// AppKit sends the Dock action to its target, potentially with a nil sender.
+// Use the actual window as target so equal titles never share an action.
+@interface NSWindow (JajanDock)
+- (void)jajanSelectDockWindow:(id)sender;
+@end
+@implementation NSWindow (JajanDock)
+- (void)jajanSelectDockWindow:(id)sender {
+    if (self.visible && !self.miniaturized)
+        jajan_activation_focus_content((__bridge void *)self);
+}
+@end
+
+extern void jajan_populate_dock_menu(void *menu);
+
+static NSMenu *dockMenu(id delegate, SEL selector, NSApplication *app) {
+    (void)delegate;
+    (void)selector;
+    (void)app;
+    NSMenu *menu = [[NSMenu alloc] initWithTitle:@""];
+    jajan_populate_dock_menu((__bridge void *)menu);
+    return menu;
+}
+
+void jajan_add_dock_window(void *menuPointer, void *windowPointer,
+                           const unsigned char *bytes, size_t length) {
+    NSMenu *menu = (__bridge NSMenu *)menuPointer;
+    NSWindow *window = (__bridge NSWindow *)windowPointer;
+    if (!window.visible || window.miniaturized) return;
+    NSString *title = [[NSString alloc] initWithBytes:bytes length:length
+                                             encoding:NSUTF8StringEncoding];
+    NSMenuItem *item = [menu addItemWithTitle:title action:@selector(jajanSelectDockWindow:)
+                                keyEquivalent:@""];
+    // Keep the target valid if the user closes the window while the menu is open.
+    item.representedObject = window;
+    item.target = window;
+    item.state = window.keyWindow ? NSControlStateValueOn : NSControlStateValueOff;
+    if (@available(macOS 11, *)) {
+        item.image = [NSImage imageWithSystemSymbolName:@"macwindow" accessibilityDescription:nil];
+    }
+}
+
 // Tao's set_focus skips a window while its deminiaturization is animated.
 // Complete this explicit focus request on the native completion notification,
 // but never after a subsequent user input or application switch.
@@ -113,6 +154,9 @@ void jajan_activation_install(void (*callback)(void)) {
     (void)inactiveObserver;
     (void)mouseMonitor;
     openManager = callback;
+    // Supply only the optional Dock menu method on Tao's existing delegate.
+    class_addMethod(object_getClass(NSApp.delegate), @selector(applicationDockMenu:),
+                    (IMP)dockMenu, "@@:@");
     NSNotificationCenter *center = NSNotificationCenter.defaultCenter;
     inactiveObserver = [center addObserverForName:NSApplicationDidResignActiveNotification
         object:NSApp queue:nil usingBlock:^(NSNotification *notification) {

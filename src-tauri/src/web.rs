@@ -230,6 +230,26 @@ pub fn entries(app: &tauri::AppHandle) -> Result<Vec<Value>, String> {
         .collect();
     ids.iter().map(|id| inspect(app, id)).collect()
 }
+#[cfg(target_os = "macos")]
+pub(crate) fn dock_windows(app: &tauri::AppHandle) -> Vec<(WebviewWindow, String)> {
+    let state = app.state::<Windows>();
+    let Ok(records) = state.0.lock() else {
+        return Vec::new();
+    };
+    records
+        .values()
+        .filter(|r| !r.session.closing())
+        .map(|r| {
+            (
+                r.host.clone(),
+                r.url
+                    .clone()
+                    .unwrap_or_else(|| crate::language::tr("웹 시작").into()),
+            )
+        })
+        .collect()
+}
+
 pub(crate) fn host_title(id: &str) -> String {
     format!(
         "{} — {} — {id}",

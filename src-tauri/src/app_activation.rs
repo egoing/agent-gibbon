@@ -1,5 +1,6 @@
 //! App-level activation opens the singleton manager; passive windows opt out.
-use std::sync::OnceLock;
+use std::{ffi::c_void, sync::OnceLock};
+use tauri::Manager;
 
 static APP: OnceLock<tauri::AppHandle> = OnceLock::new();
 
@@ -53,6 +54,61 @@ pub fn focus_manager(window: &tauri::WebviewWindow) -> Result<(), String> {
     // reference and is canceled by input/deactivation. Called on main only.
     unsafe { jajan_activation_focus_manager(pointer) };
     Ok(())
+}
+
+// AppKit requests this snapshot on the main thread each time the Dock menu opens.
+#[no_mangle]
+extern "C" fn jajan_populate_dock_menu(menu: *mut c_void) {
+    extern "C" {
+        fn jajan_add_dock_window(
+            menu: *mut c_void,
+            window: *mut c_void,
+            bytes: *const u8,
+            len: usize,
+        );
+    }
+    let Some(app) = APP.get() else { return };
+    let add = |window: tauri::WebviewWindow, title: &str| {
+        if crate::stash::owns(&window) {
+            return;
+        }
+        if let Ok(pointer) = window.ns_window() {
+            // The live menu, window and UTF-8 slice are borrowed synchronously.
+            unsafe { jajan_add_dock_window(menu, pointer, title.as_ptr(), title.len()) }
+        }
+    };
+    let notes = app.state::<crate::AppNotes>();
+    if let Ok(notes) = notes.lock() {
+        let titles: Vec<_> = notes
+            .iter()
+            .map(|(id, note)| {
+                let title = if note.title.trim().is_empty() {
+                    crate::language::tr(if note.capture.is_some() {
+                        "화면 캡처"
+                    } else {
+                        "메모"
+                    })
+                } else {
+                    &note.title
+                };
+                (crate::label(id), title.to_owned())
+            })
+            .collect();
+        drop(notes);
+        for (label, title) in titles {
+            if let Some(window) = app.get_webview_window(&label) {
+                add(window, &title);
+            }
+        }
+    }
+    for terminal in crate::terminal::entries(app) {
+        if let Some(window) = app.get_webview_window(&terminal.id) {
+            add(window, &terminal.display_title());
+        }
+    }
+    for (window, title) in crate::web::dock_windows(app) {
+        add(window, &title);
+    }
 }
 
 extern "C" fn open_manager() {
