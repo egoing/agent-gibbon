@@ -14,6 +14,7 @@ jobs:
       - name: Check Apple notarization credentials
         shell: bash
         env:
+          DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -22,6 +23,7 @@ jobs:
           [[ "$APPLE_TEAM_ID" == 5P84RWXNB6 ]] || { echo 'Unexpected team ID'; exit 1; }
           errors=$(mktemp)
           trap 'rm -f "$errors"' EXIT
+          xcodebuild -version
           xcrun notarytool --version
           if xcrun notarytool history --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" --output-format json > /dev/null 2>"$errors"; then
