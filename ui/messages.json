@@ -1,4 +1,19 @@
 {
+  "아직 확인되지 않았습니다. 설정에서 실행 중인 앱이 허용되어 있는지 확인하세요.": {
+    "ko": "아직 확인되지 않았습니다. 설정에서 실행 중인 앱이 허용되어 있는지 확인하세요.",
+    "en": "Not confirmed yet. Check that the running app is allowed in Settings.",
+    "ja": "まだ確認できません。設定で実行中のアプリが許可されているか確認してください。"
+  },
+  "설정을 열지 못했습니다. 다시 시도하세요.": {
+    "ko": "설정을 열지 못했습니다. 다시 시도하세요.",
+    "en": "Could not open Settings. Try again.",
+    "ja": "設定を開けませんでした。もう一度お試しください。"
+  },
+  "권한 상태를 확인하지 못했습니다. 잠시 후 다시 확인합니다.": {
+    "ko": "권한 상태를 확인하지 못했습니다. 잠시 후 다시 확인합니다.",
+    "en": "Could not check permission. Checking again shortly.",
+    "ja": "権限を確認できませんでした。まもなく再確認します。"
+  },
   "위로 메모 모아보기, 오른쪽으로 오른쪽 정렬, 아래로 전체 숨기기, 왼쪽으로 화면 빈자리 배치, Esc 키로 취소": {
     "ko": "위로 메모 모아보기, 오른쪽으로 오른쪽 정렬, 아래로 전체 숨기기, 왼쪽으로 화면 빈자리 배치, Esc 키로 취소",
     "en": "Swipe up for all notes, right to align right, down to hide all, or left to arrange in free space. Press Esc to cancel.",

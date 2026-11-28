@@ -66,8 +66,8 @@ pub enum ManagerTheme {
 // app-wide appearance, memo state or persisted consent crosses this command.
 #[tauri::command]
 pub fn manager_set_theme(window: tauri::WebviewWindow, theme: ManagerTheme) -> Result<(), String> {
-    if window.label() != LABEL {
-        return Err("관리 창에서만 테마를 변경할 수 있습니다".into());
+    if !matches!(window.label(), LABEL | crate::capture::PERMISSION_GUIDE_LABEL) {
+        return Err("관리 창과 권한 창에서만 테마를 변경할 수 있습니다".into());
     }
     #[cfg(target_os = "macos")]
     {

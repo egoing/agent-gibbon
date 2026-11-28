@@ -16,6 +16,8 @@ use std::{
 use tauri::{Manager, WebviewWindow};
 use xcap::image::{self, RgbaImage};
 
+pub(crate) const PERMISSION_GUIDE_LABEL: &str = "permission-guide";
+
 #[derive(Clone, Serialize, Deserialize)]
 pub struct ImageNote {
     pub x: f64,
@@ -247,7 +249,7 @@ pub(crate) fn show_shortcut_permission_guide(app: &tauri::AppHandle) -> Result<(
 
 #[cfg(target_os = "macos")]
 fn show_permission_scope(app: &tauri::AppHandle, shortcut: bool) -> Result<(), String> {
-    if let Some(window) = app.get_webview_window("permission-guide") {
+    if let Some(window) = app.get_webview_window(PERMISSION_GUIDE_LABEL) {
         // Do not interrupt a settings flow or repeatedly raise an open guide.
         if shortcut && window.is_visible().map_err(err)? {
             return Ok(());
@@ -259,7 +261,7 @@ fn show_permission_scope(app: &tauri::AppHandle, shortcut: bool) -> Result<(), S
     }
     tauri::WebviewWindowBuilder::new(
         app,
-        "permission-guide",
+        PERMISSION_GUIDE_LABEL,
         tauri::WebviewUrl::App(if shortcut {
             "permission.html?shortcut=1".into()
         } else {
@@ -267,8 +269,11 @@ fn show_permission_scope(app: &tauri::AppHandle, shortcut: bool) -> Result<(), S
         }),
     )
     .title(crate::language::tr("Jajan 권한 설정"))
-    .inner_size(600.0, 450.0)
-    .min_inner_size(380.0, 320.0)
+    .title_bar_style(tauri::TitleBarStyle::Transparent)
+    .hidden_title(true)
+    .background_color(tauri::window::Color(223, 226, 221, 255))
+    .inner_size(600.0, 268.0)
+    .min_inner_size(380.0, 200.0)
     .focused(false)
     .always_on_top(true)
     .build()
@@ -300,7 +305,7 @@ pub fn permission_guide(
     window: tauri::WebviewWindow,
     action: String,
 ) -> Result<PermissionGuideStatus, String> {
-    if window.label() != "permission-guide" {
+    if window.label() != PERMISSION_GUIDE_LABEL {
         return Err("권한 안내 창에서 실행하세요".into());
     }
     #[cfg(target_os = "macos")]
@@ -478,7 +483,7 @@ fn begin(app: &tauri::AppHandle, mode: SelectionMode, generation: u64) -> Result
         }
     }
     #[cfg(target_os = "macos")]
-    if let Some(guide) = app.get_webview_window("permission-guide") {
+    if let Some(guide) = app.get_webview_window(PERMISSION_GUIDE_LABEL) {
         guide.close().map_err(err)?;
     }
     if !app.state::<Captures>().0.lock().map_err(err)?.is_empty() {

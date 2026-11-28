@@ -1,0 +1,26 @@
+:root {
+  color-scheme: light;
+  --manager-bg:#dfe2dd; --manager-text:#2c2f7e; --manager-border:#a0a3bc;
+  --manager-focus-surface:#cdd0d3; --manager-modal:#ffffff; --manager-surface:#dfe2dd;
+  --manager-muted:#505365; --manager-control-border:#6d7084; --manager-focus:#2c2f7e;
+  --manager-selection:rgba(44,47,126,.25); --manager-disabled:#535666;
+  --manager-error:#8c2222; --manager-error-surface:#f9e9e7;
+  --manager-success:#216b32; --manager-success-surface:#e4f0e5;
+}
+:root[data-manager-theme=white] {
+  --manager-bg:#f8f8f8; --manager-text:#2d2d2d; --manager-border:#d6d6d6;
+  --manager-focus-surface:#ffffff; --manager-modal:#ffffff; --manager-surface:#f8f8f8;
+  --manager-muted:#626262; --manager-control-border:#858585; --manager-focus:#2d2d2d;
+  --manager-selection:rgba(45,45,45,.25); --manager-disabled:#696969;
+  --manager-error:#8c2222; --manager-error-surface:#f9e9e7;
+  --manager-success:#216b32; --manager-success-surface:#e4f0e5;
+}
+:root[data-manager-theme=black] {
+  color-scheme:dark;
+  --manager-bg:#262627; --manager-text:#dfe2dd; --manager-border:#444444;
+  --manager-focus-surface:#393938; --manager-modal:#191919; --manager-surface:#262627;
+  --manager-muted:#b9bcb7; --manager-control-border:#8a8d88; --manager-focus:#dfe2dd;
+  --manager-selection:rgba(223,226,221,.25); --manager-disabled:#a4a7a2;
+  --manager-error:#ffb4ab; --manager-error-surface:#482622;
+  --manager-success:#91d69e; --manager-success-surface:#233a29;
+}
