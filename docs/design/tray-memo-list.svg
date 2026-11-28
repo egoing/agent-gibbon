@@ -7,10 +7,11 @@
 <text x="48" y="80" fill="#68727d">tray-menu-polish</text>
 <text x="48" y="110">메모 관리</text>
 
-<text x="48" y="148">영역 캡처</text>
-<text x="48" y="180">영역 텍스트 메모</text>
-<text x="48" y="212">영역 터미널</text>
-<text x="48" y="244">숨김</text>
+<text x="48" y="139">이미지 캡처</text>
+<text x="48" y="164">텍스트</text>
+<text x="48" y="189">터미널</text>
+<text x="48" y="214">웹 브라우저</text>
+<text x="48" y="239">숨김</text>
 <path d="M36 261H644" stroke="#ddd" />
 <g opacity="1"><text x="84" y="290">작업 계획</text><svg x="48" y="274" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M14 3v4a1 1 0 0 0 1 1h4" />
@@ -34,7 +35,7 @@
 <text x="48" y="430">더보기(12)</text>
 <path d="M36 446H644" stroke="#ddd" />
 <text x="48" y="472">Jajan 종료</text>
-<text x="624" y="148" text-anchor="end" opacity="0.55">Ctrl ⇧ 1</text><text x="624" y="180" text-anchor="end" opacity="0.55">Ctrl ⇧ 2</text><text x="624" y="212" text-anchor="end" opacity="0.55">Ctrl ⇧ 3</text><text x="624" y="244" text-anchor="end" opacity="0.55">Ctrl Opt ⌘</text></g><g font-size="12">
+<text x="624" y="139" text-anchor="end" opacity="0.55">Ctrl ⇧ 1</text><text x="624" y="164" text-anchor="end" opacity="0.55">Ctrl ⇧ 2</text><text x="624" y="189" text-anchor="end" opacity="0.55">Ctrl ⇧ 3</text><text x="624" y="214" text-anchor="end" opacity="0.55">Ctrl ⇧ 4</text><text x="624" y="239" text-anchor="end" opacity="0.55">Ctrl Opt ⌘</text></g><g font-size="12">
 <text x="24" y="515">설명용 macOS 시안 · 본문 예시는 일부 생략 · 하위 메뉴 없음</text>
 <text x="24" y="537">실제 창 보임 100% / 숨김 45% · 숨김 항목도 선택 가능 · PTY 상태와 독립</text>
 <text x="24" y="559">최근 30개 · 마지막 갱신 시각 내림차순 · 더보기는 관리 창의 전체 목록</text>
