@@ -8,6 +8,7 @@ extern "C" {
     fn jajan_activation_end_creation();
     fn jajan_activation_install(callback: extern "C" fn());
     fn jajan_activation_preserve_focus();
+    fn jajan_activation_prepare_close(memo: *mut std::ffi::c_void, manager: *mut std::ffi::c_void);
     fn jajan_activation_focus_content(window: *mut std::ffi::c_void);
     fn jajan_activation_focus_manager(window: *mut std::ffi::c_void);
 }
@@ -38,6 +39,18 @@ pub fn install(app: &tauri::AppHandle) {
 pub fn preserve_focus() {
     // SAFETY: focus transactions and native window operations run on main.
     unsafe { jajan_activation_preserve_focus() };
+}
+
+pub fn prepare_close(
+    memo: &tauri::WebviewWindow,
+    manager: &tauri::WebviewWindow,
+) -> Result<(), String> {
+    let memo = memo.ns_window().map_err(|e| e.to_string())?;
+    let manager = manager.ns_window().map_err(|e| e.to_string())?;
+    // SAFETY: both windows are live on main. The native close completion
+    // belongs to the memo and holds only a weak reference to the manager.
+    unsafe { jajan_activation_prepare_close(memo, manager) };
+    Ok(())
 }
 
 pub fn focus_content(window: &tauri::WebviewWindow) -> Result<(), String> {
