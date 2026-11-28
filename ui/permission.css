@@ -1,3 +1,66 @@
-*{box-sizing:border-box}body{margin:0;color:#21151c;background:linear-gradient(130deg,#bdabb4,#b18c9d);font:14px -apple-system,sans-serif}main{max-width:660px;margin:auto;padding:24px;text-align:center}img{width:52px}h1{font-size:25px;margin:10px}section,aside{background:#ffffff61;border-radius:20px;padding:16px;margin:14px 0;box-shadow:0 4px 12px #280c192d;text-align:left}section{display:flex;gap:14px;align-items:center}.symbol{font-size:26px}small{display:block;margin-top:5px}button{border:0;border-radius:18px;padding:8px 14px;font:inherit;background:#ffffff80;color:inherit}section button{margin-left:auto}button:disabled{opacity:.8}code{overflow-wrap:anywhere}
+@import url("manager-palette.css");
 
-[hidden]{display:none!important}
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--manager-text);
+  background: var(--manager-bg);
+  font: 14px/1.4 -apple-system, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+main {
+  display: grid;
+  align-content: center;
+  min-height: 100vh;
+  max-width: 660px;
+  margin: auto;
+  padding: 16px 24px;
+  text-align: center;
+}
+
+img { display: block; width: 44px; margin: auto; }
+h1 { font-size: 25px; margin: 4px 0 12px; }
+p { margin: 8px 0; }
+
+section {
+  background: var(--manager-focus-surface);
+  border: 1px solid var(--manager-border);
+  border-radius: 20px;
+  padding: 12px 16px;
+  text-align: left;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+section + section { margin-top: 10px; }
+
+.symbol { font-size: 26px; }
+small { display: block; margin-top: 3px; }
+button {
+  border: 1px solid var(--manager-control-border);
+  border-radius: 18px;
+  padding: 8px 14px;
+  font: inherit;
+  background: var(--manager-surface);
+  color: inherit;
+}
+
+small, #follow-up { color: var(--manager-muted); }
+button:disabled { color: var(--manager-disabled); }
+button:focus-visible, summary:focus-visible { outline: 2px solid var(--manager-focus); }
+
+@media (max-width: 420px) {
+  section { grid-template-columns: auto minmax(0, 1fr); }
+  section button { grid-column: 2; justify-self: start; }
+}
+
+[hidden] { display: none !important; }
+
+#follow-up { grid-column: 1 / -1; }
+#follow-up p { margin: 0 0 4px; }
+#follow-up code { display: block; }

@@ -2,6 +2,7 @@
 // Loaded synchronously in the manager head so the first paint uses the preference.
 // Only a fixed theme name crosses local IPC; memo content is never read.
 (() => {
+  const permissionView = document.documentElement.dataset.themeView === 'permission';
   const key = 'jajan.manager-theme';
   const memoDesignKey = 'jajan.memo-design';
   const validDesign = value => ['white', 'gray', 'black', 'system', 'color'].includes(value);
@@ -14,7 +15,7 @@
   function renderNativeStatus() {
     if (document.readyState === 'loading') return;
     const status = document.getElementById('theme-native-status');
-    status.hidden = !nativeError;
+    if (status) status.hidden = !nativeError;
   }
   function syncNative(theme) {
     const invoke = window.__TAURI__?.core?.invoke;
@@ -34,7 +35,7 @@
   function apply() {
     document.documentElement.dataset.managerTheme = current();
     syncNative(current());
-    if (document.readyState === 'loading') return;
+    if (permissionView || document.readyState === 'loading') return;
     for (const radio of document.querySelectorAll('input[name="manager-theme"]')) radio.checked = radio.value === (selected || 'system');
     renderNativeStatus();
     for (const radio of document.querySelectorAll('input[name="memo-design"]')) radio.checked = radio.value === memoDesign;
@@ -77,6 +78,7 @@
     apply();
   });
   apply();
+  if (permissionView) return;
   document.addEventListener('DOMContentLoaded', () => {
     for (const radio of document.querySelectorAll('input[name="manager-theme"]')) {
       radio.addEventListener('click', () => { if (radio.checked && (valid(radio.value) || radio.value === 'system')) choose(radio.value === 'system' ? null : radio.value); });

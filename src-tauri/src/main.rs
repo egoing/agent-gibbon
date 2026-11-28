@@ -203,22 +203,14 @@ fn sync_opacity(window: tauri::WebviewWindow) -> Result<f64, String> {
         #[cfg(not(any(target_os = "macos", windows)))]
         return Ok(1.0);
     }
-    if window.label() == manager::LABEL {
-        #[cfg(windows)]
-        windows_window::set_opacity(&window, 1.0)?;
+    if matches!(window.label(), manager::LABEL | capture::PERMISSION_GUIDE_LABEL) {
         #[cfg(target_os = "macos")]
-        {
-            window
-                .state::<opacity::Fades>()
-                .lock()
-                .map_err(|e| e.to_string())?
-                .remove(manager::LABEL);
-            let ptr = window.ns_window().map_err(|e| e.to_string())?;
-            // SAFETY: Tauri owns this live NSWindow; called on the main thread.
-            unsafe {
-                (&*(ptr as *const objc2_app_kit::NSWindow)).setAlphaValue(1.0);
-            }
-        }
+        window
+            .state::<opacity::Fades>()
+            .lock()
+            .map_err(|e| e.to_string())?
+            .remove(window.label());
+        opacity::set_native(&window, 1.0)?;
         return Ok(1.0);
     }
     let hovered = sync_pointer(&window)?;
@@ -1024,6 +1016,14 @@ fn serve(endpoint: ipc::Endpoint, initial_open: bool) -> Result<(), String> {
                         status: None,
                     },
                 )?;
+            }
+            #[cfg(all(target_os = "macos", debug_assertions))]
+            if instance::current().id.is_some()
+                && std::env::var_os("JAJAN_DEV_OPEN_PERMISSION_GUIDE").as_deref()
+                    == Some(std::ffi::OsStr::new("1"))
+                && !privacy::onboarding_required(app.handle())
+            {
+                capture::show_permission_guide(app.handle())?;
             }
             telemetry::install(app.handle());
             #[cfg(feature = "verification-roundtrip")]

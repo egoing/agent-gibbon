@@ -498,6 +498,7 @@ pub fn refresh(app: &tauri::AppHandle) {
 }
 fn is_memo(label: &str) -> bool {
     label != crate::manager::LABEL
+        && label != crate::capture::PERMISSION_GUIDE_LABEL
         && !matches!(label, "stash-indicator" | "direction-guide")
         && !label.starts_with("capture-")
         && !label.starts_with("feedback-")
